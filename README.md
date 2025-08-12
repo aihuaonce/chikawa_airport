@@ -8,7 +8,7 @@
 所以接下來請跟我一起做
 
 ### 1. SDK設定 
-因為flutter目前推薦用android15、API35來進行，所以到設定的Android SDK進行設定
+因為flutter目前推薦用android15、API35來進行，因此到設定的Android SDK進行設定
 - 選擇SDK Platforms，勾選右下角Show Package Details
 - 展開Android 15，勾選以下安裝(如果怕儲存空間不夠可以將Android 16取消勾選)
 	1. Android SDK Platform 35
@@ -19,9 +19,10 @@
 	2. NDK(Side by Side) 26.3.11579264
 	3. Android SDK Command-line Tools(latest) 19.0
 	4. CMake 3.22.1
+
 ### 2. 模擬器
 回到首頁，點擊在New Project / Open / Clone Repository底下的More Actions。
-選擇Virtual Device Manager，新建一個模擬器，設定如下
+- 選擇Virtual Device Manager，新建一個模擬器，設定如下
 	1. 隨便選一個機型
 	2. API選擇API 35 , Android 15.0
 	3. 選擇Google Play Intel x86_64 Atom System Image後完成
