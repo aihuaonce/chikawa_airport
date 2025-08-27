@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'login.dart'; // 你自己新增的登入頁面
+import 'nav2.dart';
 
 void main() {
   runApp(const MyApp()); // App 的進入點
@@ -15,7 +16,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const LoginPage(), // 設定第一個畫面 = 登入頁
+      home: const Nav2Page(), // 設定第一個畫面 = 登入頁
     );
   }
 }
