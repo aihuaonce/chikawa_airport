@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'home.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
@@ -66,6 +67,10 @@ class LoginPage extends StatelessWidget {
                   ),
                   onPressed: () {
                     // TODO: 登入邏輯
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => const HomePage()),
+                    );
                   },
                   child: const Text(
                     "Sign up with account",
