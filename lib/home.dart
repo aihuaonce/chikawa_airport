@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'nav1.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -11,7 +12,8 @@ class HomePage extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
         child: Column(
           children: [
-            // nav
+            Nav1Page(),
+            const SizedBox(height: 24),
             Row(
               children: [
                 ElevatedButton(
