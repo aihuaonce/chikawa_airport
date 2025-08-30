@@ -1,26 +1,50 @@
-// lib/nav2.dart
 import 'package:flutter/material.dart';
+import 'AccidentRecord.dart';
+import 'ElectronicDocuments.dart';
+import 'FlightLog.dart';
+import 'MedicalCertificate.dart';
+import 'MedicalExpenses.dart';
+import 'NursingRecord.dart';
+import 'PersonalInformation.dart';
+import 'Plan.dart';
+import 'ReferralForm.dart';
+import 'Undertaking.dart';
 
-const _light = Color(0xFF83ACA9); // 淺綠
-const _dark  = Color(0xFF274C4A); // 深綠
-const _bg    = Color(0xFFEFF7F7); // 背景淡色，可自行調整
+const _light = Color(0xFF83ACA9);
+const _dark = Color(0xFF274C4A);
+const _bg = Color(0xFFEFF7F7);
 
-/// 你要看的頁面：上方有綠色橫條的導航
 class Nav2Page extends StatefulWidget {
-  const Nav2Page({super.key});
+  final Widget? child;
+  final int initialIndex;
+
+  const Nav2Page({super.key, this.child, this.initialIndex = 0});
 
   @override
   State<Nav2Page> createState() => _Nav2PageState();
 }
 
 class _Nav2PageState extends State<Nav2Page> {
-  // >>> 這裡的清單就是橫條上的選項（可自行改順序/內容）
-  // 如果你要用「圖二」那組，就把下面這組改成圖二的文字即可。
   final List<String> items = <String>[
-    '個人資料', '飛航記錄', '事故紀錄', '處置紀錄', '醫療費用', '診斷書', '拒絕轉診切結書', '電傳文件','轉診單','護理紀錄表',
+    '個人資料',
+    '飛航記錄',
+    '事故紀錄',
+    '處置紀錄',
+    '醫療費用',
+    '診斷書',
+    '拒絕轉診切結書',
+    '電傳文件',
+    '轉診單',
+    '護理紀錄表',
   ];
 
-  int selected = 0;
+  late int selected;
+
+  @override
+  void initState() {
+    super.initState();
+    selected = widget.initialIndex;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,10 +62,15 @@ class _Nav2PageState extends State<Nav2Page> {
                   // 左：出診單（保留）
                   FilledButton.tonal(
                     style: FilledButton.styleFrom(
-                      backgroundColor:Color(0xFF6ABAD5),
+                      backgroundColor: Color(0xFF6ABAD5),
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
                     onPressed: () {},
                     child: const Text('出診單'),
@@ -60,7 +89,85 @@ class _Nav2PageState extends State<Nav2Page> {
                             child: _PillButton(
                               label: items[i],
                               active: isActive,
-                              onTap: () => setState(() => selected = i),
+                              onTap: () {
+                                // 跳轉邏輯
+                                if (items[i] == '個人資料') {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) =>
+                                          const PersonalInformationPage(),
+                                    ),
+                                  );
+                                } else if (items[i] == '飛航記錄') {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => const FlightLogPage(),
+                                    ),
+                                  );
+                                } else if (items[i] == '事故紀錄') {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) =>
+                                          const AccidentRecordPage(),
+                                    ),
+                                  );
+                                } else if (items[i] == '處置紀錄') {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => const PlanPage(),
+                                    ),
+                                  );
+                                } else if (items[i] == '醫療費用') {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) =>
+                                          const MedicalExpensesPage(),
+                                    ),
+                                  );
+                                } else if (items[i] == '診斷書') {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) =>
+                                          const MedicalCertificatePage(),
+                                    ),
+                                  );
+                                } else if (items[i] == '拒絕轉診切結書') {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => const UndertakingPage(),
+                                    ),
+                                  );
+                                } else if (items[i] == '電傳文件') {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) =>
+                                          const ElectronicDocumentsPage(),
+                                    ),
+                                  );
+                                } else if (items[i] == '轉診單') {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => const ReferralFormPage(),
+                                    ),
+                                  );
+                                } else if (items[i] == '護理紀錄表') {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => const NursingRecordPage(),
+                                    ),
+                                  );
+                                }
+                              },
                             ),
                           );
                         }),
@@ -75,8 +182,13 @@ class _Nav2PageState extends State<Nav2Page> {
                     style: FilledButton.styleFrom(
                       backgroundColor: const Color(0xFFE74C3C), // 紅色
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
                     ),
                     onPressed: () {},
                     child: const Text('呼叫救護車'),
@@ -86,7 +198,9 @@ class _Nav2PageState extends State<Nav2Page> {
                   // 右：頭像（保留）
                   const CircleAvatar(
                     radius: 18,
-                    backgroundImage: AssetImage('assets/avatar.jpg'), // 你可以換成 NetworkImage
+                    backgroundImage: AssetImage(
+                      'assets/avatar.jpg',
+                    ), // 你可以換成 NetworkImage
                     // 如果暫時沒有圖片，改用 backgroundColor 即可：
                     // backgroundColor: Colors.grey,
                   ),
@@ -98,12 +212,17 @@ class _Nav2PageState extends State<Nav2Page> {
 
             // ====== 內容區（先放占位，顯示目前選中的頁籤） ======
             Expanded(
-              child: Center(
-                child: Text(
-                  '目前選擇：${items[selected]}',
-                  style: const TextStyle(fontSize: 20, color: Colors.black87),
-                ),
-              ),
+              child:
+                  widget.child ??
+                  Center(
+                    child: Text(
+                      '目前選擇：${items[selected]}',
+                      style: const TextStyle(
+                        fontSize: 20,
+                        color: Colors.black87,
+                      ),
+                    ),
+                  ),
             ),
           ],
         ),
@@ -136,7 +255,13 @@ class _PillButton extends StatelessWidget {
         decoration: BoxDecoration(
           color: bg,
           borderRadius: BorderRadius.circular(20),
-          boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 2, offset: Offset(0, 1))],
+          boxShadow: const [
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 2,
+              offset: Offset(0, 1),
+            ),
+          ],
         ),
         child: Text(
           label,
