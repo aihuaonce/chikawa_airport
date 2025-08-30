@@ -7,13 +7,13 @@ class NursingRecordPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Nav2Page(
-      initialIndex: 9,
       child: Container(
         color: const Color(0xFFE6F6FB),
         child: const Center(
           child: Text('護理記錄表內容', style: TextStyle(color: Colors.grey)),
         ),
       ),
+      selectedIndex: 9,
     );
   }
 }

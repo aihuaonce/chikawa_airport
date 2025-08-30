@@ -13,6 +13,7 @@ class AccidentRecordPage extends StatelessWidget {
           child: Text('事故記錄內容', style: TextStyle(color: Colors.grey)),
         ),
       ),
+      selectedIndex: 2, // 確保這裡有這個參數
     );
   }
 }
