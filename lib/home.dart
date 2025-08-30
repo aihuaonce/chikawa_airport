@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'nav1.dart';
+import 'PersonalInformation.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -25,7 +26,14 @@ class HomePage extends StatelessWidget {
                       vertical: 16,
                     ),
                   ),
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const PersonalInformationPage(),
+                      ),
+                    );
+                  },
                   child: const Text('+新增病患資料'),
                 ),
                 const Spacer(),

@@ -1,27 +1,51 @@
-// lib/nav2.dart
+// nav2.dart
+
 import 'package:flutter/material.dart';
+
+// 匯入所有頁面
 import 'nav3.dart';
+import 'AccidentRecord.dart';
+import 'ElectronicDocuments.dart';
+import 'FlightLog.dart';
+import 'MedicalCertificate.dart';
+import 'MedicalExpenses.dart';
+import 'NursingRecord.dart';
+import 'PersonalInformation.dart';
+import 'Plan.dart';
+import 'ReferralForm.dart';
+import 'Undertaking.dart';
 
-const _light = Color(0xFF83ACA9); // 淺綠
-const _dark  = Color(0xFF274C4A); // 深綠
-const _bg    = Color(0xFFEFF7F7); // 背景淡色，可自行調整
 
-/// 你要看的頁面：上方有綠色橫條的導航
+const _light = Color(0xFF83ACA9);
+const _dark = Color(0xFF274C4A);
+const _bg = Color(0xFFEFF7F7);
+
 class Nav2Page extends StatefulWidget {
-  const Nav2Page({super.key});
+  final Widget child;
+  final int selectedIndex;
+
+  const Nav2Page({super.key, required this.child, required this.selectedIndex});
 
   @override
   State<Nav2Page> createState() => _Nav2PageState();
 }
 
 class _Nav2PageState extends State<Nav2Page> {
-  // >>> 這裡的清單就是橫條上的選項（可自行改順序/內容）
-  // 如果你要用「圖二」那組，就把下面這組改成圖二的文字即可。
   final List<String> items = <String>[
-    '個人資料', '飛航記錄', '事故紀錄', '處置紀錄', '醫療費用', '診斷書', '拒絕轉診切結書', '電傳文件','轉診單','護理紀錄表',
+    '個人資料',
+    '飛航記錄',
+    '事故紀錄',
+    '處置紀錄',
+    '醫療費用',
+    '診斷書',
+    '拒絕轉診切結書',
+    '電傳文件',
+    '轉診單',
+    '護理紀錄表',
   ];
 
-  int selected = 0;
+  // 移除 initState，因為我們不再需要內部狀態 `selected`
+  // 導航欄的高亮狀態將直接依賴於外部傳入的 widget.selectedIndex
 
   @override
   Widget build(BuildContext context) {
@@ -39,82 +63,181 @@ class _Nav2PageState extends State<Nav2Page> {
                   // 左：出診單（保留）
                   FilledButton.tonal(
                     style: FilledButton.styleFrom(
-                      backgroundColor:Color(0xFF6ABAD5),
+                      backgroundColor: const Color(0xFF6ABAD5),
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
                     onPressed: () {},
                     child: const Text('出診單'),
                   ),
                   const SizedBox(width: 12),
-
                   // 中：可橫向捲動的綠色分頁 Pills
                   Expanded(
                     child: SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
                       child: Row(
                         children: List.generate(items.length, (i) {
-                          final bool isActive = i == selected;
+                          final bool isActive =
+                              i ==
+                              widget
+                                  .selectedIndex; // 這裡直接使用 widget.selectedIndex
                           return Padding(
                             padding: const EdgeInsets.only(right: 8),
                             child: _PillButton(
                               label: items[i],
                               active: isActive,
-                              onTap: () => setState(() => selected = i),
+                              onTap: () {
+                                // 使用 Navigator.push，並確保每次都跳轉到對應頁面
+                                if (i == 0) {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) =>
+                                          const PersonalInformationPage(),
+                                    ),
+                                  );
+                                } else if (i == 1) {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => const FlightLogPage(),
+                                    ),
+                                  );
+                                } else if (i == 2) {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) =>
+                                          const AccidentRecordPage(),
+                                    ),
+                                  );
+                                } else if (i == 3) {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => const PlanPage(),
+                                    ),
+                                  ); // 原先您的邏輯是醫療費用，這裏是處置紀錄
+                                } else if (i == 4) {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) =>
+                                          const MedicalExpensesPage(),
+                                    ),
+                                  );
+                                } else if (i == 5) {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) =>
+                                          const MedicalCertificatePage(),
+                                    ),
+                                  );
+                                } else if (i == 6) {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => const UndertakingPage(),
+                                    ),
+                                  );
+                                } else if (i == 7) {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) =>
+                                          const ElectronicDocumentsPage(),
+                                    ),
+                                  );
+                                } else if (i == 8) {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => const ReferralFormPage(),
+                                    ),
+                                  );
+                                } else if (i == 9) {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => const NursingRecordPage(),
+                                    ),
+                                  );
+                                }
+                              },
                             ),
                           );
                         }),
                       ),
                     ),
                   ),
-
                   const SizedBox(width: 12),
-
                   // 右：呼叫救護車（保留）
                   FilledButton(
                     style: FilledButton.styleFrom(
-                      backgroundColor: const Color(0xFFE74C3C), // 紅色
+                      backgroundColor: const Color(0xFFE74C3C),
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
                     ),
                     onPressed: () {},
                     child: const Text('呼叫救護車'),
                   ),
                   const SizedBox(width: 12),
-
                   // 右：頭像（保留）
                   const CircleAvatar(
                     radius: 18,
-                    backgroundImage: AssetImage('assets/avatar.jpg'), // 你可以換成 NetworkImage
-                    // 如果暫時沒有圖片，改用 backgroundColor 即可：
-                    // backgroundColor: Colors.grey,
+                    backgroundImage: AssetImage('assets/avatar.jpg'),
                   ),
                 ],
               ),
             ),
-
             const Divider(height: 1),
 
-            // ====== 內容區（先放占位，顯示目前選中的頁籤） ======
-           Expanded(
-              child: Align(
-                alignment: Alignment.topCenter,
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 28), // 想靠上/靠下自己調
-                  child: const Nav3Section(),
-                ),
+
+            // ====== 內容區 ======
+        // ====== 內容區 ======
+          Expanded(
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 12),
+                    child: const Nav3Section(),
+                  ),
+                  const SizedBox(height: 8),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: widget.child, // 或各頁自己處理滾動就不用再包
+                    ),
+                  ),
+                ],
               ),
-            ),
+            )
+
 
                   
+
+
+
           ],
         ),
       ),
     );
   }
 }
+
+// _PillButton 維持不變
 
 /// 綠色圓角 pill 按鈕（淺綠 / 深綠 切換）
 class _PillButton extends StatelessWidget {
@@ -140,7 +263,13 @@ class _PillButton extends StatelessWidget {
         decoration: BoxDecoration(
           color: bg,
           borderRadius: BorderRadius.circular(20),
-          boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 2, offset: Offset(0, 1))],
+          boxShadow: const [
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 2,
+              offset: Offset(0, 1),
+            ),
+          ],
         ),
         child: Text(
           label,
