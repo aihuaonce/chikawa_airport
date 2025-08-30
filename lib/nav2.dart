@@ -1,5 +1,6 @@
 // lib/nav2.dart
 import 'package:flutter/material.dart';
+import 'nav3.dart';
 
 const _light = Color(0xFF83ACA9); // 淺綠
 const _dark  = Color(0xFF274C4A); // 深綠
@@ -97,14 +98,17 @@ class _Nav2PageState extends State<Nav2Page> {
             const Divider(height: 1),
 
             // ====== 內容區（先放占位，顯示目前選中的頁籤） ======
-            Expanded(
-              child: Center(
-                child: Text(
-                  '目前選擇：${items[selected]}',
-                  style: const TextStyle(fontSize: 20, color: Colors.black87),
+           Expanded(
+              child: Align(
+                alignment: Alignment.topCenter,
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 28), // 想靠上/靠下自己調
+                  child: const Nav3Section(),
                 ),
               ),
             ),
+
+                  
           ],
         ),
       ),
