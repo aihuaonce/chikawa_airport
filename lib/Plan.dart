@@ -448,6 +448,108 @@ class PlanPage extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 24),
+
+                _SectionTitle('護理師簽名'),
+                TextField(
+                  decoration: const InputDecoration(
+                    hintText: '',
+                    border: OutlineInputBorder(),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.black12),
+                    ),
+                  ),
+                  maxLines: 2,
+                ),
+                const SizedBox(height: 24),
+
+                _SectionTitle('EMT姓名'),
+                TextField(
+                  decoration: const InputDecoration(
+                    hintText: '點擊選擇(備註：EMT有到出診現場協助出診時才需填寫)',
+                    border: OutlineInputBorder(),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.black12),
+                    ),
+                  ),
+                  maxLines: 2,
+                ),
+                const SizedBox(height: 24),
+
+                _SectionTitle('EMT簽名'),
+                TextField(
+                  decoration: const InputDecoration(
+                    hintText: '',
+                    border: OutlineInputBorder(),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.black12),
+                    ),
+                  ),
+                  maxLines: 2,
+                ),
+                const SizedBox(height: 24),
+
+                _SectionTitle('協助人員姓名'),
+                TextField(
+                  decoration: const InputDecoration(
+                    hintText: '請填寫協助人員的姓名',
+                    border: OutlineInputBorder(),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.black12),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Container(
+                  width: double.infinity,
+                  color: const Color(0xFFF1F3F6),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 12,
+                    horizontal: 8,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: const [
+                      Text(
+                        '協助人員姓名',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      ),
+                      SizedBox(height: 8),
+                      Text('加入資料行', style: TextStyle(color: Colors.grey)),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 24),
+
+                _SectionTitle('特別註記'),
+                Wrap(
+                  spacing: 24,
+                  runSpacing: 8,
+                  children: [
+                    _CheckBoxItem('OHCA醫護團隊到場前有CPR'),
+                    _CheckBoxItem('OHCA醫護團隊到場前有使用AED但無電擊'),
+                    _CheckBoxItem('OHCA醫護團隊到場前有使用AED有電擊'),
+                    _CheckBoxItem('現場恢復呼吸'),
+                    _CheckBoxItem('使用自動心律復甦機'),
+                    _CheckBoxItem('空白'),
+                  ],
+                ),
+                const SizedBox(height: 24),
+
+                _SectionTitle('其他特別註記'),
+                TextField(
+                  decoration: const InputDecoration(
+                    hintText: '請輸入其他特別註記',
+                    border: OutlineInputBorder(),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.black12),
+                    ),
+                  ),
+                  maxLines: 2,
+                ),
+                const SizedBox(height: 24),
               ],
             ),
           ),
