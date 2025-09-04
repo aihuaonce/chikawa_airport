@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'nav2.dart';
 
-/// 電傳文件頁（只做 TO / FROM 單選區；上方固定橫條 & 姓名輸入已由 Nav2Page/你的元件負責）
-/// 直接當作 Nav2Page 的 child 使用。
 class ElectronicDocumentsPage extends StatefulWidget {
   const ElectronicDocumentsPage({super.key});
 
@@ -11,7 +9,7 @@ class ElectronicDocumentsPage extends StatefulWidget {
 }
 
 class _ElectronicDocumentsPageState extends State<ElectronicDocumentsPage> {
-  // ─── 兩組單選的選項 ─────────────────────────────────────────────
+  // ── 兩組單選 ─────────────────────────────────────────────
   static const String _toTitle = 'TO：桃園國際機場股份有限公司營運控制中心';
   static const List<String> _toOptions = <String>[
     'T1 03-3063578',
@@ -24,65 +22,95 @@ class _ElectronicDocumentsPageState extends State<ElectronicDocumentsPage> {
     'T2 03-3983485',
   ];
 
-  // ─── 目前被選中的索引（單選） ─────────────────────────────────
-  int? _toSelected;    // 例如 0 代表第一個、1 代表第二個
-  int? _fromSelected;  // 同上
+  int? _toSelected;
+  int? _fromSelected;
+
+  // 你想要的「大卡片」樣式參數（可以自己調）
+  static const double _outerHpad = 48; // 版面左右留白（讓底色露出更多/更少）
+  static const double _cardMaxWidth = 1100; // 卡片最大寬（寬螢幕不會太長）
+  static const EdgeInsets _cardMargin = EdgeInsets.fromLTRB(24, 0, 24, 16); // 卡片外圍 margin
+  static const double _radius = 16; // 圓角
 
   @override
   Widget build(BuildContext context) {
     return Nav2Page(
-      selectedIndex: 7, // ← 將上方 pill 高亮在「電傳文件」
+      selectedIndex: 7, // 高亮「電傳文件」
       child: Theme(
-        // ① 整體字體縮放（0.92 = 小一點；1.0 = 原本；1.08 = 大一點）
         data: Theme.of(context).copyWith(
+          // 整體字體稍微縮小點，和你上一頁一致
           textTheme: Theme.of(context).textTheme.apply(fontSizeFactor: 0.92),
         ),
-        child: Padding(
-          // ② 整體內容「往右一些」：把 left 調大即可（例如 32、40、56）
-          padding: const EdgeInsets.fromLTRB(62, 16, 24, 24),
+        child: Container(
+          color: const Color(0xFFE6F6FB),
+          padding: const EdgeInsets.symmetric(horizontal: _outerHpad, vertical: 16),
           child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // 若你有自己的「請輸入患者姓名（必填）」元件，放在這裡即可
-                // 例如：const NameRequiredBar(),
-                // 這裡先預留一點空間
-                const SizedBox(height: 8),
+            child: Align(
+              alignment: Alignment.topCenter,
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: _cardMaxWidth),
+                child: _bigCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // 如果 Nav2Page 裡的姓名輸入在外層，這裡就不放；保留一點空間就好
+                      const SizedBox(height: 4),
 
-                // ── TO 區塊 ────────────────────────────────────────
-                _SectionTitle(_toTitle),
-                const SizedBox(height: 8),
-                _RadioList(
-                  options: _toOptions,
-                  groupValue: _toSelected,
-                  onChanged: (int v) => setState(() => _toSelected = v),
+                      // ── TO 區塊 ─────────────────────────────────
+                      _SectionTitle(_toTitle),
+                      const SizedBox(height: 10),
+                      _RadioList(
+                        options: _toOptions,
+                        groupValue: _toSelected,
+                        onChanged: (int v) => setState(() => _toSelected = v),
+                      ),
+
+                      const SizedBox(height: 28),
+
+                      // ── FROM 區塊 ───────────────────────────────
+                      _SectionTitle(_fromTitle),
+                      const SizedBox(height: 10),
+                      _RadioList(
+                        options: _fromOptions,
+                        groupValue: _fromSelected,
+                        onChanged: (int v) => setState(() => _fromSelected = v),
+                      ),
+
+                      const SizedBox(height: 8),
+                    ],
+                  ),
                 ),
-
-                const SizedBox(height: 28),
-
-                // ── FROM 區塊 ──────────────────────────────────────
-                _SectionTitle(_fromTitle),
-                const SizedBox(height: 8),
-                _RadioList(
-                  options: _fromOptions,
-                  groupValue: _fromSelected,
-                  onChanged: (int v) => setState(() => _fromSelected = v),
-                ),
-
-                const SizedBox(height: 24),
-              ],
+              ),
             ),
           ),
         ),
       ),
     );
   }
+
+  // 一張大卡片
+  Widget _bigCard({required Widget child}) {
+    return Container(
+      margin: _cardMargin,
+      padding: const EdgeInsets.fromLTRB(20, 18, 20, 22),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(_radius),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x14000000),
+            blurRadius: 8,
+            offset: Offset(0, 4),
+          ),
+        ],
+      ),
+      child: child,
+    );
+  }
 }
 
-/// 區段標題（例如：TO：／FROM：）
+/// 區段標題（粗體、黑色）
 class _SectionTitle extends StatelessWidget {
   const _SectionTitle(this.text);
-
   final String text;
 
   @override
@@ -95,7 +123,7 @@ class _SectionTitle extends StatelessWidget {
   }
 }
 
-/// 單選清單（垂直排列的一組 Radio）
+/// 單選清單（垂直 Radio）
 class _RadioList extends StatelessWidget {
   const _RadioList({
     required this.options,

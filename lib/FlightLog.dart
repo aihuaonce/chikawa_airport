@@ -87,190 +87,189 @@ class _FlightLogPageState extends State<FlightLogPage> {
       child: Container(
         color: const Color(0xFFE6F6FB),
         padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 16),
-        child: SingleChildScrollView( // 允許超過可滑動
+        child: SingleChildScrollView(
           child: LayoutBuilder(
             builder: (context, c) {
               final wide = c.maxWidth >= 980;
-              final left = _card(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _sectionTitle('航空公司'),
-                    const SizedBox(height: 6),
-                    ...List.generate(mainAirlines.length, (i) {
+
+              // 左側內容
+              final leftColumn = Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _sectionTitle('航空公司'),
+                  const SizedBox(height: 6),
+                  ...List.generate(mainAirlines.length, (i) {
+                    return _radioRow(
+                      label: mainAirlines[i],
+                      selected: !useOtherAirline && airlineIndex == i,
+                      onTap: () {
+                        setState(() {
+                          useOtherAirline = false;
+                          airlineIndex = i;
+                          selectedOtherAirline = null;
+                        });
+                      },
+                    );
+                  }),
+                  // 其他航空公司 + 下拉
+                  _radioRow(
+                    key: otherAirlineKey,
+                    label: '其他航空公司',
+                    selected: useOtherAirline,
+                    onTap: () async {
+                      setState(() => useOtherAirline = true);
+                      final picked = await _pickFromMenuAt(
+                        anchorKey: otherAirlineKey,
+                        options: otherAirlines,
+                        allowSearch: true,
+                      );
+                      if (picked != null) {
+                        setState(() => selectedOtherAirline = picked);
+                      }
+                    },
+                    trailing: useOtherAirline && selectedOtherAirline != null
+                        ? Padding(
+                            padding: const EdgeInsets.only(left: 8),
+                            child: Text(
+                              selectedOtherAirline!,
+                              style: const TextStyle(
+                                fontSize: 18,
+                                color: Colors.black87,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          )
+                        : null,
+                  ),
+                ],
+              );
+
+              // 右側內容
+              final rightColumn = Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _sectionTitle('班機'),
+                  const SizedBox(height: 6),
+                  _UnderlineHintInput(
+                    controller: flightNoCtrl,
+                    focusNode: flightNoFocus,
+                    hint: '請填寫班機代碼',
+                    width: 360,
+                    hintStyle: const TextStyle(
+                      color: Colors.black87, fontSize: 18, fontWeight: FontWeight.w400),
+                    textStyle: const TextStyle(
+                      color: Colors.black87, fontSize: 20, fontWeight: FontWeight.w500),
+                  ),
+                  const SizedBox(height: 22),
+
+                  _sectionTitle('旅行狀態'),
+                  const SizedBox(height: 6),
+                  Column(
+                    children: List.generate(travelOptions.length, (i) {
                       return _radioRow(
-                        label: mainAirlines[i],
-                        selected: !useOtherAirline && airlineIndex == i,
+                        label: travelOptions[i],
+                        selected: travelStatusIndex == i,
                         onTap: () {
                           setState(() {
-                            useOtherAirline = false;
-                            airlineIndex = i;
-                            selectedOtherAirline = null;
+                            travelStatusIndex = i;
+                            if (i != travelOptions.length - 1) {
+                              otherTravelCtrl.clear();
+                            }
                           });
                         },
                       );
                     }),
-                    // 其他航空公司 + 下拉
-                    _radioRow(
-                      key: otherAirlineKey,
-                      label: '其他航空公司',
-                      selected: useOtherAirline,
-                      onTap: () async {
-                        setState(() {
-                          useOtherAirline = true;
-                        });
-                        final picked = await _pickFromMenuAt(
-                          anchorKey: otherAirlineKey,
-                          options: otherAirlines,
-                          allowSearch: true,
-                        );
-                        if (picked != null) {
-                          setState(() => selectedOtherAirline = picked);
-                        }
-                      },
-                      trailing: useOtherAirline && selectedOtherAirline != null
-                          ? Padding(
-                              padding: const EdgeInsets.only(left: 8),
-                              child: Text(
-                                selectedOtherAirline!,
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  color: Colors.black87,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            )
-                          : null,
-                    ),
-                  ],
-                ),
-              );
-
-              final right = _card(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // 班機
-                    _sectionTitle('班機'),
-                    const SizedBox(height: 6),
+                  ),
+                  if (travelStatusIndex == travelOptions.length - 1) ...[
+                    const SizedBox(height: 10),
                     _UnderlineHintInput(
-                      controller: flightNoCtrl,
-                      focusNode: flightNoFocus,
-                      hint: '請填寫班機代碼',
+                      controller: otherTravelCtrl,
+                      focusNode: otherTravelFocus,
+                      hint: '請填寫其他旅行狀態',
                       width: 360,
-                      // 調整：文字黑色 / 不粗 / 比較小
                       hintStyle: const TextStyle(
                         color: Colors.black87, fontSize: 18, fontWeight: FontWeight.w400),
                       textStyle: const TextStyle(
                         color: Colors.black87, fontSize: 20, fontWeight: FontWeight.w500),
                     ),
-                    const SizedBox(height: 22),
-
-                    // 旅行狀態（改成單選圓點）
-                    _sectionTitle('旅行狀態'),
-                    const SizedBox(height: 6),
-                    Column(
-                      children: List.generate(travelOptions.length, (i) {
-                        return _radioRow(
-                          label: travelOptions[i],
-                          selected: travelStatusIndex == i,
-                          onTap: () {
-                            setState(() {
-                              travelStatusIndex = i;
-                              if (i != travelOptions.length - 1) {
-                                otherTravelCtrl.clear();
-                              }
-                            });
-                          },
-                        );
-                      }),
-                    ),
-                    if (travelStatusIndex == travelOptions.length - 1) ...[
-                      const SizedBox(height: 10),
-                      _UnderlineHintInput(
-                        controller: otherTravelCtrl,
-                        focusNode: otherTravelFocus,
-                        hint: '請填寫其他旅行狀態',
-                        width: 360,
-                        hintStyle: const TextStyle(
-                          color: Colors.black87, fontSize: 18, fontWeight: FontWeight.w400),
-                        textStyle: const TextStyle(
-                          color: Colors.black87, fontSize: 20, fontWeight: FontWeight.w500),
-                      ),
-                    ],
-                    const SizedBox(height: 28),
-
-                    // 啟程地 / 經過地 / 目的地
-                    _sectionTitle('啟程地'),
-                    const SizedBox(height: 6),
-                    _PickField(
-                      key: depKey,
-                      placeholder: '點擊選擇啟程地',
-                      value: dep,
-                      onPick: () async {
-                        final picked = await _pickFromMenuAt(
-                          anchorKey: depKey,
-                          options: airportOptions,
-                          allowSearch: true,
-                        );
-                        if (picked != null) setState(() => dep = picked);
-                      },
-                    ),
-                    const SizedBox(height: 18),
-
-                    _sectionTitle('經過地'),
-                    const SizedBox(height: 6),
-                    _PickField(
-                      key: viaKey,
-                      placeholder: '視情況點擊選擇經過地',
-                      value: via,
-                      onPick: () async {
-                        final picked = await _pickFromMenuAt(
-                          anchorKey: viaKey,
-                          options: airportOptions,
-                          allowSearch: true,
-                        );
-                        if (picked != null) setState(() => via = picked);
-                      },
-                    ),
-                    const SizedBox(height: 18),
-
-                    _sectionTitle('目的地'),
-                    const SizedBox(height: 6),
-                    _PickField(
-                      key: destKey,
-                      placeholder: '點擊選擇目的地',
-                      value: dest,
-                      onPick: () async {
-                        final picked = await _pickFromMenuAt(
-                          anchorKey: destKey,
-                          options: airportOptions,
-                          allowSearch: true,
-                        );
-                        if (picked != null) setState(() => dest = picked);
-                      },
-                    ),
                   ],
-                ),
+                  const SizedBox(height: 28),
+
+                  _sectionTitle('啟程地'),
+                  const SizedBox(height: 6),
+                  _PickField(
+                    key: depKey,
+                    placeholder: '點擊選擇啟程地',
+                    value: dep,
+                    onPick: () async {
+                      final picked = await _pickFromMenuAt(
+                        anchorKey: depKey,
+                        options: airportOptions,
+                        allowSearch: true,
+                      );
+                      if (picked != null) setState(() => dep = picked);
+                    },
+                  ),
+                  const SizedBox(height: 18),
+
+                  _sectionTitle('經過地'),
+                  const SizedBox(height: 6),
+                  _PickField(
+                    key: viaKey,
+                    placeholder: '視情況點擊選擇經過地',
+                    value: via,
+                    onPick: () async {
+                      final picked = await _pickFromMenuAt(
+                        anchorKey: viaKey,
+                        options: airportOptions,
+                        allowSearch: true,
+                      );
+                      if (picked != null) setState(() => via = picked);
+                    },
+                  ),
+                  const SizedBox(height: 18),
+
+                  _sectionTitle('目的地'),
+                  const SizedBox(height: 6),
+                  _PickField(
+                    key: destKey,
+                    placeholder: '點擊選擇目的地',
+                    value: dest,
+                    onPick: () async {
+                      final picked = await _pickFromMenuAt(
+                        anchorKey: destKey,
+                        options: airportOptions,
+                        allowSearch: true,
+                      );
+                      if (picked != null) setState(() => dest = picked);
+                    },
+                  ),
+                ],
               );
 
+              // ======= 一張大卡片（與小卡片一樣的圓角/陰影） =======
               if (wide) {
-                return Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(child: left),
-                    const SizedBox(width: 20),
-                    Expanded(child: right),
-                  ],
+                return _bigCard(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(child: leftColumn),
+                      // 中間細分隔（可要可不要）
+                      const SizedBox(width: 24),
+                      Expanded(child: rightColumn),
+                    ],
+                  ),
                 );
               } else {
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    left,
-                    const SizedBox(height: 16),
-                    right,
-                  ],
+                return _bigCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      leftColumn,
+                      const SizedBox(height: 16),
+                      rightColumn,
+                    ],
+                  ),
                 );
               }
             },
@@ -281,15 +280,17 @@ class _FlightLogPageState extends State<FlightLogPage> {
   }
 
   // ----------------- UI 小組件 -----------------
-  Widget _card({required Widget child}) {
+
+  /// 一張「大卡片」：與原本小卡片相同的圓角與陰影
+  Widget _bigCard({required Widget child}) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
+      margin: const EdgeInsets.fromLTRB(24, 0, 24, 16),
       padding: const EdgeInsets.fromLTRB(20, 18, 20, 22),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(14), // ← 圓角
         boxShadow: const [
-          BoxShadow(
+          BoxShadow( // ← 陰影
             color: Color(0x14000000),
             blurRadius: 8,
             offset: Offset(0, 4),
@@ -322,6 +323,7 @@ class _FlightLogPageState extends State<FlightLogPage> {
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 6),
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Icon(
               selected ? Icons.radio_button_checked : Icons.radio_button_off,
@@ -329,7 +331,7 @@ class _FlightLogPageState extends State<FlightLogPage> {
               color: selected ? const Color(0xFF274C4A) : Colors.black45,
             ),
             const SizedBox(width: 10),
-            Text(label, style: const TextStyle(fontSize: 18)),
+            Flexible(child: Text(label, style: const TextStyle(fontSize: 18))),
             if (trailing != null) trailing,
           ],
         ),
@@ -447,7 +449,7 @@ class _FlightLogPageState extends State<FlightLogPage> {
   }
 }
 
-// ===== 帶「紅色提示+底線」→ (調整成 黑色/小字/不粗) =====
+// ===== 帶「提示+底線」→（空白顯示提示，有字顯示輸入；字體黑色、不粗） =====
 class _UnderlineHintInput extends StatefulWidget {
   final TextEditingController controller;
   final FocusNode focusNode;
