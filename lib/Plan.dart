@@ -1,8 +1,19 @@
 import 'package:flutter/material.dart';
 import 'nav2.dart';
 
-class PlanPage extends StatelessWidget {
+class PlanPage extends StatefulWidget {
   const PlanPage({super.key});
+
+  @override
+  State<PlanPage> createState() => _PlanPageState();
+}
+
+class _PlanPageState extends State<PlanPage> {
+  int mainSymptom = 0;
+  int history = 0;
+  int allergy = 0;
+  int diagnosisCategory = 0;
+  int classify = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -34,30 +45,44 @@ class PlanPage extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           _SectionTitle('疾病管制器篩檢'),
-                          Row(
-                            children: [
-                              Checkbox(value: false, onChanged: (_) {}),
-                            ],
-                          ),
+                          _StatefulCheckbox(),
                           const SizedBox(height: 24),
 
                           _SectionTitle('主訴'),
                           Row(
                             children: [
-                              Radio(
-                                value: 0,
-                                groupValue: 0,
-                                onChanged: (_) {},
-                                activeColor: Color(0xFF83ACA9),
+                              InkWell(
+                                onTap: () => setState(() => mainSymptom = 0),
+                                child: Row(
+                                  children: [
+                                    Radio(
+                                      value: 0,
+                                      groupValue: mainSymptom,
+                                      onChanged: (v) => setState(
+                                        () => mainSymptom = v as int,
+                                      ),
+                                      activeColor: Color(0xFF83ACA9),
+                                    ),
+                                    const Text('外傷'),
+                                  ],
+                                ),
                               ),
-                              const Text('外傷'),
-                              Radio(
-                                value: 1,
-                                groupValue: 0,
-                                onChanged: (_) {},
-                                activeColor: Color(0xFF83ACA9),
+                              InkWell(
+                                onTap: () => setState(() => mainSymptom = 1),
+                                child: Row(
+                                  children: [
+                                    Radio(
+                                      value: 1,
+                                      groupValue: mainSymptom,
+                                      onChanged: (v) => setState(
+                                        () => mainSymptom = v as int,
+                                      ),
+                                      activeColor: Color(0xFF83ACA9),
+                                    ),
+                                    const Text('非外傷'),
+                                  ],
+                                ),
                               ),
-                              const Text('非外傷'),
                             ],
                           ),
                           const SizedBox(height: 24),
@@ -187,11 +212,7 @@ class PlanPage extends StatelessWidget {
                           Row(
                             children: [
                               _SectionTitle('意識清晰'),
-                              Checkbox(
-                                value: true,
-                                onChanged: (_) {},
-                                activeColor: Color(0xFF83ACA9),
-                              ),
+                              _StatefulCheckbox(),
                             ],
                           ),
                           const SizedBox(height: 24),
@@ -199,27 +220,51 @@ class PlanPage extends StatelessWidget {
                           _SectionTitle('過去病史'),
                           Row(
                             children: [
-                              Radio(
-                                value: 0,
-                                groupValue: 0,
-                                onChanged: (_) {},
-                                activeColor: Color(0xFF83ACA9),
+                              InkWell(
+                                onTap: () => setState(() => history = 0),
+                                child: Row(
+                                  children: [
+                                    Radio(
+                                      value: 0,
+                                      groupValue: history,
+                                      onChanged: (v) =>
+                                          setState(() => history = v as int),
+                                      activeColor: Color(0xFF83ACA9),
+                                    ),
+                                    const Text('無'),
+                                  ],
+                                ),
                               ),
-                              const Text('無'),
-                              Radio(
-                                value: 1,
-                                groupValue: 0,
-                                onChanged: (_) {},
-                                activeColor: Color(0xFF83ACA9),
+                              InkWell(
+                                onTap: () => setState(() => history = 1),
+                                child: Row(
+                                  children: [
+                                    Radio(
+                                      value: 1,
+                                      groupValue: history,
+                                      onChanged: (v) =>
+                                          setState(() => history = v as int),
+                                      activeColor: Color(0xFF83ACA9),
+                                    ),
+                                    const Text('不詳'),
+                                  ],
+                                ),
                               ),
-                              const Text('不詳'),
-                              Radio(
-                                value: 2,
-                                groupValue: 0,
-                                onChanged: (_) {},
-                                activeColor: Color(0xFF83ACA9),
+                              InkWell(
+                                onTap: () => setState(() => history = 2),
+                                child: Row(
+                                  children: [
+                                    Radio(
+                                      value: 2,
+                                      groupValue: history,
+                                      onChanged: (v) =>
+                                          setState(() => history = v as int),
+                                      activeColor: Color(0xFF83ACA9),
+                                    ),
+                                    const Text('有'),
+                                  ],
+                                ),
                               ),
-                              const Text('有'),
                             ],
                           ),
                           const SizedBox(height: 16),
@@ -227,27 +272,51 @@ class PlanPage extends StatelessWidget {
                           _SectionTitle('過敏史'),
                           Row(
                             children: [
-                              Radio(
-                                value: 0,
-                                groupValue: 0,
-                                onChanged: (_) {},
-                                activeColor: Color(0xFF83ACA9),
+                              InkWell(
+                                onTap: () => setState(() => allergy = 0),
+                                child: Row(
+                                  children: [
+                                    Radio(
+                                      value: 0,
+                                      groupValue: allergy,
+                                      onChanged: (v) =>
+                                          setState(() => allergy = v as int),
+                                      activeColor: Color(0xFF83ACA9),
+                                    ),
+                                    const Text('無'),
+                                  ],
+                                ),
                               ),
-                              const Text('無'),
-                              Radio(
-                                value: 1,
-                                groupValue: 0,
-                                onChanged: (_) {},
-                                activeColor: Color(0xFF83ACA9),
+                              InkWell(
+                                onTap: () => setState(() => allergy = 1),
+                                child: Row(
+                                  children: [
+                                    Radio(
+                                      value: 1,
+                                      groupValue: allergy,
+                                      onChanged: (v) =>
+                                          setState(() => allergy = v as int),
+                                      activeColor: Color(0xFF83ACA9),
+                                    ),
+                                    const Text('不詳'),
+                                  ],
+                                ),
                               ),
-                              const Text('不詳'),
-                              Radio(
-                                value: 2,
-                                groupValue: 0,
-                                onChanged: (_) {},
-                                activeColor: Color(0xFF83ACA9),
+                              InkWell(
+                                onTap: () => setState(() => allergy = 2),
+                                child: Row(
+                                  children: [
+                                    Radio(
+                                      value: 2,
+                                      groupValue: allergy,
+                                      onChanged: (v) =>
+                                          setState(() => allergy = v as int),
+                                      activeColor: Color(0xFF83ACA9),
+                                    ),
+                                    const Text('有'),
+                                  ],
+                                ),
                               ),
-                              const Text('有'),
                             ],
                           ),
                         ],
@@ -271,27 +340,120 @@ class PlanPage extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _RadioItem('Mild Neurologic(headache、dizziness、vertigo)'),
-                    _RadioItem('Severe Neurologic(syncope、seizure、CVA)'),
-                    _RadioItem('GI non-OP (AGE Epigas mild bleeding)'),
-                    _RadioItem('GI surgical (app cholecystitis PPU)'),
+                    _RadioItem(
+                      'Mild Neurologic(headache、dizziness、vertigo)',
+                      value: 0,
+                      groupValue: diagnosisCategory,
+                      onChanged: (v) => setState(() => diagnosisCategory = v!),
+                    ),
+                    _RadioItem(
+                      'Severe Neurologic(syncope、seizure、CVA)',
+                      value: 1,
+                      groupValue: diagnosisCategory,
+                      onChanged: (v) => setState(() => diagnosisCategory = v!),
+                    ),
+                    _RadioItem(
+                      'GI non-OP (AGE Epigas mild bleeding)',
+                      value: 2,
+                      groupValue: diagnosisCategory,
+                      onChanged: (v) => setState(() => diagnosisCategory = v!),
+                    ),
+                    _RadioItem(
+                      'GI surgical (app cholecystitis PPU)',
+                      value: 3,
+                      groupValue: diagnosisCategory,
+                      onChanged: (v) => setState(() => diagnosisCategory = v!),
+                    ),
                     _RadioItem(
                       'Mild Trauma(含head injury、non-surgical intervention)',
+                      value: 4,
+                      groupValue: diagnosisCategory,
+                      onChanged: (v) => setState(() => diagnosisCategory = v!),
                     ),
-                    _RadioItem('Severe Trauma (surgical intervention)'),
-                    _RadioItem('Mild CV (Palpitation Chest pain H/T hypo)'),
-                    _RadioItem('Severe CV (AMI Arrythmia Shock Others)'),
-                    _RadioItem('RESP(Asthma、COPD)'),
-                    _RadioItem('Fever (cause undetermined)'),
-                    _RadioItem('Musculoskeletal'),
-                    _RadioItem('DM (hypoglycemia or hyperglycemia)'),
-                    _RadioItem('GU (APN Stone or others)'),
-                    _RadioItem('OHCA'),
-                    _RadioItem('Derma'),
-                    _RadioItem('GYN'),
-                    _RadioItem('OPH/ENT'),
-                    _RadioItem('Psychiatric (nervous、anxious、Alcohols/drug)'),
-                    _RadioItem('Others'),
+                    _RadioItem(
+                      'Severe Trauma (surgical intervention)',
+                      value: 5,
+                      groupValue: diagnosisCategory,
+                      onChanged: (v) => setState(() => diagnosisCategory = v!),
+                    ),
+                    _RadioItem(
+                      'Mild CV (Palpitation Chest pain H/T hypo)',
+                      value: 6,
+                      groupValue: diagnosisCategory,
+                      onChanged: (v) => setState(() => diagnosisCategory = v!),
+                    ),
+                    _RadioItem(
+                      'Severe CV (AMI Arrythmia Shock Others)',
+                      value: 7,
+                      groupValue: diagnosisCategory,
+                      onChanged: (v) => setState(() => diagnosisCategory = v!),
+                    ),
+                    _RadioItem(
+                      'RESP(Asthma、COPD)',
+                      value: 8,
+                      groupValue: diagnosisCategory,
+                      onChanged: (v) => setState(() => diagnosisCategory = v!),
+                    ),
+                    _RadioItem(
+                      'Fever (cause undetermined)',
+                      value: 9,
+                      groupValue: diagnosisCategory,
+                      onChanged: (v) => setState(() => diagnosisCategory = v!),
+                    ),
+                    _RadioItem(
+                      'Musculoskeletal',
+                      value: 10,
+                      groupValue: diagnosisCategory,
+                      onChanged: (v) => setState(() => diagnosisCategory = v!),
+                    ),
+                    _RadioItem(
+                      'DM (hypoglycemia or hyperglycemia)',
+                      value: 11,
+                      groupValue: diagnosisCategory,
+                      onChanged: (v) => setState(() => diagnosisCategory = v!),
+                    ),
+                    _RadioItem(
+                      'GU (APN Stone or others)',
+                      value: 12,
+                      groupValue: diagnosisCategory,
+                      onChanged: (v) => setState(() => diagnosisCategory = v!),
+                    ),
+                    _RadioItem(
+                      'OHCA',
+                      value: 13,
+                      groupValue: diagnosisCategory,
+                      onChanged: (v) => setState(() => diagnosisCategory = v!),
+                    ),
+                    _RadioItem(
+                      'Derma',
+                      value: 14,
+                      groupValue: diagnosisCategory,
+                      onChanged: (v) => setState(() => diagnosisCategory = v!),
+                    ),
+                    _RadioItem(
+                      'GYN',
+                      value: 15,
+                      groupValue: diagnosisCategory,
+                      onChanged: (v) => setState(() => diagnosisCategory = v!),
+                    ),
+                    _RadioItem(
+                      'OPH/ENT',
+                      value: 16,
+                      groupValue: diagnosisCategory,
+                      onChanged: (v) => setState(() => diagnosisCategory = v!),
+                    ),
+                    _RadioItem(
+                      'Psychiatric (nervous、anxious、Alcohols/drug)',
+                      value: 17,
+                      groupValue: diagnosisCategory,
+                      onChanged: (v) => setState(() => diagnosisCategory = v!),
+                    ),
+                    _RadioItem(
+                      'Others',
+                      value: 18,
+                      groupValue: diagnosisCategory,
+                      onChanged: (v) => setState(() => diagnosisCategory = v!),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 24),
@@ -363,10 +525,30 @@ class PlanPage extends StatelessWidget {
                   spacing: 24,
                   runSpacing: 8,
                   children: [
-                    _RadioItem('第一級：後陣急救'),
-                    _RadioItem('第二級：急診'),
-                    _RadioItem('第三級：急診'),
-                    _RadioItem('第四級：非緊急'),
+                    _RadioItem(
+                      '第一級：後陣急救',
+                      value: 0,
+                      groupValue: classify,
+                      onChanged: (v) => setState(() => classify = v!),
+                    ),
+                    _RadioItem(
+                      '第二級：急診',
+                      value: 1,
+                      groupValue: classify,
+                      onChanged: (v) => setState(() => classify = v!),
+                    ),
+                    _RadioItem(
+                      '第三級：急診',
+                      value: 2,
+                      groupValue: classify,
+                      onChanged: (v) => setState(() => classify = v!),
+                    ),
+                    _RadioItem(
+                      '第四級：非緊急',
+                      value: 3,
+                      groupValue: classify,
+                      onChanged: (v) => setState(() => classify = v!),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 16),
@@ -582,47 +764,35 @@ class _SectionTitle extends StatelessWidget {
 }
 
 // 單選元件
-class _RadioItem extends StatefulWidget {
+class _RadioItem extends StatelessWidget {
   final String label;
-  const _RadioItem(this.label);
-
-  @override
-  State<_RadioItem> createState() => _RadioItemState();
-}
-
-class _RadioItemState extends State<_RadioItem> {
-  static int? selectedIndex;
-  late final int index;
-
-  @override
-  void initState() {
-    super.initState();
-    index = _radioItemCount++;
-  }
-
-  static int _radioItemCount = 0;
+  final int value;
+  final int groupValue;
+  final ValueChanged<int?> onChanged;
+  const _RadioItem(
+    this.label, {
+    required this.value,
+    required this.groupValue,
+    required this.onChanged,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Radio<int>(
-          value: index,
-          groupValue: selectedIndex,
-          activeColor: Color(0xFF83ACA9),
-          onChanged: (v) {
-            setState(() {
-              selectedIndex = v;
-            });
-          },
-        ),
-        Flexible(
-          child: Text(
-            widget.label,
-            style: const TextStyle(color: Colors.black),
+    return InkWell(
+      onTap: () => onChanged(value),
+      child: Row(
+        children: [
+          Radio<int>(
+            value: value,
+            groupValue: groupValue,
+            activeColor: Color(0xFF83ACA9),
+            onChanged: onChanged,
           ),
-        ),
-      ],
+          Flexible(
+            child: Text(label, style: const TextStyle(color: Colors.black)),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -640,16 +810,46 @@ class _CheckBoxItemState extends State<_CheckBoxItem> {
   bool checked = false;
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Checkbox(
-          value: checked,
-          activeColor: const Color(0xFF83ACA9),
-          onChanged: (v) => setState(() => checked = v ?? false),
-        ),
-        Text(widget.label, style: const TextStyle(color: Colors.black)),
-      ],
+    return InkWell(
+      onTap: () => setState(() => checked = !checked),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Checkbox(
+            value: checked,
+            activeColor: const Color(0xFF83ACA9),
+            onChanged: (v) => setState(() => checked = v ?? false),
+          ),
+          Text(widget.label, style: const TextStyle(color: Colors.black)),
+        ],
+      ),
+    );
+  }
+}
+
+//可勾選可取消元件
+class _StatefulCheckbox extends StatefulWidget {
+  const _StatefulCheckbox({super.key});
+  @override
+  State<_StatefulCheckbox> createState() => _StatefulCheckboxState();
+}
+
+class _StatefulCheckboxState extends State<_StatefulCheckbox> {
+  bool checked = false;
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: () => setState(() => checked = !checked),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Checkbox(
+            value: checked,
+            activeColor: const Color(0xFF83ACA9),
+            onChanged: (v) => setState(() => checked = v ?? false),
+          ),
+        ],
+      ),
     );
   }
 }
