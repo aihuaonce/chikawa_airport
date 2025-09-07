@@ -9,11 +9,22 @@ class PlanPage extends StatefulWidget {
 }
 
 class _PlanPageState extends State<PlanPage> {
-  int mainSymptom = 0;
+  int mainSymptom = -1;
   int history = 0;
   int allergy = 0;
   int diagnosisCategory = 0;
   int classify = 0;
+
+  bool consciousClear = true;
+
+  bool screeningChecked = false;
+  final Map<String, bool> screeningMethods = {
+    '喉頭採檢': false,
+    '抽血檢驗': false,
+    '其他': false,
+  };
+
+  Map<String, bool> photoTypes = {'外傷': false, '心電圖': false, '其他': false};
 
   @override
   Widget build(BuildContext context) {
@@ -44,9 +55,126 @@ class _PlanPageState extends State<PlanPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          _SectionTitle('疾病管制器篩檢'),
-                          _StatefulCheckbox(),
+                          _SectionTitle('疾病管制署篩檢'),
+                          InkWell(
+                            onTap: () => setState(
+                              () => screeningChecked = !screeningChecked,
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Checkbox(
+                                  value: screeningChecked,
+                                  activeColor: const Color(0xFF83ACA9),
+                                  onChanged: (v) => setState(
+                                    () => screeningChecked = v ?? false,
+                                  ),
+                                ),
+                                const Text(''),
+                              ],
+                            ),
+                          ),
                           const SizedBox(height: 24),
+
+                          // 篩檢區塊（依勾選狀態顯示/隱藏）
+                          if (screeningChecked) ...[
+                            const SizedBox(height: 16),
+                            _SectionTitle('篩檢方式'),
+                            Wrap(
+                              spacing: 24,
+                              runSpacing: 8,
+                              children: screeningMethods.keys.map((label) {
+                                return InkWell(
+                                  onTap: () => setState(
+                                    () => screeningMethods[label] =
+                                        !(screeningMethods[label] ?? false),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Checkbox(
+                                        value: screeningMethods[label],
+                                        activeColor: const Color(0xFF83ACA9),
+                                        onChanged: (v) => setState(
+                                          () => screeningMethods[label] =
+                                              v ?? false,
+                                        ),
+                                      ),
+                                      Text(
+                                        label,
+                                        style: const TextStyle(
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }).toList(),
+                            ),
+                            const SizedBox(height: 16),
+                            _SectionTitle('其他篩檢方式'),
+                            TextField(
+                              decoration: const InputDecoration(
+                                hintText: '請填寫其他篩檢方式',
+                                border: OutlineInputBorder(),
+                              ),
+                            ),
+                            const SizedBox(height: 24),
+                            _SectionTitle('健康評估'),
+                            Container(
+                              width: double.infinity,
+                              color: const Color(0xFFF1F3F6),
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 12,
+                                horizontal: 8,
+                              ),
+                              child: Row(
+                                children: const [
+                                  Expanded(
+                                    flex: 2,
+                                    child: Text(
+                                      '姓名',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 2,
+                                    child: Text(
+                                      '關係',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 2,
+                                    child: Text(
+                                      '體溫',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Container(
+                              width: double.infinity,
+                              color: Colors.transparent,
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 12,
+                                horizontal: 8,
+                              ),
+                              child: const Text(
+                                '加入資料行',
+                                style: TextStyle(color: Colors.grey),
+                              ),
+                            ),
+                            // 更多資料
+                            const SizedBox(height: 24),
+                          ],
 
                           _SectionTitle('主訴'),
                           Row(
@@ -87,6 +215,39 @@ class _PlanPageState extends State<PlanPage> {
                           ),
                           const SizedBox(height: 24),
 
+                          if (mainSymptom == 0) ...[
+                            _SectionTitle('外傷'),
+                            Wrap(
+                              spacing: 16,
+                              runSpacing: 8,
+                              children: [
+                                _CheckBoxItem('鈍挫傷'),
+                                _CheckBoxItem('扭傷'),
+                                _CheckBoxItem('撕裂傷'),
+                                _CheckBoxItem('擦傷'),
+                                _CheckBoxItem('肢體變形'),
+                                _CheckBoxItem('其他'),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
+                          ],
+
+                          if (mainSymptom == 1) ...[
+                            _SectionTitle('非外傷'),
+                            Wrap(
+                              spacing: 16,
+                              runSpacing: 8,
+                              children: [
+                                _CheckBoxItem('頭頸部'),
+                                _CheckBoxItem('胸部'),
+                                _CheckBoxItem('腹部'),
+                                _CheckBoxItem('四肢'),
+                                _CheckBoxItem('其他'),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
+                          ],
+
                           _SectionTitle('補充說明'),
                           TextField(
                             decoration: const InputDecoration(
@@ -100,13 +261,52 @@ class _PlanPageState extends State<PlanPage> {
                           _SectionTitle('照片類型'),
                           Wrap(
                             spacing: 16,
-                            children: [
-                              _CheckBoxItem('外傷'),
-                              _CheckBoxItem('心電圖'),
-                              _CheckBoxItem('其他'),
-                            ],
+                            children: photoTypes.keys.map((label) {
+                              return InkWell(
+                                onTap: () => setState(
+                                  () => photoTypes[label] =
+                                      !(photoTypes[label] ?? false),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Checkbox(
+                                      value: photoTypes[label],
+                                      activeColor: const Color(0xFF83ACA9),
+                                      onChanged: (v) => setState(
+                                        () => photoTypes[label] = v ?? false,
+                                      ),
+                                    ),
+                                    Text(
+                                      label,
+                                      style: const TextStyle(
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }).toList(),
                           ),
                           const SizedBox(height: 32),
+
+                          if (photoTypes['外傷'] == true) ...[
+                            _SectionTitle('外傷照片'),
+                            _PhotoGrid(title: '外傷照片'),
+                            const SizedBox(height: 16),
+                          ],
+
+                          if (photoTypes['心電圖'] == true) ...[
+                            _SectionTitle('心電圖照片'),
+                            _PhotoGrid(title: '心電圖照片'),
+                            const SizedBox(height: 16),
+                          ],
+
+                          if (photoTypes['其他'] == true) ...[
+                            _SectionTitle('其他照片'),
+                            _PhotoGrid(title: '其他照片'),
+                            const SizedBox(height: 16),
+                          ],
 
                           // 身體檢查區塊
                           _SectionTitle('身體檢查'),
@@ -212,10 +412,142 @@ class _PlanPageState extends State<PlanPage> {
                           Row(
                             children: [
                               _SectionTitle('意識清晰'),
-                              _StatefulCheckbox(),
+                              InkWell(
+                                onTap: () => setState(
+                                  () => consciousClear = !consciousClear,
+                                ),
+                                child: Checkbox(
+                                  value: consciousClear,
+                                  activeColor: const Color(0xFF83ACA9),
+                                  onChanged: (v) => setState(
+                                    () => consciousClear = v ?? false,
+                                  ),
+                                ),
+                              ),
                             ],
                           ),
                           const SizedBox(height: 24),
+
+                          if (!consciousClear) ...[
+                            Row(
+                              children: const [
+                                Text(
+                                  'E',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                                SizedBox(width: 8),
+                                SizedBox(
+                                  width: 60,
+                                  child: TextField(
+                                    decoration: InputDecoration(
+                                      border: OutlineInputBorder(),
+                                      isDense: true, // 減少高度
+                                      contentPadding: EdgeInsets.symmetric(
+                                        horizontal: 8,
+                                        vertical: 6,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(width: 32),
+                                Text(
+                                  'V',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                                SizedBox(width: 8),
+                                SizedBox(
+                                  width: 60,
+                                  child: TextField(
+                                    decoration: InputDecoration(
+                                      border: OutlineInputBorder(),
+                                      isDense: true,
+                                      contentPadding: EdgeInsets.symmetric(
+                                        horizontal: 8,
+                                        vertical: 6,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(width: 32),
+                                Text(
+                                  'M',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                                SizedBox(width: 8),
+                                SizedBox(
+                                  width: 60,
+                                  child: TextField(
+                                    decoration: InputDecoration(
+                                      border: OutlineInputBorder(),
+                                      isDense: true,
+                                      contentPadding: EdgeInsets.symmetric(
+                                        horizontal: 8,
+                                        vertical: 6,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
+                            Row(
+                              children: const [
+                                Text(
+                                  'GCS',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                                SizedBox(width: 8),
+                                Text('0'),
+                              ],
+                            ),
+                            const SizedBox(height: 24),
+
+                            _SectionTitle('左瞳孔縮放'),
+                            Row(
+                              children: [
+                                _RadioCircle(label: '+'),
+                                _RadioCircle(label: '-'),
+                                _RadioCircle(label: '±'),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+
+                            _SectionTitle('左瞳孔大小 (mm)'),
+                            const SizedBox(width: 8),
+                            SizedBox(
+                              width: 120,
+                              child: TextField(
+                                decoration: const InputDecoration(
+                                  hintText: '輸入數字',
+                                  border: OutlineInputBorder(),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+
+                            _SectionTitle('右瞳孔縮放'),
+                            Row(
+                              children: [
+                                _RadioCircle(label: '+'),
+                                _RadioCircle(label: '-'),
+                                _RadioCircle(label: '±'),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+
+                            _SectionTitle('右瞳孔大小 (mm)'),
+                            const SizedBox(width: 8),
+                            SizedBox(
+                              width: 120,
+                              child: TextField(
+                                decoration: const InputDecoration(
+                                  hintText: '輸入數字',
+                                  border: OutlineInputBorder(),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                          ],
 
                           _SectionTitle('過去病史'),
                           Row(
@@ -827,7 +1159,7 @@ class _CheckBoxItemState extends State<_CheckBoxItem> {
   }
 }
 
-//可勾選可取消元件
+//非必選元件
 class _StatefulCheckbox extends StatefulWidget {
   const _StatefulCheckbox({super.key});
   @override
@@ -884,6 +1216,85 @@ class _BodyCheckInput extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+// 單選圓圈元件（+/-/±）
+class _RadioCircle extends StatefulWidget {
+  final String label;
+  const _RadioCircle({required this.label});
+
+  @override
+  State<_RadioCircle> createState() => _RadioCircleState();
+}
+
+class _RadioCircleState extends State<_RadioCircle> {
+  static String? selected;
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: () => setState(() => selected = widget.label),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Radio<String>(
+            value: widget.label,
+            groupValue: selected,
+            onChanged: (v) => setState(() => selected = v),
+            activeColor: Color(0xFF83ACA9),
+          ),
+          Text(widget.label),
+        ],
+      ),
+    );
+  }
+}
+
+//照片上傳元件
+class _PhotoGrid extends StatelessWidget {
+  final String title;
+  const _PhotoGrid({required this.title});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: GridView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: 6,
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 3,
+          mainAxisSpacing: 12,
+          crossAxisSpacing: 12,
+          childAspectRatio: 1,
+        ),
+        itemBuilder: (context, index) {
+          return Column(
+            children: [
+              Expanded(
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.black12),
+                    borderRadius: BorderRadius.circular(8),
+                    color: Colors.grey[200],
+                  ),
+                  child: const Center(
+                    child: Icon(
+                      Icons.add_a_photo,
+                      size: 48,
+                      color: Colors.grey,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text('$title${index + 1}', style: const TextStyle(fontSize: 12)),
+            ],
+          );
+        },
+      ),
     );
   }
 }
