@@ -26,6 +26,69 @@ class _PlanPageState extends State<PlanPage> {
 
   Map<String, bool> photoTypes = {'外傷': false, '心電圖': false, '其他': false};
 
+  bool ekgChecked = false;
+  bool sugarChecked = false;
+  TextEditingController ekgController = TextEditingController();
+  TextEditingController sugarController = TextEditingController();
+
+  bool transferOtherHospital = false;
+  int selectedOtherHospital = -1;
+  final List<String> otherHospitals = [
+    '桃園經國敏盛醫院',
+    '聖保祿醫院',
+    '衛生福利部桃園醫院',
+    '衛生福利部桃園療養院',
+    '桃園榮民總醫院',
+    '三峽恩主公醫院',
+    '其他',
+  ];
+
+  // ICD獨立
+  String? selectedICD10Main;
+  String? selectedICD10Sub1;
+  String? selectedICD10Sub2;
+
+  Future<void> _showICD10Dialog(ValueChanged<String> onSelected) async {
+    final result = await showDialog<String>(
+      context: context,
+      builder: (context) {
+        return SimpleDialog(
+          title: const Text('選擇ICD-10'),
+          children: [
+            SizedBox(
+              width: 400,
+              height: 300,
+              child: ListView(
+                children: icd10List.map((item) {
+                  return ListTile(
+                    title: Text(item),
+                    onTap: () => Navigator.pop(context, item),
+                  );
+                }).toList(),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+    if (result != null) {
+      setState(() {
+        onSelected(result);
+      });
+    }
+  }
+
+  final List<String> icd10List = [
+    'A00 Cholera - 霍亂',
+    'A00.0 Cholera due to Vibrio cholerae 01, biovar cholerae - 血清型01霍亂弧菌霍亂',
+    'A00.1 Cholera due to Vibrio cholerae 01, biovar eltor - 血清型01霍亂弧菌El Tor霍亂',
+    'A00.9 Cholera, unspecified - 霍亂',
+    'A01 Typhoid and paratyphoid fevers - 傷寒及副傷寒',
+    'A01.0 Typhoid fever - 傷寒',
+    'A01.01 Typhoid fever, unspecified - 傷寒',
+    'A01.01 Typhoid meningitis - 傷寒腦膜炎',
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Nav2Page(
@@ -798,7 +861,8 @@ class _PlanPageState extends State<PlanPage> {
                         backgroundColor: Color(0xFF83ACA9),
                         foregroundColor: Colors.white,
                       ),
-                      onPressed: () {},
+                      onPressed: () =>
+                          _showICD10Dialog((v) => selectedICD10Main = v),
                       child: const Text('ICD10CM搜尋'),
                     ),
                     const SizedBox(width: 12),
@@ -814,13 +878,18 @@ class _PlanPageState extends State<PlanPage> {
                 ),
                 const SizedBox(height: 12),
                 TextField(
+                  controller: TextEditingController(
+                    text: selectedICD10Main ?? '',
+                  ),
                   decoration: const InputDecoration(
                     hintText: '請填寫ICD-10代碼',
                     border: OutlineInputBorder(),
                   ),
+                  readOnly: true,
                 ),
                 const SizedBox(height: 24),
 
+                // 副診斷1的ICD-10
                 _SectionTitle('副診斷1的ICD-10'),
                 Row(
                   children: [
@@ -829,7 +898,8 @@ class _PlanPageState extends State<PlanPage> {
                         backgroundColor: Color(0xFF83ACA9),
                         foregroundColor: Colors.white,
                       ),
-                      onPressed: () {},
+                      onPressed: () =>
+                          _showICD10Dialog((v) => selectedICD10Sub1 = v),
                       child: const Text('ICD10CM搜尋'),
                     ),
                     const SizedBox(width: 12),
@@ -845,39 +915,86 @@ class _PlanPageState extends State<PlanPage> {
                 ),
                 const SizedBox(height: 12),
                 TextField(
+                  controller: TextEditingController(
+                    text: selectedICD10Sub1 ?? '',
+                  ),
                   decoration: const InputDecoration(
                     hintText: '請填寫ICD-10代碼',
                     border: OutlineInputBorder(),
                   ),
+                  readOnly: true,
                 ),
                 const SizedBox(height: 32),
 
-                _SectionTitle('依據分類'),
+                // 副診斷2的ICD-10
+                _SectionTitle('副診斷2的ICD-10'),
+                Row(
+                  children: [
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color(0xFF83ACA9),
+                        foregroundColor: Colors.white,
+                      ),
+                      onPressed: () =>
+                          _showICD10Dialog((v) => selectedICD10Sub2 = v),
+                      child: const Text('ICD10CM搜尋'),
+                    ),
+                    const SizedBox(width: 12),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color(0xFF83ACA9),
+                        foregroundColor: Colors.white,
+                      ),
+                      onPressed: () {},
+                      child: const Text('GOOGLE搜尋'),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: TextEditingController(
+                    text: selectedICD10Sub2 ?? '',
+                  ),
+                  decoration: const InputDecoration(
+                    hintText: '請填寫ICD-10代碼',
+                    border: OutlineInputBorder(),
+                  ),
+                  readOnly: true,
+                ),
+                const SizedBox(height: 32),
+
+                _SectionTitle('檢傷分類'),
                 Wrap(
                   spacing: 24,
                   runSpacing: 8,
                   children: [
                     _RadioItem(
-                      '第一級：後陣急救',
+                      '第一級：復甦急救',
                       value: 0,
                       groupValue: classify,
                       onChanged: (v) => setState(() => classify = v!),
                     ),
                     _RadioItem(
-                      '第二級：急診',
+                      '第二級：危急',
                       value: 1,
                       groupValue: classify,
                       onChanged: (v) => setState(() => classify = v!),
                     ),
                     _RadioItem(
-                      '第三級：急診',
+                      '第三級：緊急',
                       value: 2,
                       groupValue: classify,
                       onChanged: (v) => setState(() => classify = v!),
                     ),
                     _RadioItem(
-                      '第四級：非緊急',
+                      '第四級：次緊急',
                       value: 3,
+                      groupValue: classify,
+                      onChanged: (v) => setState(() => classify = v!),
+                    ),
+                    _RadioItem(
+                      '第五級：非緊急',
+                      value: 4,
                       groupValue: classify,
                       onChanged: (v) => setState(() => classify = v!),
                     ),
@@ -890,14 +1007,11 @@ class _PlanPageState extends State<PlanPage> {
                   spacing: 24,
                   runSpacing: 8,
                   children: [
-                    _CheckBoxItem('動脈採血'),
-                    _CheckBoxItem('靜脈採血'),
-                    _CheckBoxItem('外科處置'),
+                    _CheckBoxItem('諮詢衛教'),
                     _CheckBoxItem('內科處置'),
-                    _CheckBoxItem('藥物處方'),
-                    _CheckBoxItem('醫療器材使用'),
-                    _CheckBoxItem('CPR'),
-                    _CheckBoxItem('其他'),
+                    _CheckBoxItem('外科處置'),
+                    _CheckBoxItem('拒絕處置'),
+                    _CheckBoxItem('疑似傳染病診療'),
                   ],
                 ),
                 const SizedBox(height: 16),
@@ -907,33 +1021,154 @@ class _PlanPageState extends State<PlanPage> {
                   spacing: 24,
                   runSpacing: 8,
                   children: [
-                    _CheckBoxItem('水劑'),
-                    _CheckBoxItem('EKG心電圖'),
-                    _CheckBoxItem('血壓量測'),
-                    _CheckBoxItem('配藥'),
-                    _CheckBoxItem('藥物使用'),
+                    _CheckBoxItem('冰敷'),
+                    InkWell(
+                      onTap: () => setState(() => ekgChecked = !ekgChecked),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Checkbox(
+                            value: ekgChecked,
+                            activeColor: const Color(0xFF83ACA9),
+                            onChanged: (v) =>
+                                setState(() => ekgChecked = v ?? false),
+                          ),
+                          const Text(
+                            'EKG心電圖',
+                            style: TextStyle(color: Colors.black),
+                          ),
+                        ],
+                      ),
+                    ),
+                    InkWell(
+                      onTap: () => setState(() => sugarChecked = !sugarChecked),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Checkbox(
+                            value: sugarChecked,
+                            activeColor: const Color(0xFF83ACA9),
+                            onChanged: (v) =>
+                                setState(() => sugarChecked = v ?? false),
+                          ),
+                          const Text(
+                            '血糖',
+                            style: TextStyle(color: Colors.black),
+                          ),
+                        ],
+                      ),
+                    ),
+                    _CheckBoxItem('傷口處置'),
+                    _CheckBoxItem('簽四聯單'),
+                    _CheckBoxItem('建議轉診'),
+                    _CheckBoxItem('插管'),
                     _CheckBoxItem('CPR'),
                     _CheckBoxItem('其他'),
+                    _CheckBoxItem('氧氣使用'),
+                    _CheckBoxItem('診斷書'),
+                    _CheckBoxItem('抽痰'),
+                    _CheckBoxItem('藥物使用'),
                   ],
                 ),
                 const SizedBox(height: 16),
 
-                _SectionTitle('處理結果'),
+                if (ekgChecked) ...[
+                  _SectionTitle('心電圖判讀'),
+                  TextField(
+                    controller: ekgController,
+                    decoration: const InputDecoration(
+                      hintText: '請填寫判讀結果',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                ],
+                if (sugarChecked) ...[
+                  _SectionTitle('血糖(mg/dL)'),
+                  TextField(
+                    controller: sugarController,
+                    decoration: const InputDecoration(
+                      hintText: '請填寫血糖記錄',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                ],
+
+                _SectionTitle('後續結果'),
                 Wrap(
                   spacing: 24,
                   runSpacing: 8,
                   children: [
                     _CheckBoxItem('繼續搭機旅行'),
-                    _CheckBoxItem('轉送醫院自行回家'),
-                    _CheckBoxItem('轉送醫院由同事陪同'),
-                    _CheckBoxItem('轉送醫院由家屬陪同'),
-                    _CheckBoxItem('轉送醫院由警察陪同'),
-                    _CheckBoxItem('轉送醫院由PIS陪同'),
+                    _CheckBoxItem('休息觀察或自行回家'),
+                    _CheckBoxItem('轉聯新國際醫院'),
+                    _CheckBoxItem('轉林口長庚醫院'),
+                    StatefulBuilder(
+                      builder: (context, setSBState) => InkWell(
+                        onTap: () {
+                          setState(
+                            () =>
+                                transferOtherHospital = !transferOtherHospital,
+                          );
+                          setSBState(() {});
+                        },
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Checkbox(
+                              value: transferOtherHospital,
+                              activeColor: const Color(0xFF83ACA9),
+                              onChanged: (v) {
+                                setState(
+                                  () => transferOtherHospital = v ?? false,
+                                );
+                                setSBState(() {});
+                              },
+                            ),
+                            const Text(
+                              '轉其他醫院',
+                              style: TextStyle(color: Colors.black),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    _CheckBoxItem('建議轉診門診追蹤'),
                     _CheckBoxItem('死亡'),
                     _CheckBoxItem('拒絕轉診'),
                   ],
                 ),
                 const SizedBox(height: 24),
+                if (transferOtherHospital) ...[
+                  _SectionTitle('其他醫院'),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: List.generate(otherHospitals.length, (i) {
+                      return InkWell(
+                        onTap: () => setState(() => selectedOtherHospital = i),
+                        child: Row(
+                          children: [
+                            Radio<int>(
+                              value: i,
+                              groupValue: selectedOtherHospital,
+                              onChanged: (v) =>
+                                  setState(() => selectedOtherHospital = v!),
+                              activeColor: Color(0xFF83ACA9),
+                            ),
+                            Flexible(
+                              child: Text(
+                                otherHospitals[i],
+                                style: const TextStyle(fontSize: 16),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }),
+                  ),
+                  const SizedBox(height: 16),
+                ],
 
                 // 醫師/主責醫師
                 _SectionTitle('醫師：'),
