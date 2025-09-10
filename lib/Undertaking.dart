@@ -167,12 +167,24 @@ class _UndertakingPageState extends State<UndertakingPage> {
                         ),
 
                         // 立切結書人姓名
-                        TextField(
+                       Row(
+                        children: [
+                        const Text(
+                          "立切結書人姓名：",
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                        ),
+                        Expanded(
+                         child: TextField(
                           controller: signerController,
+                          style: const TextStyle(fontSize: 16),
                           decoration: const InputDecoration(
-                            hintText: "立切結書人姓名",
-                            border: InputBorder.none,
-                          ),
+                           hintText: "請輸入姓名",
+                           hintStyle: TextStyle(color: Colors.grey, fontSize: 16),
+                           border: InputBorder.none,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                         // 身分證字號
                         TextField(
