@@ -9,11 +9,93 @@ class PlanPage extends StatefulWidget {
 }
 
 class _PlanPageState extends State<PlanPage> {
+  void _showAddDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("新增資料行"),
+          content: const Text("這裡可以放輸入表單"),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("取消"),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text("儲存"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   int mainSymptom = -1;
   int history = 0;
   int allergy = 0;
   int diagnosisCategory = 0;
   int classify = 0;
+
+  final List<Map<String, String>> healthData = [];
+
+  void _addHealthData() {
+    final nameController = TextEditingController();
+    final relationController = TextEditingController();
+    final tempController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("新增健康評估"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: nameController,
+                decoration: const InputDecoration(labelText: "姓名"),
+              ),
+              TextField(
+                controller: relationController,
+                decoration: const InputDecoration(labelText: "關係"),
+              ),
+              TextField(
+                controller: tempController,
+                decoration: const InputDecoration(labelText: "體溫"),
+                keyboardType: TextInputType.number,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("取消"),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF83ACA9),
+                foregroundColor: Colors.white,
+              ),
+              onPressed: () {
+                setState(() {
+                  healthData.add({
+                    "name": nameController.text,
+                    "relation": relationController.text,
+                    "temp": tempController.text,
+                  });
+                });
+                Navigator.pop(context);
+              },
+              child: const Text("儲存"),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   bool consciousClear = true;
 
@@ -132,72 +214,144 @@ class _PlanPageState extends State<PlanPage> {
     Map<String, String>? result = await showDialog<Map<String, String>>(
       context: context,
       builder: (context) {
-        String drug = '';
-        String usage = '';
-        String freq = '';
-        String days = '';
-        String dose = '';
-        String unit = '';
+        String? selectedDrug;
+        String? selectedUsage;
+        String? selectedFreq;
+        String? selectedDays;
+        String? selectedDoseUnit;
         String note = '';
-        return AlertDialog(
-          title: const Text('新增藥物記錄'),
-          content: SingleChildScrollView(
-            child: Column(
-              children: [
-                TextField(
-                  decoration: const InputDecoration(labelText: '藥品名稱'),
-                  onChanged: (v) => drug = v,
+
+        final drugCategories = {
+          '口服藥': [
+            'Augmentin syrup',
+            'Peace 藥錠',
+            'Wempyn 潰瘍寧',
+            'Ciprofloxacin',
+            'Ibuprofen 佈洛芬',
+          ],
+          '注射劑': [
+            'Ventolin 吸入劑',
+            'Wycillin 筋注劑',
+            'N/S 250ml',
+            'D5W 250ml',
+            'KCL 添加液',
+          ],
+          '點滴注射': ['D5S 500ml', 'Lactated Ringer\'s 乳酸林格氏液'],
+          // 可以根據需要添加更多分類
+        };
+
+        final usageOptions = ['口服', '靜脈注射', '肌肉注射', '皮下注射'];
+        final freqOptions = ['QD', 'BID', 'TID', 'QID', 'PRN'];
+        final daysOptions = ['1 天', '3 天', '5 天', '7 天'];
+        final doseUnitOptions = ['mg', 'g', 'tab', 'amp', 'vial'];
+
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text('新增藥物記錄'),
+              content: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('藥品名稱'),
+                    ...drugCategories.entries.map((categoryEntry) {
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 8.0),
+                            child: Text(
+                              categoryEntry.key,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          Wrap(
+                            spacing: 8,
+                            children: categoryEntry.value.map((drug) {
+                              return ChoiceChip(
+                                label: Text(drug),
+                                selected: selectedDrug == drug,
+                                onSelected: (_) =>
+                                    setState(() => selectedDrug = drug),
+                              );
+                            }).toList(),
+                          ),
+                        ],
+                      );
+                    }).toList(),
+                    const SizedBox(height: 16),
+                    DropdownButtonFormField<String>(
+                      decoration: const InputDecoration(labelText: '使用方式'),
+                      items: usageOptions
+                          .map(
+                            (e) => DropdownMenuItem(value: e, child: Text(e)),
+                          )
+                          .toList(),
+                      onChanged: (v) => selectedUsage = v,
+                    ),
+                    DropdownButtonFormField<String>(
+                      decoration: const InputDecoration(labelText: '服用頻率'),
+                      items: freqOptions
+                          .map(
+                            (e) => DropdownMenuItem(value: e, child: Text(e)),
+                          )
+                          .toList(),
+                      onChanged: (v) => selectedFreq = v,
+                    ),
+                    DropdownButtonFormField<String>(
+                      decoration: const InputDecoration(labelText: '服用天數'),
+                      items: daysOptions
+                          .map(
+                            (e) => DropdownMenuItem(value: e, child: Text(e)),
+                          )
+                          .toList(),
+                      onChanged: (v) => selectedDays = v,
+                    ),
+                    DropdownButtonFormField<String>(
+                      decoration: const InputDecoration(labelText: '劑量單位'),
+                      items: doseUnitOptions
+                          .map(
+                            (e) => DropdownMenuItem(value: e, child: Text(e)),
+                          )
+                          .toList(),
+                      onChanged: (v) => selectedDoseUnit = v,
+                    ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      decoration: const InputDecoration(labelText: '備註'),
+                      onChanged: (v) => note = v,
+                    ),
+                  ],
                 ),
-                TextField(
-                  decoration: const InputDecoration(labelText: '使用方式'),
-                  onChanged: (v) => usage = v,
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('取消'),
                 ),
-                TextField(
-                  decoration: const InputDecoration(labelText: '服用頻率'),
-                  onChanged: (v) => freq = v,
-                ),
-                TextField(
-                  decoration: const InputDecoration(labelText: '服用天數'),
-                  onChanged: (v) => days = v,
-                ),
-                TextField(
-                  decoration: const InputDecoration(labelText: '劑量'),
-                  onChanged: (v) => dose = v,
-                ),
-                TextField(
-                  decoration: const InputDecoration(labelText: '劑量單位'),
-                  onChanged: (v) => unit = v,
-                ),
-                TextField(
-                  decoration: const InputDecoration(labelText: '備註'),
-                  onChanged: (v) => note = v,
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context, {
+                      '藥品名稱': selectedDrug ?? '',
+                      '使用方式': selectedUsage ?? '',
+                      '服用頻率': selectedFreq ?? '',
+                      '服用天數': selectedDays ?? '',
+                      '劑量單位': selectedDoseUnit ?? '',
+                      '備註': note,
+                    });
+                  },
+                  child: const Text('儲存'),
                 ),
               ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('取消'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context, {
-                  '藥品名稱': drug,
-                  '使用方式': usage,
-                  '服用頻率': freq,
-                  '服用天數': days,
-                  '劑量': dose,
-                  '劑量單位': unit,
-                  '備註': note,
-                });
-              },
-              child: const Text('儲存'),
-            ),
-          ],
+            );
+          },
         );
       },
     );
+
     if (result != null) {
       setState(() {
         prescriptionRows.add(result);
@@ -321,6 +475,111 @@ class _PlanPageState extends State<PlanPage> {
   }
 
   final List<String> EMTs = ['王文義', '游進昌', '胡勝捷', '黃逸斌', '吳承軒', '張致綸', '劉呈軒'];
+
+  String? _selectedHelperName;
+  final List<String> _helperNames = [
+    '方詩婷',
+    '古增正',
+    '江旺財',
+    '呂學政',
+    '海欣茹',
+    '洪雲敏',
+    '徐杰',
+    '康曉朗',
+    '黎裕昌',
+    '戴逸旻',
+    '廖詠怡',
+    '許婷涵',
+    '陳小山',
+    '王悅朗',
+    '劉金宇',
+    '彭士書',
+    '熊得志',
+    '顧小',
+    '蔡心文',
+    '程皓',
+    '楊敏度',
+    '羅尹彤',
+    '廖名用',
+    '陳國平',
+    '蘇敬婷',
+    '黃梨梅',
+    '朱森學',
+    '陳思穎',
+    '邵詩婷',
+    '莊抒捷',
+    '洪萱',
+    '林育緯',
+    '唐詠婷',
+    '蔡可葳',
+    '粘瑞敏',
+    '黃馨儀',
+    '陳冠羽',
+    '陳怡玲',
+    '吳雅柔',
+    '何文豪',
+    '王文義',
+    '游恩晶',
+    '胡雅捷',
+    '黃逸誠',
+    '吳季軒',
+    '劉曉華',
+    '張峻維',
+    '劉昱軒',
+  ];
+  Future<void> _showHelperSelectionDialog() async {
+    String? tempSelectedHelper;
+
+    String? result = await showDialog<String>(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text('選擇協助人員姓名'),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: _helperNames.map((name) {
+                    return RadioListTile<String>(
+                      title: Text(name),
+                      value: name,
+                      groupValue: tempSelectedHelper,
+                      onChanged: (String? value) {
+                        setState(() {
+                          tempSelectedHelper = value;
+                        });
+                      },
+                    );
+                  }).toList(),
+                ),
+              ),
+              actions: <Widget>[
+                TextButton(
+                  child: const Text('取消'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+                ElevatedButton(
+                  child: const Text('確定'),
+                  onPressed: () {
+                    Navigator.of(context).pop(tempSelectedHelper); // 返回選定的值
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+
+    if (result != null) {
+      setState(() {
+        _selectedHelperName = result;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -456,19 +715,48 @@ class _PlanPageState extends State<PlanPage> {
                                 ],
                               ),
                             ),
-                            Container(
-                              width: double.infinity,
-                              color: Colors.transparent,
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 12,
-                                horizontal: 8,
-                              ),
-                              child: const Text(
-                                '加入資料行',
-                                style: TextStyle(color: Colors.grey),
+                            // 顯示已新增的資料
+                            ...healthData.map((row) {
+                              return Container(
+                                width: double.infinity,
+                                color: Colors.transparent,
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 12,
+                                  horizontal: 8,
+                                ),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      flex: 2,
+                                      child: Text(row["name"] ?? ""),
+                                    ),
+                                    Expanded(
+                                      flex: 2,
+                                      child: Text(row["relation"] ?? ""),
+                                    ),
+                                    Expanded(
+                                      flex: 2,
+                                      child: Text(row["temp"] ?? ""),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }),
+                            InkWell(
+                              onTap: _addHealthData,
+                              child: Container(
+                                width: double.infinity,
+                                color: Colors.transparent,
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 12,
+                                  horizontal: 8,
+                                ),
+                                child: const Text(
+                                  '加入資料行',
+                                  style: TextStyle(color: Colors.blue),
+                                ),
                               ),
                             ),
-                            // 更多資料
                             const SizedBox(height: 24),
                           ],
 
@@ -1811,6 +2099,7 @@ class _PlanPageState extends State<PlanPage> {
                 if (prescriptionChecked) ...[
                   _SectionTitle('藥物記錄表'),
                   const SizedBox(height: 16),
+
                   Container(
                     width: double.infinity,
                     color: const Color(0xFFF1F3F6),
@@ -1872,32 +2161,11 @@ class _PlanPageState extends State<PlanPage> {
                       ],
                     ),
                   ),
-                  Container(
-                    width: double.infinity,
-                    color: Colors.transparent,
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 12,
-                      horizontal: 8,
-                    ),
-                    child: GestureDetector(
-                      onTap: _showPrescriptionDialog,
-                      child: const Text(
-                        '加入資料行',
-                        style: TextStyle(
-                          color: Colors.grey,
-                          decoration: TextDecoration.underline,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                ],
 
-                if (prescriptionRows.isNotEmpty)
-                  ...prescriptionRows.map(
-                    (row) => Container(
+                  ...prescriptionRows.map((row) {
+                    return Container(
                       width: double.infinity,
-                      color: Colors.white,
+                      color: Colors.transparent,
                       padding: const EdgeInsets.symmetric(
                         vertical: 8,
                         horizontal: 8,
@@ -1913,8 +2181,27 @@ class _PlanPageState extends State<PlanPage> {
                           Expanded(flex: 2, child: Text(row['備註'] ?? '')),
                         ],
                       ),
+                    );
+                  }).toList(),
+
+                  InkWell(
+                    onTap: _showPrescriptionDialog,
+                    child: Container(
+                      width: double.infinity,
+                      color: Colors.transparent,
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 12,
+                        horizontal: 8,
+                      ),
+                      child: const Text(
+                        '加入資料行',
+                        style: TextStyle(color: Colors.blue),
+                      ),
                     ),
                   ),
+
+                  const SizedBox(height: 16),
+                ],
 
                 if (otherChecked) ...[
                   _SectionTitle('其他處理摘要'),
@@ -2109,16 +2396,59 @@ class _PlanPageState extends State<PlanPage> {
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
-                      Text(
-                        '協助人員姓名',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
+                    children: [
+                      _SectionTitle('協助人員姓名'),
+                      _selectedHelperName != null
+                          ? Padding(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 8.0,
+                              ),
+                              child: Text(
+                                _selectedHelperName!,
+                                style: const TextStyle(fontSize: 16),
+                              ),
+                            )
+                          : TextField(
+                              decoration: const InputDecoration(
+                                hintText: '請填寫協助人員的姓名',
+                                border: OutlineInputBorder(),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.black12),
+                                ),
+                              ),
+                            ),
+                      const SizedBox(height: 12),
+                      Container(
+                        width: double.infinity,
+                        color: const Color(0xFFF1F3F6),
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 12,
+                          horizontal: 8,
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              '協助人員姓名',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            InkWell(
+                              onTap: _showHelperSelectionDialog,
+                              child: Text(
+                                _selectedHelperName == null
+                                    ? '加入資料行'
+                                    : '重新選擇協助人員',
+                                style: const TextStyle(color: Colors.blue),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      SizedBox(height: 8),
-                      Text('加入資料行', style: TextStyle(color: Colors.grey)),
+                      const SizedBox(height: 24),
                     ],
                   ),
                 ),
