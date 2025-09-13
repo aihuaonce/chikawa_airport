@@ -476,7 +476,7 @@ class _PlanPageState extends State<PlanPage> {
 
   final List<String> EMTs = ['王文義', '游進昌', '胡勝捷', '黃逸斌', '吳承軒', '張致綸', '劉呈軒'];
 
-  String? _selectedHelperName;
+  List<String> _selectedHelpers = [];
   final List<String> _helperNames = [
     '方詩婷',
     '古增正',
@@ -528,9 +528,9 @@ class _PlanPageState extends State<PlanPage> {
     '劉昱軒',
   ];
   Future<void> _showHelperSelectionDialog() async {
-    String? tempSelectedHelper;
+    List<String> tempSelected = List.from(_selectedHelpers);
 
-    String? result = await showDialog<String>(
+    List<String>? result = await showDialog<List<String>>(
       context: context,
       builder: (BuildContext context) {
         return StatefulBuilder(
@@ -541,13 +541,16 @@ class _PlanPageState extends State<PlanPage> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: _helperNames.map((name) {
-                    return RadioListTile<String>(
+                    return CheckboxListTile(
                       title: Text(name),
-                      value: name,
-                      groupValue: tempSelectedHelper,
-                      onChanged: (String? value) {
+                      value: tempSelected.contains(name),
+                      onChanged: (bool? checked) {
                         setState(() {
-                          tempSelectedHelper = value;
+                          if (checked == true) {
+                            tempSelected.add(name);
+                          } else {
+                            tempSelected.remove(name);
+                          }
                         });
                       },
                     );
@@ -564,7 +567,7 @@ class _PlanPageState extends State<PlanPage> {
                 ElevatedButton(
                   child: const Text('確定'),
                   onPressed: () {
-                    Navigator.of(context).pop(tempSelectedHelper); // 返回選定的值
+                    Navigator.of(context).pop(tempSelected); // 返回多選的值
                   },
                 ),
               ],
@@ -576,7 +579,7 @@ class _PlanPageState extends State<PlanPage> {
 
     if (result != null) {
       setState(() {
-        _selectedHelperName = result;
+        _selectedHelpers = result;
       });
     }
   }
@@ -2398,60 +2401,39 @@ class _PlanPageState extends State<PlanPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _SectionTitle('協助人員姓名'),
-                      _selectedHelperName != null
-                          ? Padding(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 8.0,
-                              ),
-                              child: Text(
-                                _selectedHelperName!,
-                                style: const TextStyle(fontSize: 16),
-                              ),
-                            )
-                          : TextField(
-                              decoration: const InputDecoration(
-                                hintText: '請填寫協助人員的姓名',
-                                border: OutlineInputBorder(),
-                                focusedBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(color: Colors.black12),
-                                ),
-                              ),
-                            ),
-                      const SizedBox(height: 12),
-                      Container(
-                        width: double.infinity,
-                        color: const Color(0xFFF1F3F6),
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 12,
-                          horizontal: 8,
+                      if (_selectedHelpers.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: _selectedHelpers
+                                .map(
+                                  (helper) => Text(
+                                    helper,
+                                    style: const TextStyle(fontSize: 16),
+                                  ),
+                                )
+                                .toList(),
+                          ),
+                        )
+                      else
+                        const Text(
+                          '尚未選擇協助人員',
+                          style: TextStyle(color: Colors.grey),
                         ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              '協助人員姓名',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            InkWell(
-                              onTap: _showHelperSelectionDialog,
-                              child: Text(
-                                _selectedHelperName == null
-                                    ? '加入資料行'
-                                    : '重新選擇協助人員',
-                                style: const TextStyle(color: Colors.blue),
-                              ),
-                            ),
-                          ],
+                      const SizedBox(height: 12),
+                      InkWell(
+                        onTap: _showHelperSelectionDialog,
+                        child: const Text(
+                          '加入協助人員',
+                          style: TextStyle(color: Colors.blue),
                         ),
                       ),
                       const SizedBox(height: 24),
                     ],
                   ),
                 ),
+
                 const SizedBox(height: 24),
 
                 _SectionTitle('特別註記'),
