@@ -16,7 +16,7 @@
 	3. Google Play Intel x86_64 Atom System Image
 - 完成後移動到SDK Tools安裝以下版本
 	1. Android SDK Build Tools 34.0.0
-	2. NDK(Side by Side) 26.3.11579264
+	2. NDK(Side by Side) 27.0.12077973
 	3. Android SDK Command-line Tools(latest) 19.0
 	4. CMake 3.22.1
 
@@ -26,5 +26,6 @@
 	1. 隨便選一個機型
 	2. API選擇API 35 , Android 15.0
 	3. 選擇Google Play Intel x86_64 Atom System Image後完成
+
 
 好耶，這樣應該就能在模擬器開啟app了，反正我是可以
