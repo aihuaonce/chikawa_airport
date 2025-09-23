@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:signature/signature.dart'; // 引入簽名套件
 import 'nav2.dart';
 
 // 自行格式化「yyyy年MM月dd日」
@@ -22,7 +23,9 @@ class _UndertakingPageState extends State<UndertakingPage> {
   bool isSelf = false;
   String relation = "";
   String doctor = "江旺財"; // 預設醫師
-  final List<String> doctorList = ["方詩旋", "古璿正", "江旺財", "呂學政", "周志勃", "金霍歌", "徐丕", "康曉妍"]; // 先用數字代替
+  final List<String> doctorList = [
+    "方詩旋", "古璿正", "江旺財", "呂學政", "周志勃", "金霍歌", "徐丕", "康曉妍"
+  ];
 
   // 其他輸入控制器
   final TextEditingController relationController = TextEditingController();
@@ -31,10 +34,16 @@ class _UndertakingPageState extends State<UndertakingPage> {
   final TextEditingController signerController = TextEditingController();
   final TextEditingController signerIdController = TextEditingController();
 
+  // 簽名控制器
+  final SignatureController _signatureController = SignatureController(
+    penStrokeWidth: 2,
+    penColor: Colors.black,
+    exportBackgroundColor: Colors.white,
+  );
+
   @override
   void initState() {
     super.initState();
-    // 綁定控制器
     signerController.addListener(() {
       setState(() {
         signerName = signerController.text;
@@ -59,6 +68,7 @@ class _UndertakingPageState extends State<UndertakingPage> {
     phoneController.dispose();
     signerController.dispose();
     signerIdController.dispose();
+    _signatureController.dispose(); // 記得釋放簽名控制器
     super.dispose();
   }
 
@@ -84,17 +94,64 @@ class _UndertakingPageState extends State<UndertakingPage> {
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
+                    children: [
+                      // 英文固定文字，代入 signerName & doctor
                       Text(
-                        "I hereby clarified ... (固定英文內容)",
-                        style: TextStyle(fontSize: 14),
+                        "I: $signerName\n"
+                        "Date of birth\n"
+                        "Here by clarified that I / my family patient had been notified by Dr. $doctor of Landseed Medical Clinic at Taiwan Taoyuan Int'l Airport, I am /my family patient is now in illness/necessary condition which needed to be transported to an advanced hospital facilites for further test and treatment. But under my our personal status/consideration, I/We decided to handle this situation by myself/ourselves, against any further medical advice I am hereby signing this consent clarified that I am /and my family are willing to take all the risks and hold all the responsibilities of any consequences, even hazardous to my/my family member's health or life integrity unexpectedly.",
+                        style: const TextStyle(fontSize: 14),
                       ),
-                      SizedBox(height: 24),
-                      Text("Signature:",
+                      const SizedBox(height: 24),
+
+                      // Signature + 簽名框
+                      const Text("Signature:",
                           style: TextStyle(
                               fontSize: 16, fontWeight: FontWeight.bold)),
-                      SizedBox(height: 60),
-                      Text("Date: (Today)"),
+                      const SizedBox(height: 8),
+
+                      // 使用 Signature widget
+                      Container(
+                        height: 150,
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.black54),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Signature(
+                          controller: _signatureController,
+                          backgroundColor: Colors.white,
+                        ),
+                      ),
+
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          TextButton(
+                            onPressed: () {
+                              _signatureController.clear();
+                            },
+                            child: const Text("重寫"),
+                          ),
+                          TextButton(
+                            onPressed: () async {
+                              if (_signatureController.isNotEmpty) {
+                                final data =
+                                    await _signatureController.toPngBytes();
+                                // 這裡你可以把簽名存檔或上傳
+                                if (data != null) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text("簽名已儲存")),
+                                  );
+                                }
+                              }
+                            },
+                            child: const Text("儲存"),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+
+                      Text("Date: $today"),
                     ],
                   ),
                 ),
@@ -103,7 +160,8 @@ class _UndertakingPageState extends State<UndertakingPage> {
 
             const SizedBox(width: 16),
 
-            // ===== 右側中文區塊 =====
+
+            // ===== 右側中文區塊（完全不動） =====
             Expanded(
               child: Card(
                 color: const Color(0xFFF9F9F9),
@@ -116,7 +174,6 @@ class _UndertakingPageState extends State<UndertakingPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // 不能直接編輯，會自動帶入
                         Text("本人： $signerName"),
                         const SizedBox(height: 8),
                         Text("身分證字號： $signerId"),
@@ -124,7 +181,6 @@ class _UndertakingPageState extends State<UndertakingPage> {
                           "$today 於桃園國際機場接受聯新國際醫院桃園國際機場醫療中心醫師",
                         ),
 
-                        // 醫師下拉選單
                         DropdownButton<String>(
                           value: doctor,
                           items: doctorList
@@ -143,8 +199,6 @@ class _UndertakingPageState extends State<UndertakingPage> {
                             "診視，醫師建議轉診至醫院繼續治療，但本人因個人因素拒絕醫師「繼續治療」之建議，致生一切後果願自行負責，與聯新國際醫院桃園國際機場醫療中心無涉。"),
 
                         const SizedBox(height: 16),
-
-                        // 是否為本人 checkbox
                         Row(
                           children: [
                             const Text("是否為本人？"),
@@ -166,57 +220,122 @@ class _UndertakingPageState extends State<UndertakingPage> {
                           ],
                         ),
 
-                        // 立切結書人姓名
-                       Row(
-                        children: [
-                        const Text(
-                          "立切結書人姓名：",
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                        ),
-                        Expanded(
-                         child: TextField(
-                          controller: signerController,
-                          style: const TextStyle(fontSize: 16),
-                          decoration: const InputDecoration(
-                           hintText: "請輸入姓名",
-                           hintStyle: TextStyle(color: Colors.grey, fontSize: 16),
-                           border: InputBorder.none,
+                        Row(
+                          children: [
+                            const Text(
+                              "立切結書人姓名：",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 16),
+                            ),
+                            Expanded(
+                              child: TextField(
+                                controller: signerController,
+                                style: const TextStyle(fontSize: 16),
+                                decoration: const InputDecoration(
+                                  hintText: "請輸入姓名",
+                                  hintStyle: TextStyle(
+                                      color: Colors.grey, fontSize: 16),
+                                  border: InputBorder.none,
                                 ),
                               ),
                             ),
                           ],
                         ),
-                        // 身分證字號
-                        TextField(
-                          controller: signerIdController,
-                          decoration: const InputDecoration(
-                            hintText: "立切結書人身分證字號",
-                            border: InputBorder.none,
-                          ),
+
+                        const SizedBox(height: 12),
+
+                        Row(
+                          children: [
+                            const Text(
+                              "立切結書人身分證字號：",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 16),
+                            ),
+                            Expanded(
+                              child: TextField(
+                                controller: signerIdController,
+                                style: const TextStyle(fontSize: 16),
+                                decoration: const InputDecoration(
+                                  hintText: "請輸入身分證字號",
+                                  hintStyle: TextStyle(
+                                      color: Colors.grey, fontSize: 16),
+                                  border: InputBorder.none,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                        // 與病患關係
-                        TextField(
-                          controller: relationController,
-                          decoration: const InputDecoration(
-                            hintText: "立切結書人與病患關係",
-                            border: InputBorder.none,
-                          ),
+
+                        const SizedBox(height: 12),
+
+                        Row(
+                          children: [
+                            const Text(
+                              "立切結書人與病患關係：",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 16),
+                            ),
+                            Expanded(
+                              child: TextField(
+                                controller: relationController,
+                                style: const TextStyle(fontSize: 16),
+                                decoration: const InputDecoration(
+                                  hintText: "例如：本人、父母、配偶",
+                                  hintStyle: TextStyle(
+                                      color: Colors.grey, fontSize: 16),
+                                  border: InputBorder.none,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                        // 住址
-                        TextField(
-                          controller: addressController,
-                          decoration: const InputDecoration(
-                            hintText: "立切結書人地址",
-                            border: InputBorder.none,
-                          ),
+
+                        const SizedBox(height: 12),
+
+                        Row(
+                          children: [
+                            const Text(
+                              "立切結書人地址：",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 16),
+                            ),
+                            Expanded(
+                              child: TextField(
+                                controller: addressController,
+                                style: const TextStyle(fontSize: 16),
+                                decoration: const InputDecoration(
+                                  hintText: "請輸入地址",
+                                  hintStyle: TextStyle(
+                                      color: Colors.grey, fontSize: 16),
+                                  border: InputBorder.none,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                        // 電話
-                        TextField(
-                          controller: phoneController,
-                          decoration: const InputDecoration(
-                            hintText: "立切結書人電話",
-                            border: InputBorder.none,
-                          ),
+
+                        const SizedBox(height: 12),
+
+                        Row(
+                          children: [
+                            const Text(
+                              "立切結書人電話：",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 16),
+                            ),
+                            Expanded(
+                              child: TextField(
+                                controller: phoneController,
+                                style: const TextStyle(fontSize: 16),
+                                decoration: const InputDecoration(
+                                  hintText: "請輸入聯絡電話",
+                                  hintStyle: TextStyle(
+                                      color: Colors.grey, fontSize: 16),
+                                  border: InputBorder.none,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
