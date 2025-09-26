@@ -13,11 +13,13 @@ part 'app_database.g.dart';
   tables: [
     Visits,
     PatientProfiles,
+    AccidentRecords,
     // 之後還有 Treatments, MedicalCosts, Diagnoses... 全部加在這裡
   ],
   daos: [
     VisitsDao,
     PatientProfilesDao,
+    AccidentRecordsDao,
     // 之後還有 TreatmentsDao, MedicalCostsDao, DiagnosesDao... 全部加在這裡
   ],
 )
@@ -30,12 +32,12 @@ class AppDatabase extends _$AppDatabase {
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
-        onCreate: (m) async => m.createAll(),
-        onUpgrade: (m, from, to) async {
-          if (from < 2) await m.createTable(visits);
-          if (from < 3) await m.createTable(patientProfiles);
-        },
-      );
+    onCreate: (m) async => m.createAll(),
+    onUpgrade: (m, from, to) async {
+      if (from < 2) await m.createTable(visits);
+      if (from < 3) await m.createTable(patientProfiles);
+    },
+  );
 }
 
 LazyDatabase _openConnection() {

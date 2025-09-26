@@ -10,3 +10,6 @@ mixin _$PatientProfilesDaoMixin on DatabaseAccessor<AppDatabase> {
   $PatientProfilesTable get patientProfiles => attachedDatabase.patientProfiles;
   $VisitsTable get visits => attachedDatabase.visits;
 }
+mixin _$AccidentRecordsDaoMixin on DatabaseAccessor<AppDatabase> {
+  $AccidentRecordsTable get accidentRecords => attachedDatabase.accidentRecords;
+}

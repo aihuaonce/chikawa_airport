@@ -1,19 +1,30 @@
 import 'package:flutter/material.dart';
+import 'routes_config.dart'; // ★ 引入 routeItems
 
 const _light = Color(0xFF83ACA9);
 const _dark = Color(0xFF274C4A);
 const _bg = Color(0xFFEFF7F7);
 
 class Nav1Page extends StatefulWidget {
-  const Nav1Page({super.key});
+  final int? visitId; // 可選
+
+  const Nav1Page({super.key, this.visitId});
 
   @override
   State<Nav1Page> createState() => _Nav1PageState();
 }
 
 class _Nav1PageState extends State<Nav1Page> {
-  final List<String> items = <String>['機場出診單', '查看報表', '衛教專區'];
-  int selected = 0;
+  late int selectedIndex;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // 根據目前路由名稱自動決定 selectedIndex
+    final currentPath = ModalRoute.of(context)!.settings.name;
+    final idx = routeItems.indexWhere((r) => r.path == currentPath);
+    selectedIndex = idx >= 0 ? idx : 0;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,14 +37,21 @@ class _Nav1PageState extends State<Nav1Page> {
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
-                children: List.generate(items.length, (i) {
-                  final bool isActive = i == selected;
+                children: List.generate(routeItems.length, (i) {
+                  final bool isActive = i == selectedIndex;
                   return Padding(
                     padding: const EdgeInsets.only(right: 8),
                     child: _PillButton(
-                      label: items[i],
+                      label: routeItems[i].label,
                       active: isActive,
-                      onTap: () => setState(() => selected = i),
+                      onTap: () {
+                        if (i == selectedIndex) return;
+                        Navigator.pushReplacementNamed(
+                          context,
+                          routeItems[i].path,
+                          arguments: widget.visitId,
+                        );
+                      },
                     ),
                   );
                 }),
@@ -80,13 +98,13 @@ class _PillButton extends StatelessWidget {
     final Color bg = active ? _dark : _light;
     final Color fg = Colors.white;
     return InkWell(
-      borderRadius: BorderRadius.circular(15),
+      borderRadius: BorderRadius.circular(20),
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: BoxDecoration(
           color: bg,
-          borderRadius: BorderRadius.circular(15),
+          borderRadius: BorderRadius.circular(20),
           boxShadow: const [
             BoxShadow(
               color: Colors.black12,
