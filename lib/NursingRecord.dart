@@ -1,8 +1,16 @@
 import 'package:flutter/material.dart';
 import 'nav2.dart';
+import '../data/db/daos.dart';
+import 'package:drift/drift.dart' show Value; // for Drift Value()
+import 'package:provider/provider.dart';
+
+
 
 class NursingRecordPage extends StatefulWidget {
-  const NursingRecordPage({super.key});
+
+  final int visitId;
+  const NursingRecordPage({super.key,required this.visitId,});
+
 
   @override
   State<NursingRecordPage> createState() => _NursingRecordPageState();
@@ -82,6 +90,7 @@ class _NursingRecordPageState extends State<NursingRecordPage> {
   Widget build(BuildContext context) {
     return Nav2Page(
       selectedIndex: 9,
+      visitId: widget.visitId,
       child: Container(
         color: const Color(0xFFE6F6FB),
         alignment: Alignment.topCenter,

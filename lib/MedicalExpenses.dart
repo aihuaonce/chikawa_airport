@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'nav2.dart';
 
 class MedicalExpensesPage extends StatefulWidget {
-  const MedicalExpensesPage({super.key});
+  final int visitId;
+  const MedicalExpensesPage({super.key,required this.visitId,});
 
   @override
   State<MedicalExpensesPage> createState() => _MedicalExpensesPageState();
@@ -29,6 +30,7 @@ class _MedicalExpensesPageState extends State<MedicalExpensesPage> {
   @override
   Widget build(BuildContext context) {
     return Nav2Page(
+      visitId: widget.visitId,
       selectedIndex: 4,
       child: Container(
         color: const Color(0xFFE6F6FB),

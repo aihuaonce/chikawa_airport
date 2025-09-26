@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'nav2.dart';
 
 class ElectronicDocumentsPage extends StatefulWidget {
-  const ElectronicDocumentsPage({super.key});
+  final int visitId;
+  const ElectronicDocumentsPage({super.key,required this.visitId});
 
   @override
   State<ElectronicDocumentsPage> createState() => _ElectronicDocumentsPageState();
@@ -34,6 +35,7 @@ class _ElectronicDocumentsPageState extends State<ElectronicDocumentsPage> {
   @override
   Widget build(BuildContext context) {
     return Nav2Page(
+      visitId: widget.visitId,
       selectedIndex: 7, // 高亮「電傳文件」
       child: Theme(
         data: Theme.of(context).copyWith(

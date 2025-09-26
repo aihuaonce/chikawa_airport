@@ -1,0 +1,2022 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
+
+part of 'app_database.dart';
+
+// ignore_for_file: type=lint
+class $VisitsTable extends Visits with TableInfo<$VisitsTable, Visit> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $VisitsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _visitIdMeta = const VerificationMeta(
+    'visitId',
+  );
+  @override
+  late final GeneratedColumn<int> visitId = GeneratedColumn<int>(
+    'visit_id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _patientNameMeta = const VerificationMeta(
+    'patientName',
+  );
+  @override
+  late final GeneratedColumn<String> patientName = GeneratedColumn<String>(
+    'patient_name',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _genderMeta = const VerificationMeta('gender');
+  @override
+  late final GeneratedColumn<String> gender = GeneratedColumn<String>(
+    'gender',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _nationalityMeta = const VerificationMeta(
+    'nationality',
+  );
+  @override
+  late final GeneratedColumn<String> nationality = GeneratedColumn<String>(
+    'nationality',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _deptMeta = const VerificationMeta('dept');
+  @override
+  late final GeneratedColumn<String> dept = GeneratedColumn<String>(
+    'dept',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _noteMeta = const VerificationMeta('note');
+  @override
+  late final GeneratedColumn<String> note = GeneratedColumn<String>(
+    'note',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _filledByMeta = const VerificationMeta(
+    'filledBy',
+  );
+  @override
+  late final GeneratedColumn<String> filledBy = GeneratedColumn<String>(
+    'filled_by',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _uploadedAtMeta = const VerificationMeta(
+    'uploadedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> uploadedAt = GeneratedColumn<DateTime>(
+    'uploaded_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    visitId,
+    patientName,
+    gender,
+    nationality,
+    dept,
+    note,
+    filledBy,
+    uploadedAt,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'visits';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Visit> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('visit_id')) {
+      context.handle(
+        _visitIdMeta,
+        visitId.isAcceptableOrUnknown(data['visit_id']!, _visitIdMeta),
+      );
+    }
+    if (data.containsKey('patient_name')) {
+      context.handle(
+        _patientNameMeta,
+        patientName.isAcceptableOrUnknown(
+          data['patient_name']!,
+          _patientNameMeta,
+        ),
+      );
+    }
+    if (data.containsKey('gender')) {
+      context.handle(
+        _genderMeta,
+        gender.isAcceptableOrUnknown(data['gender']!, _genderMeta),
+      );
+    }
+    if (data.containsKey('nationality')) {
+      context.handle(
+        _nationalityMeta,
+        nationality.isAcceptableOrUnknown(
+          data['nationality']!,
+          _nationalityMeta,
+        ),
+      );
+    }
+    if (data.containsKey('dept')) {
+      context.handle(
+        _deptMeta,
+        dept.isAcceptableOrUnknown(data['dept']!, _deptMeta),
+      );
+    }
+    if (data.containsKey('note')) {
+      context.handle(
+        _noteMeta,
+        note.isAcceptableOrUnknown(data['note']!, _noteMeta),
+      );
+    }
+    if (data.containsKey('filled_by')) {
+      context.handle(
+        _filledByMeta,
+        filledBy.isAcceptableOrUnknown(data['filled_by']!, _filledByMeta),
+      );
+    }
+    if (data.containsKey('uploaded_at')) {
+      context.handle(
+        _uploadedAtMeta,
+        uploadedAt.isAcceptableOrUnknown(data['uploaded_at']!, _uploadedAtMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {visitId};
+  @override
+  Visit map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Visit(
+      visitId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}visit_id'],
+      )!,
+      patientName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}patient_name'],
+      ),
+      gender: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}gender'],
+      ),
+      nationality: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}nationality'],
+      ),
+      dept: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}dept'],
+      ),
+      note: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}note'],
+      ),
+      filledBy: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}filled_by'],
+      ),
+      uploadedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}uploaded_at'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $VisitsTable createAlias(String alias) {
+    return $VisitsTable(attachedDatabase, alias);
+  }
+}
+
+class Visit extends DataClass implements Insertable<Visit> {
+  final int visitId;
+  final String? patientName;
+  final String? gender;
+  final String? nationality;
+  final String? dept;
+  final String? note;
+  final String? filledBy;
+  final DateTime uploadedAt;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  const Visit({
+    required this.visitId,
+    this.patientName,
+    this.gender,
+    this.nationality,
+    this.dept,
+    this.note,
+    this.filledBy,
+    required this.uploadedAt,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['visit_id'] = Variable<int>(visitId);
+    if (!nullToAbsent || patientName != null) {
+      map['patient_name'] = Variable<String>(patientName);
+    }
+    if (!nullToAbsent || gender != null) {
+      map['gender'] = Variable<String>(gender);
+    }
+    if (!nullToAbsent || nationality != null) {
+      map['nationality'] = Variable<String>(nationality);
+    }
+    if (!nullToAbsent || dept != null) {
+      map['dept'] = Variable<String>(dept);
+    }
+    if (!nullToAbsent || note != null) {
+      map['note'] = Variable<String>(note);
+    }
+    if (!nullToAbsent || filledBy != null) {
+      map['filled_by'] = Variable<String>(filledBy);
+    }
+    map['uploaded_at'] = Variable<DateTime>(uploadedAt);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  VisitsCompanion toCompanion(bool nullToAbsent) {
+    return VisitsCompanion(
+      visitId: Value(visitId),
+      patientName: patientName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(patientName),
+      gender: gender == null && nullToAbsent
+          ? const Value.absent()
+          : Value(gender),
+      nationality: nationality == null && nullToAbsent
+          ? const Value.absent()
+          : Value(nationality),
+      dept: dept == null && nullToAbsent ? const Value.absent() : Value(dept),
+      note: note == null && nullToAbsent ? const Value.absent() : Value(note),
+      filledBy: filledBy == null && nullToAbsent
+          ? const Value.absent()
+          : Value(filledBy),
+      uploadedAt: Value(uploadedAt),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory Visit.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Visit(
+      visitId: serializer.fromJson<int>(json['visitId']),
+      patientName: serializer.fromJson<String?>(json['patientName']),
+      gender: serializer.fromJson<String?>(json['gender']),
+      nationality: serializer.fromJson<String?>(json['nationality']),
+      dept: serializer.fromJson<String?>(json['dept']),
+      note: serializer.fromJson<String?>(json['note']),
+      filledBy: serializer.fromJson<String?>(json['filledBy']),
+      uploadedAt: serializer.fromJson<DateTime>(json['uploadedAt']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'visitId': serializer.toJson<int>(visitId),
+      'patientName': serializer.toJson<String?>(patientName),
+      'gender': serializer.toJson<String?>(gender),
+      'nationality': serializer.toJson<String?>(nationality),
+      'dept': serializer.toJson<String?>(dept),
+      'note': serializer.toJson<String?>(note),
+      'filledBy': serializer.toJson<String?>(filledBy),
+      'uploadedAt': serializer.toJson<DateTime>(uploadedAt),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  Visit copyWith({
+    int? visitId,
+    Value<String?> patientName = const Value.absent(),
+    Value<String?> gender = const Value.absent(),
+    Value<String?> nationality = const Value.absent(),
+    Value<String?> dept = const Value.absent(),
+    Value<String?> note = const Value.absent(),
+    Value<String?> filledBy = const Value.absent(),
+    DateTime? uploadedAt,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) => Visit(
+    visitId: visitId ?? this.visitId,
+    patientName: patientName.present ? patientName.value : this.patientName,
+    gender: gender.present ? gender.value : this.gender,
+    nationality: nationality.present ? nationality.value : this.nationality,
+    dept: dept.present ? dept.value : this.dept,
+    note: note.present ? note.value : this.note,
+    filledBy: filledBy.present ? filledBy.value : this.filledBy,
+    uploadedAt: uploadedAt ?? this.uploadedAt,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  Visit copyWithCompanion(VisitsCompanion data) {
+    return Visit(
+      visitId: data.visitId.present ? data.visitId.value : this.visitId,
+      patientName: data.patientName.present
+          ? data.patientName.value
+          : this.patientName,
+      gender: data.gender.present ? data.gender.value : this.gender,
+      nationality: data.nationality.present
+          ? data.nationality.value
+          : this.nationality,
+      dept: data.dept.present ? data.dept.value : this.dept,
+      note: data.note.present ? data.note.value : this.note,
+      filledBy: data.filledBy.present ? data.filledBy.value : this.filledBy,
+      uploadedAt: data.uploadedAt.present
+          ? data.uploadedAt.value
+          : this.uploadedAt,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Visit(')
+          ..write('visitId: $visitId, ')
+          ..write('patientName: $patientName, ')
+          ..write('gender: $gender, ')
+          ..write('nationality: $nationality, ')
+          ..write('dept: $dept, ')
+          ..write('note: $note, ')
+          ..write('filledBy: $filledBy, ')
+          ..write('uploadedAt: $uploadedAt, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    visitId,
+    patientName,
+    gender,
+    nationality,
+    dept,
+    note,
+    filledBy,
+    uploadedAt,
+    createdAt,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Visit &&
+          other.visitId == this.visitId &&
+          other.patientName == this.patientName &&
+          other.gender == this.gender &&
+          other.nationality == this.nationality &&
+          other.dept == this.dept &&
+          other.note == this.note &&
+          other.filledBy == this.filledBy &&
+          other.uploadedAt == this.uploadedAt &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class VisitsCompanion extends UpdateCompanion<Visit> {
+  final Value<int> visitId;
+  final Value<String?> patientName;
+  final Value<String?> gender;
+  final Value<String?> nationality;
+  final Value<String?> dept;
+  final Value<String?> note;
+  final Value<String?> filledBy;
+  final Value<DateTime> uploadedAt;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  const VisitsCompanion({
+    this.visitId = const Value.absent(),
+    this.patientName = const Value.absent(),
+    this.gender = const Value.absent(),
+    this.nationality = const Value.absent(),
+    this.dept = const Value.absent(),
+    this.note = const Value.absent(),
+    this.filledBy = const Value.absent(),
+    this.uploadedAt = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  });
+  VisitsCompanion.insert({
+    this.visitId = const Value.absent(),
+    this.patientName = const Value.absent(),
+    this.gender = const Value.absent(),
+    this.nationality = const Value.absent(),
+    this.dept = const Value.absent(),
+    this.note = const Value.absent(),
+    this.filledBy = const Value.absent(),
+    this.uploadedAt = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  });
+  static Insertable<Visit> custom({
+    Expression<int>? visitId,
+    Expression<String>? patientName,
+    Expression<String>? gender,
+    Expression<String>? nationality,
+    Expression<String>? dept,
+    Expression<String>? note,
+    Expression<String>? filledBy,
+    Expression<DateTime>? uploadedAt,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+  }) {
+    return RawValuesInsertable({
+      if (visitId != null) 'visit_id': visitId,
+      if (patientName != null) 'patient_name': patientName,
+      if (gender != null) 'gender': gender,
+      if (nationality != null) 'nationality': nationality,
+      if (dept != null) 'dept': dept,
+      if (note != null) 'note': note,
+      if (filledBy != null) 'filled_by': filledBy,
+      if (uploadedAt != null) 'uploaded_at': uploadedAt,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+    });
+  }
+
+  VisitsCompanion copyWith({
+    Value<int>? visitId,
+    Value<String?>? patientName,
+    Value<String?>? gender,
+    Value<String?>? nationality,
+    Value<String?>? dept,
+    Value<String?>? note,
+    Value<String?>? filledBy,
+    Value<DateTime>? uploadedAt,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+  }) {
+    return VisitsCompanion(
+      visitId: visitId ?? this.visitId,
+      patientName: patientName ?? this.patientName,
+      gender: gender ?? this.gender,
+      nationality: nationality ?? this.nationality,
+      dept: dept ?? this.dept,
+      note: note ?? this.note,
+      filledBy: filledBy ?? this.filledBy,
+      uploadedAt: uploadedAt ?? this.uploadedAt,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (visitId.present) {
+      map['visit_id'] = Variable<int>(visitId.value);
+    }
+    if (patientName.present) {
+      map['patient_name'] = Variable<String>(patientName.value);
+    }
+    if (gender.present) {
+      map['gender'] = Variable<String>(gender.value);
+    }
+    if (nationality.present) {
+      map['nationality'] = Variable<String>(nationality.value);
+    }
+    if (dept.present) {
+      map['dept'] = Variable<String>(dept.value);
+    }
+    if (note.present) {
+      map['note'] = Variable<String>(note.value);
+    }
+    if (filledBy.present) {
+      map['filled_by'] = Variable<String>(filledBy.value);
+    }
+    if (uploadedAt.present) {
+      map['uploaded_at'] = Variable<DateTime>(uploadedAt.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('VisitsCompanion(')
+          ..write('visitId: $visitId, ')
+          ..write('patientName: $patientName, ')
+          ..write('gender: $gender, ')
+          ..write('nationality: $nationality, ')
+          ..write('dept: $dept, ')
+          ..write('note: $note, ')
+          ..write('filledBy: $filledBy, ')
+          ..write('uploadedAt: $uploadedAt, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $PatientProfilesTable extends PatientProfiles
+    with TableInfo<$PatientProfilesTable, PatientProfile> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $PatientProfilesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _visitIdMeta = const VerificationMeta(
+    'visitId',
+  );
+  @override
+  late final GeneratedColumn<int> visitId = GeneratedColumn<int>(
+    'visit_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _birthdayMeta = const VerificationMeta(
+    'birthday',
+  );
+  @override
+  late final GeneratedColumn<DateTime> birthday = GeneratedColumn<DateTime>(
+    'birthday',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _ageMeta = const VerificationMeta('age');
+  @override
+  late final GeneratedColumn<int> age = GeneratedColumn<int>(
+    'age',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _genderMeta = const VerificationMeta('gender');
+  @override
+  late final GeneratedColumn<String> gender = GeneratedColumn<String>(
+    'gender',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _reasonMeta = const VerificationMeta('reason');
+  @override
+  late final GeneratedColumn<String> reason = GeneratedColumn<String>(
+    'reason',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _nationalityMeta = const VerificationMeta(
+    'nationality',
+  );
+  @override
+  late final GeneratedColumn<String> nationality = GeneratedColumn<String>(
+    'nationality',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _idNumberMeta = const VerificationMeta(
+    'idNumber',
+  );
+  @override
+  late final GeneratedColumn<String> idNumber = GeneratedColumn<String>(
+    'id_number',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _addressMeta = const VerificationMeta(
+    'address',
+  );
+  @override
+  late final GeneratedColumn<String> address = GeneratedColumn<String>(
+    'address',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _phoneMeta = const VerificationMeta('phone');
+  @override
+  late final GeneratedColumn<String> phone = GeneratedColumn<String>(
+    'phone',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _photoPathMeta = const VerificationMeta(
+    'photoPath',
+  );
+  @override
+  late final GeneratedColumn<String> photoPath = GeneratedColumn<String>(
+    'photo_path',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    visitId,
+    birthday,
+    age,
+    gender,
+    reason,
+    nationality,
+    idNumber,
+    address,
+    phone,
+    photoPath,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'patient_profiles';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<PatientProfile> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('visit_id')) {
+      context.handle(
+        _visitIdMeta,
+        visitId.isAcceptableOrUnknown(data['visit_id']!, _visitIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_visitIdMeta);
+    }
+    if (data.containsKey('birthday')) {
+      context.handle(
+        _birthdayMeta,
+        birthday.isAcceptableOrUnknown(data['birthday']!, _birthdayMeta),
+      );
+    }
+    if (data.containsKey('age')) {
+      context.handle(
+        _ageMeta,
+        age.isAcceptableOrUnknown(data['age']!, _ageMeta),
+      );
+    }
+    if (data.containsKey('gender')) {
+      context.handle(
+        _genderMeta,
+        gender.isAcceptableOrUnknown(data['gender']!, _genderMeta),
+      );
+    }
+    if (data.containsKey('reason')) {
+      context.handle(
+        _reasonMeta,
+        reason.isAcceptableOrUnknown(data['reason']!, _reasonMeta),
+      );
+    }
+    if (data.containsKey('nationality')) {
+      context.handle(
+        _nationalityMeta,
+        nationality.isAcceptableOrUnknown(
+          data['nationality']!,
+          _nationalityMeta,
+        ),
+      );
+    }
+    if (data.containsKey('id_number')) {
+      context.handle(
+        _idNumberMeta,
+        idNumber.isAcceptableOrUnknown(data['id_number']!, _idNumberMeta),
+      );
+    }
+    if (data.containsKey('address')) {
+      context.handle(
+        _addressMeta,
+        address.isAcceptableOrUnknown(data['address']!, _addressMeta),
+      );
+    }
+    if (data.containsKey('phone')) {
+      context.handle(
+        _phoneMeta,
+        phone.isAcceptableOrUnknown(data['phone']!, _phoneMeta),
+      );
+    }
+    if (data.containsKey('photo_path')) {
+      context.handle(
+        _photoPathMeta,
+        photoPath.isAcceptableOrUnknown(data['photo_path']!, _photoPathMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  PatientProfile map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return PatientProfile(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      visitId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}visit_id'],
+      )!,
+      birthday: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}birthday'],
+      ),
+      age: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}age'],
+      ),
+      gender: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}gender'],
+      ),
+      reason: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}reason'],
+      ),
+      nationality: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}nationality'],
+      ),
+      idNumber: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id_number'],
+      ),
+      address: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}address'],
+      ),
+      phone: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}phone'],
+      ),
+      photoPath: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}photo_path'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $PatientProfilesTable createAlias(String alias) {
+    return $PatientProfilesTable(attachedDatabase, alias);
+  }
+}
+
+class PatientProfile extends DataClass implements Insertable<PatientProfile> {
+  final int id;
+  final int visitId;
+  final DateTime? birthday;
+  final int? age;
+  final String? gender;
+  final String? reason;
+  final String? nationality;
+  final String? idNumber;
+  final String? address;
+  final String? phone;
+  final String? photoPath;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  const PatientProfile({
+    required this.id,
+    required this.visitId,
+    this.birthday,
+    this.age,
+    this.gender,
+    this.reason,
+    this.nationality,
+    this.idNumber,
+    this.address,
+    this.phone,
+    this.photoPath,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['visit_id'] = Variable<int>(visitId);
+    if (!nullToAbsent || birthday != null) {
+      map['birthday'] = Variable<DateTime>(birthday);
+    }
+    if (!nullToAbsent || age != null) {
+      map['age'] = Variable<int>(age);
+    }
+    if (!nullToAbsent || gender != null) {
+      map['gender'] = Variable<String>(gender);
+    }
+    if (!nullToAbsent || reason != null) {
+      map['reason'] = Variable<String>(reason);
+    }
+    if (!nullToAbsent || nationality != null) {
+      map['nationality'] = Variable<String>(nationality);
+    }
+    if (!nullToAbsent || idNumber != null) {
+      map['id_number'] = Variable<String>(idNumber);
+    }
+    if (!nullToAbsent || address != null) {
+      map['address'] = Variable<String>(address);
+    }
+    if (!nullToAbsent || phone != null) {
+      map['phone'] = Variable<String>(phone);
+    }
+    if (!nullToAbsent || photoPath != null) {
+      map['photo_path'] = Variable<String>(photoPath);
+    }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  PatientProfilesCompanion toCompanion(bool nullToAbsent) {
+    return PatientProfilesCompanion(
+      id: Value(id),
+      visitId: Value(visitId),
+      birthday: birthday == null && nullToAbsent
+          ? const Value.absent()
+          : Value(birthday),
+      age: age == null && nullToAbsent ? const Value.absent() : Value(age),
+      gender: gender == null && nullToAbsent
+          ? const Value.absent()
+          : Value(gender),
+      reason: reason == null && nullToAbsent
+          ? const Value.absent()
+          : Value(reason),
+      nationality: nationality == null && nullToAbsent
+          ? const Value.absent()
+          : Value(nationality),
+      idNumber: idNumber == null && nullToAbsent
+          ? const Value.absent()
+          : Value(idNumber),
+      address: address == null && nullToAbsent
+          ? const Value.absent()
+          : Value(address),
+      phone: phone == null && nullToAbsent
+          ? const Value.absent()
+          : Value(phone),
+      photoPath: photoPath == null && nullToAbsent
+          ? const Value.absent()
+          : Value(photoPath),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory PatientProfile.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return PatientProfile(
+      id: serializer.fromJson<int>(json['id']),
+      visitId: serializer.fromJson<int>(json['visitId']),
+      birthday: serializer.fromJson<DateTime?>(json['birthday']),
+      age: serializer.fromJson<int?>(json['age']),
+      gender: serializer.fromJson<String?>(json['gender']),
+      reason: serializer.fromJson<String?>(json['reason']),
+      nationality: serializer.fromJson<String?>(json['nationality']),
+      idNumber: serializer.fromJson<String?>(json['idNumber']),
+      address: serializer.fromJson<String?>(json['address']),
+      phone: serializer.fromJson<String?>(json['phone']),
+      photoPath: serializer.fromJson<String?>(json['photoPath']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'visitId': serializer.toJson<int>(visitId),
+      'birthday': serializer.toJson<DateTime?>(birthday),
+      'age': serializer.toJson<int?>(age),
+      'gender': serializer.toJson<String?>(gender),
+      'reason': serializer.toJson<String?>(reason),
+      'nationality': serializer.toJson<String?>(nationality),
+      'idNumber': serializer.toJson<String?>(idNumber),
+      'address': serializer.toJson<String?>(address),
+      'phone': serializer.toJson<String?>(phone),
+      'photoPath': serializer.toJson<String?>(photoPath),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  PatientProfile copyWith({
+    int? id,
+    int? visitId,
+    Value<DateTime?> birthday = const Value.absent(),
+    Value<int?> age = const Value.absent(),
+    Value<String?> gender = const Value.absent(),
+    Value<String?> reason = const Value.absent(),
+    Value<String?> nationality = const Value.absent(),
+    Value<String?> idNumber = const Value.absent(),
+    Value<String?> address = const Value.absent(),
+    Value<String?> phone = const Value.absent(),
+    Value<String?> photoPath = const Value.absent(),
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) => PatientProfile(
+    id: id ?? this.id,
+    visitId: visitId ?? this.visitId,
+    birthday: birthday.present ? birthday.value : this.birthday,
+    age: age.present ? age.value : this.age,
+    gender: gender.present ? gender.value : this.gender,
+    reason: reason.present ? reason.value : this.reason,
+    nationality: nationality.present ? nationality.value : this.nationality,
+    idNumber: idNumber.present ? idNumber.value : this.idNumber,
+    address: address.present ? address.value : this.address,
+    phone: phone.present ? phone.value : this.phone,
+    photoPath: photoPath.present ? photoPath.value : this.photoPath,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  PatientProfile copyWithCompanion(PatientProfilesCompanion data) {
+    return PatientProfile(
+      id: data.id.present ? data.id.value : this.id,
+      visitId: data.visitId.present ? data.visitId.value : this.visitId,
+      birthday: data.birthday.present ? data.birthday.value : this.birthday,
+      age: data.age.present ? data.age.value : this.age,
+      gender: data.gender.present ? data.gender.value : this.gender,
+      reason: data.reason.present ? data.reason.value : this.reason,
+      nationality: data.nationality.present
+          ? data.nationality.value
+          : this.nationality,
+      idNumber: data.idNumber.present ? data.idNumber.value : this.idNumber,
+      address: data.address.present ? data.address.value : this.address,
+      phone: data.phone.present ? data.phone.value : this.phone,
+      photoPath: data.photoPath.present ? data.photoPath.value : this.photoPath,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PatientProfile(')
+          ..write('id: $id, ')
+          ..write('visitId: $visitId, ')
+          ..write('birthday: $birthday, ')
+          ..write('age: $age, ')
+          ..write('gender: $gender, ')
+          ..write('reason: $reason, ')
+          ..write('nationality: $nationality, ')
+          ..write('idNumber: $idNumber, ')
+          ..write('address: $address, ')
+          ..write('phone: $phone, ')
+          ..write('photoPath: $photoPath, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    visitId,
+    birthday,
+    age,
+    gender,
+    reason,
+    nationality,
+    idNumber,
+    address,
+    phone,
+    photoPath,
+    createdAt,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is PatientProfile &&
+          other.id == this.id &&
+          other.visitId == this.visitId &&
+          other.birthday == this.birthday &&
+          other.age == this.age &&
+          other.gender == this.gender &&
+          other.reason == this.reason &&
+          other.nationality == this.nationality &&
+          other.idNumber == this.idNumber &&
+          other.address == this.address &&
+          other.phone == this.phone &&
+          other.photoPath == this.photoPath &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class PatientProfilesCompanion extends UpdateCompanion<PatientProfile> {
+  final Value<int> id;
+  final Value<int> visitId;
+  final Value<DateTime?> birthday;
+  final Value<int?> age;
+  final Value<String?> gender;
+  final Value<String?> reason;
+  final Value<String?> nationality;
+  final Value<String?> idNumber;
+  final Value<String?> address;
+  final Value<String?> phone;
+  final Value<String?> photoPath;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  const PatientProfilesCompanion({
+    this.id = const Value.absent(),
+    this.visitId = const Value.absent(),
+    this.birthday = const Value.absent(),
+    this.age = const Value.absent(),
+    this.gender = const Value.absent(),
+    this.reason = const Value.absent(),
+    this.nationality = const Value.absent(),
+    this.idNumber = const Value.absent(),
+    this.address = const Value.absent(),
+    this.phone = const Value.absent(),
+    this.photoPath = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  });
+  PatientProfilesCompanion.insert({
+    this.id = const Value.absent(),
+    required int visitId,
+    this.birthday = const Value.absent(),
+    this.age = const Value.absent(),
+    this.gender = const Value.absent(),
+    this.reason = const Value.absent(),
+    this.nationality = const Value.absent(),
+    this.idNumber = const Value.absent(),
+    this.address = const Value.absent(),
+    this.phone = const Value.absent(),
+    this.photoPath = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  }) : visitId = Value(visitId);
+  static Insertable<PatientProfile> custom({
+    Expression<int>? id,
+    Expression<int>? visitId,
+    Expression<DateTime>? birthday,
+    Expression<int>? age,
+    Expression<String>? gender,
+    Expression<String>? reason,
+    Expression<String>? nationality,
+    Expression<String>? idNumber,
+    Expression<String>? address,
+    Expression<String>? phone,
+    Expression<String>? photoPath,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (visitId != null) 'visit_id': visitId,
+      if (birthday != null) 'birthday': birthday,
+      if (age != null) 'age': age,
+      if (gender != null) 'gender': gender,
+      if (reason != null) 'reason': reason,
+      if (nationality != null) 'nationality': nationality,
+      if (idNumber != null) 'id_number': idNumber,
+      if (address != null) 'address': address,
+      if (phone != null) 'phone': phone,
+      if (photoPath != null) 'photo_path': photoPath,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+    });
+  }
+
+  PatientProfilesCompanion copyWith({
+    Value<int>? id,
+    Value<int>? visitId,
+    Value<DateTime?>? birthday,
+    Value<int?>? age,
+    Value<String?>? gender,
+    Value<String?>? reason,
+    Value<String?>? nationality,
+    Value<String?>? idNumber,
+    Value<String?>? address,
+    Value<String?>? phone,
+    Value<String?>? photoPath,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+  }) {
+    return PatientProfilesCompanion(
+      id: id ?? this.id,
+      visitId: visitId ?? this.visitId,
+      birthday: birthday ?? this.birthday,
+      age: age ?? this.age,
+      gender: gender ?? this.gender,
+      reason: reason ?? this.reason,
+      nationality: nationality ?? this.nationality,
+      idNumber: idNumber ?? this.idNumber,
+      address: address ?? this.address,
+      phone: phone ?? this.phone,
+      photoPath: photoPath ?? this.photoPath,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (visitId.present) {
+      map['visit_id'] = Variable<int>(visitId.value);
+    }
+    if (birthday.present) {
+      map['birthday'] = Variable<DateTime>(birthday.value);
+    }
+    if (age.present) {
+      map['age'] = Variable<int>(age.value);
+    }
+    if (gender.present) {
+      map['gender'] = Variable<String>(gender.value);
+    }
+    if (reason.present) {
+      map['reason'] = Variable<String>(reason.value);
+    }
+    if (nationality.present) {
+      map['nationality'] = Variable<String>(nationality.value);
+    }
+    if (idNumber.present) {
+      map['id_number'] = Variable<String>(idNumber.value);
+    }
+    if (address.present) {
+      map['address'] = Variable<String>(address.value);
+    }
+    if (phone.present) {
+      map['phone'] = Variable<String>(phone.value);
+    }
+    if (photoPath.present) {
+      map['photo_path'] = Variable<String>(photoPath.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PatientProfilesCompanion(')
+          ..write('id: $id, ')
+          ..write('visitId: $visitId, ')
+          ..write('birthday: $birthday, ')
+          ..write('age: $age, ')
+          ..write('gender: $gender, ')
+          ..write('reason: $reason, ')
+          ..write('nationality: $nationality, ')
+          ..write('idNumber: $idNumber, ')
+          ..write('address: $address, ')
+          ..write('phone: $phone, ')
+          ..write('photoPath: $photoPath, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
+abstract class _$AppDatabase extends GeneratedDatabase {
+  _$AppDatabase(QueryExecutor e) : super(e);
+  $AppDatabaseManager get managers => $AppDatabaseManager(this);
+  late final $VisitsTable visits = $VisitsTable(this);
+  late final $PatientProfilesTable patientProfiles = $PatientProfilesTable(
+    this,
+  );
+  late final VisitsDao visitsDao = VisitsDao(this as AppDatabase);
+  late final PatientProfilesDao patientProfilesDao = PatientProfilesDao(
+    this as AppDatabase,
+  );
+  @override
+  Iterable<TableInfo<Table, Object?>> get allTables =>
+      allSchemaEntities.whereType<TableInfo<Table, Object?>>();
+  @override
+  List<DatabaseSchemaEntity> get allSchemaEntities => [visits, patientProfiles];
+}
+
+typedef $$VisitsTableCreateCompanionBuilder =
+    VisitsCompanion Function({
+      Value<int> visitId,
+      Value<String?> patientName,
+      Value<String?> gender,
+      Value<String?> nationality,
+      Value<String?> dept,
+      Value<String?> note,
+      Value<String?> filledBy,
+      Value<DateTime> uploadedAt,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+    });
+typedef $$VisitsTableUpdateCompanionBuilder =
+    VisitsCompanion Function({
+      Value<int> visitId,
+      Value<String?> patientName,
+      Value<String?> gender,
+      Value<String?> nationality,
+      Value<String?> dept,
+      Value<String?> note,
+      Value<String?> filledBy,
+      Value<DateTime> uploadedAt,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+    });
+
+class $$VisitsTableFilterComposer
+    extends Composer<_$AppDatabase, $VisitsTable> {
+  $$VisitsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get visitId => $composableBuilder(
+    column: $table.visitId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get patientName => $composableBuilder(
+    column: $table.patientName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get gender => $composableBuilder(
+    column: $table.gender,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get nationality => $composableBuilder(
+    column: $table.nationality,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get dept => $composableBuilder(
+    column: $table.dept,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get note => $composableBuilder(
+    column: $table.note,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get filledBy => $composableBuilder(
+    column: $table.filledBy,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get uploadedAt => $composableBuilder(
+    column: $table.uploadedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$VisitsTableOrderingComposer
+    extends Composer<_$AppDatabase, $VisitsTable> {
+  $$VisitsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get visitId => $composableBuilder(
+    column: $table.visitId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get patientName => $composableBuilder(
+    column: $table.patientName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get gender => $composableBuilder(
+    column: $table.gender,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get nationality => $composableBuilder(
+    column: $table.nationality,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get dept => $composableBuilder(
+    column: $table.dept,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get note => $composableBuilder(
+    column: $table.note,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get filledBy => $composableBuilder(
+    column: $table.filledBy,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get uploadedAt => $composableBuilder(
+    column: $table.uploadedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$VisitsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $VisitsTable> {
+  $$VisitsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get visitId =>
+      $composableBuilder(column: $table.visitId, builder: (column) => column);
+
+  GeneratedColumn<String> get patientName => $composableBuilder(
+    column: $table.patientName,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get gender =>
+      $composableBuilder(column: $table.gender, builder: (column) => column);
+
+  GeneratedColumn<String> get nationality => $composableBuilder(
+    column: $table.nationality,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get dept =>
+      $composableBuilder(column: $table.dept, builder: (column) => column);
+
+  GeneratedColumn<String> get note =>
+      $composableBuilder(column: $table.note, builder: (column) => column);
+
+  GeneratedColumn<String> get filledBy =>
+      $composableBuilder(column: $table.filledBy, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get uploadedAt => $composableBuilder(
+    column: $table.uploadedAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$VisitsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $VisitsTable,
+          Visit,
+          $$VisitsTableFilterComposer,
+          $$VisitsTableOrderingComposer,
+          $$VisitsTableAnnotationComposer,
+          $$VisitsTableCreateCompanionBuilder,
+          $$VisitsTableUpdateCompanionBuilder,
+          (Visit, BaseReferences<_$AppDatabase, $VisitsTable, Visit>),
+          Visit,
+          PrefetchHooks Function()
+        > {
+  $$VisitsTableTableManager(_$AppDatabase db, $VisitsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$VisitsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$VisitsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$VisitsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> visitId = const Value.absent(),
+                Value<String?> patientName = const Value.absent(),
+                Value<String?> gender = const Value.absent(),
+                Value<String?> nationality = const Value.absent(),
+                Value<String?> dept = const Value.absent(),
+                Value<String?> note = const Value.absent(),
+                Value<String?> filledBy = const Value.absent(),
+                Value<DateTime> uploadedAt = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+              }) => VisitsCompanion(
+                visitId: visitId,
+                patientName: patientName,
+                gender: gender,
+                nationality: nationality,
+                dept: dept,
+                note: note,
+                filledBy: filledBy,
+                uploadedAt: uploadedAt,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> visitId = const Value.absent(),
+                Value<String?> patientName = const Value.absent(),
+                Value<String?> gender = const Value.absent(),
+                Value<String?> nationality = const Value.absent(),
+                Value<String?> dept = const Value.absent(),
+                Value<String?> note = const Value.absent(),
+                Value<String?> filledBy = const Value.absent(),
+                Value<DateTime> uploadedAt = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+              }) => VisitsCompanion.insert(
+                visitId: visitId,
+                patientName: patientName,
+                gender: gender,
+                nationality: nationality,
+                dept: dept,
+                note: note,
+                filledBy: filledBy,
+                uploadedAt: uploadedAt,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$VisitsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $VisitsTable,
+      Visit,
+      $$VisitsTableFilterComposer,
+      $$VisitsTableOrderingComposer,
+      $$VisitsTableAnnotationComposer,
+      $$VisitsTableCreateCompanionBuilder,
+      $$VisitsTableUpdateCompanionBuilder,
+      (Visit, BaseReferences<_$AppDatabase, $VisitsTable, Visit>),
+      Visit,
+      PrefetchHooks Function()
+    >;
+typedef $$PatientProfilesTableCreateCompanionBuilder =
+    PatientProfilesCompanion Function({
+      Value<int> id,
+      required int visitId,
+      Value<DateTime?> birthday,
+      Value<int?> age,
+      Value<String?> gender,
+      Value<String?> reason,
+      Value<String?> nationality,
+      Value<String?> idNumber,
+      Value<String?> address,
+      Value<String?> phone,
+      Value<String?> photoPath,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+    });
+typedef $$PatientProfilesTableUpdateCompanionBuilder =
+    PatientProfilesCompanion Function({
+      Value<int> id,
+      Value<int> visitId,
+      Value<DateTime?> birthday,
+      Value<int?> age,
+      Value<String?> gender,
+      Value<String?> reason,
+      Value<String?> nationality,
+      Value<String?> idNumber,
+      Value<String?> address,
+      Value<String?> phone,
+      Value<String?> photoPath,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+    });
+
+class $$PatientProfilesTableFilterComposer
+    extends Composer<_$AppDatabase, $PatientProfilesTable> {
+  $$PatientProfilesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get visitId => $composableBuilder(
+    column: $table.visitId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get birthday => $composableBuilder(
+    column: $table.birthday,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get age => $composableBuilder(
+    column: $table.age,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get gender => $composableBuilder(
+    column: $table.gender,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get reason => $composableBuilder(
+    column: $table.reason,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get nationality => $composableBuilder(
+    column: $table.nationality,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get idNumber => $composableBuilder(
+    column: $table.idNumber,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get address => $composableBuilder(
+    column: $table.address,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get phone => $composableBuilder(
+    column: $table.phone,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get photoPath => $composableBuilder(
+    column: $table.photoPath,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$PatientProfilesTableOrderingComposer
+    extends Composer<_$AppDatabase, $PatientProfilesTable> {
+  $$PatientProfilesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get visitId => $composableBuilder(
+    column: $table.visitId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get birthday => $composableBuilder(
+    column: $table.birthday,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get age => $composableBuilder(
+    column: $table.age,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get gender => $composableBuilder(
+    column: $table.gender,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get reason => $composableBuilder(
+    column: $table.reason,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get nationality => $composableBuilder(
+    column: $table.nationality,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get idNumber => $composableBuilder(
+    column: $table.idNumber,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get address => $composableBuilder(
+    column: $table.address,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get phone => $composableBuilder(
+    column: $table.phone,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get photoPath => $composableBuilder(
+    column: $table.photoPath,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$PatientProfilesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $PatientProfilesTable> {
+  $$PatientProfilesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get visitId =>
+      $composableBuilder(column: $table.visitId, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get birthday =>
+      $composableBuilder(column: $table.birthday, builder: (column) => column);
+
+  GeneratedColumn<int> get age =>
+      $composableBuilder(column: $table.age, builder: (column) => column);
+
+  GeneratedColumn<String> get gender =>
+      $composableBuilder(column: $table.gender, builder: (column) => column);
+
+  GeneratedColumn<String> get reason =>
+      $composableBuilder(column: $table.reason, builder: (column) => column);
+
+  GeneratedColumn<String> get nationality => $composableBuilder(
+    column: $table.nationality,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get idNumber =>
+      $composableBuilder(column: $table.idNumber, builder: (column) => column);
+
+  GeneratedColumn<String> get address =>
+      $composableBuilder(column: $table.address, builder: (column) => column);
+
+  GeneratedColumn<String> get phone =>
+      $composableBuilder(column: $table.phone, builder: (column) => column);
+
+  GeneratedColumn<String> get photoPath =>
+      $composableBuilder(column: $table.photoPath, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$PatientProfilesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $PatientProfilesTable,
+          PatientProfile,
+          $$PatientProfilesTableFilterComposer,
+          $$PatientProfilesTableOrderingComposer,
+          $$PatientProfilesTableAnnotationComposer,
+          $$PatientProfilesTableCreateCompanionBuilder,
+          $$PatientProfilesTableUpdateCompanionBuilder,
+          (
+            PatientProfile,
+            BaseReferences<
+              _$AppDatabase,
+              $PatientProfilesTable,
+              PatientProfile
+            >,
+          ),
+          PatientProfile,
+          PrefetchHooks Function()
+        > {
+  $$PatientProfilesTableTableManager(
+    _$AppDatabase db,
+    $PatientProfilesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$PatientProfilesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$PatientProfilesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$PatientProfilesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> visitId = const Value.absent(),
+                Value<DateTime?> birthday = const Value.absent(),
+                Value<int?> age = const Value.absent(),
+                Value<String?> gender = const Value.absent(),
+                Value<String?> reason = const Value.absent(),
+                Value<String?> nationality = const Value.absent(),
+                Value<String?> idNumber = const Value.absent(),
+                Value<String?> address = const Value.absent(),
+                Value<String?> phone = const Value.absent(),
+                Value<String?> photoPath = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+              }) => PatientProfilesCompanion(
+                id: id,
+                visitId: visitId,
+                birthday: birthday,
+                age: age,
+                gender: gender,
+                reason: reason,
+                nationality: nationality,
+                idNumber: idNumber,
+                address: address,
+                phone: phone,
+                photoPath: photoPath,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int visitId,
+                Value<DateTime?> birthday = const Value.absent(),
+                Value<int?> age = const Value.absent(),
+                Value<String?> gender = const Value.absent(),
+                Value<String?> reason = const Value.absent(),
+                Value<String?> nationality = const Value.absent(),
+                Value<String?> idNumber = const Value.absent(),
+                Value<String?> address = const Value.absent(),
+                Value<String?> phone = const Value.absent(),
+                Value<String?> photoPath = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+              }) => PatientProfilesCompanion.insert(
+                id: id,
+                visitId: visitId,
+                birthday: birthday,
+                age: age,
+                gender: gender,
+                reason: reason,
+                nationality: nationality,
+                idNumber: idNumber,
+                address: address,
+                phone: phone,
+                photoPath: photoPath,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$PatientProfilesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $PatientProfilesTable,
+      PatientProfile,
+      $$PatientProfilesTableFilterComposer,
+      $$PatientProfilesTableOrderingComposer,
+      $$PatientProfilesTableAnnotationComposer,
+      $$PatientProfilesTableCreateCompanionBuilder,
+      $$PatientProfilesTableUpdateCompanionBuilder,
+      (
+        PatientProfile,
+        BaseReferences<_$AppDatabase, $PatientProfilesTable, PatientProfile>,
+      ),
+      PatientProfile,
+      PrefetchHooks Function()
+    >;
+
+class $AppDatabaseManager {
+  final _$AppDatabase _db;
+  $AppDatabaseManager(this._db);
+  $$VisitsTableTableManager get visits =>
+      $$VisitsTableTableManager(_db, _db.visits);
+  $$PatientProfilesTableTableManager get patientProfiles =>
+      $$PatientProfilesTableTableManager(_db, _db.patientProfiles);
+}

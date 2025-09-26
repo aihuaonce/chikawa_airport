@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'nav2.dart';
 
 class PlanPage extends StatefulWidget {
-  const PlanPage({super.key});
+  final int visitId;
+  const PlanPage({super.key,required this.visitId});
 
   @override
   State<PlanPage> createState() => _PlanPageState();
@@ -588,6 +589,7 @@ class _PlanPageState extends State<PlanPage> {
   Widget build(BuildContext context) {
     return Nav2Page(
       selectedIndex: 3,
+      visitId: widget.visitId,
       child: Container(
         color: const Color(0xFFE6F6FB),
         alignment: Alignment.topCenter,

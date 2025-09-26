@@ -24,7 +24,10 @@ class Nav2Page extends StatefulWidget {
   final Widget child;
   final int selectedIndex;
 
-  const Nav2Page({super.key, required this.child, required this.selectedIndex});
+    // ⭐ 新增：整個個案的 key，切頁時要帶給每個子頁
+  final int visitId;
+
+  const Nav2Page({super.key, required this.child, required this.selectedIndex,required this.visitId});
 
   @override
   State<Nav2Page> createState() => _Nav2PageState();
@@ -99,14 +102,16 @@ class _Nav2PageState extends State<Nav2Page> {
                                     context,
                                     MaterialPageRoute(
                                       builder: (_) =>
-                                          const PersonalInformationPage(),
+                                          PersonalInformationPage(
+                                            visitId: widget.visitId,
+                                          ),
                                     ),
                                   );
                                 } else if (i == 1) {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (_) => const FlightLogPage(),
+                                      builder: (_) => FlightLogPage(visitId: widget.visitId,),
                                     ),
                                   );
                                 } else if (i == 2) {
@@ -114,14 +119,14 @@ class _Nav2PageState extends State<Nav2Page> {
                                     context,
                                     MaterialPageRoute(
                                       builder: (_) =>
-                                          const AccidentRecordPage(),
+                                          AccidentRecordPage(visitId: widget.visitId,),
                                     ),
                                   );
                                 } else if (i == 3) {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (_) => const PlanPage(),
+                                      builder: (_) => PlanPage(visitId: widget.visitId),
                                     ),
                                   ); // 原先您的邏輯是醫療費用，這裏是處置紀錄
                                 } else if (i == 4) {
@@ -129,7 +134,7 @@ class _Nav2PageState extends State<Nav2Page> {
                                     context,
                                     MaterialPageRoute(
                                       builder: (_) =>
-                                          const MedicalExpensesPage(),
+                                          MedicalExpensesPage(visitId: widget.visitId,),
                                     ),
                                   );
                                 } else if (i == 5) {
@@ -137,14 +142,14 @@ class _Nav2PageState extends State<Nav2Page> {
                                     context,
                                     MaterialPageRoute(
                                       builder: (_) =>
-                                          const MedicalCertificatePage(),
+                                          MedicalCertificatePage(visitId: widget.visitId,),
                                     ),
                                   );
                                 } else if (i == 6) {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (_) => const UndertakingPage(),
+                                      builder: (_) => UndertakingPage(visitId: widget.visitId),
                                     ),
                                   );
                                 } else if (i == 7) {
@@ -152,21 +157,23 @@ class _Nav2PageState extends State<Nav2Page> {
                                     context,
                                     MaterialPageRoute(
                                       builder: (_) =>
-                                          const ElectronicDocumentsPage(),
+                                          ElectronicDocumentsPage(visitId: widget.visitId,),
                                     ),
                                   );
                                 } else if (i == 8) {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (_) => const ReferralFormPage(),
+                                      builder: (_) => ReferralFormPage(visitId: widget.visitId),
                                     ),
                                   );
                                 } else if (i == 9) {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (_) => const NursingRecordPage(),
+                                      builder: (_) => NursingRecordPage(
+                                        visitId: widget.visitId,
+                                      ),
                                     ),
                                   );
                                 }

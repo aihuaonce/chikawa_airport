@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'nav2.dart';
 
 class AccidentRecordPage extends StatefulWidget {
-  const AccidentRecordPage({super.key});
+  final int visitId;
+  const AccidentRecordPage({super.key, required this.visitId,});
 
   @override
   State<AccidentRecordPage> createState() => _AccidentRecordPageState();
@@ -81,6 +82,7 @@ class _AccidentRecordPageState extends State<AccidentRecordPage> {
     final otherIdx = reportUnits.length - 1; // 「其他」的索引
 
     return Nav2Page(
+      visitId: widget.visitId,
       selectedIndex: 2,
       child: Container(
         color: const Color(0xFFE6F6FB),
