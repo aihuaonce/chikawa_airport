@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../data/db/daos.dart';
-import '../data/db/app_database.dart';
+import 'data/db/app_database.dart';
+import 'data/db/daos.dart';
+import 'nav2.dart';
 import 'nav1.dart';
 
 class HomePage extends StatefulWidget {
@@ -13,27 +14,22 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   String keyword = "";
-
-  // 搜尋控制器
   final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    _searchController.addListener(_onSearchChanged);
+    _searchController.addListener(() {
+      setState(() {
+        keyword = _searchController.text;
+      });
+    });
   }
 
   @override
   void dispose() {
     _searchController.dispose();
     super.dispose();
-  }
-
-  void _onSearchChanged() {
-    // 當搜尋框內容改變時，更新狀態以觸發 StreamBuilder 重新查詢
-    setState(() {
-      keyword = _searchController.text;
-    });
   }
 
   @override
@@ -46,10 +42,8 @@ class _HomePageState extends State<HomePage> {
         padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
         child: Column(
           children: [
-            // Nav1Page 常駐在首頁
-            const Nav1Page(), // Nav1Page 移除了 visitId 參數 (因在首頁不需要)
-
-            const SizedBox(height: 24),
+            // Nav1Page 可以放置在這裡，如果有 Nav1
+            const Nav1Page(),
             Row(
               children: [
                 // + 新增病患資料
@@ -66,11 +60,13 @@ class _HomePageState extends State<HomePage> {
                     // 1) 先建立一筆 visit，取得 visitId
                     final visitId = await visitsDao.createVisit();
 
-                    // 2) ★ 導向個人資料頁，使用命名路由
-                    await Navigator.pushNamed(
+                    // 2) 導向 Nav2Page，預設 PersonalInformation
+                    await Navigator.push(
                       context,
-                      '/personalInformation', // 對應 routes_config.txt 中的路徑
-                      arguments: visitId, // 傳遞 visitId
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            Nav2Page(visitId: visitId, initialIndex: 0),
+                      ),
                     );
 
                     // 3) 回來後刷新列表
@@ -103,7 +99,7 @@ class _HomePageState extends State<HomePage> {
 
             const SizedBox(height: 16),
 
-            // 資料列表
+            // 病患列表
             Expanded(
               child: StreamBuilder<List<Visit>>(
                 stream: visitsDao.watchAll(keyword: keyword),
@@ -117,10 +113,9 @@ class _HomePageState extends State<HomePage> {
                   final visits = snapshot.data!;
 
                   return ListView.builder(
-                    itemCount: visits.length + 1, // +1 for header
+                    itemCount: visits.length + 1,
                     itemBuilder: (context, index) {
                       if (index == 0) {
-                        // Header
                         return const Padding(
                           padding: EdgeInsets.symmetric(vertical: 8.0),
                           child: Row(
@@ -137,18 +132,20 @@ class _HomePageState extends State<HomePage> {
                           ),
                         );
                       }
+
                       final v = visits[index - 1];
 
-                      // Data Row
                       return _DataRow(
                         onTap: () async {
-                          // 點擊列表，導航到個人資料頁
-                          await Navigator.pushNamed(
+                          // 點擊列表，直接打開 Nav2Page
+                          await Navigator.push(
                             context,
-                            '/personalInformation',
-                            arguments: v.visitId,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  Nav2Page(visitId: v.visitId, initialIndex: 0),
+                            ),
                           );
-                          if (mounted) setState(() {}); // 返回後刷新
+                          if (mounted) setState(() {});
                         },
                         children: [
                           _TableCell(v.visitId.toString()),

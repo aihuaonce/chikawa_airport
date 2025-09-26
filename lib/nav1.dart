@@ -1,57 +1,39 @@
 import 'package:flutter/material.dart';
-import 'routes_config.dart'; // ★ 引入 routeItems
 
 const _light = Color(0xFF83ACA9);
 const _dark = Color(0xFF274C4A);
-const _bg = Color(0xFFEFF7F7);
 
 class Nav1Page extends StatefulWidget {
-  final int? visitId; // 可選
-
-  const Nav1Page({super.key, this.visitId});
+  const Nav1Page({super.key});
 
   @override
   State<Nav1Page> createState() => _Nav1PageState();
 }
 
 class _Nav1PageState extends State<Nav1Page> {
-  late int selectedIndex;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    // 根據目前路由名稱自動決定 selectedIndex
-    final currentPath = ModalRoute.of(context)!.settings.name;
-    final idx = routeItems.indexWhere((r) => r.path == currentPath);
-    selectedIndex = idx >= 0 ? idx : 0;
-  }
+  final List<String> items = ['機場出診單', '查看報表', '衛教專區'];
+  int selected = 0;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      decoration: const BoxDecoration(color: Colors.white),
+      color: Colors.white,
       child: Row(
         children: [
+          // 水平滾動 Tab
           Expanded(
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
-                children: List.generate(routeItems.length, (i) {
-                  final bool isActive = i == selectedIndex;
+                children: List.generate(items.length, (i) {
+                  final isActive = i == selected;
                   return Padding(
                     padding: const EdgeInsets.only(right: 8),
                     child: _PillButton(
-                      label: routeItems[i].label,
+                      label: items[i],
                       active: isActive,
-                      onTap: () {
-                        if (i == selectedIndex) return;
-                        Navigator.pushReplacementNamed(
-                          context,
-                          routeItems[i].path,
-                          arguments: widget.visitId,
-                        );
-                      },
+                      onTap: () => setState(() => selected = i),
                     ),
                   );
                 }),
@@ -59,6 +41,7 @@ class _Nav1PageState extends State<Nav1Page> {
             ),
           ),
           const SizedBox(width: 12),
+          // 呼叫救護車按鈕
           FilledButton(
             style: FilledButton.styleFrom(
               backgroundColor: const Color(0xFFE74C3C),
@@ -95,16 +78,14 @@ class _PillButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color bg = active ? _dark : _light;
-    final Color fg = Colors.white;
     return InkWell(
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: BorderRadius.circular(15),
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: BoxDecoration(
-          color: bg,
-          borderRadius: BorderRadius.circular(20),
+          color: active ? _dark : _light,
+          borderRadius: BorderRadius.circular(15),
           boxShadow: const [
             BoxShadow(
               color: Colors.black12,
@@ -115,7 +96,10 @@ class _PillButton extends StatelessWidget {
         ),
         child: Text(
           label,
-          style: TextStyle(color: fg, fontWeight: FontWeight.w600),
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w600,
+          ),
         ),
       ),
     );

@@ -13,13 +13,11 @@ part 'app_database.g.dart';
   tables: [
     Visits,
     PatientProfiles,
-    AccidentRecords,
     // 之後還有 Treatments, MedicalCosts, Diagnoses... 全部加在這裡
   ],
   daos: [
     VisitsDao,
     PatientProfilesDao,
-    AccidentRecordsDao,
     // 之後還有 TreatmentsDao, MedicalCostsDao, DiagnosesDao... 全部加在這裡
   ],
 )

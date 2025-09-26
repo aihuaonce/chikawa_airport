@@ -1,79 +1,123 @@
+// nav2.dart
 import 'package:flutter/material.dart';
 import 'routes_config.dart';
 
-// 回首頁 callback (現在執行 Navigator.pop)
-typedef CloseNav2Callback = void Function();
+abstract class SavablePage {
+  Future<void> saveData();
+}
 
 class Nav2Page extends StatefulWidget {
   final int visitId;
   final int initialIndex;
-  final CloseNav2Callback? closeNav2;
-  final Widget child; // ★ 修正：新增 child 參數
 
-  const Nav2Page({
-    super.key,
-    required this.visitId,
-    this.initialIndex = 0,
-    this.closeNav2,
-    required this.child, // 設為 required
-  });
+  const Nav2Page({super.key, required this.visitId, this.initialIndex = 0});
 
   @override
   State<Nav2Page> createState() => _Nav2PageState();
 }
 
 class _Nav2PageState extends State<Nav2Page> {
-  void _changeTab(int index) {
-    // 點擊 Tab 時，導航到新的路由
-    final nextRouteItem = routeItems[index];
+  late int currentIndex;
+  // 使用 GlobalKey 來存取當前頁面的 state
+  final Map<int, GlobalKey> _pageKeys = {};
 
-    // 使用 pushReplacementNamed 替換當前頁面
-    // 這樣可以避免 Nav2Page 的選單邏輯複雜化，讓每個 Tab 都是一個新的路由，但保留在 Nav2Page 的外觀下。
-    Navigator.pushReplacementNamed(
-      context,
-      nextRouteItem.path,
-      arguments: widget.visitId,
+  @override
+  void initState() {
+    super.initState();
+    currentIndex = widget.initialIndex;
+    // 為每個頁面初始化一個 GlobalKey
+    for (int i = 0; i < routeItems.length; i++) {
+      _pageKeys[i] = GlobalKey();
+    }
+  }
+
+  // 獲取當前頁面的 SavablePage
+  SavablePage? get _currentSavablePage {
+    final currentWidget = routeItems[currentIndex].builder(
+      widget.visitId,
+      _pageKeys[currentIndex]!,
     );
+    return currentWidget is SavablePage ? currentWidget as SavablePage : null;
   }
 
   @override
   Widget build(BuildContext context) {
-    // 獲取當前的 selectedIndex，它就是由 routes_config 傳入的 initialIndex
-    final selectedIndex = widget.initialIndex;
+    final currentPage = routeItems[currentIndex].builder(
+      widget.visitId,
+      _pageKeys[currentIndex]!,
+    );
 
     return Scaffold(
-      body: Column(
-        children: [
-          // 上方橫向選單 (Nav2)
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: List.generate(routeItems.length, (i) {
-                final isActive = i == selectedIndex;
-                return Padding(
-                  padding: const EdgeInsets.all(4),
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: isActive ? Colors.green : Colors.grey,
-                    ),
-                    onPressed: () => _changeTab(i),
-                    child: Text(routeItems[i].label),
-                  ),
-                );
-              }),
-            ),
+      appBar: AppBar(
+        title: Text(routeItems[currentIndex].label),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.save),
+            onPressed: () async {
+              // 使用當前的 SavablePage 實例
+              final savablePage = _currentSavablePage;
+              if (savablePage != null) {
+                await savablePage.saveData();
+                if (!mounted) return;
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(const SnackBar(content: Text('已儲存')));
+              } else {
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(const SnackBar(content: Text('此頁面不支援儲存功能')));
+              }
+            },
           ),
-          // 當前分頁內容：顯示傳入的 child
-          Expanded(child: widget.child),
+          IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () => Navigator.pop(context),
+          ),
         ],
       ),
-      // 返回按鈕
-      floatingActionButton: widget.closeNav2 != null
-          ? FloatingActionButton(
-              onPressed: widget.closeNav2, // 執行 Navigator.pop(context)
-              child: const Icon(Icons.arrow_back),
-            )
-          : null,
+      body: Column(
+        children: [
+          // 頁籤切換
+          SizedBox(
+            height: 50,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: routeItems.length,
+              itemBuilder: (context, index) {
+                return GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      currentIndex = index;
+                    });
+                  },
+                  child: Container(
+                    alignment: Alignment.center,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    margin: const EdgeInsets.symmetric(horizontal: 4),
+                    decoration: BoxDecoration(
+                      color: currentIndex == index
+                          ? Colors.blue
+                          : Colors.grey[300],
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      routeItems[index].label,
+                      style: TextStyle(
+                        color: currentIndex == index
+                            ? Colors.white
+                            : Colors.black,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+          const SizedBox(height: 8),
+          Expanded(child: currentPage),
+        ],
+      ),
     );
   }
 }

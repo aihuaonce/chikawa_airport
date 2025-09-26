@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import 'home.dart';
 import 'package:provider/provider.dart';
 import 'data/db/app_database.dart';
 import 'data/db/daos.dart';
-import 'routes_config.dart'; // ← 引入路由設定檔
+import 'home.dart';
+import 'routes_config.dart';
+import 'nav2.dart';
+import 'data/models/patient_data.dart'; // 導入 PatientData
 
 void main() {
   runApp(
@@ -16,13 +18,11 @@ void main() {
         ProxyProvider<AppDatabase, VisitsDao>(
           update: (_, db, __) => VisitsDao(db),
         ),
-        // ★ 確保 PatientProfilesDao 也被提供，以便 PersonalInformationPage 可以使用
         ProxyProvider<AppDatabase, PatientProfilesDao>(
           update: (_, db, __) => PatientProfilesDao(db),
         ),
-        ProxyProvider<AppDatabase, AccidentRecordsDao>(
-          update: (_, db, __) => AccidentRecordsDao(db),
-        ),
+        // ★ 添加 PatientData Provider
+        ChangeNotifierProvider<PatientData>(create: (_) => PatientData()),
       ],
       child: const MyApp(),
     ),
@@ -32,21 +32,33 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
+  Map<String, WidgetBuilder> generateRoutes() {
+    return {
+      for (var route in routeItems)
+        route.path: (context) {
+          final routeSettings = ModalRoute.of(context)?.settings;
+          final visitId = routeSettings?.arguments as int? ?? 1;
+
+          return Nav2Page(
+            visitId: visitId,
+            initialIndex: routeItems.indexWhere(
+              (item) => item.path == route.path,
+            ),
+          );
+        },
+    };
+  }
+
   @override
   Widget build(BuildContext context) {
-    // 取得所有子頁面的路由地圖
     final Map<String, WidgetBuilder> subRoutes = generateRoutes();
-
-    // 建立包含主頁的完整路由地圖
     final Map<String, WidgetBuilder> fullRoutes = {
-      // 根路由：HomePage (包含 Nav1Page)
       '/': (context) => const HomePage(),
     };
-    fullRoutes.addAll(subRoutes); // 加入所有子頁面 (Nav2Page 包裹的內容)
+    fullRoutes.addAll(subRoutes);
 
     return MaterialApp(
       title: 'Accident Demo',
-      // 設定起始路由
       initialRoute: '/',
       routes: fullRoutes,
     );
