@@ -2,8 +2,7 @@
 // import 'nav2.dart';
 
 // class FlightLogPage extends StatefulWidget {
-//   final int visitId;
-//   const FlightLogPage({super.key,required this.visitId,});
+//   const FlightLogPage({super.key});
 
 //   @override
 //   State<FlightLogPage> createState() => _FlightLogPageState();
@@ -46,7 +45,14 @@
 //   ];
 
 //   final List<String> travelOptions = const [
-//     '出境', '入境', '過境', '轉機', '迫降', '轉降', '備降', '其他'
+//     '出境',
+//     '入境',
+//     '過境',
+//     '轉機',
+//     '迫降',
+//     '轉降',
+//     '備降',
+//     '其他',
 //   ];
 
 //   // ----------------- 狀態 -----------------
@@ -62,8 +68,8 @@
 
 //   int? travelStatusIndex;
 
-//   String? dep;  // 啟程地
-//   String? via;  // 經過地
+//   String? dep; // 啟程地
+//   String? via; // 經過地
 //   String? dest; // 目的地
 
 //   // 錨點（讓選單貼在被點元件旁邊）
@@ -84,7 +90,6 @@
 //   @override
 //   Widget build(BuildContext context) {
 //     return Nav2Page(
-//       visitId: widget.visitId,
 //       selectedIndex: 1,
 //       child: Container(
 //         color: const Color(0xFFE6F6FB),
@@ -158,9 +163,15 @@
 //                     hint: '請填寫班機代碼',
 //                     width: 360,
 //                     hintStyle: const TextStyle(
-//                       color: Colors.black87, fontSize: 18, fontWeight: FontWeight.w400),
+//                       color: Colors.black87,
+//                       fontSize: 18,
+//                       fontWeight: FontWeight.w400,
+//                     ),
 //                     textStyle: const TextStyle(
-//                       color: Colors.black87, fontSize: 20, fontWeight: FontWeight.w500),
+//                       color: Colors.black87,
+//                       fontSize: 20,
+//                       fontWeight: FontWeight.w500,
+//                     ),
 //                   ),
 //                   const SizedBox(height: 22),
 
@@ -190,9 +201,15 @@
 //                       hint: '請填寫其他旅行狀態',
 //                       width: 360,
 //                       hintStyle: const TextStyle(
-//                         color: Colors.black87, fontSize: 18, fontWeight: FontWeight.w400),
+//                         color: Colors.black87,
+//                         fontSize: 18,
+//                         fontWeight: FontWeight.w400,
+//                       ),
 //                       textStyle: const TextStyle(
-//                         color: Colors.black87, fontSize: 20, fontWeight: FontWeight.w500),
+//                         color: Colors.black87,
+//                         fontSize: 20,
+//                         fontWeight: FontWeight.w500,
+//                       ),
 //                     ),
 //                   ],
 //                   const SizedBox(height: 28),
@@ -292,11 +309,12 @@
 //         color: Colors.white,
 //         borderRadius: BorderRadius.circular(14), // ← 圓角
 //         boxShadow: const [
-//           BoxShadow( // ← 陰影
+//           BoxShadow(
+//             // ← 陰影
 //             color: Color(0x14000000),
 //             blurRadius: 8,
 //             offset: Offset(0, 4),
-//           )
+//           ),
 //         ],
 //       ),
 //       child: child,
@@ -304,13 +322,13 @@
 //   }
 
 //   Widget _sectionTitle(String s) => Text(
-//         s,
-//         style: const TextStyle(
-//           fontSize: 20,
-//           fontWeight: FontWeight.w700,
-//           color: Colors.black87,
-//         ),
-//       );
+//     s,
+//     style: const TextStyle(
+//       fontSize: 20,
+//       fontWeight: FontWeight.w700,
+//       color: Colors.black87,
+//     ),
+//   );
 
 //   Widget _radioRow({
 //     Key? key,
@@ -346,22 +364,21 @@
 //     required List<String> options,
 //     bool allowSearch = true,
 //   }) async {
-//     final overlay =
-//         Overlay.of(context).context.findRenderObject() as RenderBox;
+//     final overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
 //     final box = anchorKey.currentContext!.findRenderObject() as RenderBox;
 //     final offset = box.localToGlobal(Offset.zero);
-//     final rect = Rect.fromLTWH(offset.dx, offset.dy, box.size.width, box.size.height);
+//     final rect = Rect.fromLTWH(
+//       offset.dx,
+//       offset.dy,
+//       box.size.width,
+//       box.size.height,
+//     );
 
 //     final choice = await showMenu<String>(
 //       context: context,
 //       position: RelativeRect.fromRect(rect, Offset.zero & overlay.size),
 //       items: [
-//         ...options.map(
-//           (e) => PopupMenuItem<String>(
-//             value: e,
-//             child: Text(e),
-//           ),
-//         ),
+//         ...options.map((e) => PopupMenuItem<String>(value: e, child: Text(e))),
 //         if (allowSearch) const PopupMenuDivider(),
 //         if (allowSearch)
 //           const PopupMenuItem<String>(
@@ -389,63 +406,65 @@
 //     return showDialog<String>(
 //       context: context,
 //       builder: (ctx) {
-//         return StatefulBuilder(builder: (ctx, setS) {
-//           return AlertDialog(
-//             title: const Text('搜尋 / 輸入'),
-//             content: SizedBox(
-//               width: 420,
-//               child: Column(
-//                 mainAxisSize: MainAxisSize.min,
-//                 children: [
-//                   TextField(
-//                     controller: ctrl,
-//                     decoration: const InputDecoration(
-//                       hintText: '輸入關鍵字過濾…',
-//                     ),
-//                     onChanged: (t) {
-//                       setS(() {
-//                         showing = options
-//                             .where((e) =>
-//                                 e.toLowerCase().contains(t.toLowerCase()))
-//                             .toList();
-//                         if (showing.isEmpty && t.isNotEmpty) {
-//                           showing = ['新增：$t'];
-//                         }
-//                       });
-//                     },
-//                   ),
-//                   const SizedBox(height: 12),
-//                   ConstrainedBox(
-//                     constraints: const BoxConstraints(maxHeight: 320),
-//                     child: ListView.builder(
-//                       shrinkWrap: true,
-//                       itemCount: showing.length,
-//                       itemBuilder: (_, i) {
-//                         final val = showing[i];
-//                         return ListTile(
-//                           dense: true,
-//                           title: Text(val),
-//                           onTap: () {
-//                             final pure = val.startsWith('新增：')
-//                                 ? val.substring(3)
-//                                 : val;
-//                             Navigator.of(ctx).pop(pure);
-//                           },
-//                         );
+//         return StatefulBuilder(
+//           builder: (ctx, setS) {
+//             return AlertDialog(
+//               title: const Text('搜尋 / 輸入'),
+//               content: SizedBox(
+//                 width: 420,
+//                 child: Column(
+//                   mainAxisSize: MainAxisSize.min,
+//                   children: [
+//                     TextField(
+//                       controller: ctrl,
+//                       decoration: const InputDecoration(hintText: '輸入關鍵字過濾…'),
+//                       onChanged: (t) {
+//                         setS(() {
+//                           showing = options
+//                               .where(
+//                                 (e) =>
+//                                     e.toLowerCase().contains(t.toLowerCase()),
+//                               )
+//                               .toList();
+//                           if (showing.isEmpty && t.isNotEmpty) {
+//                             showing = ['新增：$t'];
+//                           }
+//                         });
 //                       },
 //                     ),
-//                   ),
-//                 ],
+//                     const SizedBox(height: 12),
+//                     ConstrainedBox(
+//                       constraints: const BoxConstraints(maxHeight: 320),
+//                       child: ListView.builder(
+//                         shrinkWrap: true,
+//                         itemCount: showing.length,
+//                         itemBuilder: (_, i) {
+//                           final val = showing[i];
+//                           return ListTile(
+//                             dense: true,
+//                             title: Text(val),
+//                             onTap: () {
+//                               final pure = val.startsWith('新增：')
+//                                   ? val.substring(3)
+//                                   : val;
+//                               Navigator.of(ctx).pop(pure);
+//                             },
+//                           );
+//                         },
+//                       ),
+//                     ),
+//                   ],
+//                 ),
 //               ),
-//             ),
-//             actions: [
-//               TextButton(
-//                 onPressed: () => Navigator.of(ctx).pop(),
-//                 child: const Text('取消'),
-//               ),
-//             ],
-//           );
-//         });
+//               actions: [
+//                 TextButton(
+//                   onPressed: () => Navigator.of(ctx).pop(),
+//                   child: const Text('取消'),
+//                 ),
+//               ],
+//             );
+//           },
+//         );
 //       },
 //     );
 //   }

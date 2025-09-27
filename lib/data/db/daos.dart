@@ -146,3 +146,99 @@ class PatientProfilesDao extends DatabaseAccessor<AppDatabase>
     );
   }
 }
+
+@DriftAccessor(tables: [AccidentRecords])
+class AccidentRecordsDao extends DatabaseAccessor<AppDatabase>
+    with _$AccidentRecordsDaoMixin {
+  AccidentRecordsDao(AppDatabase db) : super(db);
+
+  // 抓本頁資料
+  Future<AccidentRecord?> getByVisitId(int visitId) => (select(
+    accidentRecords,
+  )..where((t) => t.visitId.equals(visitId))).getSingleOrNull();
+
+  // 儲存資料
+  Future<void> upsertByVisitId({
+    required int visitId,
+    DateTime? incidentDate,
+    DateTime? notifyTime,
+    DateTime? pickUpTime,
+    DateTime? medicArriveTime,
+    DateTime? ambulanceDepartTime,
+    DateTime? checkTime,
+    DateTime? landingTime,
+    int? reportUnitIdx,
+    String? otherReportUnit,
+    String? notifier,
+    String? phone,
+    int? placeIdx,
+    String? placeNote,
+    bool occArrived = false,
+    String? cost,
+    int? within10min,
+    bool reasonLanding = false,
+    bool reasonOnline = false,
+    bool reasonOther = false,
+    String? reasonOtherText,
+  }) async {
+    final existing = await getByVisitId(visitId);
+    final now = DateTime.now();
+
+    if (existing == null) {
+      await into(accidentRecords).insert(
+        AccidentRecordsCompanion.insert(
+          visitId: visitId,
+          incidentDate: Value(incidentDate),
+          notifyTime: Value(notifyTime),
+          pickUpTime: Value(pickUpTime),
+          medicArriveTime: Value(medicArriveTime),
+          ambulanceDepartTime: Value(ambulanceDepartTime),
+          checkTime: Value(checkTime),
+          landingTime: Value(landingTime),
+          reportUnitIdx: Value(reportUnitIdx),
+          otherReportUnit: Value(otherReportUnit),
+          notifier: Value(notifier),
+          phone: Value(phone),
+          placeIdx: Value(placeIdx),
+          placeNote: Value(placeNote),
+          occArrived: Value(occArrived),
+          cost: Value(cost),
+          within10min: Value(within10min),
+          reasonLanding: Value(reasonLanding),
+          reasonOnline: Value(reasonOnline),
+          reasonOther: Value(reasonOther),
+          reasonOtherText: Value(reasonOtherText),
+          updatedAt: Value(now),
+        ),
+      );
+    } else {
+      await (update(
+        accidentRecords,
+      )..where((t) => t.visitId.equals(visitId))).write(
+        AccidentRecordsCompanion(
+          incidentDate: Value(incidentDate),
+          notifyTime: Value(notifyTime),
+          pickUpTime: Value(pickUpTime),
+          medicArriveTime: Value(medicArriveTime),
+          ambulanceDepartTime: Value(ambulanceDepartTime),
+          checkTime: Value(checkTime),
+          landingTime: Value(landingTime),
+          reportUnitIdx: Value(reportUnitIdx),
+          otherReportUnit: Value(otherReportUnit),
+          notifier: Value(notifier),
+          phone: Value(phone),
+          placeIdx: Value(placeIdx),
+          placeNote: Value(placeNote),
+          occArrived: Value(occArrived),
+          cost: Value(cost),
+          within10min: Value(within10min),
+          reasonLanding: Value(reasonLanding),
+          reasonOnline: Value(reasonOnline),
+          reasonOther: Value(reasonOther),
+          reasonOtherText: Value(reasonOtherText),
+          updatedAt: Value(now),
+        ),
+      );
+    }
+  }
+}

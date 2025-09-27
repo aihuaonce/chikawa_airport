@@ -13,11 +13,13 @@ part 'app_database.g.dart';
   tables: [
     Visits,
     PatientProfiles,
+    AccidentRecords,
     // 之後還有 Treatments, MedicalCosts, Diagnoses... 全部加在這裡
   ],
   daos: [
     VisitsDao,
     PatientProfilesDao,
+    AccidentRecordsDao,
     // 之後還有 TreatmentsDao, MedicalCostsDao, DiagnosesDao... 全部加在這裡
   ],
 )
@@ -26,7 +28,7 @@ class AppDatabase extends _$AppDatabase {
 
   // 每次資料庫 schema 有變更（加表/加欄位），這裡要 +1
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -34,6 +36,7 @@ class AppDatabase extends _$AppDatabase {
     onUpgrade: (m, from, to) async {
       if (from < 2) await m.createTable(visits);
       if (from < 3) await m.createTable(patientProfiles);
+      if (from < 4) await m.createTable(accidentRecords);
     },
   );
 }
@@ -41,7 +44,7 @@ class AppDatabase extends _$AppDatabase {
 LazyDatabase _openConnection() {
   return LazyDatabase(() async {
     final dir = await getApplicationDocumentsDirectory();
-    final file = File(p.join(dir.path, 'app_v3.db'));
+    final file = File(p.join(dir.path, 'app_v4.db'));
     return NativeDatabase.createInBackground(file);
   });
 }

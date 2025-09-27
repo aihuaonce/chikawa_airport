@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'data/models/patient_data.dart';
+import 'data/models/accident_data.dart';
 import 'data/db/app_database.dart';
-import 'data/db/daos.dart';
-import 'nav2.dart';
 import 'home.dart';
 
 void main() {
@@ -12,8 +11,11 @@ void main() {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => PatientData()),
+        ChangeNotifierProvider(create: (_) => AccidentData()),
+        Provider(create: (_) => db),
         Provider(create: (_) => db.visitsDao),
         Provider(create: (_) => db.patientProfilesDao),
+        Provider(create: (_) => db.accidentRecordsDao),
       ],
       child: const MyApp(),
     ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'PersonalInformation.dart';
+import 'AccidentRecord.dart';
 
 class RouteItem {
   final String label;
@@ -13,5 +14,9 @@ final List<RouteItem> routeItems = [
     builder: (visitId, key) =>
         PersonalInformationPage(key: key, visitId: visitId),
   ),
-  // 可以加入其他頁面
+  RouteItem(
+    label: '事故紀錄',
+    builder: (visitId, key) => AccidentRecordPage(key: key, visitId: visitId),
+  ),
+  // 未來其他頁面...
 ];

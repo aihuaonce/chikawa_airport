@@ -1350,6 +1350,1367 @@ class PatientProfilesCompanion extends UpdateCompanion<PatientProfile> {
   }
 }
 
+class $AccidentRecordsTable extends AccidentRecords
+    with TableInfo<$AccidentRecordsTable, AccidentRecord> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $AccidentRecordsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _visitIdMeta = const VerificationMeta(
+    'visitId',
+  );
+  @override
+  late final GeneratedColumn<int> visitId = GeneratedColumn<int>(
+    'visit_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'),
+  );
+  static const VerificationMeta _incidentDateMeta = const VerificationMeta(
+    'incidentDate',
+  );
+  @override
+  late final GeneratedColumn<DateTime> incidentDate = GeneratedColumn<DateTime>(
+    'incident_date',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _notifyTimeMeta = const VerificationMeta(
+    'notifyTime',
+  );
+  @override
+  late final GeneratedColumn<DateTime> notifyTime = GeneratedColumn<DateTime>(
+    'notify_time',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _pickUpTimeMeta = const VerificationMeta(
+    'pickUpTime',
+  );
+  @override
+  late final GeneratedColumn<DateTime> pickUpTime = GeneratedColumn<DateTime>(
+    'pick_up_time',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _medicArriveTimeMeta = const VerificationMeta(
+    'medicArriveTime',
+  );
+  @override
+  late final GeneratedColumn<DateTime> medicArriveTime =
+      GeneratedColumn<DateTime>(
+        'medic_arrive_time',
+        aliasedName,
+        true,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _ambulanceDepartTimeMeta =
+      const VerificationMeta('ambulanceDepartTime');
+  @override
+  late final GeneratedColumn<DateTime> ambulanceDepartTime =
+      GeneratedColumn<DateTime>(
+        'ambulance_depart_time',
+        aliasedName,
+        true,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _checkTimeMeta = const VerificationMeta(
+    'checkTime',
+  );
+  @override
+  late final GeneratedColumn<DateTime> checkTime = GeneratedColumn<DateTime>(
+    'check_time',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _landingTimeMeta = const VerificationMeta(
+    'landingTime',
+  );
+  @override
+  late final GeneratedColumn<DateTime> landingTime = GeneratedColumn<DateTime>(
+    'landing_time',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _reportUnitIdxMeta = const VerificationMeta(
+    'reportUnitIdx',
+  );
+  @override
+  late final GeneratedColumn<int> reportUnitIdx = GeneratedColumn<int>(
+    'report_unit_idx',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _otherReportUnitMeta = const VerificationMeta(
+    'otherReportUnit',
+  );
+  @override
+  late final GeneratedColumn<String> otherReportUnit = GeneratedColumn<String>(
+    'other_report_unit',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _notifierMeta = const VerificationMeta(
+    'notifier',
+  );
+  @override
+  late final GeneratedColumn<String> notifier = GeneratedColumn<String>(
+    'notifier',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _phoneMeta = const VerificationMeta('phone');
+  @override
+  late final GeneratedColumn<String> phone = GeneratedColumn<String>(
+    'phone',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _placeIdxMeta = const VerificationMeta(
+    'placeIdx',
+  );
+  @override
+  late final GeneratedColumn<int> placeIdx = GeneratedColumn<int>(
+    'place_idx',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _placeNoteMeta = const VerificationMeta(
+    'placeNote',
+  );
+  @override
+  late final GeneratedColumn<String> placeNote = GeneratedColumn<String>(
+    'place_note',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _occArrivedMeta = const VerificationMeta(
+    'occArrived',
+  );
+  @override
+  late final GeneratedColumn<bool> occArrived = GeneratedColumn<bool>(
+    'occ_arrived',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("occ_arrived" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _costMeta = const VerificationMeta('cost');
+  @override
+  late final GeneratedColumn<String> cost = GeneratedColumn<String>(
+    'cost',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _within10minMeta = const VerificationMeta(
+    'within10min',
+  );
+  @override
+  late final GeneratedColumn<int> within10min = GeneratedColumn<int>(
+    'within10min',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _reasonLandingMeta = const VerificationMeta(
+    'reasonLanding',
+  );
+  @override
+  late final GeneratedColumn<bool> reasonLanding = GeneratedColumn<bool>(
+    'reason_landing',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("reason_landing" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _reasonOnlineMeta = const VerificationMeta(
+    'reasonOnline',
+  );
+  @override
+  late final GeneratedColumn<bool> reasonOnline = GeneratedColumn<bool>(
+    'reason_online',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("reason_online" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _reasonOtherMeta = const VerificationMeta(
+    'reasonOther',
+  );
+  @override
+  late final GeneratedColumn<bool> reasonOther = GeneratedColumn<bool>(
+    'reason_other',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("reason_other" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _reasonOtherTextMeta = const VerificationMeta(
+    'reasonOtherText',
+  );
+  @override
+  late final GeneratedColumn<String> reasonOtherText = GeneratedColumn<String>(
+    'reason_other_text',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    visitId,
+    incidentDate,
+    notifyTime,
+    pickUpTime,
+    medicArriveTime,
+    ambulanceDepartTime,
+    checkTime,
+    landingTime,
+    reportUnitIdx,
+    otherReportUnit,
+    notifier,
+    phone,
+    placeIdx,
+    placeNote,
+    occArrived,
+    cost,
+    within10min,
+    reasonLanding,
+    reasonOnline,
+    reasonOther,
+    reasonOtherText,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'accident_records';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<AccidentRecord> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('visit_id')) {
+      context.handle(
+        _visitIdMeta,
+        visitId.isAcceptableOrUnknown(data['visit_id']!, _visitIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_visitIdMeta);
+    }
+    if (data.containsKey('incident_date')) {
+      context.handle(
+        _incidentDateMeta,
+        incidentDate.isAcceptableOrUnknown(
+          data['incident_date']!,
+          _incidentDateMeta,
+        ),
+      );
+    }
+    if (data.containsKey('notify_time')) {
+      context.handle(
+        _notifyTimeMeta,
+        notifyTime.isAcceptableOrUnknown(data['notify_time']!, _notifyTimeMeta),
+      );
+    }
+    if (data.containsKey('pick_up_time')) {
+      context.handle(
+        _pickUpTimeMeta,
+        pickUpTime.isAcceptableOrUnknown(
+          data['pick_up_time']!,
+          _pickUpTimeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('medic_arrive_time')) {
+      context.handle(
+        _medicArriveTimeMeta,
+        medicArriveTime.isAcceptableOrUnknown(
+          data['medic_arrive_time']!,
+          _medicArriveTimeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('ambulance_depart_time')) {
+      context.handle(
+        _ambulanceDepartTimeMeta,
+        ambulanceDepartTime.isAcceptableOrUnknown(
+          data['ambulance_depart_time']!,
+          _ambulanceDepartTimeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('check_time')) {
+      context.handle(
+        _checkTimeMeta,
+        checkTime.isAcceptableOrUnknown(data['check_time']!, _checkTimeMeta),
+      );
+    }
+    if (data.containsKey('landing_time')) {
+      context.handle(
+        _landingTimeMeta,
+        landingTime.isAcceptableOrUnknown(
+          data['landing_time']!,
+          _landingTimeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('report_unit_idx')) {
+      context.handle(
+        _reportUnitIdxMeta,
+        reportUnitIdx.isAcceptableOrUnknown(
+          data['report_unit_idx']!,
+          _reportUnitIdxMeta,
+        ),
+      );
+    }
+    if (data.containsKey('other_report_unit')) {
+      context.handle(
+        _otherReportUnitMeta,
+        otherReportUnit.isAcceptableOrUnknown(
+          data['other_report_unit']!,
+          _otherReportUnitMeta,
+        ),
+      );
+    }
+    if (data.containsKey('notifier')) {
+      context.handle(
+        _notifierMeta,
+        notifier.isAcceptableOrUnknown(data['notifier']!, _notifierMeta),
+      );
+    }
+    if (data.containsKey('phone')) {
+      context.handle(
+        _phoneMeta,
+        phone.isAcceptableOrUnknown(data['phone']!, _phoneMeta),
+      );
+    }
+    if (data.containsKey('place_idx')) {
+      context.handle(
+        _placeIdxMeta,
+        placeIdx.isAcceptableOrUnknown(data['place_idx']!, _placeIdxMeta),
+      );
+    }
+    if (data.containsKey('place_note')) {
+      context.handle(
+        _placeNoteMeta,
+        placeNote.isAcceptableOrUnknown(data['place_note']!, _placeNoteMeta),
+      );
+    }
+    if (data.containsKey('occ_arrived')) {
+      context.handle(
+        _occArrivedMeta,
+        occArrived.isAcceptableOrUnknown(data['occ_arrived']!, _occArrivedMeta),
+      );
+    }
+    if (data.containsKey('cost')) {
+      context.handle(
+        _costMeta,
+        cost.isAcceptableOrUnknown(data['cost']!, _costMeta),
+      );
+    }
+    if (data.containsKey('within10min')) {
+      context.handle(
+        _within10minMeta,
+        within10min.isAcceptableOrUnknown(
+          data['within10min']!,
+          _within10minMeta,
+        ),
+      );
+    }
+    if (data.containsKey('reason_landing')) {
+      context.handle(
+        _reasonLandingMeta,
+        reasonLanding.isAcceptableOrUnknown(
+          data['reason_landing']!,
+          _reasonLandingMeta,
+        ),
+      );
+    }
+    if (data.containsKey('reason_online')) {
+      context.handle(
+        _reasonOnlineMeta,
+        reasonOnline.isAcceptableOrUnknown(
+          data['reason_online']!,
+          _reasonOnlineMeta,
+        ),
+      );
+    }
+    if (data.containsKey('reason_other')) {
+      context.handle(
+        _reasonOtherMeta,
+        reasonOther.isAcceptableOrUnknown(
+          data['reason_other']!,
+          _reasonOtherMeta,
+        ),
+      );
+    }
+    if (data.containsKey('reason_other_text')) {
+      context.handle(
+        _reasonOtherTextMeta,
+        reasonOtherText.isAcceptableOrUnknown(
+          data['reason_other_text']!,
+          _reasonOtherTextMeta,
+        ),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  AccidentRecord map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return AccidentRecord(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      visitId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}visit_id'],
+      )!,
+      incidentDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}incident_date'],
+      ),
+      notifyTime: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}notify_time'],
+      ),
+      pickUpTime: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}pick_up_time'],
+      ),
+      medicArriveTime: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}medic_arrive_time'],
+      ),
+      ambulanceDepartTime: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}ambulance_depart_time'],
+      ),
+      checkTime: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}check_time'],
+      ),
+      landingTime: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}landing_time'],
+      ),
+      reportUnitIdx: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}report_unit_idx'],
+      ),
+      otherReportUnit: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}other_report_unit'],
+      ),
+      notifier: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}notifier'],
+      ),
+      phone: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}phone'],
+      ),
+      placeIdx: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}place_idx'],
+      ),
+      placeNote: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}place_note'],
+      ),
+      occArrived: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}occ_arrived'],
+      )!,
+      cost: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}cost'],
+      ),
+      within10min: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}within10min'],
+      ),
+      reasonLanding: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}reason_landing'],
+      )!,
+      reasonOnline: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}reason_online'],
+      )!,
+      reasonOther: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}reason_other'],
+      )!,
+      reasonOtherText: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}reason_other_text'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $AccidentRecordsTable createAlias(String alias) {
+    return $AccidentRecordsTable(attachedDatabase, alias);
+  }
+}
+
+class AccidentRecord extends DataClass implements Insertable<AccidentRecord> {
+  final int id;
+  final int visitId;
+  final DateTime? incidentDate;
+  final DateTime? notifyTime;
+  final DateTime? pickUpTime;
+  final DateTime? medicArriveTime;
+  final DateTime? ambulanceDepartTime;
+  final DateTime? checkTime;
+  final DateTime? landingTime;
+  final int? reportUnitIdx;
+  final String? otherReportUnit;
+  final String? notifier;
+  final String? phone;
+  final int? placeIdx;
+  final String? placeNote;
+  final bool occArrived;
+  final String? cost;
+  final int? within10min;
+  final bool reasonLanding;
+  final bool reasonOnline;
+  final bool reasonOther;
+  final String? reasonOtherText;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  const AccidentRecord({
+    required this.id,
+    required this.visitId,
+    this.incidentDate,
+    this.notifyTime,
+    this.pickUpTime,
+    this.medicArriveTime,
+    this.ambulanceDepartTime,
+    this.checkTime,
+    this.landingTime,
+    this.reportUnitIdx,
+    this.otherReportUnit,
+    this.notifier,
+    this.phone,
+    this.placeIdx,
+    this.placeNote,
+    required this.occArrived,
+    this.cost,
+    this.within10min,
+    required this.reasonLanding,
+    required this.reasonOnline,
+    required this.reasonOther,
+    this.reasonOtherText,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['visit_id'] = Variable<int>(visitId);
+    if (!nullToAbsent || incidentDate != null) {
+      map['incident_date'] = Variable<DateTime>(incidentDate);
+    }
+    if (!nullToAbsent || notifyTime != null) {
+      map['notify_time'] = Variable<DateTime>(notifyTime);
+    }
+    if (!nullToAbsent || pickUpTime != null) {
+      map['pick_up_time'] = Variable<DateTime>(pickUpTime);
+    }
+    if (!nullToAbsent || medicArriveTime != null) {
+      map['medic_arrive_time'] = Variable<DateTime>(medicArriveTime);
+    }
+    if (!nullToAbsent || ambulanceDepartTime != null) {
+      map['ambulance_depart_time'] = Variable<DateTime>(ambulanceDepartTime);
+    }
+    if (!nullToAbsent || checkTime != null) {
+      map['check_time'] = Variable<DateTime>(checkTime);
+    }
+    if (!nullToAbsent || landingTime != null) {
+      map['landing_time'] = Variable<DateTime>(landingTime);
+    }
+    if (!nullToAbsent || reportUnitIdx != null) {
+      map['report_unit_idx'] = Variable<int>(reportUnitIdx);
+    }
+    if (!nullToAbsent || otherReportUnit != null) {
+      map['other_report_unit'] = Variable<String>(otherReportUnit);
+    }
+    if (!nullToAbsent || notifier != null) {
+      map['notifier'] = Variable<String>(notifier);
+    }
+    if (!nullToAbsent || phone != null) {
+      map['phone'] = Variable<String>(phone);
+    }
+    if (!nullToAbsent || placeIdx != null) {
+      map['place_idx'] = Variable<int>(placeIdx);
+    }
+    if (!nullToAbsent || placeNote != null) {
+      map['place_note'] = Variable<String>(placeNote);
+    }
+    map['occ_arrived'] = Variable<bool>(occArrived);
+    if (!nullToAbsent || cost != null) {
+      map['cost'] = Variable<String>(cost);
+    }
+    if (!nullToAbsent || within10min != null) {
+      map['within10min'] = Variable<int>(within10min);
+    }
+    map['reason_landing'] = Variable<bool>(reasonLanding);
+    map['reason_online'] = Variable<bool>(reasonOnline);
+    map['reason_other'] = Variable<bool>(reasonOther);
+    if (!nullToAbsent || reasonOtherText != null) {
+      map['reason_other_text'] = Variable<String>(reasonOtherText);
+    }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  AccidentRecordsCompanion toCompanion(bool nullToAbsent) {
+    return AccidentRecordsCompanion(
+      id: Value(id),
+      visitId: Value(visitId),
+      incidentDate: incidentDate == null && nullToAbsent
+          ? const Value.absent()
+          : Value(incidentDate),
+      notifyTime: notifyTime == null && nullToAbsent
+          ? const Value.absent()
+          : Value(notifyTime),
+      pickUpTime: pickUpTime == null && nullToAbsent
+          ? const Value.absent()
+          : Value(pickUpTime),
+      medicArriveTime: medicArriveTime == null && nullToAbsent
+          ? const Value.absent()
+          : Value(medicArriveTime),
+      ambulanceDepartTime: ambulanceDepartTime == null && nullToAbsent
+          ? const Value.absent()
+          : Value(ambulanceDepartTime),
+      checkTime: checkTime == null && nullToAbsent
+          ? const Value.absent()
+          : Value(checkTime),
+      landingTime: landingTime == null && nullToAbsent
+          ? const Value.absent()
+          : Value(landingTime),
+      reportUnitIdx: reportUnitIdx == null && nullToAbsent
+          ? const Value.absent()
+          : Value(reportUnitIdx),
+      otherReportUnit: otherReportUnit == null && nullToAbsent
+          ? const Value.absent()
+          : Value(otherReportUnit),
+      notifier: notifier == null && nullToAbsent
+          ? const Value.absent()
+          : Value(notifier),
+      phone: phone == null && nullToAbsent
+          ? const Value.absent()
+          : Value(phone),
+      placeIdx: placeIdx == null && nullToAbsent
+          ? const Value.absent()
+          : Value(placeIdx),
+      placeNote: placeNote == null && nullToAbsent
+          ? const Value.absent()
+          : Value(placeNote),
+      occArrived: Value(occArrived),
+      cost: cost == null && nullToAbsent ? const Value.absent() : Value(cost),
+      within10min: within10min == null && nullToAbsent
+          ? const Value.absent()
+          : Value(within10min),
+      reasonLanding: Value(reasonLanding),
+      reasonOnline: Value(reasonOnline),
+      reasonOther: Value(reasonOther),
+      reasonOtherText: reasonOtherText == null && nullToAbsent
+          ? const Value.absent()
+          : Value(reasonOtherText),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory AccidentRecord.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return AccidentRecord(
+      id: serializer.fromJson<int>(json['id']),
+      visitId: serializer.fromJson<int>(json['visitId']),
+      incidentDate: serializer.fromJson<DateTime?>(json['incidentDate']),
+      notifyTime: serializer.fromJson<DateTime?>(json['notifyTime']),
+      pickUpTime: serializer.fromJson<DateTime?>(json['pickUpTime']),
+      medicArriveTime: serializer.fromJson<DateTime?>(json['medicArriveTime']),
+      ambulanceDepartTime: serializer.fromJson<DateTime?>(
+        json['ambulanceDepartTime'],
+      ),
+      checkTime: serializer.fromJson<DateTime?>(json['checkTime']),
+      landingTime: serializer.fromJson<DateTime?>(json['landingTime']),
+      reportUnitIdx: serializer.fromJson<int?>(json['reportUnitIdx']),
+      otherReportUnit: serializer.fromJson<String?>(json['otherReportUnit']),
+      notifier: serializer.fromJson<String?>(json['notifier']),
+      phone: serializer.fromJson<String?>(json['phone']),
+      placeIdx: serializer.fromJson<int?>(json['placeIdx']),
+      placeNote: serializer.fromJson<String?>(json['placeNote']),
+      occArrived: serializer.fromJson<bool>(json['occArrived']),
+      cost: serializer.fromJson<String?>(json['cost']),
+      within10min: serializer.fromJson<int?>(json['within10min']),
+      reasonLanding: serializer.fromJson<bool>(json['reasonLanding']),
+      reasonOnline: serializer.fromJson<bool>(json['reasonOnline']),
+      reasonOther: serializer.fromJson<bool>(json['reasonOther']),
+      reasonOtherText: serializer.fromJson<String?>(json['reasonOtherText']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'visitId': serializer.toJson<int>(visitId),
+      'incidentDate': serializer.toJson<DateTime?>(incidentDate),
+      'notifyTime': serializer.toJson<DateTime?>(notifyTime),
+      'pickUpTime': serializer.toJson<DateTime?>(pickUpTime),
+      'medicArriveTime': serializer.toJson<DateTime?>(medicArriveTime),
+      'ambulanceDepartTime': serializer.toJson<DateTime?>(ambulanceDepartTime),
+      'checkTime': serializer.toJson<DateTime?>(checkTime),
+      'landingTime': serializer.toJson<DateTime?>(landingTime),
+      'reportUnitIdx': serializer.toJson<int?>(reportUnitIdx),
+      'otherReportUnit': serializer.toJson<String?>(otherReportUnit),
+      'notifier': serializer.toJson<String?>(notifier),
+      'phone': serializer.toJson<String?>(phone),
+      'placeIdx': serializer.toJson<int?>(placeIdx),
+      'placeNote': serializer.toJson<String?>(placeNote),
+      'occArrived': serializer.toJson<bool>(occArrived),
+      'cost': serializer.toJson<String?>(cost),
+      'within10min': serializer.toJson<int?>(within10min),
+      'reasonLanding': serializer.toJson<bool>(reasonLanding),
+      'reasonOnline': serializer.toJson<bool>(reasonOnline),
+      'reasonOther': serializer.toJson<bool>(reasonOther),
+      'reasonOtherText': serializer.toJson<String?>(reasonOtherText),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  AccidentRecord copyWith({
+    int? id,
+    int? visitId,
+    Value<DateTime?> incidentDate = const Value.absent(),
+    Value<DateTime?> notifyTime = const Value.absent(),
+    Value<DateTime?> pickUpTime = const Value.absent(),
+    Value<DateTime?> medicArriveTime = const Value.absent(),
+    Value<DateTime?> ambulanceDepartTime = const Value.absent(),
+    Value<DateTime?> checkTime = const Value.absent(),
+    Value<DateTime?> landingTime = const Value.absent(),
+    Value<int?> reportUnitIdx = const Value.absent(),
+    Value<String?> otherReportUnit = const Value.absent(),
+    Value<String?> notifier = const Value.absent(),
+    Value<String?> phone = const Value.absent(),
+    Value<int?> placeIdx = const Value.absent(),
+    Value<String?> placeNote = const Value.absent(),
+    bool? occArrived,
+    Value<String?> cost = const Value.absent(),
+    Value<int?> within10min = const Value.absent(),
+    bool? reasonLanding,
+    bool? reasonOnline,
+    bool? reasonOther,
+    Value<String?> reasonOtherText = const Value.absent(),
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) => AccidentRecord(
+    id: id ?? this.id,
+    visitId: visitId ?? this.visitId,
+    incidentDate: incidentDate.present ? incidentDate.value : this.incidentDate,
+    notifyTime: notifyTime.present ? notifyTime.value : this.notifyTime,
+    pickUpTime: pickUpTime.present ? pickUpTime.value : this.pickUpTime,
+    medicArriveTime: medicArriveTime.present
+        ? medicArriveTime.value
+        : this.medicArriveTime,
+    ambulanceDepartTime: ambulanceDepartTime.present
+        ? ambulanceDepartTime.value
+        : this.ambulanceDepartTime,
+    checkTime: checkTime.present ? checkTime.value : this.checkTime,
+    landingTime: landingTime.present ? landingTime.value : this.landingTime,
+    reportUnitIdx: reportUnitIdx.present
+        ? reportUnitIdx.value
+        : this.reportUnitIdx,
+    otherReportUnit: otherReportUnit.present
+        ? otherReportUnit.value
+        : this.otherReportUnit,
+    notifier: notifier.present ? notifier.value : this.notifier,
+    phone: phone.present ? phone.value : this.phone,
+    placeIdx: placeIdx.present ? placeIdx.value : this.placeIdx,
+    placeNote: placeNote.present ? placeNote.value : this.placeNote,
+    occArrived: occArrived ?? this.occArrived,
+    cost: cost.present ? cost.value : this.cost,
+    within10min: within10min.present ? within10min.value : this.within10min,
+    reasonLanding: reasonLanding ?? this.reasonLanding,
+    reasonOnline: reasonOnline ?? this.reasonOnline,
+    reasonOther: reasonOther ?? this.reasonOther,
+    reasonOtherText: reasonOtherText.present
+        ? reasonOtherText.value
+        : this.reasonOtherText,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  AccidentRecord copyWithCompanion(AccidentRecordsCompanion data) {
+    return AccidentRecord(
+      id: data.id.present ? data.id.value : this.id,
+      visitId: data.visitId.present ? data.visitId.value : this.visitId,
+      incidentDate: data.incidentDate.present
+          ? data.incidentDate.value
+          : this.incidentDate,
+      notifyTime: data.notifyTime.present
+          ? data.notifyTime.value
+          : this.notifyTime,
+      pickUpTime: data.pickUpTime.present
+          ? data.pickUpTime.value
+          : this.pickUpTime,
+      medicArriveTime: data.medicArriveTime.present
+          ? data.medicArriveTime.value
+          : this.medicArriveTime,
+      ambulanceDepartTime: data.ambulanceDepartTime.present
+          ? data.ambulanceDepartTime.value
+          : this.ambulanceDepartTime,
+      checkTime: data.checkTime.present ? data.checkTime.value : this.checkTime,
+      landingTime: data.landingTime.present
+          ? data.landingTime.value
+          : this.landingTime,
+      reportUnitIdx: data.reportUnitIdx.present
+          ? data.reportUnitIdx.value
+          : this.reportUnitIdx,
+      otherReportUnit: data.otherReportUnit.present
+          ? data.otherReportUnit.value
+          : this.otherReportUnit,
+      notifier: data.notifier.present ? data.notifier.value : this.notifier,
+      phone: data.phone.present ? data.phone.value : this.phone,
+      placeIdx: data.placeIdx.present ? data.placeIdx.value : this.placeIdx,
+      placeNote: data.placeNote.present ? data.placeNote.value : this.placeNote,
+      occArrived: data.occArrived.present
+          ? data.occArrived.value
+          : this.occArrived,
+      cost: data.cost.present ? data.cost.value : this.cost,
+      within10min: data.within10min.present
+          ? data.within10min.value
+          : this.within10min,
+      reasonLanding: data.reasonLanding.present
+          ? data.reasonLanding.value
+          : this.reasonLanding,
+      reasonOnline: data.reasonOnline.present
+          ? data.reasonOnline.value
+          : this.reasonOnline,
+      reasonOther: data.reasonOther.present
+          ? data.reasonOther.value
+          : this.reasonOther,
+      reasonOtherText: data.reasonOtherText.present
+          ? data.reasonOtherText.value
+          : this.reasonOtherText,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AccidentRecord(')
+          ..write('id: $id, ')
+          ..write('visitId: $visitId, ')
+          ..write('incidentDate: $incidentDate, ')
+          ..write('notifyTime: $notifyTime, ')
+          ..write('pickUpTime: $pickUpTime, ')
+          ..write('medicArriveTime: $medicArriveTime, ')
+          ..write('ambulanceDepartTime: $ambulanceDepartTime, ')
+          ..write('checkTime: $checkTime, ')
+          ..write('landingTime: $landingTime, ')
+          ..write('reportUnitIdx: $reportUnitIdx, ')
+          ..write('otherReportUnit: $otherReportUnit, ')
+          ..write('notifier: $notifier, ')
+          ..write('phone: $phone, ')
+          ..write('placeIdx: $placeIdx, ')
+          ..write('placeNote: $placeNote, ')
+          ..write('occArrived: $occArrived, ')
+          ..write('cost: $cost, ')
+          ..write('within10min: $within10min, ')
+          ..write('reasonLanding: $reasonLanding, ')
+          ..write('reasonOnline: $reasonOnline, ')
+          ..write('reasonOther: $reasonOther, ')
+          ..write('reasonOtherText: $reasonOtherText, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hashAll([
+    id,
+    visitId,
+    incidentDate,
+    notifyTime,
+    pickUpTime,
+    medicArriveTime,
+    ambulanceDepartTime,
+    checkTime,
+    landingTime,
+    reportUnitIdx,
+    otherReportUnit,
+    notifier,
+    phone,
+    placeIdx,
+    placeNote,
+    occArrived,
+    cost,
+    within10min,
+    reasonLanding,
+    reasonOnline,
+    reasonOther,
+    reasonOtherText,
+    createdAt,
+    updatedAt,
+  ]);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is AccidentRecord &&
+          other.id == this.id &&
+          other.visitId == this.visitId &&
+          other.incidentDate == this.incidentDate &&
+          other.notifyTime == this.notifyTime &&
+          other.pickUpTime == this.pickUpTime &&
+          other.medicArriveTime == this.medicArriveTime &&
+          other.ambulanceDepartTime == this.ambulanceDepartTime &&
+          other.checkTime == this.checkTime &&
+          other.landingTime == this.landingTime &&
+          other.reportUnitIdx == this.reportUnitIdx &&
+          other.otherReportUnit == this.otherReportUnit &&
+          other.notifier == this.notifier &&
+          other.phone == this.phone &&
+          other.placeIdx == this.placeIdx &&
+          other.placeNote == this.placeNote &&
+          other.occArrived == this.occArrived &&
+          other.cost == this.cost &&
+          other.within10min == this.within10min &&
+          other.reasonLanding == this.reasonLanding &&
+          other.reasonOnline == this.reasonOnline &&
+          other.reasonOther == this.reasonOther &&
+          other.reasonOtherText == this.reasonOtherText &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class AccidentRecordsCompanion extends UpdateCompanion<AccidentRecord> {
+  final Value<int> id;
+  final Value<int> visitId;
+  final Value<DateTime?> incidentDate;
+  final Value<DateTime?> notifyTime;
+  final Value<DateTime?> pickUpTime;
+  final Value<DateTime?> medicArriveTime;
+  final Value<DateTime?> ambulanceDepartTime;
+  final Value<DateTime?> checkTime;
+  final Value<DateTime?> landingTime;
+  final Value<int?> reportUnitIdx;
+  final Value<String?> otherReportUnit;
+  final Value<String?> notifier;
+  final Value<String?> phone;
+  final Value<int?> placeIdx;
+  final Value<String?> placeNote;
+  final Value<bool> occArrived;
+  final Value<String?> cost;
+  final Value<int?> within10min;
+  final Value<bool> reasonLanding;
+  final Value<bool> reasonOnline;
+  final Value<bool> reasonOther;
+  final Value<String?> reasonOtherText;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  const AccidentRecordsCompanion({
+    this.id = const Value.absent(),
+    this.visitId = const Value.absent(),
+    this.incidentDate = const Value.absent(),
+    this.notifyTime = const Value.absent(),
+    this.pickUpTime = const Value.absent(),
+    this.medicArriveTime = const Value.absent(),
+    this.ambulanceDepartTime = const Value.absent(),
+    this.checkTime = const Value.absent(),
+    this.landingTime = const Value.absent(),
+    this.reportUnitIdx = const Value.absent(),
+    this.otherReportUnit = const Value.absent(),
+    this.notifier = const Value.absent(),
+    this.phone = const Value.absent(),
+    this.placeIdx = const Value.absent(),
+    this.placeNote = const Value.absent(),
+    this.occArrived = const Value.absent(),
+    this.cost = const Value.absent(),
+    this.within10min = const Value.absent(),
+    this.reasonLanding = const Value.absent(),
+    this.reasonOnline = const Value.absent(),
+    this.reasonOther = const Value.absent(),
+    this.reasonOtherText = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  });
+  AccidentRecordsCompanion.insert({
+    this.id = const Value.absent(),
+    required int visitId,
+    this.incidentDate = const Value.absent(),
+    this.notifyTime = const Value.absent(),
+    this.pickUpTime = const Value.absent(),
+    this.medicArriveTime = const Value.absent(),
+    this.ambulanceDepartTime = const Value.absent(),
+    this.checkTime = const Value.absent(),
+    this.landingTime = const Value.absent(),
+    this.reportUnitIdx = const Value.absent(),
+    this.otherReportUnit = const Value.absent(),
+    this.notifier = const Value.absent(),
+    this.phone = const Value.absent(),
+    this.placeIdx = const Value.absent(),
+    this.placeNote = const Value.absent(),
+    this.occArrived = const Value.absent(),
+    this.cost = const Value.absent(),
+    this.within10min = const Value.absent(),
+    this.reasonLanding = const Value.absent(),
+    this.reasonOnline = const Value.absent(),
+    this.reasonOther = const Value.absent(),
+    this.reasonOtherText = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  }) : visitId = Value(visitId);
+  static Insertable<AccidentRecord> custom({
+    Expression<int>? id,
+    Expression<int>? visitId,
+    Expression<DateTime>? incidentDate,
+    Expression<DateTime>? notifyTime,
+    Expression<DateTime>? pickUpTime,
+    Expression<DateTime>? medicArriveTime,
+    Expression<DateTime>? ambulanceDepartTime,
+    Expression<DateTime>? checkTime,
+    Expression<DateTime>? landingTime,
+    Expression<int>? reportUnitIdx,
+    Expression<String>? otherReportUnit,
+    Expression<String>? notifier,
+    Expression<String>? phone,
+    Expression<int>? placeIdx,
+    Expression<String>? placeNote,
+    Expression<bool>? occArrived,
+    Expression<String>? cost,
+    Expression<int>? within10min,
+    Expression<bool>? reasonLanding,
+    Expression<bool>? reasonOnline,
+    Expression<bool>? reasonOther,
+    Expression<String>? reasonOtherText,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (visitId != null) 'visit_id': visitId,
+      if (incidentDate != null) 'incident_date': incidentDate,
+      if (notifyTime != null) 'notify_time': notifyTime,
+      if (pickUpTime != null) 'pick_up_time': pickUpTime,
+      if (medicArriveTime != null) 'medic_arrive_time': medicArriveTime,
+      if (ambulanceDepartTime != null)
+        'ambulance_depart_time': ambulanceDepartTime,
+      if (checkTime != null) 'check_time': checkTime,
+      if (landingTime != null) 'landing_time': landingTime,
+      if (reportUnitIdx != null) 'report_unit_idx': reportUnitIdx,
+      if (otherReportUnit != null) 'other_report_unit': otherReportUnit,
+      if (notifier != null) 'notifier': notifier,
+      if (phone != null) 'phone': phone,
+      if (placeIdx != null) 'place_idx': placeIdx,
+      if (placeNote != null) 'place_note': placeNote,
+      if (occArrived != null) 'occ_arrived': occArrived,
+      if (cost != null) 'cost': cost,
+      if (within10min != null) 'within10min': within10min,
+      if (reasonLanding != null) 'reason_landing': reasonLanding,
+      if (reasonOnline != null) 'reason_online': reasonOnline,
+      if (reasonOther != null) 'reason_other': reasonOther,
+      if (reasonOtherText != null) 'reason_other_text': reasonOtherText,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+    });
+  }
+
+  AccidentRecordsCompanion copyWith({
+    Value<int>? id,
+    Value<int>? visitId,
+    Value<DateTime?>? incidentDate,
+    Value<DateTime?>? notifyTime,
+    Value<DateTime?>? pickUpTime,
+    Value<DateTime?>? medicArriveTime,
+    Value<DateTime?>? ambulanceDepartTime,
+    Value<DateTime?>? checkTime,
+    Value<DateTime?>? landingTime,
+    Value<int?>? reportUnitIdx,
+    Value<String?>? otherReportUnit,
+    Value<String?>? notifier,
+    Value<String?>? phone,
+    Value<int?>? placeIdx,
+    Value<String?>? placeNote,
+    Value<bool>? occArrived,
+    Value<String?>? cost,
+    Value<int?>? within10min,
+    Value<bool>? reasonLanding,
+    Value<bool>? reasonOnline,
+    Value<bool>? reasonOther,
+    Value<String?>? reasonOtherText,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+  }) {
+    return AccidentRecordsCompanion(
+      id: id ?? this.id,
+      visitId: visitId ?? this.visitId,
+      incidentDate: incidentDate ?? this.incidentDate,
+      notifyTime: notifyTime ?? this.notifyTime,
+      pickUpTime: pickUpTime ?? this.pickUpTime,
+      medicArriveTime: medicArriveTime ?? this.medicArriveTime,
+      ambulanceDepartTime: ambulanceDepartTime ?? this.ambulanceDepartTime,
+      checkTime: checkTime ?? this.checkTime,
+      landingTime: landingTime ?? this.landingTime,
+      reportUnitIdx: reportUnitIdx ?? this.reportUnitIdx,
+      otherReportUnit: otherReportUnit ?? this.otherReportUnit,
+      notifier: notifier ?? this.notifier,
+      phone: phone ?? this.phone,
+      placeIdx: placeIdx ?? this.placeIdx,
+      placeNote: placeNote ?? this.placeNote,
+      occArrived: occArrived ?? this.occArrived,
+      cost: cost ?? this.cost,
+      within10min: within10min ?? this.within10min,
+      reasonLanding: reasonLanding ?? this.reasonLanding,
+      reasonOnline: reasonOnline ?? this.reasonOnline,
+      reasonOther: reasonOther ?? this.reasonOther,
+      reasonOtherText: reasonOtherText ?? this.reasonOtherText,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (visitId.present) {
+      map['visit_id'] = Variable<int>(visitId.value);
+    }
+    if (incidentDate.present) {
+      map['incident_date'] = Variable<DateTime>(incidentDate.value);
+    }
+    if (notifyTime.present) {
+      map['notify_time'] = Variable<DateTime>(notifyTime.value);
+    }
+    if (pickUpTime.present) {
+      map['pick_up_time'] = Variable<DateTime>(pickUpTime.value);
+    }
+    if (medicArriveTime.present) {
+      map['medic_arrive_time'] = Variable<DateTime>(medicArriveTime.value);
+    }
+    if (ambulanceDepartTime.present) {
+      map['ambulance_depart_time'] = Variable<DateTime>(
+        ambulanceDepartTime.value,
+      );
+    }
+    if (checkTime.present) {
+      map['check_time'] = Variable<DateTime>(checkTime.value);
+    }
+    if (landingTime.present) {
+      map['landing_time'] = Variable<DateTime>(landingTime.value);
+    }
+    if (reportUnitIdx.present) {
+      map['report_unit_idx'] = Variable<int>(reportUnitIdx.value);
+    }
+    if (otherReportUnit.present) {
+      map['other_report_unit'] = Variable<String>(otherReportUnit.value);
+    }
+    if (notifier.present) {
+      map['notifier'] = Variable<String>(notifier.value);
+    }
+    if (phone.present) {
+      map['phone'] = Variable<String>(phone.value);
+    }
+    if (placeIdx.present) {
+      map['place_idx'] = Variable<int>(placeIdx.value);
+    }
+    if (placeNote.present) {
+      map['place_note'] = Variable<String>(placeNote.value);
+    }
+    if (occArrived.present) {
+      map['occ_arrived'] = Variable<bool>(occArrived.value);
+    }
+    if (cost.present) {
+      map['cost'] = Variable<String>(cost.value);
+    }
+    if (within10min.present) {
+      map['within10min'] = Variable<int>(within10min.value);
+    }
+    if (reasonLanding.present) {
+      map['reason_landing'] = Variable<bool>(reasonLanding.value);
+    }
+    if (reasonOnline.present) {
+      map['reason_online'] = Variable<bool>(reasonOnline.value);
+    }
+    if (reasonOther.present) {
+      map['reason_other'] = Variable<bool>(reasonOther.value);
+    }
+    if (reasonOtherText.present) {
+      map['reason_other_text'] = Variable<String>(reasonOtherText.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AccidentRecordsCompanion(')
+          ..write('id: $id, ')
+          ..write('visitId: $visitId, ')
+          ..write('incidentDate: $incidentDate, ')
+          ..write('notifyTime: $notifyTime, ')
+          ..write('pickUpTime: $pickUpTime, ')
+          ..write('medicArriveTime: $medicArriveTime, ')
+          ..write('ambulanceDepartTime: $ambulanceDepartTime, ')
+          ..write('checkTime: $checkTime, ')
+          ..write('landingTime: $landingTime, ')
+          ..write('reportUnitIdx: $reportUnitIdx, ')
+          ..write('otherReportUnit: $otherReportUnit, ')
+          ..write('notifier: $notifier, ')
+          ..write('phone: $phone, ')
+          ..write('placeIdx: $placeIdx, ')
+          ..write('placeNote: $placeNote, ')
+          ..write('occArrived: $occArrived, ')
+          ..write('cost: $cost, ')
+          ..write('within10min: $within10min, ')
+          ..write('reasonLanding: $reasonLanding, ')
+          ..write('reasonOnline: $reasonOnline, ')
+          ..write('reasonOther: $reasonOther, ')
+          ..write('reasonOtherText: $reasonOtherText, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -1357,15 +2718,25 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $PatientProfilesTable patientProfiles = $PatientProfilesTable(
     this,
   );
+  late final $AccidentRecordsTable accidentRecords = $AccidentRecordsTable(
+    this,
+  );
   late final VisitsDao visitsDao = VisitsDao(this as AppDatabase);
   late final PatientProfilesDao patientProfilesDao = PatientProfilesDao(
+    this as AppDatabase,
+  );
+  late final AccidentRecordsDao accidentRecordsDao = AccidentRecordsDao(
     this as AppDatabase,
   );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
-  List<DatabaseSchemaEntity> get allSchemaEntities => [visits, patientProfiles];
+  List<DatabaseSchemaEntity> get allSchemaEntities => [
+    visits,
+    patientProfiles,
+    accidentRecords,
+  ];
 }
 
 typedef $$VisitsTableCreateCompanionBuilder =
@@ -2011,6 +3382,595 @@ typedef $$PatientProfilesTableProcessedTableManager =
       PatientProfile,
       PrefetchHooks Function()
     >;
+typedef $$AccidentRecordsTableCreateCompanionBuilder =
+    AccidentRecordsCompanion Function({
+      Value<int> id,
+      required int visitId,
+      Value<DateTime?> incidentDate,
+      Value<DateTime?> notifyTime,
+      Value<DateTime?> pickUpTime,
+      Value<DateTime?> medicArriveTime,
+      Value<DateTime?> ambulanceDepartTime,
+      Value<DateTime?> checkTime,
+      Value<DateTime?> landingTime,
+      Value<int?> reportUnitIdx,
+      Value<String?> otherReportUnit,
+      Value<String?> notifier,
+      Value<String?> phone,
+      Value<int?> placeIdx,
+      Value<String?> placeNote,
+      Value<bool> occArrived,
+      Value<String?> cost,
+      Value<int?> within10min,
+      Value<bool> reasonLanding,
+      Value<bool> reasonOnline,
+      Value<bool> reasonOther,
+      Value<String?> reasonOtherText,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+    });
+typedef $$AccidentRecordsTableUpdateCompanionBuilder =
+    AccidentRecordsCompanion Function({
+      Value<int> id,
+      Value<int> visitId,
+      Value<DateTime?> incidentDate,
+      Value<DateTime?> notifyTime,
+      Value<DateTime?> pickUpTime,
+      Value<DateTime?> medicArriveTime,
+      Value<DateTime?> ambulanceDepartTime,
+      Value<DateTime?> checkTime,
+      Value<DateTime?> landingTime,
+      Value<int?> reportUnitIdx,
+      Value<String?> otherReportUnit,
+      Value<String?> notifier,
+      Value<String?> phone,
+      Value<int?> placeIdx,
+      Value<String?> placeNote,
+      Value<bool> occArrived,
+      Value<String?> cost,
+      Value<int?> within10min,
+      Value<bool> reasonLanding,
+      Value<bool> reasonOnline,
+      Value<bool> reasonOther,
+      Value<String?> reasonOtherText,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+    });
+
+class $$AccidentRecordsTableFilterComposer
+    extends Composer<_$AppDatabase, $AccidentRecordsTable> {
+  $$AccidentRecordsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get visitId => $composableBuilder(
+    column: $table.visitId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get incidentDate => $composableBuilder(
+    column: $table.incidentDate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get notifyTime => $composableBuilder(
+    column: $table.notifyTime,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get pickUpTime => $composableBuilder(
+    column: $table.pickUpTime,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get medicArriveTime => $composableBuilder(
+    column: $table.medicArriveTime,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get ambulanceDepartTime => $composableBuilder(
+    column: $table.ambulanceDepartTime,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get checkTime => $composableBuilder(
+    column: $table.checkTime,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get landingTime => $composableBuilder(
+    column: $table.landingTime,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get reportUnitIdx => $composableBuilder(
+    column: $table.reportUnitIdx,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get otherReportUnit => $composableBuilder(
+    column: $table.otherReportUnit,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get notifier => $composableBuilder(
+    column: $table.notifier,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get phone => $composableBuilder(
+    column: $table.phone,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get placeIdx => $composableBuilder(
+    column: $table.placeIdx,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get placeNote => $composableBuilder(
+    column: $table.placeNote,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get occArrived => $composableBuilder(
+    column: $table.occArrived,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get cost => $composableBuilder(
+    column: $table.cost,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get within10min => $composableBuilder(
+    column: $table.within10min,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get reasonLanding => $composableBuilder(
+    column: $table.reasonLanding,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get reasonOnline => $composableBuilder(
+    column: $table.reasonOnline,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get reasonOther => $composableBuilder(
+    column: $table.reasonOther,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get reasonOtherText => $composableBuilder(
+    column: $table.reasonOtherText,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$AccidentRecordsTableOrderingComposer
+    extends Composer<_$AppDatabase, $AccidentRecordsTable> {
+  $$AccidentRecordsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get visitId => $composableBuilder(
+    column: $table.visitId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get incidentDate => $composableBuilder(
+    column: $table.incidentDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get notifyTime => $composableBuilder(
+    column: $table.notifyTime,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get pickUpTime => $composableBuilder(
+    column: $table.pickUpTime,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get medicArriveTime => $composableBuilder(
+    column: $table.medicArriveTime,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get ambulanceDepartTime => $composableBuilder(
+    column: $table.ambulanceDepartTime,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get checkTime => $composableBuilder(
+    column: $table.checkTime,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get landingTime => $composableBuilder(
+    column: $table.landingTime,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get reportUnitIdx => $composableBuilder(
+    column: $table.reportUnitIdx,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get otherReportUnit => $composableBuilder(
+    column: $table.otherReportUnit,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get notifier => $composableBuilder(
+    column: $table.notifier,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get phone => $composableBuilder(
+    column: $table.phone,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get placeIdx => $composableBuilder(
+    column: $table.placeIdx,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get placeNote => $composableBuilder(
+    column: $table.placeNote,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get occArrived => $composableBuilder(
+    column: $table.occArrived,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get cost => $composableBuilder(
+    column: $table.cost,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get within10min => $composableBuilder(
+    column: $table.within10min,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get reasonLanding => $composableBuilder(
+    column: $table.reasonLanding,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get reasonOnline => $composableBuilder(
+    column: $table.reasonOnline,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get reasonOther => $composableBuilder(
+    column: $table.reasonOther,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get reasonOtherText => $composableBuilder(
+    column: $table.reasonOtherText,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$AccidentRecordsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $AccidentRecordsTable> {
+  $$AccidentRecordsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get visitId =>
+      $composableBuilder(column: $table.visitId, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get incidentDate => $composableBuilder(
+    column: $table.incidentDate,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get notifyTime => $composableBuilder(
+    column: $table.notifyTime,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get pickUpTime => $composableBuilder(
+    column: $table.pickUpTime,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get medicArriveTime => $composableBuilder(
+    column: $table.medicArriveTime,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get ambulanceDepartTime => $composableBuilder(
+    column: $table.ambulanceDepartTime,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get checkTime =>
+      $composableBuilder(column: $table.checkTime, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get landingTime => $composableBuilder(
+    column: $table.landingTime,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get reportUnitIdx => $composableBuilder(
+    column: $table.reportUnitIdx,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get otherReportUnit => $composableBuilder(
+    column: $table.otherReportUnit,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get notifier =>
+      $composableBuilder(column: $table.notifier, builder: (column) => column);
+
+  GeneratedColumn<String> get phone =>
+      $composableBuilder(column: $table.phone, builder: (column) => column);
+
+  GeneratedColumn<int> get placeIdx =>
+      $composableBuilder(column: $table.placeIdx, builder: (column) => column);
+
+  GeneratedColumn<String> get placeNote =>
+      $composableBuilder(column: $table.placeNote, builder: (column) => column);
+
+  GeneratedColumn<bool> get occArrived => $composableBuilder(
+    column: $table.occArrived,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get cost =>
+      $composableBuilder(column: $table.cost, builder: (column) => column);
+
+  GeneratedColumn<int> get within10min => $composableBuilder(
+    column: $table.within10min,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get reasonLanding => $composableBuilder(
+    column: $table.reasonLanding,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get reasonOnline => $composableBuilder(
+    column: $table.reasonOnline,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get reasonOther => $composableBuilder(
+    column: $table.reasonOther,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get reasonOtherText => $composableBuilder(
+    column: $table.reasonOtherText,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$AccidentRecordsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $AccidentRecordsTable,
+          AccidentRecord,
+          $$AccidentRecordsTableFilterComposer,
+          $$AccidentRecordsTableOrderingComposer,
+          $$AccidentRecordsTableAnnotationComposer,
+          $$AccidentRecordsTableCreateCompanionBuilder,
+          $$AccidentRecordsTableUpdateCompanionBuilder,
+          (
+            AccidentRecord,
+            BaseReferences<
+              _$AppDatabase,
+              $AccidentRecordsTable,
+              AccidentRecord
+            >,
+          ),
+          AccidentRecord,
+          PrefetchHooks Function()
+        > {
+  $$AccidentRecordsTableTableManager(
+    _$AppDatabase db,
+    $AccidentRecordsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$AccidentRecordsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$AccidentRecordsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$AccidentRecordsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> visitId = const Value.absent(),
+                Value<DateTime?> incidentDate = const Value.absent(),
+                Value<DateTime?> notifyTime = const Value.absent(),
+                Value<DateTime?> pickUpTime = const Value.absent(),
+                Value<DateTime?> medicArriveTime = const Value.absent(),
+                Value<DateTime?> ambulanceDepartTime = const Value.absent(),
+                Value<DateTime?> checkTime = const Value.absent(),
+                Value<DateTime?> landingTime = const Value.absent(),
+                Value<int?> reportUnitIdx = const Value.absent(),
+                Value<String?> otherReportUnit = const Value.absent(),
+                Value<String?> notifier = const Value.absent(),
+                Value<String?> phone = const Value.absent(),
+                Value<int?> placeIdx = const Value.absent(),
+                Value<String?> placeNote = const Value.absent(),
+                Value<bool> occArrived = const Value.absent(),
+                Value<String?> cost = const Value.absent(),
+                Value<int?> within10min = const Value.absent(),
+                Value<bool> reasonLanding = const Value.absent(),
+                Value<bool> reasonOnline = const Value.absent(),
+                Value<bool> reasonOther = const Value.absent(),
+                Value<String?> reasonOtherText = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+              }) => AccidentRecordsCompanion(
+                id: id,
+                visitId: visitId,
+                incidentDate: incidentDate,
+                notifyTime: notifyTime,
+                pickUpTime: pickUpTime,
+                medicArriveTime: medicArriveTime,
+                ambulanceDepartTime: ambulanceDepartTime,
+                checkTime: checkTime,
+                landingTime: landingTime,
+                reportUnitIdx: reportUnitIdx,
+                otherReportUnit: otherReportUnit,
+                notifier: notifier,
+                phone: phone,
+                placeIdx: placeIdx,
+                placeNote: placeNote,
+                occArrived: occArrived,
+                cost: cost,
+                within10min: within10min,
+                reasonLanding: reasonLanding,
+                reasonOnline: reasonOnline,
+                reasonOther: reasonOther,
+                reasonOtherText: reasonOtherText,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int visitId,
+                Value<DateTime?> incidentDate = const Value.absent(),
+                Value<DateTime?> notifyTime = const Value.absent(),
+                Value<DateTime?> pickUpTime = const Value.absent(),
+                Value<DateTime?> medicArriveTime = const Value.absent(),
+                Value<DateTime?> ambulanceDepartTime = const Value.absent(),
+                Value<DateTime?> checkTime = const Value.absent(),
+                Value<DateTime?> landingTime = const Value.absent(),
+                Value<int?> reportUnitIdx = const Value.absent(),
+                Value<String?> otherReportUnit = const Value.absent(),
+                Value<String?> notifier = const Value.absent(),
+                Value<String?> phone = const Value.absent(),
+                Value<int?> placeIdx = const Value.absent(),
+                Value<String?> placeNote = const Value.absent(),
+                Value<bool> occArrived = const Value.absent(),
+                Value<String?> cost = const Value.absent(),
+                Value<int?> within10min = const Value.absent(),
+                Value<bool> reasonLanding = const Value.absent(),
+                Value<bool> reasonOnline = const Value.absent(),
+                Value<bool> reasonOther = const Value.absent(),
+                Value<String?> reasonOtherText = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+              }) => AccidentRecordsCompanion.insert(
+                id: id,
+                visitId: visitId,
+                incidentDate: incidentDate,
+                notifyTime: notifyTime,
+                pickUpTime: pickUpTime,
+                medicArriveTime: medicArriveTime,
+                ambulanceDepartTime: ambulanceDepartTime,
+                checkTime: checkTime,
+                landingTime: landingTime,
+                reportUnitIdx: reportUnitIdx,
+                otherReportUnit: otherReportUnit,
+                notifier: notifier,
+                phone: phone,
+                placeIdx: placeIdx,
+                placeNote: placeNote,
+                occArrived: occArrived,
+                cost: cost,
+                within10min: within10min,
+                reasonLanding: reasonLanding,
+                reasonOnline: reasonOnline,
+                reasonOther: reasonOther,
+                reasonOtherText: reasonOtherText,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$AccidentRecordsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $AccidentRecordsTable,
+      AccidentRecord,
+      $$AccidentRecordsTableFilterComposer,
+      $$AccidentRecordsTableOrderingComposer,
+      $$AccidentRecordsTableAnnotationComposer,
+      $$AccidentRecordsTableCreateCompanionBuilder,
+      $$AccidentRecordsTableUpdateCompanionBuilder,
+      (
+        AccidentRecord,
+        BaseReferences<_$AppDatabase, $AccidentRecordsTable, AccidentRecord>,
+      ),
+      AccidentRecord,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -2019,4 +3979,6 @@ class $AppDatabaseManager {
       $$VisitsTableTableManager(_db, _db.visits);
   $$PatientProfilesTableTableManager get patientProfiles =>
       $$PatientProfilesTableTableManager(_db, _db.patientProfiles);
+  $$AccidentRecordsTableTableManager get accidentRecords =>
+      $$AccidentRecordsTableTableManager(_db, _db.accidentRecords);
 }
