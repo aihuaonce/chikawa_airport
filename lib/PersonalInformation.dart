@@ -1,33 +1,10 @@
-// lib/pages/PersonalInformation.dart
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import '../data/models/patient_data.dart';
 import '../data/db/daos.dart';
-import 'nav2.dart';
-
-class PatientData extends ChangeNotifier {
-  String? gender;
-  String? reason;
-  String? nationality;
-  DateTime? birthday;
-  int? age;
-  String? idNumber;
-  String? address;
-  String? phone;
-
-  void update() => notifyListeners();
-
-  void clear() {
-    gender = null;
-    reason = null;
-    nationality = null;
-    birthday = null;
-    age = null;
-    idNumber = null;
-    address = null;
-    phone = null;
-    notifyListeners();
-  }
-}
+import '../nav2.dart';
 
 class PersonalInformationPage extends StatefulWidget implements SavablePage {
   final int visitId;
@@ -38,22 +15,24 @@ class PersonalInformationPage extends StatefulWidget implements SavablePage {
   State<PersonalInformationPage> createState() =>
       _PersonalInformationPageState();
 
-  // 使用 GlobalKey 來存取 state
-  static final GlobalKey<_PersonalInformationPageState> pageKey =
-      GlobalKey<_PersonalInformationPageState>();
-
   @override
   Future<void> saveData() async {
-    final state = pageKey.currentState;
+    final state = _PersonalInformationPageState.pageKey.currentState;
     if (state != null) await state._save();
   }
+
+  static final GlobalKey<_PersonalInformationPageState> pageKey =
+      GlobalKey<_PersonalInformationPageState>();
 }
 
 class _PersonalInformationPageState extends State<PersonalInformationPage> {
   late TextEditingController idController;
   late TextEditingController addrController;
   late TextEditingController phoneController;
-
+  late TextEditingController reasonController;
+  late TextEditingController nationalityController;
+  late TextEditingController noteController;
+  File? _photo;
   bool _isLoading = true;
 
   @override
@@ -62,6 +41,9 @@ class _PersonalInformationPageState extends State<PersonalInformationPage> {
     idController = TextEditingController();
     addrController = TextEditingController();
     phoneController = TextEditingController();
+    reasonController = TextEditingController();
+    nationalityController = TextEditingController();
+    noteController = TextEditingController();
     _loadPatientProfile();
   }
 
@@ -70,6 +52,9 @@ class _PersonalInformationPageState extends State<PersonalInformationPage> {
     idController.dispose();
     addrController.dispose();
     phoneController.dispose();
+    reasonController.dispose();
+    nationalityController.dispose();
+    noteController.dispose();
     super.dispose();
   }
 
@@ -78,7 +63,6 @@ class _PersonalInformationPageState extends State<PersonalInformationPage> {
     final profile = await dao.getByVisitId(widget.visitId);
 
     if (!mounted) return;
-
     final patientData = context.read<PatientData>();
 
     if (profile != null) {
@@ -92,11 +76,17 @@ class _PersonalInformationPageState extends State<PersonalInformationPage> {
       patientData.idNumber = profile.idNumber;
       patientData.address = profile.address;
       patientData.phone = profile.phone;
+      patientData.photoPath = profile.photoPath;
+      patientData.note = profile.note;
       patientData.update();
 
       idController.text = patientData.idNumber ?? '';
       addrController.text = patientData.address ?? '';
       phoneController.text = patientData.phone ?? '';
+      reasonController.text = patientData.reason ?? '';
+      nationalityController.text = patientData.nationality ?? '';
+      noteController.text = patientData.note ?? '';
+      if (patientData.photoPath != null) _photo = File(patientData.photoPath!);
     }
 
     setState(() {
@@ -130,7 +120,19 @@ class _PersonalInformationPageState extends State<PersonalInformationPage> {
     }
   }
 
-  // 供 Nav2 按鈕呼叫的儲存方法
+  Future<void> _pickPhoto() async {
+    final picker = ImagePicker();
+    final picked = await picker.pickImage(source: ImageSource.gallery);
+    if (picked != null) {
+      setState(() {
+        _photo = File(picked.path);
+      });
+      final patientData = context.read<PatientData>();
+      patientData.photoPath = picked.path;
+      patientData.update();
+    }
+  }
+
   Future<void> _save() async {
     final patientData = context.read<PatientData>();
     final dao = context.read<PatientProfilesDao>();
@@ -144,11 +146,33 @@ class _PersonalInformationPageState extends State<PersonalInformationPage> {
       idNumber: patientData.idNumber,
       address: patientData.address,
       phone: patientData.phone,
-      photoPath: null,
+      photoPath: patientData.photoPath,
     );
 
-    if (!mounted) return;
-    patientData.clear();
+    // 回寫備註到 Visits 主檔
+    final visitsDao = context.read<VisitsDao>();
+    await visitsDao.updateVisitSummary(widget.visitId, note: patientData.note);
+  }
+
+  Widget _buildTextField({
+    required String label,
+    required TextEditingController controller,
+    required Function(String) onChanged,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 16),
+        TextField(
+          controller: controller,
+          decoration: InputDecoration(
+            labelText: label,
+            border: const OutlineInputBorder(),
+          ),
+          onChanged: onChanged,
+        ),
+      ],
+    );
   }
 
   @override
@@ -157,233 +181,130 @@ class _PersonalInformationPageState extends State<PersonalInformationPage> {
 
     return Consumer<PatientData>(
       builder: (context, patientData, _) {
-        idController.text = patientData.idNumber ?? '';
-        addrController.text = patientData.address ?? '';
-        phoneController.text = patientData.phone ?? '';
-
-        return Container(
-          color: const Color(0xFFE6F6FB),
-          alignment: Alignment.topCenter,
-          child: SingleChildScrollView(
-            child: Container(
-              width: 900,
-              margin: const EdgeInsets.symmetric(vertical: 32),
-              padding: const EdgeInsets.all(32),
-              decoration: BoxDecoration(
-                color: const Color(0xFFF9FAFB),
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 8)],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    '個人資料',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                  ),
-                  Container(
-                    height: 150,
-                    width: 150,
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey.shade400),
-                      borderRadius: BorderRadius.circular(8),
-                      color: Colors.grey.shade200,
-                    ),
-                    child: const Icon(
-                      Icons.add_a_photo,
-                      size: 50,
-                      color: Colors.grey,
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  InkWell(
-                    onTap: _pickBirthday,
-                    child: InputDecorator(
-                      decoration: const InputDecoration(
-                        labelText: '生日',
-                        border: OutlineInputBorder(),
-                      ),
-                      child: Text(
-                        patientData.birthday == null
-                            ? '尚未選擇'
-                            : '${patientData.birthday!.year}-${patientData.birthday!.month}-${patientData.birthday!.day}',
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  InputDecorator(
+        return SingleChildScrollView(
+          child: Container(
+            width: 900,
+            margin: const EdgeInsets.all(32),
+            padding: const EdgeInsets.all(32),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 8)],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  '個人資料',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                ),
+                const SizedBox(height: 16),
+                // 生日
+                InkWell(
+                  onTap: _pickBirthday,
+                  child: InputDecorator(
                     decoration: const InputDecoration(
-                      labelText: '年齡',
+                      labelText: '生日',
                       border: OutlineInputBorder(),
                     ),
                     child: Text(
-                      patientData.age != null
-                          ? '${patientData.age} 歲'
-                          : '尚未選擇生日',
+                      patientData.birthday == null
+                          ? '尚未選擇'
+                          : '${patientData.birthday!.year}-${patientData.birthday!.month}-${patientData.birthday!.day}',
                     ),
                   ),
-                  const SizedBox(height: 16),
-                  const _SectionTitle('性別'),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: RadioListTile<String>(
-                          title: const Text('男'),
-                          value: '男',
-                          groupValue: patientData.gender,
-                          activeColor: const Color(0xFF83ACA9),
-                          onChanged: (v) {
-                            patientData.gender = v;
-                            patientData.update();
-                          },
-                        ),
-                      ),
-                      Expanded(
-                        child: RadioListTile<String>(
-                          title: const Text('女'),
-                          value: '女',
-                          groupValue: patientData.gender,
-                          activeColor: const Color(0xFF83ACA9),
-                          onChanged: (v) {
-                            patientData.gender = v;
-                            patientData.update();
-                          },
-                        ),
-                      ),
-                    ],
+                ),
+                const SizedBox(height: 16),
+                // 年齡
+                InputDecorator(
+                  decoration: const InputDecoration(
+                    labelText: '年齡',
+                    border: OutlineInputBorder(),
                   ),
-                  const SizedBox(height: 16),
-                  TextField(
-                    controller: idController,
-                    decoration: const InputDecoration(
-                      labelText: '護照號或身份證字號',
-                      border: OutlineInputBorder(),
+                  child: Text(patientData.age?.toString() ?? ''),
+                ),
+                _buildTextField(
+                  label: '性別',
+                  controller: TextEditingController(text: patientData.gender),
+                  onChanged: (v) {
+                    patientData.gender = v;
+                    patientData.update();
+                  },
+                ),
+                _buildTextField(
+                  label: '就醫原因',
+                  controller: reasonController,
+                  onChanged: (v) {
+                    patientData.reason = v;
+                    patientData.update();
+                  },
+                ),
+                _buildTextField(
+                  label: '國籍',
+                  controller: nationalityController,
+                  onChanged: (v) {
+                    patientData.nationality = v;
+                    patientData.update();
+                  },
+                ),
+                _buildTextField(
+                  label: '身分證號',
+                  controller: idController,
+                  onChanged: (v) {
+                    patientData.idNumber = v;
+                    patientData.update();
+                  },
+                ),
+                _buildTextField(
+                  label: '地址',
+                  controller: addrController,
+                  onChanged: (v) {
+                    patientData.address = v;
+                    patientData.update();
+                  },
+                ),
+                _buildTextField(
+                  label: '電話',
+                  controller: phoneController,
+                  onChanged: (v) {
+                    patientData.phone = v;
+                    patientData.update();
+                  },
+                ),
+                const SizedBox(height: 16),
+                // 備註
+                _buildTextField(
+                  label: '備註',
+                  controller: noteController,
+                  onChanged: (v) {
+                    patientData.note = v;
+                    patientData.update();
+                  },
+                ),
+                const SizedBox(height: 16),
+                // 照片上傳
+                Row(
+                  children: [
+                    ElevatedButton(
+                      onPressed: _pickPhoto,
+                      child: const Text('上傳照片'),
                     ),
-                    onChanged: (v) => patientData.idNumber = v,
-                  ),
-                  const SizedBox(height: 16),
-                  const _SectionTitle('為何至機場？'),
-                  Column(
-                    children: [
-                      RadioListTile<String>(
-                        title: const Text('航空公司機組員'),
-                        value: '航空公司機組員',
-                        groupValue: patientData.reason,
-                        activeColor: const Color(0xFF83ACA9),
-                        onChanged: (v) {
-                          patientData.reason = v;
-                          patientData.update();
-                        },
-                      ),
-                      RadioListTile<String>(
-                        title: const Text('旅客/民眾'),
-                        value: '旅客/民眾',
-                        groupValue: patientData.reason,
-                        activeColor: const Color(0xFF83ACA9),
-                        onChanged: (v) {
-                          patientData.reason = v;
-                          patientData.update();
-                        },
-                      ),
-                      RadioListTile<String>(
-                        title: const Text('機場內部員工'),
-                        value: '機場內部員工',
-                        groupValue: patientData.reason,
-                        activeColor: const Color(0xFF83ACA9),
-                        onChanged: (v) {
-                          patientData.reason = v;
-                          patientData.update();
-                        },
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  const _SectionTitle('國籍'),
-                  Column(
-                    children: [
-                      RadioListTile<String>(
-                        title: const Text('台灣 (中華民國) TAIWAN'),
-                        value: '台灣',
-                        groupValue: patientData.nationality,
-                        activeColor: const Color(0xFF83ACA9),
-                        onChanged: (v) {
-                          patientData.nationality = v;
-                          patientData.update();
-                        },
-                      ),
-                      RadioListTile<String>(
-                        title: const Text('美國 UNITED STATES'),
-                        value: '美國',
-                        groupValue: patientData.nationality,
-                        activeColor: const Color(0xFF83ACA9),
-                        onChanged: (v) {
-                          patientData.nationality = v;
-                          patientData.update();
-                        },
-                      ),
-                      RadioListTile<String>(
-                        title: const Text('日本 JAPAN'),
-                        value: '日本',
-                        groupValue: patientData.nationality,
-                        activeColor: const Color(0xFF83ACA9),
-                        onChanged: (v) {
-                          patientData.nationality = v;
-                          patientData.update();
-                        },
-                      ),
-                      RadioListTile<String>(
-                        title: const Text('其他國籍'),
-                        value: '其他',
-                        groupValue: patientData.nationality,
-                        activeColor: const Color(0xFF83ACA9),
-                        onChanged: (v) {
-                          patientData.nationality = v;
-                          patientData.update();
-                        },
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  TextField(
-                    controller: addrController,
-                    decoration: const InputDecoration(
-                      labelText: '地址',
-                      border: OutlineInputBorder(),
-                    ),
-                    onChanged: (v) => patientData.address = v,
-                  ),
-                  const SizedBox(height: 16),
-                  TextField(
-                    controller: phoneController,
-                    decoration: const InputDecoration(
-                      labelText: '聯絡電話',
-                      border: OutlineInputBorder(),
-                    ),
-                    onChanged: (v) => patientData.phone = v,
-                  ),
-                  const SizedBox(height: 24),
-                ],
-              ),
+                    const SizedBox(width: 16),
+                    _photo != null
+                        ? Image.file(
+                            _photo!,
+                            width: 100,
+                            height: 100,
+                            fit: BoxFit.cover,
+                          )
+                        : const Text('尚未上傳照片'),
+                  ],
+                ),
+              ],
             ),
           ),
         );
       },
-    );
-  }
-}
-
-class _SectionTitle extends StatelessWidget {
-  final String title;
-  const _SectionTitle(this.title);
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8.0, top: 8.0),
-      child: Text(
-        title,
-        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-      ),
     );
   }
 }

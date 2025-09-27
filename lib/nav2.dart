@@ -1,6 +1,8 @@
-// nav2.dart
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'routes_config.dart';
+import 'data/models/patient_data.dart';
+import 'data/db/daos.dart';
 
 abstract class SavablePage {
   Future<void> saveData();
@@ -18,26 +20,45 @@ class Nav2Page extends StatefulWidget {
 
 class _Nav2PageState extends State<Nav2Page> {
   late int currentIndex;
-  // 使用 GlobalKey 來存取當前頁面的 state
   final Map<int, GlobalKey> _pageKeys = {};
 
   @override
   void initState() {
     super.initState();
     currentIndex = widget.initialIndex;
-    // 為每個頁面初始化一個 GlobalKey
     for (int i = 0; i < routeItems.length; i++) {
       _pageKeys[i] = GlobalKey();
     }
   }
 
-  // 獲取當前頁面的 SavablePage
   SavablePage? get _currentSavablePage {
     final currentWidget = routeItems[currentIndex].builder(
       widget.visitId,
       _pageKeys[currentIndex]!,
     );
     return currentWidget is SavablePage ? currentWidget as SavablePage : null;
+  }
+
+  Future<void> _saveAllPages() async {
+    final patientData = context.read<PatientData>();
+    final patientDao = context.read<PatientProfilesDao>();
+    final visitsDao = context.read<VisitsDao>();
+
+    // 遍歷所有頁面 key
+    for (int i = 0; i < routeItems.length; i++) {
+      final key = _pageKeys[i]!;
+      if (key.currentState is SavablePage) {
+        await (key.currentState as SavablePage).saveData();
+      }
+    }
+
+    // 同步回 Visits 主檔（主要是 note）
+    await visitsDao.updateVisitSummary(
+      widget.visitId,
+      gender: patientData.gender,
+      nationality: patientData.nationality,
+      note: patientData.note,
+    );
   }
 
   @override
@@ -54,19 +75,11 @@ class _Nav2PageState extends State<Nav2Page> {
           IconButton(
             icon: const Icon(Icons.save),
             onPressed: () async {
-              // 使用當前的 SavablePage 實例
-              final savablePage = _currentSavablePage;
-              if (savablePage != null) {
-                await savablePage.saveData();
-                if (!mounted) return;
-                ScaffoldMessenger.of(
-                  context,
-                ).showSnackBar(const SnackBar(content: Text('已儲存')));
-              } else {
-                ScaffoldMessenger.of(
-                  context,
-                ).showSnackBar(const SnackBar(content: Text('此頁面不支援儲存功能')));
-              }
+              await _saveAllPages();
+              if (!mounted) return;
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(const SnackBar(content: Text('所有頁面資料已儲存')));
             },
           ),
           IconButton(
@@ -77,7 +90,6 @@ class _Nav2PageState extends State<Nav2Page> {
       ),
       body: Column(
         children: [
-          // 頁籤切換
           SizedBox(
             height: 50,
             child: ListView.builder(
