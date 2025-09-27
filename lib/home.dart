@@ -42,11 +42,10 @@ class _HomePageState extends State<HomePage> {
         padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
         child: Column(
           children: [
-            // Nav1Page 可以放置在這裡，如果有 Nav1
             const Nav1Page(),
+            const SizedBox(height: 24),
             Row(
               children: [
-                // + 新增病患資料
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.black,
@@ -57,10 +56,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                   onPressed: () async {
-                    // 1) 先建立一筆 visit，取得 visitId
                     final visitId = await visitsDao.createVisit();
-
-                    // 2) 導向 Nav2Page，預設 PersonalInformation
                     await Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -68,38 +64,55 @@ class _HomePageState extends State<HomePage> {
                             Nav2Page(visitId: visitId, initialIndex: 0),
                       ),
                     );
-
-                    // 3) 回來後刷新列表
                     if (mounted) setState(() {});
                   },
                   child: const Text('+新增病患資料'),
                 ),
-
                 const Spacer(),
-
-                // 搜尋框
                 SizedBox(
-                  width: 300,
+                  width: 320,
                   child: TextField(
                     controller: _searchController,
                     decoration: InputDecoration(
+                      prefixIcon: const Icon(Icons.search),
                       hintText: '搜尋姓名/國籍/科別...',
-                      border: const OutlineInputBorder(),
+                      filled: true,
+                      fillColor: Colors.white,
+                      contentPadding: const EdgeInsets.symmetric(
+                        vertical: 0,
+                        horizontal: 16,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide.none,
+                      ),
                       suffixIcon: keyword.isNotEmpty
                           ? IconButton(
                               icon: const Icon(Icons.clear),
                               onPressed: () => _searchController.clear(),
                             )
-                          : const Icon(Icons.search),
+                          : null,
                     ),
                   ),
                 ),
               ],
             ),
-
-            const SizedBox(height: 16),
-
-            // 病患列表
+            const SizedBox(height: 32),
+            Container(
+              color: Colors.transparent,
+              child: Row(
+                children: const [
+                  _TableHeader('病患'),
+                  _TableHeader('性別'),
+                  _TableHeader('國籍'),
+                  _TableHeader('更新時間'),
+                  _TableHeader('科別'),
+                  _TableHeader('備註'),
+                  _TableHeader('填寫人'),
+                ],
+              ),
+            ),
+            const Divider(thickness: 1, color: Color(0xFFB7E1E6), height: 12),
             Expanded(
               child: StreamBuilder<List<Visit>>(
                 stream: visitsDao.watchAll(keyword: keyword),
@@ -111,33 +124,13 @@ class _HomePageState extends State<HomePage> {
                     return const Center(child: Text('目前沒有任何病患紀錄。'));
                   }
                   final visits = snapshot.data!;
-
                   return ListView.builder(
-                    itemCount: visits.length + 1,
+                    padding: EdgeInsets.zero,
+                    itemCount: visits.length,
                     itemBuilder: (context, index) {
-                      if (index == 0) {
-                        return const Padding(
-                          padding: EdgeInsets.symmetric(vertical: 8.0),
-                          child: Row(
-                            children: [
-                              _TableHeader('ID'),
-                              _TableHeader('姓名'),
-                              _TableHeader('性別'),
-                              _TableHeader('國籍'),
-                              _TableHeader('更新時間'),
-                              _TableHeader('科別'),
-                              _TableHeader('備註'),
-                              _TableHeader('填表人'),
-                            ],
-                          ),
-                        );
-                      }
-
-                      final v = visits[index - 1];
-
-                      return _DataRow(
+                      final v = visits[index];
+                      return InkWell(
                         onTap: () async {
-                          // 點擊列表，直接打開 Nav2Page
                           await Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -147,20 +140,29 @@ class _HomePageState extends State<HomePage> {
                           );
                           if (mounted) setState(() {});
                         },
-                        children: [
-                          _TableCell(v.visitId.toString()),
-                          _TableCell(v.patientName ?? '—'),
-                          _TableCell(v.gender ?? '—'),
-                          _TableCell(v.nationality ?? '—'),
-                          _TableCell(
-                            v.uploadedAt == null
-                                ? '—'
-                                : _fmtDateTime(v.uploadedAt!),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 8.0),
+                          decoration: BoxDecoration(
+                            border: Border(
+                              bottom: BorderSide(color: Colors.grey.shade300),
+                            ),
                           ),
-                          _TableCell(v.dept ?? '—'),
-                          _TableCell(v.note ?? '—'),
-                          _TableCell(v.filledBy ?? '—'),
-                        ],
+                          child: Row(
+                            children: [
+                              _TableCell(v.patientName ?? '—'),
+                              _TableCell(v.gender ?? '—'),
+                              _TableCell(v.nationality ?? '—'),
+                              _TableCell(
+                                v.uploadedAt == null
+                                    ? '—'
+                                    : _fmtDateTime(v.uploadedAt!),
+                              ),
+                              _TableCell(v.dept ?? '—'),
+                              _TableCell(v.note ?? '—'),
+                              _TableCell(v.filledBy ?? '—'),
+                            ],
+                          ),
+                        ),
                       );
                     },
                   );
@@ -204,27 +206,6 @@ class _TableCell extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 4.0),
         child: Text(text, textAlign: TextAlign.left),
-      ),
-    );
-  }
-}
-
-class _DataRow extends StatelessWidget {
-  final List<Widget> children;
-  final VoidCallback onTap;
-
-  const _DataRow({required this.children, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 8.0),
-        decoration: BoxDecoration(
-          border: Border(bottom: BorderSide(color: Colors.grey.shade300)),
-        ),
-        child: Row(children: children),
       ),
     );
   }

@@ -4,6 +4,7 @@ import 'data/models/patient_data.dart';
 import 'data/db/app_database.dart';
 import 'data/db/daos.dart';
 import 'nav2.dart';
+import 'home.dart';
 
 void main() {
   final db = AppDatabase();
@@ -27,7 +28,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Hospital App',
       theme: ThemeData(primarySwatch: Colors.blue),
-      home: const Nav2Page(visitId: 1),
+      home: const HomePage(),
     );
   }
 }

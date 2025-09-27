@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 
 class PatientData extends ChangeNotifier {
   DateTime? birthday;
-  int? age;
+  int? age; // 年齡計算在 PersonalInformationPage
   String? gender;
   String? reason;
   String? nationality;
   String? idNumber;
   String? address;
   String? phone;
-  String? photoPath;
+  String? photoBase64; // 儲存轉成 base64 的圖片
   String? note;
 
   void update() {
@@ -25,7 +25,7 @@ class PatientData extends ChangeNotifier {
     String? idNumber,
     String? address,
     String? phone,
-    String? photoPath,
+    String? photoBase64,
     String? note,
   }) {
     this.birthday = birthday ?? this.birthday;
@@ -36,7 +36,7 @@ class PatientData extends ChangeNotifier {
     this.idNumber = idNumber ?? this.idNumber;
     this.address = address ?? this.address;
     this.phone = phone ?? this.phone;
-    this.photoPath = photoPath ?? this.photoPath;
+    this.photoBase64 = photoBase64 ?? this.photoBase64;
     this.note = note ?? this.note;
     notifyListeners();
   }
@@ -50,7 +50,7 @@ class PatientData extends ChangeNotifier {
     idNumber = null;
     address = null;
     phone = null;
-    photoPath = null;
+    photoBase64 = null;
     note = null;
     notifyListeners();
   }
