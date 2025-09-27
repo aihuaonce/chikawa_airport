@@ -16,6 +16,28 @@ class _HomePageState extends State<HomePage> {
   String keyword = "";
   final TextEditingController _searchController = TextEditingController();
 
+  // 定義所有可用的欄位（順序固定）
+  final List<MapEntry<String, String>> availableColumns = [
+    const MapEntry('patientName', '病患'),
+    const MapEntry('gender', '性別'),
+    const MapEntry('nationality', '國籍'),
+    const MapEntry('uploadedAt', '更新時間'),
+    const MapEntry('dept', '科別'),
+    const MapEntry('note', '備註'),
+    const MapEntry('filledBy', '填寫人'),
+  ];
+
+  // 預設顯示的欄位
+  List<String> visibleColumns = [
+    'patientName',
+    'gender',
+    'nationality',
+    'uploadedAt',
+    'dept',
+    'note',
+    'filledBy',
+  ];
+
   @override
   void initState() {
     super.initState();
@@ -30,6 +52,122 @@ class _HomePageState extends State<HomePage> {
   void dispose() {
     _searchController.dispose();
     super.dispose();
+  }
+
+  void _showColumnSelector() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        List<String> tempVisibleColumns = List.from(visibleColumns);
+
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              title: const Text('選擇要顯示的欄位 (最多7個)'),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: availableColumns.map((entry) {
+                    bool isSelected = tempVisibleColumns.contains(entry.key);
+                    bool canSelect =
+                        tempVisibleColumns.length < 7 || isSelected;
+
+                    return CheckboxListTile(
+                      title: Text(
+                        entry.value,
+                        style: TextStyle(color: canSelect ? null : Colors.grey),
+                      ),
+                      value: isSelected,
+                      onChanged: canSelect
+                          ? (bool? value) {
+                              setDialogState(() {
+                                if (value == true) {
+                                  if (!tempVisibleColumns.contains(entry.key) &&
+                                      tempVisibleColumns.length < 7) {
+                                    tempVisibleColumns.add(entry.key);
+                                  }
+                                } else {
+                                  tempVisibleColumns.remove(entry.key);
+                                }
+                              });
+                            }
+                          : null,
+                    );
+                  }).toList(),
+                ),
+              ),
+              actions: [
+                Text(
+                  '已選擇: ${tempVisibleColumns.length}/7',
+                  style: TextStyle(
+                    color: tempVisibleColumns.length == 7
+                        ? Colors.orange
+                        : Colors.grey,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const Spacer(),
+                TextButton(
+                  onPressed: () {
+                    setDialogState(() {
+                      tempVisibleColumns = availableColumns
+                          .take(7)
+                          .map((e) => e.key)
+                          .toList();
+                    });
+                  },
+                  child: const Text('預設7個'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    setDialogState(() {
+                      tempVisibleColumns.clear();
+                    });
+                  },
+                  child: const Text('全部清除'),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('取消'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      visibleColumns = tempVisibleColumns;
+                    });
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('確定'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  String? _getCellValue(Visit visit, String columnKey) {
+    switch (columnKey) {
+      case 'patientName':
+        return visit.patientName;
+      case 'gender':
+        return visit.gender;
+      case 'nationality':
+        return visit.nationality;
+      case 'uploadedAt':
+        return visit.uploadedAt == null
+            ? null
+            : _fmtDateTime(visit.uploadedAt!);
+      case 'dept':
+        return visit.dept;
+      case 'note':
+        return visit.note;
+      case 'filledBy':
+        return visit.filledBy;
+      default:
+        return null;
+    }
   }
 
   @override
@@ -69,6 +207,21 @@ class _HomePageState extends State<HomePage> {
                   child: const Text('+新增病患資料'),
                 ),
                 const Spacer(),
+                ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: Colors.grey[700],
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
+                    side: BorderSide(color: Colors.grey.shade300),
+                  ),
+                  onPressed: _showColumnSelector,
+                  icon: const Icon(Icons.view_column, size: 18),
+                  label: Text('欄位設定 (${visibleColumns.length}/7)'),
+                ),
+                const SizedBox(width: 8),
                 SizedBox(
                   width: 320,
                   child: TextField(
@@ -101,15 +254,10 @@ class _HomePageState extends State<HomePage> {
             Container(
               color: Colors.transparent,
               child: Row(
-                children: const [
-                  _TableHeader('病患'),
-                  _TableHeader('性別'),
-                  _TableHeader('國籍'),
-                  _TableHeader('更新時間'),
-                  _TableHeader('科別'),
-                  _TableHeader('備註'),
-                  _TableHeader('填寫人'),
-                ],
+                children: availableColumns
+                    .where((column) => visibleColumns.contains(column.key))
+                    .map((column) => _TableHeader(column.value))
+                    .toList(),
               ),
             ),
             const Divider(thickness: 1, color: Color(0xFFB7E1E6), height: 12),
@@ -148,19 +296,19 @@ class _HomePageState extends State<HomePage> {
                             ),
                           ),
                           child: Row(
-                            children: [
-                              _TableCell(v.patientName ?? '—'),
-                              _TableCell(v.gender ?? '—'),
-                              _TableCell(v.nationality ?? '—'),
-                              _TableCell(
-                                v.uploadedAt == null
-                                    ? '—'
-                                    : _fmtDateTime(v.uploadedAt!),
-                              ),
-                              _TableCell(v.dept ?? '—'),
-                              _TableCell(v.note ?? '—'),
-                              _TableCell(v.filledBy ?? '—'),
-                            ],
+                            children: availableColumns
+                                .where(
+                                  (column) =>
+                                      visibleColumns.contains(column.key),
+                                )
+                                .map((column) {
+                                  final cellValue = _getCellValue(
+                                    v,
+                                    column.key,
+                                  );
+                                  return _TableCell(cellValue ?? '—');
+                                })
+                                .toList(),
                           ),
                         ),
                       );
