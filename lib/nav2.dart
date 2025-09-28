@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'AccidentRecord.dart';
+import 'PersonalInformation.dart';
 import 'data/models/patient_data.dart';
 import 'data/db/daos.dart';
 import 'routes_config.dart';
@@ -28,12 +30,16 @@ class _Nav2PageState extends State<Nav2Page> {
   void initState() {
     super.initState();
     currentIndex = widget.initialIndex;
-    for (int i = 0; i < routeItems.length; i++) {
+    _pageKeys[0] = GlobalKey<State<PersonalInformationPage>>(); // 索引 0: 個人資料頁
+    _pageKeys[1] = GlobalKey<State<AccidentRecordPage>>(); // 索引 1: 事故紀錄頁
+    for (int i = 2; i < routeItems.length; i++) {
       _pageKeys[i] = GlobalKey();
     }
   }
 
   Future<void> _saveAllPages() async {
+    print('--- [DEBUG] _saveAllPages() 啟動 ---');
+
     final patientData = context.read<PatientData>();
     final patientDao = context.read<PatientProfilesDao>();
     final visitsDao = context.read<VisitsDao>();
@@ -41,8 +47,17 @@ class _Nav2PageState extends State<Nav2Page> {
     // 遍歷所有頁面 key 並儲存每個 SavablePage 的資料
     for (int i = 0; i < routeItems.length; i++) {
       final key = _pageKeys[i]!;
+      print('--- [DEBUG] 檢查頁面 ${routeItems[i].label} (索引 $i) ---');
+
+      if (key.currentState == null) {
+        print('--- [DEBUG] ❌ 頁面 State 為 null，無法儲存 ---');
+      }
+
+      // 關鍵判斷式
       if (key.currentState is SavablePage) {
         await (key.currentState as SavablePage).saveData();
+      } else {
+        print('--- [DEBUG] ❌ State 存在，但不是 SavablePage 型別 ---');
       }
     }
 

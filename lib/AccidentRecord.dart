@@ -2,27 +2,44 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../data/db/daos.dart';
 import '../data/models/accident_data.dart';
-import 'nav2.dart';
+import 'nav2.dart'; // 假設 SavablePage 介面在這裡
 
-class AccidentRecordPage extends StatefulWidget implements SavablePage {
+// 1. 修正：Widget (AccidentRecordPage) 移除 implements SavablePage
+// 讓 GlobalKey 正確指向 State 物件
+class AccidentRecordPage extends StatefulWidget {
   final int visitId;
 
   const AccidentRecordPage({super.key, required this.visitId});
 
   @override
   State<AccidentRecordPage> createState() => _AccidentRecordPageState();
-
-  static final GlobalKey<_AccidentRecordPageState> pageKey =
-      GlobalKey<_AccidentRecordPageState>();
-
-  @override
-  Future<void> saveData() async {
-    final state = pageKey.currentState;
-    if (state != null) await state._saveData();
-  }
 }
 
-class _AccidentRecordPageState extends State<AccidentRecordPage> {
+// 2. 修正：State 必須實作 SavablePage 介面，並加入 KeepAlive Mixin
+class _AccidentRecordPageState extends State<AccidentRecordPage>
+    with AutomaticKeepAliveClientMixin<AccidentRecordPage>
+    implements SavablePage {
+  // ===============================================
+  // 🌟 修正一：實作 SavablePage 的抽象方法 saveData() 🌟
+  // 這是 GlobalKey 呼叫的入口點，它會呼叫原本的 _saveData 邏輯
+  // ===============================================
+  @override
+  Future<void> saveData() async {
+    print('--- [DEBUG] 🌟 AccidentRecordPage State 成功呼叫 saveData() 🌟');
+    await _saveData(); // 呼叫您既有的儲存邏輯
+  }
+
+  // ===============================================
+  // 修正二：實作 AutomaticKeepAliveClientMixin 的 wantKeepAlive 屬性
+  // 確保切換頁籤時這個 State 不會被銷毀
+  // ===============================================
+  @override
+  bool get wantKeepAlive => true;
+
+  // ===============================================
+  // 原本的 State 內容 (無變動)
+  // ===============================================
+
   bool _isLoading = true;
 
   // ===== 外觀參數 =====
@@ -30,7 +47,7 @@ class _AccidentRecordPageState extends State<AccidentRecordPage> {
   static const double _cardMaxWidth = 1100;
   static const double _radius = 16;
 
-  // ===== 選項列表 =====
+  // ===== 選項列表 (略，內容與您提供的相同) =====
   final List<String> reportUnits = const [
     'T1-OCC',
     'T2-OCC',
@@ -53,7 +70,6 @@ class _AccidentRecordPageState extends State<AccidentRecordPage> {
     '飛機機艙內',
   ];
 
-  // 各地點細項列表
   final List<String> t1Places = const [
     '出境查驗台',
     '入境查驗台',
@@ -216,7 +232,7 @@ class _AccidentRecordPageState extends State<AccidentRecordPage> {
     if (!mounted) return;
 
     if (record != null) {
-      // 從資料庫載入到 AccidentData
+      // 從資料庫載入到 AccidentData (略，邏輯與您提供的相同)
       accidentData.incidentDate = record.incidentDate;
       accidentData.notifyTime = record.notifyTime;
       accidentData.pickUpTime = record.pickUpTime;
@@ -231,7 +247,6 @@ class _AccidentRecordPageState extends State<AccidentRecordPage> {
       accidentData.placeGroupIdx = record.placeIdx;
       accidentData.placeNote = record.placeNote;
 
-      // ✅ 新增：載入子地點選擇
       accidentData.t1Selected = record.t1PlaceIdx;
       accidentData.t2Selected = record.t2PlaceIdx;
       accidentData.remoteSelected = record.remotePlaceIdx;
@@ -248,7 +263,6 @@ class _AccidentRecordPageState extends State<AccidentRecordPage> {
       accidentData.otherReasonText = record.reasonOtherText;
       accidentData.update();
     } else {
-      // 如果沒有紀錄，初始化時間為現在
       final now = DateTime.now();
       accidentData.incidentDate = now;
       accidentData.notifyTime = now;
@@ -259,7 +273,6 @@ class _AccidentRecordPageState extends State<AccidentRecordPage> {
       accidentData.update();
     }
 
-    // 同步控制器
     _syncControllersFromData(accidentData);
 
     setState(() {
@@ -276,11 +289,13 @@ class _AccidentRecordPageState extends State<AccidentRecordPage> {
     otherReportUnitCtrl.text = accidentData.otherReportUnit ?? '';
   }
 
+  // ⚠️ 注意：這個函式是您原本的儲存邏輯，現在由上面的 saveData() 呼叫。
   Future<void> _saveData() async {
+    print('--- [DEBUG] _saveData() 函式已啟動 ---');
     final dao = context.read<AccidentRecordsDao>();
     final accidentData = context.read<AccidentData>();
 
-    // 從控制器同步到 AccidentData
+    // 從控制器同步到 AccidentData (略，邏輯與您提供的相同)
     accidentData.notifier = notifierCtrl.text.trim().isEmpty
         ? null
         : notifierCtrl.text.trim();
@@ -300,6 +315,12 @@ class _AccidentRecordPageState extends State<AccidentRecordPage> {
         ? null
         : otherReportUnitCtrl.text.trim();
 
+    print('--- [DEBUG] 準備呼叫 DAO 儲存 ---');
+    print('visitId: ${widget.visitId}');
+    print('incidentDate: ${accidentData.incidentDate}');
+    print('notifier: ${accidentData.notifier}');
+    print('t1Selected: ${accidentData.t1Selected}');
+
     await dao.upsertByVisitId(
       visitId: widget.visitId,
       incidentDate: accidentData.incidentDate,
@@ -316,7 +337,6 @@ class _AccidentRecordPageState extends State<AccidentRecordPage> {
       placeIdx: accidentData.placeGroupIdx,
       placeNote: accidentData.placeNote,
 
-      // ✅ 新增：儲存子地點選擇
       t1PlaceIdx: accidentData.t1Selected,
       t2PlaceIdx: accidentData.t2Selected,
       remotePlaceIdx: accidentData.remoteSelected,
@@ -333,9 +353,12 @@ class _AccidentRecordPageState extends State<AccidentRecordPage> {
       reasonOtherText: accidentData.otherReasonText,
     );
 
+    print('--- AccidentRecord 儲存完成 ---');
+
     if (!mounted) return;
     // 儲存完成後清空 AccidentData，為下一筆新增資料做準備
-    accidentData.clear();
+    // ⚠️ 備註：在多頁籤情況下，如果 App 沒有重新啟動，這裡清空可能會影響資料準確性，請依據您的 App 邏輯確認是否需要清空。
+    // accidentData.clear();
   }
 
   void _calculateTimeDifference(AccidentData accidentData) {
@@ -361,11 +384,16 @@ class _AccidentRecordPageState extends State<AccidentRecordPage> {
 
   @override
   Widget build(BuildContext context) {
+    // 🌟 修正三：呼叫 super.build(context) 以啟用 AutomaticKeepAliveClientMixin 的功能 🌟
+    super.build(context);
+
     if (_isLoading) return const Center(child: CircularProgressIndicator());
+
+    final accidentDataInstance = context.read<AccidentData>();
 
     return Consumer<AccidentData>(
       builder: (context, accidentData, _) {
-        // 同步控制器（避免資料丟失）
+        // ... (以下 UI 程式碼保持不變) ...
         return Container(
           color: const Color(0xFFE6F6FB),
           padding: const EdgeInsets.symmetric(
@@ -578,7 +606,7 @@ class _AccidentRecordPageState extends State<AccidentRecordPage> {
     );
   }
 
-  // ================= UI 小積木 =================
+  // ================= UI 小積木 (略，內容與您提供的相同) =================
   Widget _bigCard({required Widget child}) {
     return Container(
       margin: const EdgeInsets.fromLTRB(24, 0, 24, 16),
