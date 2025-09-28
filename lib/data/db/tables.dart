@@ -103,3 +103,24 @@ class AccidentRecords extends Table {
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
   DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
 }
+
+class FlightLogs extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get visitId => integer()(); // 關聯到 Visits
+
+  IntColumn get airlineIndex => integer().nullable()();
+  BoolColumn get useOtherAirline =>
+      boolean().withDefault(const Constant(false))();
+  TextColumn get otherAirline => text().nullable()();
+
+  TextColumn get flightNo => text().nullable()();
+
+  IntColumn get travelStatusIndex => integer().nullable()();
+  TextColumn get otherTravelStatus => text().nullable()();
+
+  TextColumn get departure => text().nullable()();
+  TextColumn get via => text().nullable()();
+  TextColumn get destination => text().nullable()();
+
+  DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
+}

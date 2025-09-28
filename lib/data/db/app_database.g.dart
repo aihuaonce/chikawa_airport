@@ -3043,6 +3043,740 @@ class AccidentRecordsCompanion extends UpdateCompanion<AccidentRecord> {
   }
 }
 
+class $FlightLogsTable extends FlightLogs
+    with TableInfo<$FlightLogsTable, FlightLog> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $FlightLogsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _visitIdMeta = const VerificationMeta(
+    'visitId',
+  );
+  @override
+  late final GeneratedColumn<int> visitId = GeneratedColumn<int>(
+    'visit_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _airlineIndexMeta = const VerificationMeta(
+    'airlineIndex',
+  );
+  @override
+  late final GeneratedColumn<int> airlineIndex = GeneratedColumn<int>(
+    'airline_index',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _useOtherAirlineMeta = const VerificationMeta(
+    'useOtherAirline',
+  );
+  @override
+  late final GeneratedColumn<bool> useOtherAirline = GeneratedColumn<bool>(
+    'use_other_airline',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("use_other_airline" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _otherAirlineMeta = const VerificationMeta(
+    'otherAirline',
+  );
+  @override
+  late final GeneratedColumn<String> otherAirline = GeneratedColumn<String>(
+    'other_airline',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _flightNoMeta = const VerificationMeta(
+    'flightNo',
+  );
+  @override
+  late final GeneratedColumn<String> flightNo = GeneratedColumn<String>(
+    'flight_no',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _travelStatusIndexMeta = const VerificationMeta(
+    'travelStatusIndex',
+  );
+  @override
+  late final GeneratedColumn<int> travelStatusIndex = GeneratedColumn<int>(
+    'travel_status_index',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _otherTravelStatusMeta = const VerificationMeta(
+    'otherTravelStatus',
+  );
+  @override
+  late final GeneratedColumn<String> otherTravelStatus =
+      GeneratedColumn<String>(
+        'other_travel_status',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _departureMeta = const VerificationMeta(
+    'departure',
+  );
+  @override
+  late final GeneratedColumn<String> departure = GeneratedColumn<String>(
+    'departure',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _viaMeta = const VerificationMeta('via');
+  @override
+  late final GeneratedColumn<String> via = GeneratedColumn<String>(
+    'via',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _destinationMeta = const VerificationMeta(
+    'destination',
+  );
+  @override
+  late final GeneratedColumn<String> destination = GeneratedColumn<String>(
+    'destination',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    visitId,
+    airlineIndex,
+    useOtherAirline,
+    otherAirline,
+    flightNo,
+    travelStatusIndex,
+    otherTravelStatus,
+    departure,
+    via,
+    destination,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'flight_logs';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<FlightLog> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('visit_id')) {
+      context.handle(
+        _visitIdMeta,
+        visitId.isAcceptableOrUnknown(data['visit_id']!, _visitIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_visitIdMeta);
+    }
+    if (data.containsKey('airline_index')) {
+      context.handle(
+        _airlineIndexMeta,
+        airlineIndex.isAcceptableOrUnknown(
+          data['airline_index']!,
+          _airlineIndexMeta,
+        ),
+      );
+    }
+    if (data.containsKey('use_other_airline')) {
+      context.handle(
+        _useOtherAirlineMeta,
+        useOtherAirline.isAcceptableOrUnknown(
+          data['use_other_airline']!,
+          _useOtherAirlineMeta,
+        ),
+      );
+    }
+    if (data.containsKey('other_airline')) {
+      context.handle(
+        _otherAirlineMeta,
+        otherAirline.isAcceptableOrUnknown(
+          data['other_airline']!,
+          _otherAirlineMeta,
+        ),
+      );
+    }
+    if (data.containsKey('flight_no')) {
+      context.handle(
+        _flightNoMeta,
+        flightNo.isAcceptableOrUnknown(data['flight_no']!, _flightNoMeta),
+      );
+    }
+    if (data.containsKey('travel_status_index')) {
+      context.handle(
+        _travelStatusIndexMeta,
+        travelStatusIndex.isAcceptableOrUnknown(
+          data['travel_status_index']!,
+          _travelStatusIndexMeta,
+        ),
+      );
+    }
+    if (data.containsKey('other_travel_status')) {
+      context.handle(
+        _otherTravelStatusMeta,
+        otherTravelStatus.isAcceptableOrUnknown(
+          data['other_travel_status']!,
+          _otherTravelStatusMeta,
+        ),
+      );
+    }
+    if (data.containsKey('departure')) {
+      context.handle(
+        _departureMeta,
+        departure.isAcceptableOrUnknown(data['departure']!, _departureMeta),
+      );
+    }
+    if (data.containsKey('via')) {
+      context.handle(
+        _viaMeta,
+        via.isAcceptableOrUnknown(data['via']!, _viaMeta),
+      );
+    }
+    if (data.containsKey('destination')) {
+      context.handle(
+        _destinationMeta,
+        destination.isAcceptableOrUnknown(
+          data['destination']!,
+          _destinationMeta,
+        ),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  FlightLog map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return FlightLog(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      visitId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}visit_id'],
+      )!,
+      airlineIndex: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}airline_index'],
+      ),
+      useOtherAirline: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}use_other_airline'],
+      )!,
+      otherAirline: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}other_airline'],
+      ),
+      flightNo: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}flight_no'],
+      ),
+      travelStatusIndex: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}travel_status_index'],
+      ),
+      otherTravelStatus: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}other_travel_status'],
+      ),
+      departure: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}departure'],
+      ),
+      via: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}via'],
+      ),
+      destination: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}destination'],
+      ),
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $FlightLogsTable createAlias(String alias) {
+    return $FlightLogsTable(attachedDatabase, alias);
+  }
+}
+
+class FlightLog extends DataClass implements Insertable<FlightLog> {
+  final int id;
+  final int visitId;
+  final int? airlineIndex;
+  final bool useOtherAirline;
+  final String? otherAirline;
+  final String? flightNo;
+  final int? travelStatusIndex;
+  final String? otherTravelStatus;
+  final String? departure;
+  final String? via;
+  final String? destination;
+  final DateTime updatedAt;
+  const FlightLog({
+    required this.id,
+    required this.visitId,
+    this.airlineIndex,
+    required this.useOtherAirline,
+    this.otherAirline,
+    this.flightNo,
+    this.travelStatusIndex,
+    this.otherTravelStatus,
+    this.departure,
+    this.via,
+    this.destination,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['visit_id'] = Variable<int>(visitId);
+    if (!nullToAbsent || airlineIndex != null) {
+      map['airline_index'] = Variable<int>(airlineIndex);
+    }
+    map['use_other_airline'] = Variable<bool>(useOtherAirline);
+    if (!nullToAbsent || otherAirline != null) {
+      map['other_airline'] = Variable<String>(otherAirline);
+    }
+    if (!nullToAbsent || flightNo != null) {
+      map['flight_no'] = Variable<String>(flightNo);
+    }
+    if (!nullToAbsent || travelStatusIndex != null) {
+      map['travel_status_index'] = Variable<int>(travelStatusIndex);
+    }
+    if (!nullToAbsent || otherTravelStatus != null) {
+      map['other_travel_status'] = Variable<String>(otherTravelStatus);
+    }
+    if (!nullToAbsent || departure != null) {
+      map['departure'] = Variable<String>(departure);
+    }
+    if (!nullToAbsent || via != null) {
+      map['via'] = Variable<String>(via);
+    }
+    if (!nullToAbsent || destination != null) {
+      map['destination'] = Variable<String>(destination);
+    }
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  FlightLogsCompanion toCompanion(bool nullToAbsent) {
+    return FlightLogsCompanion(
+      id: Value(id),
+      visitId: Value(visitId),
+      airlineIndex: airlineIndex == null && nullToAbsent
+          ? const Value.absent()
+          : Value(airlineIndex),
+      useOtherAirline: Value(useOtherAirline),
+      otherAirline: otherAirline == null && nullToAbsent
+          ? const Value.absent()
+          : Value(otherAirline),
+      flightNo: flightNo == null && nullToAbsent
+          ? const Value.absent()
+          : Value(flightNo),
+      travelStatusIndex: travelStatusIndex == null && nullToAbsent
+          ? const Value.absent()
+          : Value(travelStatusIndex),
+      otherTravelStatus: otherTravelStatus == null && nullToAbsent
+          ? const Value.absent()
+          : Value(otherTravelStatus),
+      departure: departure == null && nullToAbsent
+          ? const Value.absent()
+          : Value(departure),
+      via: via == null && nullToAbsent ? const Value.absent() : Value(via),
+      destination: destination == null && nullToAbsent
+          ? const Value.absent()
+          : Value(destination),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory FlightLog.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return FlightLog(
+      id: serializer.fromJson<int>(json['id']),
+      visitId: serializer.fromJson<int>(json['visitId']),
+      airlineIndex: serializer.fromJson<int?>(json['airlineIndex']),
+      useOtherAirline: serializer.fromJson<bool>(json['useOtherAirline']),
+      otherAirline: serializer.fromJson<String?>(json['otherAirline']),
+      flightNo: serializer.fromJson<String?>(json['flightNo']),
+      travelStatusIndex: serializer.fromJson<int?>(json['travelStatusIndex']),
+      otherTravelStatus: serializer.fromJson<String?>(
+        json['otherTravelStatus'],
+      ),
+      departure: serializer.fromJson<String?>(json['departure']),
+      via: serializer.fromJson<String?>(json['via']),
+      destination: serializer.fromJson<String?>(json['destination']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'visitId': serializer.toJson<int>(visitId),
+      'airlineIndex': serializer.toJson<int?>(airlineIndex),
+      'useOtherAirline': serializer.toJson<bool>(useOtherAirline),
+      'otherAirline': serializer.toJson<String?>(otherAirline),
+      'flightNo': serializer.toJson<String?>(flightNo),
+      'travelStatusIndex': serializer.toJson<int?>(travelStatusIndex),
+      'otherTravelStatus': serializer.toJson<String?>(otherTravelStatus),
+      'departure': serializer.toJson<String?>(departure),
+      'via': serializer.toJson<String?>(via),
+      'destination': serializer.toJson<String?>(destination),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  FlightLog copyWith({
+    int? id,
+    int? visitId,
+    Value<int?> airlineIndex = const Value.absent(),
+    bool? useOtherAirline,
+    Value<String?> otherAirline = const Value.absent(),
+    Value<String?> flightNo = const Value.absent(),
+    Value<int?> travelStatusIndex = const Value.absent(),
+    Value<String?> otherTravelStatus = const Value.absent(),
+    Value<String?> departure = const Value.absent(),
+    Value<String?> via = const Value.absent(),
+    Value<String?> destination = const Value.absent(),
+    DateTime? updatedAt,
+  }) => FlightLog(
+    id: id ?? this.id,
+    visitId: visitId ?? this.visitId,
+    airlineIndex: airlineIndex.present ? airlineIndex.value : this.airlineIndex,
+    useOtherAirline: useOtherAirline ?? this.useOtherAirline,
+    otherAirline: otherAirline.present ? otherAirline.value : this.otherAirline,
+    flightNo: flightNo.present ? flightNo.value : this.flightNo,
+    travelStatusIndex: travelStatusIndex.present
+        ? travelStatusIndex.value
+        : this.travelStatusIndex,
+    otherTravelStatus: otherTravelStatus.present
+        ? otherTravelStatus.value
+        : this.otherTravelStatus,
+    departure: departure.present ? departure.value : this.departure,
+    via: via.present ? via.value : this.via,
+    destination: destination.present ? destination.value : this.destination,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  FlightLog copyWithCompanion(FlightLogsCompanion data) {
+    return FlightLog(
+      id: data.id.present ? data.id.value : this.id,
+      visitId: data.visitId.present ? data.visitId.value : this.visitId,
+      airlineIndex: data.airlineIndex.present
+          ? data.airlineIndex.value
+          : this.airlineIndex,
+      useOtherAirline: data.useOtherAirline.present
+          ? data.useOtherAirline.value
+          : this.useOtherAirline,
+      otherAirline: data.otherAirline.present
+          ? data.otherAirline.value
+          : this.otherAirline,
+      flightNo: data.flightNo.present ? data.flightNo.value : this.flightNo,
+      travelStatusIndex: data.travelStatusIndex.present
+          ? data.travelStatusIndex.value
+          : this.travelStatusIndex,
+      otherTravelStatus: data.otherTravelStatus.present
+          ? data.otherTravelStatus.value
+          : this.otherTravelStatus,
+      departure: data.departure.present ? data.departure.value : this.departure,
+      via: data.via.present ? data.via.value : this.via,
+      destination: data.destination.present
+          ? data.destination.value
+          : this.destination,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FlightLog(')
+          ..write('id: $id, ')
+          ..write('visitId: $visitId, ')
+          ..write('airlineIndex: $airlineIndex, ')
+          ..write('useOtherAirline: $useOtherAirline, ')
+          ..write('otherAirline: $otherAirline, ')
+          ..write('flightNo: $flightNo, ')
+          ..write('travelStatusIndex: $travelStatusIndex, ')
+          ..write('otherTravelStatus: $otherTravelStatus, ')
+          ..write('departure: $departure, ')
+          ..write('via: $via, ')
+          ..write('destination: $destination, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    visitId,
+    airlineIndex,
+    useOtherAirline,
+    otherAirline,
+    flightNo,
+    travelStatusIndex,
+    otherTravelStatus,
+    departure,
+    via,
+    destination,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is FlightLog &&
+          other.id == this.id &&
+          other.visitId == this.visitId &&
+          other.airlineIndex == this.airlineIndex &&
+          other.useOtherAirline == this.useOtherAirline &&
+          other.otherAirline == this.otherAirline &&
+          other.flightNo == this.flightNo &&
+          other.travelStatusIndex == this.travelStatusIndex &&
+          other.otherTravelStatus == this.otherTravelStatus &&
+          other.departure == this.departure &&
+          other.via == this.via &&
+          other.destination == this.destination &&
+          other.updatedAt == this.updatedAt);
+}
+
+class FlightLogsCompanion extends UpdateCompanion<FlightLog> {
+  final Value<int> id;
+  final Value<int> visitId;
+  final Value<int?> airlineIndex;
+  final Value<bool> useOtherAirline;
+  final Value<String?> otherAirline;
+  final Value<String?> flightNo;
+  final Value<int?> travelStatusIndex;
+  final Value<String?> otherTravelStatus;
+  final Value<String?> departure;
+  final Value<String?> via;
+  final Value<String?> destination;
+  final Value<DateTime> updatedAt;
+  const FlightLogsCompanion({
+    this.id = const Value.absent(),
+    this.visitId = const Value.absent(),
+    this.airlineIndex = const Value.absent(),
+    this.useOtherAirline = const Value.absent(),
+    this.otherAirline = const Value.absent(),
+    this.flightNo = const Value.absent(),
+    this.travelStatusIndex = const Value.absent(),
+    this.otherTravelStatus = const Value.absent(),
+    this.departure = const Value.absent(),
+    this.via = const Value.absent(),
+    this.destination = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  });
+  FlightLogsCompanion.insert({
+    this.id = const Value.absent(),
+    required int visitId,
+    this.airlineIndex = const Value.absent(),
+    this.useOtherAirline = const Value.absent(),
+    this.otherAirline = const Value.absent(),
+    this.flightNo = const Value.absent(),
+    this.travelStatusIndex = const Value.absent(),
+    this.otherTravelStatus = const Value.absent(),
+    this.departure = const Value.absent(),
+    this.via = const Value.absent(),
+    this.destination = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  }) : visitId = Value(visitId);
+  static Insertable<FlightLog> custom({
+    Expression<int>? id,
+    Expression<int>? visitId,
+    Expression<int>? airlineIndex,
+    Expression<bool>? useOtherAirline,
+    Expression<String>? otherAirline,
+    Expression<String>? flightNo,
+    Expression<int>? travelStatusIndex,
+    Expression<String>? otherTravelStatus,
+    Expression<String>? departure,
+    Expression<String>? via,
+    Expression<String>? destination,
+    Expression<DateTime>? updatedAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (visitId != null) 'visit_id': visitId,
+      if (airlineIndex != null) 'airline_index': airlineIndex,
+      if (useOtherAirline != null) 'use_other_airline': useOtherAirline,
+      if (otherAirline != null) 'other_airline': otherAirline,
+      if (flightNo != null) 'flight_no': flightNo,
+      if (travelStatusIndex != null) 'travel_status_index': travelStatusIndex,
+      if (otherTravelStatus != null) 'other_travel_status': otherTravelStatus,
+      if (departure != null) 'departure': departure,
+      if (via != null) 'via': via,
+      if (destination != null) 'destination': destination,
+      if (updatedAt != null) 'updated_at': updatedAt,
+    });
+  }
+
+  FlightLogsCompanion copyWith({
+    Value<int>? id,
+    Value<int>? visitId,
+    Value<int?>? airlineIndex,
+    Value<bool>? useOtherAirline,
+    Value<String?>? otherAirline,
+    Value<String?>? flightNo,
+    Value<int?>? travelStatusIndex,
+    Value<String?>? otherTravelStatus,
+    Value<String?>? departure,
+    Value<String?>? via,
+    Value<String?>? destination,
+    Value<DateTime>? updatedAt,
+  }) {
+    return FlightLogsCompanion(
+      id: id ?? this.id,
+      visitId: visitId ?? this.visitId,
+      airlineIndex: airlineIndex ?? this.airlineIndex,
+      useOtherAirline: useOtherAirline ?? this.useOtherAirline,
+      otherAirline: otherAirline ?? this.otherAirline,
+      flightNo: flightNo ?? this.flightNo,
+      travelStatusIndex: travelStatusIndex ?? this.travelStatusIndex,
+      otherTravelStatus: otherTravelStatus ?? this.otherTravelStatus,
+      departure: departure ?? this.departure,
+      via: via ?? this.via,
+      destination: destination ?? this.destination,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (visitId.present) {
+      map['visit_id'] = Variable<int>(visitId.value);
+    }
+    if (airlineIndex.present) {
+      map['airline_index'] = Variable<int>(airlineIndex.value);
+    }
+    if (useOtherAirline.present) {
+      map['use_other_airline'] = Variable<bool>(useOtherAirline.value);
+    }
+    if (otherAirline.present) {
+      map['other_airline'] = Variable<String>(otherAirline.value);
+    }
+    if (flightNo.present) {
+      map['flight_no'] = Variable<String>(flightNo.value);
+    }
+    if (travelStatusIndex.present) {
+      map['travel_status_index'] = Variable<int>(travelStatusIndex.value);
+    }
+    if (otherTravelStatus.present) {
+      map['other_travel_status'] = Variable<String>(otherTravelStatus.value);
+    }
+    if (departure.present) {
+      map['departure'] = Variable<String>(departure.value);
+    }
+    if (via.present) {
+      map['via'] = Variable<String>(via.value);
+    }
+    if (destination.present) {
+      map['destination'] = Variable<String>(destination.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FlightLogsCompanion(')
+          ..write('id: $id, ')
+          ..write('visitId: $visitId, ')
+          ..write('airlineIndex: $airlineIndex, ')
+          ..write('useOtherAirline: $useOtherAirline, ')
+          ..write('otherAirline: $otherAirline, ')
+          ..write('flightNo: $flightNo, ')
+          ..write('travelStatusIndex: $travelStatusIndex, ')
+          ..write('otherTravelStatus: $otherTravelStatus, ')
+          ..write('departure: $departure, ')
+          ..write('via: $via, ')
+          ..write('destination: $destination, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -3053,6 +3787,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $AccidentRecordsTable accidentRecords = $AccidentRecordsTable(
     this,
   );
+  late final $FlightLogsTable flightLogs = $FlightLogsTable(this);
   late final VisitsDao visitsDao = VisitsDao(this as AppDatabase);
   late final PatientProfilesDao patientProfilesDao = PatientProfilesDao(
     this as AppDatabase,
@@ -3060,6 +3795,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final AccidentRecordsDao accidentRecordsDao = AccidentRecordsDao(
     this as AppDatabase,
   );
+  late final FlightLogsDao flightLogsDao = FlightLogsDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -3068,6 +3804,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     visits,
     patientProfiles,
     accidentRecords,
+    flightLogs,
   ];
 }
 
@@ -4429,6 +5166,342 @@ typedef $$AccidentRecordsTableProcessedTableManager =
       AccidentRecord,
       PrefetchHooks Function()
     >;
+typedef $$FlightLogsTableCreateCompanionBuilder =
+    FlightLogsCompanion Function({
+      Value<int> id,
+      required int visitId,
+      Value<int?> airlineIndex,
+      Value<bool> useOtherAirline,
+      Value<String?> otherAirline,
+      Value<String?> flightNo,
+      Value<int?> travelStatusIndex,
+      Value<String?> otherTravelStatus,
+      Value<String?> departure,
+      Value<String?> via,
+      Value<String?> destination,
+      Value<DateTime> updatedAt,
+    });
+typedef $$FlightLogsTableUpdateCompanionBuilder =
+    FlightLogsCompanion Function({
+      Value<int> id,
+      Value<int> visitId,
+      Value<int?> airlineIndex,
+      Value<bool> useOtherAirline,
+      Value<String?> otherAirline,
+      Value<String?> flightNo,
+      Value<int?> travelStatusIndex,
+      Value<String?> otherTravelStatus,
+      Value<String?> departure,
+      Value<String?> via,
+      Value<String?> destination,
+      Value<DateTime> updatedAt,
+    });
+
+class $$FlightLogsTableFilterComposer
+    extends Composer<_$AppDatabase, $FlightLogsTable> {
+  $$FlightLogsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get visitId => $composableBuilder(
+    column: $table.visitId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get airlineIndex => $composableBuilder(
+    column: $table.airlineIndex,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get useOtherAirline => $composableBuilder(
+    column: $table.useOtherAirline,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get otherAirline => $composableBuilder(
+    column: $table.otherAirline,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get flightNo => $composableBuilder(
+    column: $table.flightNo,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get travelStatusIndex => $composableBuilder(
+    column: $table.travelStatusIndex,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get otherTravelStatus => $composableBuilder(
+    column: $table.otherTravelStatus,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get departure => $composableBuilder(
+    column: $table.departure,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get via => $composableBuilder(
+    column: $table.via,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get destination => $composableBuilder(
+    column: $table.destination,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$FlightLogsTableOrderingComposer
+    extends Composer<_$AppDatabase, $FlightLogsTable> {
+  $$FlightLogsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get visitId => $composableBuilder(
+    column: $table.visitId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get airlineIndex => $composableBuilder(
+    column: $table.airlineIndex,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get useOtherAirline => $composableBuilder(
+    column: $table.useOtherAirline,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get otherAirline => $composableBuilder(
+    column: $table.otherAirline,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get flightNo => $composableBuilder(
+    column: $table.flightNo,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get travelStatusIndex => $composableBuilder(
+    column: $table.travelStatusIndex,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get otherTravelStatus => $composableBuilder(
+    column: $table.otherTravelStatus,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get departure => $composableBuilder(
+    column: $table.departure,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get via => $composableBuilder(
+    column: $table.via,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get destination => $composableBuilder(
+    column: $table.destination,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$FlightLogsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $FlightLogsTable> {
+  $$FlightLogsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get visitId =>
+      $composableBuilder(column: $table.visitId, builder: (column) => column);
+
+  GeneratedColumn<int> get airlineIndex => $composableBuilder(
+    column: $table.airlineIndex,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get useOtherAirline => $composableBuilder(
+    column: $table.useOtherAirline,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get otherAirline => $composableBuilder(
+    column: $table.otherAirline,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get flightNo =>
+      $composableBuilder(column: $table.flightNo, builder: (column) => column);
+
+  GeneratedColumn<int> get travelStatusIndex => $composableBuilder(
+    column: $table.travelStatusIndex,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get otherTravelStatus => $composableBuilder(
+    column: $table.otherTravelStatus,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get departure =>
+      $composableBuilder(column: $table.departure, builder: (column) => column);
+
+  GeneratedColumn<String> get via =>
+      $composableBuilder(column: $table.via, builder: (column) => column);
+
+  GeneratedColumn<String> get destination => $composableBuilder(
+    column: $table.destination,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$FlightLogsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $FlightLogsTable,
+          FlightLog,
+          $$FlightLogsTableFilterComposer,
+          $$FlightLogsTableOrderingComposer,
+          $$FlightLogsTableAnnotationComposer,
+          $$FlightLogsTableCreateCompanionBuilder,
+          $$FlightLogsTableUpdateCompanionBuilder,
+          (
+            FlightLog,
+            BaseReferences<_$AppDatabase, $FlightLogsTable, FlightLog>,
+          ),
+          FlightLog,
+          PrefetchHooks Function()
+        > {
+  $$FlightLogsTableTableManager(_$AppDatabase db, $FlightLogsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$FlightLogsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$FlightLogsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$FlightLogsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> visitId = const Value.absent(),
+                Value<int?> airlineIndex = const Value.absent(),
+                Value<bool> useOtherAirline = const Value.absent(),
+                Value<String?> otherAirline = const Value.absent(),
+                Value<String?> flightNo = const Value.absent(),
+                Value<int?> travelStatusIndex = const Value.absent(),
+                Value<String?> otherTravelStatus = const Value.absent(),
+                Value<String?> departure = const Value.absent(),
+                Value<String?> via = const Value.absent(),
+                Value<String?> destination = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+              }) => FlightLogsCompanion(
+                id: id,
+                visitId: visitId,
+                airlineIndex: airlineIndex,
+                useOtherAirline: useOtherAirline,
+                otherAirline: otherAirline,
+                flightNo: flightNo,
+                travelStatusIndex: travelStatusIndex,
+                otherTravelStatus: otherTravelStatus,
+                departure: departure,
+                via: via,
+                destination: destination,
+                updatedAt: updatedAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int visitId,
+                Value<int?> airlineIndex = const Value.absent(),
+                Value<bool> useOtherAirline = const Value.absent(),
+                Value<String?> otherAirline = const Value.absent(),
+                Value<String?> flightNo = const Value.absent(),
+                Value<int?> travelStatusIndex = const Value.absent(),
+                Value<String?> otherTravelStatus = const Value.absent(),
+                Value<String?> departure = const Value.absent(),
+                Value<String?> via = const Value.absent(),
+                Value<String?> destination = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+              }) => FlightLogsCompanion.insert(
+                id: id,
+                visitId: visitId,
+                airlineIndex: airlineIndex,
+                useOtherAirline: useOtherAirline,
+                otherAirline: otherAirline,
+                flightNo: flightNo,
+                travelStatusIndex: travelStatusIndex,
+                otherTravelStatus: otherTravelStatus,
+                departure: departure,
+                via: via,
+                destination: destination,
+                updatedAt: updatedAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$FlightLogsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $FlightLogsTable,
+      FlightLog,
+      $$FlightLogsTableFilterComposer,
+      $$FlightLogsTableOrderingComposer,
+      $$FlightLogsTableAnnotationComposer,
+      $$FlightLogsTableCreateCompanionBuilder,
+      $$FlightLogsTableUpdateCompanionBuilder,
+      (FlightLog, BaseReferences<_$AppDatabase, $FlightLogsTable, FlightLog>),
+      FlightLog,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -4439,4 +5512,6 @@ class $AppDatabaseManager {
       $$PatientProfilesTableTableManager(_db, _db.patientProfiles);
   $$AccidentRecordsTableTableManager get accidentRecords =>
       $$AccidentRecordsTableTableManager(_db, _db.accidentRecords);
+  $$FlightLogsTableTableManager get flightLogs =>
+      $$FlightLogsTableTableManager(_db, _db.flightLogs);
 }

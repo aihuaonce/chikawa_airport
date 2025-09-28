@@ -269,3 +269,64 @@ class AccidentRecordsDao extends DatabaseAccessor<AppDatabase>
     }
   }
 }
+
+@DriftAccessor(tables: [FlightLogs])
+class FlightLogsDao extends DatabaseAccessor<AppDatabase>
+    with _$FlightLogsDaoMixin {
+  FlightLogsDao(AppDatabase db) : super(db);
+
+  // 抓本頁資料
+  Future<FlightLog?> getByVisitId(int visitId) => (select(
+    flightLogs,
+  )..where((t) => t.visitId.equals(visitId))).getSingleOrNull();
+
+  // 儲存（沒有就 insert，有就 update）
+  Future<void> upsertByVisitId({
+    required int visitId,
+    int? airlineIndex,
+    bool useOtherAirline = false,
+    String? otherAirline,
+    String? flightNo,
+    int? travelStatusIndex,
+    String? otherTravelStatus,
+    String? departure,
+    String? via,
+    String? destination,
+  }) async {
+    final existing = await getByVisitId(visitId);
+    final now = DateTime.now();
+
+    if (existing == null) {
+      await into(flightLogs).insert(
+        FlightLogsCompanion.insert(
+          visitId: visitId,
+          airlineIndex: Value(airlineIndex),
+          useOtherAirline: Value(useOtherAirline),
+          otherAirline: Value(otherAirline),
+          flightNo: Value(flightNo),
+          travelStatusIndex: Value(travelStatusIndex),
+          otherTravelStatus: Value(otherTravelStatus),
+          departure: Value(departure),
+          via: Value(via),
+          destination: Value(destination),
+          updatedAt: Value(now),
+        ),
+      );
+    } else {
+      await (update(flightLogs)..where((t) => t.visitId.equals(visitId))).write(
+        FlightLogsCompanion(
+          airlineIndex: Value(airlineIndex),
+          useOtherAirline: Value(useOtherAirline),
+          otherAirline: Value(otherAirline),
+          flightNo: Value(flightNo),
+          travelStatusIndex: Value(travelStatusIndex),
+          otherTravelStatus: Value(otherTravelStatus),
+          departure: Value(departure),
+          via: Value(via),
+          destination: Value(destination),
+          updatedAt: Value(now),
+        ),
+      );
+    }
+  }
+}

@@ -1,571 +1,417 @@
-// import 'package:flutter/material.dart';
-// import 'nav2.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../data/db/daos.dart';
+import '../data/models/flightlog_data.dart';
+import 'nav2.dart'; // SavablePage 介面
 
-// class FlightLogPage extends StatefulWidget {
-//   const FlightLogPage({super.key});
+class FlightLogPage extends StatefulWidget {
+  final int visitId;
 
-//   @override
-//   State<FlightLogPage> createState() => _FlightLogPageState();
-// }
+  const FlightLogPage({super.key, required this.visitId});
 
-// class _FlightLogPageState extends State<FlightLogPage> {
-//   // ----------------- 資料 -----------------
-//   final List<String> mainAirlines = [
-//     'BR長榮航空',
-//     'CI中華航空',
-//     'CX國泰航空',
-//     'UA聯合航空',
-//     'KL荷蘭航空',
-//     'CZ中國南方航空',
-//     'IT台灣虎航',
-//     'EK阿聯酋航空',
-//     'CA中國國際航空',
-//   ];
+  @override
+  State<FlightLogPage> createState() => _FlightLogPageState();
+}
 
-//   final List<String> otherAirlines = [
-//     'JX星宇航空',
-//     'AE華信航空',
-//     'B7立榮航空',
-//     'MU中國東方航空',
-//     'MF廈門航空',
-//     'MM樂桃航空',
-//     'KE大韓航空',
-//     'OZ韓亞航空',
-//   ];
+class _FlightLogPageState extends State<FlightLogPage>
+    with
+        AutomaticKeepAliveClientMixin<FlightLogPage>,
+        SavableStateMixin<FlightLogPage> {
+  bool _isLoading = true;
 
-//   final List<String> airportOptions = const [
-//     'TPE台北 / 台灣',
-//     'HKG香港 / 香港',
-//     'LAX洛杉磯 / 美國',
-//     'SHA上海 / 中國',
-//     'TYO東京 / 日本',
-//     'BKK曼谷 / 泰國',
-//     'SFO舊金山 / 美國',
-//     'MNL馬尼拉 / 菲律賓',
-//   ];
+  // 外觀參數
+  static const double _outerHpad = 48;
+  static const double _cardMaxWidth = 1100;
+  static const double _radius = 16;
 
-//   final List<String> travelOptions = const [
-//     '出境',
-//     '入境',
-//     '過境',
-//     '轉機',
-//     '迫降',
-//     '轉降',
-//     '備降',
-//     '其他',
-//   ];
+  // 選項列表
+  final List<String> mainAirlines = const [
+    'BR長榮航空',
+    'CI中華航空',
+    'CX國泰航空',
+    'UA聯合航空',
+    'KL荷蘭航空',
+    'CZ中國南方航空',
+    'IT台灣虎航',
+    'EK阿聯酋航空',
+    'CA中國國際航空',
+  ];
 
-//   // ----------------- 狀態 -----------------
-//   int airlineIndex = 0;
-//   bool useOtherAirline = false;
-//   String? selectedOtherAirline;
+  final List<String> otherAirlines = const [
+    'JX星宇航空',
+    'AE華信航空',
+    'B7立榮航空',
+    'MU中國東方航空',
+    'MF廈門航空',
+    'MM樂桃航空',
+    'KE大韓航空',
+    'OZ韓亞航空',
+  ];
 
-//   final TextEditingController flightNoCtrl = TextEditingController();
-//   final FocusNode flightNoFocus = FocusNode();
+  final List<String> travelOptions = const [
+    '出境',
+    '入境',
+    '過境',
+    '轉機',
+    '迫降',
+    '轉降',
+    '備降',
+    '其他',
+  ];
 
-//   final TextEditingController otherTravelCtrl = TextEditingController();
-//   final FocusNode otherTravelFocus = FocusNode();
+  final List<String> airportOptions = const [
+    'TPE台北 / 台灣',
+    'HKG香港 / 香港',
+    'LAX洛杉磯 / 美國',
+    'SHA上海 / 中國',
+    'TYO東京 / 日本',
+    'BKK曼谷 / 泰國',
+    'SFO舊金山 / 美國',
+    'MNL馬尼拉 / 菲律賓',
+  ];
 
-//   int? travelStatusIndex;
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
 
-//   String? dep; // 啟程地
-//   String? via; // 經過地
-//   String? dest; // 目的地
+  @override
+  Future<void> saveData() async {
+    try {
+      _syncControllersToData();
+      await _saveData();
+    } catch (e) {
+      rethrow;
+    }
+  }
 
-//   // 錨點（讓選單貼在被點元件旁邊）
-//   final GlobalKey otherAirlineKey = GlobalKey();
-//   final GlobalKey depKey = GlobalKey();
-//   final GlobalKey viaKey = GlobalKey();
-//   final GlobalKey destKey = GlobalKey();
+  @override
+  bool get wantKeepAlive => true;
 
-//   @override
-//   void dispose() {
-//     flightNoCtrl.dispose();
-//     flightNoFocus.dispose();
-//     otherTravelCtrl.dispose();
-//     otherTravelFocus.dispose();
-//     super.dispose();
-//   }
+  Future<void> _loadData() async {
+    try {
+      final dao = context.read<FlightLogsDao>();
+      final data = context.read<FlightLogData>();
+      final record = await dao.getByVisitId(widget.visitId);
 
-//   @override
-//   Widget build(BuildContext context) {
-//     return Nav2Page(
-//       selectedIndex: 1,
-//       child: Container(
-//         color: const Color(0xFFE6F6FB),
-//         padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 16),
-//         child: SingleChildScrollView(
-//           child: LayoutBuilder(
-//             builder: (context, c) {
-//               final wide = c.maxWidth >= 980;
+      if (!mounted) return;
 
-//               // 左側內容
-//               final leftColumn = Column(
-//                 crossAxisAlignment: CrossAxisAlignment.start,
-//                 children: [
-//                   _sectionTitle('航空公司'),
-//                   const SizedBox(height: 6),
-//                   ...List.generate(mainAirlines.length, (i) {
-//                     return _radioRow(
-//                       label: mainAirlines[i],
-//                       selected: !useOtherAirline && airlineIndex == i,
-//                       onTap: () {
-//                         setState(() {
-//                           useOtherAirline = false;
-//                           airlineIndex = i;
-//                           selectedOtherAirline = null;
-//                         });
-//                       },
-//                     );
-//                   }),
-//                   // 其他航空公司 + 下拉
-//                   _radioRow(
-//                     key: otherAirlineKey,
-//                     label: '其他航空公司',
-//                     selected: useOtherAirline,
-//                     onTap: () async {
-//                       setState(() => useOtherAirline = true);
-//                       final picked = await _pickFromMenuAt(
-//                         anchorKey: otherAirlineKey,
-//                         options: otherAirlines,
-//                         allowSearch: true,
-//                       );
-//                       if (picked != null) {
-//                         setState(() => selectedOtherAirline = picked);
-//                       }
-//                     },
-//                     trailing: useOtherAirline && selectedOtherAirline != null
-//                         ? Padding(
-//                             padding: const EdgeInsets.only(left: 8),
-//                             child: Text(
-//                               selectedOtherAirline!,
-//                               style: const TextStyle(
-//                                 fontSize: 18,
-//                                 color: Colors.black87,
-//                                 fontWeight: FontWeight.w600,
-//                               ),
-//                             ),
-//                           )
-//                         : null,
-//                   ),
-//                 ],
-//               );
+      if (record != null) {
+        // 從資料庫載入到 model
+        data.airlineIndex = record.airlineIndex;
+        data.useOtherAirline = record.useOtherAirline;
+        data.selectedOtherAirline = record.otherAirline;
+        data.flightNoCtrl.text = record.flightNo ?? '';
+        data.travelStatusIndex = record.travelStatusIndex;
+        data.otherTravelCtrl.text = record.otherTravelStatus ?? '';
+        data.departure = record.departure;
+        data.via = record.via;
+        data.destination = record.destination;
+        data.update();
+      }
+      _syncControllersFromData(data);
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
 
-//               // 右側內容
-//               final rightColumn = Column(
-//                 crossAxisAlignment: CrossAxisAlignment.start,
-//                 children: [
-//                   _sectionTitle('班機'),
-//                   const SizedBox(height: 6),
-//                   _UnderlineHintInput(
-//                     controller: flightNoCtrl,
-//                     focusNode: flightNoFocus,
-//                     hint: '請填寫班機代碼',
-//                     width: 360,
-//                     hintStyle: const TextStyle(
-//                       color: Colors.black87,
-//                       fontSize: 18,
-//                       fontWeight: FontWeight.w400,
-//                     ),
-//                     textStyle: const TextStyle(
-//                       color: Colors.black87,
-//                       fontSize: 20,
-//                       fontWeight: FontWeight.w500,
-//                     ),
-//                   ),
-//                   const SizedBox(height: 22),
+  void _syncControllersFromData(FlightLogData data) {
+    if (data.flightNo != null) data.flightNoCtrl.text = data.flightNo!;
+    if (data.otherTravelStatus != null) {
+      data.otherTravelCtrl.text = data.otherTravelStatus!;
+    }
+  }
 
-//                   _sectionTitle('旅行狀態'),
-//                   const SizedBox(height: 6),
-//                   Column(
-//                     children: List.generate(travelOptions.length, (i) {
-//                       return _radioRow(
-//                         label: travelOptions[i],
-//                         selected: travelStatusIndex == i,
-//                         onTap: () {
-//                           setState(() {
-//                             travelStatusIndex = i;
-//                             if (i != travelOptions.length - 1) {
-//                               otherTravelCtrl.clear();
-//                             }
-//                           });
-//                         },
-//                       );
-//                     }),
-//                   ),
-//                   if (travelStatusIndex == travelOptions.length - 1) ...[
-//                     const SizedBox(height: 10),
-//                     _UnderlineHintInput(
-//                       controller: otherTravelCtrl,
-//                       focusNode: otherTravelFocus,
-//                       hint: '請填寫其他旅行狀態',
-//                       width: 360,
-//                       hintStyle: const TextStyle(
-//                         color: Colors.black87,
-//                         fontSize: 18,
-//                         fontWeight: FontWeight.w400,
-//                       ),
-//                       textStyle: const TextStyle(
-//                         color: Colors.black87,
-//                         fontSize: 20,
-//                         fontWeight: FontWeight.w500,
-//                       ),
-//                     ),
-//                   ],
-//                   const SizedBox(height: 28),
+  void _syncControllersToData() {
+    final data = context.read<FlightLogData>();
+    data.flightNo = data.flightNoCtrl.text.trim().isEmpty
+        ? null
+        : data.flightNoCtrl.text.trim();
+    data.otherTravelStatus = data.otherTravelCtrl.text.trim().isEmpty
+        ? null
+        : data.otherTravelCtrl.text.trim();
+  }
 
-//                   _sectionTitle('啟程地'),
-//                   const SizedBox(height: 6),
-//                   _PickField(
-//                     key: depKey,
-//                     placeholder: '點擊選擇啟程地',
-//                     value: dep,
-//                     onPick: () async {
-//                       final picked = await _pickFromMenuAt(
-//                         anchorKey: depKey,
-//                         options: airportOptions,
-//                         allowSearch: true,
-//                       );
-//                       if (picked != null) setState(() => dep = picked);
-//                     },
-//                   ),
-//                   const SizedBox(height: 18),
+  Future<void> _saveData() async {
+    final dao = context.read<FlightLogsDao>();
+    final data = context.read<FlightLogData>();
 
-//                   _sectionTitle('經過地'),
-//                   const SizedBox(height: 6),
-//                   _PickField(
-//                     key: viaKey,
-//                     placeholder: '視情況點擊選擇經過地',
-//                     value: via,
-//                     onPick: () async {
-//                       final picked = await _pickFromMenuAt(
-//                         anchorKey: viaKey,
-//                         options: airportOptions,
-//                         allowSearch: true,
-//                       );
-//                       if (picked != null) setState(() => via = picked);
-//                     },
-//                   ),
-//                   const SizedBox(height: 18),
+    await dao.upsertByVisitId(
+      visitId: widget.visitId,
+      airlineIndex: data.airlineIndex,
+      useOtherAirline: data.useOtherAirline,
+      otherAirline: data.selectedOtherAirline,
+      flightNo: data.flightNo,
+      travelStatusIndex: data.travelStatusIndex,
+      otherTravelStatus: data.otherTravelStatus,
+      departure: data.departure,
+      via: data.via,
+      destination: data.destination,
+    );
+  }
 
-//                   _sectionTitle('目的地'),
-//                   const SizedBox(height: 6),
-//                   _PickField(
-//                     key: destKey,
-//                     placeholder: '點擊選擇目的地',
-//                     value: dest,
-//                     onPick: () async {
-//                       final picked = await _pickFromMenuAt(
-//                         anchorKey: destKey,
-//                         options: airportOptions,
-//                         allowSearch: true,
-//                       );
-//                       if (picked != null) setState(() => dest = picked);
-//                     },
-//                   ),
-//                 ],
-//               );
+  // ================= build =================
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
 
-//               // ======= 一張大卡片（與小卡片一樣的圓角/陰影） =======
-//               if (wide) {
-//                 return _bigCard(
-//                   child: Row(
-//                     crossAxisAlignment: CrossAxisAlignment.start,
-//                     children: [
-//                       Expanded(child: leftColumn),
-//                       // 中間細分隔（可要可不要）
-//                       const SizedBox(width: 24),
-//                       Expanded(child: rightColumn),
-//                     ],
-//                   ),
-//                 );
-//               } else {
-//                 return _bigCard(
-//                   child: Column(
-//                     crossAxisAlignment: CrossAxisAlignment.start,
-//                     children: [
-//                       leftColumn,
-//                       const SizedBox(height: 16),
-//                       rightColumn,
-//                     ],
-//                   ),
-//                 );
-//               }
-//             },
-//           ),
-//         ),
-//       ),
-//     );
-//   }
+    if (_isLoading) return const Center(child: CircularProgressIndicator());
 
-//   // ----------------- UI 小組件 -----------------
+    return Consumer<FlightLogData>(
+      builder: (context, data, _) {
+        return Container(
+          color: const Color(0xFFE6F6FB),
+          padding: const EdgeInsets.symmetric(
+            horizontal: _outerHpad,
+            vertical: 16,
+          ),
+          child: SingleChildScrollView(
+            child: Align(
+              alignment: Alignment.topCenter,
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: _cardMaxWidth),
+                child: _bigCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _boldLabel('航空公司'),
+                      const SizedBox(height: 6),
+                      _radioWrap(
+                        options: mainAirlines,
+                        groupIndex: data.useOtherAirline
+                            ? null
+                            : data.airlineIndex,
+                        onChanged: (i) {
+                          data.useOtherAirline = false;
+                          data.airlineIndex = i;
+                          data.selectedOtherAirline = null;
+                          data.update();
+                        },
+                      ),
+                      const SizedBox(height: 6),
+                      Row(
+                        children: [
+                          Checkbox(
+                            value: data.useOtherAirline,
+                            onChanged: (v) {
+                              data.useOtherAirline = v ?? false;
+                              data.update();
+                            },
+                          ),
+                          const Text('其他航空公司'),
+                          if (data.useOtherAirline)
+                            Padding(
+                              padding: const EdgeInsets.only(left: 8),
+                              child: DropdownButton<String>(
+                                value: data.selectedOtherAirline,
+                                hint: const Text('請選擇'),
+                                items: otherAirlines
+                                    .map(
+                                      (e) => DropdownMenuItem(
+                                        value: e,
+                                        child: Text(e),
+                                      ),
+                                    )
+                                    .toList(),
+                                onChanged: (v) {
+                                  data.selectedOtherAirline = v;
+                                  data.update();
+                                },
+                              ),
+                            ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
 
-//   /// 一張「大卡片」：與原本小卡片相同的圓角與陰影
-//   Widget _bigCard({required Widget child}) {
-//     return Container(
-//       margin: const EdgeInsets.fromLTRB(24, 0, 24, 16),
-//       padding: const EdgeInsets.fromLTRB(20, 18, 20, 22),
-//       decoration: BoxDecoration(
-//         color: Colors.white,
-//         borderRadius: BorderRadius.circular(14), // ← 圓角
-//         boxShadow: const [
-//           BoxShadow(
-//             // ← 陰影
-//             color: Color(0x14000000),
-//             blurRadius: 8,
-//             offset: Offset(0, 4),
-//           ),
-//         ],
-//       ),
-//       child: child,
-//     );
-//   }
+                      _inputRowBold('班機代碼', '請輸入班機號碼', data.flightNoCtrl),
+                      const SizedBox(height: 16),
 
-//   Widget _sectionTitle(String s) => Text(
-//     s,
-//     style: const TextStyle(
-//       fontSize: 20,
-//       fontWeight: FontWeight.w700,
-//       color: Colors.black87,
-//     ),
-//   );
+                      _boldLabel('旅行狀態'),
+                      const SizedBox(height: 6),
+                      _radioWrap(
+                        options: travelOptions,
+                        groupIndex: data.travelStatusIndex,
+                        onChanged: (i) {
+                          data.travelStatusIndex = i;
+                          if (i != travelOptions.length - 1) {
+                            data.otherTravelCtrl.clear();
+                          }
+                          data.update();
+                        },
+                      ),
+                      if (data.travelStatusIndex == travelOptions.length - 1)
+                        _inputRowBold(
+                          '其他旅行狀態',
+                          '請輸入旅行狀態',
+                          data.otherTravelCtrl,
+                        ),
+                      const SizedBox(height: 16),
 
-//   Widget _radioRow({
-//     Key? key,
-//     required String label,
-//     required bool selected,
-//     required VoidCallback onTap,
-//     Widget? trailing,
-//   }) {
-//     return InkWell(
-//       key: key,
-//       onTap: onTap,
-//       child: Padding(
-//         padding: const EdgeInsets.symmetric(vertical: 6),
-//         child: Row(
-//           crossAxisAlignment: CrossAxisAlignment.center,
-//           children: [
-//             Icon(
-//               selected ? Icons.radio_button_checked : Icons.radio_button_off,
-//               size: 20,
-//               color: selected ? const Color(0xFF274C4A) : Colors.black45,
-//             ),
-//             const SizedBox(width: 10),
-//             Flexible(child: Text(label, style: const TextStyle(fontSize: 18))),
-//             if (trailing != null) trailing,
-//           ],
-//         ),
-//       ),
-//     );
-//   }
+                      _boldLabel('啟程地'),
+                      _pickField('點擊選擇啟程地', data.departure, (v) {
+                        data.departure = v;
+                        data.update();
+                      }),
+                      const SizedBox(height: 16),
 
-//   Future<String?> _pickFromMenuAt({
-//     required GlobalKey anchorKey,
-//     required List<String> options,
-//     bool allowSearch = true,
-//   }) async {
-//     final overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
-//     final box = anchorKey.currentContext!.findRenderObject() as RenderBox;
-//     final offset = box.localToGlobal(Offset.zero);
-//     final rect = Rect.fromLTWH(
-//       offset.dx,
-//       offset.dy,
-//       box.size.width,
-//       box.size.height,
-//     );
+                      _boldLabel('經過地'),
+                      _pickField('點擊選擇經過地', data.via, (v) {
+                        data.via = v;
+                        data.update();
+                      }),
+                      const SizedBox(height: 16),
 
-//     final choice = await showMenu<String>(
-//       context: context,
-//       position: RelativeRect.fromRect(rect, Offset.zero & overlay.size),
-//       items: [
-//         ...options.map((e) => PopupMenuItem<String>(value: e, child: Text(e))),
-//         if (allowSearch) const PopupMenuDivider(),
-//         if (allowSearch)
-//           const PopupMenuItem<String>(
-//             value: '__search_more__',
-//             child: Text('搜尋更多…', style: TextStyle(fontWeight: FontWeight.w600)),
-//           ),
-//         if (allowSearch)
-//           const PopupMenuItem<String>(
-//             value: '__start_input__',
-//             child: Text('開始輸入…', style: TextStyle(fontWeight: FontWeight.w600)),
-//           ),
-//       ],
-//     );
+                      _boldLabel('目的地'),
+                      _pickField('點擊選擇目的地', data.destination, (v) {
+                        data.destination = v;
+                        data.update();
+                      }),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
 
-//     if (choice == '__search_more__' || choice == '__start_input__') {
-//       return _searchDialog(options: options);
-//     }
-//     return choice;
-//   }
+  // ================= 小積木 =================
+  Widget _bigCard({required Widget child}) {
+    return Container(
+      margin: const EdgeInsets.fromLTRB(24, 0, 24, 16),
+      padding: const EdgeInsets.fromLTRB(20, 18, 20, 22),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(_radius),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x14000000),
+            blurRadius: 8,
+            offset: Offset(0, 4),
+          ),
+        ],
+      ),
+      child: child,
+    );
+  }
 
-//   Future<String?> _searchDialog({required List<String> options}) async {
-//     final ctrl = TextEditingController();
-//     List<String> showing = List.of(options);
+  Widget _boldLabel(String s) => Text(
+    s,
+    style: const TextStyle(
+      fontSize: 16,
+      fontWeight: FontWeight.w700,
+      color: Colors.black87,
+    ),
+  );
 
-//     return showDialog<String>(
-//       context: context,
-//       builder: (ctx) {
-//         return StatefulBuilder(
-//           builder: (ctx, setS) {
-//             return AlertDialog(
-//               title: const Text('搜尋 / 輸入'),
-//               content: SizedBox(
-//                 width: 420,
-//                 child: Column(
-//                   mainAxisSize: MainAxisSize.min,
-//                   children: [
-//                     TextField(
-//                       controller: ctrl,
-//                       decoration: const InputDecoration(hintText: '輸入關鍵字過濾…'),
-//                       onChanged: (t) {
-//                         setS(() {
-//                           showing = options
-//                               .where(
-//                                 (e) =>
-//                                     e.toLowerCase().contains(t.toLowerCase()),
-//                               )
-//                               .toList();
-//                           if (showing.isEmpty && t.isNotEmpty) {
-//                             showing = ['新增：$t'];
-//                           }
-//                         });
-//                       },
-//                     ),
-//                     const SizedBox(height: 12),
-//                     ConstrainedBox(
-//                       constraints: const BoxConstraints(maxHeight: 320),
-//                       child: ListView.builder(
-//                         shrinkWrap: true,
-//                         itemCount: showing.length,
-//                         itemBuilder: (_, i) {
-//                           final val = showing[i];
-//                           return ListTile(
-//                             dense: true,
-//                             title: Text(val),
-//                             onTap: () {
-//                               final pure = val.startsWith('新增：')
-//                                   ? val.substring(3)
-//                                   : val;
-//                               Navigator.of(ctx).pop(pure);
-//                             },
-//                           );
-//                         },
-//                       ),
-//                     ),
-//                   ],
-//                 ),
-//               ),
-//               actions: [
-//                 TextButton(
-//                   onPressed: () => Navigator.of(ctx).pop(),
-//                   child: const Text('取消'),
-//                 ),
-//               ],
-//             );
-//           },
-//         );
-//       },
-//     );
-//   }
-// }
+  Widget _inputRowBold(
+    String label,
+    String hint,
+    TextEditingController ctrl, {
+    VoidCallback? onChanged,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 160,
+            child: Text(
+              label,
+              style: const TextStyle(
+                fontSize: 15.5,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+          Expanded(
+            child: TextField(
+              controller: ctrl,
+              decoration: InputDecoration(
+                hintText: hint,
+                border: const OutlineInputBorder(),
+                isDense: true,
+              ),
+              onChanged: (_) {
+                if (onChanged != null) onChanged();
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
-// // ===== 帶「提示+底線」→（空白顯示提示，有字顯示輸入；字體黑色、不粗） =====
-// class _UnderlineHintInput extends StatefulWidget {
-//   final TextEditingController controller;
-//   final FocusNode focusNode;
-//   final String hint;
-//   final double width;
-//   final TextStyle hintStyle;
-//   final TextStyle textStyle;
+  Widget _radioWrap({
+    required List<String> options,
+    required int? groupIndex,
+    required ValueChanged<int> onChanged,
+  }) {
+    return Wrap(
+      spacing: 14,
+      runSpacing: 4,
+      children: List.generate(options.length, (i) {
+        final selected = groupIndex == i;
+        return InkWell(
+          onTap: () => onChanged(i),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                selected ? Icons.radio_button_checked : Icons.radio_button_off,
+                size: 20,
+                color: selected ? const Color(0xFF274C4A) : Colors.black45,
+              ),
+              const SizedBox(width: 6),
+              Text(options[i]),
+            ],
+          ),
+        );
+      }),
+    );
+  }
 
-//   const _UnderlineHintInput({
-//     required this.controller,
-//     required this.focusNode,
-//     required this.hint,
-//     required this.width,
-//     required this.hintStyle,
-//     required this.textStyle,
-//   });
-
-//   @override
-//   State<_UnderlineHintInput> createState() => _UnderlineHintInputState();
-// }
-
-// class _UnderlineHintInputState extends State<_UnderlineHintInput> {
-//   @override
-//   void initState() {
-//     super.initState();
-//     widget.controller.addListener(() => setState(() {}));
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     final empty = widget.controller.text.isEmpty;
-//     return Column(
-//       crossAxisAlignment: CrossAxisAlignment.start,
-//       children: [
-//         SizedBox(
-//           width: widget.width,
-//           child: Stack(
-//             alignment: Alignment.centerLeft,
-//             children: [
-//               if (empty)
-//                 Padding(
-//                   padding: const EdgeInsets.only(bottom: 6),
-//                   child: Text(widget.hint, style: widget.hintStyle),
-//                 ),
-//               TextField(
-//                 controller: widget.controller,
-//                 focusNode: widget.focusNode,
-//                 decoration: const InputDecoration(
-//                   isCollapsed: true,
-//                   border: InputBorder.none,
-//                   hintText: '',
-//                 ),
-//                 style: widget.textStyle,
-//               ),
-//             ],
-//           ),
-//         ),
-//         Container(width: widget.width, height: 2, color: Colors.black87),
-//       ],
-//     );
-//   }
-// }
-
-// // ===== 可點擊的選擇欄位 =====
-// class _PickField extends StatelessWidget {
-//   final String placeholder;
-//   final String? value;
-//   final VoidCallback onPick;
-
-//   const _PickField({
-//     Key? key,
-//     required this.placeholder,
-//     required this.value,
-//     required this.onPick,
-//   }) : super(key: key);
-
-//   @override
-//   Widget build(BuildContext context) {
-//     final show = value ?? placeholder;
-//     final isPlaceholder = value == null;
-
-//     return InkWell(
-//       onTap: onPick,
-//       borderRadius: BorderRadius.circular(6),
-//       child: Padding(
-//         padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 2),
-//         child: Text(
-//           show,
-//           style: TextStyle(
-//             fontSize: 18,
-//             color: isPlaceholder ? Colors.black54 : Colors.black87,
-//             fontWeight: isPlaceholder ? FontWeight.w500 : FontWeight.w700,
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-// }
+  Widget _pickField(
+    String placeholder,
+    String? value,
+    ValueChanged<String?> onPick,
+  ) {
+    return InkWell(
+      onTap: () async {
+        final picked = await showDialog<String>(
+          context: context,
+          builder: (ctx) {
+            return SimpleDialog(
+              title: const Text('選擇地點'),
+              children: airportOptions
+                  .map(
+                    (e) => SimpleDialogOption(
+                      child: Text(e),
+                      onPressed: () => Navigator.of(ctx).pop(e),
+                    ),
+                  )
+                  .toList(),
+            );
+          },
+        );
+        if (picked != null) onPick(picked);
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 6),
+        child: Text(
+          value ?? placeholder,
+          style: TextStyle(
+            fontSize: 15.5,
+            fontWeight: value == null ? FontWeight.w500 : FontWeight.w700,
+            color: value == null ? Colors.black54 : Colors.black87,
+          ),
+        ),
+      ),
+    );
+  }
+}

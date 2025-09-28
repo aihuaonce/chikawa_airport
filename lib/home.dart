@@ -4,6 +4,9 @@ import 'data/db/app_database.dart';
 import 'data/db/daos.dart';
 import 'nav2.dart';
 import 'nav1.dart';
+import 'data/models/accident_data.dart';
+import 'data/models/flightlog_data.dart';
+import 'data/models/patient_data.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -195,6 +198,11 @@ class _HomePageState extends State<HomePage> {
                   ),
                   onPressed: () async {
                     final visitId = await visitsDao.createVisit();
+
+                    context.read<PatientData>().clear();
+                    context.read<AccidentData>().clear();
+                    context.read<FlightLogData>().clear();
+
                     await Navigator.push(
                       context,
                       MaterialPageRoute(

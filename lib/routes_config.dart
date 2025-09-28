@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'PersonalInformation.dart';
 import 'AccidentRecord.dart';
+import 'FlightLog.dart';
 
 class RouteItem {
   final String label;
@@ -13,6 +14,10 @@ final List<RouteItem> routeItems = [
     label: '個人資料',
     builder: (visitId, key) =>
         PersonalInformationPage(key: key, visitId: visitId),
+  ),
+  RouteItem(
+    label: '飛行紀錄',
+    builder: (visitId, key) => FlightLogPage(key: key, visitId: visitId),
   ),
   RouteItem(
     label: '事故紀錄',
