@@ -1,5 +1,5 @@
+import 'package:chikawa_airport/home.dart';
 import 'package:flutter/material.dart';
-import 'login.dart';
 import 'nav2.dart';
 
 void main() {
@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const LoginPage(),
+      home: const HomePage(),
     );
   }
 }
