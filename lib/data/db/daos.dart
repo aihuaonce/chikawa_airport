@@ -157,7 +157,7 @@ class AccidentRecordsDao extends DatabaseAccessor<AppDatabase>
     accidentRecords,
   )..where((t) => t.visitId.equals(visitId))).getSingleOrNull();
 
-  // 儲存資料
+  // 儲存資料 - 更新版本，包含子地點參數
   Future<void> upsertByVisitId({
     required int visitId,
     DateTime? incidentDate,
@@ -173,6 +173,15 @@ class AccidentRecordsDao extends DatabaseAccessor<AppDatabase>
     String? phone,
     int? placeIdx,
     String? placeNote,
+
+    // 新增子地點參數
+    int? t1PlaceIdx,
+    int? t2PlaceIdx,
+    int? remotePlaceIdx,
+    int? cargoPlaceIdx,
+    int? novotelPlaceIdx,
+    int? cabinPlaceIdx,
+
     bool occArrived = false,
     String? cost,
     int? within10min,
@@ -201,6 +210,15 @@ class AccidentRecordsDao extends DatabaseAccessor<AppDatabase>
           phone: Value(phone),
           placeIdx: Value(placeIdx),
           placeNote: Value(placeNote),
+
+          // 新增子地點字段
+          t1PlaceIdx: Value(t1PlaceIdx),
+          t2PlaceIdx: Value(t2PlaceIdx),
+          remotePlaceIdx: Value(remotePlaceIdx),
+          cargoPlaceIdx: Value(cargoPlaceIdx),
+          novotelPlaceIdx: Value(novotelPlaceIdx),
+          cabinPlaceIdx: Value(cabinPlaceIdx),
+
           occArrived: Value(occArrived),
           cost: Value(cost),
           within10min: Value(within10min),
@@ -229,6 +247,15 @@ class AccidentRecordsDao extends DatabaseAccessor<AppDatabase>
           phone: Value(phone),
           placeIdx: Value(placeIdx),
           placeNote: Value(placeNote),
+
+          // 新增子地點字段
+          t1PlaceIdx: Value(t1PlaceIdx),
+          t2PlaceIdx: Value(t2PlaceIdx),
+          remotePlaceIdx: Value(remotePlaceIdx),
+          cargoPlaceIdx: Value(cargoPlaceIdx),
+          novotelPlaceIdx: Value(novotelPlaceIdx),
+          cabinPlaceIdx: Value(cabinPlaceIdx),
+
           occArrived: Value(occArrived),
           cost: Value(cost),
           within10min: Value(within10min),

@@ -57,7 +57,7 @@ class _Nav1PageState extends State<Nav1Page> {
           const SizedBox(width: 12),
           const CircleAvatar(
             radius: 18,
-            backgroundImage: AssetImage('assets/avatar.jpg'),
+            // backgroundImage: AssetImage('assets/avatar.jpg'),
           ),
         ],
       ),

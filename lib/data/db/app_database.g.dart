@@ -1523,6 +1523,72 @@ class $AccidentRecordsTable extends AccidentRecords
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _t1PlaceIdxMeta = const VerificationMeta(
+    't1PlaceIdx',
+  );
+  @override
+  late final GeneratedColumn<int> t1PlaceIdx = GeneratedColumn<int>(
+    't1_place_idx',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _t2PlaceIdxMeta = const VerificationMeta(
+    't2PlaceIdx',
+  );
+  @override
+  late final GeneratedColumn<int> t2PlaceIdx = GeneratedColumn<int>(
+    't2_place_idx',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _remotePlaceIdxMeta = const VerificationMeta(
+    'remotePlaceIdx',
+  );
+  @override
+  late final GeneratedColumn<int> remotePlaceIdx = GeneratedColumn<int>(
+    'remote_place_idx',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _cargoPlaceIdxMeta = const VerificationMeta(
+    'cargoPlaceIdx',
+  );
+  @override
+  late final GeneratedColumn<int> cargoPlaceIdx = GeneratedColumn<int>(
+    'cargo_place_idx',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _novotelPlaceIdxMeta = const VerificationMeta(
+    'novotelPlaceIdx',
+  );
+  @override
+  late final GeneratedColumn<int> novotelPlaceIdx = GeneratedColumn<int>(
+    'novotel_place_idx',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _cabinPlaceIdxMeta = const VerificationMeta(
+    'cabinPlaceIdx',
+  );
+  @override
+  late final GeneratedColumn<int> cabinPlaceIdx = GeneratedColumn<int>(
+    'cabin_place_idx',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _occArrivedMeta = const VerificationMeta(
     'occArrived',
   );
@@ -1655,6 +1721,12 @@ class $AccidentRecordsTable extends AccidentRecords
     phone,
     placeIdx,
     placeNote,
+    t1PlaceIdx,
+    t2PlaceIdx,
+    remotePlaceIdx,
+    cargoPlaceIdx,
+    novotelPlaceIdx,
+    cabinPlaceIdx,
     occArrived,
     cost,
     within10min,
@@ -1785,6 +1857,60 @@ class $AccidentRecordsTable extends AccidentRecords
       context.handle(
         _placeNoteMeta,
         placeNote.isAcceptableOrUnknown(data['place_note']!, _placeNoteMeta),
+      );
+    }
+    if (data.containsKey('t1_place_idx')) {
+      context.handle(
+        _t1PlaceIdxMeta,
+        t1PlaceIdx.isAcceptableOrUnknown(
+          data['t1_place_idx']!,
+          _t1PlaceIdxMeta,
+        ),
+      );
+    }
+    if (data.containsKey('t2_place_idx')) {
+      context.handle(
+        _t2PlaceIdxMeta,
+        t2PlaceIdx.isAcceptableOrUnknown(
+          data['t2_place_idx']!,
+          _t2PlaceIdxMeta,
+        ),
+      );
+    }
+    if (data.containsKey('remote_place_idx')) {
+      context.handle(
+        _remotePlaceIdxMeta,
+        remotePlaceIdx.isAcceptableOrUnknown(
+          data['remote_place_idx']!,
+          _remotePlaceIdxMeta,
+        ),
+      );
+    }
+    if (data.containsKey('cargo_place_idx')) {
+      context.handle(
+        _cargoPlaceIdxMeta,
+        cargoPlaceIdx.isAcceptableOrUnknown(
+          data['cargo_place_idx']!,
+          _cargoPlaceIdxMeta,
+        ),
+      );
+    }
+    if (data.containsKey('novotel_place_idx')) {
+      context.handle(
+        _novotelPlaceIdxMeta,
+        novotelPlaceIdx.isAcceptableOrUnknown(
+          data['novotel_place_idx']!,
+          _novotelPlaceIdxMeta,
+        ),
+      );
+    }
+    if (data.containsKey('cabin_place_idx')) {
+      context.handle(
+        _cabinPlaceIdxMeta,
+        cabinPlaceIdx.isAcceptableOrUnknown(
+          data['cabin_place_idx']!,
+          _cabinPlaceIdxMeta,
+        ),
       );
     }
     if (data.containsKey('occ_arrived')) {
@@ -1925,6 +2051,30 @@ class $AccidentRecordsTable extends AccidentRecords
         DriftSqlType.string,
         data['${effectivePrefix}place_note'],
       ),
+      t1PlaceIdx: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}t1_place_idx'],
+      ),
+      t2PlaceIdx: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}t2_place_idx'],
+      ),
+      remotePlaceIdx: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}remote_place_idx'],
+      ),
+      cargoPlaceIdx: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}cargo_place_idx'],
+      ),
+      novotelPlaceIdx: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}novotel_place_idx'],
+      ),
+      cabinPlaceIdx: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}cabin_place_idx'],
+      ),
       occArrived: attachedDatabase.typeMapping.read(
         DriftSqlType.bool,
         data['${effectivePrefix}occ_arrived'],
@@ -1986,6 +2136,12 @@ class AccidentRecord extends DataClass implements Insertable<AccidentRecord> {
   final String? phone;
   final int? placeIdx;
   final String? placeNote;
+  final int? t1PlaceIdx;
+  final int? t2PlaceIdx;
+  final int? remotePlaceIdx;
+  final int? cargoPlaceIdx;
+  final int? novotelPlaceIdx;
+  final int? cabinPlaceIdx;
   final bool occArrived;
   final String? cost;
   final int? within10min;
@@ -2011,6 +2167,12 @@ class AccidentRecord extends DataClass implements Insertable<AccidentRecord> {
     this.phone,
     this.placeIdx,
     this.placeNote,
+    this.t1PlaceIdx,
+    this.t2PlaceIdx,
+    this.remotePlaceIdx,
+    this.cargoPlaceIdx,
+    this.novotelPlaceIdx,
+    this.cabinPlaceIdx,
     required this.occArrived,
     this.cost,
     this.within10min,
@@ -2064,6 +2226,24 @@ class AccidentRecord extends DataClass implements Insertable<AccidentRecord> {
     }
     if (!nullToAbsent || placeNote != null) {
       map['place_note'] = Variable<String>(placeNote);
+    }
+    if (!nullToAbsent || t1PlaceIdx != null) {
+      map['t1_place_idx'] = Variable<int>(t1PlaceIdx);
+    }
+    if (!nullToAbsent || t2PlaceIdx != null) {
+      map['t2_place_idx'] = Variable<int>(t2PlaceIdx);
+    }
+    if (!nullToAbsent || remotePlaceIdx != null) {
+      map['remote_place_idx'] = Variable<int>(remotePlaceIdx);
+    }
+    if (!nullToAbsent || cargoPlaceIdx != null) {
+      map['cargo_place_idx'] = Variable<int>(cargoPlaceIdx);
+    }
+    if (!nullToAbsent || novotelPlaceIdx != null) {
+      map['novotel_place_idx'] = Variable<int>(novotelPlaceIdx);
+    }
+    if (!nullToAbsent || cabinPlaceIdx != null) {
+      map['cabin_place_idx'] = Variable<int>(cabinPlaceIdx);
     }
     map['occ_arrived'] = Variable<bool>(occArrived);
     if (!nullToAbsent || cost != null) {
@@ -2126,6 +2306,24 @@ class AccidentRecord extends DataClass implements Insertable<AccidentRecord> {
       placeNote: placeNote == null && nullToAbsent
           ? const Value.absent()
           : Value(placeNote),
+      t1PlaceIdx: t1PlaceIdx == null && nullToAbsent
+          ? const Value.absent()
+          : Value(t1PlaceIdx),
+      t2PlaceIdx: t2PlaceIdx == null && nullToAbsent
+          ? const Value.absent()
+          : Value(t2PlaceIdx),
+      remotePlaceIdx: remotePlaceIdx == null && nullToAbsent
+          ? const Value.absent()
+          : Value(remotePlaceIdx),
+      cargoPlaceIdx: cargoPlaceIdx == null && nullToAbsent
+          ? const Value.absent()
+          : Value(cargoPlaceIdx),
+      novotelPlaceIdx: novotelPlaceIdx == null && nullToAbsent
+          ? const Value.absent()
+          : Value(novotelPlaceIdx),
+      cabinPlaceIdx: cabinPlaceIdx == null && nullToAbsent
+          ? const Value.absent()
+          : Value(cabinPlaceIdx),
       occArrived: Value(occArrived),
       cost: cost == null && nullToAbsent ? const Value.absent() : Value(cost),
       within10min: within10min == null && nullToAbsent
@@ -2165,6 +2363,12 @@ class AccidentRecord extends DataClass implements Insertable<AccidentRecord> {
       phone: serializer.fromJson<String?>(json['phone']),
       placeIdx: serializer.fromJson<int?>(json['placeIdx']),
       placeNote: serializer.fromJson<String?>(json['placeNote']),
+      t1PlaceIdx: serializer.fromJson<int?>(json['t1PlaceIdx']),
+      t2PlaceIdx: serializer.fromJson<int?>(json['t2PlaceIdx']),
+      remotePlaceIdx: serializer.fromJson<int?>(json['remotePlaceIdx']),
+      cargoPlaceIdx: serializer.fromJson<int?>(json['cargoPlaceIdx']),
+      novotelPlaceIdx: serializer.fromJson<int?>(json['novotelPlaceIdx']),
+      cabinPlaceIdx: serializer.fromJson<int?>(json['cabinPlaceIdx']),
       occArrived: serializer.fromJson<bool>(json['occArrived']),
       cost: serializer.fromJson<String?>(json['cost']),
       within10min: serializer.fromJson<int?>(json['within10min']),
@@ -2195,6 +2399,12 @@ class AccidentRecord extends DataClass implements Insertable<AccidentRecord> {
       'phone': serializer.toJson<String?>(phone),
       'placeIdx': serializer.toJson<int?>(placeIdx),
       'placeNote': serializer.toJson<String?>(placeNote),
+      't1PlaceIdx': serializer.toJson<int?>(t1PlaceIdx),
+      't2PlaceIdx': serializer.toJson<int?>(t2PlaceIdx),
+      'remotePlaceIdx': serializer.toJson<int?>(remotePlaceIdx),
+      'cargoPlaceIdx': serializer.toJson<int?>(cargoPlaceIdx),
+      'novotelPlaceIdx': serializer.toJson<int?>(novotelPlaceIdx),
+      'cabinPlaceIdx': serializer.toJson<int?>(cabinPlaceIdx),
       'occArrived': serializer.toJson<bool>(occArrived),
       'cost': serializer.toJson<String?>(cost),
       'within10min': serializer.toJson<int?>(within10min),
@@ -2223,6 +2433,12 @@ class AccidentRecord extends DataClass implements Insertable<AccidentRecord> {
     Value<String?> phone = const Value.absent(),
     Value<int?> placeIdx = const Value.absent(),
     Value<String?> placeNote = const Value.absent(),
+    Value<int?> t1PlaceIdx = const Value.absent(),
+    Value<int?> t2PlaceIdx = const Value.absent(),
+    Value<int?> remotePlaceIdx = const Value.absent(),
+    Value<int?> cargoPlaceIdx = const Value.absent(),
+    Value<int?> novotelPlaceIdx = const Value.absent(),
+    Value<int?> cabinPlaceIdx = const Value.absent(),
     bool? occArrived,
     Value<String?> cost = const Value.absent(),
     Value<int?> within10min = const Value.absent(),
@@ -2256,6 +2472,20 @@ class AccidentRecord extends DataClass implements Insertable<AccidentRecord> {
     phone: phone.present ? phone.value : this.phone,
     placeIdx: placeIdx.present ? placeIdx.value : this.placeIdx,
     placeNote: placeNote.present ? placeNote.value : this.placeNote,
+    t1PlaceIdx: t1PlaceIdx.present ? t1PlaceIdx.value : this.t1PlaceIdx,
+    t2PlaceIdx: t2PlaceIdx.present ? t2PlaceIdx.value : this.t2PlaceIdx,
+    remotePlaceIdx: remotePlaceIdx.present
+        ? remotePlaceIdx.value
+        : this.remotePlaceIdx,
+    cargoPlaceIdx: cargoPlaceIdx.present
+        ? cargoPlaceIdx.value
+        : this.cargoPlaceIdx,
+    novotelPlaceIdx: novotelPlaceIdx.present
+        ? novotelPlaceIdx.value
+        : this.novotelPlaceIdx,
+    cabinPlaceIdx: cabinPlaceIdx.present
+        ? cabinPlaceIdx.value
+        : this.cabinPlaceIdx,
     occArrived: occArrived ?? this.occArrived,
     cost: cost.present ? cost.value : this.cost,
     within10min: within10min.present ? within10min.value : this.within10min,
@@ -2301,6 +2531,24 @@ class AccidentRecord extends DataClass implements Insertable<AccidentRecord> {
       phone: data.phone.present ? data.phone.value : this.phone,
       placeIdx: data.placeIdx.present ? data.placeIdx.value : this.placeIdx,
       placeNote: data.placeNote.present ? data.placeNote.value : this.placeNote,
+      t1PlaceIdx: data.t1PlaceIdx.present
+          ? data.t1PlaceIdx.value
+          : this.t1PlaceIdx,
+      t2PlaceIdx: data.t2PlaceIdx.present
+          ? data.t2PlaceIdx.value
+          : this.t2PlaceIdx,
+      remotePlaceIdx: data.remotePlaceIdx.present
+          ? data.remotePlaceIdx.value
+          : this.remotePlaceIdx,
+      cargoPlaceIdx: data.cargoPlaceIdx.present
+          ? data.cargoPlaceIdx.value
+          : this.cargoPlaceIdx,
+      novotelPlaceIdx: data.novotelPlaceIdx.present
+          ? data.novotelPlaceIdx.value
+          : this.novotelPlaceIdx,
+      cabinPlaceIdx: data.cabinPlaceIdx.present
+          ? data.cabinPlaceIdx.value
+          : this.cabinPlaceIdx,
       occArrived: data.occArrived.present
           ? data.occArrived.value
           : this.occArrived,
@@ -2343,6 +2591,12 @@ class AccidentRecord extends DataClass implements Insertable<AccidentRecord> {
           ..write('phone: $phone, ')
           ..write('placeIdx: $placeIdx, ')
           ..write('placeNote: $placeNote, ')
+          ..write('t1PlaceIdx: $t1PlaceIdx, ')
+          ..write('t2PlaceIdx: $t2PlaceIdx, ')
+          ..write('remotePlaceIdx: $remotePlaceIdx, ')
+          ..write('cargoPlaceIdx: $cargoPlaceIdx, ')
+          ..write('novotelPlaceIdx: $novotelPlaceIdx, ')
+          ..write('cabinPlaceIdx: $cabinPlaceIdx, ')
           ..write('occArrived: $occArrived, ')
           ..write('cost: $cost, ')
           ..write('within10min: $within10min, ')
@@ -2373,6 +2627,12 @@ class AccidentRecord extends DataClass implements Insertable<AccidentRecord> {
     phone,
     placeIdx,
     placeNote,
+    t1PlaceIdx,
+    t2PlaceIdx,
+    remotePlaceIdx,
+    cargoPlaceIdx,
+    novotelPlaceIdx,
+    cabinPlaceIdx,
     occArrived,
     cost,
     within10min,
@@ -2402,6 +2662,12 @@ class AccidentRecord extends DataClass implements Insertable<AccidentRecord> {
           other.phone == this.phone &&
           other.placeIdx == this.placeIdx &&
           other.placeNote == this.placeNote &&
+          other.t1PlaceIdx == this.t1PlaceIdx &&
+          other.t2PlaceIdx == this.t2PlaceIdx &&
+          other.remotePlaceIdx == this.remotePlaceIdx &&
+          other.cargoPlaceIdx == this.cargoPlaceIdx &&
+          other.novotelPlaceIdx == this.novotelPlaceIdx &&
+          other.cabinPlaceIdx == this.cabinPlaceIdx &&
           other.occArrived == this.occArrived &&
           other.cost == this.cost &&
           other.within10min == this.within10min &&
@@ -2429,6 +2695,12 @@ class AccidentRecordsCompanion extends UpdateCompanion<AccidentRecord> {
   final Value<String?> phone;
   final Value<int?> placeIdx;
   final Value<String?> placeNote;
+  final Value<int?> t1PlaceIdx;
+  final Value<int?> t2PlaceIdx;
+  final Value<int?> remotePlaceIdx;
+  final Value<int?> cargoPlaceIdx;
+  final Value<int?> novotelPlaceIdx;
+  final Value<int?> cabinPlaceIdx;
   final Value<bool> occArrived;
   final Value<String?> cost;
   final Value<int?> within10min;
@@ -2454,6 +2726,12 @@ class AccidentRecordsCompanion extends UpdateCompanion<AccidentRecord> {
     this.phone = const Value.absent(),
     this.placeIdx = const Value.absent(),
     this.placeNote = const Value.absent(),
+    this.t1PlaceIdx = const Value.absent(),
+    this.t2PlaceIdx = const Value.absent(),
+    this.remotePlaceIdx = const Value.absent(),
+    this.cargoPlaceIdx = const Value.absent(),
+    this.novotelPlaceIdx = const Value.absent(),
+    this.cabinPlaceIdx = const Value.absent(),
     this.occArrived = const Value.absent(),
     this.cost = const Value.absent(),
     this.within10min = const Value.absent(),
@@ -2480,6 +2758,12 @@ class AccidentRecordsCompanion extends UpdateCompanion<AccidentRecord> {
     this.phone = const Value.absent(),
     this.placeIdx = const Value.absent(),
     this.placeNote = const Value.absent(),
+    this.t1PlaceIdx = const Value.absent(),
+    this.t2PlaceIdx = const Value.absent(),
+    this.remotePlaceIdx = const Value.absent(),
+    this.cargoPlaceIdx = const Value.absent(),
+    this.novotelPlaceIdx = const Value.absent(),
+    this.cabinPlaceIdx = const Value.absent(),
     this.occArrived = const Value.absent(),
     this.cost = const Value.absent(),
     this.within10min = const Value.absent(),
@@ -2506,6 +2790,12 @@ class AccidentRecordsCompanion extends UpdateCompanion<AccidentRecord> {
     Expression<String>? phone,
     Expression<int>? placeIdx,
     Expression<String>? placeNote,
+    Expression<int>? t1PlaceIdx,
+    Expression<int>? t2PlaceIdx,
+    Expression<int>? remotePlaceIdx,
+    Expression<int>? cargoPlaceIdx,
+    Expression<int>? novotelPlaceIdx,
+    Expression<int>? cabinPlaceIdx,
     Expression<bool>? occArrived,
     Expression<String>? cost,
     Expression<int>? within10min,
@@ -2533,6 +2823,12 @@ class AccidentRecordsCompanion extends UpdateCompanion<AccidentRecord> {
       if (phone != null) 'phone': phone,
       if (placeIdx != null) 'place_idx': placeIdx,
       if (placeNote != null) 'place_note': placeNote,
+      if (t1PlaceIdx != null) 't1_place_idx': t1PlaceIdx,
+      if (t2PlaceIdx != null) 't2_place_idx': t2PlaceIdx,
+      if (remotePlaceIdx != null) 'remote_place_idx': remotePlaceIdx,
+      if (cargoPlaceIdx != null) 'cargo_place_idx': cargoPlaceIdx,
+      if (novotelPlaceIdx != null) 'novotel_place_idx': novotelPlaceIdx,
+      if (cabinPlaceIdx != null) 'cabin_place_idx': cabinPlaceIdx,
       if (occArrived != null) 'occ_arrived': occArrived,
       if (cost != null) 'cost': cost,
       if (within10min != null) 'within10min': within10min,
@@ -2561,6 +2857,12 @@ class AccidentRecordsCompanion extends UpdateCompanion<AccidentRecord> {
     Value<String?>? phone,
     Value<int?>? placeIdx,
     Value<String?>? placeNote,
+    Value<int?>? t1PlaceIdx,
+    Value<int?>? t2PlaceIdx,
+    Value<int?>? remotePlaceIdx,
+    Value<int?>? cargoPlaceIdx,
+    Value<int?>? novotelPlaceIdx,
+    Value<int?>? cabinPlaceIdx,
     Value<bool>? occArrived,
     Value<String?>? cost,
     Value<int?>? within10min,
@@ -2587,6 +2889,12 @@ class AccidentRecordsCompanion extends UpdateCompanion<AccidentRecord> {
       phone: phone ?? this.phone,
       placeIdx: placeIdx ?? this.placeIdx,
       placeNote: placeNote ?? this.placeNote,
+      t1PlaceIdx: t1PlaceIdx ?? this.t1PlaceIdx,
+      t2PlaceIdx: t2PlaceIdx ?? this.t2PlaceIdx,
+      remotePlaceIdx: remotePlaceIdx ?? this.remotePlaceIdx,
+      cargoPlaceIdx: cargoPlaceIdx ?? this.cargoPlaceIdx,
+      novotelPlaceIdx: novotelPlaceIdx ?? this.novotelPlaceIdx,
+      cabinPlaceIdx: cabinPlaceIdx ?? this.cabinPlaceIdx,
       occArrived: occArrived ?? this.occArrived,
       cost: cost ?? this.cost,
       within10min: within10min ?? this.within10min,
@@ -2649,6 +2957,24 @@ class AccidentRecordsCompanion extends UpdateCompanion<AccidentRecord> {
     if (placeNote.present) {
       map['place_note'] = Variable<String>(placeNote.value);
     }
+    if (t1PlaceIdx.present) {
+      map['t1_place_idx'] = Variable<int>(t1PlaceIdx.value);
+    }
+    if (t2PlaceIdx.present) {
+      map['t2_place_idx'] = Variable<int>(t2PlaceIdx.value);
+    }
+    if (remotePlaceIdx.present) {
+      map['remote_place_idx'] = Variable<int>(remotePlaceIdx.value);
+    }
+    if (cargoPlaceIdx.present) {
+      map['cargo_place_idx'] = Variable<int>(cargoPlaceIdx.value);
+    }
+    if (novotelPlaceIdx.present) {
+      map['novotel_place_idx'] = Variable<int>(novotelPlaceIdx.value);
+    }
+    if (cabinPlaceIdx.present) {
+      map['cabin_place_idx'] = Variable<int>(cabinPlaceIdx.value);
+    }
     if (occArrived.present) {
       map['occ_arrived'] = Variable<bool>(occArrived.value);
     }
@@ -2697,6 +3023,12 @@ class AccidentRecordsCompanion extends UpdateCompanion<AccidentRecord> {
           ..write('phone: $phone, ')
           ..write('placeIdx: $placeIdx, ')
           ..write('placeNote: $placeNote, ')
+          ..write('t1PlaceIdx: $t1PlaceIdx, ')
+          ..write('t2PlaceIdx: $t2PlaceIdx, ')
+          ..write('remotePlaceIdx: $remotePlaceIdx, ')
+          ..write('cargoPlaceIdx: $cargoPlaceIdx, ')
+          ..write('novotelPlaceIdx: $novotelPlaceIdx, ')
+          ..write('cabinPlaceIdx: $cabinPlaceIdx, ')
           ..write('occArrived: $occArrived, ')
           ..write('cost: $cost, ')
           ..write('within10min: $within10min, ')
@@ -3399,6 +3731,12 @@ typedef $$AccidentRecordsTableCreateCompanionBuilder =
       Value<String?> phone,
       Value<int?> placeIdx,
       Value<String?> placeNote,
+      Value<int?> t1PlaceIdx,
+      Value<int?> t2PlaceIdx,
+      Value<int?> remotePlaceIdx,
+      Value<int?> cargoPlaceIdx,
+      Value<int?> novotelPlaceIdx,
+      Value<int?> cabinPlaceIdx,
       Value<bool> occArrived,
       Value<String?> cost,
       Value<int?> within10min,
@@ -3426,6 +3764,12 @@ typedef $$AccidentRecordsTableUpdateCompanionBuilder =
       Value<String?> phone,
       Value<int?> placeIdx,
       Value<String?> placeNote,
+      Value<int?> t1PlaceIdx,
+      Value<int?> t2PlaceIdx,
+      Value<int?> remotePlaceIdx,
+      Value<int?> cargoPlaceIdx,
+      Value<int?> novotelPlaceIdx,
+      Value<int?> cabinPlaceIdx,
       Value<bool> occArrived,
       Value<String?> cost,
       Value<int?> within10min,
@@ -3518,6 +3862,36 @@ class $$AccidentRecordsTableFilterComposer
 
   ColumnFilters<String> get placeNote => $composableBuilder(
     column: $table.placeNote,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get t1PlaceIdx => $composableBuilder(
+    column: $table.t1PlaceIdx,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get t2PlaceIdx => $composableBuilder(
+    column: $table.t2PlaceIdx,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get remotePlaceIdx => $composableBuilder(
+    column: $table.remotePlaceIdx,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get cargoPlaceIdx => $composableBuilder(
+    column: $table.cargoPlaceIdx,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get novotelPlaceIdx => $composableBuilder(
+    column: $table.novotelPlaceIdx,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get cabinPlaceIdx => $composableBuilder(
+    column: $table.cabinPlaceIdx,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -3651,6 +4025,36 @@ class $$AccidentRecordsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<int> get t1PlaceIdx => $composableBuilder(
+    column: $table.t1PlaceIdx,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get t2PlaceIdx => $composableBuilder(
+    column: $table.t2PlaceIdx,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get remotePlaceIdx => $composableBuilder(
+    column: $table.remotePlaceIdx,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get cargoPlaceIdx => $composableBuilder(
+    column: $table.cargoPlaceIdx,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get novotelPlaceIdx => $composableBuilder(
+    column: $table.novotelPlaceIdx,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get cabinPlaceIdx => $composableBuilder(
+    column: $table.cabinPlaceIdx,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<bool> get occArrived => $composableBuilder(
     column: $table.occArrived,
     builder: (column) => ColumnOrderings(column),
@@ -3767,6 +4171,36 @@ class $$AccidentRecordsTableAnnotationComposer
   GeneratedColumn<String> get placeNote =>
       $composableBuilder(column: $table.placeNote, builder: (column) => column);
 
+  GeneratedColumn<int> get t1PlaceIdx => $composableBuilder(
+    column: $table.t1PlaceIdx,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get t2PlaceIdx => $composableBuilder(
+    column: $table.t2PlaceIdx,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get remotePlaceIdx => $composableBuilder(
+    column: $table.remotePlaceIdx,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get cargoPlaceIdx => $composableBuilder(
+    column: $table.cargoPlaceIdx,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get novotelPlaceIdx => $composableBuilder(
+    column: $table.novotelPlaceIdx,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get cabinPlaceIdx => $composableBuilder(
+    column: $table.cabinPlaceIdx,
+    builder: (column) => column,
+  );
+
   GeneratedColumn<bool> get occArrived => $composableBuilder(
     column: $table.occArrived,
     builder: (column) => column,
@@ -3859,6 +4293,12 @@ class $$AccidentRecordsTableTableManager
                 Value<String?> phone = const Value.absent(),
                 Value<int?> placeIdx = const Value.absent(),
                 Value<String?> placeNote = const Value.absent(),
+                Value<int?> t1PlaceIdx = const Value.absent(),
+                Value<int?> t2PlaceIdx = const Value.absent(),
+                Value<int?> remotePlaceIdx = const Value.absent(),
+                Value<int?> cargoPlaceIdx = const Value.absent(),
+                Value<int?> novotelPlaceIdx = const Value.absent(),
+                Value<int?> cabinPlaceIdx = const Value.absent(),
                 Value<bool> occArrived = const Value.absent(),
                 Value<String?> cost = const Value.absent(),
                 Value<int?> within10min = const Value.absent(),
@@ -3884,6 +4324,12 @@ class $$AccidentRecordsTableTableManager
                 phone: phone,
                 placeIdx: placeIdx,
                 placeNote: placeNote,
+                t1PlaceIdx: t1PlaceIdx,
+                t2PlaceIdx: t2PlaceIdx,
+                remotePlaceIdx: remotePlaceIdx,
+                cargoPlaceIdx: cargoPlaceIdx,
+                novotelPlaceIdx: novotelPlaceIdx,
+                cabinPlaceIdx: cabinPlaceIdx,
                 occArrived: occArrived,
                 cost: cost,
                 within10min: within10min,
@@ -3911,6 +4357,12 @@ class $$AccidentRecordsTableTableManager
                 Value<String?> phone = const Value.absent(),
                 Value<int?> placeIdx = const Value.absent(),
                 Value<String?> placeNote = const Value.absent(),
+                Value<int?> t1PlaceIdx = const Value.absent(),
+                Value<int?> t2PlaceIdx = const Value.absent(),
+                Value<int?> remotePlaceIdx = const Value.absent(),
+                Value<int?> cargoPlaceIdx = const Value.absent(),
+                Value<int?> novotelPlaceIdx = const Value.absent(),
+                Value<int?> cabinPlaceIdx = const Value.absent(),
                 Value<bool> occArrived = const Value.absent(),
                 Value<String?> cost = const Value.absent(),
                 Value<int?> within10min = const Value.absent(),
@@ -3936,6 +4388,12 @@ class $$AccidentRecordsTableTableManager
                 phone: phone,
                 placeIdx: placeIdx,
                 placeNote: placeNote,
+                t1PlaceIdx: t1PlaceIdx,
+                t2PlaceIdx: t2PlaceIdx,
+                remotePlaceIdx: remotePlaceIdx,
+                cargoPlaceIdx: cargoPlaceIdx,
+                novotelPlaceIdx: novotelPlaceIdx,
+                cabinPlaceIdx: cabinPlaceIdx,
                 occArrived: occArrived,
                 cost: cost,
                 within10min: within10min,

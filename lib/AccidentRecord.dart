@@ -230,6 +230,15 @@ class _AccidentRecordPageState extends State<AccidentRecordPage> {
       accidentData.phone = record.phone;
       accidentData.placeGroupIdx = record.placeIdx;
       accidentData.placeNote = record.placeNote;
+
+      // ✅ 新增：載入子地點選擇
+      accidentData.t1Selected = record.t1PlaceIdx;
+      accidentData.t2Selected = record.t2PlaceIdx;
+      accidentData.remoteSelected = record.remotePlaceIdx;
+      accidentData.cargoSelected = record.cargoPlaceIdx;
+      accidentData.novotelSelected = record.novotelPlaceIdx;
+      accidentData.cabinSelected = record.cabinPlaceIdx;
+
       accidentData.occArrived = record.occArrived;
       accidentData.cost = record.cost;
       accidentData.within10min = record.within10min;
@@ -306,6 +315,15 @@ class _AccidentRecordPageState extends State<AccidentRecordPage> {
       phone: accidentData.phone,
       placeIdx: accidentData.placeGroupIdx,
       placeNote: accidentData.placeNote,
+
+      // ✅ 新增：儲存子地點選擇
+      t1PlaceIdx: accidentData.t1Selected,
+      t2PlaceIdx: accidentData.t2Selected,
+      remotePlaceIdx: accidentData.remoteSelected,
+      cargoPlaceIdx: accidentData.cargoSelected,
+      novotelPlaceIdx: accidentData.novotelSelected,
+      cabinPlaceIdx: accidentData.cabinSelected,
+
       occArrived: accidentData.occArrived,
       cost: accidentData.cost,
       within10min: accidentData.within10min,
@@ -348,8 +366,6 @@ class _AccidentRecordPageState extends State<AccidentRecordPage> {
     return Consumer<AccidentData>(
       builder: (context, accidentData, _) {
         // 同步控制器（避免資料丟失）
-        _syncControllersFromData(accidentData);
-
         return Container(
           color: const Color(0xFFE6F6FB),
           padding: const EdgeInsets.symmetric(

@@ -28,23 +28,17 @@ class AppDatabase extends _$AppDatabase {
 
   // 每次資料庫 schema 有變更（加表/加欄位），這裡要 +1
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 1;
 
   @override
-  MigrationStrategy get migration => MigrationStrategy(
-    onCreate: (m) async => m.createAll(),
-    onUpgrade: (m, from, to) async {
-      if (from < 2) await m.createTable(visits);
-      if (from < 3) await m.createTable(patientProfiles);
-      if (from < 4) await m.createTable(accidentRecords);
-    },
-  );
+  MigrationStrategy get migration =>
+      MigrationStrategy(onCreate: (m) async => m.createAll());
 }
 
 LazyDatabase _openConnection() {
   return LazyDatabase(() async {
     final dir = await getApplicationDocumentsDirectory();
-    final file = File(p.join(dir.path, 'app_v4.db'));
+    final file = File(p.join(dir.path, 'app_v1.db'));
     return NativeDatabase.createInBackground(file);
   });
 }

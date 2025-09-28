@@ -76,8 +76,17 @@ class AccidentRecords extends Table {
   TextColumn get otherReportUnit => text().nullable()(); // 其他通報單位
   TextColumn get notifier => text().nullable()(); // 通報人員
   TextColumn get phone => text().nullable()(); // 電話
-  IntColumn get placeIdx => integer().nullable()(); // 事故地點索引
+  IntColumn get placeIdx => integer().nullable()(); // 事故地點主群組索引
   TextColumn get placeNote => text().nullable()(); // 地點備註
+
+  // ✅ 新增：各地點群組的子項目索引
+  IntColumn get t1PlaceIdx => integer().nullable()(); // 第一航廈子地點索引
+  IntColumn get t2PlaceIdx => integer().nullable()(); // 第二航廈子地點索引
+  IntColumn get remotePlaceIdx => integer().nullable()(); // 遠端機坪子地點索引
+  IntColumn get cargoPlaceIdx => integer().nullable()(); // 貨運站子地點索引
+  IntColumn get novotelPlaceIdx => integer().nullable()(); // 諾富特子地點索引
+  IntColumn get cabinPlaceIdx => integer().nullable()(); // 機艙內子地點索引
+
   BoolColumn get occArrived =>
       boolean().withDefault(const Constant(false))(); // 營運控制中心到達現場
   TextColumn get cost => text().nullable()(); // 花費時間(分秒)
