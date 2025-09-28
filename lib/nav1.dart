@@ -118,8 +118,6 @@ class Nav1Page extends StatelessWidget {
       case 1:
       case 2:
       case 3:
-        // 機場出診單、急救紀錄單、救護車紀錄單、查看報表
-        // 使用 Provider 更新狀態，不再使用 Navigator.push
         navigationProvider.setSelectedIndex(index);
         break;
       case 4:
@@ -130,7 +128,6 @@ class Nav1Page extends StatelessWidget {
           backgroundColor: Colors.transparent,
           builder: (_) => const MaintainMenuSheet(),
         );
-        // 不更新導航狀態，保持在當前頁面
         break;
       default:
         break;

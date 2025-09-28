@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'nav1.dart';
+import 'nav4.dart';
 
 class Home2Page extends StatelessWidget {
   const Home2Page({super.key});
@@ -26,9 +27,10 @@ class Home2Page extends StatelessWidget {
                     ),
                   ),
                   onPressed: () {
-                    ScaffoldMessenger.of(
+                    Navigator.push(
                       context,
-                    ).showSnackBar(const SnackBar(content: Text('新增急救紀錄單按下了')));
+                      MaterialPageRoute(builder: (context) => const Nav4Page()),
+                    );
                   },
                   child: const Text('+新增急救紀錄'),
                 ),
