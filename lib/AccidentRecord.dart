@@ -2,10 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../data/db/daos.dart';
 import '../data/models/accident_data.dart';
-import 'nav2.dart'; // 假設 SavablePage 介面在這裡
+import 'nav2.dart'; // SavablePage 介面
 
-// 1. 修正：Widget (AccidentRecordPage) 移除 implements SavablePage
-// 讓 GlobalKey 正確指向 State 物件
 class AccidentRecordPage extends StatefulWidget {
   final int visitId;
 
@@ -15,39 +13,43 @@ class AccidentRecordPage extends StatefulWidget {
   State<AccidentRecordPage> createState() => _AccidentRecordPageState();
 }
 
-// 2. 修正：State 必須實作 SavablePage 介面，並加入 KeepAlive Mixin
 class _AccidentRecordPageState extends State<AccidentRecordPage>
-    with AutomaticKeepAliveClientMixin<AccidentRecordPage>
-    implements SavablePage {
+    with
+        AutomaticKeepAliveClientMixin<AccidentRecordPage>,
+        SavableStateMixin<AccidentRecordPage> {
   // ===============================================
-  // 🌟 修正一：實作 SavablePage 的抽象方法 saveData() 🌟
-  // 這是 GlobalKey 呼叫的入口點，它會呼叫原本的 _saveData 邏輯
+  // 實作 SavablePage 的 saveData() 方法
   // ===============================================
   @override
   Future<void> saveData() async {
-    print('--- [DEBUG] 🌟 AccidentRecordPage State 成功呼叫 saveData() 🌟');
-    await _saveData(); // 呼叫您既有的儲存邏輯
+    try {
+      // 先同步控制器資料到 AccidentData
+      _syncControllersToData();
+
+      // 執行儲存邏輯
+      await _saveData();
+    } catch (e) {
+      rethrow;
+    }
   }
 
   // ===============================================
-  // 修正二：實作 AutomaticKeepAliveClientMixin 的 wantKeepAlive 屬性
-  // 確保切換頁籤時這個 State 不會被銷毀
+  // 保持頁面存活
   // ===============================================
   @override
   bool get wantKeepAlive => true;
 
   // ===============================================
-  // 原本的 State 內容 (無變動)
+  // 原有的變數和選項列表
   // ===============================================
-
   bool _isLoading = true;
 
-  // ===== 外觀參數 =====
+  // 外觀參數
   static const double _outerHpad = 48;
   static const double _cardMaxWidth = 1100;
   static const double _radius = 16;
 
-  // ===== 選項列表 (略，內容與您提供的相同) =====
+  // 選項列表
   final List<String> reportUnits = const [
     'T1-OCC',
     'T2-OCC',
@@ -225,59 +227,65 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
   }
 
   Future<void> _loadData() async {
-    final dao = context.read<AccidentRecordsDao>();
-    final accidentData = context.read<AccidentData>();
-    final record = await dao.getByVisitId(widget.visitId);
+    try {
+      final dao = context.read<AccidentRecordsDao>();
+      final accidentData = context.read<AccidentData>();
+      final record = await dao.getByVisitId(widget.visitId);
 
-    if (!mounted) return;
+      if (!mounted) return;
 
-    if (record != null) {
-      // 從資料庫載入到 AccidentData (略，邏輯與您提供的相同)
-      accidentData.incidentDate = record.incidentDate;
-      accidentData.notifyTime = record.notifyTime;
-      accidentData.pickUpTime = record.pickUpTime;
-      accidentData.medicDepartTime = record.ambulanceDepartTime;
-      accidentData.medicArriveTime = record.medicArriveTime;
-      accidentData.landingTime = record.landingTime;
-      accidentData.checkTime = record.checkTime;
-      accidentData.reportUnitIdx = record.reportUnitIdx;
-      accidentData.otherReportUnit = record.otherReportUnit;
-      accidentData.notifier = record.notifier;
-      accidentData.phone = record.phone;
-      accidentData.placeGroupIdx = record.placeIdx;
-      accidentData.placeNote = record.placeNote;
+      if (record != null) {
+        // 從資料庫載入到 AccidentData
+        accidentData.incidentDate = record.incidentDate;
+        accidentData.notifyTime = record.notifyTime;
+        accidentData.pickUpTime = record.pickUpTime;
+        accidentData.medicDepartTime = record.ambulanceDepartTime;
+        accidentData.medicArriveTime = record.medicArriveTime;
+        accidentData.landingTime = record.landingTime;
+        accidentData.checkTime = record.checkTime;
+        accidentData.reportUnitIdx = record.reportUnitIdx;
+        accidentData.otherReportUnit = record.otherReportUnit;
+        accidentData.notifier = record.notifier;
+        accidentData.phone = record.phone;
+        accidentData.placeGroupIdx = record.placeIdx;
+        accidentData.placeNote = record.placeNote;
 
-      accidentData.t1Selected = record.t1PlaceIdx;
-      accidentData.t2Selected = record.t2PlaceIdx;
-      accidentData.remoteSelected = record.remotePlaceIdx;
-      accidentData.cargoSelected = record.cargoPlaceIdx;
-      accidentData.novotelSelected = record.novotelPlaceIdx;
-      accidentData.cabinSelected = record.cabinPlaceIdx;
+        accidentData.t1Selected = record.t1PlaceIdx;
+        accidentData.t2Selected = record.t2PlaceIdx;
+        accidentData.remoteSelected = record.remotePlaceIdx;
+        accidentData.cargoSelected = record.cargoPlaceIdx;
+        accidentData.novotelSelected = record.novotelPlaceIdx;
+        accidentData.cabinSelected = record.cabinPlaceIdx;
 
-      accidentData.occArrived = record.occArrived;
-      accidentData.cost = record.cost;
-      accidentData.within10min = record.within10min;
-      accidentData.reasonPreLanding = record.reasonLanding;
-      accidentData.reasonOnDuty = record.reasonOnline;
-      accidentData.reasonOther = record.reasonOther;
-      accidentData.otherReasonText = record.reasonOtherText;
-      accidentData.update();
-    } else {
-      final now = DateTime.now();
-      accidentData.incidentDate = now;
-      accidentData.notifyTime = now;
-      accidentData.pickUpTime = now;
-      accidentData.medicDepartTime = now;
-      accidentData.medicArriveTime = now;
-      accidentData.checkTime = now;
-      accidentData.update();
+        accidentData.occArrived = record.occArrived;
+        accidentData.cost = record.cost;
+        accidentData.within10min = record.within10min;
+        accidentData.reasonPreLanding = record.reasonLanding;
+        accidentData.reasonOnDuty = record.reasonOnline;
+        accidentData.reasonOther = record.reasonOther;
+        accidentData.otherReasonText = record.reasonOtherText;
+        accidentData.update();
+      } else {
+        // 新記錄的預設值
+        final now = DateTime.now();
+        accidentData.incidentDate = now;
+        accidentData.notifyTime = now;
+        accidentData.pickUpTime = now;
+        accidentData.medicDepartTime = now;
+        accidentData.medicArriveTime = now;
+        accidentData.checkTime = now;
+        accidentData.update();
+      }
+
+      _syncControllersFromData(accidentData);
+    } catch (e) {
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
-
-    _syncControllersFromData(accidentData);
-
-    setState(() {
-      _isLoading = false;
-    });
   }
 
   void _syncControllersFromData(AccidentData accidentData) {
@@ -289,13 +297,9 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
     otherReportUnitCtrl.text = accidentData.otherReportUnit ?? '';
   }
 
-  // ⚠️ 注意：這個函式是您原本的儲存邏輯，現在由上面的 saveData() 呼叫。
-  Future<void> _saveData() async {
-    print('--- [DEBUG] _saveData() 函式已啟動 ---');
-    final dao = context.read<AccidentRecordsDao>();
+  void _syncControllersToData() {
     final accidentData = context.read<AccidentData>();
 
-    // 從控制器同步到 AccidentData (略，邏輯與您提供的相同)
     accidentData.notifier = notifierCtrl.text.trim().isEmpty
         ? null
         : notifierCtrl.text.trim();
@@ -314,51 +318,53 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
     accidentData.otherReportUnit = otherReportUnitCtrl.text.trim().isEmpty
         ? null
         : otherReportUnitCtrl.text.trim();
+  }
 
-    print('--- [DEBUG] 準備呼叫 DAO 儲存 ---');
-    print('visitId: ${widget.visitId}');
-    print('incidentDate: ${accidentData.incidentDate}');
-    print('notifier: ${accidentData.notifier}');
-    print('t1Selected: ${accidentData.t1Selected}');
+  Future<void> _saveData() async {
+    try {
+      final dao = context.read<AccidentRecordsDao>();
+      final accidentData = context.read<AccidentData>();
 
-    await dao.upsertByVisitId(
-      visitId: widget.visitId,
-      incidentDate: accidentData.incidentDate,
-      notifyTime: accidentData.notifyTime,
-      pickUpTime: accidentData.pickUpTime,
-      medicArriveTime: accidentData.medicArriveTime,
-      ambulanceDepartTime: accidentData.medicDepartTime,
-      checkTime: accidentData.checkTime,
-      landingTime: accidentData.landingTime,
-      reportUnitIdx: accidentData.reportUnitIdx,
-      otherReportUnit: accidentData.otherReportUnit,
-      notifier: accidentData.notifier,
-      phone: accidentData.phone,
-      placeIdx: accidentData.placeGroupIdx,
-      placeNote: accidentData.placeNote,
+      print('visitId: ${widget.visitId}');
+      print('incidentDate: ${accidentData.incidentDate}');
+      print('notifier: ${accidentData.notifier}');
+      print('t1Selected: ${accidentData.t1Selected}');
 
-      t1PlaceIdx: accidentData.t1Selected,
-      t2PlaceIdx: accidentData.t2Selected,
-      remotePlaceIdx: accidentData.remoteSelected,
-      cargoPlaceIdx: accidentData.cargoSelected,
-      novotelPlaceIdx: accidentData.novotelSelected,
-      cabinPlaceIdx: accidentData.cabinSelected,
+      await dao.upsertByVisitId(
+        visitId: widget.visitId,
+        incidentDate: accidentData.incidentDate,
+        notifyTime: accidentData.notifyTime,
+        pickUpTime: accidentData.pickUpTime,
+        medicArriveTime: accidentData.medicArriveTime,
+        ambulanceDepartTime: accidentData.medicDepartTime,
+        checkTime: accidentData.checkTime,
+        landingTime: accidentData.landingTime,
+        reportUnitIdx: accidentData.reportUnitIdx,
+        otherReportUnit: accidentData.otherReportUnit,
+        notifier: accidentData.notifier,
+        phone: accidentData.phone,
+        placeIdx: accidentData.placeGroupIdx,
+        placeNote: accidentData.placeNote,
 
-      occArrived: accidentData.occArrived,
-      cost: accidentData.cost,
-      within10min: accidentData.within10min,
-      reasonLanding: accidentData.reasonPreLanding,
-      reasonOnline: accidentData.reasonOnDuty,
-      reasonOther: accidentData.reasonOther,
-      reasonOtherText: accidentData.otherReasonText,
-    );
+        t1PlaceIdx: accidentData.t1Selected,
+        t2PlaceIdx: accidentData.t2Selected,
+        remotePlaceIdx: accidentData.remoteSelected,
+        cargoPlaceIdx: accidentData.cargoSelected,
+        novotelPlaceIdx: accidentData.novotelSelected,
+        cabinPlaceIdx: accidentData.cabinSelected,
 
-    print('--- AccidentRecord 儲存完成 ---');
+        occArrived: accidentData.occArrived,
+        cost: accidentData.cost,
+        within10min: accidentData.within10min,
+        reasonLanding: accidentData.reasonPreLanding,
+        reasonOnline: accidentData.reasonOnDuty,
+        reasonOther: accidentData.reasonOther,
+        reasonOtherText: accidentData.otherReasonText,
+      );
 
-    if (!mounted) return;
-    // 儲存完成後清空 AccidentData，為下一筆新增資料做準備
-    // ⚠️ 備註：在多頁籤情況下，如果 App 沒有重新啟動，這裡清空可能會影響資料準確性，請依據您的 App 邏輯確認是否需要清空。
-    // accidentData.clear();
+    } catch (e) {
+      rethrow;
+    }
   }
 
   void _calculateTimeDifference(AccidentData accidentData) {
@@ -382,18 +388,48 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
     }
   }
 
+  // 延遲更新方法，避免每次輸入都觸發
+  void _onTextFieldChanged() {
+    Future.delayed(const Duration(milliseconds: 500), () {
+      if (mounted) {
+        _syncControllersToData();
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    // 🌟 修正三：呼叫 super.build(context) 以啟用 AutomaticKeepAliveClientMixin 的功能 🌟
-    super.build(context);
+    super.build(context); // 啟用 AutomaticKeepAliveClientMixin
 
     if (_isLoading) return const Center(child: CircularProgressIndicator());
 
-    final accidentDataInstance = context.read<AccidentData>();
-
     return Consumer<AccidentData>(
       builder: (context, accidentData, _) {
-        // ... (以下 UI 程式碼保持不變) ...
+        // 同步 AccidentData 到控制器（避免循環更新）
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            if (notifierCtrl.text != (accidentData.notifier ?? '')) {
+              notifierCtrl.text = accidentData.notifier ?? '';
+            }
+            if (phoneCtrl.text != (accidentData.phone ?? '')) {
+              phoneCtrl.text = accidentData.phone ?? '';
+            }
+            if (placeNoteCtrl.text != (accidentData.placeNote ?? '')) {
+              placeNoteCtrl.text = accidentData.placeNote ?? '';
+            }
+            if (costCtrl.text != (accidentData.cost ?? '')) {
+              costCtrl.text = accidentData.cost ?? '';
+            }
+            if (otherReasonCtrl.text != (accidentData.otherReasonText ?? '')) {
+              otherReasonCtrl.text = accidentData.otherReasonText ?? '';
+            }
+            if (otherReportUnitCtrl.text !=
+                (accidentData.otherReportUnit ?? '')) {
+              otherReportUnitCtrl.text = accidentData.otherReportUnit ?? '';
+            }
+          }
+        });
+
         return Container(
           color: const Color(0xFFE6F6FB),
           padding: const EdgeInsets.symmetric(
@@ -446,13 +482,24 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
                           '其他通報單位',
                           '請輸入其他通報單位',
                           otherReportUnitCtrl,
+                          onChanged: _onTextFieldChanged,
                         ),
                       ],
                       const SizedBox(height: 16),
 
-                      _inputRowBold('通報人員？', '請填寫通報人員姓名', notifierCtrl),
+                      _inputRowBold(
+                        '通報人員？',
+                        '請填寫通報人員姓名',
+                        notifierCtrl,
+                        onChanged: _onTextFieldChanged,
+                      ),
                       const SizedBox(height: 8),
-                      _inputRowBold('電話？', '請填寫接獲通報的聯絡電話', phoneCtrl),
+                      _inputRowBold(
+                        '電話？',
+                        '請填寫接獲通報的聯絡電話',
+                        phoneCtrl,
+                        onChanged: _onTextFieldChanged,
+                      ),
                       const SizedBox(height: 12),
 
                       _dateTimePicker(
@@ -492,7 +539,12 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
                       const SizedBox(height: 8),
                       _placeSubOptions(accidentData),
                       const SizedBox(height: 8),
-                      _inputRowBold('地點備註', '請填寫地點備註', placeNoteCtrl),
+                      _inputRowBold(
+                        '地點備註',
+                        '請填寫地點備註',
+                        placeNoteCtrl,
+                        onChanged: _onTextFieldChanged,
+                      ),
                       const SizedBox(height: 16),
 
                       _checkboxRowBold('營運控制中心到達現場', accidentData.occArrived, (
@@ -517,7 +569,12 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
                       ),
                       const SizedBox(height: 12),
 
-                      _inputRowBold('花費時間(分秒)', '例如：10分30秒', costCtrl),
+                      _inputRowBold(
+                        '花費時間(分秒)',
+                        '例如：10分30秒',
+                        costCtrl,
+                        onChanged: _onTextFieldChanged,
+                      ),
                       const SizedBox(height: 8),
                       _boldLabel('10分鐘內到達'),
                       const SizedBox(height: 6),
@@ -571,7 +628,12 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
                         ),
                         if (accidentData.reasonOther) ...[
                           const SizedBox(height: 6),
-                          _inputRowBold('其他原因', '請填寫其他原因', otherReasonCtrl),
+                          _inputRowBold(
+                            '其他原因',
+                            '請填寫其他原因',
+                            otherReasonCtrl,
+                            onChanged: _onTextFieldChanged,
+                          ),
                         ],
                         if (accidentData.reasonPreLanding) ...[
                           const SizedBox(height: 6),
@@ -606,7 +668,7 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
     );
   }
 
-  // ================= UI 小積木 (略，內容與您提供的相同) =================
+  // ================= UI 小積木 =================
   Widget _bigCard({required Widget child}) {
     return Container(
       margin: const EdgeInsets.fromLTRB(24, 0, 24, 16),
@@ -740,7 +802,12 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
     );
   }
 
-  Widget _inputRowBold(String label, String hint, TextEditingController ctrl) {
+  Widget _inputRowBold(
+    String label,
+    String hint,
+    TextEditingController ctrl, {
+    VoidCallback? onChanged,
+  }) {
     return _labeledRowBold(
       label: label,
       child: ConstrainedBox(
@@ -756,6 +823,11 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
               vertical: 10,
             ),
           ),
+          onChanged: (value) {
+            if (onChanged != null) {
+              onChanged();
+            }
+          },
         ),
       ),
     );
