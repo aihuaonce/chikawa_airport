@@ -12,7 +12,7 @@ class Home2Page extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
         child: Column(
           children: [
-            Nav1Page(),
+            const Nav1Page(),
             const SizedBox(height: 24),
             Row(
               children: [
@@ -26,7 +26,6 @@ class Home2Page extends StatelessWidget {
                     ),
                   ),
                   onPressed: () {
-                    // TODO: 這裡換成你的「新增急救紀錄單」頁面
                     ScaffoldMessenger.of(
                       context,
                     ).showSnackBar(const SnackBar(content: Text('新增急救紀錄單按下了')));
@@ -54,20 +53,27 @@ class Home2Page extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 16),
-                IconButton(icon: const Icon(Icons.menu), onPressed: () {}),
+                IconButton(
+                  icon: const Icon(Icons.filter_list),
+                  tooltip: '篩選',
+                  onPressed: () {
+                    // TODO: 實作篩選功能
+                    ScaffoldMessenger.of(
+                      context,
+                    ).showSnackBar(const SnackBar(content: Text('篩選功能開發中')));
+                  },
+                ),
               ],
             ),
             const SizedBox(height: 32),
-            // 表格標題列
+            // 表格標題列 - 簡化為三欄
             Container(
               color: Colors.transparent,
-              child: Row(
-                children: const [
-                  _TableHeader('出勤日期'),
+              child: const Row(
+                children: [
+                  _TableHeader('事發日期'),
                   _TableHeader('姓名'),
-                  _TableHeader('送往醫院或地點'),
-                  _TableHeader('狀況說明'),
-                  _TableHeader('救護人員'),
+                  _TableHeader('急救結果'),
                 ],
               ),
             ),
