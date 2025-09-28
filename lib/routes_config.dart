@@ -16,7 +16,7 @@ final List<RouteItem> routeItems = [
         PersonalInformationPage(key: key, visitId: visitId),
   ),
   RouteItem(
-    label: '飛行紀錄',
+    label: '飛航紀錄',
     builder: (visitId, key) => FlightLogPage(key: key, visitId: visitId),
   ),
   RouteItem(
