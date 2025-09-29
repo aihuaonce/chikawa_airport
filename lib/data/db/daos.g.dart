@@ -19,3 +19,6 @@ mixin _$FlightLogsDaoMixin on DatabaseAccessor<AppDatabase> {
 mixin _$TreatmentsDaoMixin on DatabaseAccessor<AppDatabase> {
   $TreatmentsTable get treatments => attachedDatabase.treatments;
 }
+mixin _$MedicalCostsDaoMixin on DatabaseAccessor<AppDatabase> {
+  $MedicalCostsTable get medicalCosts => attachedDatabase.medicalCosts;
+}

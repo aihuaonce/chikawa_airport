@@ -4,7 +4,8 @@ import 'package:provider/provider.dart';
 import 'data/models/patient_data.dart';
 import 'data/models/accident_data.dart';
 import 'data/models/flightlog_data.dart';
-import 'data/models/plan_data.dart'; // <-- ADD THIS
+import 'data/models/plan_data.dart';
+import 'data/models/medical_costs_data.dart';
 import 'data/db/app_database.dart';
 import 'home.dart';
 
@@ -16,14 +17,16 @@ void main() {
         ChangeNotifierProvider(create: (_) => PatientData()),
         ChangeNotifierProvider(create: (_) => FlightLogData()),
         ChangeNotifierProvider(create: (_) => AccidentData()),
-        ChangeNotifierProvider(create: (_) => PlanData()), // <-- ADD THIS
+        ChangeNotifierProvider(create: (_) => PlanData()),
+        ChangeNotifierProvider(create: (_) => MedicalCostsData()),
 
         Provider(create: (_) => db),
         Provider(create: (_) => db.visitsDao),
         Provider(create: (_) => db.patientProfilesDao),
         Provider(create: (_) => db.flightLogsDao),
         Provider(create: (_) => db.accidentRecordsDao),
-        Provider(create: (_) => db.treatmentsDao), // <-- ADD THIS
+        Provider(create: (_) => db.treatmentsDao),
+        Provider(create: (_) => db.medicalCostsDao),
       ],
       child: const MyApp(),
     ),

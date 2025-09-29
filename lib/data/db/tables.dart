@@ -232,3 +232,27 @@ class Treatments extends Table {
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
   DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
 }
+
+class MedicalCosts extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get visitId => integer().unique()(); // 確保一個 Visit 只有一筆費用紀錄
+
+  // 費用收取方式
+  TextColumn get chargeMethod => text().nullable()();
+
+  // 費用（以文字儲存）
+  TextColumn get visitFee => text().nullable()();
+  TextColumn get ambulanceFee => text().nullable()();
+
+  // 備註
+  TextColumn get note => text().nullable()();
+
+  // 圖片與簽名檔案路徑（預留欄位）
+  TextColumn get photoPath => text().nullable()();
+  TextColumn get agreementSignaturePath => text().nullable()();
+  TextColumn get witnessSignaturePath => text().nullable()();
+
+  // 紀錄時間
+  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+  DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
+}

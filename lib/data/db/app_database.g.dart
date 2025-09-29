@@ -7973,6 +7973,691 @@ class TreatmentsCompanion extends UpdateCompanion<Treatment> {
   }
 }
 
+class $MedicalCostsTable extends MedicalCosts
+    with TableInfo<$MedicalCostsTable, MedicalCost> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $MedicalCostsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _visitIdMeta = const VerificationMeta(
+    'visitId',
+  );
+  @override
+  late final GeneratedColumn<int> visitId = GeneratedColumn<int>(
+    'visit_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'),
+  );
+  static const VerificationMeta _chargeMethodMeta = const VerificationMeta(
+    'chargeMethod',
+  );
+  @override
+  late final GeneratedColumn<String> chargeMethod = GeneratedColumn<String>(
+    'charge_method',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _visitFeeMeta = const VerificationMeta(
+    'visitFee',
+  );
+  @override
+  late final GeneratedColumn<String> visitFee = GeneratedColumn<String>(
+    'visit_fee',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _ambulanceFeeMeta = const VerificationMeta(
+    'ambulanceFee',
+  );
+  @override
+  late final GeneratedColumn<String> ambulanceFee = GeneratedColumn<String>(
+    'ambulance_fee',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _noteMeta = const VerificationMeta('note');
+  @override
+  late final GeneratedColumn<String> note = GeneratedColumn<String>(
+    'note',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _photoPathMeta = const VerificationMeta(
+    'photoPath',
+  );
+  @override
+  late final GeneratedColumn<String> photoPath = GeneratedColumn<String>(
+    'photo_path',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _agreementSignaturePathMeta =
+      const VerificationMeta('agreementSignaturePath');
+  @override
+  late final GeneratedColumn<String> agreementSignaturePath =
+      GeneratedColumn<String>(
+        'agreement_signature_path',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _witnessSignaturePathMeta =
+      const VerificationMeta('witnessSignaturePath');
+  @override
+  late final GeneratedColumn<String> witnessSignaturePath =
+      GeneratedColumn<String>(
+        'witness_signature_path',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    visitId,
+    chargeMethod,
+    visitFee,
+    ambulanceFee,
+    note,
+    photoPath,
+    agreementSignaturePath,
+    witnessSignaturePath,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'medical_costs';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<MedicalCost> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('visit_id')) {
+      context.handle(
+        _visitIdMeta,
+        visitId.isAcceptableOrUnknown(data['visit_id']!, _visitIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_visitIdMeta);
+    }
+    if (data.containsKey('charge_method')) {
+      context.handle(
+        _chargeMethodMeta,
+        chargeMethod.isAcceptableOrUnknown(
+          data['charge_method']!,
+          _chargeMethodMeta,
+        ),
+      );
+    }
+    if (data.containsKey('visit_fee')) {
+      context.handle(
+        _visitFeeMeta,
+        visitFee.isAcceptableOrUnknown(data['visit_fee']!, _visitFeeMeta),
+      );
+    }
+    if (data.containsKey('ambulance_fee')) {
+      context.handle(
+        _ambulanceFeeMeta,
+        ambulanceFee.isAcceptableOrUnknown(
+          data['ambulance_fee']!,
+          _ambulanceFeeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('note')) {
+      context.handle(
+        _noteMeta,
+        note.isAcceptableOrUnknown(data['note']!, _noteMeta),
+      );
+    }
+    if (data.containsKey('photo_path')) {
+      context.handle(
+        _photoPathMeta,
+        photoPath.isAcceptableOrUnknown(data['photo_path']!, _photoPathMeta),
+      );
+    }
+    if (data.containsKey('agreement_signature_path')) {
+      context.handle(
+        _agreementSignaturePathMeta,
+        agreementSignaturePath.isAcceptableOrUnknown(
+          data['agreement_signature_path']!,
+          _agreementSignaturePathMeta,
+        ),
+      );
+    }
+    if (data.containsKey('witness_signature_path')) {
+      context.handle(
+        _witnessSignaturePathMeta,
+        witnessSignaturePath.isAcceptableOrUnknown(
+          data['witness_signature_path']!,
+          _witnessSignaturePathMeta,
+        ),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  MedicalCost map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return MedicalCost(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      visitId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}visit_id'],
+      )!,
+      chargeMethod: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}charge_method'],
+      ),
+      visitFee: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}visit_fee'],
+      ),
+      ambulanceFee: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}ambulance_fee'],
+      ),
+      note: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}note'],
+      ),
+      photoPath: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}photo_path'],
+      ),
+      agreementSignaturePath: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}agreement_signature_path'],
+      ),
+      witnessSignaturePath: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}witness_signature_path'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $MedicalCostsTable createAlias(String alias) {
+    return $MedicalCostsTable(attachedDatabase, alias);
+  }
+}
+
+class MedicalCost extends DataClass implements Insertable<MedicalCost> {
+  final int id;
+  final int visitId;
+  final String? chargeMethod;
+  final String? visitFee;
+  final String? ambulanceFee;
+  final String? note;
+  final String? photoPath;
+  final String? agreementSignaturePath;
+  final String? witnessSignaturePath;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  const MedicalCost({
+    required this.id,
+    required this.visitId,
+    this.chargeMethod,
+    this.visitFee,
+    this.ambulanceFee,
+    this.note,
+    this.photoPath,
+    this.agreementSignaturePath,
+    this.witnessSignaturePath,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['visit_id'] = Variable<int>(visitId);
+    if (!nullToAbsent || chargeMethod != null) {
+      map['charge_method'] = Variable<String>(chargeMethod);
+    }
+    if (!nullToAbsent || visitFee != null) {
+      map['visit_fee'] = Variable<String>(visitFee);
+    }
+    if (!nullToAbsent || ambulanceFee != null) {
+      map['ambulance_fee'] = Variable<String>(ambulanceFee);
+    }
+    if (!nullToAbsent || note != null) {
+      map['note'] = Variable<String>(note);
+    }
+    if (!nullToAbsent || photoPath != null) {
+      map['photo_path'] = Variable<String>(photoPath);
+    }
+    if (!nullToAbsent || agreementSignaturePath != null) {
+      map['agreement_signature_path'] = Variable<String>(
+        agreementSignaturePath,
+      );
+    }
+    if (!nullToAbsent || witnessSignaturePath != null) {
+      map['witness_signature_path'] = Variable<String>(witnessSignaturePath);
+    }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  MedicalCostsCompanion toCompanion(bool nullToAbsent) {
+    return MedicalCostsCompanion(
+      id: Value(id),
+      visitId: Value(visitId),
+      chargeMethod: chargeMethod == null && nullToAbsent
+          ? const Value.absent()
+          : Value(chargeMethod),
+      visitFee: visitFee == null && nullToAbsent
+          ? const Value.absent()
+          : Value(visitFee),
+      ambulanceFee: ambulanceFee == null && nullToAbsent
+          ? const Value.absent()
+          : Value(ambulanceFee),
+      note: note == null && nullToAbsent ? const Value.absent() : Value(note),
+      photoPath: photoPath == null && nullToAbsent
+          ? const Value.absent()
+          : Value(photoPath),
+      agreementSignaturePath: agreementSignaturePath == null && nullToAbsent
+          ? const Value.absent()
+          : Value(agreementSignaturePath),
+      witnessSignaturePath: witnessSignaturePath == null && nullToAbsent
+          ? const Value.absent()
+          : Value(witnessSignaturePath),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory MedicalCost.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return MedicalCost(
+      id: serializer.fromJson<int>(json['id']),
+      visitId: serializer.fromJson<int>(json['visitId']),
+      chargeMethod: serializer.fromJson<String?>(json['chargeMethod']),
+      visitFee: serializer.fromJson<String?>(json['visitFee']),
+      ambulanceFee: serializer.fromJson<String?>(json['ambulanceFee']),
+      note: serializer.fromJson<String?>(json['note']),
+      photoPath: serializer.fromJson<String?>(json['photoPath']),
+      agreementSignaturePath: serializer.fromJson<String?>(
+        json['agreementSignaturePath'],
+      ),
+      witnessSignaturePath: serializer.fromJson<String?>(
+        json['witnessSignaturePath'],
+      ),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'visitId': serializer.toJson<int>(visitId),
+      'chargeMethod': serializer.toJson<String?>(chargeMethod),
+      'visitFee': serializer.toJson<String?>(visitFee),
+      'ambulanceFee': serializer.toJson<String?>(ambulanceFee),
+      'note': serializer.toJson<String?>(note),
+      'photoPath': serializer.toJson<String?>(photoPath),
+      'agreementSignaturePath': serializer.toJson<String?>(
+        agreementSignaturePath,
+      ),
+      'witnessSignaturePath': serializer.toJson<String?>(witnessSignaturePath),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  MedicalCost copyWith({
+    int? id,
+    int? visitId,
+    Value<String?> chargeMethod = const Value.absent(),
+    Value<String?> visitFee = const Value.absent(),
+    Value<String?> ambulanceFee = const Value.absent(),
+    Value<String?> note = const Value.absent(),
+    Value<String?> photoPath = const Value.absent(),
+    Value<String?> agreementSignaturePath = const Value.absent(),
+    Value<String?> witnessSignaturePath = const Value.absent(),
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) => MedicalCost(
+    id: id ?? this.id,
+    visitId: visitId ?? this.visitId,
+    chargeMethod: chargeMethod.present ? chargeMethod.value : this.chargeMethod,
+    visitFee: visitFee.present ? visitFee.value : this.visitFee,
+    ambulanceFee: ambulanceFee.present ? ambulanceFee.value : this.ambulanceFee,
+    note: note.present ? note.value : this.note,
+    photoPath: photoPath.present ? photoPath.value : this.photoPath,
+    agreementSignaturePath: agreementSignaturePath.present
+        ? agreementSignaturePath.value
+        : this.agreementSignaturePath,
+    witnessSignaturePath: witnessSignaturePath.present
+        ? witnessSignaturePath.value
+        : this.witnessSignaturePath,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  MedicalCost copyWithCompanion(MedicalCostsCompanion data) {
+    return MedicalCost(
+      id: data.id.present ? data.id.value : this.id,
+      visitId: data.visitId.present ? data.visitId.value : this.visitId,
+      chargeMethod: data.chargeMethod.present
+          ? data.chargeMethod.value
+          : this.chargeMethod,
+      visitFee: data.visitFee.present ? data.visitFee.value : this.visitFee,
+      ambulanceFee: data.ambulanceFee.present
+          ? data.ambulanceFee.value
+          : this.ambulanceFee,
+      note: data.note.present ? data.note.value : this.note,
+      photoPath: data.photoPath.present ? data.photoPath.value : this.photoPath,
+      agreementSignaturePath: data.agreementSignaturePath.present
+          ? data.agreementSignaturePath.value
+          : this.agreementSignaturePath,
+      witnessSignaturePath: data.witnessSignaturePath.present
+          ? data.witnessSignaturePath.value
+          : this.witnessSignaturePath,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MedicalCost(')
+          ..write('id: $id, ')
+          ..write('visitId: $visitId, ')
+          ..write('chargeMethod: $chargeMethod, ')
+          ..write('visitFee: $visitFee, ')
+          ..write('ambulanceFee: $ambulanceFee, ')
+          ..write('note: $note, ')
+          ..write('photoPath: $photoPath, ')
+          ..write('agreementSignaturePath: $agreementSignaturePath, ')
+          ..write('witnessSignaturePath: $witnessSignaturePath, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    visitId,
+    chargeMethod,
+    visitFee,
+    ambulanceFee,
+    note,
+    photoPath,
+    agreementSignaturePath,
+    witnessSignaturePath,
+    createdAt,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is MedicalCost &&
+          other.id == this.id &&
+          other.visitId == this.visitId &&
+          other.chargeMethod == this.chargeMethod &&
+          other.visitFee == this.visitFee &&
+          other.ambulanceFee == this.ambulanceFee &&
+          other.note == this.note &&
+          other.photoPath == this.photoPath &&
+          other.agreementSignaturePath == this.agreementSignaturePath &&
+          other.witnessSignaturePath == this.witnessSignaturePath &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class MedicalCostsCompanion extends UpdateCompanion<MedicalCost> {
+  final Value<int> id;
+  final Value<int> visitId;
+  final Value<String?> chargeMethod;
+  final Value<String?> visitFee;
+  final Value<String?> ambulanceFee;
+  final Value<String?> note;
+  final Value<String?> photoPath;
+  final Value<String?> agreementSignaturePath;
+  final Value<String?> witnessSignaturePath;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  const MedicalCostsCompanion({
+    this.id = const Value.absent(),
+    this.visitId = const Value.absent(),
+    this.chargeMethod = const Value.absent(),
+    this.visitFee = const Value.absent(),
+    this.ambulanceFee = const Value.absent(),
+    this.note = const Value.absent(),
+    this.photoPath = const Value.absent(),
+    this.agreementSignaturePath = const Value.absent(),
+    this.witnessSignaturePath = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  });
+  MedicalCostsCompanion.insert({
+    this.id = const Value.absent(),
+    required int visitId,
+    this.chargeMethod = const Value.absent(),
+    this.visitFee = const Value.absent(),
+    this.ambulanceFee = const Value.absent(),
+    this.note = const Value.absent(),
+    this.photoPath = const Value.absent(),
+    this.agreementSignaturePath = const Value.absent(),
+    this.witnessSignaturePath = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  }) : visitId = Value(visitId);
+  static Insertable<MedicalCost> custom({
+    Expression<int>? id,
+    Expression<int>? visitId,
+    Expression<String>? chargeMethod,
+    Expression<String>? visitFee,
+    Expression<String>? ambulanceFee,
+    Expression<String>? note,
+    Expression<String>? photoPath,
+    Expression<String>? agreementSignaturePath,
+    Expression<String>? witnessSignaturePath,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (visitId != null) 'visit_id': visitId,
+      if (chargeMethod != null) 'charge_method': chargeMethod,
+      if (visitFee != null) 'visit_fee': visitFee,
+      if (ambulanceFee != null) 'ambulance_fee': ambulanceFee,
+      if (note != null) 'note': note,
+      if (photoPath != null) 'photo_path': photoPath,
+      if (agreementSignaturePath != null)
+        'agreement_signature_path': agreementSignaturePath,
+      if (witnessSignaturePath != null)
+        'witness_signature_path': witnessSignaturePath,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+    });
+  }
+
+  MedicalCostsCompanion copyWith({
+    Value<int>? id,
+    Value<int>? visitId,
+    Value<String?>? chargeMethod,
+    Value<String?>? visitFee,
+    Value<String?>? ambulanceFee,
+    Value<String?>? note,
+    Value<String?>? photoPath,
+    Value<String?>? agreementSignaturePath,
+    Value<String?>? witnessSignaturePath,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+  }) {
+    return MedicalCostsCompanion(
+      id: id ?? this.id,
+      visitId: visitId ?? this.visitId,
+      chargeMethod: chargeMethod ?? this.chargeMethod,
+      visitFee: visitFee ?? this.visitFee,
+      ambulanceFee: ambulanceFee ?? this.ambulanceFee,
+      note: note ?? this.note,
+      photoPath: photoPath ?? this.photoPath,
+      agreementSignaturePath:
+          agreementSignaturePath ?? this.agreementSignaturePath,
+      witnessSignaturePath: witnessSignaturePath ?? this.witnessSignaturePath,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (visitId.present) {
+      map['visit_id'] = Variable<int>(visitId.value);
+    }
+    if (chargeMethod.present) {
+      map['charge_method'] = Variable<String>(chargeMethod.value);
+    }
+    if (visitFee.present) {
+      map['visit_fee'] = Variable<String>(visitFee.value);
+    }
+    if (ambulanceFee.present) {
+      map['ambulance_fee'] = Variable<String>(ambulanceFee.value);
+    }
+    if (note.present) {
+      map['note'] = Variable<String>(note.value);
+    }
+    if (photoPath.present) {
+      map['photo_path'] = Variable<String>(photoPath.value);
+    }
+    if (agreementSignaturePath.present) {
+      map['agreement_signature_path'] = Variable<String>(
+        agreementSignaturePath.value,
+      );
+    }
+    if (witnessSignaturePath.present) {
+      map['witness_signature_path'] = Variable<String>(
+        witnessSignaturePath.value,
+      );
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MedicalCostsCompanion(')
+          ..write('id: $id, ')
+          ..write('visitId: $visitId, ')
+          ..write('chargeMethod: $chargeMethod, ')
+          ..write('visitFee: $visitFee, ')
+          ..write('ambulanceFee: $ambulanceFee, ')
+          ..write('note: $note, ')
+          ..write('photoPath: $photoPath, ')
+          ..write('agreementSignaturePath: $agreementSignaturePath, ')
+          ..write('witnessSignaturePath: $witnessSignaturePath, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -7985,6 +8670,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   );
   late final $FlightLogsTable flightLogs = $FlightLogsTable(this);
   late final $TreatmentsTable treatments = $TreatmentsTable(this);
+  late final $MedicalCostsTable medicalCosts = $MedicalCostsTable(this);
   late final VisitsDao visitsDao = VisitsDao(this as AppDatabase);
   late final PatientProfilesDao patientProfilesDao = PatientProfilesDao(
     this as AppDatabase,
@@ -7994,6 +8680,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   );
   late final FlightLogsDao flightLogsDao = FlightLogsDao(this as AppDatabase);
   late final TreatmentsDao treatmentsDao = TreatmentsDao(this as AppDatabase);
+  late final MedicalCostsDao medicalCostsDao = MedicalCostsDao(
+    this as AppDatabase,
+  );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -8004,6 +8693,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     accidentRecords,
     flightLogs,
     treatments,
+    medicalCosts,
   ];
 }
 
@@ -11331,6 +12021,322 @@ typedef $$TreatmentsTableProcessedTableManager =
       Treatment,
       PrefetchHooks Function()
     >;
+typedef $$MedicalCostsTableCreateCompanionBuilder =
+    MedicalCostsCompanion Function({
+      Value<int> id,
+      required int visitId,
+      Value<String?> chargeMethod,
+      Value<String?> visitFee,
+      Value<String?> ambulanceFee,
+      Value<String?> note,
+      Value<String?> photoPath,
+      Value<String?> agreementSignaturePath,
+      Value<String?> witnessSignaturePath,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+    });
+typedef $$MedicalCostsTableUpdateCompanionBuilder =
+    MedicalCostsCompanion Function({
+      Value<int> id,
+      Value<int> visitId,
+      Value<String?> chargeMethod,
+      Value<String?> visitFee,
+      Value<String?> ambulanceFee,
+      Value<String?> note,
+      Value<String?> photoPath,
+      Value<String?> agreementSignaturePath,
+      Value<String?> witnessSignaturePath,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+    });
+
+class $$MedicalCostsTableFilterComposer
+    extends Composer<_$AppDatabase, $MedicalCostsTable> {
+  $$MedicalCostsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get visitId => $composableBuilder(
+    column: $table.visitId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get chargeMethod => $composableBuilder(
+    column: $table.chargeMethod,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get visitFee => $composableBuilder(
+    column: $table.visitFee,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get ambulanceFee => $composableBuilder(
+    column: $table.ambulanceFee,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get note => $composableBuilder(
+    column: $table.note,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get photoPath => $composableBuilder(
+    column: $table.photoPath,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get agreementSignaturePath => $composableBuilder(
+    column: $table.agreementSignaturePath,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get witnessSignaturePath => $composableBuilder(
+    column: $table.witnessSignaturePath,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$MedicalCostsTableOrderingComposer
+    extends Composer<_$AppDatabase, $MedicalCostsTable> {
+  $$MedicalCostsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get visitId => $composableBuilder(
+    column: $table.visitId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get chargeMethod => $composableBuilder(
+    column: $table.chargeMethod,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get visitFee => $composableBuilder(
+    column: $table.visitFee,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get ambulanceFee => $composableBuilder(
+    column: $table.ambulanceFee,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get note => $composableBuilder(
+    column: $table.note,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get photoPath => $composableBuilder(
+    column: $table.photoPath,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get agreementSignaturePath => $composableBuilder(
+    column: $table.agreementSignaturePath,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get witnessSignaturePath => $composableBuilder(
+    column: $table.witnessSignaturePath,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$MedicalCostsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $MedicalCostsTable> {
+  $$MedicalCostsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get visitId =>
+      $composableBuilder(column: $table.visitId, builder: (column) => column);
+
+  GeneratedColumn<String> get chargeMethod => $composableBuilder(
+    column: $table.chargeMethod,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get visitFee =>
+      $composableBuilder(column: $table.visitFee, builder: (column) => column);
+
+  GeneratedColumn<String> get ambulanceFee => $composableBuilder(
+    column: $table.ambulanceFee,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get note =>
+      $composableBuilder(column: $table.note, builder: (column) => column);
+
+  GeneratedColumn<String> get photoPath =>
+      $composableBuilder(column: $table.photoPath, builder: (column) => column);
+
+  GeneratedColumn<String> get agreementSignaturePath => $composableBuilder(
+    column: $table.agreementSignaturePath,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get witnessSignaturePath => $composableBuilder(
+    column: $table.witnessSignaturePath,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$MedicalCostsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $MedicalCostsTable,
+          MedicalCost,
+          $$MedicalCostsTableFilterComposer,
+          $$MedicalCostsTableOrderingComposer,
+          $$MedicalCostsTableAnnotationComposer,
+          $$MedicalCostsTableCreateCompanionBuilder,
+          $$MedicalCostsTableUpdateCompanionBuilder,
+          (
+            MedicalCost,
+            BaseReferences<_$AppDatabase, $MedicalCostsTable, MedicalCost>,
+          ),
+          MedicalCost,
+          PrefetchHooks Function()
+        > {
+  $$MedicalCostsTableTableManager(_$AppDatabase db, $MedicalCostsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$MedicalCostsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$MedicalCostsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$MedicalCostsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> visitId = const Value.absent(),
+                Value<String?> chargeMethod = const Value.absent(),
+                Value<String?> visitFee = const Value.absent(),
+                Value<String?> ambulanceFee = const Value.absent(),
+                Value<String?> note = const Value.absent(),
+                Value<String?> photoPath = const Value.absent(),
+                Value<String?> agreementSignaturePath = const Value.absent(),
+                Value<String?> witnessSignaturePath = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+              }) => MedicalCostsCompanion(
+                id: id,
+                visitId: visitId,
+                chargeMethod: chargeMethod,
+                visitFee: visitFee,
+                ambulanceFee: ambulanceFee,
+                note: note,
+                photoPath: photoPath,
+                agreementSignaturePath: agreementSignaturePath,
+                witnessSignaturePath: witnessSignaturePath,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int visitId,
+                Value<String?> chargeMethod = const Value.absent(),
+                Value<String?> visitFee = const Value.absent(),
+                Value<String?> ambulanceFee = const Value.absent(),
+                Value<String?> note = const Value.absent(),
+                Value<String?> photoPath = const Value.absent(),
+                Value<String?> agreementSignaturePath = const Value.absent(),
+                Value<String?> witnessSignaturePath = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+              }) => MedicalCostsCompanion.insert(
+                id: id,
+                visitId: visitId,
+                chargeMethod: chargeMethod,
+                visitFee: visitFee,
+                ambulanceFee: ambulanceFee,
+                note: note,
+                photoPath: photoPath,
+                agreementSignaturePath: agreementSignaturePath,
+                witnessSignaturePath: witnessSignaturePath,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$MedicalCostsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $MedicalCostsTable,
+      MedicalCost,
+      $$MedicalCostsTableFilterComposer,
+      $$MedicalCostsTableOrderingComposer,
+      $$MedicalCostsTableAnnotationComposer,
+      $$MedicalCostsTableCreateCompanionBuilder,
+      $$MedicalCostsTableUpdateCompanionBuilder,
+      (
+        MedicalCost,
+        BaseReferences<_$AppDatabase, $MedicalCostsTable, MedicalCost>,
+      ),
+      MedicalCost,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -11345,4 +12351,6 @@ class $AppDatabaseManager {
       $$FlightLogsTableTableManager(_db, _db.flightLogs);
   $$TreatmentsTableTableManager get treatments =>
       $$TreatmentsTableTableManager(_db, _db.treatments);
+  $$MedicalCostsTableTableManager get medicalCosts =>
+      $$MedicalCostsTableTableManager(_db, _db.medicalCosts);
 }
