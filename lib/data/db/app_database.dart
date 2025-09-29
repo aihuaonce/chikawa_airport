@@ -15,6 +15,7 @@ part 'app_database.g.dart';
     PatientProfiles,
     AccidentRecords,
     FlightLogs,
+    Treatments,
     // 之後還有 Treatments, MedicalCosts, Diagnoses... 全部加在這裡
   ],
   daos: [
@@ -22,6 +23,7 @@ part 'app_database.g.dart';
     PatientProfilesDao,
     AccidentRecordsDao,
     FlightLogsDao,
+    TreatmentsDao,
     // 之後還有 TreatmentsDao, MedicalCostsDao, DiagnosesDao... 全部加在這裡
   ],
 )

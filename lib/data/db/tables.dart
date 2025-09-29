@@ -124,3 +124,111 @@ class FlightLogs extends Table {
 
   DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
 }
+
+class Treatments extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get visitId => integer().unique()();
+
+  // 疾病管制署篩檢
+  BoolColumn get screeningChecked =>
+      boolean().withDefault(const Constant(false))();
+  TextColumn get screeningMethodsJson =>
+      text().nullable()(); // JSON-encoded Map<String, bool>
+  TextColumn get otherScreeningMethod => text().nullable()();
+  TextColumn get healthDataJson =>
+      text().nullable()(); // JSON-encoded List<Map<String, String>>
+
+  // 主訴
+  IntColumn get mainSymptom => integer().nullable()();
+  TextColumn get traumaSymptomsJson => text().nullable()();
+  TextColumn get nonTraumaSymptomsJson => text().nullable()();
+  TextColumn get symptomNote => text().nullable()();
+
+  // 照片類型
+  TextColumn get photoTypesJson => text().nullable()();
+
+  // 身體檢查
+  TextColumn get bodyCheckHead => text().nullable()();
+  TextColumn get bodyCheckChest => text().nullable()();
+  TextColumn get bodyCheckAbdomen => text().nullable()();
+  TextColumn get bodyCheckLimbs => text().nullable()();
+  TextColumn get bodyCheckOther => text().nullable()();
+
+  // 生命徵象
+  TextColumn get temperature => text().nullable()();
+  TextColumn get pulse => text().nullable()();
+  TextColumn get respiration => text().nullable()();
+  TextColumn get bpSystolic => text().nullable()();
+  TextColumn get bpDiastolic => text().nullable()();
+  TextColumn get spo2 => text().nullable()();
+  BoolColumn get consciousClear =>
+      boolean().withDefault(const Constant(true))();
+  TextColumn get evmE => text().nullable()();
+  TextColumn get evmV => text().nullable()();
+  TextColumn get evmM => text().nullable()();
+  IntColumn get leftPupilScale => integer().nullable()();
+  TextColumn get leftPupilSize => text().nullable()();
+  IntColumn get rightPupilScale => integer().nullable()();
+  TextColumn get rightPupilSize => text().nullable()();
+
+  // 病史
+  IntColumn get history => integer().nullable()();
+  IntColumn get allergy => integer().nullable()();
+
+  // 初步診斷
+  TextColumn get initialDiagnosis => text().nullable()();
+  IntColumn get diagnosisCategory => integer().nullable()();
+  TextColumn get selectedICD10Main => text().nullable()();
+  TextColumn get selectedICD10Sub1 => text().nullable()();
+  TextColumn get selectedICD10Sub2 => text().nullable()();
+  IntColumn get triageCategory => integer().nullable()();
+
+  // 處理摘要 & 後續
+  TextColumn get onSiteTreatmentsJson => text().nullable()();
+  BoolColumn get ekgChecked => boolean().withDefault(const Constant(false))();
+  TextColumn get ekgReading => text().nullable()();
+  BoolColumn get sugarChecked => boolean().withDefault(const Constant(false))();
+  TextColumn get sugarReading => text().nullable()();
+  BoolColumn get suggestReferral =>
+      boolean().withDefault(const Constant(false))();
+  BoolColumn get intubationChecked =>
+      boolean().withDefault(const Constant(false))();
+  BoolColumn get cprChecked => boolean().withDefault(const Constant(false))();
+  BoolColumn get oxygenTherapyChecked =>
+      boolean().withDefault(const Constant(false))();
+  BoolColumn get medicalCertificateChecked =>
+      boolean().withDefault(const Constant(false))();
+  BoolColumn get prescriptionChecked =>
+      boolean().withDefault(const Constant(false))();
+  BoolColumn get otherChecked => boolean().withDefault(const Constant(false))();
+  TextColumn get otherSummary => text().nullable()();
+  IntColumn get referralPassageType => integer().nullable()();
+  IntColumn get referralAmbulanceType => integer().nullable()();
+  IntColumn get referralHospitalIdx => integer().nullable()();
+  TextColumn get referralOtherHospital => text().nullable()();
+  TextColumn get referralEscort => text().nullable()();
+  IntColumn get intubationType => integer().nullable()();
+  IntColumn get oxygenType => integer().nullable()();
+  TextColumn get oxygenFlow => text().nullable()();
+  TextColumn get medicalCertificateTypesJson => text().nullable()();
+  TextColumn get prescriptionRowsJson => text().nullable()();
+  TextColumn get followUpResultsJson => text().nullable()();
+  IntColumn get otherHospitalIdx => integer().nullable()();
+
+  // 人員
+  TextColumn get selectedMainDoctor => text().nullable()();
+  TextColumn get selectedMainNurse => text().nullable()();
+  TextColumn get nurseSignature => text().nullable()();
+  TextColumn get selectedEMT => text().nullable()();
+  TextColumn get emtSignature => text().nullable()();
+  TextColumn get helperNamesText => text().nullable()();
+  TextColumn get selectedHelpersJson => text().nullable()();
+
+  // 特別註記
+  TextColumn get specialNotesJson => text().nullable()();
+  TextColumn get otherSpecialNote => text().nullable()();
+
+  // 紀錄時間
+  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+  DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
+}

@@ -51,7 +51,6 @@ class _PersonalInformationPageState extends State<PersonalInformationPage>
   // 實現 saveData 方法 - 這個方法會被 Nav2Page 呼叫
   @override
   Future<void> saveData() async {
-
     _formKey.currentState?.validate();
 
     try {
@@ -180,7 +179,6 @@ class _PersonalInformationPageState extends State<PersonalInformationPage>
         phone: patientData.phone,
         photoPath: patientData.photoBase64,
       );
-
 
       // 注意：這裡不要清空 patientData，讓 Nav2Page 統一處理
     } catch (e) {

@@ -3777,6 +3777,4202 @@ class FlightLogsCompanion extends UpdateCompanion<FlightLog> {
   }
 }
 
+class $TreatmentsTable extends Treatments
+    with TableInfo<$TreatmentsTable, Treatment> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $TreatmentsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _visitIdMeta = const VerificationMeta(
+    'visitId',
+  );
+  @override
+  late final GeneratedColumn<int> visitId = GeneratedColumn<int>(
+    'visit_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'),
+  );
+  static const VerificationMeta _screeningCheckedMeta = const VerificationMeta(
+    'screeningChecked',
+  );
+  @override
+  late final GeneratedColumn<bool> screeningChecked = GeneratedColumn<bool>(
+    'screening_checked',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("screening_checked" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _screeningMethodsJsonMeta =
+      const VerificationMeta('screeningMethodsJson');
+  @override
+  late final GeneratedColumn<String> screeningMethodsJson =
+      GeneratedColumn<String>(
+        'screening_methods_json',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _otherScreeningMethodMeta =
+      const VerificationMeta('otherScreeningMethod');
+  @override
+  late final GeneratedColumn<String> otherScreeningMethod =
+      GeneratedColumn<String>(
+        'other_screening_method',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _healthDataJsonMeta = const VerificationMeta(
+    'healthDataJson',
+  );
+  @override
+  late final GeneratedColumn<String> healthDataJson = GeneratedColumn<String>(
+    'health_data_json',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _mainSymptomMeta = const VerificationMeta(
+    'mainSymptom',
+  );
+  @override
+  late final GeneratedColumn<int> mainSymptom = GeneratedColumn<int>(
+    'main_symptom',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _traumaSymptomsJsonMeta =
+      const VerificationMeta('traumaSymptomsJson');
+  @override
+  late final GeneratedColumn<String> traumaSymptomsJson =
+      GeneratedColumn<String>(
+        'trauma_symptoms_json',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _nonTraumaSymptomsJsonMeta =
+      const VerificationMeta('nonTraumaSymptomsJson');
+  @override
+  late final GeneratedColumn<String> nonTraumaSymptomsJson =
+      GeneratedColumn<String>(
+        'non_trauma_symptoms_json',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _symptomNoteMeta = const VerificationMeta(
+    'symptomNote',
+  );
+  @override
+  late final GeneratedColumn<String> symptomNote = GeneratedColumn<String>(
+    'symptom_note',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _photoTypesJsonMeta = const VerificationMeta(
+    'photoTypesJson',
+  );
+  @override
+  late final GeneratedColumn<String> photoTypesJson = GeneratedColumn<String>(
+    'photo_types_json',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _bodyCheckHeadMeta = const VerificationMeta(
+    'bodyCheckHead',
+  );
+  @override
+  late final GeneratedColumn<String> bodyCheckHead = GeneratedColumn<String>(
+    'body_check_head',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _bodyCheckChestMeta = const VerificationMeta(
+    'bodyCheckChest',
+  );
+  @override
+  late final GeneratedColumn<String> bodyCheckChest = GeneratedColumn<String>(
+    'body_check_chest',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _bodyCheckAbdomenMeta = const VerificationMeta(
+    'bodyCheckAbdomen',
+  );
+  @override
+  late final GeneratedColumn<String> bodyCheckAbdomen = GeneratedColumn<String>(
+    'body_check_abdomen',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _bodyCheckLimbsMeta = const VerificationMeta(
+    'bodyCheckLimbs',
+  );
+  @override
+  late final GeneratedColumn<String> bodyCheckLimbs = GeneratedColumn<String>(
+    'body_check_limbs',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _bodyCheckOtherMeta = const VerificationMeta(
+    'bodyCheckOther',
+  );
+  @override
+  late final GeneratedColumn<String> bodyCheckOther = GeneratedColumn<String>(
+    'body_check_other',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _temperatureMeta = const VerificationMeta(
+    'temperature',
+  );
+  @override
+  late final GeneratedColumn<String> temperature = GeneratedColumn<String>(
+    'temperature',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _pulseMeta = const VerificationMeta('pulse');
+  @override
+  late final GeneratedColumn<String> pulse = GeneratedColumn<String>(
+    'pulse',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _respirationMeta = const VerificationMeta(
+    'respiration',
+  );
+  @override
+  late final GeneratedColumn<String> respiration = GeneratedColumn<String>(
+    'respiration',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _bpSystolicMeta = const VerificationMeta(
+    'bpSystolic',
+  );
+  @override
+  late final GeneratedColumn<String> bpSystolic = GeneratedColumn<String>(
+    'bp_systolic',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _bpDiastolicMeta = const VerificationMeta(
+    'bpDiastolic',
+  );
+  @override
+  late final GeneratedColumn<String> bpDiastolic = GeneratedColumn<String>(
+    'bp_diastolic',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _spo2Meta = const VerificationMeta('spo2');
+  @override
+  late final GeneratedColumn<String> spo2 = GeneratedColumn<String>(
+    'spo2',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _consciousClearMeta = const VerificationMeta(
+    'consciousClear',
+  );
+  @override
+  late final GeneratedColumn<bool> consciousClear = GeneratedColumn<bool>(
+    'conscious_clear',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("conscious_clear" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  static const VerificationMeta _evmEMeta = const VerificationMeta('evmE');
+  @override
+  late final GeneratedColumn<String> evmE = GeneratedColumn<String>(
+    'evm_e',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _evmVMeta = const VerificationMeta('evmV');
+  @override
+  late final GeneratedColumn<String> evmV = GeneratedColumn<String>(
+    'evm_v',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _evmMMeta = const VerificationMeta('evmM');
+  @override
+  late final GeneratedColumn<String> evmM = GeneratedColumn<String>(
+    'evm_m',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _leftPupilScaleMeta = const VerificationMeta(
+    'leftPupilScale',
+  );
+  @override
+  late final GeneratedColumn<int> leftPupilScale = GeneratedColumn<int>(
+    'left_pupil_scale',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _leftPupilSizeMeta = const VerificationMeta(
+    'leftPupilSize',
+  );
+  @override
+  late final GeneratedColumn<String> leftPupilSize = GeneratedColumn<String>(
+    'left_pupil_size',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _rightPupilScaleMeta = const VerificationMeta(
+    'rightPupilScale',
+  );
+  @override
+  late final GeneratedColumn<int> rightPupilScale = GeneratedColumn<int>(
+    'right_pupil_scale',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _rightPupilSizeMeta = const VerificationMeta(
+    'rightPupilSize',
+  );
+  @override
+  late final GeneratedColumn<String> rightPupilSize = GeneratedColumn<String>(
+    'right_pupil_size',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _historyMeta = const VerificationMeta(
+    'history',
+  );
+  @override
+  late final GeneratedColumn<int> history = GeneratedColumn<int>(
+    'history',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _allergyMeta = const VerificationMeta(
+    'allergy',
+  );
+  @override
+  late final GeneratedColumn<int> allergy = GeneratedColumn<int>(
+    'allergy',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _initialDiagnosisMeta = const VerificationMeta(
+    'initialDiagnosis',
+  );
+  @override
+  late final GeneratedColumn<String> initialDiagnosis = GeneratedColumn<String>(
+    'initial_diagnosis',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _diagnosisCategoryMeta = const VerificationMeta(
+    'diagnosisCategory',
+  );
+  @override
+  late final GeneratedColumn<int> diagnosisCategory = GeneratedColumn<int>(
+    'diagnosis_category',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _selectedICD10MainMeta = const VerificationMeta(
+    'selectedICD10Main',
+  );
+  @override
+  late final GeneratedColumn<String> selectedICD10Main =
+      GeneratedColumn<String>(
+        'selected_i_c_d10_main',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _selectedICD10Sub1Meta = const VerificationMeta(
+    'selectedICD10Sub1',
+  );
+  @override
+  late final GeneratedColumn<String> selectedICD10Sub1 =
+      GeneratedColumn<String>(
+        'selected_i_c_d10_sub1',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _selectedICD10Sub2Meta = const VerificationMeta(
+    'selectedICD10Sub2',
+  );
+  @override
+  late final GeneratedColumn<String> selectedICD10Sub2 =
+      GeneratedColumn<String>(
+        'selected_i_c_d10_sub2',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _triageCategoryMeta = const VerificationMeta(
+    'triageCategory',
+  );
+  @override
+  late final GeneratedColumn<int> triageCategory = GeneratedColumn<int>(
+    'triage_category',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _onSiteTreatmentsJsonMeta =
+      const VerificationMeta('onSiteTreatmentsJson');
+  @override
+  late final GeneratedColumn<String> onSiteTreatmentsJson =
+      GeneratedColumn<String>(
+        'on_site_treatments_json',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _ekgCheckedMeta = const VerificationMeta(
+    'ekgChecked',
+  );
+  @override
+  late final GeneratedColumn<bool> ekgChecked = GeneratedColumn<bool>(
+    'ekg_checked',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("ekg_checked" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _ekgReadingMeta = const VerificationMeta(
+    'ekgReading',
+  );
+  @override
+  late final GeneratedColumn<String> ekgReading = GeneratedColumn<String>(
+    'ekg_reading',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _sugarCheckedMeta = const VerificationMeta(
+    'sugarChecked',
+  );
+  @override
+  late final GeneratedColumn<bool> sugarChecked = GeneratedColumn<bool>(
+    'sugar_checked',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("sugar_checked" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _sugarReadingMeta = const VerificationMeta(
+    'sugarReading',
+  );
+  @override
+  late final GeneratedColumn<String> sugarReading = GeneratedColumn<String>(
+    'sugar_reading',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _suggestReferralMeta = const VerificationMeta(
+    'suggestReferral',
+  );
+  @override
+  late final GeneratedColumn<bool> suggestReferral = GeneratedColumn<bool>(
+    'suggest_referral',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("suggest_referral" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _intubationCheckedMeta = const VerificationMeta(
+    'intubationChecked',
+  );
+  @override
+  late final GeneratedColumn<bool> intubationChecked = GeneratedColumn<bool>(
+    'intubation_checked',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("intubation_checked" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _cprCheckedMeta = const VerificationMeta(
+    'cprChecked',
+  );
+  @override
+  late final GeneratedColumn<bool> cprChecked = GeneratedColumn<bool>(
+    'cpr_checked',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("cpr_checked" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _oxygenTherapyCheckedMeta =
+      const VerificationMeta('oxygenTherapyChecked');
+  @override
+  late final GeneratedColumn<bool> oxygenTherapyChecked = GeneratedColumn<bool>(
+    'oxygen_therapy_checked',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("oxygen_therapy_checked" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _medicalCertificateCheckedMeta =
+      const VerificationMeta('medicalCertificateChecked');
+  @override
+  late final GeneratedColumn<bool> medicalCertificateChecked =
+      GeneratedColumn<bool>(
+        'medical_certificate_checked',
+        aliasedName,
+        false,
+        type: DriftSqlType.bool,
+        requiredDuringInsert: false,
+        defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'CHECK ("medical_certificate_checked" IN (0, 1))',
+        ),
+        defaultValue: const Constant(false),
+      );
+  static const VerificationMeta _prescriptionCheckedMeta =
+      const VerificationMeta('prescriptionChecked');
+  @override
+  late final GeneratedColumn<bool> prescriptionChecked = GeneratedColumn<bool>(
+    'prescription_checked',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("prescription_checked" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _otherCheckedMeta = const VerificationMeta(
+    'otherChecked',
+  );
+  @override
+  late final GeneratedColumn<bool> otherChecked = GeneratedColumn<bool>(
+    'other_checked',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("other_checked" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _otherSummaryMeta = const VerificationMeta(
+    'otherSummary',
+  );
+  @override
+  late final GeneratedColumn<String> otherSummary = GeneratedColumn<String>(
+    'other_summary',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _referralPassageTypeMeta =
+      const VerificationMeta('referralPassageType');
+  @override
+  late final GeneratedColumn<int> referralPassageType = GeneratedColumn<int>(
+    'referral_passage_type',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _referralAmbulanceTypeMeta =
+      const VerificationMeta('referralAmbulanceType');
+  @override
+  late final GeneratedColumn<int> referralAmbulanceType = GeneratedColumn<int>(
+    'referral_ambulance_type',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _referralHospitalIdxMeta =
+      const VerificationMeta('referralHospitalIdx');
+  @override
+  late final GeneratedColumn<int> referralHospitalIdx = GeneratedColumn<int>(
+    'referral_hospital_idx',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _referralOtherHospitalMeta =
+      const VerificationMeta('referralOtherHospital');
+  @override
+  late final GeneratedColumn<String> referralOtherHospital =
+      GeneratedColumn<String>(
+        'referral_other_hospital',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _referralEscortMeta = const VerificationMeta(
+    'referralEscort',
+  );
+  @override
+  late final GeneratedColumn<String> referralEscort = GeneratedColumn<String>(
+    'referral_escort',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _intubationTypeMeta = const VerificationMeta(
+    'intubationType',
+  );
+  @override
+  late final GeneratedColumn<int> intubationType = GeneratedColumn<int>(
+    'intubation_type',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _oxygenTypeMeta = const VerificationMeta(
+    'oxygenType',
+  );
+  @override
+  late final GeneratedColumn<int> oxygenType = GeneratedColumn<int>(
+    'oxygen_type',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _oxygenFlowMeta = const VerificationMeta(
+    'oxygenFlow',
+  );
+  @override
+  late final GeneratedColumn<String> oxygenFlow = GeneratedColumn<String>(
+    'oxygen_flow',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _medicalCertificateTypesJsonMeta =
+      const VerificationMeta('medicalCertificateTypesJson');
+  @override
+  late final GeneratedColumn<String> medicalCertificateTypesJson =
+      GeneratedColumn<String>(
+        'medical_certificate_types_json',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _prescriptionRowsJsonMeta =
+      const VerificationMeta('prescriptionRowsJson');
+  @override
+  late final GeneratedColumn<String> prescriptionRowsJson =
+      GeneratedColumn<String>(
+        'prescription_rows_json',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _followUpResultsJsonMeta =
+      const VerificationMeta('followUpResultsJson');
+  @override
+  late final GeneratedColumn<String> followUpResultsJson =
+      GeneratedColumn<String>(
+        'follow_up_results_json',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _otherHospitalIdxMeta = const VerificationMeta(
+    'otherHospitalIdx',
+  );
+  @override
+  late final GeneratedColumn<int> otherHospitalIdx = GeneratedColumn<int>(
+    'other_hospital_idx',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _selectedMainDoctorMeta =
+      const VerificationMeta('selectedMainDoctor');
+  @override
+  late final GeneratedColumn<String> selectedMainDoctor =
+      GeneratedColumn<String>(
+        'selected_main_doctor',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _selectedMainNurseMeta = const VerificationMeta(
+    'selectedMainNurse',
+  );
+  @override
+  late final GeneratedColumn<String> selectedMainNurse =
+      GeneratedColumn<String>(
+        'selected_main_nurse',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _nurseSignatureMeta = const VerificationMeta(
+    'nurseSignature',
+  );
+  @override
+  late final GeneratedColumn<String> nurseSignature = GeneratedColumn<String>(
+    'nurse_signature',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _selectedEMTMeta = const VerificationMeta(
+    'selectedEMT',
+  );
+  @override
+  late final GeneratedColumn<String> selectedEMT = GeneratedColumn<String>(
+    'selected_e_m_t',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _emtSignatureMeta = const VerificationMeta(
+    'emtSignature',
+  );
+  @override
+  late final GeneratedColumn<String> emtSignature = GeneratedColumn<String>(
+    'emt_signature',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _helperNamesTextMeta = const VerificationMeta(
+    'helperNamesText',
+  );
+  @override
+  late final GeneratedColumn<String> helperNamesText = GeneratedColumn<String>(
+    'helper_names_text',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _selectedHelpersJsonMeta =
+      const VerificationMeta('selectedHelpersJson');
+  @override
+  late final GeneratedColumn<String> selectedHelpersJson =
+      GeneratedColumn<String>(
+        'selected_helpers_json',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _specialNotesJsonMeta = const VerificationMeta(
+    'specialNotesJson',
+  );
+  @override
+  late final GeneratedColumn<String> specialNotesJson = GeneratedColumn<String>(
+    'special_notes_json',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _otherSpecialNoteMeta = const VerificationMeta(
+    'otherSpecialNote',
+  );
+  @override
+  late final GeneratedColumn<String> otherSpecialNote = GeneratedColumn<String>(
+    'other_special_note',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    visitId,
+    screeningChecked,
+    screeningMethodsJson,
+    otherScreeningMethod,
+    healthDataJson,
+    mainSymptom,
+    traumaSymptomsJson,
+    nonTraumaSymptomsJson,
+    symptomNote,
+    photoTypesJson,
+    bodyCheckHead,
+    bodyCheckChest,
+    bodyCheckAbdomen,
+    bodyCheckLimbs,
+    bodyCheckOther,
+    temperature,
+    pulse,
+    respiration,
+    bpSystolic,
+    bpDiastolic,
+    spo2,
+    consciousClear,
+    evmE,
+    evmV,
+    evmM,
+    leftPupilScale,
+    leftPupilSize,
+    rightPupilScale,
+    rightPupilSize,
+    history,
+    allergy,
+    initialDiagnosis,
+    diagnosisCategory,
+    selectedICD10Main,
+    selectedICD10Sub1,
+    selectedICD10Sub2,
+    triageCategory,
+    onSiteTreatmentsJson,
+    ekgChecked,
+    ekgReading,
+    sugarChecked,
+    sugarReading,
+    suggestReferral,
+    intubationChecked,
+    cprChecked,
+    oxygenTherapyChecked,
+    medicalCertificateChecked,
+    prescriptionChecked,
+    otherChecked,
+    otherSummary,
+    referralPassageType,
+    referralAmbulanceType,
+    referralHospitalIdx,
+    referralOtherHospital,
+    referralEscort,
+    intubationType,
+    oxygenType,
+    oxygenFlow,
+    medicalCertificateTypesJson,
+    prescriptionRowsJson,
+    followUpResultsJson,
+    otherHospitalIdx,
+    selectedMainDoctor,
+    selectedMainNurse,
+    nurseSignature,
+    selectedEMT,
+    emtSignature,
+    helperNamesText,
+    selectedHelpersJson,
+    specialNotesJson,
+    otherSpecialNote,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'treatments';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Treatment> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('visit_id')) {
+      context.handle(
+        _visitIdMeta,
+        visitId.isAcceptableOrUnknown(data['visit_id']!, _visitIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_visitIdMeta);
+    }
+    if (data.containsKey('screening_checked')) {
+      context.handle(
+        _screeningCheckedMeta,
+        screeningChecked.isAcceptableOrUnknown(
+          data['screening_checked']!,
+          _screeningCheckedMeta,
+        ),
+      );
+    }
+    if (data.containsKey('screening_methods_json')) {
+      context.handle(
+        _screeningMethodsJsonMeta,
+        screeningMethodsJson.isAcceptableOrUnknown(
+          data['screening_methods_json']!,
+          _screeningMethodsJsonMeta,
+        ),
+      );
+    }
+    if (data.containsKey('other_screening_method')) {
+      context.handle(
+        _otherScreeningMethodMeta,
+        otherScreeningMethod.isAcceptableOrUnknown(
+          data['other_screening_method']!,
+          _otherScreeningMethodMeta,
+        ),
+      );
+    }
+    if (data.containsKey('health_data_json')) {
+      context.handle(
+        _healthDataJsonMeta,
+        healthDataJson.isAcceptableOrUnknown(
+          data['health_data_json']!,
+          _healthDataJsonMeta,
+        ),
+      );
+    }
+    if (data.containsKey('main_symptom')) {
+      context.handle(
+        _mainSymptomMeta,
+        mainSymptom.isAcceptableOrUnknown(
+          data['main_symptom']!,
+          _mainSymptomMeta,
+        ),
+      );
+    }
+    if (data.containsKey('trauma_symptoms_json')) {
+      context.handle(
+        _traumaSymptomsJsonMeta,
+        traumaSymptomsJson.isAcceptableOrUnknown(
+          data['trauma_symptoms_json']!,
+          _traumaSymptomsJsonMeta,
+        ),
+      );
+    }
+    if (data.containsKey('non_trauma_symptoms_json')) {
+      context.handle(
+        _nonTraumaSymptomsJsonMeta,
+        nonTraumaSymptomsJson.isAcceptableOrUnknown(
+          data['non_trauma_symptoms_json']!,
+          _nonTraumaSymptomsJsonMeta,
+        ),
+      );
+    }
+    if (data.containsKey('symptom_note')) {
+      context.handle(
+        _symptomNoteMeta,
+        symptomNote.isAcceptableOrUnknown(
+          data['symptom_note']!,
+          _symptomNoteMeta,
+        ),
+      );
+    }
+    if (data.containsKey('photo_types_json')) {
+      context.handle(
+        _photoTypesJsonMeta,
+        photoTypesJson.isAcceptableOrUnknown(
+          data['photo_types_json']!,
+          _photoTypesJsonMeta,
+        ),
+      );
+    }
+    if (data.containsKey('body_check_head')) {
+      context.handle(
+        _bodyCheckHeadMeta,
+        bodyCheckHead.isAcceptableOrUnknown(
+          data['body_check_head']!,
+          _bodyCheckHeadMeta,
+        ),
+      );
+    }
+    if (data.containsKey('body_check_chest')) {
+      context.handle(
+        _bodyCheckChestMeta,
+        bodyCheckChest.isAcceptableOrUnknown(
+          data['body_check_chest']!,
+          _bodyCheckChestMeta,
+        ),
+      );
+    }
+    if (data.containsKey('body_check_abdomen')) {
+      context.handle(
+        _bodyCheckAbdomenMeta,
+        bodyCheckAbdomen.isAcceptableOrUnknown(
+          data['body_check_abdomen']!,
+          _bodyCheckAbdomenMeta,
+        ),
+      );
+    }
+    if (data.containsKey('body_check_limbs')) {
+      context.handle(
+        _bodyCheckLimbsMeta,
+        bodyCheckLimbs.isAcceptableOrUnknown(
+          data['body_check_limbs']!,
+          _bodyCheckLimbsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('body_check_other')) {
+      context.handle(
+        _bodyCheckOtherMeta,
+        bodyCheckOther.isAcceptableOrUnknown(
+          data['body_check_other']!,
+          _bodyCheckOtherMeta,
+        ),
+      );
+    }
+    if (data.containsKey('temperature')) {
+      context.handle(
+        _temperatureMeta,
+        temperature.isAcceptableOrUnknown(
+          data['temperature']!,
+          _temperatureMeta,
+        ),
+      );
+    }
+    if (data.containsKey('pulse')) {
+      context.handle(
+        _pulseMeta,
+        pulse.isAcceptableOrUnknown(data['pulse']!, _pulseMeta),
+      );
+    }
+    if (data.containsKey('respiration')) {
+      context.handle(
+        _respirationMeta,
+        respiration.isAcceptableOrUnknown(
+          data['respiration']!,
+          _respirationMeta,
+        ),
+      );
+    }
+    if (data.containsKey('bp_systolic')) {
+      context.handle(
+        _bpSystolicMeta,
+        bpSystolic.isAcceptableOrUnknown(data['bp_systolic']!, _bpSystolicMeta),
+      );
+    }
+    if (data.containsKey('bp_diastolic')) {
+      context.handle(
+        _bpDiastolicMeta,
+        bpDiastolic.isAcceptableOrUnknown(
+          data['bp_diastolic']!,
+          _bpDiastolicMeta,
+        ),
+      );
+    }
+    if (data.containsKey('spo2')) {
+      context.handle(
+        _spo2Meta,
+        spo2.isAcceptableOrUnknown(data['spo2']!, _spo2Meta),
+      );
+    }
+    if (data.containsKey('conscious_clear')) {
+      context.handle(
+        _consciousClearMeta,
+        consciousClear.isAcceptableOrUnknown(
+          data['conscious_clear']!,
+          _consciousClearMeta,
+        ),
+      );
+    }
+    if (data.containsKey('evm_e')) {
+      context.handle(
+        _evmEMeta,
+        evmE.isAcceptableOrUnknown(data['evm_e']!, _evmEMeta),
+      );
+    }
+    if (data.containsKey('evm_v')) {
+      context.handle(
+        _evmVMeta,
+        evmV.isAcceptableOrUnknown(data['evm_v']!, _evmVMeta),
+      );
+    }
+    if (data.containsKey('evm_m')) {
+      context.handle(
+        _evmMMeta,
+        evmM.isAcceptableOrUnknown(data['evm_m']!, _evmMMeta),
+      );
+    }
+    if (data.containsKey('left_pupil_scale')) {
+      context.handle(
+        _leftPupilScaleMeta,
+        leftPupilScale.isAcceptableOrUnknown(
+          data['left_pupil_scale']!,
+          _leftPupilScaleMeta,
+        ),
+      );
+    }
+    if (data.containsKey('left_pupil_size')) {
+      context.handle(
+        _leftPupilSizeMeta,
+        leftPupilSize.isAcceptableOrUnknown(
+          data['left_pupil_size']!,
+          _leftPupilSizeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('right_pupil_scale')) {
+      context.handle(
+        _rightPupilScaleMeta,
+        rightPupilScale.isAcceptableOrUnknown(
+          data['right_pupil_scale']!,
+          _rightPupilScaleMeta,
+        ),
+      );
+    }
+    if (data.containsKey('right_pupil_size')) {
+      context.handle(
+        _rightPupilSizeMeta,
+        rightPupilSize.isAcceptableOrUnknown(
+          data['right_pupil_size']!,
+          _rightPupilSizeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('history')) {
+      context.handle(
+        _historyMeta,
+        history.isAcceptableOrUnknown(data['history']!, _historyMeta),
+      );
+    }
+    if (data.containsKey('allergy')) {
+      context.handle(
+        _allergyMeta,
+        allergy.isAcceptableOrUnknown(data['allergy']!, _allergyMeta),
+      );
+    }
+    if (data.containsKey('initial_diagnosis')) {
+      context.handle(
+        _initialDiagnosisMeta,
+        initialDiagnosis.isAcceptableOrUnknown(
+          data['initial_diagnosis']!,
+          _initialDiagnosisMeta,
+        ),
+      );
+    }
+    if (data.containsKey('diagnosis_category')) {
+      context.handle(
+        _diagnosisCategoryMeta,
+        diagnosisCategory.isAcceptableOrUnknown(
+          data['diagnosis_category']!,
+          _diagnosisCategoryMeta,
+        ),
+      );
+    }
+    if (data.containsKey('selected_i_c_d10_main')) {
+      context.handle(
+        _selectedICD10MainMeta,
+        selectedICD10Main.isAcceptableOrUnknown(
+          data['selected_i_c_d10_main']!,
+          _selectedICD10MainMeta,
+        ),
+      );
+    }
+    if (data.containsKey('selected_i_c_d10_sub1')) {
+      context.handle(
+        _selectedICD10Sub1Meta,
+        selectedICD10Sub1.isAcceptableOrUnknown(
+          data['selected_i_c_d10_sub1']!,
+          _selectedICD10Sub1Meta,
+        ),
+      );
+    }
+    if (data.containsKey('selected_i_c_d10_sub2')) {
+      context.handle(
+        _selectedICD10Sub2Meta,
+        selectedICD10Sub2.isAcceptableOrUnknown(
+          data['selected_i_c_d10_sub2']!,
+          _selectedICD10Sub2Meta,
+        ),
+      );
+    }
+    if (data.containsKey('triage_category')) {
+      context.handle(
+        _triageCategoryMeta,
+        triageCategory.isAcceptableOrUnknown(
+          data['triage_category']!,
+          _triageCategoryMeta,
+        ),
+      );
+    }
+    if (data.containsKey('on_site_treatments_json')) {
+      context.handle(
+        _onSiteTreatmentsJsonMeta,
+        onSiteTreatmentsJson.isAcceptableOrUnknown(
+          data['on_site_treatments_json']!,
+          _onSiteTreatmentsJsonMeta,
+        ),
+      );
+    }
+    if (data.containsKey('ekg_checked')) {
+      context.handle(
+        _ekgCheckedMeta,
+        ekgChecked.isAcceptableOrUnknown(data['ekg_checked']!, _ekgCheckedMeta),
+      );
+    }
+    if (data.containsKey('ekg_reading')) {
+      context.handle(
+        _ekgReadingMeta,
+        ekgReading.isAcceptableOrUnknown(data['ekg_reading']!, _ekgReadingMeta),
+      );
+    }
+    if (data.containsKey('sugar_checked')) {
+      context.handle(
+        _sugarCheckedMeta,
+        sugarChecked.isAcceptableOrUnknown(
+          data['sugar_checked']!,
+          _sugarCheckedMeta,
+        ),
+      );
+    }
+    if (data.containsKey('sugar_reading')) {
+      context.handle(
+        _sugarReadingMeta,
+        sugarReading.isAcceptableOrUnknown(
+          data['sugar_reading']!,
+          _sugarReadingMeta,
+        ),
+      );
+    }
+    if (data.containsKey('suggest_referral')) {
+      context.handle(
+        _suggestReferralMeta,
+        suggestReferral.isAcceptableOrUnknown(
+          data['suggest_referral']!,
+          _suggestReferralMeta,
+        ),
+      );
+    }
+    if (data.containsKey('intubation_checked')) {
+      context.handle(
+        _intubationCheckedMeta,
+        intubationChecked.isAcceptableOrUnknown(
+          data['intubation_checked']!,
+          _intubationCheckedMeta,
+        ),
+      );
+    }
+    if (data.containsKey('cpr_checked')) {
+      context.handle(
+        _cprCheckedMeta,
+        cprChecked.isAcceptableOrUnknown(data['cpr_checked']!, _cprCheckedMeta),
+      );
+    }
+    if (data.containsKey('oxygen_therapy_checked')) {
+      context.handle(
+        _oxygenTherapyCheckedMeta,
+        oxygenTherapyChecked.isAcceptableOrUnknown(
+          data['oxygen_therapy_checked']!,
+          _oxygenTherapyCheckedMeta,
+        ),
+      );
+    }
+    if (data.containsKey('medical_certificate_checked')) {
+      context.handle(
+        _medicalCertificateCheckedMeta,
+        medicalCertificateChecked.isAcceptableOrUnknown(
+          data['medical_certificate_checked']!,
+          _medicalCertificateCheckedMeta,
+        ),
+      );
+    }
+    if (data.containsKey('prescription_checked')) {
+      context.handle(
+        _prescriptionCheckedMeta,
+        prescriptionChecked.isAcceptableOrUnknown(
+          data['prescription_checked']!,
+          _prescriptionCheckedMeta,
+        ),
+      );
+    }
+    if (data.containsKey('other_checked')) {
+      context.handle(
+        _otherCheckedMeta,
+        otherChecked.isAcceptableOrUnknown(
+          data['other_checked']!,
+          _otherCheckedMeta,
+        ),
+      );
+    }
+    if (data.containsKey('other_summary')) {
+      context.handle(
+        _otherSummaryMeta,
+        otherSummary.isAcceptableOrUnknown(
+          data['other_summary']!,
+          _otherSummaryMeta,
+        ),
+      );
+    }
+    if (data.containsKey('referral_passage_type')) {
+      context.handle(
+        _referralPassageTypeMeta,
+        referralPassageType.isAcceptableOrUnknown(
+          data['referral_passage_type']!,
+          _referralPassageTypeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('referral_ambulance_type')) {
+      context.handle(
+        _referralAmbulanceTypeMeta,
+        referralAmbulanceType.isAcceptableOrUnknown(
+          data['referral_ambulance_type']!,
+          _referralAmbulanceTypeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('referral_hospital_idx')) {
+      context.handle(
+        _referralHospitalIdxMeta,
+        referralHospitalIdx.isAcceptableOrUnknown(
+          data['referral_hospital_idx']!,
+          _referralHospitalIdxMeta,
+        ),
+      );
+    }
+    if (data.containsKey('referral_other_hospital')) {
+      context.handle(
+        _referralOtherHospitalMeta,
+        referralOtherHospital.isAcceptableOrUnknown(
+          data['referral_other_hospital']!,
+          _referralOtherHospitalMeta,
+        ),
+      );
+    }
+    if (data.containsKey('referral_escort')) {
+      context.handle(
+        _referralEscortMeta,
+        referralEscort.isAcceptableOrUnknown(
+          data['referral_escort']!,
+          _referralEscortMeta,
+        ),
+      );
+    }
+    if (data.containsKey('intubation_type')) {
+      context.handle(
+        _intubationTypeMeta,
+        intubationType.isAcceptableOrUnknown(
+          data['intubation_type']!,
+          _intubationTypeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('oxygen_type')) {
+      context.handle(
+        _oxygenTypeMeta,
+        oxygenType.isAcceptableOrUnknown(data['oxygen_type']!, _oxygenTypeMeta),
+      );
+    }
+    if (data.containsKey('oxygen_flow')) {
+      context.handle(
+        _oxygenFlowMeta,
+        oxygenFlow.isAcceptableOrUnknown(data['oxygen_flow']!, _oxygenFlowMeta),
+      );
+    }
+    if (data.containsKey('medical_certificate_types_json')) {
+      context.handle(
+        _medicalCertificateTypesJsonMeta,
+        medicalCertificateTypesJson.isAcceptableOrUnknown(
+          data['medical_certificate_types_json']!,
+          _medicalCertificateTypesJsonMeta,
+        ),
+      );
+    }
+    if (data.containsKey('prescription_rows_json')) {
+      context.handle(
+        _prescriptionRowsJsonMeta,
+        prescriptionRowsJson.isAcceptableOrUnknown(
+          data['prescription_rows_json']!,
+          _prescriptionRowsJsonMeta,
+        ),
+      );
+    }
+    if (data.containsKey('follow_up_results_json')) {
+      context.handle(
+        _followUpResultsJsonMeta,
+        followUpResultsJson.isAcceptableOrUnknown(
+          data['follow_up_results_json']!,
+          _followUpResultsJsonMeta,
+        ),
+      );
+    }
+    if (data.containsKey('other_hospital_idx')) {
+      context.handle(
+        _otherHospitalIdxMeta,
+        otherHospitalIdx.isAcceptableOrUnknown(
+          data['other_hospital_idx']!,
+          _otherHospitalIdxMeta,
+        ),
+      );
+    }
+    if (data.containsKey('selected_main_doctor')) {
+      context.handle(
+        _selectedMainDoctorMeta,
+        selectedMainDoctor.isAcceptableOrUnknown(
+          data['selected_main_doctor']!,
+          _selectedMainDoctorMeta,
+        ),
+      );
+    }
+    if (data.containsKey('selected_main_nurse')) {
+      context.handle(
+        _selectedMainNurseMeta,
+        selectedMainNurse.isAcceptableOrUnknown(
+          data['selected_main_nurse']!,
+          _selectedMainNurseMeta,
+        ),
+      );
+    }
+    if (data.containsKey('nurse_signature')) {
+      context.handle(
+        _nurseSignatureMeta,
+        nurseSignature.isAcceptableOrUnknown(
+          data['nurse_signature']!,
+          _nurseSignatureMeta,
+        ),
+      );
+    }
+    if (data.containsKey('selected_e_m_t')) {
+      context.handle(
+        _selectedEMTMeta,
+        selectedEMT.isAcceptableOrUnknown(
+          data['selected_e_m_t']!,
+          _selectedEMTMeta,
+        ),
+      );
+    }
+    if (data.containsKey('emt_signature')) {
+      context.handle(
+        _emtSignatureMeta,
+        emtSignature.isAcceptableOrUnknown(
+          data['emt_signature']!,
+          _emtSignatureMeta,
+        ),
+      );
+    }
+    if (data.containsKey('helper_names_text')) {
+      context.handle(
+        _helperNamesTextMeta,
+        helperNamesText.isAcceptableOrUnknown(
+          data['helper_names_text']!,
+          _helperNamesTextMeta,
+        ),
+      );
+    }
+    if (data.containsKey('selected_helpers_json')) {
+      context.handle(
+        _selectedHelpersJsonMeta,
+        selectedHelpersJson.isAcceptableOrUnknown(
+          data['selected_helpers_json']!,
+          _selectedHelpersJsonMeta,
+        ),
+      );
+    }
+    if (data.containsKey('special_notes_json')) {
+      context.handle(
+        _specialNotesJsonMeta,
+        specialNotesJson.isAcceptableOrUnknown(
+          data['special_notes_json']!,
+          _specialNotesJsonMeta,
+        ),
+      );
+    }
+    if (data.containsKey('other_special_note')) {
+      context.handle(
+        _otherSpecialNoteMeta,
+        otherSpecialNote.isAcceptableOrUnknown(
+          data['other_special_note']!,
+          _otherSpecialNoteMeta,
+        ),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  Treatment map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Treatment(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      visitId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}visit_id'],
+      )!,
+      screeningChecked: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}screening_checked'],
+      )!,
+      screeningMethodsJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}screening_methods_json'],
+      ),
+      otherScreeningMethod: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}other_screening_method'],
+      ),
+      healthDataJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}health_data_json'],
+      ),
+      mainSymptom: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}main_symptom'],
+      ),
+      traumaSymptomsJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}trauma_symptoms_json'],
+      ),
+      nonTraumaSymptomsJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}non_trauma_symptoms_json'],
+      ),
+      symptomNote: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}symptom_note'],
+      ),
+      photoTypesJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}photo_types_json'],
+      ),
+      bodyCheckHead: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}body_check_head'],
+      ),
+      bodyCheckChest: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}body_check_chest'],
+      ),
+      bodyCheckAbdomen: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}body_check_abdomen'],
+      ),
+      bodyCheckLimbs: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}body_check_limbs'],
+      ),
+      bodyCheckOther: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}body_check_other'],
+      ),
+      temperature: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}temperature'],
+      ),
+      pulse: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}pulse'],
+      ),
+      respiration: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}respiration'],
+      ),
+      bpSystolic: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}bp_systolic'],
+      ),
+      bpDiastolic: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}bp_diastolic'],
+      ),
+      spo2: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}spo2'],
+      ),
+      consciousClear: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}conscious_clear'],
+      )!,
+      evmE: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}evm_e'],
+      ),
+      evmV: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}evm_v'],
+      ),
+      evmM: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}evm_m'],
+      ),
+      leftPupilScale: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}left_pupil_scale'],
+      ),
+      leftPupilSize: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}left_pupil_size'],
+      ),
+      rightPupilScale: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}right_pupil_scale'],
+      ),
+      rightPupilSize: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}right_pupil_size'],
+      ),
+      history: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}history'],
+      ),
+      allergy: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}allergy'],
+      ),
+      initialDiagnosis: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}initial_diagnosis'],
+      ),
+      diagnosisCategory: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}diagnosis_category'],
+      ),
+      selectedICD10Main: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}selected_i_c_d10_main'],
+      ),
+      selectedICD10Sub1: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}selected_i_c_d10_sub1'],
+      ),
+      selectedICD10Sub2: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}selected_i_c_d10_sub2'],
+      ),
+      triageCategory: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}triage_category'],
+      ),
+      onSiteTreatmentsJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}on_site_treatments_json'],
+      ),
+      ekgChecked: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}ekg_checked'],
+      )!,
+      ekgReading: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}ekg_reading'],
+      ),
+      sugarChecked: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}sugar_checked'],
+      )!,
+      sugarReading: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}sugar_reading'],
+      ),
+      suggestReferral: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}suggest_referral'],
+      )!,
+      intubationChecked: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}intubation_checked'],
+      )!,
+      cprChecked: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}cpr_checked'],
+      )!,
+      oxygenTherapyChecked: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}oxygen_therapy_checked'],
+      )!,
+      medicalCertificateChecked: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}medical_certificate_checked'],
+      )!,
+      prescriptionChecked: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}prescription_checked'],
+      )!,
+      otherChecked: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}other_checked'],
+      )!,
+      otherSummary: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}other_summary'],
+      ),
+      referralPassageType: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}referral_passage_type'],
+      ),
+      referralAmbulanceType: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}referral_ambulance_type'],
+      ),
+      referralHospitalIdx: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}referral_hospital_idx'],
+      ),
+      referralOtherHospital: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}referral_other_hospital'],
+      ),
+      referralEscort: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}referral_escort'],
+      ),
+      intubationType: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}intubation_type'],
+      ),
+      oxygenType: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}oxygen_type'],
+      ),
+      oxygenFlow: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}oxygen_flow'],
+      ),
+      medicalCertificateTypesJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}medical_certificate_types_json'],
+      ),
+      prescriptionRowsJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}prescription_rows_json'],
+      ),
+      followUpResultsJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}follow_up_results_json'],
+      ),
+      otherHospitalIdx: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}other_hospital_idx'],
+      ),
+      selectedMainDoctor: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}selected_main_doctor'],
+      ),
+      selectedMainNurse: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}selected_main_nurse'],
+      ),
+      nurseSignature: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}nurse_signature'],
+      ),
+      selectedEMT: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}selected_e_m_t'],
+      ),
+      emtSignature: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}emt_signature'],
+      ),
+      helperNamesText: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}helper_names_text'],
+      ),
+      selectedHelpersJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}selected_helpers_json'],
+      ),
+      specialNotesJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}special_notes_json'],
+      ),
+      otherSpecialNote: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}other_special_note'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $TreatmentsTable createAlias(String alias) {
+    return $TreatmentsTable(attachedDatabase, alias);
+  }
+}
+
+class Treatment extends DataClass implements Insertable<Treatment> {
+  final int id;
+  final int visitId;
+  final bool screeningChecked;
+  final String? screeningMethodsJson;
+  final String? otherScreeningMethod;
+  final String? healthDataJson;
+  final int? mainSymptom;
+  final String? traumaSymptomsJson;
+  final String? nonTraumaSymptomsJson;
+  final String? symptomNote;
+  final String? photoTypesJson;
+  final String? bodyCheckHead;
+  final String? bodyCheckChest;
+  final String? bodyCheckAbdomen;
+  final String? bodyCheckLimbs;
+  final String? bodyCheckOther;
+  final String? temperature;
+  final String? pulse;
+  final String? respiration;
+  final String? bpSystolic;
+  final String? bpDiastolic;
+  final String? spo2;
+  final bool consciousClear;
+  final String? evmE;
+  final String? evmV;
+  final String? evmM;
+  final int? leftPupilScale;
+  final String? leftPupilSize;
+  final int? rightPupilScale;
+  final String? rightPupilSize;
+  final int? history;
+  final int? allergy;
+  final String? initialDiagnosis;
+  final int? diagnosisCategory;
+  final String? selectedICD10Main;
+  final String? selectedICD10Sub1;
+  final String? selectedICD10Sub2;
+  final int? triageCategory;
+  final String? onSiteTreatmentsJson;
+  final bool ekgChecked;
+  final String? ekgReading;
+  final bool sugarChecked;
+  final String? sugarReading;
+  final bool suggestReferral;
+  final bool intubationChecked;
+  final bool cprChecked;
+  final bool oxygenTherapyChecked;
+  final bool medicalCertificateChecked;
+  final bool prescriptionChecked;
+  final bool otherChecked;
+  final String? otherSummary;
+  final int? referralPassageType;
+  final int? referralAmbulanceType;
+  final int? referralHospitalIdx;
+  final String? referralOtherHospital;
+  final String? referralEscort;
+  final int? intubationType;
+  final int? oxygenType;
+  final String? oxygenFlow;
+  final String? medicalCertificateTypesJson;
+  final String? prescriptionRowsJson;
+  final String? followUpResultsJson;
+  final int? otherHospitalIdx;
+  final String? selectedMainDoctor;
+  final String? selectedMainNurse;
+  final String? nurseSignature;
+  final String? selectedEMT;
+  final String? emtSignature;
+  final String? helperNamesText;
+  final String? selectedHelpersJson;
+  final String? specialNotesJson;
+  final String? otherSpecialNote;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  const Treatment({
+    required this.id,
+    required this.visitId,
+    required this.screeningChecked,
+    this.screeningMethodsJson,
+    this.otherScreeningMethod,
+    this.healthDataJson,
+    this.mainSymptom,
+    this.traumaSymptomsJson,
+    this.nonTraumaSymptomsJson,
+    this.symptomNote,
+    this.photoTypesJson,
+    this.bodyCheckHead,
+    this.bodyCheckChest,
+    this.bodyCheckAbdomen,
+    this.bodyCheckLimbs,
+    this.bodyCheckOther,
+    this.temperature,
+    this.pulse,
+    this.respiration,
+    this.bpSystolic,
+    this.bpDiastolic,
+    this.spo2,
+    required this.consciousClear,
+    this.evmE,
+    this.evmV,
+    this.evmM,
+    this.leftPupilScale,
+    this.leftPupilSize,
+    this.rightPupilScale,
+    this.rightPupilSize,
+    this.history,
+    this.allergy,
+    this.initialDiagnosis,
+    this.diagnosisCategory,
+    this.selectedICD10Main,
+    this.selectedICD10Sub1,
+    this.selectedICD10Sub2,
+    this.triageCategory,
+    this.onSiteTreatmentsJson,
+    required this.ekgChecked,
+    this.ekgReading,
+    required this.sugarChecked,
+    this.sugarReading,
+    required this.suggestReferral,
+    required this.intubationChecked,
+    required this.cprChecked,
+    required this.oxygenTherapyChecked,
+    required this.medicalCertificateChecked,
+    required this.prescriptionChecked,
+    required this.otherChecked,
+    this.otherSummary,
+    this.referralPassageType,
+    this.referralAmbulanceType,
+    this.referralHospitalIdx,
+    this.referralOtherHospital,
+    this.referralEscort,
+    this.intubationType,
+    this.oxygenType,
+    this.oxygenFlow,
+    this.medicalCertificateTypesJson,
+    this.prescriptionRowsJson,
+    this.followUpResultsJson,
+    this.otherHospitalIdx,
+    this.selectedMainDoctor,
+    this.selectedMainNurse,
+    this.nurseSignature,
+    this.selectedEMT,
+    this.emtSignature,
+    this.helperNamesText,
+    this.selectedHelpersJson,
+    this.specialNotesJson,
+    this.otherSpecialNote,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['visit_id'] = Variable<int>(visitId);
+    map['screening_checked'] = Variable<bool>(screeningChecked);
+    if (!nullToAbsent || screeningMethodsJson != null) {
+      map['screening_methods_json'] = Variable<String>(screeningMethodsJson);
+    }
+    if (!nullToAbsent || otherScreeningMethod != null) {
+      map['other_screening_method'] = Variable<String>(otherScreeningMethod);
+    }
+    if (!nullToAbsent || healthDataJson != null) {
+      map['health_data_json'] = Variable<String>(healthDataJson);
+    }
+    if (!nullToAbsent || mainSymptom != null) {
+      map['main_symptom'] = Variable<int>(mainSymptom);
+    }
+    if (!nullToAbsent || traumaSymptomsJson != null) {
+      map['trauma_symptoms_json'] = Variable<String>(traumaSymptomsJson);
+    }
+    if (!nullToAbsent || nonTraumaSymptomsJson != null) {
+      map['non_trauma_symptoms_json'] = Variable<String>(nonTraumaSymptomsJson);
+    }
+    if (!nullToAbsent || symptomNote != null) {
+      map['symptom_note'] = Variable<String>(symptomNote);
+    }
+    if (!nullToAbsent || photoTypesJson != null) {
+      map['photo_types_json'] = Variable<String>(photoTypesJson);
+    }
+    if (!nullToAbsent || bodyCheckHead != null) {
+      map['body_check_head'] = Variable<String>(bodyCheckHead);
+    }
+    if (!nullToAbsent || bodyCheckChest != null) {
+      map['body_check_chest'] = Variable<String>(bodyCheckChest);
+    }
+    if (!nullToAbsent || bodyCheckAbdomen != null) {
+      map['body_check_abdomen'] = Variable<String>(bodyCheckAbdomen);
+    }
+    if (!nullToAbsent || bodyCheckLimbs != null) {
+      map['body_check_limbs'] = Variable<String>(bodyCheckLimbs);
+    }
+    if (!nullToAbsent || bodyCheckOther != null) {
+      map['body_check_other'] = Variable<String>(bodyCheckOther);
+    }
+    if (!nullToAbsent || temperature != null) {
+      map['temperature'] = Variable<String>(temperature);
+    }
+    if (!nullToAbsent || pulse != null) {
+      map['pulse'] = Variable<String>(pulse);
+    }
+    if (!nullToAbsent || respiration != null) {
+      map['respiration'] = Variable<String>(respiration);
+    }
+    if (!nullToAbsent || bpSystolic != null) {
+      map['bp_systolic'] = Variable<String>(bpSystolic);
+    }
+    if (!nullToAbsent || bpDiastolic != null) {
+      map['bp_diastolic'] = Variable<String>(bpDiastolic);
+    }
+    if (!nullToAbsent || spo2 != null) {
+      map['spo2'] = Variable<String>(spo2);
+    }
+    map['conscious_clear'] = Variable<bool>(consciousClear);
+    if (!nullToAbsent || evmE != null) {
+      map['evm_e'] = Variable<String>(evmE);
+    }
+    if (!nullToAbsent || evmV != null) {
+      map['evm_v'] = Variable<String>(evmV);
+    }
+    if (!nullToAbsent || evmM != null) {
+      map['evm_m'] = Variable<String>(evmM);
+    }
+    if (!nullToAbsent || leftPupilScale != null) {
+      map['left_pupil_scale'] = Variable<int>(leftPupilScale);
+    }
+    if (!nullToAbsent || leftPupilSize != null) {
+      map['left_pupil_size'] = Variable<String>(leftPupilSize);
+    }
+    if (!nullToAbsent || rightPupilScale != null) {
+      map['right_pupil_scale'] = Variable<int>(rightPupilScale);
+    }
+    if (!nullToAbsent || rightPupilSize != null) {
+      map['right_pupil_size'] = Variable<String>(rightPupilSize);
+    }
+    if (!nullToAbsent || history != null) {
+      map['history'] = Variable<int>(history);
+    }
+    if (!nullToAbsent || allergy != null) {
+      map['allergy'] = Variable<int>(allergy);
+    }
+    if (!nullToAbsent || initialDiagnosis != null) {
+      map['initial_diagnosis'] = Variable<String>(initialDiagnosis);
+    }
+    if (!nullToAbsent || diagnosisCategory != null) {
+      map['diagnosis_category'] = Variable<int>(diagnosisCategory);
+    }
+    if (!nullToAbsent || selectedICD10Main != null) {
+      map['selected_i_c_d10_main'] = Variable<String>(selectedICD10Main);
+    }
+    if (!nullToAbsent || selectedICD10Sub1 != null) {
+      map['selected_i_c_d10_sub1'] = Variable<String>(selectedICD10Sub1);
+    }
+    if (!nullToAbsent || selectedICD10Sub2 != null) {
+      map['selected_i_c_d10_sub2'] = Variable<String>(selectedICD10Sub2);
+    }
+    if (!nullToAbsent || triageCategory != null) {
+      map['triage_category'] = Variable<int>(triageCategory);
+    }
+    if (!nullToAbsent || onSiteTreatmentsJson != null) {
+      map['on_site_treatments_json'] = Variable<String>(onSiteTreatmentsJson);
+    }
+    map['ekg_checked'] = Variable<bool>(ekgChecked);
+    if (!nullToAbsent || ekgReading != null) {
+      map['ekg_reading'] = Variable<String>(ekgReading);
+    }
+    map['sugar_checked'] = Variable<bool>(sugarChecked);
+    if (!nullToAbsent || sugarReading != null) {
+      map['sugar_reading'] = Variable<String>(sugarReading);
+    }
+    map['suggest_referral'] = Variable<bool>(suggestReferral);
+    map['intubation_checked'] = Variable<bool>(intubationChecked);
+    map['cpr_checked'] = Variable<bool>(cprChecked);
+    map['oxygen_therapy_checked'] = Variable<bool>(oxygenTherapyChecked);
+    map['medical_certificate_checked'] = Variable<bool>(
+      medicalCertificateChecked,
+    );
+    map['prescription_checked'] = Variable<bool>(prescriptionChecked);
+    map['other_checked'] = Variable<bool>(otherChecked);
+    if (!nullToAbsent || otherSummary != null) {
+      map['other_summary'] = Variable<String>(otherSummary);
+    }
+    if (!nullToAbsent || referralPassageType != null) {
+      map['referral_passage_type'] = Variable<int>(referralPassageType);
+    }
+    if (!nullToAbsent || referralAmbulanceType != null) {
+      map['referral_ambulance_type'] = Variable<int>(referralAmbulanceType);
+    }
+    if (!nullToAbsent || referralHospitalIdx != null) {
+      map['referral_hospital_idx'] = Variable<int>(referralHospitalIdx);
+    }
+    if (!nullToAbsent || referralOtherHospital != null) {
+      map['referral_other_hospital'] = Variable<String>(referralOtherHospital);
+    }
+    if (!nullToAbsent || referralEscort != null) {
+      map['referral_escort'] = Variable<String>(referralEscort);
+    }
+    if (!nullToAbsent || intubationType != null) {
+      map['intubation_type'] = Variable<int>(intubationType);
+    }
+    if (!nullToAbsent || oxygenType != null) {
+      map['oxygen_type'] = Variable<int>(oxygenType);
+    }
+    if (!nullToAbsent || oxygenFlow != null) {
+      map['oxygen_flow'] = Variable<String>(oxygenFlow);
+    }
+    if (!nullToAbsent || medicalCertificateTypesJson != null) {
+      map['medical_certificate_types_json'] = Variable<String>(
+        medicalCertificateTypesJson,
+      );
+    }
+    if (!nullToAbsent || prescriptionRowsJson != null) {
+      map['prescription_rows_json'] = Variable<String>(prescriptionRowsJson);
+    }
+    if (!nullToAbsent || followUpResultsJson != null) {
+      map['follow_up_results_json'] = Variable<String>(followUpResultsJson);
+    }
+    if (!nullToAbsent || otherHospitalIdx != null) {
+      map['other_hospital_idx'] = Variable<int>(otherHospitalIdx);
+    }
+    if (!nullToAbsent || selectedMainDoctor != null) {
+      map['selected_main_doctor'] = Variable<String>(selectedMainDoctor);
+    }
+    if (!nullToAbsent || selectedMainNurse != null) {
+      map['selected_main_nurse'] = Variable<String>(selectedMainNurse);
+    }
+    if (!nullToAbsent || nurseSignature != null) {
+      map['nurse_signature'] = Variable<String>(nurseSignature);
+    }
+    if (!nullToAbsent || selectedEMT != null) {
+      map['selected_e_m_t'] = Variable<String>(selectedEMT);
+    }
+    if (!nullToAbsent || emtSignature != null) {
+      map['emt_signature'] = Variable<String>(emtSignature);
+    }
+    if (!nullToAbsent || helperNamesText != null) {
+      map['helper_names_text'] = Variable<String>(helperNamesText);
+    }
+    if (!nullToAbsent || selectedHelpersJson != null) {
+      map['selected_helpers_json'] = Variable<String>(selectedHelpersJson);
+    }
+    if (!nullToAbsent || specialNotesJson != null) {
+      map['special_notes_json'] = Variable<String>(specialNotesJson);
+    }
+    if (!nullToAbsent || otherSpecialNote != null) {
+      map['other_special_note'] = Variable<String>(otherSpecialNote);
+    }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  TreatmentsCompanion toCompanion(bool nullToAbsent) {
+    return TreatmentsCompanion(
+      id: Value(id),
+      visitId: Value(visitId),
+      screeningChecked: Value(screeningChecked),
+      screeningMethodsJson: screeningMethodsJson == null && nullToAbsent
+          ? const Value.absent()
+          : Value(screeningMethodsJson),
+      otherScreeningMethod: otherScreeningMethod == null && nullToAbsent
+          ? const Value.absent()
+          : Value(otherScreeningMethod),
+      healthDataJson: healthDataJson == null && nullToAbsent
+          ? const Value.absent()
+          : Value(healthDataJson),
+      mainSymptom: mainSymptom == null && nullToAbsent
+          ? const Value.absent()
+          : Value(mainSymptom),
+      traumaSymptomsJson: traumaSymptomsJson == null && nullToAbsent
+          ? const Value.absent()
+          : Value(traumaSymptomsJson),
+      nonTraumaSymptomsJson: nonTraumaSymptomsJson == null && nullToAbsent
+          ? const Value.absent()
+          : Value(nonTraumaSymptomsJson),
+      symptomNote: symptomNote == null && nullToAbsent
+          ? const Value.absent()
+          : Value(symptomNote),
+      photoTypesJson: photoTypesJson == null && nullToAbsent
+          ? const Value.absent()
+          : Value(photoTypesJson),
+      bodyCheckHead: bodyCheckHead == null && nullToAbsent
+          ? const Value.absent()
+          : Value(bodyCheckHead),
+      bodyCheckChest: bodyCheckChest == null && nullToAbsent
+          ? const Value.absent()
+          : Value(bodyCheckChest),
+      bodyCheckAbdomen: bodyCheckAbdomen == null && nullToAbsent
+          ? const Value.absent()
+          : Value(bodyCheckAbdomen),
+      bodyCheckLimbs: bodyCheckLimbs == null && nullToAbsent
+          ? const Value.absent()
+          : Value(bodyCheckLimbs),
+      bodyCheckOther: bodyCheckOther == null && nullToAbsent
+          ? const Value.absent()
+          : Value(bodyCheckOther),
+      temperature: temperature == null && nullToAbsent
+          ? const Value.absent()
+          : Value(temperature),
+      pulse: pulse == null && nullToAbsent
+          ? const Value.absent()
+          : Value(pulse),
+      respiration: respiration == null && nullToAbsent
+          ? const Value.absent()
+          : Value(respiration),
+      bpSystolic: bpSystolic == null && nullToAbsent
+          ? const Value.absent()
+          : Value(bpSystolic),
+      bpDiastolic: bpDiastolic == null && nullToAbsent
+          ? const Value.absent()
+          : Value(bpDiastolic),
+      spo2: spo2 == null && nullToAbsent ? const Value.absent() : Value(spo2),
+      consciousClear: Value(consciousClear),
+      evmE: evmE == null && nullToAbsent ? const Value.absent() : Value(evmE),
+      evmV: evmV == null && nullToAbsent ? const Value.absent() : Value(evmV),
+      evmM: evmM == null && nullToAbsent ? const Value.absent() : Value(evmM),
+      leftPupilScale: leftPupilScale == null && nullToAbsent
+          ? const Value.absent()
+          : Value(leftPupilScale),
+      leftPupilSize: leftPupilSize == null && nullToAbsent
+          ? const Value.absent()
+          : Value(leftPupilSize),
+      rightPupilScale: rightPupilScale == null && nullToAbsent
+          ? const Value.absent()
+          : Value(rightPupilScale),
+      rightPupilSize: rightPupilSize == null && nullToAbsent
+          ? const Value.absent()
+          : Value(rightPupilSize),
+      history: history == null && nullToAbsent
+          ? const Value.absent()
+          : Value(history),
+      allergy: allergy == null && nullToAbsent
+          ? const Value.absent()
+          : Value(allergy),
+      initialDiagnosis: initialDiagnosis == null && nullToAbsent
+          ? const Value.absent()
+          : Value(initialDiagnosis),
+      diagnosisCategory: diagnosisCategory == null && nullToAbsent
+          ? const Value.absent()
+          : Value(diagnosisCategory),
+      selectedICD10Main: selectedICD10Main == null && nullToAbsent
+          ? const Value.absent()
+          : Value(selectedICD10Main),
+      selectedICD10Sub1: selectedICD10Sub1 == null && nullToAbsent
+          ? const Value.absent()
+          : Value(selectedICD10Sub1),
+      selectedICD10Sub2: selectedICD10Sub2 == null && nullToAbsent
+          ? const Value.absent()
+          : Value(selectedICD10Sub2),
+      triageCategory: triageCategory == null && nullToAbsent
+          ? const Value.absent()
+          : Value(triageCategory),
+      onSiteTreatmentsJson: onSiteTreatmentsJson == null && nullToAbsent
+          ? const Value.absent()
+          : Value(onSiteTreatmentsJson),
+      ekgChecked: Value(ekgChecked),
+      ekgReading: ekgReading == null && nullToAbsent
+          ? const Value.absent()
+          : Value(ekgReading),
+      sugarChecked: Value(sugarChecked),
+      sugarReading: sugarReading == null && nullToAbsent
+          ? const Value.absent()
+          : Value(sugarReading),
+      suggestReferral: Value(suggestReferral),
+      intubationChecked: Value(intubationChecked),
+      cprChecked: Value(cprChecked),
+      oxygenTherapyChecked: Value(oxygenTherapyChecked),
+      medicalCertificateChecked: Value(medicalCertificateChecked),
+      prescriptionChecked: Value(prescriptionChecked),
+      otherChecked: Value(otherChecked),
+      otherSummary: otherSummary == null && nullToAbsent
+          ? const Value.absent()
+          : Value(otherSummary),
+      referralPassageType: referralPassageType == null && nullToAbsent
+          ? const Value.absent()
+          : Value(referralPassageType),
+      referralAmbulanceType: referralAmbulanceType == null && nullToAbsent
+          ? const Value.absent()
+          : Value(referralAmbulanceType),
+      referralHospitalIdx: referralHospitalIdx == null && nullToAbsent
+          ? const Value.absent()
+          : Value(referralHospitalIdx),
+      referralOtherHospital: referralOtherHospital == null && nullToAbsent
+          ? const Value.absent()
+          : Value(referralOtherHospital),
+      referralEscort: referralEscort == null && nullToAbsent
+          ? const Value.absent()
+          : Value(referralEscort),
+      intubationType: intubationType == null && nullToAbsent
+          ? const Value.absent()
+          : Value(intubationType),
+      oxygenType: oxygenType == null && nullToAbsent
+          ? const Value.absent()
+          : Value(oxygenType),
+      oxygenFlow: oxygenFlow == null && nullToAbsent
+          ? const Value.absent()
+          : Value(oxygenFlow),
+      medicalCertificateTypesJson:
+          medicalCertificateTypesJson == null && nullToAbsent
+          ? const Value.absent()
+          : Value(medicalCertificateTypesJson),
+      prescriptionRowsJson: prescriptionRowsJson == null && nullToAbsent
+          ? const Value.absent()
+          : Value(prescriptionRowsJson),
+      followUpResultsJson: followUpResultsJson == null && nullToAbsent
+          ? const Value.absent()
+          : Value(followUpResultsJson),
+      otherHospitalIdx: otherHospitalIdx == null && nullToAbsent
+          ? const Value.absent()
+          : Value(otherHospitalIdx),
+      selectedMainDoctor: selectedMainDoctor == null && nullToAbsent
+          ? const Value.absent()
+          : Value(selectedMainDoctor),
+      selectedMainNurse: selectedMainNurse == null && nullToAbsent
+          ? const Value.absent()
+          : Value(selectedMainNurse),
+      nurseSignature: nurseSignature == null && nullToAbsent
+          ? const Value.absent()
+          : Value(nurseSignature),
+      selectedEMT: selectedEMT == null && nullToAbsent
+          ? const Value.absent()
+          : Value(selectedEMT),
+      emtSignature: emtSignature == null && nullToAbsent
+          ? const Value.absent()
+          : Value(emtSignature),
+      helperNamesText: helperNamesText == null && nullToAbsent
+          ? const Value.absent()
+          : Value(helperNamesText),
+      selectedHelpersJson: selectedHelpersJson == null && nullToAbsent
+          ? const Value.absent()
+          : Value(selectedHelpersJson),
+      specialNotesJson: specialNotesJson == null && nullToAbsent
+          ? const Value.absent()
+          : Value(specialNotesJson),
+      otherSpecialNote: otherSpecialNote == null && nullToAbsent
+          ? const Value.absent()
+          : Value(otherSpecialNote),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory Treatment.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Treatment(
+      id: serializer.fromJson<int>(json['id']),
+      visitId: serializer.fromJson<int>(json['visitId']),
+      screeningChecked: serializer.fromJson<bool>(json['screeningChecked']),
+      screeningMethodsJson: serializer.fromJson<String?>(
+        json['screeningMethodsJson'],
+      ),
+      otherScreeningMethod: serializer.fromJson<String?>(
+        json['otherScreeningMethod'],
+      ),
+      healthDataJson: serializer.fromJson<String?>(json['healthDataJson']),
+      mainSymptom: serializer.fromJson<int?>(json['mainSymptom']),
+      traumaSymptomsJson: serializer.fromJson<String?>(
+        json['traumaSymptomsJson'],
+      ),
+      nonTraumaSymptomsJson: serializer.fromJson<String?>(
+        json['nonTraumaSymptomsJson'],
+      ),
+      symptomNote: serializer.fromJson<String?>(json['symptomNote']),
+      photoTypesJson: serializer.fromJson<String?>(json['photoTypesJson']),
+      bodyCheckHead: serializer.fromJson<String?>(json['bodyCheckHead']),
+      bodyCheckChest: serializer.fromJson<String?>(json['bodyCheckChest']),
+      bodyCheckAbdomen: serializer.fromJson<String?>(json['bodyCheckAbdomen']),
+      bodyCheckLimbs: serializer.fromJson<String?>(json['bodyCheckLimbs']),
+      bodyCheckOther: serializer.fromJson<String?>(json['bodyCheckOther']),
+      temperature: serializer.fromJson<String?>(json['temperature']),
+      pulse: serializer.fromJson<String?>(json['pulse']),
+      respiration: serializer.fromJson<String?>(json['respiration']),
+      bpSystolic: serializer.fromJson<String?>(json['bpSystolic']),
+      bpDiastolic: serializer.fromJson<String?>(json['bpDiastolic']),
+      spo2: serializer.fromJson<String?>(json['spo2']),
+      consciousClear: serializer.fromJson<bool>(json['consciousClear']),
+      evmE: serializer.fromJson<String?>(json['evmE']),
+      evmV: serializer.fromJson<String?>(json['evmV']),
+      evmM: serializer.fromJson<String?>(json['evmM']),
+      leftPupilScale: serializer.fromJson<int?>(json['leftPupilScale']),
+      leftPupilSize: serializer.fromJson<String?>(json['leftPupilSize']),
+      rightPupilScale: serializer.fromJson<int?>(json['rightPupilScale']),
+      rightPupilSize: serializer.fromJson<String?>(json['rightPupilSize']),
+      history: serializer.fromJson<int?>(json['history']),
+      allergy: serializer.fromJson<int?>(json['allergy']),
+      initialDiagnosis: serializer.fromJson<String?>(json['initialDiagnosis']),
+      diagnosisCategory: serializer.fromJson<int?>(json['diagnosisCategory']),
+      selectedICD10Main: serializer.fromJson<String?>(
+        json['selectedICD10Main'],
+      ),
+      selectedICD10Sub1: serializer.fromJson<String?>(
+        json['selectedICD10Sub1'],
+      ),
+      selectedICD10Sub2: serializer.fromJson<String?>(
+        json['selectedICD10Sub2'],
+      ),
+      triageCategory: serializer.fromJson<int?>(json['triageCategory']),
+      onSiteTreatmentsJson: serializer.fromJson<String?>(
+        json['onSiteTreatmentsJson'],
+      ),
+      ekgChecked: serializer.fromJson<bool>(json['ekgChecked']),
+      ekgReading: serializer.fromJson<String?>(json['ekgReading']),
+      sugarChecked: serializer.fromJson<bool>(json['sugarChecked']),
+      sugarReading: serializer.fromJson<String?>(json['sugarReading']),
+      suggestReferral: serializer.fromJson<bool>(json['suggestReferral']),
+      intubationChecked: serializer.fromJson<bool>(json['intubationChecked']),
+      cprChecked: serializer.fromJson<bool>(json['cprChecked']),
+      oxygenTherapyChecked: serializer.fromJson<bool>(
+        json['oxygenTherapyChecked'],
+      ),
+      medicalCertificateChecked: serializer.fromJson<bool>(
+        json['medicalCertificateChecked'],
+      ),
+      prescriptionChecked: serializer.fromJson<bool>(
+        json['prescriptionChecked'],
+      ),
+      otherChecked: serializer.fromJson<bool>(json['otherChecked']),
+      otherSummary: serializer.fromJson<String?>(json['otherSummary']),
+      referralPassageType: serializer.fromJson<int?>(
+        json['referralPassageType'],
+      ),
+      referralAmbulanceType: serializer.fromJson<int?>(
+        json['referralAmbulanceType'],
+      ),
+      referralHospitalIdx: serializer.fromJson<int?>(
+        json['referralHospitalIdx'],
+      ),
+      referralOtherHospital: serializer.fromJson<String?>(
+        json['referralOtherHospital'],
+      ),
+      referralEscort: serializer.fromJson<String?>(json['referralEscort']),
+      intubationType: serializer.fromJson<int?>(json['intubationType']),
+      oxygenType: serializer.fromJson<int?>(json['oxygenType']),
+      oxygenFlow: serializer.fromJson<String?>(json['oxygenFlow']),
+      medicalCertificateTypesJson: serializer.fromJson<String?>(
+        json['medicalCertificateTypesJson'],
+      ),
+      prescriptionRowsJson: serializer.fromJson<String?>(
+        json['prescriptionRowsJson'],
+      ),
+      followUpResultsJson: serializer.fromJson<String?>(
+        json['followUpResultsJson'],
+      ),
+      otherHospitalIdx: serializer.fromJson<int?>(json['otherHospitalIdx']),
+      selectedMainDoctor: serializer.fromJson<String?>(
+        json['selectedMainDoctor'],
+      ),
+      selectedMainNurse: serializer.fromJson<String?>(
+        json['selectedMainNurse'],
+      ),
+      nurseSignature: serializer.fromJson<String?>(json['nurseSignature']),
+      selectedEMT: serializer.fromJson<String?>(json['selectedEMT']),
+      emtSignature: serializer.fromJson<String?>(json['emtSignature']),
+      helperNamesText: serializer.fromJson<String?>(json['helperNamesText']),
+      selectedHelpersJson: serializer.fromJson<String?>(
+        json['selectedHelpersJson'],
+      ),
+      specialNotesJson: serializer.fromJson<String?>(json['specialNotesJson']),
+      otherSpecialNote: serializer.fromJson<String?>(json['otherSpecialNote']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'visitId': serializer.toJson<int>(visitId),
+      'screeningChecked': serializer.toJson<bool>(screeningChecked),
+      'screeningMethodsJson': serializer.toJson<String?>(screeningMethodsJson),
+      'otherScreeningMethod': serializer.toJson<String?>(otherScreeningMethod),
+      'healthDataJson': serializer.toJson<String?>(healthDataJson),
+      'mainSymptom': serializer.toJson<int?>(mainSymptom),
+      'traumaSymptomsJson': serializer.toJson<String?>(traumaSymptomsJson),
+      'nonTraumaSymptomsJson': serializer.toJson<String?>(
+        nonTraumaSymptomsJson,
+      ),
+      'symptomNote': serializer.toJson<String?>(symptomNote),
+      'photoTypesJson': serializer.toJson<String?>(photoTypesJson),
+      'bodyCheckHead': serializer.toJson<String?>(bodyCheckHead),
+      'bodyCheckChest': serializer.toJson<String?>(bodyCheckChest),
+      'bodyCheckAbdomen': serializer.toJson<String?>(bodyCheckAbdomen),
+      'bodyCheckLimbs': serializer.toJson<String?>(bodyCheckLimbs),
+      'bodyCheckOther': serializer.toJson<String?>(bodyCheckOther),
+      'temperature': serializer.toJson<String?>(temperature),
+      'pulse': serializer.toJson<String?>(pulse),
+      'respiration': serializer.toJson<String?>(respiration),
+      'bpSystolic': serializer.toJson<String?>(bpSystolic),
+      'bpDiastolic': serializer.toJson<String?>(bpDiastolic),
+      'spo2': serializer.toJson<String?>(spo2),
+      'consciousClear': serializer.toJson<bool>(consciousClear),
+      'evmE': serializer.toJson<String?>(evmE),
+      'evmV': serializer.toJson<String?>(evmV),
+      'evmM': serializer.toJson<String?>(evmM),
+      'leftPupilScale': serializer.toJson<int?>(leftPupilScale),
+      'leftPupilSize': serializer.toJson<String?>(leftPupilSize),
+      'rightPupilScale': serializer.toJson<int?>(rightPupilScale),
+      'rightPupilSize': serializer.toJson<String?>(rightPupilSize),
+      'history': serializer.toJson<int?>(history),
+      'allergy': serializer.toJson<int?>(allergy),
+      'initialDiagnosis': serializer.toJson<String?>(initialDiagnosis),
+      'diagnosisCategory': serializer.toJson<int?>(diagnosisCategory),
+      'selectedICD10Main': serializer.toJson<String?>(selectedICD10Main),
+      'selectedICD10Sub1': serializer.toJson<String?>(selectedICD10Sub1),
+      'selectedICD10Sub2': serializer.toJson<String?>(selectedICD10Sub2),
+      'triageCategory': serializer.toJson<int?>(triageCategory),
+      'onSiteTreatmentsJson': serializer.toJson<String?>(onSiteTreatmentsJson),
+      'ekgChecked': serializer.toJson<bool>(ekgChecked),
+      'ekgReading': serializer.toJson<String?>(ekgReading),
+      'sugarChecked': serializer.toJson<bool>(sugarChecked),
+      'sugarReading': serializer.toJson<String?>(sugarReading),
+      'suggestReferral': serializer.toJson<bool>(suggestReferral),
+      'intubationChecked': serializer.toJson<bool>(intubationChecked),
+      'cprChecked': serializer.toJson<bool>(cprChecked),
+      'oxygenTherapyChecked': serializer.toJson<bool>(oxygenTherapyChecked),
+      'medicalCertificateChecked': serializer.toJson<bool>(
+        medicalCertificateChecked,
+      ),
+      'prescriptionChecked': serializer.toJson<bool>(prescriptionChecked),
+      'otherChecked': serializer.toJson<bool>(otherChecked),
+      'otherSummary': serializer.toJson<String?>(otherSummary),
+      'referralPassageType': serializer.toJson<int?>(referralPassageType),
+      'referralAmbulanceType': serializer.toJson<int?>(referralAmbulanceType),
+      'referralHospitalIdx': serializer.toJson<int?>(referralHospitalIdx),
+      'referralOtherHospital': serializer.toJson<String?>(
+        referralOtherHospital,
+      ),
+      'referralEscort': serializer.toJson<String?>(referralEscort),
+      'intubationType': serializer.toJson<int?>(intubationType),
+      'oxygenType': serializer.toJson<int?>(oxygenType),
+      'oxygenFlow': serializer.toJson<String?>(oxygenFlow),
+      'medicalCertificateTypesJson': serializer.toJson<String?>(
+        medicalCertificateTypesJson,
+      ),
+      'prescriptionRowsJson': serializer.toJson<String?>(prescriptionRowsJson),
+      'followUpResultsJson': serializer.toJson<String?>(followUpResultsJson),
+      'otherHospitalIdx': serializer.toJson<int?>(otherHospitalIdx),
+      'selectedMainDoctor': serializer.toJson<String?>(selectedMainDoctor),
+      'selectedMainNurse': serializer.toJson<String?>(selectedMainNurse),
+      'nurseSignature': serializer.toJson<String?>(nurseSignature),
+      'selectedEMT': serializer.toJson<String?>(selectedEMT),
+      'emtSignature': serializer.toJson<String?>(emtSignature),
+      'helperNamesText': serializer.toJson<String?>(helperNamesText),
+      'selectedHelpersJson': serializer.toJson<String?>(selectedHelpersJson),
+      'specialNotesJson': serializer.toJson<String?>(specialNotesJson),
+      'otherSpecialNote': serializer.toJson<String?>(otherSpecialNote),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  Treatment copyWith({
+    int? id,
+    int? visitId,
+    bool? screeningChecked,
+    Value<String?> screeningMethodsJson = const Value.absent(),
+    Value<String?> otherScreeningMethod = const Value.absent(),
+    Value<String?> healthDataJson = const Value.absent(),
+    Value<int?> mainSymptom = const Value.absent(),
+    Value<String?> traumaSymptomsJson = const Value.absent(),
+    Value<String?> nonTraumaSymptomsJson = const Value.absent(),
+    Value<String?> symptomNote = const Value.absent(),
+    Value<String?> photoTypesJson = const Value.absent(),
+    Value<String?> bodyCheckHead = const Value.absent(),
+    Value<String?> bodyCheckChest = const Value.absent(),
+    Value<String?> bodyCheckAbdomen = const Value.absent(),
+    Value<String?> bodyCheckLimbs = const Value.absent(),
+    Value<String?> bodyCheckOther = const Value.absent(),
+    Value<String?> temperature = const Value.absent(),
+    Value<String?> pulse = const Value.absent(),
+    Value<String?> respiration = const Value.absent(),
+    Value<String?> bpSystolic = const Value.absent(),
+    Value<String?> bpDiastolic = const Value.absent(),
+    Value<String?> spo2 = const Value.absent(),
+    bool? consciousClear,
+    Value<String?> evmE = const Value.absent(),
+    Value<String?> evmV = const Value.absent(),
+    Value<String?> evmM = const Value.absent(),
+    Value<int?> leftPupilScale = const Value.absent(),
+    Value<String?> leftPupilSize = const Value.absent(),
+    Value<int?> rightPupilScale = const Value.absent(),
+    Value<String?> rightPupilSize = const Value.absent(),
+    Value<int?> history = const Value.absent(),
+    Value<int?> allergy = const Value.absent(),
+    Value<String?> initialDiagnosis = const Value.absent(),
+    Value<int?> diagnosisCategory = const Value.absent(),
+    Value<String?> selectedICD10Main = const Value.absent(),
+    Value<String?> selectedICD10Sub1 = const Value.absent(),
+    Value<String?> selectedICD10Sub2 = const Value.absent(),
+    Value<int?> triageCategory = const Value.absent(),
+    Value<String?> onSiteTreatmentsJson = const Value.absent(),
+    bool? ekgChecked,
+    Value<String?> ekgReading = const Value.absent(),
+    bool? sugarChecked,
+    Value<String?> sugarReading = const Value.absent(),
+    bool? suggestReferral,
+    bool? intubationChecked,
+    bool? cprChecked,
+    bool? oxygenTherapyChecked,
+    bool? medicalCertificateChecked,
+    bool? prescriptionChecked,
+    bool? otherChecked,
+    Value<String?> otherSummary = const Value.absent(),
+    Value<int?> referralPassageType = const Value.absent(),
+    Value<int?> referralAmbulanceType = const Value.absent(),
+    Value<int?> referralHospitalIdx = const Value.absent(),
+    Value<String?> referralOtherHospital = const Value.absent(),
+    Value<String?> referralEscort = const Value.absent(),
+    Value<int?> intubationType = const Value.absent(),
+    Value<int?> oxygenType = const Value.absent(),
+    Value<String?> oxygenFlow = const Value.absent(),
+    Value<String?> medicalCertificateTypesJson = const Value.absent(),
+    Value<String?> prescriptionRowsJson = const Value.absent(),
+    Value<String?> followUpResultsJson = const Value.absent(),
+    Value<int?> otherHospitalIdx = const Value.absent(),
+    Value<String?> selectedMainDoctor = const Value.absent(),
+    Value<String?> selectedMainNurse = const Value.absent(),
+    Value<String?> nurseSignature = const Value.absent(),
+    Value<String?> selectedEMT = const Value.absent(),
+    Value<String?> emtSignature = const Value.absent(),
+    Value<String?> helperNamesText = const Value.absent(),
+    Value<String?> selectedHelpersJson = const Value.absent(),
+    Value<String?> specialNotesJson = const Value.absent(),
+    Value<String?> otherSpecialNote = const Value.absent(),
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) => Treatment(
+    id: id ?? this.id,
+    visitId: visitId ?? this.visitId,
+    screeningChecked: screeningChecked ?? this.screeningChecked,
+    screeningMethodsJson: screeningMethodsJson.present
+        ? screeningMethodsJson.value
+        : this.screeningMethodsJson,
+    otherScreeningMethod: otherScreeningMethod.present
+        ? otherScreeningMethod.value
+        : this.otherScreeningMethod,
+    healthDataJson: healthDataJson.present
+        ? healthDataJson.value
+        : this.healthDataJson,
+    mainSymptom: mainSymptom.present ? mainSymptom.value : this.mainSymptom,
+    traumaSymptomsJson: traumaSymptomsJson.present
+        ? traumaSymptomsJson.value
+        : this.traumaSymptomsJson,
+    nonTraumaSymptomsJson: nonTraumaSymptomsJson.present
+        ? nonTraumaSymptomsJson.value
+        : this.nonTraumaSymptomsJson,
+    symptomNote: symptomNote.present ? symptomNote.value : this.symptomNote,
+    photoTypesJson: photoTypesJson.present
+        ? photoTypesJson.value
+        : this.photoTypesJson,
+    bodyCheckHead: bodyCheckHead.present
+        ? bodyCheckHead.value
+        : this.bodyCheckHead,
+    bodyCheckChest: bodyCheckChest.present
+        ? bodyCheckChest.value
+        : this.bodyCheckChest,
+    bodyCheckAbdomen: bodyCheckAbdomen.present
+        ? bodyCheckAbdomen.value
+        : this.bodyCheckAbdomen,
+    bodyCheckLimbs: bodyCheckLimbs.present
+        ? bodyCheckLimbs.value
+        : this.bodyCheckLimbs,
+    bodyCheckOther: bodyCheckOther.present
+        ? bodyCheckOther.value
+        : this.bodyCheckOther,
+    temperature: temperature.present ? temperature.value : this.temperature,
+    pulse: pulse.present ? pulse.value : this.pulse,
+    respiration: respiration.present ? respiration.value : this.respiration,
+    bpSystolic: bpSystolic.present ? bpSystolic.value : this.bpSystolic,
+    bpDiastolic: bpDiastolic.present ? bpDiastolic.value : this.bpDiastolic,
+    spo2: spo2.present ? spo2.value : this.spo2,
+    consciousClear: consciousClear ?? this.consciousClear,
+    evmE: evmE.present ? evmE.value : this.evmE,
+    evmV: evmV.present ? evmV.value : this.evmV,
+    evmM: evmM.present ? evmM.value : this.evmM,
+    leftPupilScale: leftPupilScale.present
+        ? leftPupilScale.value
+        : this.leftPupilScale,
+    leftPupilSize: leftPupilSize.present
+        ? leftPupilSize.value
+        : this.leftPupilSize,
+    rightPupilScale: rightPupilScale.present
+        ? rightPupilScale.value
+        : this.rightPupilScale,
+    rightPupilSize: rightPupilSize.present
+        ? rightPupilSize.value
+        : this.rightPupilSize,
+    history: history.present ? history.value : this.history,
+    allergy: allergy.present ? allergy.value : this.allergy,
+    initialDiagnosis: initialDiagnosis.present
+        ? initialDiagnosis.value
+        : this.initialDiagnosis,
+    diagnosisCategory: diagnosisCategory.present
+        ? diagnosisCategory.value
+        : this.diagnosisCategory,
+    selectedICD10Main: selectedICD10Main.present
+        ? selectedICD10Main.value
+        : this.selectedICD10Main,
+    selectedICD10Sub1: selectedICD10Sub1.present
+        ? selectedICD10Sub1.value
+        : this.selectedICD10Sub1,
+    selectedICD10Sub2: selectedICD10Sub2.present
+        ? selectedICD10Sub2.value
+        : this.selectedICD10Sub2,
+    triageCategory: triageCategory.present
+        ? triageCategory.value
+        : this.triageCategory,
+    onSiteTreatmentsJson: onSiteTreatmentsJson.present
+        ? onSiteTreatmentsJson.value
+        : this.onSiteTreatmentsJson,
+    ekgChecked: ekgChecked ?? this.ekgChecked,
+    ekgReading: ekgReading.present ? ekgReading.value : this.ekgReading,
+    sugarChecked: sugarChecked ?? this.sugarChecked,
+    sugarReading: sugarReading.present ? sugarReading.value : this.sugarReading,
+    suggestReferral: suggestReferral ?? this.suggestReferral,
+    intubationChecked: intubationChecked ?? this.intubationChecked,
+    cprChecked: cprChecked ?? this.cprChecked,
+    oxygenTherapyChecked: oxygenTherapyChecked ?? this.oxygenTherapyChecked,
+    medicalCertificateChecked:
+        medicalCertificateChecked ?? this.medicalCertificateChecked,
+    prescriptionChecked: prescriptionChecked ?? this.prescriptionChecked,
+    otherChecked: otherChecked ?? this.otherChecked,
+    otherSummary: otherSummary.present ? otherSummary.value : this.otherSummary,
+    referralPassageType: referralPassageType.present
+        ? referralPassageType.value
+        : this.referralPassageType,
+    referralAmbulanceType: referralAmbulanceType.present
+        ? referralAmbulanceType.value
+        : this.referralAmbulanceType,
+    referralHospitalIdx: referralHospitalIdx.present
+        ? referralHospitalIdx.value
+        : this.referralHospitalIdx,
+    referralOtherHospital: referralOtherHospital.present
+        ? referralOtherHospital.value
+        : this.referralOtherHospital,
+    referralEscort: referralEscort.present
+        ? referralEscort.value
+        : this.referralEscort,
+    intubationType: intubationType.present
+        ? intubationType.value
+        : this.intubationType,
+    oxygenType: oxygenType.present ? oxygenType.value : this.oxygenType,
+    oxygenFlow: oxygenFlow.present ? oxygenFlow.value : this.oxygenFlow,
+    medicalCertificateTypesJson: medicalCertificateTypesJson.present
+        ? medicalCertificateTypesJson.value
+        : this.medicalCertificateTypesJson,
+    prescriptionRowsJson: prescriptionRowsJson.present
+        ? prescriptionRowsJson.value
+        : this.prescriptionRowsJson,
+    followUpResultsJson: followUpResultsJson.present
+        ? followUpResultsJson.value
+        : this.followUpResultsJson,
+    otherHospitalIdx: otherHospitalIdx.present
+        ? otherHospitalIdx.value
+        : this.otherHospitalIdx,
+    selectedMainDoctor: selectedMainDoctor.present
+        ? selectedMainDoctor.value
+        : this.selectedMainDoctor,
+    selectedMainNurse: selectedMainNurse.present
+        ? selectedMainNurse.value
+        : this.selectedMainNurse,
+    nurseSignature: nurseSignature.present
+        ? nurseSignature.value
+        : this.nurseSignature,
+    selectedEMT: selectedEMT.present ? selectedEMT.value : this.selectedEMT,
+    emtSignature: emtSignature.present ? emtSignature.value : this.emtSignature,
+    helperNamesText: helperNamesText.present
+        ? helperNamesText.value
+        : this.helperNamesText,
+    selectedHelpersJson: selectedHelpersJson.present
+        ? selectedHelpersJson.value
+        : this.selectedHelpersJson,
+    specialNotesJson: specialNotesJson.present
+        ? specialNotesJson.value
+        : this.specialNotesJson,
+    otherSpecialNote: otherSpecialNote.present
+        ? otherSpecialNote.value
+        : this.otherSpecialNote,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  Treatment copyWithCompanion(TreatmentsCompanion data) {
+    return Treatment(
+      id: data.id.present ? data.id.value : this.id,
+      visitId: data.visitId.present ? data.visitId.value : this.visitId,
+      screeningChecked: data.screeningChecked.present
+          ? data.screeningChecked.value
+          : this.screeningChecked,
+      screeningMethodsJson: data.screeningMethodsJson.present
+          ? data.screeningMethodsJson.value
+          : this.screeningMethodsJson,
+      otherScreeningMethod: data.otherScreeningMethod.present
+          ? data.otherScreeningMethod.value
+          : this.otherScreeningMethod,
+      healthDataJson: data.healthDataJson.present
+          ? data.healthDataJson.value
+          : this.healthDataJson,
+      mainSymptom: data.mainSymptom.present
+          ? data.mainSymptom.value
+          : this.mainSymptom,
+      traumaSymptomsJson: data.traumaSymptomsJson.present
+          ? data.traumaSymptomsJson.value
+          : this.traumaSymptomsJson,
+      nonTraumaSymptomsJson: data.nonTraumaSymptomsJson.present
+          ? data.nonTraumaSymptomsJson.value
+          : this.nonTraumaSymptomsJson,
+      symptomNote: data.symptomNote.present
+          ? data.symptomNote.value
+          : this.symptomNote,
+      photoTypesJson: data.photoTypesJson.present
+          ? data.photoTypesJson.value
+          : this.photoTypesJson,
+      bodyCheckHead: data.bodyCheckHead.present
+          ? data.bodyCheckHead.value
+          : this.bodyCheckHead,
+      bodyCheckChest: data.bodyCheckChest.present
+          ? data.bodyCheckChest.value
+          : this.bodyCheckChest,
+      bodyCheckAbdomen: data.bodyCheckAbdomen.present
+          ? data.bodyCheckAbdomen.value
+          : this.bodyCheckAbdomen,
+      bodyCheckLimbs: data.bodyCheckLimbs.present
+          ? data.bodyCheckLimbs.value
+          : this.bodyCheckLimbs,
+      bodyCheckOther: data.bodyCheckOther.present
+          ? data.bodyCheckOther.value
+          : this.bodyCheckOther,
+      temperature: data.temperature.present
+          ? data.temperature.value
+          : this.temperature,
+      pulse: data.pulse.present ? data.pulse.value : this.pulse,
+      respiration: data.respiration.present
+          ? data.respiration.value
+          : this.respiration,
+      bpSystolic: data.bpSystolic.present
+          ? data.bpSystolic.value
+          : this.bpSystolic,
+      bpDiastolic: data.bpDiastolic.present
+          ? data.bpDiastolic.value
+          : this.bpDiastolic,
+      spo2: data.spo2.present ? data.spo2.value : this.spo2,
+      consciousClear: data.consciousClear.present
+          ? data.consciousClear.value
+          : this.consciousClear,
+      evmE: data.evmE.present ? data.evmE.value : this.evmE,
+      evmV: data.evmV.present ? data.evmV.value : this.evmV,
+      evmM: data.evmM.present ? data.evmM.value : this.evmM,
+      leftPupilScale: data.leftPupilScale.present
+          ? data.leftPupilScale.value
+          : this.leftPupilScale,
+      leftPupilSize: data.leftPupilSize.present
+          ? data.leftPupilSize.value
+          : this.leftPupilSize,
+      rightPupilScale: data.rightPupilScale.present
+          ? data.rightPupilScale.value
+          : this.rightPupilScale,
+      rightPupilSize: data.rightPupilSize.present
+          ? data.rightPupilSize.value
+          : this.rightPupilSize,
+      history: data.history.present ? data.history.value : this.history,
+      allergy: data.allergy.present ? data.allergy.value : this.allergy,
+      initialDiagnosis: data.initialDiagnosis.present
+          ? data.initialDiagnosis.value
+          : this.initialDiagnosis,
+      diagnosisCategory: data.diagnosisCategory.present
+          ? data.diagnosisCategory.value
+          : this.diagnosisCategory,
+      selectedICD10Main: data.selectedICD10Main.present
+          ? data.selectedICD10Main.value
+          : this.selectedICD10Main,
+      selectedICD10Sub1: data.selectedICD10Sub1.present
+          ? data.selectedICD10Sub1.value
+          : this.selectedICD10Sub1,
+      selectedICD10Sub2: data.selectedICD10Sub2.present
+          ? data.selectedICD10Sub2.value
+          : this.selectedICD10Sub2,
+      triageCategory: data.triageCategory.present
+          ? data.triageCategory.value
+          : this.triageCategory,
+      onSiteTreatmentsJson: data.onSiteTreatmentsJson.present
+          ? data.onSiteTreatmentsJson.value
+          : this.onSiteTreatmentsJson,
+      ekgChecked: data.ekgChecked.present
+          ? data.ekgChecked.value
+          : this.ekgChecked,
+      ekgReading: data.ekgReading.present
+          ? data.ekgReading.value
+          : this.ekgReading,
+      sugarChecked: data.sugarChecked.present
+          ? data.sugarChecked.value
+          : this.sugarChecked,
+      sugarReading: data.sugarReading.present
+          ? data.sugarReading.value
+          : this.sugarReading,
+      suggestReferral: data.suggestReferral.present
+          ? data.suggestReferral.value
+          : this.suggestReferral,
+      intubationChecked: data.intubationChecked.present
+          ? data.intubationChecked.value
+          : this.intubationChecked,
+      cprChecked: data.cprChecked.present
+          ? data.cprChecked.value
+          : this.cprChecked,
+      oxygenTherapyChecked: data.oxygenTherapyChecked.present
+          ? data.oxygenTherapyChecked.value
+          : this.oxygenTherapyChecked,
+      medicalCertificateChecked: data.medicalCertificateChecked.present
+          ? data.medicalCertificateChecked.value
+          : this.medicalCertificateChecked,
+      prescriptionChecked: data.prescriptionChecked.present
+          ? data.prescriptionChecked.value
+          : this.prescriptionChecked,
+      otherChecked: data.otherChecked.present
+          ? data.otherChecked.value
+          : this.otherChecked,
+      otherSummary: data.otherSummary.present
+          ? data.otherSummary.value
+          : this.otherSummary,
+      referralPassageType: data.referralPassageType.present
+          ? data.referralPassageType.value
+          : this.referralPassageType,
+      referralAmbulanceType: data.referralAmbulanceType.present
+          ? data.referralAmbulanceType.value
+          : this.referralAmbulanceType,
+      referralHospitalIdx: data.referralHospitalIdx.present
+          ? data.referralHospitalIdx.value
+          : this.referralHospitalIdx,
+      referralOtherHospital: data.referralOtherHospital.present
+          ? data.referralOtherHospital.value
+          : this.referralOtherHospital,
+      referralEscort: data.referralEscort.present
+          ? data.referralEscort.value
+          : this.referralEscort,
+      intubationType: data.intubationType.present
+          ? data.intubationType.value
+          : this.intubationType,
+      oxygenType: data.oxygenType.present
+          ? data.oxygenType.value
+          : this.oxygenType,
+      oxygenFlow: data.oxygenFlow.present
+          ? data.oxygenFlow.value
+          : this.oxygenFlow,
+      medicalCertificateTypesJson: data.medicalCertificateTypesJson.present
+          ? data.medicalCertificateTypesJson.value
+          : this.medicalCertificateTypesJson,
+      prescriptionRowsJson: data.prescriptionRowsJson.present
+          ? data.prescriptionRowsJson.value
+          : this.prescriptionRowsJson,
+      followUpResultsJson: data.followUpResultsJson.present
+          ? data.followUpResultsJson.value
+          : this.followUpResultsJson,
+      otherHospitalIdx: data.otherHospitalIdx.present
+          ? data.otherHospitalIdx.value
+          : this.otherHospitalIdx,
+      selectedMainDoctor: data.selectedMainDoctor.present
+          ? data.selectedMainDoctor.value
+          : this.selectedMainDoctor,
+      selectedMainNurse: data.selectedMainNurse.present
+          ? data.selectedMainNurse.value
+          : this.selectedMainNurse,
+      nurseSignature: data.nurseSignature.present
+          ? data.nurseSignature.value
+          : this.nurseSignature,
+      selectedEMT: data.selectedEMT.present
+          ? data.selectedEMT.value
+          : this.selectedEMT,
+      emtSignature: data.emtSignature.present
+          ? data.emtSignature.value
+          : this.emtSignature,
+      helperNamesText: data.helperNamesText.present
+          ? data.helperNamesText.value
+          : this.helperNamesText,
+      selectedHelpersJson: data.selectedHelpersJson.present
+          ? data.selectedHelpersJson.value
+          : this.selectedHelpersJson,
+      specialNotesJson: data.specialNotesJson.present
+          ? data.specialNotesJson.value
+          : this.specialNotesJson,
+      otherSpecialNote: data.otherSpecialNote.present
+          ? data.otherSpecialNote.value
+          : this.otherSpecialNote,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Treatment(')
+          ..write('id: $id, ')
+          ..write('visitId: $visitId, ')
+          ..write('screeningChecked: $screeningChecked, ')
+          ..write('screeningMethodsJson: $screeningMethodsJson, ')
+          ..write('otherScreeningMethod: $otherScreeningMethod, ')
+          ..write('healthDataJson: $healthDataJson, ')
+          ..write('mainSymptom: $mainSymptom, ')
+          ..write('traumaSymptomsJson: $traumaSymptomsJson, ')
+          ..write('nonTraumaSymptomsJson: $nonTraumaSymptomsJson, ')
+          ..write('symptomNote: $symptomNote, ')
+          ..write('photoTypesJson: $photoTypesJson, ')
+          ..write('bodyCheckHead: $bodyCheckHead, ')
+          ..write('bodyCheckChest: $bodyCheckChest, ')
+          ..write('bodyCheckAbdomen: $bodyCheckAbdomen, ')
+          ..write('bodyCheckLimbs: $bodyCheckLimbs, ')
+          ..write('bodyCheckOther: $bodyCheckOther, ')
+          ..write('temperature: $temperature, ')
+          ..write('pulse: $pulse, ')
+          ..write('respiration: $respiration, ')
+          ..write('bpSystolic: $bpSystolic, ')
+          ..write('bpDiastolic: $bpDiastolic, ')
+          ..write('spo2: $spo2, ')
+          ..write('consciousClear: $consciousClear, ')
+          ..write('evmE: $evmE, ')
+          ..write('evmV: $evmV, ')
+          ..write('evmM: $evmM, ')
+          ..write('leftPupilScale: $leftPupilScale, ')
+          ..write('leftPupilSize: $leftPupilSize, ')
+          ..write('rightPupilScale: $rightPupilScale, ')
+          ..write('rightPupilSize: $rightPupilSize, ')
+          ..write('history: $history, ')
+          ..write('allergy: $allergy, ')
+          ..write('initialDiagnosis: $initialDiagnosis, ')
+          ..write('diagnosisCategory: $diagnosisCategory, ')
+          ..write('selectedICD10Main: $selectedICD10Main, ')
+          ..write('selectedICD10Sub1: $selectedICD10Sub1, ')
+          ..write('selectedICD10Sub2: $selectedICD10Sub2, ')
+          ..write('triageCategory: $triageCategory, ')
+          ..write('onSiteTreatmentsJson: $onSiteTreatmentsJson, ')
+          ..write('ekgChecked: $ekgChecked, ')
+          ..write('ekgReading: $ekgReading, ')
+          ..write('sugarChecked: $sugarChecked, ')
+          ..write('sugarReading: $sugarReading, ')
+          ..write('suggestReferral: $suggestReferral, ')
+          ..write('intubationChecked: $intubationChecked, ')
+          ..write('cprChecked: $cprChecked, ')
+          ..write('oxygenTherapyChecked: $oxygenTherapyChecked, ')
+          ..write('medicalCertificateChecked: $medicalCertificateChecked, ')
+          ..write('prescriptionChecked: $prescriptionChecked, ')
+          ..write('otherChecked: $otherChecked, ')
+          ..write('otherSummary: $otherSummary, ')
+          ..write('referralPassageType: $referralPassageType, ')
+          ..write('referralAmbulanceType: $referralAmbulanceType, ')
+          ..write('referralHospitalIdx: $referralHospitalIdx, ')
+          ..write('referralOtherHospital: $referralOtherHospital, ')
+          ..write('referralEscort: $referralEscort, ')
+          ..write('intubationType: $intubationType, ')
+          ..write('oxygenType: $oxygenType, ')
+          ..write('oxygenFlow: $oxygenFlow, ')
+          ..write('medicalCertificateTypesJson: $medicalCertificateTypesJson, ')
+          ..write('prescriptionRowsJson: $prescriptionRowsJson, ')
+          ..write('followUpResultsJson: $followUpResultsJson, ')
+          ..write('otherHospitalIdx: $otherHospitalIdx, ')
+          ..write('selectedMainDoctor: $selectedMainDoctor, ')
+          ..write('selectedMainNurse: $selectedMainNurse, ')
+          ..write('nurseSignature: $nurseSignature, ')
+          ..write('selectedEMT: $selectedEMT, ')
+          ..write('emtSignature: $emtSignature, ')
+          ..write('helperNamesText: $helperNamesText, ')
+          ..write('selectedHelpersJson: $selectedHelpersJson, ')
+          ..write('specialNotesJson: $specialNotesJson, ')
+          ..write('otherSpecialNote: $otherSpecialNote, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hashAll([
+    id,
+    visitId,
+    screeningChecked,
+    screeningMethodsJson,
+    otherScreeningMethod,
+    healthDataJson,
+    mainSymptom,
+    traumaSymptomsJson,
+    nonTraumaSymptomsJson,
+    symptomNote,
+    photoTypesJson,
+    bodyCheckHead,
+    bodyCheckChest,
+    bodyCheckAbdomen,
+    bodyCheckLimbs,
+    bodyCheckOther,
+    temperature,
+    pulse,
+    respiration,
+    bpSystolic,
+    bpDiastolic,
+    spo2,
+    consciousClear,
+    evmE,
+    evmV,
+    evmM,
+    leftPupilScale,
+    leftPupilSize,
+    rightPupilScale,
+    rightPupilSize,
+    history,
+    allergy,
+    initialDiagnosis,
+    diagnosisCategory,
+    selectedICD10Main,
+    selectedICD10Sub1,
+    selectedICD10Sub2,
+    triageCategory,
+    onSiteTreatmentsJson,
+    ekgChecked,
+    ekgReading,
+    sugarChecked,
+    sugarReading,
+    suggestReferral,
+    intubationChecked,
+    cprChecked,
+    oxygenTherapyChecked,
+    medicalCertificateChecked,
+    prescriptionChecked,
+    otherChecked,
+    otherSummary,
+    referralPassageType,
+    referralAmbulanceType,
+    referralHospitalIdx,
+    referralOtherHospital,
+    referralEscort,
+    intubationType,
+    oxygenType,
+    oxygenFlow,
+    medicalCertificateTypesJson,
+    prescriptionRowsJson,
+    followUpResultsJson,
+    otherHospitalIdx,
+    selectedMainDoctor,
+    selectedMainNurse,
+    nurseSignature,
+    selectedEMT,
+    emtSignature,
+    helperNamesText,
+    selectedHelpersJson,
+    specialNotesJson,
+    otherSpecialNote,
+    createdAt,
+    updatedAt,
+  ]);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Treatment &&
+          other.id == this.id &&
+          other.visitId == this.visitId &&
+          other.screeningChecked == this.screeningChecked &&
+          other.screeningMethodsJson == this.screeningMethodsJson &&
+          other.otherScreeningMethod == this.otherScreeningMethod &&
+          other.healthDataJson == this.healthDataJson &&
+          other.mainSymptom == this.mainSymptom &&
+          other.traumaSymptomsJson == this.traumaSymptomsJson &&
+          other.nonTraumaSymptomsJson == this.nonTraumaSymptomsJson &&
+          other.symptomNote == this.symptomNote &&
+          other.photoTypesJson == this.photoTypesJson &&
+          other.bodyCheckHead == this.bodyCheckHead &&
+          other.bodyCheckChest == this.bodyCheckChest &&
+          other.bodyCheckAbdomen == this.bodyCheckAbdomen &&
+          other.bodyCheckLimbs == this.bodyCheckLimbs &&
+          other.bodyCheckOther == this.bodyCheckOther &&
+          other.temperature == this.temperature &&
+          other.pulse == this.pulse &&
+          other.respiration == this.respiration &&
+          other.bpSystolic == this.bpSystolic &&
+          other.bpDiastolic == this.bpDiastolic &&
+          other.spo2 == this.spo2 &&
+          other.consciousClear == this.consciousClear &&
+          other.evmE == this.evmE &&
+          other.evmV == this.evmV &&
+          other.evmM == this.evmM &&
+          other.leftPupilScale == this.leftPupilScale &&
+          other.leftPupilSize == this.leftPupilSize &&
+          other.rightPupilScale == this.rightPupilScale &&
+          other.rightPupilSize == this.rightPupilSize &&
+          other.history == this.history &&
+          other.allergy == this.allergy &&
+          other.initialDiagnosis == this.initialDiagnosis &&
+          other.diagnosisCategory == this.diagnosisCategory &&
+          other.selectedICD10Main == this.selectedICD10Main &&
+          other.selectedICD10Sub1 == this.selectedICD10Sub1 &&
+          other.selectedICD10Sub2 == this.selectedICD10Sub2 &&
+          other.triageCategory == this.triageCategory &&
+          other.onSiteTreatmentsJson == this.onSiteTreatmentsJson &&
+          other.ekgChecked == this.ekgChecked &&
+          other.ekgReading == this.ekgReading &&
+          other.sugarChecked == this.sugarChecked &&
+          other.sugarReading == this.sugarReading &&
+          other.suggestReferral == this.suggestReferral &&
+          other.intubationChecked == this.intubationChecked &&
+          other.cprChecked == this.cprChecked &&
+          other.oxygenTherapyChecked == this.oxygenTherapyChecked &&
+          other.medicalCertificateChecked == this.medicalCertificateChecked &&
+          other.prescriptionChecked == this.prescriptionChecked &&
+          other.otherChecked == this.otherChecked &&
+          other.otherSummary == this.otherSummary &&
+          other.referralPassageType == this.referralPassageType &&
+          other.referralAmbulanceType == this.referralAmbulanceType &&
+          other.referralHospitalIdx == this.referralHospitalIdx &&
+          other.referralOtherHospital == this.referralOtherHospital &&
+          other.referralEscort == this.referralEscort &&
+          other.intubationType == this.intubationType &&
+          other.oxygenType == this.oxygenType &&
+          other.oxygenFlow == this.oxygenFlow &&
+          other.medicalCertificateTypesJson ==
+              this.medicalCertificateTypesJson &&
+          other.prescriptionRowsJson == this.prescriptionRowsJson &&
+          other.followUpResultsJson == this.followUpResultsJson &&
+          other.otherHospitalIdx == this.otherHospitalIdx &&
+          other.selectedMainDoctor == this.selectedMainDoctor &&
+          other.selectedMainNurse == this.selectedMainNurse &&
+          other.nurseSignature == this.nurseSignature &&
+          other.selectedEMT == this.selectedEMT &&
+          other.emtSignature == this.emtSignature &&
+          other.helperNamesText == this.helperNamesText &&
+          other.selectedHelpersJson == this.selectedHelpersJson &&
+          other.specialNotesJson == this.specialNotesJson &&
+          other.otherSpecialNote == this.otherSpecialNote &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class TreatmentsCompanion extends UpdateCompanion<Treatment> {
+  final Value<int> id;
+  final Value<int> visitId;
+  final Value<bool> screeningChecked;
+  final Value<String?> screeningMethodsJson;
+  final Value<String?> otherScreeningMethod;
+  final Value<String?> healthDataJson;
+  final Value<int?> mainSymptom;
+  final Value<String?> traumaSymptomsJson;
+  final Value<String?> nonTraumaSymptomsJson;
+  final Value<String?> symptomNote;
+  final Value<String?> photoTypesJson;
+  final Value<String?> bodyCheckHead;
+  final Value<String?> bodyCheckChest;
+  final Value<String?> bodyCheckAbdomen;
+  final Value<String?> bodyCheckLimbs;
+  final Value<String?> bodyCheckOther;
+  final Value<String?> temperature;
+  final Value<String?> pulse;
+  final Value<String?> respiration;
+  final Value<String?> bpSystolic;
+  final Value<String?> bpDiastolic;
+  final Value<String?> spo2;
+  final Value<bool> consciousClear;
+  final Value<String?> evmE;
+  final Value<String?> evmV;
+  final Value<String?> evmM;
+  final Value<int?> leftPupilScale;
+  final Value<String?> leftPupilSize;
+  final Value<int?> rightPupilScale;
+  final Value<String?> rightPupilSize;
+  final Value<int?> history;
+  final Value<int?> allergy;
+  final Value<String?> initialDiagnosis;
+  final Value<int?> diagnosisCategory;
+  final Value<String?> selectedICD10Main;
+  final Value<String?> selectedICD10Sub1;
+  final Value<String?> selectedICD10Sub2;
+  final Value<int?> triageCategory;
+  final Value<String?> onSiteTreatmentsJson;
+  final Value<bool> ekgChecked;
+  final Value<String?> ekgReading;
+  final Value<bool> sugarChecked;
+  final Value<String?> sugarReading;
+  final Value<bool> suggestReferral;
+  final Value<bool> intubationChecked;
+  final Value<bool> cprChecked;
+  final Value<bool> oxygenTherapyChecked;
+  final Value<bool> medicalCertificateChecked;
+  final Value<bool> prescriptionChecked;
+  final Value<bool> otherChecked;
+  final Value<String?> otherSummary;
+  final Value<int?> referralPassageType;
+  final Value<int?> referralAmbulanceType;
+  final Value<int?> referralHospitalIdx;
+  final Value<String?> referralOtherHospital;
+  final Value<String?> referralEscort;
+  final Value<int?> intubationType;
+  final Value<int?> oxygenType;
+  final Value<String?> oxygenFlow;
+  final Value<String?> medicalCertificateTypesJson;
+  final Value<String?> prescriptionRowsJson;
+  final Value<String?> followUpResultsJson;
+  final Value<int?> otherHospitalIdx;
+  final Value<String?> selectedMainDoctor;
+  final Value<String?> selectedMainNurse;
+  final Value<String?> nurseSignature;
+  final Value<String?> selectedEMT;
+  final Value<String?> emtSignature;
+  final Value<String?> helperNamesText;
+  final Value<String?> selectedHelpersJson;
+  final Value<String?> specialNotesJson;
+  final Value<String?> otherSpecialNote;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  const TreatmentsCompanion({
+    this.id = const Value.absent(),
+    this.visitId = const Value.absent(),
+    this.screeningChecked = const Value.absent(),
+    this.screeningMethodsJson = const Value.absent(),
+    this.otherScreeningMethod = const Value.absent(),
+    this.healthDataJson = const Value.absent(),
+    this.mainSymptom = const Value.absent(),
+    this.traumaSymptomsJson = const Value.absent(),
+    this.nonTraumaSymptomsJson = const Value.absent(),
+    this.symptomNote = const Value.absent(),
+    this.photoTypesJson = const Value.absent(),
+    this.bodyCheckHead = const Value.absent(),
+    this.bodyCheckChest = const Value.absent(),
+    this.bodyCheckAbdomen = const Value.absent(),
+    this.bodyCheckLimbs = const Value.absent(),
+    this.bodyCheckOther = const Value.absent(),
+    this.temperature = const Value.absent(),
+    this.pulse = const Value.absent(),
+    this.respiration = const Value.absent(),
+    this.bpSystolic = const Value.absent(),
+    this.bpDiastolic = const Value.absent(),
+    this.spo2 = const Value.absent(),
+    this.consciousClear = const Value.absent(),
+    this.evmE = const Value.absent(),
+    this.evmV = const Value.absent(),
+    this.evmM = const Value.absent(),
+    this.leftPupilScale = const Value.absent(),
+    this.leftPupilSize = const Value.absent(),
+    this.rightPupilScale = const Value.absent(),
+    this.rightPupilSize = const Value.absent(),
+    this.history = const Value.absent(),
+    this.allergy = const Value.absent(),
+    this.initialDiagnosis = const Value.absent(),
+    this.diagnosisCategory = const Value.absent(),
+    this.selectedICD10Main = const Value.absent(),
+    this.selectedICD10Sub1 = const Value.absent(),
+    this.selectedICD10Sub2 = const Value.absent(),
+    this.triageCategory = const Value.absent(),
+    this.onSiteTreatmentsJson = const Value.absent(),
+    this.ekgChecked = const Value.absent(),
+    this.ekgReading = const Value.absent(),
+    this.sugarChecked = const Value.absent(),
+    this.sugarReading = const Value.absent(),
+    this.suggestReferral = const Value.absent(),
+    this.intubationChecked = const Value.absent(),
+    this.cprChecked = const Value.absent(),
+    this.oxygenTherapyChecked = const Value.absent(),
+    this.medicalCertificateChecked = const Value.absent(),
+    this.prescriptionChecked = const Value.absent(),
+    this.otherChecked = const Value.absent(),
+    this.otherSummary = const Value.absent(),
+    this.referralPassageType = const Value.absent(),
+    this.referralAmbulanceType = const Value.absent(),
+    this.referralHospitalIdx = const Value.absent(),
+    this.referralOtherHospital = const Value.absent(),
+    this.referralEscort = const Value.absent(),
+    this.intubationType = const Value.absent(),
+    this.oxygenType = const Value.absent(),
+    this.oxygenFlow = const Value.absent(),
+    this.medicalCertificateTypesJson = const Value.absent(),
+    this.prescriptionRowsJson = const Value.absent(),
+    this.followUpResultsJson = const Value.absent(),
+    this.otherHospitalIdx = const Value.absent(),
+    this.selectedMainDoctor = const Value.absent(),
+    this.selectedMainNurse = const Value.absent(),
+    this.nurseSignature = const Value.absent(),
+    this.selectedEMT = const Value.absent(),
+    this.emtSignature = const Value.absent(),
+    this.helperNamesText = const Value.absent(),
+    this.selectedHelpersJson = const Value.absent(),
+    this.specialNotesJson = const Value.absent(),
+    this.otherSpecialNote = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  });
+  TreatmentsCompanion.insert({
+    this.id = const Value.absent(),
+    required int visitId,
+    this.screeningChecked = const Value.absent(),
+    this.screeningMethodsJson = const Value.absent(),
+    this.otherScreeningMethod = const Value.absent(),
+    this.healthDataJson = const Value.absent(),
+    this.mainSymptom = const Value.absent(),
+    this.traumaSymptomsJson = const Value.absent(),
+    this.nonTraumaSymptomsJson = const Value.absent(),
+    this.symptomNote = const Value.absent(),
+    this.photoTypesJson = const Value.absent(),
+    this.bodyCheckHead = const Value.absent(),
+    this.bodyCheckChest = const Value.absent(),
+    this.bodyCheckAbdomen = const Value.absent(),
+    this.bodyCheckLimbs = const Value.absent(),
+    this.bodyCheckOther = const Value.absent(),
+    this.temperature = const Value.absent(),
+    this.pulse = const Value.absent(),
+    this.respiration = const Value.absent(),
+    this.bpSystolic = const Value.absent(),
+    this.bpDiastolic = const Value.absent(),
+    this.spo2 = const Value.absent(),
+    this.consciousClear = const Value.absent(),
+    this.evmE = const Value.absent(),
+    this.evmV = const Value.absent(),
+    this.evmM = const Value.absent(),
+    this.leftPupilScale = const Value.absent(),
+    this.leftPupilSize = const Value.absent(),
+    this.rightPupilScale = const Value.absent(),
+    this.rightPupilSize = const Value.absent(),
+    this.history = const Value.absent(),
+    this.allergy = const Value.absent(),
+    this.initialDiagnosis = const Value.absent(),
+    this.diagnosisCategory = const Value.absent(),
+    this.selectedICD10Main = const Value.absent(),
+    this.selectedICD10Sub1 = const Value.absent(),
+    this.selectedICD10Sub2 = const Value.absent(),
+    this.triageCategory = const Value.absent(),
+    this.onSiteTreatmentsJson = const Value.absent(),
+    this.ekgChecked = const Value.absent(),
+    this.ekgReading = const Value.absent(),
+    this.sugarChecked = const Value.absent(),
+    this.sugarReading = const Value.absent(),
+    this.suggestReferral = const Value.absent(),
+    this.intubationChecked = const Value.absent(),
+    this.cprChecked = const Value.absent(),
+    this.oxygenTherapyChecked = const Value.absent(),
+    this.medicalCertificateChecked = const Value.absent(),
+    this.prescriptionChecked = const Value.absent(),
+    this.otherChecked = const Value.absent(),
+    this.otherSummary = const Value.absent(),
+    this.referralPassageType = const Value.absent(),
+    this.referralAmbulanceType = const Value.absent(),
+    this.referralHospitalIdx = const Value.absent(),
+    this.referralOtherHospital = const Value.absent(),
+    this.referralEscort = const Value.absent(),
+    this.intubationType = const Value.absent(),
+    this.oxygenType = const Value.absent(),
+    this.oxygenFlow = const Value.absent(),
+    this.medicalCertificateTypesJson = const Value.absent(),
+    this.prescriptionRowsJson = const Value.absent(),
+    this.followUpResultsJson = const Value.absent(),
+    this.otherHospitalIdx = const Value.absent(),
+    this.selectedMainDoctor = const Value.absent(),
+    this.selectedMainNurse = const Value.absent(),
+    this.nurseSignature = const Value.absent(),
+    this.selectedEMT = const Value.absent(),
+    this.emtSignature = const Value.absent(),
+    this.helperNamesText = const Value.absent(),
+    this.selectedHelpersJson = const Value.absent(),
+    this.specialNotesJson = const Value.absent(),
+    this.otherSpecialNote = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  }) : visitId = Value(visitId);
+  static Insertable<Treatment> custom({
+    Expression<int>? id,
+    Expression<int>? visitId,
+    Expression<bool>? screeningChecked,
+    Expression<String>? screeningMethodsJson,
+    Expression<String>? otherScreeningMethod,
+    Expression<String>? healthDataJson,
+    Expression<int>? mainSymptom,
+    Expression<String>? traumaSymptomsJson,
+    Expression<String>? nonTraumaSymptomsJson,
+    Expression<String>? symptomNote,
+    Expression<String>? photoTypesJson,
+    Expression<String>? bodyCheckHead,
+    Expression<String>? bodyCheckChest,
+    Expression<String>? bodyCheckAbdomen,
+    Expression<String>? bodyCheckLimbs,
+    Expression<String>? bodyCheckOther,
+    Expression<String>? temperature,
+    Expression<String>? pulse,
+    Expression<String>? respiration,
+    Expression<String>? bpSystolic,
+    Expression<String>? bpDiastolic,
+    Expression<String>? spo2,
+    Expression<bool>? consciousClear,
+    Expression<String>? evmE,
+    Expression<String>? evmV,
+    Expression<String>? evmM,
+    Expression<int>? leftPupilScale,
+    Expression<String>? leftPupilSize,
+    Expression<int>? rightPupilScale,
+    Expression<String>? rightPupilSize,
+    Expression<int>? history,
+    Expression<int>? allergy,
+    Expression<String>? initialDiagnosis,
+    Expression<int>? diagnosisCategory,
+    Expression<String>? selectedICD10Main,
+    Expression<String>? selectedICD10Sub1,
+    Expression<String>? selectedICD10Sub2,
+    Expression<int>? triageCategory,
+    Expression<String>? onSiteTreatmentsJson,
+    Expression<bool>? ekgChecked,
+    Expression<String>? ekgReading,
+    Expression<bool>? sugarChecked,
+    Expression<String>? sugarReading,
+    Expression<bool>? suggestReferral,
+    Expression<bool>? intubationChecked,
+    Expression<bool>? cprChecked,
+    Expression<bool>? oxygenTherapyChecked,
+    Expression<bool>? medicalCertificateChecked,
+    Expression<bool>? prescriptionChecked,
+    Expression<bool>? otherChecked,
+    Expression<String>? otherSummary,
+    Expression<int>? referralPassageType,
+    Expression<int>? referralAmbulanceType,
+    Expression<int>? referralHospitalIdx,
+    Expression<String>? referralOtherHospital,
+    Expression<String>? referralEscort,
+    Expression<int>? intubationType,
+    Expression<int>? oxygenType,
+    Expression<String>? oxygenFlow,
+    Expression<String>? medicalCertificateTypesJson,
+    Expression<String>? prescriptionRowsJson,
+    Expression<String>? followUpResultsJson,
+    Expression<int>? otherHospitalIdx,
+    Expression<String>? selectedMainDoctor,
+    Expression<String>? selectedMainNurse,
+    Expression<String>? nurseSignature,
+    Expression<String>? selectedEMT,
+    Expression<String>? emtSignature,
+    Expression<String>? helperNamesText,
+    Expression<String>? selectedHelpersJson,
+    Expression<String>? specialNotesJson,
+    Expression<String>? otherSpecialNote,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (visitId != null) 'visit_id': visitId,
+      if (screeningChecked != null) 'screening_checked': screeningChecked,
+      if (screeningMethodsJson != null)
+        'screening_methods_json': screeningMethodsJson,
+      if (otherScreeningMethod != null)
+        'other_screening_method': otherScreeningMethod,
+      if (healthDataJson != null) 'health_data_json': healthDataJson,
+      if (mainSymptom != null) 'main_symptom': mainSymptom,
+      if (traumaSymptomsJson != null)
+        'trauma_symptoms_json': traumaSymptomsJson,
+      if (nonTraumaSymptomsJson != null)
+        'non_trauma_symptoms_json': nonTraumaSymptomsJson,
+      if (symptomNote != null) 'symptom_note': symptomNote,
+      if (photoTypesJson != null) 'photo_types_json': photoTypesJson,
+      if (bodyCheckHead != null) 'body_check_head': bodyCheckHead,
+      if (bodyCheckChest != null) 'body_check_chest': bodyCheckChest,
+      if (bodyCheckAbdomen != null) 'body_check_abdomen': bodyCheckAbdomen,
+      if (bodyCheckLimbs != null) 'body_check_limbs': bodyCheckLimbs,
+      if (bodyCheckOther != null) 'body_check_other': bodyCheckOther,
+      if (temperature != null) 'temperature': temperature,
+      if (pulse != null) 'pulse': pulse,
+      if (respiration != null) 'respiration': respiration,
+      if (bpSystolic != null) 'bp_systolic': bpSystolic,
+      if (bpDiastolic != null) 'bp_diastolic': bpDiastolic,
+      if (spo2 != null) 'spo2': spo2,
+      if (consciousClear != null) 'conscious_clear': consciousClear,
+      if (evmE != null) 'evm_e': evmE,
+      if (evmV != null) 'evm_v': evmV,
+      if (evmM != null) 'evm_m': evmM,
+      if (leftPupilScale != null) 'left_pupil_scale': leftPupilScale,
+      if (leftPupilSize != null) 'left_pupil_size': leftPupilSize,
+      if (rightPupilScale != null) 'right_pupil_scale': rightPupilScale,
+      if (rightPupilSize != null) 'right_pupil_size': rightPupilSize,
+      if (history != null) 'history': history,
+      if (allergy != null) 'allergy': allergy,
+      if (initialDiagnosis != null) 'initial_diagnosis': initialDiagnosis,
+      if (diagnosisCategory != null) 'diagnosis_category': diagnosisCategory,
+      if (selectedICD10Main != null) 'selected_i_c_d10_main': selectedICD10Main,
+      if (selectedICD10Sub1 != null) 'selected_i_c_d10_sub1': selectedICD10Sub1,
+      if (selectedICD10Sub2 != null) 'selected_i_c_d10_sub2': selectedICD10Sub2,
+      if (triageCategory != null) 'triage_category': triageCategory,
+      if (onSiteTreatmentsJson != null)
+        'on_site_treatments_json': onSiteTreatmentsJson,
+      if (ekgChecked != null) 'ekg_checked': ekgChecked,
+      if (ekgReading != null) 'ekg_reading': ekgReading,
+      if (sugarChecked != null) 'sugar_checked': sugarChecked,
+      if (sugarReading != null) 'sugar_reading': sugarReading,
+      if (suggestReferral != null) 'suggest_referral': suggestReferral,
+      if (intubationChecked != null) 'intubation_checked': intubationChecked,
+      if (cprChecked != null) 'cpr_checked': cprChecked,
+      if (oxygenTherapyChecked != null)
+        'oxygen_therapy_checked': oxygenTherapyChecked,
+      if (medicalCertificateChecked != null)
+        'medical_certificate_checked': medicalCertificateChecked,
+      if (prescriptionChecked != null)
+        'prescription_checked': prescriptionChecked,
+      if (otherChecked != null) 'other_checked': otherChecked,
+      if (otherSummary != null) 'other_summary': otherSummary,
+      if (referralPassageType != null)
+        'referral_passage_type': referralPassageType,
+      if (referralAmbulanceType != null)
+        'referral_ambulance_type': referralAmbulanceType,
+      if (referralHospitalIdx != null)
+        'referral_hospital_idx': referralHospitalIdx,
+      if (referralOtherHospital != null)
+        'referral_other_hospital': referralOtherHospital,
+      if (referralEscort != null) 'referral_escort': referralEscort,
+      if (intubationType != null) 'intubation_type': intubationType,
+      if (oxygenType != null) 'oxygen_type': oxygenType,
+      if (oxygenFlow != null) 'oxygen_flow': oxygenFlow,
+      if (medicalCertificateTypesJson != null)
+        'medical_certificate_types_json': medicalCertificateTypesJson,
+      if (prescriptionRowsJson != null)
+        'prescription_rows_json': prescriptionRowsJson,
+      if (followUpResultsJson != null)
+        'follow_up_results_json': followUpResultsJson,
+      if (otherHospitalIdx != null) 'other_hospital_idx': otherHospitalIdx,
+      if (selectedMainDoctor != null)
+        'selected_main_doctor': selectedMainDoctor,
+      if (selectedMainNurse != null) 'selected_main_nurse': selectedMainNurse,
+      if (nurseSignature != null) 'nurse_signature': nurseSignature,
+      if (selectedEMT != null) 'selected_e_m_t': selectedEMT,
+      if (emtSignature != null) 'emt_signature': emtSignature,
+      if (helperNamesText != null) 'helper_names_text': helperNamesText,
+      if (selectedHelpersJson != null)
+        'selected_helpers_json': selectedHelpersJson,
+      if (specialNotesJson != null) 'special_notes_json': specialNotesJson,
+      if (otherSpecialNote != null) 'other_special_note': otherSpecialNote,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+    });
+  }
+
+  TreatmentsCompanion copyWith({
+    Value<int>? id,
+    Value<int>? visitId,
+    Value<bool>? screeningChecked,
+    Value<String?>? screeningMethodsJson,
+    Value<String?>? otherScreeningMethod,
+    Value<String?>? healthDataJson,
+    Value<int?>? mainSymptom,
+    Value<String?>? traumaSymptomsJson,
+    Value<String?>? nonTraumaSymptomsJson,
+    Value<String?>? symptomNote,
+    Value<String?>? photoTypesJson,
+    Value<String?>? bodyCheckHead,
+    Value<String?>? bodyCheckChest,
+    Value<String?>? bodyCheckAbdomen,
+    Value<String?>? bodyCheckLimbs,
+    Value<String?>? bodyCheckOther,
+    Value<String?>? temperature,
+    Value<String?>? pulse,
+    Value<String?>? respiration,
+    Value<String?>? bpSystolic,
+    Value<String?>? bpDiastolic,
+    Value<String?>? spo2,
+    Value<bool>? consciousClear,
+    Value<String?>? evmE,
+    Value<String?>? evmV,
+    Value<String?>? evmM,
+    Value<int?>? leftPupilScale,
+    Value<String?>? leftPupilSize,
+    Value<int?>? rightPupilScale,
+    Value<String?>? rightPupilSize,
+    Value<int?>? history,
+    Value<int?>? allergy,
+    Value<String?>? initialDiagnosis,
+    Value<int?>? diagnosisCategory,
+    Value<String?>? selectedICD10Main,
+    Value<String?>? selectedICD10Sub1,
+    Value<String?>? selectedICD10Sub2,
+    Value<int?>? triageCategory,
+    Value<String?>? onSiteTreatmentsJson,
+    Value<bool>? ekgChecked,
+    Value<String?>? ekgReading,
+    Value<bool>? sugarChecked,
+    Value<String?>? sugarReading,
+    Value<bool>? suggestReferral,
+    Value<bool>? intubationChecked,
+    Value<bool>? cprChecked,
+    Value<bool>? oxygenTherapyChecked,
+    Value<bool>? medicalCertificateChecked,
+    Value<bool>? prescriptionChecked,
+    Value<bool>? otherChecked,
+    Value<String?>? otherSummary,
+    Value<int?>? referralPassageType,
+    Value<int?>? referralAmbulanceType,
+    Value<int?>? referralHospitalIdx,
+    Value<String?>? referralOtherHospital,
+    Value<String?>? referralEscort,
+    Value<int?>? intubationType,
+    Value<int?>? oxygenType,
+    Value<String?>? oxygenFlow,
+    Value<String?>? medicalCertificateTypesJson,
+    Value<String?>? prescriptionRowsJson,
+    Value<String?>? followUpResultsJson,
+    Value<int?>? otherHospitalIdx,
+    Value<String?>? selectedMainDoctor,
+    Value<String?>? selectedMainNurse,
+    Value<String?>? nurseSignature,
+    Value<String?>? selectedEMT,
+    Value<String?>? emtSignature,
+    Value<String?>? helperNamesText,
+    Value<String?>? selectedHelpersJson,
+    Value<String?>? specialNotesJson,
+    Value<String?>? otherSpecialNote,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+  }) {
+    return TreatmentsCompanion(
+      id: id ?? this.id,
+      visitId: visitId ?? this.visitId,
+      screeningChecked: screeningChecked ?? this.screeningChecked,
+      screeningMethodsJson: screeningMethodsJson ?? this.screeningMethodsJson,
+      otherScreeningMethod: otherScreeningMethod ?? this.otherScreeningMethod,
+      healthDataJson: healthDataJson ?? this.healthDataJson,
+      mainSymptom: mainSymptom ?? this.mainSymptom,
+      traumaSymptomsJson: traumaSymptomsJson ?? this.traumaSymptomsJson,
+      nonTraumaSymptomsJson:
+          nonTraumaSymptomsJson ?? this.nonTraumaSymptomsJson,
+      symptomNote: symptomNote ?? this.symptomNote,
+      photoTypesJson: photoTypesJson ?? this.photoTypesJson,
+      bodyCheckHead: bodyCheckHead ?? this.bodyCheckHead,
+      bodyCheckChest: bodyCheckChest ?? this.bodyCheckChest,
+      bodyCheckAbdomen: bodyCheckAbdomen ?? this.bodyCheckAbdomen,
+      bodyCheckLimbs: bodyCheckLimbs ?? this.bodyCheckLimbs,
+      bodyCheckOther: bodyCheckOther ?? this.bodyCheckOther,
+      temperature: temperature ?? this.temperature,
+      pulse: pulse ?? this.pulse,
+      respiration: respiration ?? this.respiration,
+      bpSystolic: bpSystolic ?? this.bpSystolic,
+      bpDiastolic: bpDiastolic ?? this.bpDiastolic,
+      spo2: spo2 ?? this.spo2,
+      consciousClear: consciousClear ?? this.consciousClear,
+      evmE: evmE ?? this.evmE,
+      evmV: evmV ?? this.evmV,
+      evmM: evmM ?? this.evmM,
+      leftPupilScale: leftPupilScale ?? this.leftPupilScale,
+      leftPupilSize: leftPupilSize ?? this.leftPupilSize,
+      rightPupilScale: rightPupilScale ?? this.rightPupilScale,
+      rightPupilSize: rightPupilSize ?? this.rightPupilSize,
+      history: history ?? this.history,
+      allergy: allergy ?? this.allergy,
+      initialDiagnosis: initialDiagnosis ?? this.initialDiagnosis,
+      diagnosisCategory: diagnosisCategory ?? this.diagnosisCategory,
+      selectedICD10Main: selectedICD10Main ?? this.selectedICD10Main,
+      selectedICD10Sub1: selectedICD10Sub1 ?? this.selectedICD10Sub1,
+      selectedICD10Sub2: selectedICD10Sub2 ?? this.selectedICD10Sub2,
+      triageCategory: triageCategory ?? this.triageCategory,
+      onSiteTreatmentsJson: onSiteTreatmentsJson ?? this.onSiteTreatmentsJson,
+      ekgChecked: ekgChecked ?? this.ekgChecked,
+      ekgReading: ekgReading ?? this.ekgReading,
+      sugarChecked: sugarChecked ?? this.sugarChecked,
+      sugarReading: sugarReading ?? this.sugarReading,
+      suggestReferral: suggestReferral ?? this.suggestReferral,
+      intubationChecked: intubationChecked ?? this.intubationChecked,
+      cprChecked: cprChecked ?? this.cprChecked,
+      oxygenTherapyChecked: oxygenTherapyChecked ?? this.oxygenTherapyChecked,
+      medicalCertificateChecked:
+          medicalCertificateChecked ?? this.medicalCertificateChecked,
+      prescriptionChecked: prescriptionChecked ?? this.prescriptionChecked,
+      otherChecked: otherChecked ?? this.otherChecked,
+      otherSummary: otherSummary ?? this.otherSummary,
+      referralPassageType: referralPassageType ?? this.referralPassageType,
+      referralAmbulanceType:
+          referralAmbulanceType ?? this.referralAmbulanceType,
+      referralHospitalIdx: referralHospitalIdx ?? this.referralHospitalIdx,
+      referralOtherHospital:
+          referralOtherHospital ?? this.referralOtherHospital,
+      referralEscort: referralEscort ?? this.referralEscort,
+      intubationType: intubationType ?? this.intubationType,
+      oxygenType: oxygenType ?? this.oxygenType,
+      oxygenFlow: oxygenFlow ?? this.oxygenFlow,
+      medicalCertificateTypesJson:
+          medicalCertificateTypesJson ?? this.medicalCertificateTypesJson,
+      prescriptionRowsJson: prescriptionRowsJson ?? this.prescriptionRowsJson,
+      followUpResultsJson: followUpResultsJson ?? this.followUpResultsJson,
+      otherHospitalIdx: otherHospitalIdx ?? this.otherHospitalIdx,
+      selectedMainDoctor: selectedMainDoctor ?? this.selectedMainDoctor,
+      selectedMainNurse: selectedMainNurse ?? this.selectedMainNurse,
+      nurseSignature: nurseSignature ?? this.nurseSignature,
+      selectedEMT: selectedEMT ?? this.selectedEMT,
+      emtSignature: emtSignature ?? this.emtSignature,
+      helperNamesText: helperNamesText ?? this.helperNamesText,
+      selectedHelpersJson: selectedHelpersJson ?? this.selectedHelpersJson,
+      specialNotesJson: specialNotesJson ?? this.specialNotesJson,
+      otherSpecialNote: otherSpecialNote ?? this.otherSpecialNote,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (visitId.present) {
+      map['visit_id'] = Variable<int>(visitId.value);
+    }
+    if (screeningChecked.present) {
+      map['screening_checked'] = Variable<bool>(screeningChecked.value);
+    }
+    if (screeningMethodsJson.present) {
+      map['screening_methods_json'] = Variable<String>(
+        screeningMethodsJson.value,
+      );
+    }
+    if (otherScreeningMethod.present) {
+      map['other_screening_method'] = Variable<String>(
+        otherScreeningMethod.value,
+      );
+    }
+    if (healthDataJson.present) {
+      map['health_data_json'] = Variable<String>(healthDataJson.value);
+    }
+    if (mainSymptom.present) {
+      map['main_symptom'] = Variable<int>(mainSymptom.value);
+    }
+    if (traumaSymptomsJson.present) {
+      map['trauma_symptoms_json'] = Variable<String>(traumaSymptomsJson.value);
+    }
+    if (nonTraumaSymptomsJson.present) {
+      map['non_trauma_symptoms_json'] = Variable<String>(
+        nonTraumaSymptomsJson.value,
+      );
+    }
+    if (symptomNote.present) {
+      map['symptom_note'] = Variable<String>(symptomNote.value);
+    }
+    if (photoTypesJson.present) {
+      map['photo_types_json'] = Variable<String>(photoTypesJson.value);
+    }
+    if (bodyCheckHead.present) {
+      map['body_check_head'] = Variable<String>(bodyCheckHead.value);
+    }
+    if (bodyCheckChest.present) {
+      map['body_check_chest'] = Variable<String>(bodyCheckChest.value);
+    }
+    if (bodyCheckAbdomen.present) {
+      map['body_check_abdomen'] = Variable<String>(bodyCheckAbdomen.value);
+    }
+    if (bodyCheckLimbs.present) {
+      map['body_check_limbs'] = Variable<String>(bodyCheckLimbs.value);
+    }
+    if (bodyCheckOther.present) {
+      map['body_check_other'] = Variable<String>(bodyCheckOther.value);
+    }
+    if (temperature.present) {
+      map['temperature'] = Variable<String>(temperature.value);
+    }
+    if (pulse.present) {
+      map['pulse'] = Variable<String>(pulse.value);
+    }
+    if (respiration.present) {
+      map['respiration'] = Variable<String>(respiration.value);
+    }
+    if (bpSystolic.present) {
+      map['bp_systolic'] = Variable<String>(bpSystolic.value);
+    }
+    if (bpDiastolic.present) {
+      map['bp_diastolic'] = Variable<String>(bpDiastolic.value);
+    }
+    if (spo2.present) {
+      map['spo2'] = Variable<String>(spo2.value);
+    }
+    if (consciousClear.present) {
+      map['conscious_clear'] = Variable<bool>(consciousClear.value);
+    }
+    if (evmE.present) {
+      map['evm_e'] = Variable<String>(evmE.value);
+    }
+    if (evmV.present) {
+      map['evm_v'] = Variable<String>(evmV.value);
+    }
+    if (evmM.present) {
+      map['evm_m'] = Variable<String>(evmM.value);
+    }
+    if (leftPupilScale.present) {
+      map['left_pupil_scale'] = Variable<int>(leftPupilScale.value);
+    }
+    if (leftPupilSize.present) {
+      map['left_pupil_size'] = Variable<String>(leftPupilSize.value);
+    }
+    if (rightPupilScale.present) {
+      map['right_pupil_scale'] = Variable<int>(rightPupilScale.value);
+    }
+    if (rightPupilSize.present) {
+      map['right_pupil_size'] = Variable<String>(rightPupilSize.value);
+    }
+    if (history.present) {
+      map['history'] = Variable<int>(history.value);
+    }
+    if (allergy.present) {
+      map['allergy'] = Variable<int>(allergy.value);
+    }
+    if (initialDiagnosis.present) {
+      map['initial_diagnosis'] = Variable<String>(initialDiagnosis.value);
+    }
+    if (diagnosisCategory.present) {
+      map['diagnosis_category'] = Variable<int>(diagnosisCategory.value);
+    }
+    if (selectedICD10Main.present) {
+      map['selected_i_c_d10_main'] = Variable<String>(selectedICD10Main.value);
+    }
+    if (selectedICD10Sub1.present) {
+      map['selected_i_c_d10_sub1'] = Variable<String>(selectedICD10Sub1.value);
+    }
+    if (selectedICD10Sub2.present) {
+      map['selected_i_c_d10_sub2'] = Variable<String>(selectedICD10Sub2.value);
+    }
+    if (triageCategory.present) {
+      map['triage_category'] = Variable<int>(triageCategory.value);
+    }
+    if (onSiteTreatmentsJson.present) {
+      map['on_site_treatments_json'] = Variable<String>(
+        onSiteTreatmentsJson.value,
+      );
+    }
+    if (ekgChecked.present) {
+      map['ekg_checked'] = Variable<bool>(ekgChecked.value);
+    }
+    if (ekgReading.present) {
+      map['ekg_reading'] = Variable<String>(ekgReading.value);
+    }
+    if (sugarChecked.present) {
+      map['sugar_checked'] = Variable<bool>(sugarChecked.value);
+    }
+    if (sugarReading.present) {
+      map['sugar_reading'] = Variable<String>(sugarReading.value);
+    }
+    if (suggestReferral.present) {
+      map['suggest_referral'] = Variable<bool>(suggestReferral.value);
+    }
+    if (intubationChecked.present) {
+      map['intubation_checked'] = Variable<bool>(intubationChecked.value);
+    }
+    if (cprChecked.present) {
+      map['cpr_checked'] = Variable<bool>(cprChecked.value);
+    }
+    if (oxygenTherapyChecked.present) {
+      map['oxygen_therapy_checked'] = Variable<bool>(
+        oxygenTherapyChecked.value,
+      );
+    }
+    if (medicalCertificateChecked.present) {
+      map['medical_certificate_checked'] = Variable<bool>(
+        medicalCertificateChecked.value,
+      );
+    }
+    if (prescriptionChecked.present) {
+      map['prescription_checked'] = Variable<bool>(prescriptionChecked.value);
+    }
+    if (otherChecked.present) {
+      map['other_checked'] = Variable<bool>(otherChecked.value);
+    }
+    if (otherSummary.present) {
+      map['other_summary'] = Variable<String>(otherSummary.value);
+    }
+    if (referralPassageType.present) {
+      map['referral_passage_type'] = Variable<int>(referralPassageType.value);
+    }
+    if (referralAmbulanceType.present) {
+      map['referral_ambulance_type'] = Variable<int>(
+        referralAmbulanceType.value,
+      );
+    }
+    if (referralHospitalIdx.present) {
+      map['referral_hospital_idx'] = Variable<int>(referralHospitalIdx.value);
+    }
+    if (referralOtherHospital.present) {
+      map['referral_other_hospital'] = Variable<String>(
+        referralOtherHospital.value,
+      );
+    }
+    if (referralEscort.present) {
+      map['referral_escort'] = Variable<String>(referralEscort.value);
+    }
+    if (intubationType.present) {
+      map['intubation_type'] = Variable<int>(intubationType.value);
+    }
+    if (oxygenType.present) {
+      map['oxygen_type'] = Variable<int>(oxygenType.value);
+    }
+    if (oxygenFlow.present) {
+      map['oxygen_flow'] = Variable<String>(oxygenFlow.value);
+    }
+    if (medicalCertificateTypesJson.present) {
+      map['medical_certificate_types_json'] = Variable<String>(
+        medicalCertificateTypesJson.value,
+      );
+    }
+    if (prescriptionRowsJson.present) {
+      map['prescription_rows_json'] = Variable<String>(
+        prescriptionRowsJson.value,
+      );
+    }
+    if (followUpResultsJson.present) {
+      map['follow_up_results_json'] = Variable<String>(
+        followUpResultsJson.value,
+      );
+    }
+    if (otherHospitalIdx.present) {
+      map['other_hospital_idx'] = Variable<int>(otherHospitalIdx.value);
+    }
+    if (selectedMainDoctor.present) {
+      map['selected_main_doctor'] = Variable<String>(selectedMainDoctor.value);
+    }
+    if (selectedMainNurse.present) {
+      map['selected_main_nurse'] = Variable<String>(selectedMainNurse.value);
+    }
+    if (nurseSignature.present) {
+      map['nurse_signature'] = Variable<String>(nurseSignature.value);
+    }
+    if (selectedEMT.present) {
+      map['selected_e_m_t'] = Variable<String>(selectedEMT.value);
+    }
+    if (emtSignature.present) {
+      map['emt_signature'] = Variable<String>(emtSignature.value);
+    }
+    if (helperNamesText.present) {
+      map['helper_names_text'] = Variable<String>(helperNamesText.value);
+    }
+    if (selectedHelpersJson.present) {
+      map['selected_helpers_json'] = Variable<String>(
+        selectedHelpersJson.value,
+      );
+    }
+    if (specialNotesJson.present) {
+      map['special_notes_json'] = Variable<String>(specialNotesJson.value);
+    }
+    if (otherSpecialNote.present) {
+      map['other_special_note'] = Variable<String>(otherSpecialNote.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('TreatmentsCompanion(')
+          ..write('id: $id, ')
+          ..write('visitId: $visitId, ')
+          ..write('screeningChecked: $screeningChecked, ')
+          ..write('screeningMethodsJson: $screeningMethodsJson, ')
+          ..write('otherScreeningMethod: $otherScreeningMethod, ')
+          ..write('healthDataJson: $healthDataJson, ')
+          ..write('mainSymptom: $mainSymptom, ')
+          ..write('traumaSymptomsJson: $traumaSymptomsJson, ')
+          ..write('nonTraumaSymptomsJson: $nonTraumaSymptomsJson, ')
+          ..write('symptomNote: $symptomNote, ')
+          ..write('photoTypesJson: $photoTypesJson, ')
+          ..write('bodyCheckHead: $bodyCheckHead, ')
+          ..write('bodyCheckChest: $bodyCheckChest, ')
+          ..write('bodyCheckAbdomen: $bodyCheckAbdomen, ')
+          ..write('bodyCheckLimbs: $bodyCheckLimbs, ')
+          ..write('bodyCheckOther: $bodyCheckOther, ')
+          ..write('temperature: $temperature, ')
+          ..write('pulse: $pulse, ')
+          ..write('respiration: $respiration, ')
+          ..write('bpSystolic: $bpSystolic, ')
+          ..write('bpDiastolic: $bpDiastolic, ')
+          ..write('spo2: $spo2, ')
+          ..write('consciousClear: $consciousClear, ')
+          ..write('evmE: $evmE, ')
+          ..write('evmV: $evmV, ')
+          ..write('evmM: $evmM, ')
+          ..write('leftPupilScale: $leftPupilScale, ')
+          ..write('leftPupilSize: $leftPupilSize, ')
+          ..write('rightPupilScale: $rightPupilScale, ')
+          ..write('rightPupilSize: $rightPupilSize, ')
+          ..write('history: $history, ')
+          ..write('allergy: $allergy, ')
+          ..write('initialDiagnosis: $initialDiagnosis, ')
+          ..write('diagnosisCategory: $diagnosisCategory, ')
+          ..write('selectedICD10Main: $selectedICD10Main, ')
+          ..write('selectedICD10Sub1: $selectedICD10Sub1, ')
+          ..write('selectedICD10Sub2: $selectedICD10Sub2, ')
+          ..write('triageCategory: $triageCategory, ')
+          ..write('onSiteTreatmentsJson: $onSiteTreatmentsJson, ')
+          ..write('ekgChecked: $ekgChecked, ')
+          ..write('ekgReading: $ekgReading, ')
+          ..write('sugarChecked: $sugarChecked, ')
+          ..write('sugarReading: $sugarReading, ')
+          ..write('suggestReferral: $suggestReferral, ')
+          ..write('intubationChecked: $intubationChecked, ')
+          ..write('cprChecked: $cprChecked, ')
+          ..write('oxygenTherapyChecked: $oxygenTherapyChecked, ')
+          ..write('medicalCertificateChecked: $medicalCertificateChecked, ')
+          ..write('prescriptionChecked: $prescriptionChecked, ')
+          ..write('otherChecked: $otherChecked, ')
+          ..write('otherSummary: $otherSummary, ')
+          ..write('referralPassageType: $referralPassageType, ')
+          ..write('referralAmbulanceType: $referralAmbulanceType, ')
+          ..write('referralHospitalIdx: $referralHospitalIdx, ')
+          ..write('referralOtherHospital: $referralOtherHospital, ')
+          ..write('referralEscort: $referralEscort, ')
+          ..write('intubationType: $intubationType, ')
+          ..write('oxygenType: $oxygenType, ')
+          ..write('oxygenFlow: $oxygenFlow, ')
+          ..write('medicalCertificateTypesJson: $medicalCertificateTypesJson, ')
+          ..write('prescriptionRowsJson: $prescriptionRowsJson, ')
+          ..write('followUpResultsJson: $followUpResultsJson, ')
+          ..write('otherHospitalIdx: $otherHospitalIdx, ')
+          ..write('selectedMainDoctor: $selectedMainDoctor, ')
+          ..write('selectedMainNurse: $selectedMainNurse, ')
+          ..write('nurseSignature: $nurseSignature, ')
+          ..write('selectedEMT: $selectedEMT, ')
+          ..write('emtSignature: $emtSignature, ')
+          ..write('helperNamesText: $helperNamesText, ')
+          ..write('selectedHelpersJson: $selectedHelpersJson, ')
+          ..write('specialNotesJson: $specialNotesJson, ')
+          ..write('otherSpecialNote: $otherSpecialNote, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -3788,6 +7984,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     this,
   );
   late final $FlightLogsTable flightLogs = $FlightLogsTable(this);
+  late final $TreatmentsTable treatments = $TreatmentsTable(this);
   late final VisitsDao visitsDao = VisitsDao(this as AppDatabase);
   late final PatientProfilesDao patientProfilesDao = PatientProfilesDao(
     this as AppDatabase,
@@ -3796,6 +7993,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     this as AppDatabase,
   );
   late final FlightLogsDao flightLogsDao = FlightLogsDao(this as AppDatabase);
+  late final TreatmentsDao treatmentsDao = TreatmentsDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -3805,6 +8003,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     patientProfiles,
     accidentRecords,
     flightLogs,
+    treatments,
   ];
 }
 
@@ -5502,6 +9701,1636 @@ typedef $$FlightLogsTableProcessedTableManager =
       FlightLog,
       PrefetchHooks Function()
     >;
+typedef $$TreatmentsTableCreateCompanionBuilder =
+    TreatmentsCompanion Function({
+      Value<int> id,
+      required int visitId,
+      Value<bool> screeningChecked,
+      Value<String?> screeningMethodsJson,
+      Value<String?> otherScreeningMethod,
+      Value<String?> healthDataJson,
+      Value<int?> mainSymptom,
+      Value<String?> traumaSymptomsJson,
+      Value<String?> nonTraumaSymptomsJson,
+      Value<String?> symptomNote,
+      Value<String?> photoTypesJson,
+      Value<String?> bodyCheckHead,
+      Value<String?> bodyCheckChest,
+      Value<String?> bodyCheckAbdomen,
+      Value<String?> bodyCheckLimbs,
+      Value<String?> bodyCheckOther,
+      Value<String?> temperature,
+      Value<String?> pulse,
+      Value<String?> respiration,
+      Value<String?> bpSystolic,
+      Value<String?> bpDiastolic,
+      Value<String?> spo2,
+      Value<bool> consciousClear,
+      Value<String?> evmE,
+      Value<String?> evmV,
+      Value<String?> evmM,
+      Value<int?> leftPupilScale,
+      Value<String?> leftPupilSize,
+      Value<int?> rightPupilScale,
+      Value<String?> rightPupilSize,
+      Value<int?> history,
+      Value<int?> allergy,
+      Value<String?> initialDiagnosis,
+      Value<int?> diagnosisCategory,
+      Value<String?> selectedICD10Main,
+      Value<String?> selectedICD10Sub1,
+      Value<String?> selectedICD10Sub2,
+      Value<int?> triageCategory,
+      Value<String?> onSiteTreatmentsJson,
+      Value<bool> ekgChecked,
+      Value<String?> ekgReading,
+      Value<bool> sugarChecked,
+      Value<String?> sugarReading,
+      Value<bool> suggestReferral,
+      Value<bool> intubationChecked,
+      Value<bool> cprChecked,
+      Value<bool> oxygenTherapyChecked,
+      Value<bool> medicalCertificateChecked,
+      Value<bool> prescriptionChecked,
+      Value<bool> otherChecked,
+      Value<String?> otherSummary,
+      Value<int?> referralPassageType,
+      Value<int?> referralAmbulanceType,
+      Value<int?> referralHospitalIdx,
+      Value<String?> referralOtherHospital,
+      Value<String?> referralEscort,
+      Value<int?> intubationType,
+      Value<int?> oxygenType,
+      Value<String?> oxygenFlow,
+      Value<String?> medicalCertificateTypesJson,
+      Value<String?> prescriptionRowsJson,
+      Value<String?> followUpResultsJson,
+      Value<int?> otherHospitalIdx,
+      Value<String?> selectedMainDoctor,
+      Value<String?> selectedMainNurse,
+      Value<String?> nurseSignature,
+      Value<String?> selectedEMT,
+      Value<String?> emtSignature,
+      Value<String?> helperNamesText,
+      Value<String?> selectedHelpersJson,
+      Value<String?> specialNotesJson,
+      Value<String?> otherSpecialNote,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+    });
+typedef $$TreatmentsTableUpdateCompanionBuilder =
+    TreatmentsCompanion Function({
+      Value<int> id,
+      Value<int> visitId,
+      Value<bool> screeningChecked,
+      Value<String?> screeningMethodsJson,
+      Value<String?> otherScreeningMethod,
+      Value<String?> healthDataJson,
+      Value<int?> mainSymptom,
+      Value<String?> traumaSymptomsJson,
+      Value<String?> nonTraumaSymptomsJson,
+      Value<String?> symptomNote,
+      Value<String?> photoTypesJson,
+      Value<String?> bodyCheckHead,
+      Value<String?> bodyCheckChest,
+      Value<String?> bodyCheckAbdomen,
+      Value<String?> bodyCheckLimbs,
+      Value<String?> bodyCheckOther,
+      Value<String?> temperature,
+      Value<String?> pulse,
+      Value<String?> respiration,
+      Value<String?> bpSystolic,
+      Value<String?> bpDiastolic,
+      Value<String?> spo2,
+      Value<bool> consciousClear,
+      Value<String?> evmE,
+      Value<String?> evmV,
+      Value<String?> evmM,
+      Value<int?> leftPupilScale,
+      Value<String?> leftPupilSize,
+      Value<int?> rightPupilScale,
+      Value<String?> rightPupilSize,
+      Value<int?> history,
+      Value<int?> allergy,
+      Value<String?> initialDiagnosis,
+      Value<int?> diagnosisCategory,
+      Value<String?> selectedICD10Main,
+      Value<String?> selectedICD10Sub1,
+      Value<String?> selectedICD10Sub2,
+      Value<int?> triageCategory,
+      Value<String?> onSiteTreatmentsJson,
+      Value<bool> ekgChecked,
+      Value<String?> ekgReading,
+      Value<bool> sugarChecked,
+      Value<String?> sugarReading,
+      Value<bool> suggestReferral,
+      Value<bool> intubationChecked,
+      Value<bool> cprChecked,
+      Value<bool> oxygenTherapyChecked,
+      Value<bool> medicalCertificateChecked,
+      Value<bool> prescriptionChecked,
+      Value<bool> otherChecked,
+      Value<String?> otherSummary,
+      Value<int?> referralPassageType,
+      Value<int?> referralAmbulanceType,
+      Value<int?> referralHospitalIdx,
+      Value<String?> referralOtherHospital,
+      Value<String?> referralEscort,
+      Value<int?> intubationType,
+      Value<int?> oxygenType,
+      Value<String?> oxygenFlow,
+      Value<String?> medicalCertificateTypesJson,
+      Value<String?> prescriptionRowsJson,
+      Value<String?> followUpResultsJson,
+      Value<int?> otherHospitalIdx,
+      Value<String?> selectedMainDoctor,
+      Value<String?> selectedMainNurse,
+      Value<String?> nurseSignature,
+      Value<String?> selectedEMT,
+      Value<String?> emtSignature,
+      Value<String?> helperNamesText,
+      Value<String?> selectedHelpersJson,
+      Value<String?> specialNotesJson,
+      Value<String?> otherSpecialNote,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+    });
+
+class $$TreatmentsTableFilterComposer
+    extends Composer<_$AppDatabase, $TreatmentsTable> {
+  $$TreatmentsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get visitId => $composableBuilder(
+    column: $table.visitId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get screeningChecked => $composableBuilder(
+    column: $table.screeningChecked,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get screeningMethodsJson => $composableBuilder(
+    column: $table.screeningMethodsJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get otherScreeningMethod => $composableBuilder(
+    column: $table.otherScreeningMethod,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get healthDataJson => $composableBuilder(
+    column: $table.healthDataJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get mainSymptom => $composableBuilder(
+    column: $table.mainSymptom,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get traumaSymptomsJson => $composableBuilder(
+    column: $table.traumaSymptomsJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get nonTraumaSymptomsJson => $composableBuilder(
+    column: $table.nonTraumaSymptomsJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get symptomNote => $composableBuilder(
+    column: $table.symptomNote,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get photoTypesJson => $composableBuilder(
+    column: $table.photoTypesJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get bodyCheckHead => $composableBuilder(
+    column: $table.bodyCheckHead,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get bodyCheckChest => $composableBuilder(
+    column: $table.bodyCheckChest,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get bodyCheckAbdomen => $composableBuilder(
+    column: $table.bodyCheckAbdomen,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get bodyCheckLimbs => $composableBuilder(
+    column: $table.bodyCheckLimbs,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get bodyCheckOther => $composableBuilder(
+    column: $table.bodyCheckOther,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get temperature => $composableBuilder(
+    column: $table.temperature,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get pulse => $composableBuilder(
+    column: $table.pulse,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get respiration => $composableBuilder(
+    column: $table.respiration,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get bpSystolic => $composableBuilder(
+    column: $table.bpSystolic,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get bpDiastolic => $composableBuilder(
+    column: $table.bpDiastolic,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get spo2 => $composableBuilder(
+    column: $table.spo2,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get consciousClear => $composableBuilder(
+    column: $table.consciousClear,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get evmE => $composableBuilder(
+    column: $table.evmE,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get evmV => $composableBuilder(
+    column: $table.evmV,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get evmM => $composableBuilder(
+    column: $table.evmM,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get leftPupilScale => $composableBuilder(
+    column: $table.leftPupilScale,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get leftPupilSize => $composableBuilder(
+    column: $table.leftPupilSize,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get rightPupilScale => $composableBuilder(
+    column: $table.rightPupilScale,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get rightPupilSize => $composableBuilder(
+    column: $table.rightPupilSize,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get history => $composableBuilder(
+    column: $table.history,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get allergy => $composableBuilder(
+    column: $table.allergy,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get initialDiagnosis => $composableBuilder(
+    column: $table.initialDiagnosis,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get diagnosisCategory => $composableBuilder(
+    column: $table.diagnosisCategory,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get selectedICD10Main => $composableBuilder(
+    column: $table.selectedICD10Main,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get selectedICD10Sub1 => $composableBuilder(
+    column: $table.selectedICD10Sub1,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get selectedICD10Sub2 => $composableBuilder(
+    column: $table.selectedICD10Sub2,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get triageCategory => $composableBuilder(
+    column: $table.triageCategory,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get onSiteTreatmentsJson => $composableBuilder(
+    column: $table.onSiteTreatmentsJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get ekgChecked => $composableBuilder(
+    column: $table.ekgChecked,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get ekgReading => $composableBuilder(
+    column: $table.ekgReading,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get sugarChecked => $composableBuilder(
+    column: $table.sugarChecked,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get sugarReading => $composableBuilder(
+    column: $table.sugarReading,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get suggestReferral => $composableBuilder(
+    column: $table.suggestReferral,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get intubationChecked => $composableBuilder(
+    column: $table.intubationChecked,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get cprChecked => $composableBuilder(
+    column: $table.cprChecked,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get oxygenTherapyChecked => $composableBuilder(
+    column: $table.oxygenTherapyChecked,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get medicalCertificateChecked => $composableBuilder(
+    column: $table.medicalCertificateChecked,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get prescriptionChecked => $composableBuilder(
+    column: $table.prescriptionChecked,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get otherChecked => $composableBuilder(
+    column: $table.otherChecked,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get otherSummary => $composableBuilder(
+    column: $table.otherSummary,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get referralPassageType => $composableBuilder(
+    column: $table.referralPassageType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get referralAmbulanceType => $composableBuilder(
+    column: $table.referralAmbulanceType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get referralHospitalIdx => $composableBuilder(
+    column: $table.referralHospitalIdx,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get referralOtherHospital => $composableBuilder(
+    column: $table.referralOtherHospital,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get referralEscort => $composableBuilder(
+    column: $table.referralEscort,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get intubationType => $composableBuilder(
+    column: $table.intubationType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get oxygenType => $composableBuilder(
+    column: $table.oxygenType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get oxygenFlow => $composableBuilder(
+    column: $table.oxygenFlow,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get medicalCertificateTypesJson => $composableBuilder(
+    column: $table.medicalCertificateTypesJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get prescriptionRowsJson => $composableBuilder(
+    column: $table.prescriptionRowsJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get followUpResultsJson => $composableBuilder(
+    column: $table.followUpResultsJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get otherHospitalIdx => $composableBuilder(
+    column: $table.otherHospitalIdx,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get selectedMainDoctor => $composableBuilder(
+    column: $table.selectedMainDoctor,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get selectedMainNurse => $composableBuilder(
+    column: $table.selectedMainNurse,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get nurseSignature => $composableBuilder(
+    column: $table.nurseSignature,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get selectedEMT => $composableBuilder(
+    column: $table.selectedEMT,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get emtSignature => $composableBuilder(
+    column: $table.emtSignature,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get helperNamesText => $composableBuilder(
+    column: $table.helperNamesText,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get selectedHelpersJson => $composableBuilder(
+    column: $table.selectedHelpersJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get specialNotesJson => $composableBuilder(
+    column: $table.specialNotesJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get otherSpecialNote => $composableBuilder(
+    column: $table.otherSpecialNote,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$TreatmentsTableOrderingComposer
+    extends Composer<_$AppDatabase, $TreatmentsTable> {
+  $$TreatmentsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get visitId => $composableBuilder(
+    column: $table.visitId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get screeningChecked => $composableBuilder(
+    column: $table.screeningChecked,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get screeningMethodsJson => $composableBuilder(
+    column: $table.screeningMethodsJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get otherScreeningMethod => $composableBuilder(
+    column: $table.otherScreeningMethod,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get healthDataJson => $composableBuilder(
+    column: $table.healthDataJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get mainSymptom => $composableBuilder(
+    column: $table.mainSymptom,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get traumaSymptomsJson => $composableBuilder(
+    column: $table.traumaSymptomsJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get nonTraumaSymptomsJson => $composableBuilder(
+    column: $table.nonTraumaSymptomsJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get symptomNote => $composableBuilder(
+    column: $table.symptomNote,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get photoTypesJson => $composableBuilder(
+    column: $table.photoTypesJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get bodyCheckHead => $composableBuilder(
+    column: $table.bodyCheckHead,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get bodyCheckChest => $composableBuilder(
+    column: $table.bodyCheckChest,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get bodyCheckAbdomen => $composableBuilder(
+    column: $table.bodyCheckAbdomen,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get bodyCheckLimbs => $composableBuilder(
+    column: $table.bodyCheckLimbs,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get bodyCheckOther => $composableBuilder(
+    column: $table.bodyCheckOther,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get temperature => $composableBuilder(
+    column: $table.temperature,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get pulse => $composableBuilder(
+    column: $table.pulse,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get respiration => $composableBuilder(
+    column: $table.respiration,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get bpSystolic => $composableBuilder(
+    column: $table.bpSystolic,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get bpDiastolic => $composableBuilder(
+    column: $table.bpDiastolic,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get spo2 => $composableBuilder(
+    column: $table.spo2,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get consciousClear => $composableBuilder(
+    column: $table.consciousClear,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get evmE => $composableBuilder(
+    column: $table.evmE,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get evmV => $composableBuilder(
+    column: $table.evmV,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get evmM => $composableBuilder(
+    column: $table.evmM,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get leftPupilScale => $composableBuilder(
+    column: $table.leftPupilScale,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get leftPupilSize => $composableBuilder(
+    column: $table.leftPupilSize,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get rightPupilScale => $composableBuilder(
+    column: $table.rightPupilScale,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get rightPupilSize => $composableBuilder(
+    column: $table.rightPupilSize,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get history => $composableBuilder(
+    column: $table.history,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get allergy => $composableBuilder(
+    column: $table.allergy,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get initialDiagnosis => $composableBuilder(
+    column: $table.initialDiagnosis,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get diagnosisCategory => $composableBuilder(
+    column: $table.diagnosisCategory,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get selectedICD10Main => $composableBuilder(
+    column: $table.selectedICD10Main,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get selectedICD10Sub1 => $composableBuilder(
+    column: $table.selectedICD10Sub1,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get selectedICD10Sub2 => $composableBuilder(
+    column: $table.selectedICD10Sub2,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get triageCategory => $composableBuilder(
+    column: $table.triageCategory,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get onSiteTreatmentsJson => $composableBuilder(
+    column: $table.onSiteTreatmentsJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get ekgChecked => $composableBuilder(
+    column: $table.ekgChecked,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get ekgReading => $composableBuilder(
+    column: $table.ekgReading,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get sugarChecked => $composableBuilder(
+    column: $table.sugarChecked,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get sugarReading => $composableBuilder(
+    column: $table.sugarReading,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get suggestReferral => $composableBuilder(
+    column: $table.suggestReferral,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get intubationChecked => $composableBuilder(
+    column: $table.intubationChecked,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get cprChecked => $composableBuilder(
+    column: $table.cprChecked,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get oxygenTherapyChecked => $composableBuilder(
+    column: $table.oxygenTherapyChecked,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get medicalCertificateChecked => $composableBuilder(
+    column: $table.medicalCertificateChecked,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get prescriptionChecked => $composableBuilder(
+    column: $table.prescriptionChecked,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get otherChecked => $composableBuilder(
+    column: $table.otherChecked,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get otherSummary => $composableBuilder(
+    column: $table.otherSummary,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get referralPassageType => $composableBuilder(
+    column: $table.referralPassageType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get referralAmbulanceType => $composableBuilder(
+    column: $table.referralAmbulanceType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get referralHospitalIdx => $composableBuilder(
+    column: $table.referralHospitalIdx,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get referralOtherHospital => $composableBuilder(
+    column: $table.referralOtherHospital,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get referralEscort => $composableBuilder(
+    column: $table.referralEscort,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get intubationType => $composableBuilder(
+    column: $table.intubationType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get oxygenType => $composableBuilder(
+    column: $table.oxygenType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get oxygenFlow => $composableBuilder(
+    column: $table.oxygenFlow,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get medicalCertificateTypesJson => $composableBuilder(
+    column: $table.medicalCertificateTypesJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get prescriptionRowsJson => $composableBuilder(
+    column: $table.prescriptionRowsJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get followUpResultsJson => $composableBuilder(
+    column: $table.followUpResultsJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get otherHospitalIdx => $composableBuilder(
+    column: $table.otherHospitalIdx,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get selectedMainDoctor => $composableBuilder(
+    column: $table.selectedMainDoctor,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get selectedMainNurse => $composableBuilder(
+    column: $table.selectedMainNurse,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get nurseSignature => $composableBuilder(
+    column: $table.nurseSignature,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get selectedEMT => $composableBuilder(
+    column: $table.selectedEMT,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get emtSignature => $composableBuilder(
+    column: $table.emtSignature,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get helperNamesText => $composableBuilder(
+    column: $table.helperNamesText,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get selectedHelpersJson => $composableBuilder(
+    column: $table.selectedHelpersJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get specialNotesJson => $composableBuilder(
+    column: $table.specialNotesJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get otherSpecialNote => $composableBuilder(
+    column: $table.otherSpecialNote,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$TreatmentsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $TreatmentsTable> {
+  $$TreatmentsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get visitId =>
+      $composableBuilder(column: $table.visitId, builder: (column) => column);
+
+  GeneratedColumn<bool> get screeningChecked => $composableBuilder(
+    column: $table.screeningChecked,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get screeningMethodsJson => $composableBuilder(
+    column: $table.screeningMethodsJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get otherScreeningMethod => $composableBuilder(
+    column: $table.otherScreeningMethod,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get healthDataJson => $composableBuilder(
+    column: $table.healthDataJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get mainSymptom => $composableBuilder(
+    column: $table.mainSymptom,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get traumaSymptomsJson => $composableBuilder(
+    column: $table.traumaSymptomsJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get nonTraumaSymptomsJson => $composableBuilder(
+    column: $table.nonTraumaSymptomsJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get symptomNote => $composableBuilder(
+    column: $table.symptomNote,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get photoTypesJson => $composableBuilder(
+    column: $table.photoTypesJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get bodyCheckHead => $composableBuilder(
+    column: $table.bodyCheckHead,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get bodyCheckChest => $composableBuilder(
+    column: $table.bodyCheckChest,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get bodyCheckAbdomen => $composableBuilder(
+    column: $table.bodyCheckAbdomen,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get bodyCheckLimbs => $composableBuilder(
+    column: $table.bodyCheckLimbs,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get bodyCheckOther => $composableBuilder(
+    column: $table.bodyCheckOther,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get temperature => $composableBuilder(
+    column: $table.temperature,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get pulse =>
+      $composableBuilder(column: $table.pulse, builder: (column) => column);
+
+  GeneratedColumn<String> get respiration => $composableBuilder(
+    column: $table.respiration,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get bpSystolic => $composableBuilder(
+    column: $table.bpSystolic,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get bpDiastolic => $composableBuilder(
+    column: $table.bpDiastolic,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get spo2 =>
+      $composableBuilder(column: $table.spo2, builder: (column) => column);
+
+  GeneratedColumn<bool> get consciousClear => $composableBuilder(
+    column: $table.consciousClear,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get evmE =>
+      $composableBuilder(column: $table.evmE, builder: (column) => column);
+
+  GeneratedColumn<String> get evmV =>
+      $composableBuilder(column: $table.evmV, builder: (column) => column);
+
+  GeneratedColumn<String> get evmM =>
+      $composableBuilder(column: $table.evmM, builder: (column) => column);
+
+  GeneratedColumn<int> get leftPupilScale => $composableBuilder(
+    column: $table.leftPupilScale,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get leftPupilSize => $composableBuilder(
+    column: $table.leftPupilSize,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get rightPupilScale => $composableBuilder(
+    column: $table.rightPupilScale,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get rightPupilSize => $composableBuilder(
+    column: $table.rightPupilSize,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get history =>
+      $composableBuilder(column: $table.history, builder: (column) => column);
+
+  GeneratedColumn<int> get allergy =>
+      $composableBuilder(column: $table.allergy, builder: (column) => column);
+
+  GeneratedColumn<String> get initialDiagnosis => $composableBuilder(
+    column: $table.initialDiagnosis,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get diagnosisCategory => $composableBuilder(
+    column: $table.diagnosisCategory,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get selectedICD10Main => $composableBuilder(
+    column: $table.selectedICD10Main,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get selectedICD10Sub1 => $composableBuilder(
+    column: $table.selectedICD10Sub1,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get selectedICD10Sub2 => $composableBuilder(
+    column: $table.selectedICD10Sub2,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get triageCategory => $composableBuilder(
+    column: $table.triageCategory,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get onSiteTreatmentsJson => $composableBuilder(
+    column: $table.onSiteTreatmentsJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get ekgChecked => $composableBuilder(
+    column: $table.ekgChecked,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get ekgReading => $composableBuilder(
+    column: $table.ekgReading,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get sugarChecked => $composableBuilder(
+    column: $table.sugarChecked,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get sugarReading => $composableBuilder(
+    column: $table.sugarReading,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get suggestReferral => $composableBuilder(
+    column: $table.suggestReferral,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get intubationChecked => $composableBuilder(
+    column: $table.intubationChecked,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get cprChecked => $composableBuilder(
+    column: $table.cprChecked,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get oxygenTherapyChecked => $composableBuilder(
+    column: $table.oxygenTherapyChecked,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get medicalCertificateChecked => $composableBuilder(
+    column: $table.medicalCertificateChecked,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get prescriptionChecked => $composableBuilder(
+    column: $table.prescriptionChecked,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get otherChecked => $composableBuilder(
+    column: $table.otherChecked,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get otherSummary => $composableBuilder(
+    column: $table.otherSummary,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get referralPassageType => $composableBuilder(
+    column: $table.referralPassageType,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get referralAmbulanceType => $composableBuilder(
+    column: $table.referralAmbulanceType,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get referralHospitalIdx => $composableBuilder(
+    column: $table.referralHospitalIdx,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get referralOtherHospital => $composableBuilder(
+    column: $table.referralOtherHospital,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get referralEscort => $composableBuilder(
+    column: $table.referralEscort,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get intubationType => $composableBuilder(
+    column: $table.intubationType,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get oxygenType => $composableBuilder(
+    column: $table.oxygenType,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get oxygenFlow => $composableBuilder(
+    column: $table.oxygenFlow,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get medicalCertificateTypesJson => $composableBuilder(
+    column: $table.medicalCertificateTypesJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get prescriptionRowsJson => $composableBuilder(
+    column: $table.prescriptionRowsJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get followUpResultsJson => $composableBuilder(
+    column: $table.followUpResultsJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get otherHospitalIdx => $composableBuilder(
+    column: $table.otherHospitalIdx,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get selectedMainDoctor => $composableBuilder(
+    column: $table.selectedMainDoctor,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get selectedMainNurse => $composableBuilder(
+    column: $table.selectedMainNurse,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get nurseSignature => $composableBuilder(
+    column: $table.nurseSignature,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get selectedEMT => $composableBuilder(
+    column: $table.selectedEMT,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get emtSignature => $composableBuilder(
+    column: $table.emtSignature,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get helperNamesText => $composableBuilder(
+    column: $table.helperNamesText,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get selectedHelpersJson => $composableBuilder(
+    column: $table.selectedHelpersJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get specialNotesJson => $composableBuilder(
+    column: $table.specialNotesJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get otherSpecialNote => $composableBuilder(
+    column: $table.otherSpecialNote,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$TreatmentsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $TreatmentsTable,
+          Treatment,
+          $$TreatmentsTableFilterComposer,
+          $$TreatmentsTableOrderingComposer,
+          $$TreatmentsTableAnnotationComposer,
+          $$TreatmentsTableCreateCompanionBuilder,
+          $$TreatmentsTableUpdateCompanionBuilder,
+          (
+            Treatment,
+            BaseReferences<_$AppDatabase, $TreatmentsTable, Treatment>,
+          ),
+          Treatment,
+          PrefetchHooks Function()
+        > {
+  $$TreatmentsTableTableManager(_$AppDatabase db, $TreatmentsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$TreatmentsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$TreatmentsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$TreatmentsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> visitId = const Value.absent(),
+                Value<bool> screeningChecked = const Value.absent(),
+                Value<String?> screeningMethodsJson = const Value.absent(),
+                Value<String?> otherScreeningMethod = const Value.absent(),
+                Value<String?> healthDataJson = const Value.absent(),
+                Value<int?> mainSymptom = const Value.absent(),
+                Value<String?> traumaSymptomsJson = const Value.absent(),
+                Value<String?> nonTraumaSymptomsJson = const Value.absent(),
+                Value<String?> symptomNote = const Value.absent(),
+                Value<String?> photoTypesJson = const Value.absent(),
+                Value<String?> bodyCheckHead = const Value.absent(),
+                Value<String?> bodyCheckChest = const Value.absent(),
+                Value<String?> bodyCheckAbdomen = const Value.absent(),
+                Value<String?> bodyCheckLimbs = const Value.absent(),
+                Value<String?> bodyCheckOther = const Value.absent(),
+                Value<String?> temperature = const Value.absent(),
+                Value<String?> pulse = const Value.absent(),
+                Value<String?> respiration = const Value.absent(),
+                Value<String?> bpSystolic = const Value.absent(),
+                Value<String?> bpDiastolic = const Value.absent(),
+                Value<String?> spo2 = const Value.absent(),
+                Value<bool> consciousClear = const Value.absent(),
+                Value<String?> evmE = const Value.absent(),
+                Value<String?> evmV = const Value.absent(),
+                Value<String?> evmM = const Value.absent(),
+                Value<int?> leftPupilScale = const Value.absent(),
+                Value<String?> leftPupilSize = const Value.absent(),
+                Value<int?> rightPupilScale = const Value.absent(),
+                Value<String?> rightPupilSize = const Value.absent(),
+                Value<int?> history = const Value.absent(),
+                Value<int?> allergy = const Value.absent(),
+                Value<String?> initialDiagnosis = const Value.absent(),
+                Value<int?> diagnosisCategory = const Value.absent(),
+                Value<String?> selectedICD10Main = const Value.absent(),
+                Value<String?> selectedICD10Sub1 = const Value.absent(),
+                Value<String?> selectedICD10Sub2 = const Value.absent(),
+                Value<int?> triageCategory = const Value.absent(),
+                Value<String?> onSiteTreatmentsJson = const Value.absent(),
+                Value<bool> ekgChecked = const Value.absent(),
+                Value<String?> ekgReading = const Value.absent(),
+                Value<bool> sugarChecked = const Value.absent(),
+                Value<String?> sugarReading = const Value.absent(),
+                Value<bool> suggestReferral = const Value.absent(),
+                Value<bool> intubationChecked = const Value.absent(),
+                Value<bool> cprChecked = const Value.absent(),
+                Value<bool> oxygenTherapyChecked = const Value.absent(),
+                Value<bool> medicalCertificateChecked = const Value.absent(),
+                Value<bool> prescriptionChecked = const Value.absent(),
+                Value<bool> otherChecked = const Value.absent(),
+                Value<String?> otherSummary = const Value.absent(),
+                Value<int?> referralPassageType = const Value.absent(),
+                Value<int?> referralAmbulanceType = const Value.absent(),
+                Value<int?> referralHospitalIdx = const Value.absent(),
+                Value<String?> referralOtherHospital = const Value.absent(),
+                Value<String?> referralEscort = const Value.absent(),
+                Value<int?> intubationType = const Value.absent(),
+                Value<int?> oxygenType = const Value.absent(),
+                Value<String?> oxygenFlow = const Value.absent(),
+                Value<String?> medicalCertificateTypesJson =
+                    const Value.absent(),
+                Value<String?> prescriptionRowsJson = const Value.absent(),
+                Value<String?> followUpResultsJson = const Value.absent(),
+                Value<int?> otherHospitalIdx = const Value.absent(),
+                Value<String?> selectedMainDoctor = const Value.absent(),
+                Value<String?> selectedMainNurse = const Value.absent(),
+                Value<String?> nurseSignature = const Value.absent(),
+                Value<String?> selectedEMT = const Value.absent(),
+                Value<String?> emtSignature = const Value.absent(),
+                Value<String?> helperNamesText = const Value.absent(),
+                Value<String?> selectedHelpersJson = const Value.absent(),
+                Value<String?> specialNotesJson = const Value.absent(),
+                Value<String?> otherSpecialNote = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+              }) => TreatmentsCompanion(
+                id: id,
+                visitId: visitId,
+                screeningChecked: screeningChecked,
+                screeningMethodsJson: screeningMethodsJson,
+                otherScreeningMethod: otherScreeningMethod,
+                healthDataJson: healthDataJson,
+                mainSymptom: mainSymptom,
+                traumaSymptomsJson: traumaSymptomsJson,
+                nonTraumaSymptomsJson: nonTraumaSymptomsJson,
+                symptomNote: symptomNote,
+                photoTypesJson: photoTypesJson,
+                bodyCheckHead: bodyCheckHead,
+                bodyCheckChest: bodyCheckChest,
+                bodyCheckAbdomen: bodyCheckAbdomen,
+                bodyCheckLimbs: bodyCheckLimbs,
+                bodyCheckOther: bodyCheckOther,
+                temperature: temperature,
+                pulse: pulse,
+                respiration: respiration,
+                bpSystolic: bpSystolic,
+                bpDiastolic: bpDiastolic,
+                spo2: spo2,
+                consciousClear: consciousClear,
+                evmE: evmE,
+                evmV: evmV,
+                evmM: evmM,
+                leftPupilScale: leftPupilScale,
+                leftPupilSize: leftPupilSize,
+                rightPupilScale: rightPupilScale,
+                rightPupilSize: rightPupilSize,
+                history: history,
+                allergy: allergy,
+                initialDiagnosis: initialDiagnosis,
+                diagnosisCategory: diagnosisCategory,
+                selectedICD10Main: selectedICD10Main,
+                selectedICD10Sub1: selectedICD10Sub1,
+                selectedICD10Sub2: selectedICD10Sub2,
+                triageCategory: triageCategory,
+                onSiteTreatmentsJson: onSiteTreatmentsJson,
+                ekgChecked: ekgChecked,
+                ekgReading: ekgReading,
+                sugarChecked: sugarChecked,
+                sugarReading: sugarReading,
+                suggestReferral: suggestReferral,
+                intubationChecked: intubationChecked,
+                cprChecked: cprChecked,
+                oxygenTherapyChecked: oxygenTherapyChecked,
+                medicalCertificateChecked: medicalCertificateChecked,
+                prescriptionChecked: prescriptionChecked,
+                otherChecked: otherChecked,
+                otherSummary: otherSummary,
+                referralPassageType: referralPassageType,
+                referralAmbulanceType: referralAmbulanceType,
+                referralHospitalIdx: referralHospitalIdx,
+                referralOtherHospital: referralOtherHospital,
+                referralEscort: referralEscort,
+                intubationType: intubationType,
+                oxygenType: oxygenType,
+                oxygenFlow: oxygenFlow,
+                medicalCertificateTypesJson: medicalCertificateTypesJson,
+                prescriptionRowsJson: prescriptionRowsJson,
+                followUpResultsJson: followUpResultsJson,
+                otherHospitalIdx: otherHospitalIdx,
+                selectedMainDoctor: selectedMainDoctor,
+                selectedMainNurse: selectedMainNurse,
+                nurseSignature: nurseSignature,
+                selectedEMT: selectedEMT,
+                emtSignature: emtSignature,
+                helperNamesText: helperNamesText,
+                selectedHelpersJson: selectedHelpersJson,
+                specialNotesJson: specialNotesJson,
+                otherSpecialNote: otherSpecialNote,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int visitId,
+                Value<bool> screeningChecked = const Value.absent(),
+                Value<String?> screeningMethodsJson = const Value.absent(),
+                Value<String?> otherScreeningMethod = const Value.absent(),
+                Value<String?> healthDataJson = const Value.absent(),
+                Value<int?> mainSymptom = const Value.absent(),
+                Value<String?> traumaSymptomsJson = const Value.absent(),
+                Value<String?> nonTraumaSymptomsJson = const Value.absent(),
+                Value<String?> symptomNote = const Value.absent(),
+                Value<String?> photoTypesJson = const Value.absent(),
+                Value<String?> bodyCheckHead = const Value.absent(),
+                Value<String?> bodyCheckChest = const Value.absent(),
+                Value<String?> bodyCheckAbdomen = const Value.absent(),
+                Value<String?> bodyCheckLimbs = const Value.absent(),
+                Value<String?> bodyCheckOther = const Value.absent(),
+                Value<String?> temperature = const Value.absent(),
+                Value<String?> pulse = const Value.absent(),
+                Value<String?> respiration = const Value.absent(),
+                Value<String?> bpSystolic = const Value.absent(),
+                Value<String?> bpDiastolic = const Value.absent(),
+                Value<String?> spo2 = const Value.absent(),
+                Value<bool> consciousClear = const Value.absent(),
+                Value<String?> evmE = const Value.absent(),
+                Value<String?> evmV = const Value.absent(),
+                Value<String?> evmM = const Value.absent(),
+                Value<int?> leftPupilScale = const Value.absent(),
+                Value<String?> leftPupilSize = const Value.absent(),
+                Value<int?> rightPupilScale = const Value.absent(),
+                Value<String?> rightPupilSize = const Value.absent(),
+                Value<int?> history = const Value.absent(),
+                Value<int?> allergy = const Value.absent(),
+                Value<String?> initialDiagnosis = const Value.absent(),
+                Value<int?> diagnosisCategory = const Value.absent(),
+                Value<String?> selectedICD10Main = const Value.absent(),
+                Value<String?> selectedICD10Sub1 = const Value.absent(),
+                Value<String?> selectedICD10Sub2 = const Value.absent(),
+                Value<int?> triageCategory = const Value.absent(),
+                Value<String?> onSiteTreatmentsJson = const Value.absent(),
+                Value<bool> ekgChecked = const Value.absent(),
+                Value<String?> ekgReading = const Value.absent(),
+                Value<bool> sugarChecked = const Value.absent(),
+                Value<String?> sugarReading = const Value.absent(),
+                Value<bool> suggestReferral = const Value.absent(),
+                Value<bool> intubationChecked = const Value.absent(),
+                Value<bool> cprChecked = const Value.absent(),
+                Value<bool> oxygenTherapyChecked = const Value.absent(),
+                Value<bool> medicalCertificateChecked = const Value.absent(),
+                Value<bool> prescriptionChecked = const Value.absent(),
+                Value<bool> otherChecked = const Value.absent(),
+                Value<String?> otherSummary = const Value.absent(),
+                Value<int?> referralPassageType = const Value.absent(),
+                Value<int?> referralAmbulanceType = const Value.absent(),
+                Value<int?> referralHospitalIdx = const Value.absent(),
+                Value<String?> referralOtherHospital = const Value.absent(),
+                Value<String?> referralEscort = const Value.absent(),
+                Value<int?> intubationType = const Value.absent(),
+                Value<int?> oxygenType = const Value.absent(),
+                Value<String?> oxygenFlow = const Value.absent(),
+                Value<String?> medicalCertificateTypesJson =
+                    const Value.absent(),
+                Value<String?> prescriptionRowsJson = const Value.absent(),
+                Value<String?> followUpResultsJson = const Value.absent(),
+                Value<int?> otherHospitalIdx = const Value.absent(),
+                Value<String?> selectedMainDoctor = const Value.absent(),
+                Value<String?> selectedMainNurse = const Value.absent(),
+                Value<String?> nurseSignature = const Value.absent(),
+                Value<String?> selectedEMT = const Value.absent(),
+                Value<String?> emtSignature = const Value.absent(),
+                Value<String?> helperNamesText = const Value.absent(),
+                Value<String?> selectedHelpersJson = const Value.absent(),
+                Value<String?> specialNotesJson = const Value.absent(),
+                Value<String?> otherSpecialNote = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+              }) => TreatmentsCompanion.insert(
+                id: id,
+                visitId: visitId,
+                screeningChecked: screeningChecked,
+                screeningMethodsJson: screeningMethodsJson,
+                otherScreeningMethod: otherScreeningMethod,
+                healthDataJson: healthDataJson,
+                mainSymptom: mainSymptom,
+                traumaSymptomsJson: traumaSymptomsJson,
+                nonTraumaSymptomsJson: nonTraumaSymptomsJson,
+                symptomNote: symptomNote,
+                photoTypesJson: photoTypesJson,
+                bodyCheckHead: bodyCheckHead,
+                bodyCheckChest: bodyCheckChest,
+                bodyCheckAbdomen: bodyCheckAbdomen,
+                bodyCheckLimbs: bodyCheckLimbs,
+                bodyCheckOther: bodyCheckOther,
+                temperature: temperature,
+                pulse: pulse,
+                respiration: respiration,
+                bpSystolic: bpSystolic,
+                bpDiastolic: bpDiastolic,
+                spo2: spo2,
+                consciousClear: consciousClear,
+                evmE: evmE,
+                evmV: evmV,
+                evmM: evmM,
+                leftPupilScale: leftPupilScale,
+                leftPupilSize: leftPupilSize,
+                rightPupilScale: rightPupilScale,
+                rightPupilSize: rightPupilSize,
+                history: history,
+                allergy: allergy,
+                initialDiagnosis: initialDiagnosis,
+                diagnosisCategory: diagnosisCategory,
+                selectedICD10Main: selectedICD10Main,
+                selectedICD10Sub1: selectedICD10Sub1,
+                selectedICD10Sub2: selectedICD10Sub2,
+                triageCategory: triageCategory,
+                onSiteTreatmentsJson: onSiteTreatmentsJson,
+                ekgChecked: ekgChecked,
+                ekgReading: ekgReading,
+                sugarChecked: sugarChecked,
+                sugarReading: sugarReading,
+                suggestReferral: suggestReferral,
+                intubationChecked: intubationChecked,
+                cprChecked: cprChecked,
+                oxygenTherapyChecked: oxygenTherapyChecked,
+                medicalCertificateChecked: medicalCertificateChecked,
+                prescriptionChecked: prescriptionChecked,
+                otherChecked: otherChecked,
+                otherSummary: otherSummary,
+                referralPassageType: referralPassageType,
+                referralAmbulanceType: referralAmbulanceType,
+                referralHospitalIdx: referralHospitalIdx,
+                referralOtherHospital: referralOtherHospital,
+                referralEscort: referralEscort,
+                intubationType: intubationType,
+                oxygenType: oxygenType,
+                oxygenFlow: oxygenFlow,
+                medicalCertificateTypesJson: medicalCertificateTypesJson,
+                prescriptionRowsJson: prescriptionRowsJson,
+                followUpResultsJson: followUpResultsJson,
+                otherHospitalIdx: otherHospitalIdx,
+                selectedMainDoctor: selectedMainDoctor,
+                selectedMainNurse: selectedMainNurse,
+                nurseSignature: nurseSignature,
+                selectedEMT: selectedEMT,
+                emtSignature: emtSignature,
+                helperNamesText: helperNamesText,
+                selectedHelpersJson: selectedHelpersJson,
+                specialNotesJson: specialNotesJson,
+                otherSpecialNote: otherSpecialNote,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$TreatmentsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $TreatmentsTable,
+      Treatment,
+      $$TreatmentsTableFilterComposer,
+      $$TreatmentsTableOrderingComposer,
+      $$TreatmentsTableAnnotationComposer,
+      $$TreatmentsTableCreateCompanionBuilder,
+      $$TreatmentsTableUpdateCompanionBuilder,
+      (Treatment, BaseReferences<_$AppDatabase, $TreatmentsTable, Treatment>),
+      Treatment,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -5514,4 +11343,6 @@ class $AppDatabaseManager {
       $$AccidentRecordsTableTableManager(_db, _db.accidentRecords);
   $$FlightLogsTableTableManager get flightLogs =>
       $$FlightLogsTableTableManager(_db, _db.flightLogs);
+  $$TreatmentsTableTableManager get treatments =>
+      $$TreatmentsTableTableManager(_db, _db.treatments);
 }

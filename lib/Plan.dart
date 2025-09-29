@@ -1,2701 +1,2477 @@
-// import 'package:flutter/material.dart';
-// import 'nav2.dart';
-
-// class PlanPage extends StatefulWidget {
-//   final int visitId;
-//   const PlanPage({super.key,required this.visitId});
-
-//   @override
-//   State<PlanPage> createState() => _PlanPageState();
-// }
-
-// class _PlanPageState extends State<PlanPage> {
-//   void _showAddDialog(BuildContext context) {
-//     showDialog(
-//       context: context,
-//       builder: (context) {
-//         return AlertDialog(
-//           title: const Text("新增資料行"),
-//           content: const Text("這裡可以放輸入表單"),
-//           actions: [
-//             TextButton(
-//               onPressed: () => Navigator.pop(context),
-//               child: const Text("取消"),
-//             ),
-//             ElevatedButton(
-//               onPressed: () {
-//                 Navigator.pop(context);
-//               },
-//               child: const Text("儲存"),
-//             ),
-//           ],
-//         );
-//       },
-//     );
-//   }
-
-//   int mainSymptom = -1;
-//   int history = 0;
-//   int allergy = 0;
-//   int diagnosisCategory = 0;
-//   int classify = 0;
-
-//   final List<Map<String, String>> healthData = [];
-
-//   void _addHealthData() {
-//     final nameController = TextEditingController();
-//     final relationController = TextEditingController();
-//     final tempController = TextEditingController();
-
-//     showDialog(
-//       context: context,
-//       builder: (context) {
-//         return AlertDialog(
-//           title: const Text("新增健康評估"),
-//           content: Column(
-//             mainAxisSize: MainAxisSize.min,
-//             children: [
-//               TextField(
-//                 controller: nameController,
-//                 decoration: const InputDecoration(labelText: "姓名"),
-//               ),
-//               TextField(
-//                 controller: relationController,
-//                 decoration: const InputDecoration(labelText: "關係"),
-//               ),
-//               TextField(
-//                 controller: tempController,
-//                 decoration: const InputDecoration(labelText: "體溫"),
-//                 keyboardType: TextInputType.number,
-//               ),
-//             ],
-//           ),
-//           actions: [
-//             TextButton(
-//               onPressed: () => Navigator.pop(context),
-//               child: const Text("取消"),
-//             ),
-//             ElevatedButton(
-//               style: ElevatedButton.styleFrom(
-//                 backgroundColor: const Color(0xFF83ACA9),
-//                 foregroundColor: Colors.white,
-//               ),
-//               onPressed: () {
-//                 setState(() {
-//                   healthData.add({
-//                     "name": nameController.text,
-//                     "relation": relationController.text,
-//                     "temp": tempController.text,
-//                   });
-//                 });
-//                 Navigator.pop(context);
-//               },
-//               child: const Text("儲存"),
-//             ),
-//           ],
-//         );
-//       },
-//     );
-//   }
-
-//   bool consciousClear = true;
-
-//   bool screeningChecked = false;
-//   final Map<String, bool> screeningMethods = {
-//     '喉頭採檢': false,
-//     '抽血檢驗': false,
-//     '其他': false,
-//   };
-
-//   Map<String, bool> photoTypes = {'外傷': false, '心電圖': false, '其他': false};
-
-//   bool ekgChecked = false;
-//   bool sugarChecked = false;
-//   TextEditingController ekgController = TextEditingController();
-//   TextEditingController sugarController = TextEditingController();
-
-//   bool transferOtherHospital = false;
-//   int selectedOtherHospital = -1;
-//   final List<String> otherHospitals = [
-//     '桃園經國敏盛醫院',
-//     '聖保祿醫院',
-//     '衛生福利部桃園醫院',
-//     '衛生福利部桃園療養院',
-//     '桃園榮民總醫院',
-//     '三峽恩主公醫院',
-//     '其他',
-//   ];
-
-//   // ICD獨立
-//   String? selectedICD10Main;
-//   String? selectedICD10Sub1;
-//   String? selectedICD10Sub2;
-
-//   Future<void> _showICD10Dialog(ValueChanged<String> onSelected) async {
-//     final result = await showDialog<String>(
-//       context: context,
-//       builder: (context) {
-//         return SimpleDialog(
-//           title: const Text('選擇ICD-10'),
-//           children: [
-//             SizedBox(
-//               width: 400,
-//               height: 300,
-//               child: ListView(
-//                 children: icd10List.map((item) {
-//                   return ListTile(
-//                     title: Text(item),
-//                     onTap: () => Navigator.pop(context, item),
-//                   );
-//                 }).toList(),
-//               ),
-//             ),
-//           ],
-//         );
-//       },
-//     );
-//     if (result != null) {
-//       setState(() {
-//         onSelected(result);
-//       });
-//     }
-//   }
-
-//   final List<String> icd10List = [
-//     'A00 Cholera - 霍亂',
-//     'A00.0 Cholera due to Vibrio cholerae 01, biovar cholerae - 血清型01霍亂弧菌霍亂',
-//     'A00.1 Cholera due to Vibrio cholerae 01, biovar eltor - 血清型01霍亂弧菌El Tor霍亂',
-//     'A00.9 Cholera, unspecified - 霍亂',
-//     'A01 Typhoid and paratyphoid fevers - 傷寒及副傷寒',
-//     'A01.0 Typhoid fever - 傷寒',
-//     'A01.01 Typhoid fever, unspecified - 傷寒',
-//     'A01.01 Typhoid meningitis - 傷寒腦膜炎',
-//   ];
-
-//   bool suggestReferral = false;
-//   int referralHospital = -1;
-//   int referralType = 0;
-//   int rescueType = 0;
-//   TextEditingController referralOtherController = TextEditingController();
-//   TextEditingController referralEscortController = TextEditingController();
-
-//   final List<String> referralHospitals = [
-//     '聯新國際醫院',
-//     '林口長庚醫院',
-//     '衛生福利部桃園醫院',
-//     '衛生福利部桃園療養院',
-//     '桃園國際敏盛醫院',
-//     '聖保祿醫院',
-//     '中壢天晟醫院',
-//     '桃園榮民總醫院',
-//     '三峽恩主公醫院',
-//     '其他',
-//   ];
-
-//   bool intubationChecked = false;
-//   int intubationType = 0;
-//   bool cprChecked = false;
-//   bool oxygentherpyChecked = false;
-//   int oxygentype = 0;
-
-//   bool medicalCertificateChecked = false;
-//   final Map<String, bool> medicalCertificateTypes = {
-//     '中文診斷書': false,
-//     '英文診斷書': false,
-//     '中英文適航證明': false,
-//   };
-
-//   bool otherChecked = false;
-//   TextEditingController otherController = TextEditingController();
-
-//   bool prescriptionChecked = false;
-
-//   List<Map<String, String>> prescriptionRows = [];
-//   Future<void> _showPrescriptionDialog() async {
-//     Map<String, String>? result = await showDialog<Map<String, String>>(
-//       context: context,
-//       builder: (context) {
-//         String? selectedDrug;
-//         String? selectedUsage;
-//         String? selectedFreq;
-//         String? selectedDays;
-//         String? selectedDoseUnit;
-//         String note = '';
-
-//         final drugCategories = {
-//           '口服藥': [
-//             'Augmentin syrup',
-//             'Peace 藥錠',
-//             'Wempyn 潰瘍寧',
-//             'Ciprofloxacin',
-//             'Ibuprofen 佈洛芬',
-//           ],
-//           '注射劑': [
-//             'Ventolin 吸入劑',
-//             'Wycillin 筋注劑',
-//             'N/S 250ml',
-//             'D5W 250ml',
-//             'KCL 添加液',
-//           ],
-//           '點滴注射': ['D5S 500ml', 'Lactated Ringer\'s 乳酸林格氏液'],
-//           // 可以根據需要添加更多分類
-//         };
-
-//         final usageOptions = ['口服', '靜脈注射', '肌肉注射', '皮下注射'];
-//         final freqOptions = ['QD', 'BID', 'TID', 'QID', 'PRN'];
-//         final daysOptions = ['1 天', '3 天', '5 天', '7 天'];
-//         final doseUnitOptions = ['mg', 'g', 'tab', 'amp', 'vial'];
-
-//         return StatefulBuilder(
-//           builder: (context, setState) {
-//             return AlertDialog(
-//               title: const Text('新增藥物記錄'),
-//               content: SingleChildScrollView(
-//                 child: Column(
-//                   crossAxisAlignment: CrossAxisAlignment.start,
-//                   children: [
-//                     const Text('藥品名稱'),
-//                     ...drugCategories.entries.map((categoryEntry) {
-//                       return Column(
-//                         crossAxisAlignment: CrossAxisAlignment.start,
-//                         children: [
-//                           Padding(
-//                             padding: const EdgeInsets.symmetric(vertical: 8.0),
-//                             child: Text(
-//                               categoryEntry.key,
-//                               style: const TextStyle(
-//                                 fontSize: 16,
-//                                 fontWeight: FontWeight.bold,
-//                               ),
-//                             ),
-//                           ),
-//                           Wrap(
-//                             spacing: 8,
-//                             children: categoryEntry.value.map((drug) {
-//                               return ChoiceChip(
-//                                 label: Text(drug),
-//                                 selected: selectedDrug == drug,
-//                                 onSelected: (_) =>
-//                                     setState(() => selectedDrug = drug),
-//                               );
-//                             }).toList(),
-//                           ),
-//                         ],
-//                       );
-//                     }).toList(),
-//                     const SizedBox(height: 16),
-//                     DropdownButtonFormField<String>(
-//                       decoration: const InputDecoration(labelText: '使用方式'),
-//                       items: usageOptions
-//                           .map(
-//                             (e) => DropdownMenuItem(value: e, child: Text(e)),
-//                           )
-//                           .toList(),
-//                       onChanged: (v) => selectedUsage = v,
-//                     ),
-//                     DropdownButtonFormField<String>(
-//                       decoration: const InputDecoration(labelText: '服用頻率'),
-//                       items: freqOptions
-//                           .map(
-//                             (e) => DropdownMenuItem(value: e, child: Text(e)),
-//                           )
-//                           .toList(),
-//                       onChanged: (v) => selectedFreq = v,
-//                     ),
-//                     DropdownButtonFormField<String>(
-//                       decoration: const InputDecoration(labelText: '服用天數'),
-//                       items: daysOptions
-//                           .map(
-//                             (e) => DropdownMenuItem(value: e, child: Text(e)),
-//                           )
-//                           .toList(),
-//                       onChanged: (v) => selectedDays = v,
-//                     ),
-//                     DropdownButtonFormField<String>(
-//                       decoration: const InputDecoration(labelText: '劑量單位'),
-//                       items: doseUnitOptions
-//                           .map(
-//                             (e) => DropdownMenuItem(value: e, child: Text(e)),
-//                           )
-//                           .toList(),
-//                       onChanged: (v) => selectedDoseUnit = v,
-//                     ),
-//                     const SizedBox(height: 16),
-//                     TextField(
-//                       decoration: const InputDecoration(labelText: '備註'),
-//                       onChanged: (v) => note = v,
-//                     ),
-//                   ],
-//                 ),
-//               ),
-//               actions: [
-//                 TextButton(
-//                   onPressed: () => Navigator.pop(context),
-//                   child: const Text('取消'),
-//                 ),
-//                 ElevatedButton(
-//                   onPressed: () {
-//                     Navigator.pop(context, {
-//                       '藥品名稱': selectedDrug ?? '',
-//                       '使用方式': selectedUsage ?? '',
-//                       '服用頻率': selectedFreq ?? '',
-//                       '服用天數': selectedDays ?? '',
-//                       '劑量單位': selectedDoseUnit ?? '',
-//                       '備註': note,
-//                     });
-//                   },
-//                   child: const Text('儲存'),
-//                 ),
-//               ],
-//             );
-//           },
-//         );
-//       },
-//     );
-
-//     if (result != null) {
-//       setState(() {
-//         prescriptionRows.add(result);
-//       });
-//     }
-//   }
-
-//   String? selectedMainDoctor;
-//   Future<void> _showMainDoctorDialog() async {
-//     final result = await showDialog<String>(
-//       context: context,
-//       builder: (context) {
-//         return SimpleDialog(
-//           title: const Text('選擇主責醫師'),
-//           children: [
-//             SizedBox(
-//               width: 400,
-//               height: 300,
-//               child: ListView(
-//                 children: VisitingStaff.map((item) {
-//                   return ListTile(
-//                     title: Text(item),
-//                     onTap: () => Navigator.pop(context, item),
-//                   );
-//                 }).toList(),
-//               ),
-//             ),
-//           ],
-//         );
-//       },
-//     );
-//     if (result != null) {
-//       setState(() {
-//         selectedMainDoctor = result;
-//       });
-//     }
-//   }
-
-//   final List<String> VisitingStaff = [
-//     '方詩旋',
-//     '古璿正',
-//     '江汪財',
-//     '呂學政',
-//     '周志勃',
-//     '金霍歌',
-//     '徐丕',
-//     '康曉妍',
-//   ];
-
-//   String? selectedMainNurse;
-//   Future<void> _showMainNurseDialog() async {
-//     final result = await showDialog<String>(
-//       context: context,
-//       builder: (context) {
-//         return SimpleDialog(
-//           title: const Text('選擇主責護理師'),
-//           children: [
-//             SizedBox(
-//               width: 400,
-//               height: 300,
-//               child: ListView(
-//                 children: RegisteredNurses.map((item) {
-//                   return ListTile(
-//                     title: Text(item),
-//                     onTap: () => Navigator.pop(context, item),
-//                   );
-//                 }).toList(),
-//               ),
-//             ),
-//           ],
-//         );
-//       },
-//     );
-//     if (result != null) {
-//       setState(() {
-//         selectedMainNurse = result;
-//       });
-//     }
-//   }
-
-//   final List<String> RegisteredNurses = [
-//     '陳思穎',
-//     '邱靜鈴',
-//     '莊杼媛',
-//     '洪萱',
-//     '范育婕',
-//     '陳珮妤',
-//     '蔡可葳',
-//     '粘瑞華',
-//   ];
-
-//   String? selectedEMT;
-//   Future<void> _showEMTDialog() async {
-//     final result = await showDialog<String>(
-//       context: context,
-//       builder: (context) {
-//         return SimpleDialog(
-//           title: const Text('選擇EMT'),
-//           children: [
-//             SizedBox(
-//               width: 400,
-//               height: 300,
-//               child: ListView(
-//                 children: EMTs.map((item) {
-//                   return ListTile(
-//                     title: Text(item),
-//                     onTap: () => Navigator.pop(context, item),
-//                   );
-//                 }).toList(),
-//               ),
-//             ),
-//           ],
-//         );
-//       },
-//     );
-//     if (result != null) {
-//       setState(() {
-//         selectedEMT = result;
-//       });
-//     }
-//   }
-
-//   final List<String> EMTs = ['王文義', '游進昌', '胡勝捷', '黃逸斌', '吳承軒', '張致綸', '劉呈軒'];
-
-//   List<String> _selectedHelpers = [];
-//   final List<String> _helperNames = [
-//     '方詩婷',
-//     '古增正',
-//     '江旺財',
-//     '呂學政',
-//     '海欣茹',
-//     '洪雲敏',
-//     '徐杰',
-//     '康曉朗',
-//     '黎裕昌',
-//     '戴逸旻',
-//     '廖詠怡',
-//     '許婷涵',
-//     '陳小山',
-//     '王悅朗',
-//     '劉金宇',
-//     '彭士書',
-//     '熊得志',
-//     '顧小',
-//     '蔡心文',
-//     '程皓',
-//     '楊敏度',
-//     '羅尹彤',
-//     '廖名用',
-//     '陳國平',
-//     '蘇敬婷',
-//     '黃梨梅',
-//     '朱森學',
-//     '陳思穎',
-//     '邵詩婷',
-//     '莊抒捷',
-//     '洪萱',
-//     '林育緯',
-//     '唐詠婷',
-//     '蔡可葳',
-//     '粘瑞敏',
-//     '黃馨儀',
-//     '陳冠羽',
-//     '陳怡玲',
-//     '吳雅柔',
-//     '何文豪',
-//     '王文義',
-//     '游恩晶',
-//     '胡雅捷',
-//     '黃逸誠',
-//     '吳季軒',
-//     '劉曉華',
-//     '張峻維',
-//     '劉昱軒',
-//   ];
-//   Future<void> _showHelperSelectionDialog() async {
-//     List<String> tempSelected = List.from(_selectedHelpers);
-
-//     List<String>? result = await showDialog<List<String>>(
-//       context: context,
-//       builder: (BuildContext context) {
-//         return StatefulBuilder(
-//           builder: (context, setState) {
-//             return AlertDialog(
-//               title: const Text('選擇協助人員姓名'),
-//               content: SingleChildScrollView(
-//                 child: Column(
-//                   mainAxisSize: MainAxisSize.min,
-//                   children: _helperNames.map((name) {
-//                     return CheckboxListTile(
-//                       title: Text(name),
-//                       value: tempSelected.contains(name),
-//                       onChanged: (bool? checked) {
-//                         setState(() {
-//                           if (checked == true) {
-//                             tempSelected.add(name);
-//                           } else {
-//                             tempSelected.remove(name);
-//                           }
-//                         });
-//                       },
-//                     );
-//                   }).toList(),
-//                 ),
-//               ),
-//               actions: <Widget>[
-//                 TextButton(
-//                   child: const Text('取消'),
-//                   onPressed: () {
-//                     Navigator.of(context).pop();
-//                   },
-//                 ),
-//                 ElevatedButton(
-//                   child: const Text('確定'),
-//                   onPressed: () {
-//                     Navigator.of(context).pop(tempSelected); // 返回多選的值
-//                   },
-//                 ),
-//               ],
-//             );
-//           },
-//         );
-//       },
-//     );
-
-//     if (result != null) {
-//       setState(() {
-//         _selectedHelpers = result;
-//       });
-//     }
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Nav2Page(
-//       selectedIndex: 3,
-//       visitId: widget.visitId,
-//       child: Container(
-//         color: const Color(0xFFE6F6FB),
-//         alignment: Alignment.topCenter,
-//         child: SingleChildScrollView(
-//           child: Container(
-//             width: 900,
-//             margin: const EdgeInsets.symmetric(vertical: 32),
-//             padding: const EdgeInsets.all(32),
-//             decoration: BoxDecoration(
-//               color: const Color(0xFFF9FAFB),
-//               borderRadius: BorderRadius.circular(12),
-//               boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 8)],
-//             ),
-//             child: Column(
-//               crossAxisAlignment: CrossAxisAlignment.start,
-//               children: [
-//                 // ======= 上方左右分欄區塊 =======
-//                 Row(
-//                   crossAxisAlignment: CrossAxisAlignment.start,
-//                   children: [
-//                     // 左側欄位
-//                     Expanded(
-//                       child: Column(
-//                         crossAxisAlignment: CrossAxisAlignment.start,
-//                         children: [
-//                           _SectionTitle('疾病管制署篩檢'),
-//                           InkWell(
-//                             onTap: () => setState(
-//                               () => screeningChecked = !screeningChecked,
-//                             ),
-//                             child: Row(
-//                               mainAxisSize: MainAxisSize.min,
-//                               children: [
-//                                 Checkbox(
-//                                   value: screeningChecked,
-//                                   activeColor: const Color(0xFF83ACA9),
-//                                   onChanged: (v) => setState(
-//                                     () => screeningChecked = v ?? false,
-//                                   ),
-//                                 ),
-//                                 const Text(''),
-//                               ],
-//                             ),
-//                           ),
-//                           const SizedBox(height: 24),
-
-//                           // 篩檢區塊（依勾選狀態顯示/隱藏）
-//                           if (screeningChecked) ...[
-//                             const SizedBox(height: 16),
-//                             _SectionTitle('篩檢方式'),
-//                             Wrap(
-//                               spacing: 24,
-//                               runSpacing: 8,
-//                               children: screeningMethods.keys.map((label) {
-//                                 return InkWell(
-//                                   onTap: () => setState(
-//                                     () => screeningMethods[label] =
-//                                         !(screeningMethods[label] ?? false),
-//                                   ),
-//                                   child: Row(
-//                                     mainAxisSize: MainAxisSize.min,
-//                                     children: [
-//                                       Checkbox(
-//                                         value: screeningMethods[label],
-//                                         activeColor: const Color(0xFF83ACA9),
-//                                         onChanged: (v) => setState(
-//                                           () => screeningMethods[label] =
-//                                               v ?? false,
-//                                         ),
-//                                       ),
-//                                       Text(
-//                                         label,
-//                                         style: const TextStyle(
-//                                           color: Colors.black,
-//                                         ),
-//                                       ),
-//                                     ],
-//                                   ),
-//                                 );
-//                               }).toList(),
-//                             ),
-//                             const SizedBox(height: 16),
-//                             _SectionTitle('其他篩檢方式'),
-//                             TextField(
-//                               decoration: const InputDecoration(
-//                                 hintText: '請填寫其他篩檢方式',
-//                                 border: OutlineInputBorder(),
-//                               ),
-//                             ),
-//                             const SizedBox(height: 24),
-//                             _SectionTitle('健康評估'),
-//                             Container(
-//                               width: double.infinity,
-//                               color: const Color(0xFFF1F3F6),
-//                               padding: const EdgeInsets.symmetric(
-//                                 vertical: 12,
-//                                 horizontal: 8,
-//                               ),
-//                               child: Row(
-//                                 children: const [
-//                                   Expanded(
-//                                     flex: 2,
-//                                     child: Text(
-//                                       '姓名',
-//                                       style: TextStyle(
-//                                         fontWeight: FontWeight.bold,
-//                                       ),
-//                                     ),
-//                                   ),
-//                                   Expanded(
-//                                     flex: 2,
-//                                     child: Text(
-//                                       '關係',
-//                                       style: TextStyle(
-//                                         fontWeight: FontWeight.bold,
-//                                       ),
-//                                     ),
-//                                   ),
-//                                   Expanded(
-//                                     flex: 2,
-//                                     child: Text(
-//                                       '體溫',
-//                                       style: TextStyle(
-//                                         fontWeight: FontWeight.bold,
-//                                       ),
-//                                     ),
-//                                   ),
-//                                 ],
-//                               ),
-//                             ),
-//                             // 顯示已新增的資料
-//                             ...healthData.map((row) {
-//                               return Container(
-//                                 width: double.infinity,
-//                                 color: Colors.transparent,
-//                                 padding: const EdgeInsets.symmetric(
-//                                   vertical: 12,
-//                                   horizontal: 8,
-//                                 ),
-//                                 child: Row(
-//                                   children: [
-//                                     Expanded(
-//                                       flex: 2,
-//                                       child: Text(row["name"] ?? ""),
-//                                     ),
-//                                     Expanded(
-//                                       flex: 2,
-//                                       child: Text(row["relation"] ?? ""),
-//                                     ),
-//                                     Expanded(
-//                                       flex: 2,
-//                                       child: Text(row["temp"] ?? ""),
-//                                     ),
-//                                   ],
-//                                 ),
-//                               );
-//                             }),
-//                             InkWell(
-//                               onTap: _addHealthData,
-//                               child: Container(
-//                                 width: double.infinity,
-//                                 color: Colors.transparent,
-//                                 padding: const EdgeInsets.symmetric(
-//                                   vertical: 12,
-//                                   horizontal: 8,
-//                                 ),
-//                                 child: const Text(
-//                                   '加入資料行',
-//                                   style: TextStyle(color: Colors.blue),
-//                                 ),
-//                               ),
-//                             ),
-//                             const SizedBox(height: 24),
-//                           ],
-
-//                           _SectionTitle('主訴'),
-//                           Row(
-//                             children: [
-//                               InkWell(
-//                                 onTap: () => setState(() => mainSymptom = 0),
-//                                 child: Row(
-//                                   children: [
-//                                     Radio(
-//                                       value: 0,
-//                                       groupValue: mainSymptom,
-//                                       onChanged: (v) => setState(
-//                                         () => mainSymptom = v as int,
-//                                       ),
-//                                       activeColor: Color(0xFF83ACA9),
-//                                     ),
-//                                     const Text('外傷'),
-//                                   ],
-//                                 ),
-//                               ),
-//                               InkWell(
-//                                 onTap: () => setState(() => mainSymptom = 1),
-//                                 child: Row(
-//                                   children: [
-//                                     Radio(
-//                                       value: 1,
-//                                       groupValue: mainSymptom,
-//                                       onChanged: (v) => setState(
-//                                         () => mainSymptom = v as int,
-//                                       ),
-//                                       activeColor: Color(0xFF83ACA9),
-//                                     ),
-//                                     const Text('非外傷'),
-//                                   ],
-//                                 ),
-//                               ),
-//                             ],
-//                           ),
-//                           const SizedBox(height: 24),
-
-//                           if (mainSymptom == 0) ...[
-//                             _SectionTitle('外傷'),
-//                             Wrap(
-//                               spacing: 16,
-//                               runSpacing: 8,
-//                               children: [
-//                                 _CheckBoxItem('鈍挫傷'),
-//                                 _CheckBoxItem('扭傷'),
-//                                 _CheckBoxItem('撕裂傷'),
-//                                 _CheckBoxItem('擦傷'),
-//                                 _CheckBoxItem('肢體變形'),
-//                                 _CheckBoxItem('其他'),
-//                               ],
-//                             ),
-//                             const SizedBox(height: 16),
-//                           ],
-
-//                           if (mainSymptom == 1) ...[
-//                             _SectionTitle('非外傷'),
-//                             Wrap(
-//                               spacing: 16,
-//                               runSpacing: 8,
-//                               children: [
-//                                 _CheckBoxItem('頭頸部'),
-//                                 _CheckBoxItem('胸部'),
-//                                 _CheckBoxItem('腹部'),
-//                                 _CheckBoxItem('四肢'),
-//                                 _CheckBoxItem('其他'),
-//                               ],
-//                             ),
-//                             const SizedBox(height: 16),
-//                           ],
-
-//                           _SectionTitle('補充說明'),
-//                           TextField(
-//                             decoration: const InputDecoration(
-//                               hintText: '填寫主訴補充說明',
-//                               border: OutlineInputBorder(),
-//                             ),
-//                             maxLines: 2,
-//                           ),
-//                           const SizedBox(height: 24),
-
-//                           _SectionTitle('照片類型'),
-//                           Wrap(
-//                             spacing: 16,
-//                             children: photoTypes.keys.map((label) {
-//                               return InkWell(
-//                                 onTap: () => setState(
-//                                   () => photoTypes[label] =
-//                                       !(photoTypes[label] ?? false),
-//                                 ),
-//                                 child: Row(
-//                                   mainAxisSize: MainAxisSize.min,
-//                                   children: [
-//                                     Checkbox(
-//                                       value: photoTypes[label],
-//                                       activeColor: const Color(0xFF83ACA9),
-//                                       onChanged: (v) => setState(
-//                                         () => photoTypes[label] = v ?? false,
-//                                       ),
-//                                     ),
-//                                     Text(
-//                                       label,
-//                                       style: const TextStyle(
-//                                         color: Colors.black,
-//                                       ),
-//                                     ),
-//                                   ],
-//                                 ),
-//                               );
-//                             }).toList(),
-//                           ),
-//                           const SizedBox(height: 32),
-
-//                           if (photoTypes['外傷'] == true) ...[
-//                             _SectionTitle('外傷照片'),
-//                             _PhotoGrid(title: '外傷照片'),
-//                             const SizedBox(height: 16),
-//                           ],
-
-//                           if (photoTypes['心電圖'] == true) ...[
-//                             _SectionTitle('心電圖照片'),
-//                             _PhotoGrid(title: '心電圖照片'),
-//                             const SizedBox(height: 16),
-//                           ],
-
-//                           if (photoTypes['其他'] == true) ...[
-//                             _SectionTitle('其他照片'),
-//                             _PhotoGrid(title: '其他照片'),
-//                             const SizedBox(height: 16),
-//                           ],
-
-//                           // 身體檢查區塊
-//                           _SectionTitle('身體檢查'),
-//                           const SizedBox(height: 8),
-//                           _BodyCheckInput('頭頸部'),
-//                           const SizedBox(height: 8),
-//                           _BodyCheckInput('胸部'),
-//                           const SizedBox(height: 8),
-//                           _BodyCheckInput('腹部'),
-//                           const SizedBox(height: 8),
-//                           _BodyCheckInput('四肢'),
-//                           const SizedBox(height: 8),
-//                           _BodyCheckInput('其他'),
-//                         ],
-//                       ),
-//                     ),
-//                     const SizedBox(width: 48),
-//                     // 右側欄位
-//                     Expanded(
-//                       child: Column(
-//                         crossAxisAlignment: CrossAxisAlignment.start,
-//                         children: [
-//                           _SectionTitle('語音輸入：'),
-//                           const Text(
-//                             '這裡依序輸入體溫、脈搏、呼吸、血壓、血氧、血糖',
-//                             style: TextStyle(color: Colors.black),
-//                           ),
-//                           const SizedBox(height: 8),
-//                           ElevatedButton(
-//                             style: ElevatedButton.styleFrom(
-//                               backgroundColor: Color(0xFF83ACA9),
-//                               foregroundColor: Colors.white,
-//                             ),
-//                             onPressed: () {},
-//                             child: const Text('確認'),
-//                           ),
-//                           const SizedBox(height: 24),
-
-//                           _SectionTitle('體溫(°C)'),
-//                           TextField(
-//                             decoration: const InputDecoration(
-//                               hintText: '輸入數字',
-//                               border: OutlineInputBorder(),
-//                             ),
-//                           ),
-//                           const SizedBox(height: 16),
-
-//                           _SectionTitle('脈搏(次/min)'),
-//                           TextField(
-//                             decoration: const InputDecoration(
-//                               hintText: '輸入整數',
-//                               border: OutlineInputBorder(),
-//                             ),
-//                           ),
-//                           const SizedBox(height: 16),
-
-//                           _SectionTitle('呼吸(次/min)'),
-//                           TextField(
-//                             decoration: const InputDecoration(
-//                               hintText: '輸入整數',
-//                               border: OutlineInputBorder(),
-//                             ),
-//                           ),
-//                           const SizedBox(height: 16),
-
-//                           _SectionTitle('血壓(mmHg)'),
-//                           Row(
-//                             children: [
-//                               SizedBox(
-//                                 width: 80,
-//                                 child: TextField(
-//                                   decoration: const InputDecoration(
-//                                     hintText: '整數',
-//                                     border: OutlineInputBorder(),
-//                                   ),
-//                                 ),
-//                               ),
-//                               const SizedBox(width: 8),
-//                               const Text('/'),
-//                               const SizedBox(width: 8),
-//                               SizedBox(
-//                                 width: 80,
-//                                 child: TextField(
-//                                   decoration: const InputDecoration(
-//                                     hintText: '整數',
-//                                     border: OutlineInputBorder(),
-//                                   ),
-//                                 ),
-//                               ),
-//                             ],
-//                           ),
-//                           const SizedBox(height: 16),
-
-//                           _SectionTitle('血氧(%)'),
-//                           TextField(
-//                             decoration: const InputDecoration(
-//                               hintText: '輸入數字',
-//                               border: OutlineInputBorder(),
-//                             ),
-//                           ),
-//                           const SizedBox(height: 16),
-
-//                           Row(
-//                             children: [
-//                               _SectionTitle('意識清晰'),
-//                               InkWell(
-//                                 onTap: () => setState(
-//                                   () => consciousClear = !consciousClear,
-//                                 ),
-//                                 child: Checkbox(
-//                                   value: consciousClear,
-//                                   activeColor: const Color(0xFF83ACA9),
-//                                   onChanged: (v) => setState(
-//                                     () => consciousClear = v ?? false,
-//                                   ),
-//                                 ),
-//                               ),
-//                             ],
-//                           ),
-//                           const SizedBox(height: 24),
-
-//                           if (!consciousClear) ...[
-//                             Row(
-//                               children: const [
-//                                 Text(
-//                                   'E',
-//                                   style: TextStyle(fontWeight: FontWeight.bold),
-//                                 ),
-//                                 SizedBox(width: 8),
-//                                 SizedBox(
-//                                   width: 60,
-//                                   child: TextField(
-//                                     decoration: InputDecoration(
-//                                       border: OutlineInputBorder(),
-//                                       isDense: true, // 減少高度
-//                                       contentPadding: EdgeInsets.symmetric(
-//                                         horizontal: 8,
-//                                         vertical: 6,
-//                                       ),
-//                                     ),
-//                                   ),
-//                                 ),
-//                                 SizedBox(width: 32),
-//                                 Text(
-//                                   'V',
-//                                   style: TextStyle(fontWeight: FontWeight.bold),
-//                                 ),
-//                                 SizedBox(width: 8),
-//                                 SizedBox(
-//                                   width: 60,
-//                                   child: TextField(
-//                                     decoration: InputDecoration(
-//                                       border: OutlineInputBorder(),
-//                                       isDense: true,
-//                                       contentPadding: EdgeInsets.symmetric(
-//                                         horizontal: 8,
-//                                         vertical: 6,
-//                                       ),
-//                                     ),
-//                                   ),
-//                                 ),
-//                                 SizedBox(width: 32),
-//                                 Text(
-//                                   'M',
-//                                   style: TextStyle(fontWeight: FontWeight.bold),
-//                                 ),
-//                                 SizedBox(width: 8),
-//                                 SizedBox(
-//                                   width: 60,
-//                                   child: TextField(
-//                                     decoration: InputDecoration(
-//                                       border: OutlineInputBorder(),
-//                                       isDense: true,
-//                                       contentPadding: EdgeInsets.symmetric(
-//                                         horizontal: 8,
-//                                         vertical: 6,
-//                                       ),
-//                                     ),
-//                                   ),
-//                                 ),
-//                               ],
-//                             ),
-//                             const SizedBox(height: 16),
-//                             Row(
-//                               children: const [
-//                                 Text(
-//                                   'GCS',
-//                                   style: TextStyle(fontWeight: FontWeight.bold),
-//                                 ),
-//                                 SizedBox(width: 8),
-//                                 Text('0'),
-//                               ],
-//                             ),
-//                             const SizedBox(height: 24),
-
-//                             _SectionTitle('左瞳孔縮放'),
-//                             Row(
-//                               children: [
-//                                 _RadioCircle(label: '+'),
-//                                 _RadioCircle(label: '-'),
-//                                 _RadioCircle(label: '±'),
-//                               ],
-//                             ),
-//                             const SizedBox(height: 8),
-
-//                             _SectionTitle('左瞳孔大小 (mm)'),
-//                             const SizedBox(width: 8),
-//                             SizedBox(
-//                               width: 120,
-//                               child: TextField(
-//                                 decoration: const InputDecoration(
-//                                   hintText: '輸入數字',
-//                                   border: OutlineInputBorder(),
-//                                 ),
-//                               ),
-//                             ),
-//                             const SizedBox(height: 16),
-
-//                             _SectionTitle('右瞳孔縮放'),
-//                             Row(
-//                               children: [
-//                                 _RadioCircle(label: '+'),
-//                                 _RadioCircle(label: '-'),
-//                                 _RadioCircle(label: '±'),
-//                               ],
-//                             ),
-//                             const SizedBox(height: 8),
-
-//                             _SectionTitle('右瞳孔大小 (mm)'),
-//                             const SizedBox(width: 8),
-//                             SizedBox(
-//                               width: 120,
-//                               child: TextField(
-//                                 decoration: const InputDecoration(
-//                                   hintText: '輸入數字',
-//                                   border: OutlineInputBorder(),
-//                                 ),
-//                               ),
-//                             ),
-//                             const SizedBox(height: 16),
-//                           ],
-
-//                           _SectionTitle('過去病史'),
-//                           Row(
-//                             children: [
-//                               InkWell(
-//                                 onTap: () => setState(() => history = 0),
-//                                 child: Row(
-//                                   children: [
-//                                     Radio(
-//                                       value: 0,
-//                                       groupValue: history,
-//                                       onChanged: (v) =>
-//                                           setState(() => history = v as int),
-//                                       activeColor: Color(0xFF83ACA9),
-//                                     ),
-//                                     const Text('無'),
-//                                   ],
-//                                 ),
-//                               ),
-//                               InkWell(
-//                                 onTap: () => setState(() => history = 1),
-//                                 child: Row(
-//                                   children: [
-//                                     Radio(
-//                                       value: 1,
-//                                       groupValue: history,
-//                                       onChanged: (v) =>
-//                                           setState(() => history = v as int),
-//                                       activeColor: Color(0xFF83ACA9),
-//                                     ),
-//                                     const Text('不詳'),
-//                                   ],
-//                                 ),
-//                               ),
-//                               InkWell(
-//                                 onTap: () => setState(() => history = 2),
-//                                 child: Row(
-//                                   children: [
-//                                     Radio(
-//                                       value: 2,
-//                                       groupValue: history,
-//                                       onChanged: (v) =>
-//                                           setState(() => history = v as int),
-//                                       activeColor: Color(0xFF83ACA9),
-//                                     ),
-//                                     const Text('有'),
-//                                   ],
-//                                 ),
-//                               ),
-//                             ],
-//                           ),
-//                           const SizedBox(height: 16),
-
-//                           _SectionTitle('過敏史'),
-//                           Row(
-//                             children: [
-//                               InkWell(
-//                                 onTap: () => setState(() => allergy = 0),
-//                                 child: Row(
-//                                   children: [
-//                                     Radio(
-//                                       value: 0,
-//                                       groupValue: allergy,
-//                                       onChanged: (v) =>
-//                                           setState(() => allergy = v as int),
-//                                       activeColor: Color(0xFF83ACA9),
-//                                     ),
-//                                     const Text('無'),
-//                                   ],
-//                                 ),
-//                               ),
-//                               InkWell(
-//                                 onTap: () => setState(() => allergy = 1),
-//                                 child: Row(
-//                                   children: [
-//                                     Radio(
-//                                       value: 1,
-//                                       groupValue: allergy,
-//                                       onChanged: (v) =>
-//                                           setState(() => allergy = v as int),
-//                                       activeColor: Color(0xFF83ACA9),
-//                                     ),
-//                                     const Text('不詳'),
-//                                   ],
-//                                 ),
-//                               ),
-//                               InkWell(
-//                                 onTap: () => setState(() => allergy = 2),
-//                                 child: Row(
-//                                   children: [
-//                                     Radio(
-//                                       value: 2,
-//                                       groupValue: allergy,
-//                                       onChanged: (v) =>
-//                                           setState(() => allergy = v as int),
-//                                       activeColor: Color(0xFF83ACA9),
-//                                     ),
-//                                     const Text('有'),
-//                                   ],
-//                                 ),
-//                               ),
-//                             ],
-//                           ),
-//                         ],
-//                       ),
-//                     ),
-//                   ],
-//                 ),
-
-//                 // ===== 初步診斷區塊 =====
-//                 const SizedBox(height: 40),
-//                 _SectionTitle('初步診斷'),
-//                 TextField(
-//                   decoration: const InputDecoration(
-//                     hintText: '請填寫初步診斷',
-//                     border: OutlineInputBorder(),
-//                   ),
-//                 ),
-//                 const SizedBox(height: 24),
-
-//                 _SectionTitle('初步診斷類別'),
-//                 Column(
-//                   crossAxisAlignment: CrossAxisAlignment.start,
-//                   children: [
-//                     _RadioItem(
-//                       'Mild Neurologic(headache、dizziness、vertigo)',
-//                       value: 0,
-//                       groupValue: diagnosisCategory,
-//                       onChanged: (v) => setState(() => diagnosisCategory = v!),
-//                     ),
-//                     _RadioItem(
-//                       'Severe Neurologic(syncope、seizure、CVA)',
-//                       value: 1,
-//                       groupValue: diagnosisCategory,
-//                       onChanged: (v) => setState(() => diagnosisCategory = v!),
-//                     ),
-//                     _RadioItem(
-//                       'GI non-OP (AGE Epigas mild bleeding)',
-//                       value: 2,
-//                       groupValue: diagnosisCategory,
-//                       onChanged: (v) => setState(() => diagnosisCategory = v!),
-//                     ),
-//                     _RadioItem(
-//                       'GI surgical (app cholecystitis PPU)',
-//                       value: 3,
-//                       groupValue: diagnosisCategory,
-//                       onChanged: (v) => setState(() => diagnosisCategory = v!),
-//                     ),
-//                     _RadioItem(
-//                       'Mild Trauma(含head injury、non-surgical intervention)',
-//                       value: 4,
-//                       groupValue: diagnosisCategory,
-//                       onChanged: (v) => setState(() => diagnosisCategory = v!),
-//                     ),
-//                     _RadioItem(
-//                       'Severe Trauma (surgical intervention)',
-//                       value: 5,
-//                       groupValue: diagnosisCategory,
-//                       onChanged: (v) => setState(() => diagnosisCategory = v!),
-//                     ),
-//                     _RadioItem(
-//                       'Mild CV (Palpitation Chest pain H/T hypo)',
-//                       value: 6,
-//                       groupValue: diagnosisCategory,
-//                       onChanged: (v) => setState(() => diagnosisCategory = v!),
-//                     ),
-//                     _RadioItem(
-//                       'Severe CV (AMI Arrythmia Shock Others)',
-//                       value: 7,
-//                       groupValue: diagnosisCategory,
-//                       onChanged: (v) => setState(() => diagnosisCategory = v!),
-//                     ),
-//                     _RadioItem(
-//                       'RESP(Asthma、COPD)',
-//                       value: 8,
-//                       groupValue: diagnosisCategory,
-//                       onChanged: (v) => setState(() => diagnosisCategory = v!),
-//                     ),
-//                     _RadioItem(
-//                       'Fever (cause undetermined)',
-//                       value: 9,
-//                       groupValue: diagnosisCategory,
-//                       onChanged: (v) => setState(() => diagnosisCategory = v!),
-//                     ),
-//                     _RadioItem(
-//                       'Musculoskeletal',
-//                       value: 10,
-//                       groupValue: diagnosisCategory,
-//                       onChanged: (v) => setState(() => diagnosisCategory = v!),
-//                     ),
-//                     _RadioItem(
-//                       'DM (hypoglycemia or hyperglycemia)',
-//                       value: 11,
-//                       groupValue: diagnosisCategory,
-//                       onChanged: (v) => setState(() => diagnosisCategory = v!),
-//                     ),
-//                     _RadioItem(
-//                       'GU (APN Stone or others)',
-//                       value: 12,
-//                       groupValue: diagnosisCategory,
-//                       onChanged: (v) => setState(() => diagnosisCategory = v!),
-//                     ),
-//                     _RadioItem(
-//                       'OHCA',
-//                       value: 13,
-//                       groupValue: diagnosisCategory,
-//                       onChanged: (v) => setState(() => diagnosisCategory = v!),
-//                     ),
-//                     _RadioItem(
-//                       'Derma',
-//                       value: 14,
-//                       groupValue: diagnosisCategory,
-//                       onChanged: (v) => setState(() => diagnosisCategory = v!),
-//                     ),
-//                     _RadioItem(
-//                       'GYN',
-//                       value: 15,
-//                       groupValue: diagnosisCategory,
-//                       onChanged: (v) => setState(() => diagnosisCategory = v!),
-//                     ),
-//                     _RadioItem(
-//                       'OPH/ENT',
-//                       value: 16,
-//                       groupValue: diagnosisCategory,
-//                       onChanged: (v) => setState(() => diagnosisCategory = v!),
-//                     ),
-//                     _RadioItem(
-//                       'Psychiatric (nervous、anxious、Alcohols/drug)',
-//                       value: 17,
-//                       groupValue: diagnosisCategory,
-//                       onChanged: (v) => setState(() => diagnosisCategory = v!),
-//                     ),
-//                     _RadioItem(
-//                       'Others',
-//                       value: 18,
-//                       groupValue: diagnosisCategory,
-//                       onChanged: (v) => setState(() => diagnosisCategory = v!),
-//                     ),
-//                   ],
-//                 ),
-//                 const SizedBox(height: 24),
-
-//                 _SectionTitle('初步診斷的ICD-10'),
-//                 Row(
-//                   children: [
-//                     ElevatedButton(
-//                       style: ElevatedButton.styleFrom(
-//                         backgroundColor: Color(0xFF83ACA9),
-//                         foregroundColor: Colors.white,
-//                       ),
-//                       onPressed: () =>
-//                           _showICD10Dialog((v) => selectedICD10Main = v),
-//                       child: const Text('ICD10CM搜尋'),
-//                     ),
-//                     const SizedBox(width: 12),
-//                     ElevatedButton(
-//                       style: ElevatedButton.styleFrom(
-//                         backgroundColor: Color(0xFF83ACA9),
-//                         foregroundColor: Colors.white,
-//                       ),
-//                       onPressed: () {},
-//                       child: const Text('GOOGLE搜尋'),
-//                     ),
-//                   ],
-//                 ),
-//                 const SizedBox(height: 12),
-//                 TextField(
-//                   controller: TextEditingController(
-//                     text: selectedICD10Main ?? '',
-//                   ),
-//                   decoration: const InputDecoration(
-//                     hintText: '請填寫ICD-10代碼',
-//                     border: OutlineInputBorder(),
-//                   ),
-//                   readOnly: true,
-//                 ),
-//                 const SizedBox(height: 24),
-
-//                 // 副診斷1的ICD-10
-//                 _SectionTitle('副診斷1的ICD-10'),
-//                 Row(
-//                   children: [
-//                     ElevatedButton(
-//                       style: ElevatedButton.styleFrom(
-//                         backgroundColor: Color(0xFF83ACA9),
-//                         foregroundColor: Colors.white,
-//                       ),
-//                       onPressed: () =>
-//                           _showICD10Dialog((v) => selectedICD10Sub1 = v),
-//                       child: const Text('ICD10CM搜尋'),
-//                     ),
-//                     const SizedBox(width: 12),
-//                     ElevatedButton(
-//                       style: ElevatedButton.styleFrom(
-//                         backgroundColor: Color(0xFF83ACA9),
-//                         foregroundColor: Colors.white,
-//                       ),
-//                       onPressed: () {},
-//                       child: const Text('GOOGLE搜尋'),
-//                     ),
-//                   ],
-//                 ),
-//                 const SizedBox(height: 12),
-//                 TextField(
-//                   controller: TextEditingController(
-//                     text: selectedICD10Sub1 ?? '',
-//                   ),
-//                   decoration: const InputDecoration(
-//                     hintText: '請填寫ICD-10代碼',
-//                     border: OutlineInputBorder(),
-//                   ),
-//                   readOnly: true,
-//                 ),
-//                 const SizedBox(height: 32),
-
-//                 // 副診斷2的ICD-10
-//                 _SectionTitle('副診斷2的ICD-10'),
-//                 Row(
-//                   children: [
-//                     ElevatedButton(
-//                       style: ElevatedButton.styleFrom(
-//                         backgroundColor: Color(0xFF83ACA9),
-//                         foregroundColor: Colors.white,
-//                       ),
-//                       onPressed: () =>
-//                           _showICD10Dialog((v) => selectedICD10Sub2 = v),
-//                       child: const Text('ICD10CM搜尋'),
-//                     ),
-//                     const SizedBox(width: 12),
-//                     ElevatedButton(
-//                       style: ElevatedButton.styleFrom(
-//                         backgroundColor: Color(0xFF83ACA9),
-//                         foregroundColor: Colors.white,
-//                       ),
-//                       onPressed: () {},
-//                       child: const Text('GOOGLE搜尋'),
-//                     ),
-//                   ],
-//                 ),
-//                 const SizedBox(height: 12),
-//                 TextField(
-//                   controller: TextEditingController(
-//                     text: selectedICD10Sub2 ?? '',
-//                   ),
-//                   decoration: const InputDecoration(
-//                     hintText: '請填寫ICD-10代碼',
-//                     border: OutlineInputBorder(),
-//                   ),
-//                   readOnly: true,
-//                 ),
-//                 const SizedBox(height: 32),
-
-//                 _SectionTitle('檢傷分類'),
-//                 Wrap(
-//                   spacing: 24,
-//                   runSpacing: 8,
-//                   children: [
-//                     _RadioItem(
-//                       '第一級：復甦急救',
-//                       value: 0,
-//                       groupValue: classify,
-//                       onChanged: (v) => setState(() => classify = v!),
-//                     ),
-//                     _RadioItem(
-//                       '第二級：危急',
-//                       value: 1,
-//                       groupValue: classify,
-//                       onChanged: (v) => setState(() => classify = v!),
-//                     ),
-//                     _RadioItem(
-//                       '第三級：緊急',
-//                       value: 2,
-//                       groupValue: classify,
-//                       onChanged: (v) => setState(() => classify = v!),
-//                     ),
-//                     _RadioItem(
-//                       '第四級：次緊急',
-//                       value: 3,
-//                       groupValue: classify,
-//                       onChanged: (v) => setState(() => classify = v!),
-//                     ),
-//                     _RadioItem(
-//                       '第五級：非緊急',
-//                       value: 4,
-//                       groupValue: classify,
-//                       onChanged: (v) => setState(() => classify = v!),
-//                     ),
-//                   ],
-//                 ),
-//                 const SizedBox(height: 16),
-
-//                 _SectionTitle('現場處置'),
-//                 Wrap(
-//                   spacing: 24,
-//                   runSpacing: 8,
-//                   children: [
-//                     _CheckBoxItem('諮詢衛教'),
-//                     _CheckBoxItem('內科處置'),
-//                     _CheckBoxItem('外科處置'),
-//                     _CheckBoxItem('拒絕處置'),
-//                     _CheckBoxItem('疑似傳染病診療'),
-//                   ],
-//                 ),
-//                 const SizedBox(height: 16),
-
-//                 _SectionTitle('處理摘要'),
-//                 Wrap(
-//                   spacing: 24,
-//                   runSpacing: 8,
-//                   children: [
-//                     _CheckBoxItem('冰敷'),
-//                     InkWell(
-//                       onTap: () => setState(() => ekgChecked = !ekgChecked),
-//                       child: Row(
-//                         mainAxisSize: MainAxisSize.min,
-//                         children: [
-//                           Checkbox(
-//                             value: ekgChecked,
-//                             activeColor: const Color(0xFF83ACA9),
-//                             onChanged: (v) =>
-//                                 setState(() => ekgChecked = v ?? false),
-//                           ),
-//                           const Text(
-//                             'EKG心電圖',
-//                             style: TextStyle(color: Colors.black),
-//                           ),
-//                         ],
-//                       ),
-//                     ),
-//                     InkWell(
-//                       onTap: () => setState(() => sugarChecked = !sugarChecked),
-//                       child: Row(
-//                         mainAxisSize: MainAxisSize.min,
-//                         children: [
-//                           Checkbox(
-//                             value: sugarChecked,
-//                             activeColor: const Color(0xFF83ACA9),
-//                             onChanged: (v) =>
-//                                 setState(() => sugarChecked = v ?? false),
-//                           ),
-//                           const Text(
-//                             '血糖',
-//                             style: TextStyle(color: Colors.black),
-//                           ),
-//                         ],
-//                       ),
-//                     ),
-//                     _CheckBoxItem('傷口處置'),
-//                     _CheckBoxItem('簽四聯單'),
-//                     InkWell(
-//                       onTap: () =>
-//                           setState(() => suggestReferral = !suggestReferral),
-//                       child: Row(
-//                         mainAxisSize: MainAxisSize.min,
-//                         children: [
-//                           Checkbox(
-//                             value: suggestReferral,
-//                             activeColor: const Color(0xFF83ACA9),
-//                             onChanged: (v) =>
-//                                 setState(() => suggestReferral = v ?? false),
-//                           ),
-//                           const Text(
-//                             '建議轉診',
-//                             style: TextStyle(color: Colors.black),
-//                           ),
-//                         ],
-//                       ),
-//                     ),
-//                     InkWell(
-//                       onTap: () => setState(
-//                         () => intubationChecked = !intubationChecked,
-//                       ),
-//                       child: Row(
-//                         mainAxisSize: MainAxisSize.min,
-//                         children: [
-//                           Checkbox(
-//                             value: intubationChecked,
-//                             activeColor: const Color(0xFF83ACA9),
-//                             onChanged: (v) =>
-//                                 setState(() => intubationChecked = v ?? false),
-//                           ),
-//                           const Text(
-//                             '插管',
-//                             style: TextStyle(color: Colors.black),
-//                           ),
-//                         ],
-//                       ),
-//                     ),
-//                     InkWell(
-//                       onTap: () => setState(() => cprChecked = !cprChecked),
-//                       child: Row(
-//                         mainAxisSize: MainAxisSize.min,
-//                         children: [
-//                           Checkbox(
-//                             value: cprChecked,
-//                             activeColor: const Color(0xFF83ACA9),
-//                             onChanged: (v) =>
-//                                 setState(() => cprChecked = v ?? false),
-//                           ),
-//                           const Text(
-//                             'CPR',
-//                             style: TextStyle(color: Colors.black),
-//                           ),
-//                         ],
-//                       ),
-//                     ),
-//                     InkWell(
-//                       onTap: () => setState(
-//                         () => oxygentherpyChecked = !oxygentherpyChecked,
-//                       ),
-//                       child: Row(
-//                         mainAxisSize: MainAxisSize.min,
-//                         children: [
-//                           Checkbox(
-//                             value: intubationChecked,
-//                             activeColor: const Color(0xFF83ACA9),
-//                             onChanged: (v) =>
-//                                 setState(() => intubationChecked = v ?? false),
-//                           ),
-//                           const Text(
-//                             '氧氣使用',
-//                             style: TextStyle(color: Colors.black),
-//                           ),
-//                         ],
-//                       ),
-//                     ),
-//                     InkWell(
-//                       onTap: () => setState(
-//                         () => medicalCertificateChecked =
-//                             !medicalCertificateChecked,
-//                       ),
-//                       child: Row(
-//                         mainAxisSize: MainAxisSize.min,
-//                         children: [
-//                           Checkbox(
-//                             value: medicalCertificateChecked,
-//                             activeColor: const Color(0xFF83ACA9),
-//                             onChanged: (v) => setState(
-//                               () => medicalCertificateChecked = v ?? false,
-//                             ),
-//                           ),
-//                           const Text(
-//                             '診斷書',
-//                             style: TextStyle(color: Colors.black),
-//                           ),
-//                         ],
-//                       ),
-//                     ),
-//                     _CheckBoxItem('抽痰'),
-//                     InkWell(
-//                       onTap: () => setState(
-//                         () => prescriptionChecked = !prescriptionChecked,
-//                       ),
-//                       child: Row(
-//                         mainAxisSize: MainAxisSize.min,
-//                         children: [
-//                           Checkbox(
-//                             value: prescriptionChecked,
-//                             activeColor: const Color(0xFF83ACA9),
-//                             onChanged: (v) => setState(
-//                               () => prescriptionChecked = v ?? false,
-//                             ),
-//                           ),
-//                           const Text(
-//                             '藥物使用',
-//                             style: TextStyle(color: Colors.black),
-//                           ),
-//                         ],
-//                       ),
-//                     ),
-//                     InkWell(
-//                       onTap: () => setState(() => otherChecked = !otherChecked),
-//                       child: Row(
-//                         mainAxisSize: MainAxisSize.min,
-//                         children: [
-//                           Checkbox(
-//                             value: otherChecked,
-//                             activeColor: const Color(0xFF83ACA9),
-//                             onChanged: (v) =>
-//                                 setState(() => otherChecked = v ?? false),
-//                           ),
-//                           const Text(
-//                             '其他',
-//                             style: TextStyle(color: Colors.black),
-//                           ),
-//                         ],
-//                       ),
-//                     ),
-//                   ],
-//                 ),
-//                 const SizedBox(height: 16),
-
-//                 if (ekgChecked) ...[
-//                   _SectionTitle('心電圖判讀'),
-//                   TextField(
-//                     controller: ekgController,
-//                     decoration: const InputDecoration(
-//                       hintText: '請填寫判讀結果',
-//                       border: OutlineInputBorder(),
-//                     ),
-//                   ),
-//                   const SizedBox(height: 16),
-//                 ],
-
-//                 if (sugarChecked) ...[
-//                   _SectionTitle('血糖(mg/dL)'),
-//                   TextField(
-//                     controller: sugarController,
-//                     decoration: const InputDecoration(
-//                       hintText: '請填寫血糖記錄',
-//                       border: OutlineInputBorder(),
-//                     ),
-//                   ),
-//                   const SizedBox(height: 16),
-//                 ],
-
-//                 if (suggestReferral) ...[
-//                   // 通關方式
-//                   _SectionTitle('通關方式', color: Colors.black),
-//                   Row(
-//                     children: [
-//                       InkWell(
-//                         onTap: () => setState(() => referralType = 0),
-//                         child: Row(
-//                           children: [
-//                             Radio(
-//                               value: 0,
-//                               groupValue: referralType,
-//                               onChanged: (v) =>
-//                                   setState(() => referralType = v as int),
-//                               activeColor: Color(0xFF274C4A),
-//                             ),
-//                             const Text('一般通關'),
-//                           ],
-//                         ),
-//                       ),
-//                       InkWell(
-//                         onTap: () => setState(() => referralType = 1),
-//                         child: Row(
-//                           children: [
-//                             Radio(
-//                               value: 1,
-//                               groupValue: referralType,
-//                               onChanged: (v) =>
-//                                   setState(() => referralType = v as int),
-//                               activeColor: Color(0xFF274C4A),
-//                             ),
-//                             const Text('緊急通關'),
-//                           ],
-//                         ),
-//                       ),
-//                     ],
-//                   ),
-//                   const SizedBox(height: 8),
-
-//                   // 救護車
-//                   _SectionTitle('救護車', color: Colors.black),
-//                   Row(
-//                     children: [
-//                       InkWell(
-//                         onTap: () => setState(() => rescueType = 0),
-//                         child: Row(
-//                           children: [
-//                             Radio(
-//                               value: 0,
-//                               groupValue: rescueType,
-//                               onChanged: (v) =>
-//                                   setState(() => rescueType = v as int),
-//                               activeColor: Color(0xFF274C4A),
-//                             ),
-//                             const Text('醫療中心'),
-//                           ],
-//                         ),
-//                       ),
-//                       InkWell(
-//                         onTap: () => setState(() => rescueType = 1),
-//                         child: Row(
-//                           children: [
-//                             Radio(
-//                               value: 1,
-//                               groupValue: rescueType,
-//                               onChanged: (v) =>
-//                                   setState(() => rescueType = v as int),
-//                               activeColor: Color(0xFF274C4A),
-//                             ),
-//                             const Text('民間'),
-//                           ],
-//                         ),
-//                       ),
-//                       InkWell(
-//                         onTap: () => setState(() => rescueType = 2),
-//                         child: Row(
-//                           children: [
-//                             Radio(
-//                               value: 2,
-//                               groupValue: rescueType,
-//                               onChanged: (v) =>
-//                                   setState(() => rescueType = v as int),
-//                               activeColor: Color(0xFF274C4A),
-//                             ),
-//                             const Text('消防隊'),
-//                           ],
-//                         ),
-//                       ),
-//                     ],
-//                   ),
-//                   const SizedBox(height: 8),
-
-//                   // 轉送醫院
-//                   _SectionTitle('轉送醫院', color: Colors.black),
-//                   Column(
-//                     crossAxisAlignment: CrossAxisAlignment.start,
-//                     children: List.generate(referralHospitals.length, (i) {
-//                       return InkWell(
-//                         onTap: () => setState(() => referralHospital = i),
-//                         child: Row(
-//                           children: [
-//                             Radio<int>(
-//                               value: i,
-//                               groupValue: referralHospital,
-//                               onChanged: (v) =>
-//                                   setState(() => referralHospital = v!),
-//                               activeColor: Color(0xFF274C4A),
-//                             ),
-//                             Flexible(child: Text(referralHospitals[i])),
-//                           ],
-//                         ),
-//                       );
-//                     }),
-//                   ),
-//                   const SizedBox(height: 8),
-
-//                   // 其他轉送醫院
-//                   _SectionTitle('其他轉送醫院?', color: Colors.black),
-//                   TextField(
-//                     controller: referralOtherController,
-//                     decoration: const InputDecoration(
-//                       hintText: '請填寫其他轉送醫院',
-//                       border: OutlineInputBorder(),
-//                     ),
-//                   ),
-//                   const SizedBox(height: 8),
-
-//                   // 隨車人員
-//                   _SectionTitle('隨車人員(舊)', color: Colors.black),
-//                   TextField(
-//                     controller: referralEscortController,
-//                     decoration: const InputDecoration(
-//                       hintText: '請填寫隨車人員的姓名',
-//                       border: OutlineInputBorder(),
-//                     ),
-//                   ),
-//                   const SizedBox(height: 8),
-
-//                   // 隨車人員log
-//                   _SectionTitle('隨車人員'),
-//                   Container(
-//                     width: double.infinity,
-//                     color: const Color(0xFFF1F3F6),
-//                     padding: const EdgeInsets.symmetric(
-//                       vertical: 12,
-//                       horizontal: 8,
-//                     ),
-//                     child: Column(
-//                       crossAxisAlignment: CrossAxisAlignment.start,
-//                       children: const [
-//                         Text(
-//                           '隨車人員姓名',
-//                           style: TextStyle(
-//                             fontWeight: FontWeight.bold,
-//                             color: Colors.black,
-//                           ),
-//                         ),
-//                         SizedBox(height: 8),
-//                         Text('加入資料行', style: TextStyle(color: Colors.grey)),
-//                       ],
-//                     ),
-//                   ),
-//                   const SizedBox(height: 8),
-
-//                   // 產生救護車紀錄單
-//                   Align(
-//                     alignment: Alignment.centerLeft,
-//                     child: ElevatedButton(
-//                       style: ElevatedButton.styleFrom(
-//                         backgroundColor: Color(0xFF274C4A),
-//                         foregroundColor: Colors.white,
-//                       ),
-//                       onPressed: () {},
-//                       child: const Text('產生救護車紀錄單'),
-//                     ),
-//                   ),
-//                   const SizedBox(height: 16),
-//                 ],
-
-//                 if (intubationChecked) ...[
-//                   _SectionTitle('插管方式'),
-//                   Row(
-//                     children: [
-//                       InkWell(
-//                         onTap: () => setState(() => intubationType = 0),
-//                         child: Row(
-//                           children: [
-//                             Radio(
-//                               value: 0,
-//                               groupValue: intubationType,
-//                               onChanged: (v) =>
-//                                   setState(() => intubationType = v as int),
-//                               activeColor: Color(0xFF83ACA9),
-//                             ),
-//                             const Text('Endotracheal tube'),
-//                           ],
-//                         ),
-//                       ),
-//                       InkWell(
-//                         onTap: () => setState(() => intubationType = 1),
-//                         child: Row(
-//                           children: [
-//                             Radio(
-//                               value: 1,
-//                               groupValue: intubationType,
-//                               onChanged: (v) =>
-//                                   setState(() => intubationType = v as int),
-//                               activeColor: Color(0xFF83ACA9),
-//                             ),
-//                             const Text('LMA'),
-//                           ],
-//                         ),
-//                       ),
-//                     ],
-//                   ),
-//                   const SizedBox(height: 16),
-//                 ],
-
-//                 if (cprChecked) ...[
-//                   Align(
-//                     alignment: Alignment.centerLeft,
-//                     child: ElevatedButton(
-//                       style: ElevatedButton.styleFrom(
-//                         backgroundColor: Color(0xFF83ACA9),
-//                         foregroundColor: Colors.white,
-//                       ),
-//                       onPressed: () {
-//                         // 產生急救記錄單的功能
-//                       },
-//                       child: const Text('產生急救記錄單'),
-//                     ),
-//                   ),
-//                   const SizedBox(height: 16),
-//                 ],
-
-//                 if (oxygentherpyChecked) ...[
-//                   _SectionTitle('氧氣使用'),
-//                   Row(
-//                     children: [
-//                       InkWell(
-//                         onTap: () => setState(() => oxygentype = 0),
-//                         child: Row(
-//                           children: [
-//                             Radio(
-//                               value: 0,
-//                               groupValue: oxygentype,
-//                               onChanged: (v) =>
-//                                   setState(() => oxygentype = v as int),
-//                               activeColor: Color(0xFF83ACA9),
-//                             ),
-//                             const Text('鼻導管N/C'),
-//                           ],
-//                         ),
-//                       ),
-//                       InkWell(
-//                         onTap: () => setState(() => oxygentype = 1),
-//                         child: Row(
-//                           children: [
-//                             Radio(
-//                               value: 1,
-//                               groupValue: oxygentype,
-//                               onChanged: (v) =>
-//                                   setState(() => oxygentype = v as int),
-//                               activeColor: Color(0xFF83ACA9),
-//                             ),
-//                             const Text('面罩Mask'),
-//                           ],
-//                         ),
-//                       ),
-//                       InkWell(
-//                         onTap: () => setState(() => oxygentype = 2),
-//                         child: Row(
-//                           children: [
-//                             Radio(
-//                               value: 2,
-//                               groupValue: oxygentype,
-//                               onChanged: (v) =>
-//                                   setState(() => oxygentype = v as int),
-//                               activeColor: Color(0xFF83ACA9),
-//                             ),
-//                             const Text('非再吸入面罩'),
-//                           ],
-//                         ),
-//                       ),
-//                       InkWell(
-//                         onTap: () => setState(() => oxygentype = 3),
-//                         child: Row(
-//                           children: [
-//                             Radio(
-//                               value: 3,
-//                               groupValue: oxygentype,
-//                               onChanged: (v) =>
-//                                   setState(() => oxygentype = v as int),
-//                               activeColor: Color(0xFF83ACA9),
-//                             ),
-//                             const Text('Ambu'),
-//                           ],
-//                         ),
-//                       ),
-//                       const SizedBox(height: 8),
-//                       _SectionTitle('氧氣流量(L/MIN)', color: Color(0xFF83ACA9)),
-//                       TextField(
-//                         controller: referralEscortController,
-//                         decoration: const InputDecoration(
-//                           hintText: '請填寫氧氣流量',
-//                           border: OutlineInputBorder(),
-//                         ),
-//                       ),
-//                     ],
-//                   ),
-//                   const SizedBox(height: 16),
-//                 ],
-
-//                 if (medicalCertificateChecked) ...[
-//                   const SizedBox(height: 16),
-//                   _SectionTitle('診斷書種類'),
-//                   Wrap(
-//                     spacing: 24,
-//                     runSpacing: 8,
-//                     children: medicalCertificateTypes.keys.map((label) {
-//                       return InkWell(
-//                         onTap: () => setState(
-//                           () => medicalCertificateTypes[label] =
-//                               !(medicalCertificateTypes[label] ?? false),
-//                         ),
-//                         child: Row(
-//                           mainAxisSize: MainAxisSize.min,
-//                           children: [
-//                             Checkbox(
-//                               value: medicalCertificateTypes[label],
-//                               activeColor: const Color(0xFF83ACA9),
-//                               onChanged: (v) => setState(
-//                                 () =>
-//                                     medicalCertificateTypes[label] = v ?? false,
-//                               ),
-//                             ),
-//                             Text(
-//                               label,
-//                               style: const TextStyle(color: Colors.black),
-//                             ),
-//                           ],
-//                         ),
-//                       );
-//                     }).toList(),
-//                   ),
-//                   const SizedBox(height: 16),
-//                 ],
-
-//                 if (prescriptionChecked) ...[
-//                   _SectionTitle('藥物記錄表'),
-//                   const SizedBox(height: 16),
-
-//                   Container(
-//                     width: double.infinity,
-//                     color: const Color(0xFFF1F3F6),
-//                     padding: const EdgeInsets.symmetric(
-//                       vertical: 12,
-//                       horizontal: 8,
-//                     ),
-//                     child: Row(
-//                       children: const [
-//                         Expanded(
-//                           flex: 2,
-//                           child: Text(
-//                             '藥品名稱',
-//                             style: TextStyle(fontWeight: FontWeight.bold),
-//                           ),
-//                         ),
-//                         Expanded(
-//                           flex: 2,
-//                           child: Text(
-//                             '使用方式',
-//                             style: TextStyle(fontWeight: FontWeight.bold),
-//                           ),
-//                         ),
-//                         Expanded(
-//                           flex: 2,
-//                           child: Text(
-//                             '服用頻率',
-//                             style: TextStyle(fontWeight: FontWeight.bold),
-//                           ),
-//                         ),
-//                         Expanded(
-//                           flex: 2,
-//                           child: Text(
-//                             '服用天數',
-//                             style: TextStyle(fontWeight: FontWeight.bold),
-//                           ),
-//                         ),
-//                         Expanded(
-//                           flex: 2,
-//                           child: Text(
-//                             '劑量',
-//                             style: TextStyle(fontWeight: FontWeight.bold),
-//                           ),
-//                         ),
-//                         Expanded(
-//                           flex: 2,
-//                           child: Text(
-//                             '劑量單位',
-//                             style: TextStyle(fontWeight: FontWeight.bold),
-//                           ),
-//                         ),
-//                         Expanded(
-//                           flex: 2,
-//                           child: Text(
-//                             '備註',
-//                             style: TextStyle(fontWeight: FontWeight.bold),
-//                           ),
-//                         ),
-//                       ],
-//                     ),
-//                   ),
-
-//                   ...prescriptionRows.map((row) {
-//                     return Container(
-//                       width: double.infinity,
-//                       color: Colors.transparent,
-//                       padding: const EdgeInsets.symmetric(
-//                         vertical: 8,
-//                         horizontal: 8,
-//                       ),
-//                       child: Row(
-//                         children: [
-//                           Expanded(flex: 2, child: Text(row['藥品名稱'] ?? '')),
-//                           Expanded(flex: 2, child: Text(row['使用方式'] ?? '')),
-//                           Expanded(flex: 2, child: Text(row['服用頻率'] ?? '')),
-//                           Expanded(flex: 2, child: Text(row['服用天數'] ?? '')),
-//                           Expanded(flex: 2, child: Text(row['劑量'] ?? '')),
-//                           Expanded(flex: 2, child: Text(row['劑量單位'] ?? '')),
-//                           Expanded(flex: 2, child: Text(row['備註'] ?? '')),
-//                         ],
-//                       ),
-//                     );
-//                   }).toList(),
-
-//                   InkWell(
-//                     onTap: _showPrescriptionDialog,
-//                     child: Container(
-//                       width: double.infinity,
-//                       color: Colors.transparent,
-//                       padding: const EdgeInsets.symmetric(
-//                         vertical: 12,
-//                         horizontal: 8,
-//                       ),
-//                       child: const Text(
-//                         '加入資料行',
-//                         style: TextStyle(color: Colors.blue),
-//                       ),
-//                     ),
-//                   ),
-
-//                   const SizedBox(height: 16),
-//                 ],
-
-//                 if (otherChecked) ...[
-//                   _SectionTitle('其他處理摘要'),
-//                   const SizedBox(height: 16),
-//                   TextField(
-//                     controller: otherController,
-//                     decoration: const InputDecoration(
-//                       hintText: '請填寫其他處理摘要',
-//                       border: OutlineInputBorder(),
-//                     ),
-//                   ),
-//                   const SizedBox(height: 16),
-//                 ],
-
-//                 _SectionTitle('後續結果'),
-//                 Wrap(
-//                   spacing: 24,
-//                   runSpacing: 8,
-//                   children: [
-//                     _CheckBoxItem('繼續搭機旅行'),
-//                     _CheckBoxItem('休息觀察或自行回家'),
-//                     _CheckBoxItem('轉聯新國際醫院'),
-//                     _CheckBoxItem('轉林口長庚醫院'),
-//                     StatefulBuilder(
-//                       builder: (context, setSBState) => InkWell(
-//                         onTap: () {
-//                           setState(
-//                             () =>
-//                                 transferOtherHospital = !transferOtherHospital,
-//                           );
-//                           setSBState(() {});
-//                         },
-//                         child: Row(
-//                           mainAxisSize: MainAxisSize.min,
-//                           children: [
-//                             Checkbox(
-//                               value: transferOtherHospital,
-//                               activeColor: const Color(0xFF83ACA9),
-//                               onChanged: (v) {
-//                                 setState(
-//                                   () => transferOtherHospital = v ?? false,
-//                                 );
-//                                 setSBState(() {});
-//                               },
-//                             ),
-//                             const Text(
-//                               '轉其他醫院',
-//                               style: TextStyle(color: Colors.black),
-//                             ),
-//                           ],
-//                         ),
-//                       ),
-//                     ),
-//                     _CheckBoxItem('建議轉診門診追蹤'),
-//                     _CheckBoxItem('死亡'),
-//                     _CheckBoxItem('拒絕轉診'),
-//                   ],
-//                 ),
-//                 const SizedBox(height: 24),
-
-//                 if (transferOtherHospital) ...[
-//                   _SectionTitle('其他醫院'),
-//                   Column(
-//                     crossAxisAlignment: CrossAxisAlignment.start,
-//                     children: List.generate(otherHospitals.length, (i) {
-//                       return InkWell(
-//                         onTap: () => setState(() => selectedOtherHospital = i),
-//                         child: Row(
-//                           children: [
-//                             Radio<int>(
-//                               value: i,
-//                               groupValue: selectedOtherHospital,
-//                               onChanged: (v) =>
-//                                   setState(() => selectedOtherHospital = v!),
-//                               activeColor: Color(0xFF83ACA9),
-//                             ),
-//                             Flexible(
-//                               child: Text(
-//                                 otherHospitals[i],
-//                                 style: const TextStyle(fontSize: 16),
-//                               ),
-//                             ),
-//                           ],
-//                         ),
-//                       );
-//                     }),
-//                   ),
-//                   const SizedBox(height: 16),
-//                 ],
-
-//                 // 醫師/主責醫師
-//                 _SectionTitle('院長'),
-//                 const SizedBox(height: 16),
-
-//                 _SectionTitle('主責醫師', color: Colors.red),
-//                 GestureDetector(
-//                   onTap: _showMainDoctorDialog,
-//                   child: AbsorbPointer(
-//                     child: TextField(
-//                       controller: TextEditingController(
-//                         text: selectedMainDoctor ?? '',
-//                       ),
-//                       decoration: const InputDecoration(
-//                         hintText: '點擊選擇醫師的姓名（必填）',
-//                         border: OutlineInputBorder(),
-//                       ),
-//                       readOnly: true,
-//                     ),
-//                   ),
-//                 ),
-//                 const SizedBox(height: 16),
-
-//                 _SectionTitle('主責護理師', color: Colors.red),
-//                 GestureDetector(
-//                   onTap: _showMainNurseDialog,
-//                   child: AbsorbPointer(
-//                     child: TextField(
-//                       controller: TextEditingController(
-//                         text: selectedMainNurse ?? '',
-//                       ),
-//                       decoration: const InputDecoration(
-//                         hintText: '點擊選擇護理師的姓名（必填）',
-//                         border: OutlineInputBorder(),
-//                       ),
-//                       readOnly: true,
-//                     ),
-//                   ),
-//                 ),
-//                 const SizedBox(height: 16),
-
-//                 _SectionTitle('護理師簽名'),
-//                 TextField(
-//                   decoration: const InputDecoration(
-//                     hintText: '',
-//                     border: OutlineInputBorder(),
-//                     focusedBorder: OutlineInputBorder(
-//                       borderSide: BorderSide(color: Colors.black12),
-//                     ),
-//                   ),
-//                   maxLines: 2,
-//                 ),
-//                 const SizedBox(height: 24),
-
-//                 _SectionTitle('EMT姓名', color: Colors.black),
-//                 GestureDetector(
-//                   onTap: _showEMTDialog,
-//                   child: AbsorbPointer(
-//                     child: TextField(
-//                       controller: TextEditingController(
-//                         text: selectedEMT ?? '',
-//                       ),
-//                       decoration: const InputDecoration(
-//                         hintText: '點擊選擇EMT的姓名（必填）',
-//                         border: OutlineInputBorder(),
-//                       ),
-//                       readOnly: true,
-//                     ),
-//                   ),
-//                 ),
-//                 const SizedBox(height: 16),
-
-//                 _SectionTitle('EMT簽名'),
-//                 TextField(
-//                   decoration: const InputDecoration(
-//                     hintText: '',
-//                     border: OutlineInputBorder(),
-//                     focusedBorder: OutlineInputBorder(
-//                       borderSide: BorderSide(color: Colors.black12),
-//                     ),
-//                   ),
-//                   maxLines: 2,
-//                 ),
-//                 const SizedBox(height: 24),
-
-//                 _SectionTitle('協助人員姓名'),
-//                 TextField(
-//                   decoration: const InputDecoration(
-//                     hintText: '請填寫協助人員的姓名',
-//                     border: OutlineInputBorder(),
-//                     focusedBorder: OutlineInputBorder(
-//                       borderSide: BorderSide(color: Colors.black12),
-//                     ),
-//                   ),
-//                 ),
-//                 const SizedBox(height: 12),
-//                 Container(
-//                   width: double.infinity,
-//                   color: const Color(0xFFF1F3F6),
-//                   padding: const EdgeInsets.symmetric(
-//                     vertical: 12,
-//                     horizontal: 8,
-//                   ),
-//                   child: Column(
-//                     crossAxisAlignment: CrossAxisAlignment.start,
-//                     children: [
-//                       _SectionTitle('協助人員姓名'),
-//                       if (_selectedHelpers.isNotEmpty)
-//                         Padding(
-//                           padding: const EdgeInsets.symmetric(vertical: 8.0),
-//                           child: Column(
-//                             crossAxisAlignment: CrossAxisAlignment.start,
-//                             children: _selectedHelpers
-//                                 .map(
-//                                   (helper) => Text(
-//                                     helper,
-//                                     style: const TextStyle(fontSize: 16),
-//                                   ),
-//                                 )
-//                                 .toList(),
-//                           ),
-//                         )
-//                       else
-//                         const Text(
-//                           '尚未選擇協助人員',
-//                           style: TextStyle(color: Colors.grey),
-//                         ),
-//                       const SizedBox(height: 12),
-//                       InkWell(
-//                         onTap: _showHelperSelectionDialog,
-//                         child: const Text(
-//                           '加入協助人員',
-//                           style: TextStyle(color: Colors.blue),
-//                         ),
-//                       ),
-//                       const SizedBox(height: 24),
-//                     ],
-//                   ),
-//                 ),
-
-//                 const SizedBox(height: 24),
-
-//                 _SectionTitle('特別註記'),
-//                 Wrap(
-//                   spacing: 24,
-//                   runSpacing: 8,
-//                   children: [
-//                     _CheckBoxItem('OHCA醫護團隊到場前有CPR'),
-//                     _CheckBoxItem('OHCA醫護團隊到場前有使用AED但無電擊'),
-//                     _CheckBoxItem('OHCA醫護團隊到場前有使用AED有電擊'),
-//                     _CheckBoxItem('現場恢復呼吸'),
-//                     _CheckBoxItem('使用自動心律復甦機'),
-//                     _CheckBoxItem('空白'),
-//                   ],
-//                 ),
-//                 const SizedBox(height: 24),
-
-//                 _SectionTitle('其他特別註記'),
-//                 TextField(
-//                   decoration: const InputDecoration(
-//                     hintText: '請輸入其他特別註記',
-//                     border: OutlineInputBorder(),
-//                     focusedBorder: OutlineInputBorder(
-//                       borderSide: BorderSide(color: Colors.black12),
-//                     ),
-//                   ),
-//                   maxLines: 2,
-//                 ),
-//                 const SizedBox(height: 24),
-//               ],
-//             ),
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-// }
-
-// // 標題元件
-// class _SectionTitle extends StatelessWidget {
-//   final String text;
-//   final Color? color;
-//   const _SectionTitle(this.text, {this.color});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Padding(
-//       padding: const EdgeInsets.only(bottom: 4),
-//       child: Text(
-//         text,
-//         style: TextStyle(
-//           fontWeight: FontWeight.bold,
-//           color: color ?? Colors.black,
-//           fontSize: 16,
-//         ),
-//       ),
-//     );
-//   }
-// }
-
-// // 單選元件
-// class _RadioItem extends StatelessWidget {
-//   final String label;
-//   final int value;
-//   final int groupValue;
-//   final ValueChanged<int?> onChanged;
-//   const _RadioItem(
-//     this.label, {
-//     required this.value,
-//     required this.groupValue,
-//     required this.onChanged,
-//   });
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return InkWell(
-//       onTap: () => onChanged(value),
-//       child: Row(
-//         children: [
-//           Radio<int>(
-//             value: value,
-//             groupValue: groupValue,
-//             activeColor: Color(0xFF83ACA9),
-//             onChanged: onChanged,
-//           ),
-//           Flexible(
-//             child: Text(label, style: const TextStyle(color: Colors.black)),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }
-
-// // Checkbox 元件
-// class _CheckBoxItem extends StatefulWidget {
-//   final String label;
-//   const _CheckBoxItem(this.label);
-
-//   @override
-//   State<_CheckBoxItem> createState() => _CheckBoxItemState();
-// }
-
-// class _CheckBoxItemState extends State<_CheckBoxItem> {
-//   bool checked = false;
-//   @override
-//   Widget build(BuildContext context) {
-//     return InkWell(
-//       onTap: () => setState(() => checked = !checked),
-//       child: Row(
-//         mainAxisSize: MainAxisSize.min,
-//         children: [
-//           Checkbox(
-//             value: checked,
-//             activeColor: const Color(0xFF83ACA9),
-//             onChanged: (v) => setState(() => checked = v ?? false),
-//           ),
-//           Text(widget.label, style: const TextStyle(color: Colors.black)),
-//         ],
-//       ),
-//     );
-//   }
-// }
-
-// //非必選元件
-// class _StatefulCheckbox extends StatefulWidget {
-//   const _StatefulCheckbox({super.key});
-//   @override
-//   State<_StatefulCheckbox> createState() => _StatefulCheckboxState();
-// }
-
-// class _StatefulCheckboxState extends State<_StatefulCheckbox> {
-//   bool checked = false;
-//   @override
-//   Widget build(BuildContext context) {
-//     return InkWell(
-//       onTap: () => setState(() => checked = !checked),
-//       child: Row(
-//         mainAxisSize: MainAxisSize.min,
-//         children: [
-//           Checkbox(
-//             value: checked,
-//             activeColor: const Color(0xFF83ACA9),
-//             onChanged: (v) => setState(() => checked = v ?? false),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }
-
-// // 身體檢查輸入元件
-// class _BodyCheckInput extends StatelessWidget {
-//   final String label;
-//   const _BodyCheckInput(this.label);
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Row(
-//       children: [
-//         SizedBox(
-//           width: 70,
-//           child: Text(
-//             label,
-//             style: const TextStyle(
-//               fontWeight: FontWeight.bold,
-//               color: Colors.black,
-//             ),
-//           ),
-//         ),
-//         const SizedBox(width: 12),
-//         SizedBox(
-//           width: 300,
-//           child: TextField(
-//             decoration: const InputDecoration(
-//               hintText: '請輸入檢查資訊',
-//               border: OutlineInputBorder(),
-//             ),
-//           ),
-//         ),
-//       ],
-//     );
-//   }
-// }
-
-// // 單選圓圈元件（+/-/±）
-// class _RadioCircle extends StatefulWidget {
-//   final String label;
-//   const _RadioCircle({required this.label});
-
-//   @override
-//   State<_RadioCircle> createState() => _RadioCircleState();
-// }
-
-// class _RadioCircleState extends State<_RadioCircle> {
-//   static String? selected;
-//   @override
-//   Widget build(BuildContext context) {
-//     return InkWell(
-//       onTap: () => setState(() => selected = widget.label),
-//       child: Row(
-//         mainAxisSize: MainAxisSize.min,
-//         children: [
-//           Radio<String>(
-//             value: widget.label,
-//             groupValue: selected,
-//             onChanged: (v) => setState(() => selected = v),
-//             activeColor: Color(0xFF83ACA9),
-//           ),
-//           Text(widget.label),
-//         ],
-//       ),
-//     );
-//   }
-// }
-
-// //照片上傳元件
-// class _PhotoGrid extends StatelessWidget {
-//   final String title;
-//   const _PhotoGrid({required this.title});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Container(
-//       padding: const EdgeInsets.symmetric(vertical: 8),
-//       child: GridView.builder(
-//         shrinkWrap: true,
-//         physics: const NeverScrollableScrollPhysics(),
-//         itemCount: 6,
-//         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-//           crossAxisCount: 3,
-//           mainAxisSpacing: 12,
-//           crossAxisSpacing: 12,
-//           childAspectRatio: 1,
-//         ),
-//         itemBuilder: (context, index) {
-//           return Column(
-//             children: [
-//               Expanded(
-//                 child: Container(
-//                   decoration: BoxDecoration(
-//                     border: Border.all(color: Colors.black12),
-//                     borderRadius: BorderRadius.circular(8),
-//                     color: Colors.grey[200],
-//                   ),
-//                   child: const Center(
-//                     child: Icon(
-//                       Icons.add_a_photo,
-//                       size: 48,
-//                       color: Colors.grey,
-//                     ),
-//                   ),
-//                 ),
-//               ),
-//               const SizedBox(height: 4),
-//               Text('$title${index + 1}', style: const TextStyle(fontSize: 12)),
-//             ],
-//           );
-//         },
-//       ),
-//     );
-//   }
-// }
+import 'dart:convert';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'data/db/daos.dart';
+import 'data/models/plan_data.dart';
+import 'nav2.dart'; // SavableStateMixin interface
+
+class PlanPage extends StatefulWidget {
+  final int visitId;
+  const PlanPage({super.key, required this.visitId});
+
+  @override
+  State<PlanPage> createState() => _PlanPageState();
+}
+
+class _PlanPageState extends State<PlanPage>
+    with AutomaticKeepAliveClientMixin<PlanPage>, SavableStateMixin<PlanPage> {
+  // ===============================================
+  // Boilerplate & State Management
+  // ===============================================
+  @override
+  bool get wantKeepAlive => true;
+  bool _isLoading = true;
+
+  // Text controllers for all text fields
+  final Map<String, TextEditingController> _controllers = {
+    'otherScreeningMethod': TextEditingController(),
+    'symptomNote': TextEditingController(),
+    'bodyCheckHead': TextEditingController(),
+    'bodyCheckChest': TextEditingController(),
+    'bodyCheckAbdomen': TextEditingController(),
+    'bodyCheckLimbs': TextEditingController(),
+    'bodyCheckOther': TextEditingController(),
+    'temperature': TextEditingController(),
+    'pulse': TextEditingController(),
+    'respiration': TextEditingController(),
+    'bpSystolic': TextEditingController(),
+    'bpDiastolic': TextEditingController(),
+    'spo2': TextEditingController(),
+    'evmE': TextEditingController(),
+    'evmV': TextEditingController(),
+    'evmM': TextEditingController(),
+    'leftPupilSize': TextEditingController(),
+    'rightPupilSize': TextEditingController(),
+    'initialDiagnosis': TextEditingController(),
+    'ekgReading': TextEditingController(),
+    'sugarReading': TextEditingController(),
+    'otherSummary': TextEditingController(),
+    'referralOtherHospital': TextEditingController(),
+    'referralEscort': TextEditingController(),
+    'oxygenFlow': TextEditingController(),
+    'nurseSignature': TextEditingController(),
+    'emtSignature': TextEditingController(),
+    'helperNamesText': TextEditingController(),
+    'otherSpecialNote': TextEditingController(),
+  };
+
+  // Lists for dialogs and options
+  final List<String> icd10List = [
+    'A00 Cholera - 霍亂',
+    'A00.0 Cholera due to Vibrio cholerae 01, biovar cholerae - 血清型01霍亂弧菌霍亂',
+    'A00.1 Cholera due to Vibrio cholerae 01, biovar eltor - 血清型01霍亂弧菌El Tor霍亂',
+    'A00.9 Cholera, unspecified - 霍亂',
+    'A01 Typhoid and paratyphoid fevers - 傷寒及副傷寒',
+    'A01.0 Typhoid fever - 傷寒',
+    'A01.01 Typhoid fever, unspecified - 傷寒',
+    'A01.01 Typhoid meningitis - 傷寒腦膜炎',
+  ];
+  final List<String> referralHospitals = [
+    '聯新國際醫院',
+    '林口長庚醫院',
+    '衛生福利部桃園醫院',
+    '衛生福利部桃園療養院',
+    '桃園國際敏盛醫院',
+    '聖保祿醫院',
+    '中壢天晟醫院',
+    '桃園榮民總醫院',
+    '三峽恩主公醫院',
+    '其他',
+  ];
+  final List<String> otherHospitals = [
+    '桃園經國敏盛醫院',
+    '聖保祿醫院',
+    '衛生福利部桃園醫院',
+    '衛生福利部桃園療養院',
+    '桃園榮民總醫院',
+    '三峽恩主公醫院',
+    '其他',
+  ];
+  final List<String> VisitingStaff = [
+    '方詩旋',
+    '古璿正',
+    '江汪財',
+    '呂學政',
+    '周志勃',
+    '金霍歌',
+    '徐丕',
+    '康曉妍',
+  ];
+  final List<String> RegisteredNurses = [
+    '陳思穎',
+    '邱靜鈴',
+    '莊杼媛',
+    '洪萱',
+    '范育婕',
+    '陳珮妤',
+    '蔡可葳',
+    '粘瑞華',
+  ];
+  final List<String> EMTs = ['王文義', '游進昌', '胡勝捷', '黃逸斌', '吳承軒', '張致綸', '劉呈軒'];
+  final List<String> _helperNames = [
+    '方詩婷',
+    '古增正',
+    '江旺財',
+    '呂學政',
+    '海欣茹',
+    '洪雲敏',
+    '徐杰',
+    '康曉朗',
+    '黎裕昌',
+    '戴逸旻',
+    '廖詠怡',
+    '許婷涵',
+    '陳小山',
+    '王悅朗',
+    '劉金宇',
+    '彭士書',
+    '熊得志',
+    '顧小',
+    '蔡心文',
+    '程皓',
+    '楊敏度',
+    '羅尹彤',
+    '廖名用',
+    '陳國平',
+    '蘇敬婷',
+    '黃梨梅',
+    '朱森學',
+    '陳思穎',
+    '邵詩婷',
+    '莊抒捷',
+    '洪萱',
+    '林育緯',
+    '唐詠婷',
+    '蔡可葳',
+    '粘瑞敏',
+    '黃馨儀',
+    '陳冠羽',
+    '陳怡玲',
+    '吳雅柔',
+    '何文豪',
+    '王文義',
+    '游恩晶',
+    '胡雅捷',
+    '黃逸誠',
+    '吳季軒',
+    '劉曉華',
+    '張峻維',
+    '劉昱軒',
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  @override
+  void dispose() {
+    _controllers.forEach((_, controller) => controller.dispose());
+    super.dispose();
+  }
+
+  // ===============================================
+  // SavableStateMixin Implementation
+  // ===============================================
+  @override
+  Future<void> saveData() async {
+    try {
+      _syncControllersToData();
+      await _saveData();
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('儲存計畫與處置頁面失敗: $e')));
+      }
+      rethrow;
+    }
+  }
+
+  // ===============================================
+  // Data Handling Logic
+  // ===============================================
+
+  Future<void> _loadData() async {
+    if (!mounted) return;
+    try {
+      final dao = context.read<TreatmentsDao>();
+      final planData = context.read<PlanData>();
+      final record = await dao.getByVisitId(widget.visitId);
+
+      planData.clear(); // Start with a fresh model
+
+      if (record != null) {
+        T decodeJson<T>(String? jsonString, T defaultValue) {
+          if (jsonString == null || jsonString.isEmpty) return defaultValue;
+          try {
+            return jsonDecode(jsonString) as T;
+          } catch (e) {
+            return defaultValue;
+          }
+        }
+
+        planData.screeningChecked = record.screeningChecked;
+        planData.screeningMethods = Map<String, bool>.from(
+          decodeJson(record.screeningMethodsJson, {}),
+        );
+        planData.otherScreeningMethod = record.otherScreeningMethod;
+        planData.healthData = (decodeJson(record.healthDataJson, []) as List)
+            .map((item) => Map<String, String>.from(item))
+            .toList();
+        planData.mainSymptom = record.mainSymptom;
+        planData.traumaSymptoms = Map<String, bool>.from(
+          decodeJson(record.traumaSymptomsJson, {}),
+        );
+        planData.nonTraumaSymptoms = Map<String, bool>.from(
+          decodeJson(record.nonTraumaSymptomsJson, {}),
+        );
+        planData.symptomNote = record.symptomNote;
+        planData.photoTypes = Map<String, bool>.from(
+          decodeJson(record.photoTypesJson, {}),
+        );
+        planData.bodyCheckHead = record.bodyCheckHead;
+        planData.bodyCheckChest = record.bodyCheckChest;
+        planData.bodyCheckAbdomen = record.bodyCheckAbdomen;
+        planData.bodyCheckLimbs = record.bodyCheckLimbs;
+        planData.bodyCheckOther = record.bodyCheckOther;
+        planData.temperature = record.temperature;
+        planData.pulse = record.pulse;
+        planData.respiration = record.respiration;
+        planData.bpSystolic = record.bpSystolic;
+        planData.bpDiastolic = record.bpDiastolic;
+        planData.spo2 = record.spo2;
+        planData.consciousClear = record.consciousClear;
+        planData.evmE = record.evmE;
+        planData.evmV = record.evmV;
+        planData.evmM = record.evmM;
+        planData.leftPupilScale = record.leftPupilScale;
+        planData.leftPupilSize = record.leftPupilSize;
+        planData.rightPupilScale = record.rightPupilScale;
+        planData.rightPupilSize = record.rightPupilSize;
+        planData.history = record.history;
+        planData.allergy = record.allergy;
+        planData.initialDiagnosis = record.initialDiagnosis;
+        planData.diagnosisCategory = record.diagnosisCategory;
+        planData.selectedICD10Main = record.selectedICD10Main;
+        planData.selectedICD10Sub1 = record.selectedICD10Sub1;
+        planData.selectedICD10Sub2 = record.selectedICD10Sub2;
+        planData.triageCategory = record.triageCategory;
+        planData.onSiteTreatments = Map<String, bool>.from(
+          decodeJson(record.onSiteTreatmentsJson, {}),
+        );
+        planData.ekgChecked = record.ekgChecked;
+        planData.ekgReading = record.ekgReading;
+        planData.sugarChecked = record.sugarChecked;
+        planData.sugarReading = record.sugarReading;
+        planData.suggestReferral = record.suggestReferral;
+        planData.intubationChecked = record.intubationChecked;
+        planData.cprChecked = record.cprChecked;
+        planData.oxygenTherapyChecked = record.oxygenTherapyChecked;
+        planData.medicalCertificateChecked = record.medicalCertificateChecked;
+        planData.prescriptionChecked = record.prescriptionChecked;
+        planData.otherChecked = record.otherChecked;
+        planData.otherSummary = record.otherSummary;
+        planData.referralPassageType = record.referralPassageType;
+        planData.referralAmbulanceType = record.referralAmbulanceType;
+        planData.referralHospitalIdx = record.referralHospitalIdx;
+        planData.referralOtherHospital = record.referralOtherHospital;
+        planData.referralEscort = record.referralEscort;
+        planData.intubationType = record.intubationType;
+        planData.oxygenType = record.oxygenType;
+        planData.oxygenFlow = record.oxygenFlow;
+        planData.medicalCertificateTypes = Map<String, bool>.from(
+          decodeJson(record.medicalCertificateTypesJson, {}),
+        );
+        planData.prescriptionRows =
+            (decodeJson(record.prescriptionRowsJson, []) as List)
+                .map((item) => Map<String, String>.from(item))
+                .toList();
+        planData.followUpResults = Map<String, bool>.from(
+          decodeJson(record.followUpResultsJson, {}),
+        );
+        planData.otherHospitalIdx = record.otherHospitalIdx;
+        planData.selectedMainDoctor = record.selectedMainDoctor;
+        planData.selectedMainNurse = record.selectedMainNurse;
+        planData.nurseSignature = record.nurseSignature;
+        planData.selectedEMT = record.selectedEMT;
+        planData.emtSignature = record.emtSignature;
+        planData.helperNamesText = record.helperNamesText;
+        planData.selectedHelpers = List<String>.from(
+          decodeJson(record.selectedHelpersJson, []),
+        );
+        planData.specialNotes = Map<String, bool>.from(
+          decodeJson(record.specialNotesJson, {}),
+        );
+        planData.otherSpecialNote = record.otherSpecialNote;
+      }
+
+      _syncControllersFromData(planData);
+      planData.update();
+    } catch (e) {
+      if (mounted)
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text("載入資料失敗: $e")));
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  void _syncControllersFromData(PlanData planData) {
+    _controllers.forEach((key, controller) {
+      final value = switch (key) {
+        'otherScreeningMethod' => planData.otherScreeningMethod,
+        'symptomNote' => planData.symptomNote,
+        'bodyCheckHead' => planData.bodyCheckHead,
+        'bodyCheckChest' => planData.bodyCheckChest,
+        'bodyCheckAbdomen' => planData.bodyCheckAbdomen,
+        'bodyCheckLimbs' => planData.bodyCheckLimbs,
+        'bodyCheckOther' => planData.bodyCheckOther,
+        'temperature' => planData.temperature,
+        'pulse' => planData.pulse,
+        'respiration' => planData.respiration,
+        'bpSystolic' => planData.bpSystolic,
+        'bpDiastolic' => planData.bpDiastolic,
+        'spo2' => planData.spo2,
+        'evmE' => planData.evmE,
+        'evmV' => planData.evmV,
+        'evmM' => planData.evmM,
+        'leftPupilSize' => planData.leftPupilSize,
+        'rightPupilSize' => planData.rightPupilSize,
+        'initialDiagnosis' => planData.initialDiagnosis,
+        'ekgReading' => planData.ekgReading,
+        'sugarReading' => planData.sugarReading,
+        'otherSummary' => planData.otherSummary,
+        'referralOtherHospital' => planData.referralOtherHospital,
+        'referralEscort' => planData.referralEscort,
+        'oxygenFlow' => planData.oxygenFlow,
+        'nurseSignature' => planData.nurseSignature,
+        'emtSignature' => planData.emtSignature,
+        'helperNamesText' => planData.helperNamesText,
+        'otherSpecialNote' => planData.otherSpecialNote,
+        _ => null,
+      };
+      if (value != null) controller.text = value;
+    });
+  }
+
+  void _syncControllersToData() {
+    final planData = context.read<PlanData>();
+    _controllers.forEach((key, controller) {
+      final text = controller.text.trim();
+      switch (key) {
+        case 'otherScreeningMethod':
+          planData.otherScreeningMethod = text;
+          break;
+        case 'symptomNote':
+          planData.symptomNote = text;
+          break;
+        case 'bodyCheckHead':
+          planData.bodyCheckHead = text;
+          break;
+        case 'bodyCheckChest':
+          planData.bodyCheckChest = text;
+          break;
+        case 'bodyCheckAbdomen':
+          planData.bodyCheckAbdomen = text;
+          break;
+        case 'bodyCheckLimbs':
+          planData.bodyCheckLimbs = text;
+          break;
+        case 'bodyCheckOther':
+          planData.bodyCheckOther = text;
+          break;
+        case 'temperature':
+          planData.temperature = text;
+          break;
+        case 'pulse':
+          planData.pulse = text;
+          break;
+        case 'respiration':
+          planData.respiration = text;
+          break;
+        case 'bpSystolic':
+          planData.bpSystolic = text;
+          break;
+        case 'bpDiastolic':
+          planData.bpDiastolic = text;
+          break;
+        case 'spo2':
+          planData.spo2 = text;
+          break;
+        case 'evmE':
+          planData.evmE = text;
+          break;
+        case 'evmV':
+          planData.evmV = text;
+          break;
+        case 'evmM':
+          planData.evmM = text;
+          break;
+        case 'leftPupilSize':
+          planData.leftPupilSize = text;
+          break;
+        case 'rightPupilSize':
+          planData.rightPupilSize = text;
+          break;
+        case 'initialDiagnosis':
+          planData.initialDiagnosis = text;
+          break;
+        case 'ekgReading':
+          planData.ekgReading = text;
+          break;
+        case 'sugarReading':
+          planData.sugarReading = text;
+          break;
+        case 'otherSummary':
+          planData.otherSummary = text;
+          break;
+        case 'referralOtherHospital':
+          planData.referralOtherHospital = text;
+          break;
+        case 'referralEscort':
+          planData.referralEscort = text;
+          break;
+        case 'oxygenFlow':
+          planData.oxygenFlow = text;
+          break;
+        case 'nurseSignature':
+          planData.nurseSignature = text;
+          break;
+        case 'emtSignature':
+          planData.emtSignature = text;
+          break;
+        case 'helperNamesText':
+          planData.helperNamesText = text;
+          break;
+        case 'otherSpecialNote':
+          planData.otherSpecialNote = text;
+          break;
+      }
+    });
+  }
+
+  Future<void> _saveData() async {
+    final dao = context.read<TreatmentsDao>();
+    final planData = context.read<PlanData>();
+    await dao.upsertByVisitId(
+      visitId: widget.visitId,
+      screeningChecked: planData.screeningChecked,
+      screeningMethods: planData.screeningMethods,
+      otherScreeningMethod: planData.otherScreeningMethod,
+      healthData: planData.healthData,
+      mainSymptom: planData.mainSymptom,
+      traumaSymptoms: planData.traumaSymptoms,
+      nonTraumaSymptoms: planData.nonTraumaSymptoms,
+      symptomNote: planData.symptomNote,
+      photoTypes: planData.photoTypes,
+      bodyCheckHead: planData.bodyCheckHead,
+      bodyCheckChest: planData.bodyCheckChest,
+      bodyCheckAbdomen: planData.bodyCheckAbdomen,
+      bodyCheckLimbs: planData.bodyCheckLimbs,
+      bodyCheckOther: planData.bodyCheckOther,
+      temperature: planData.temperature,
+      pulse: planData.pulse,
+      respiration: planData.respiration,
+      bpSystolic: planData.bpSystolic,
+      bpDiastolic: planData.bpDiastolic,
+      spo2: planData.spo2,
+      consciousClear: planData.consciousClear,
+      evmE: planData.evmE,
+      evmV: planData.evmV,
+      evmM: planData.evmM,
+      leftPupilScale: planData.leftPupilScale,
+      leftPupilSize: planData.leftPupilSize,
+      rightPupilScale: planData.rightPupilScale,
+      rightPupilSize: planData.rightPupilSize,
+      history: planData.history,
+      allergy: planData.allergy,
+      initialDiagnosis: planData.initialDiagnosis,
+      diagnosisCategory: planData.diagnosisCategory,
+      selectedICD10Main: planData.selectedICD10Main,
+      selectedICD10Sub1: planData.selectedICD10Sub1,
+      selectedICD10Sub2: planData.selectedICD10Sub2,
+      triageCategory: planData.triageCategory,
+      onSiteTreatments: planData.onSiteTreatments,
+      ekgChecked: planData.ekgChecked,
+      ekgReading: planData.ekgReading,
+      sugarChecked: planData.sugarChecked,
+      sugarReading: planData.sugarReading,
+      suggestReferral: planData.suggestReferral,
+      intubationChecked: planData.intubationChecked,
+      cprChecked: planData.cprChecked,
+      oxygenTherapyChecked: planData.oxygenTherapyChecked,
+      medicalCertificateChecked: planData.medicalCertificateChecked,
+      prescriptionChecked: planData.prescriptionChecked,
+      otherChecked: planData.otherChecked,
+      otherSummary: planData.otherSummary,
+      referralPassageType: planData.referralPassageType,
+      referralAmbulanceType: planData.referralAmbulanceType,
+      referralHospitalIdx: planData.referralHospitalIdx,
+      referralOtherHospital: planData.referralOtherHospital,
+      referralEscort: planData.referralEscort,
+      intubationType: planData.intubationType,
+      oxygenType: planData.oxygenType,
+      oxygenFlow: planData.oxygenFlow,
+      medicalCertificateTypes: planData.medicalCertificateTypes,
+      prescriptionRows: planData.prescriptionRows,
+      followUpResults: planData.followUpResults,
+      otherHospitalIdx: planData.otherHospitalIdx,
+      selectedMainDoctor: planData.selectedMainDoctor,
+      selectedMainNurse: planData.selectedMainNurse,
+      nurseSignature: planData.nurseSignature,
+      selectedEMT: planData.selectedEMT,
+      emtSignature: planData.emtSignature,
+      helperNamesText: planData.helperNamesText,
+      selectedHelpers: planData.selectedHelpers,
+      specialNotes: planData.specialNotes,
+      otherSpecialNote: planData.otherSpecialNote,
+    );
+  }
+
+  // ===============================================
+  // UI Build Method
+  // ===============================================
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+
+    if (_isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    return Consumer<PlanData>(
+      builder: (context, planData, child) {
+        return Container(
+          color: const Color(0xFFE6F6FB),
+          alignment: Alignment.topCenter,
+          child: SingleChildScrollView(
+            child: Container(
+              width: 900,
+              margin: const EdgeInsets.symmetric(vertical: 32),
+              padding: const EdgeInsets.all(32),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF9FAFB),
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: const [
+                  BoxShadow(color: Colors.black12, blurRadius: 8),
+                ],
+              ),
+              child: _buildFullUI(planData),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  // ===============================================
+  // Main UI Structure (Extracted for Readability)
+  // ===============================================
+  Widget _buildFullUI(PlanData planData) {
+    final Map<String, bool> onSiteTreatments = {
+      '諮詢衛教': false,
+      '內科處置': false,
+      '外科處置': false,
+      '拒絕處置': false,
+      '疑似傳染病診療': false,
+    };
+    final Map<String, bool> specialNotes = {
+      'OHCA醫護團隊到場前有CPR': false,
+      'OHCA醫護團隊到場前有使用AED但無電擊': false,
+      'OHCA醫護團隊到場前有使用AED有電擊': false,
+      '現場恢復呼吸': false,
+      '使用自動心律復甦機': false,
+      '空白': false,
+    };
+    final Map<String, bool> followUpResults = {
+      '繼續搭機旅行': false,
+      '休息觀察或自行回家': false,
+      '轉聯新國際醫院': false,
+      '轉林口長庚醫院': false,
+      '轉其他醫院': true,
+      '建議轉診門診追蹤': false,
+      '死亡': false,
+      '拒絕轉診': false,
+    };
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              // Left Column
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _SectionTitle('疾病管制署篩檢'),
+                  _CheckBoxItem(
+                    label: "啟用篩檢",
+                    value: planData.screeningChecked,
+                    onChanged: (v) {
+                      planData.screeningChecked = v ?? false;
+                      planData.update();
+                    },
+                  ),
+                  const SizedBox(height: 24),
+                  if (planData.screeningChecked) ...[
+                    _SectionTitle('篩檢方式'),
+                    Wrap(
+                      spacing: 24,
+                      runSpacing: 8,
+                      children: planData.screeningMethods.keys
+                          .map(
+                            (label) => _CheckBoxItem(
+                              label: label,
+                              value: planData.screeningMethods[label] ?? false,
+                              onChanged: (v) {
+                                planData.screeningMethods[label] = v ?? false;
+                                planData.update();
+                              },
+                            ),
+                          )
+                          .toList(),
+                    ),
+                    const SizedBox(height: 16),
+                    _SectionTitle('其他篩檢方式'),
+                    TextField(
+                      controller: _controllers['otherScreeningMethod'],
+                      decoration: const InputDecoration(
+                        hintText: '請填寫其他篩檢方式',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    _SectionTitle('健康評估'),
+                    _HealthDataTable(
+                      healthData: planData.healthData,
+                      onAdd: () => _addHealthDataDialog(planData),
+                    ),
+                    const SizedBox(height: 24),
+                  ],
+                  _SectionTitle('主訴'),
+                  Row(
+                    children: [
+                      _RadioItem(
+                        "外傷",
+                        value: 0,
+                        groupValue: planData.mainSymptom,
+                        onChanged: (v) {
+                          planData.mainSymptom = v;
+                          planData.update();
+                        },
+                      ),
+                      _RadioItem(
+                        "非外傷",
+                        value: 1,
+                        groupValue: planData.mainSymptom,
+                        onChanged: (v) {
+                          planData.mainSymptom = v;
+                          planData.update();
+                        },
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+                  if (planData.mainSymptom == 0) ...[
+                    _SectionTitle('外傷'),
+                    Wrap(
+                      spacing: 16,
+                      runSpacing: 8,
+                      children: planData.traumaSymptoms.keys
+                          .map(
+                            (label) => _CheckBoxItem(
+                              label: label,
+                              value: planData.traumaSymptoms[label] ?? false,
+                              onChanged: (v) {
+                                planData.traumaSymptoms[label] = v ?? false;
+                                planData.update();
+                              },
+                            ),
+                          )
+                          .toList(),
+                    ),
+                  ],
+                  if (planData.mainSymptom == 1) ...[
+                    _SectionTitle('非外傷'),
+                    Wrap(
+                      spacing: 16,
+                      runSpacing: 8,
+                      children: planData.nonTraumaSymptoms.keys
+                          .map(
+                            (label) => _CheckBoxItem(
+                              label: label,
+                              value: planData.nonTraumaSymptoms[label] ?? false,
+                              onChanged: (v) {
+                                planData.nonTraumaSymptoms[label] = v ?? false;
+                                planData.update();
+                              },
+                            ),
+                          )
+                          .toList(),
+                    ),
+                  ],
+                  const SizedBox(height: 16),
+                  _SectionTitle('補充說明'),
+                  TextField(
+                    controller: _controllers['symptomNote'],
+                    decoration: const InputDecoration(
+                      hintText: '填寫主訴補充說明',
+                      border: OutlineInputBorder(),
+                    ),
+                    maxLines: 2,
+                  ),
+                  const SizedBox(height: 24),
+                  _SectionTitle('照片類型'),
+                  Wrap(
+                    spacing: 16,
+                    children: planData.photoTypes.keys
+                        .map(
+                          (label) => _CheckBoxItem(
+                            label: label,
+                            value: planData.photoTypes[label] ?? false,
+                            onChanged: (v) {
+                              planData.photoTypes[label] = v ?? false;
+                              planData.update();
+                            },
+                          ),
+                        )
+                        .toList(),
+                  ),
+                  const SizedBox(height: 32),
+                  if (planData.photoTypes['外傷'] == true) ...[
+                    _SectionTitle('外傷照片'),
+                    _PhotoGrid(title: '外傷照片'),
+                    const SizedBox(height: 16),
+                  ],
+                  if (planData.photoTypes['心電圖'] == true) ...[
+                    _SectionTitle('心電圖照片'),
+                    _PhotoGrid(title: '心電圖照片'),
+                    const SizedBox(height: 16),
+                  ],
+                  if (planData.photoTypes['其他'] == true) ...[
+                    _SectionTitle('其他照片'),
+                    _PhotoGrid(title: '其他照片'),
+                    const SizedBox(height: 16),
+                  ],
+                  _SectionTitle('身體檢查'),
+                  const SizedBox(height: 8),
+                  _BodyCheckInput('頭頸部', _controllers['bodyCheckHead']!),
+                  _BodyCheckInput('胸部', _controllers['bodyCheckChest']!),
+                  _BodyCheckInput('腹部', _controllers['bodyCheckAbdomen']!),
+                  _BodyCheckInput('四肢', _controllers['bodyCheckLimbs']!),
+                  _BodyCheckInput('其他', _controllers['bodyCheckOther']!),
+                ],
+              ),
+            ),
+            const SizedBox(width: 48),
+            Expanded(
+              // Right Column
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _SectionTitle('語音輸入：'),
+                  const Text('這裡依序輸入體溫、脈搏、呼吸、血壓、血氧、血糖'),
+                  const SizedBox(height: 8),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF83ACA9),
+                      foregroundColor: Colors.white,
+                    ),
+                    onPressed: () {},
+                    child: const Text('確認'),
+                  ),
+                  const SizedBox(height: 24),
+                  _SectionTitle('體溫(°C)'),
+                  TextField(
+                    controller: _controllers['temperature'],
+                    decoration: const InputDecoration(
+                      hintText: '輸入數字',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  _SectionTitle('脈搏(次/min)'),
+                  TextField(
+                    controller: _controllers['pulse'],
+                    decoration: const InputDecoration(
+                      hintText: '輸入整數',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  _SectionTitle('呼吸(次/min)'),
+                  TextField(
+                    controller: _controllers['respiration'],
+                    decoration: const InputDecoration(
+                      hintText: '輸入整數',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  _SectionTitle('血壓(mmHg)'),
+                  Row(
+                    children: [
+                      SizedBox(
+                        width: 80,
+                        child: TextField(
+                          controller: _controllers['bpSystolic'],
+                          decoration: const InputDecoration(
+                            hintText: '整數',
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      const Text('/'),
+                      const SizedBox(width: 8),
+                      SizedBox(
+                        width: 80,
+                        child: TextField(
+                          controller: _controllers['bpDiastolic'],
+                          decoration: const InputDecoration(
+                            hintText: '整數',
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  _SectionTitle('血氧(%)'),
+                  TextField(
+                    controller: _controllers['spo2'],
+                    decoration: const InputDecoration(
+                      hintText: '輸入數字',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      _SectionTitle('意識清晰'),
+                      Checkbox(
+                        value: planData.consciousClear,
+                        onChanged: (v) {
+                          planData.consciousClear = v ?? true;
+                          planData.update();
+                        },
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+                  if (!planData.consciousClear) ...[
+                    Row(
+                      children: [
+                        const Text(
+                          'E',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(width: 8),
+                        SizedBox(
+                          width: 60,
+                          child: TextField(
+                            controller: _controllers['evmE'],
+                            decoration: const InputDecoration(
+                              border: OutlineInputBorder(),
+                              isDense: true,
+                              contentPadding: EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 6,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 32),
+                        const Text(
+                          'V',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(width: 8),
+                        SizedBox(
+                          width: 60,
+                          child: TextField(
+                            controller: _controllers['evmV'],
+                            decoration: const InputDecoration(
+                              border: OutlineInputBorder(),
+                              isDense: true,
+                              contentPadding: EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 6,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 32),
+                        const Text(
+                          'M',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(width: 8),
+                        SizedBox(
+                          width: 60,
+                          child: TextField(
+                            controller: _controllers['evmM'],
+                            decoration: const InputDecoration(
+                              border: OutlineInputBorder(),
+                              isDense: true,
+                              contentPadding: EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 6,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    // GCS calculation logic would go here
+                    const Row(
+                      children: [
+                        Text(
+                          'GCS',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        SizedBox(width: 8),
+                        Text('0'),
+                      ],
+                    ),
+                    const SizedBox(height: 24),
+                    _SectionTitle('左瞳孔縮放'),
+                    Row(
+                      children: [
+                        _RadioCircle(
+                          label: '+',
+                          value: 0,
+                          groupValue: planData.leftPupilScale,
+                          onChanged: (v) {
+                            planData.leftPupilScale = v;
+                            planData.update();
+                          },
+                        ),
+                        _RadioCircle(
+                          label: '-',
+                          value: 1,
+                          groupValue: planData.leftPupilScale,
+                          onChanged: (v) {
+                            planData.leftPupilScale = v;
+                            planData.update();
+                          },
+                        ),
+                        _RadioCircle(
+                          label: '±',
+                          value: 2,
+                          groupValue: planData.leftPupilScale,
+                          onChanged: (v) {
+                            planData.leftPupilScale = v;
+                            planData.update();
+                          },
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    _SectionTitle('左瞳孔大小 (mm)'),
+                    SizedBox(
+                      width: 120,
+                      child: TextField(
+                        controller: _controllers['leftPupilSize'],
+                        decoration: const InputDecoration(
+                          hintText: '輸入數字',
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    _SectionTitle('右瞳孔縮放'),
+                    Row(
+                      children: [
+                        _RadioCircle(
+                          label: '+',
+                          value: 0,
+                          groupValue: planData.rightPupilScale,
+                          onChanged: (v) {
+                            planData.rightPupilScale = v;
+                            planData.update();
+                          },
+                        ),
+                        _RadioCircle(
+                          label: '-',
+                          value: 1,
+                          groupValue: planData.rightPupilScale,
+                          onChanged: (v) {
+                            planData.rightPupilScale = v;
+                            planData.update();
+                          },
+                        ),
+                        _RadioCircle(
+                          label: '±',
+                          value: 2,
+                          groupValue: planData.rightPupilScale,
+                          onChanged: (v) {
+                            planData.rightPupilScale = v;
+                            planData.update();
+                          },
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    _SectionTitle('右瞳孔大小 (mm)'),
+                    SizedBox(
+                      width: 120,
+                      child: TextField(
+                        controller: _controllers['rightPupilSize'],
+                        decoration: const InputDecoration(
+                          hintText: '輸入數字',
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+                  _SectionTitle('過去病史'),
+                  Row(
+                    children: [
+                      _RadioItem(
+                        "無",
+                        value: 0,
+                        groupValue: planData.history,
+                        onChanged: (v) {
+                          planData.history = v;
+                          planData.update();
+                        },
+                      ),
+                      _RadioItem(
+                        "不詳",
+                        value: 1,
+                        groupValue: planData.history,
+                        onChanged: (v) {
+                          planData.history = v;
+                          planData.update();
+                        },
+                      ),
+                      _RadioItem(
+                        "有",
+                        value: 2,
+                        groupValue: planData.history,
+                        onChanged: (v) {
+                          planData.history = v;
+                          planData.update();
+                        },
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  _SectionTitle('過敏史'),
+                  Row(
+                    children: [
+                      _RadioItem(
+                        "無",
+                        value: 0,
+                        groupValue: planData.allergy,
+                        onChanged: (v) {
+                          planData.allergy = v;
+                          planData.update();
+                        },
+                      ),
+                      _RadioItem(
+                        "不詳",
+                        value: 1,
+                        groupValue: planData.allergy,
+                        onChanged: (v) {
+                          planData.allergy = v;
+                          planData.update();
+                        },
+                      ),
+                      _RadioItem(
+                        "有",
+                        value: 2,
+                        groupValue: planData.allergy,
+                        onChanged: (v) {
+                          planData.allergy = v;
+                          planData.update();
+                        },
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 40),
+        _SectionTitle('初步診斷'),
+        TextField(
+          controller: _controllers['initialDiagnosis'],
+          decoration: const InputDecoration(
+            hintText: '請填寫初步診斷',
+            border: OutlineInputBorder(),
+          ),
+        ),
+        const SizedBox(height: 24),
+        _SectionTitle('初步診斷類別'),
+        _buildDiagnosisCategory(planData),
+        const SizedBox(height: 24),
+        _SectionTitle('初步診斷的ICD-10'),
+        _buildICD10Selector("主診斷", planData.selectedICD10Main, (v) {
+          planData.selectedICD10Main = v;
+          planData.update();
+        }),
+        const SizedBox(height: 24),
+        _SectionTitle('副診斷1的ICD-10'),
+        _buildICD10Selector("副診斷1", planData.selectedICD10Sub1, (v) {
+          planData.selectedICD10Sub1 = v;
+          planData.update();
+        }),
+        const SizedBox(height: 24),
+        _SectionTitle('副診斷2的ICD-10'),
+        _buildICD10Selector("副診斷2", planData.selectedICD10Sub2, (v) {
+          planData.selectedICD10Sub2 = v;
+          planData.update();
+        }),
+        const SizedBox(height: 32),
+        _SectionTitle('檢傷分類'),
+        Wrap(
+          spacing: 24,
+          runSpacing: 8,
+          children: [
+            _RadioItem(
+              '第一級：復甦急救',
+              value: 0,
+              groupValue: planData.triageCategory,
+              onChanged: (v) {
+                planData.triageCategory = v;
+                planData.update();
+              },
+            ),
+            _RadioItem(
+              '第二級：危急',
+              value: 1,
+              groupValue: planData.triageCategory,
+              onChanged: (v) {
+                planData.triageCategory = v;
+                planData.update();
+              },
+            ),
+            _RadioItem(
+              '第三級：緊急',
+              value: 2,
+              groupValue: planData.triageCategory,
+              onChanged: (v) {
+                planData.triageCategory = v;
+                planData.update();
+              },
+            ),
+            _RadioItem(
+              '第四級：次緊急',
+              value: 3,
+              groupValue: planData.triageCategory,
+              onChanged: (v) {
+                planData.triageCategory = v;
+                planData.update();
+              },
+            ),
+            _RadioItem(
+              '第五級：非緊急',
+              value: 4,
+              groupValue: planData.triageCategory,
+              onChanged: (v) {
+                planData.triageCategory = v;
+                planData.update();
+              },
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        _SectionTitle('現場處置'),
+        Wrap(
+          spacing: 24,
+          runSpacing: 8,
+          children: onSiteTreatments.keys
+              .map(
+                (label) => _CheckBoxItem(
+                  label: label,
+                  value: planData.onSiteTreatments[label] ?? false,
+                  onChanged: (v) {
+                    planData.onSiteTreatments[label] = v ?? false;
+                    planData.update();
+                  },
+                ),
+              )
+              .toList(),
+        ),
+        const SizedBox(height: 16),
+        _SectionTitle('處理摘要'),
+        _buildSummaryCheckboxes(planData),
+        const SizedBox(height: 16),
+        if (planData.ekgChecked) ...[
+          _SectionTitle('心電圖判讀'),
+          TextField(
+            controller: _controllers['ekgReading'],
+            decoration: const InputDecoration(
+              hintText: '請填寫判讀結果',
+              border: OutlineInputBorder(),
+            ),
+          ),
+          const SizedBox(height: 16),
+        ],
+        if (planData.sugarChecked) ...[
+          _SectionTitle('血糖(mg/dL)'),
+          TextField(
+            controller: _controllers['sugarReading'],
+            decoration: const InputDecoration(
+              hintText: '請填寫血糖記錄',
+              border: OutlineInputBorder(),
+            ),
+          ),
+          const SizedBox(height: 16),
+        ],
+        if (planData.suggestReferral) _buildReferralSection(planData),
+        if (planData.intubationChecked) ...[
+          _SectionTitle('插管方式'),
+          Row(
+            children: [
+              _RadioItem(
+                'Endotracheal tube',
+                value: 0,
+                groupValue: planData.intubationType,
+                onChanged: (v) {
+                  planData.intubationType = v;
+                  planData.update();
+                },
+              ),
+              _RadioItem(
+                'LMA',
+                value: 1,
+                groupValue: planData.intubationType,
+                onChanged: (v) {
+                  planData.intubationType = v;
+                  planData.update();
+                },
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+        ],
+        if (planData.cprChecked) ...[
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF83ACA9),
+              foregroundColor: Colors.white,
+            ),
+            onPressed: () {},
+            child: const Text('產生急救記錄單'),
+          ),
+          const SizedBox(height: 16),
+        ],
+        if (planData.oxygenTherapyChecked) _buildOxygenSection(planData),
+        if (planData.medicalCertificateChecked) ...[
+          _SectionTitle('診斷書種類'),
+          Wrap(
+            spacing: 24,
+            runSpacing: 8,
+            children: planData.medicalCertificateTypes.keys
+                .map(
+                  (label) => _CheckBoxItem(
+                    label: label,
+                    value: planData.medicalCertificateTypes[label] ?? false,
+                    onChanged: (v) {
+                      planData.medicalCertificateTypes[label] = v ?? false;
+                      planData.update();
+                    },
+                  ),
+                )
+                .toList(),
+          ),
+          const SizedBox(height: 16),
+        ],
+        if (planData.prescriptionChecked) ...[
+          _SectionTitle('藥物記錄表'),
+          _PrescriptionTable(
+            prescriptionRows: planData.prescriptionRows,
+            onAdd: () => _showPrescriptionDialog(planData),
+          ),
+          const SizedBox(height: 16),
+        ],
+        if (planData.otherChecked) ...[
+          _SectionTitle('其他處理摘要'),
+          TextField(
+            controller: _controllers['otherSummary'],
+            decoration: const InputDecoration(
+              hintText: '請填寫其他處理摘要',
+              border: OutlineInputBorder(),
+            ),
+          ),
+          const SizedBox(height: 16),
+        ],
+        _SectionTitle('後續結果'),
+        Wrap(
+          spacing: 24,
+          runSpacing: 8,
+          children: followUpResults.keys.map((label) {
+            bool isOtherHospital = label == '轉其他醫院';
+            return _CheckBoxItem(
+              label: label,
+              value: isOtherHospital
+                  ? planData.followUpResults['轉其他醫院'] ?? false
+                  : planData.followUpResults[label] ?? false,
+              onChanged: (v) {
+                if (isOtherHospital) {
+                  planData.followUpResults['轉其他醫院'] = v ?? false;
+                } else {
+                  planData.followUpResults[label] = v ?? false;
+                }
+                planData.update();
+              },
+            );
+          }).toList(),
+        ),
+        const SizedBox(height: 24),
+        if (planData.followUpResults['轉其他醫院'] == true) ...[
+          _SectionTitle('其他醫院'),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: List.generate(
+              otherHospitals.length,
+              (i) => _RadioItem(
+                otherHospitals[i],
+                value: i,
+                groupValue: planData.otherHospitalIdx,
+                onChanged: (v) {
+                  planData.otherHospitalIdx = v;
+                  planData.update();
+                },
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+        ],
+        _SectionTitle('院長'),
+        const SizedBox(height: 16),
+        _SectionTitle('主責醫師', color: Colors.red),
+        GestureDetector(
+          onTap: () => _showStaffDialog(planData, '醫師'),
+          child: AbsorbPointer(
+            child: TextField(
+              controller: TextEditingController(
+                text: planData.selectedMainDoctor ?? '',
+              ),
+              decoration: const InputDecoration(
+                hintText: '點擊選擇醫師的姓名（必填）',
+                border: OutlineInputBorder(),
+              ),
+              readOnly: true,
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+        _SectionTitle('主責護理師', color: Colors.red),
+        GestureDetector(
+          onTap: () => _showStaffDialog(planData, '護理師'),
+          child: AbsorbPointer(
+            child: TextField(
+              controller: TextEditingController(
+                text: planData.selectedMainNurse ?? '',
+              ),
+              decoration: const InputDecoration(
+                hintText: '點擊選擇護理師的姓名（必填）',
+                border: OutlineInputBorder(),
+              ),
+              readOnly: true,
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+        _SectionTitle('護理師簽名'),
+        TextField(
+          controller: _controllers['nurseSignature'],
+          decoration: const InputDecoration(
+            hintText: '',
+            border: OutlineInputBorder(),
+          ),
+          maxLines: 2,
+        ),
+        const SizedBox(height: 24),
+        _SectionTitle('EMT姓名'),
+        GestureDetector(
+          onTap: () => _showStaffDialog(planData, 'EMT'),
+          child: AbsorbPointer(
+            child: TextField(
+              controller: TextEditingController(
+                text: planData.selectedEMT ?? '',
+              ),
+              decoration: const InputDecoration(
+                hintText: '點擊選擇EMT的姓名',
+                border: OutlineInputBorder(),
+              ),
+              readOnly: true,
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+        _SectionTitle('EMT簽名'),
+        TextField(
+          controller: _controllers['emtSignature'],
+          decoration: const InputDecoration(
+            hintText: '',
+            border: OutlineInputBorder(),
+          ),
+          maxLines: 2,
+        ),
+        const SizedBox(height: 24),
+        _SectionTitle('協助人員姓名'),
+        TextField(
+          controller: _controllers['helperNamesText'],
+          decoration: const InputDecoration(
+            hintText: '請填寫協助人員的姓名',
+            border: OutlineInputBorder(),
+          ),
+        ),
+        const SizedBox(height: 12),
+        _HelperTable(
+          selectedHelpers: planData.selectedHelpers,
+          onAdd: () => _showHelperSelectionDialog(planData),
+        ),
+        const SizedBox(height: 24),
+        _SectionTitle('特別註記'),
+        Wrap(
+          spacing: 24,
+          runSpacing: 8,
+          children: specialNotes.keys
+              .map(
+                (label) => _CheckBoxItem(
+                  label: label,
+                  value: planData.specialNotes[label] ?? false,
+                  onChanged: (v) {
+                    planData.specialNotes[label] = v ?? false;
+                    planData.update();
+                  },
+                ),
+              )
+              .toList(),
+        ),
+        const SizedBox(height: 24),
+        _SectionTitle('其他特別註記'),
+        TextField(
+          controller: _controllers['otherSpecialNote'],
+          decoration: const InputDecoration(
+            hintText: '請輸入其他特別註記',
+            border: OutlineInputBorder(),
+          ),
+          maxLines: 2,
+        ),
+        const SizedBox(height: 24),
+      ],
+    );
+  }
+
+  // ... (Dialogs and other specific UI section builders)
+
+  // ===============================================
+  // Dialogs & Complex UI Section Builders
+  // ===============================================
+
+  Widget _buildSummaryCheckboxes(PlanData planData) {
+    // A helper map to build the checkboxes
+    final Map<String, bool> items = {
+      '冰敷': planData.icePack,
+      'EKG心電圖': planData.ekgChecked,
+      '血糖': planData.sugarChecked,
+      '傷口處置': planData.woundCare,
+      '簽四聯單': planData.signQuadruplicate,
+      '建議轉診': planData.suggestReferral,
+      '插管': planData.intubationChecked,
+      'CPR': planData.cprChecked,
+      '氧氣使用': planData.oxygenTherapyChecked,
+      '診斷書': planData.medicalCertificateChecked,
+      '抽痰': planData.suction,
+      '藥物使用': planData.prescriptionChecked,
+      '其他': planData.otherChecked,
+    };
+
+    return Wrap(
+      spacing: 24,
+      runSpacing: 8,
+      children: items.entries.map((entry) {
+        return _CheckBoxItem(
+          label: entry.key,
+          value: entry.value,
+          onChanged: (v) {
+            switch (entry.key) {
+              case '冰敷':
+                planData.icePack = v ?? false;
+                break;
+              case 'EKG心電圖':
+                planData.ekgChecked = v ?? false;
+                break;
+              case '血糖':
+                planData.sugarChecked = v ?? false;
+                break;
+              case '傷口處置':
+                planData.woundCare = v ?? false;
+                break;
+              case '簽四聯單':
+                planData.signQuadruplicate = v ?? false;
+                break;
+              case '建議轉診':
+                planData.suggestReferral = v ?? false;
+                break;
+              case '插管':
+                planData.intubationChecked = v ?? false;
+                break;
+              case 'CPR':
+                planData.cprChecked = v ?? false;
+                break;
+              case '氧氣使用':
+                planData.oxygenTherapyChecked = v ?? false;
+                break;
+              case '診斷書':
+                planData.medicalCertificateChecked = v ?? false;
+                break;
+              case '抽痰':
+                planData.suction = v ?? false;
+                break;
+              case '藥物使用':
+                planData.prescriptionChecked = v ?? false;
+                break;
+              case '其他':
+                planData.otherChecked = v ?? false;
+                break;
+            }
+            planData.update();
+          },
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _buildReferralSection(PlanData planData) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _SectionTitle('通關方式'),
+        Row(
+          children: [
+            _RadioItem(
+              '一般通關',
+              value: 0,
+              groupValue: planData.referralPassageType,
+              onChanged: (v) {
+                planData.referralPassageType = v;
+                planData.update();
+              },
+            ),
+            _RadioItem(
+              '緊急通關',
+              value: 1,
+              groupValue: planData.referralPassageType,
+              onChanged: (v) {
+                planData.referralPassageType = v;
+                planData.update();
+              },
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        _SectionTitle('救護車'),
+        Row(
+          children: [
+            _RadioItem(
+              '醫療中心',
+              value: 0,
+              groupValue: planData.referralAmbulanceType,
+              onChanged: (v) {
+                planData.referralAmbulanceType = v;
+                planData.update();
+              },
+            ),
+            _RadioItem(
+              '民間',
+              value: 1,
+              groupValue: planData.referralAmbulanceType,
+              onChanged: (v) {
+                planData.referralAmbulanceType = v;
+                planData.update();
+              },
+            ),
+            _RadioItem(
+              '消防隊',
+              value: 2,
+              groupValue: planData.referralAmbulanceType,
+              onChanged: (v) {
+                planData.referralAmbulanceType = v;
+                planData.update();
+              },
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        _SectionTitle('轉送醫院'),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: List.generate(
+            referralHospitals.length,
+            (i) => _RadioItem(
+              referralHospitals[i],
+              value: i,
+              groupValue: planData.referralHospitalIdx,
+              onChanged: (v) {
+                planData.referralHospitalIdx = v;
+                planData.update();
+              },
+            ),
+          ),
+        ),
+        const SizedBox(height: 8),
+        _SectionTitle('其他轉送醫院?'),
+        TextField(
+          controller: _controllers['referralOtherHospital'],
+          decoration: const InputDecoration(
+            hintText: '請填寫其他轉送醫院',
+            border: OutlineInputBorder(),
+          ),
+        ),
+        const SizedBox(height: 8),
+        _SectionTitle('隨車人員'),
+        TextField(
+          controller: _controllers['referralEscort'],
+          decoration: const InputDecoration(
+            hintText: '請填寫隨車人員的姓名',
+            border: OutlineInputBorder(),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF274C4A),
+              foregroundColor: Colors.white,
+            ),
+            onPressed: () {},
+            child: const Text('產生救護車紀錄單'),
+          ),
+        ),
+        const SizedBox(height: 16),
+      ],
+    );
+  }
+
+  Widget _buildOxygenSection(PlanData planData) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _SectionTitle('氧氣使用'),
+        Row(
+          children: [
+            _RadioItem(
+              '鼻導管N/C',
+              value: 0,
+              groupValue: planData.oxygenType,
+              onChanged: (v) {
+                planData.oxygenType = v;
+                planData.update();
+              },
+            ),
+            _RadioItem(
+              '面罩Mask',
+              value: 1,
+              groupValue: planData.oxygenType,
+              onChanged: (v) {
+                planData.oxygenType = v;
+                planData.update();
+              },
+            ),
+            _RadioItem(
+              '非再吸入面罩',
+              value: 2,
+              groupValue: planData.oxygenType,
+              onChanged: (v) {
+                planData.oxygenType = v;
+                planData.update();
+              },
+            ),
+            _RadioItem(
+              'Ambu',
+              value: 3,
+              groupValue: planData.oxygenType,
+              onChanged: (v) {
+                planData.oxygenType = v;
+                planData.update();
+              },
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        _SectionTitle('氧氣流量(L/MIN)'),
+        TextField(
+          controller: _controllers['oxygenFlow'],
+          decoration: const InputDecoration(
+            hintText: '請填寫氧氣流量',
+            border: OutlineInputBorder(),
+          ),
+        ),
+        const SizedBox(height: 16),
+      ],
+    );
+  }
+
+  void _addHealthDataDialog(PlanData planData) {
+    final nameController = TextEditingController();
+    final relationController = TextEditingController();
+    final tempController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("新增健康評估"),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: nameController,
+              decoration: const InputDecoration(labelText: "姓名"),
+            ),
+            TextField(
+              controller: relationController,
+              decoration: const InputDecoration(labelText: "關係"),
+            ),
+            TextField(
+              controller: tempController,
+              decoration: const InputDecoration(labelText: "體溫"),
+              keyboardType: TextInputType.number,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("取消"),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF83ACA9),
+              foregroundColor: Colors.white,
+            ),
+            onPressed: () {
+              planData.healthData.add({
+                "name": nameController.text,
+                "relation": relationController.text,
+                "temp": tempController.text,
+              });
+              planData.update();
+              Navigator.pop(context);
+            },
+            child: const Text("儲存"),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _showICD10Dialog(ValueChanged<String?> onSelected) async {
+    final result = await showDialog<String>(
+      context: context,
+      builder: (context) => SimpleDialog(
+        title: const Text('選擇ICD-10'),
+        children: [
+          SizedBox(
+            width: 400,
+            height: 300,
+            child: ListView(
+              children: icd10List
+                  .map(
+                    (item) => ListTile(
+                      title: Text(item),
+                      onTap: () => Navigator.pop(context, item),
+                    ),
+                  )
+                  .toList(),
+            ),
+          ),
+        ],
+      ),
+    );
+    if (result != null) onSelected(result);
+  }
+
+  Future<void> _showStaffDialog(PlanData planData, String role) async {
+    final List<String> staffList = switch (role) {
+      '醫師' => VisitingStaff,
+      '護理師' => RegisteredNurses,
+      'EMT' => EMTs,
+      _ => [],
+    };
+    final result = await showDialog<String>(
+      context: context,
+      builder: (context) => SimpleDialog(
+        title: Text('選擇$role'),
+        children: [
+          SizedBox(
+            width: 400,
+            height: 300,
+            child: ListView(
+              children: staffList
+                  .map(
+                    (item) => ListTile(
+                      title: Text(item),
+                      onTap: () => Navigator.pop(context, item),
+                    ),
+                  )
+                  .toList(),
+            ),
+          ),
+        ],
+      ),
+    );
+    if (result != null) {
+      switch (role) {
+        case '醫師':
+          planData.selectedMainDoctor = result;
+          break;
+        case '護理師':
+          planData.selectedMainNurse = result;
+          break;
+        case 'EMT':
+          planData.selectedEMT = result;
+          break;
+      }
+      planData.update();
+    }
+  }
+
+  Future<void> _showHelperSelectionDialog(PlanData planData) async {
+    List<String> tempSelected = List.from(planData.selectedHelpers);
+    List<String>? result = await showDialog<List<String>>(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text('選擇協助人員姓名'),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: _helperNames.map((name) {
+                    return CheckboxListTile(
+                      title: Text(name),
+                      value: tempSelected.contains(name),
+                      onChanged: (bool? checked) {
+                        setState(() {
+                          if (checked == true) {
+                            tempSelected.add(name);
+                          } else {
+                            tempSelected.remove(name);
+                          }
+                        });
+                      },
+                    );
+                  }).toList(),
+                ),
+              ),
+              actions: <Widget>[
+                TextButton(
+                  child: const Text('取消'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+                ElevatedButton(
+                  child: const Text('確定'),
+                  onPressed: () {
+                    Navigator.of(context).pop(tempSelected);
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+    if (result != null) {
+      planData.selectedHelpers = result;
+      planData.update();
+    }
+  }
+
+  Future<void> _showPrescriptionDialog(PlanData planData) async {
+    Map<String, String>? result = await showDialog<Map<String, String>>(
+      context: context,
+      builder: (context) {
+        String? selectedDrug,
+            selectedUsage,
+            selectedFreq,
+            selectedDays,
+            selectedDoseUnit;
+        String note = '';
+        final drugCategories = {
+          '口服藥': [
+            'Augmentin syrup',
+            'Peace 藥錠',
+            'Wempyn 潰瘍寧',
+            'Ciprofloxacin',
+            'Ibuprofen 佈洛芬',
+          ],
+          '注射劑': [
+            'Ventolin 吸入劑',
+            'Wycillin 筋注劑',
+            'N/S 250ml',
+            'D5W 250ml',
+            'KCL 添加液',
+          ],
+          '點滴注射': ['D5S 500ml', 'Lactated Ringer\'s 乳酸林格氏液'],
+        };
+        final usageOptions = ['口服', '靜脈注射', '肌肉注射', '皮下注射'];
+        final freqOptions = ['QD', 'BID', 'TID', 'QID', 'PRN'];
+        final daysOptions = ['1 天', '3 天', '5 天', '7 天'];
+        final doseUnitOptions = ['mg', 'g', 'tab', 'amp', 'vial'];
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text('新增藥物記錄'),
+              content: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('藥品名稱'),
+                    ...drugCategories.entries
+                        .map(
+                          (categoryEntry) => Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 8.0,
+                                ),
+                                child: Text(
+                                  categoryEntry.key,
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                              Wrap(
+                                spacing: 8,
+                                children: categoryEntry.value
+                                    .map(
+                                      (drug) => ChoiceChip(
+                                        label: Text(drug),
+                                        selected: selectedDrug == drug,
+                                        onSelected: (_) =>
+                                            setState(() => selectedDrug = drug),
+                                      ),
+                                    )
+                                    .toList(),
+                              ),
+                            ],
+                          ),
+                        )
+                        .toList(),
+                    const SizedBox(height: 16),
+                    DropdownButtonFormField<String>(
+                      decoration: const InputDecoration(labelText: '使用方式'),
+                      items: usageOptions
+                          .map(
+                            (e) => DropdownMenuItem(value: e, child: Text(e)),
+                          )
+                          .toList(),
+                      onChanged: (v) => selectedUsage = v,
+                    ),
+                    DropdownButtonFormField<String>(
+                      decoration: const InputDecoration(labelText: '服用頻率'),
+                      items: freqOptions
+                          .map(
+                            (e) => DropdownMenuItem(value: e, child: Text(e)),
+                          )
+                          .toList(),
+                      onChanged: (v) => selectedFreq = v,
+                    ),
+                    DropdownButtonFormField<String>(
+                      decoration: const InputDecoration(labelText: '服用天數'),
+                      items: daysOptions
+                          .map(
+                            (e) => DropdownMenuItem(value: e, child: Text(e)),
+                          )
+                          .toList(),
+                      onChanged: (v) => selectedDays = v,
+                    ),
+                    DropdownButtonFormField<String>(
+                      decoration: const InputDecoration(labelText: '劑量單位'),
+                      items: doseUnitOptions
+                          .map(
+                            (e) => DropdownMenuItem(value: e, child: Text(e)),
+                          )
+                          .toList(),
+                      onChanged: (v) => selectedDoseUnit = v,
+                    ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      decoration: const InputDecoration(labelText: '備註'),
+                      onChanged: (v) => note = v,
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('取消'),
+                ),
+                ElevatedButton(
+                  onPressed: () => Navigator.pop(context, {
+                    '藥品名稱': selectedDrug ?? '',
+                    '使用方式': selectedUsage ?? '',
+                    '服用頻率': selectedFreq ?? '',
+                    '服用天數': selectedDays ?? '',
+                    '劑量單位': selectedDoseUnit ?? '',
+                    '備註': note,
+                  }),
+                  child: const Text('儲存'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+    if (result != null) {
+      planData.prescriptionRows.add(result);
+      planData.update();
+    }
+  }
+
+  Widget _buildICD10Selector(
+    String title,
+    String? value,
+    ValueChanged<String?> onSelected,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF83ACA9),
+                foregroundColor: Colors.white,
+              ),
+              onPressed: () => _showICD10Dialog(onSelected),
+              child: const Text('ICD10CM搜尋'),
+            ),
+            const SizedBox(width: 12),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF83ACA9),
+                foregroundColor: Colors.white,
+              ),
+              onPressed: () {},
+              child: const Text('GOOGLE搜尋'),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        TextField(
+          controller: TextEditingController(text: value ?? ''),
+          decoration: InputDecoration(
+            hintText: '請填寫 $title 的ICD-10代碼',
+            border: const OutlineInputBorder(),
+          ),
+          readOnly: true,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDiagnosisCategory(PlanData planData) {
+    final categories = [
+      'Mild Neurologic(headache、dizziness、vertigo)',
+      'Severe Neurologic(syncope、seizure、CVA)',
+      'GI non-OP (AGE Epigas mild bleeding)',
+      'GI surgical (app cholecystitis PPU)',
+      'Mild Trauma(含head injury、non-surgical intervention)',
+      'Severe Trauma (surgical intervention)',
+      'Mild CV (Palpitation Chest pain H/T hypo)',
+      'Severe CV (AMI Arrythmia Shock Others)',
+      'RESP(Asthma、COPD)',
+      'Fever (cause undetermined)',
+      'Musculoskeletal',
+      'DM (hypoglycemia or hyperglycemia)',
+      'GU (APN Stone or others)',
+      'OHCA',
+      'Derma',
+      'GYN',
+      'OPH/ENT',
+      'Psychiatric (nervous、anxious、Alcohols/drug)',
+      'Others',
+    ];
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: List.generate(
+        categories.length,
+        (i) => _RadioItem(
+          categories[i],
+          value: i,
+          groupValue: planData.diagnosisCategory,
+          onChanged: (v) {
+            planData.diagnosisCategory = v;
+            planData.update();
+          },
+        ),
+      ),
+    );
+  }
+}
+
+// ===============================================
+// Stateless Helper Widgets
+// ===============================================
+
+class _SectionTitle extends StatelessWidget {
+  final String text;
+  final Color? color;
+  const _SectionTitle(this.text, {this.color});
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.only(bottom: 8, top: 8),
+    child: Text(
+      text,
+      style: TextStyle(
+        fontWeight: FontWeight.bold,
+        color: color ?? Colors.black,
+        fontSize: 16,
+      ),
+    ),
+  );
+}
+
+class _RadioItem<T> extends StatelessWidget {
+  final String label;
+  final T value;
+  final T? groupValue;
+  final ValueChanged<T?> onChanged;
+  const _RadioItem(
+    this.label, {
+    required this.value,
+    required this.groupValue,
+    required this.onChanged,
+  });
+  @override
+  Widget build(BuildContext context) => InkWell(
+    onTap: () => onChanged(value),
+    child: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Radio<T>(
+          value: value,
+          groupValue: groupValue,
+          activeColor: const Color(0xFF83ACA9),
+          onChanged: onChanged,
+        ),
+        Flexible(
+          child: Text(label, style: const TextStyle(color: Colors.black)),
+        ),
+      ],
+    ),
+  );
+}
+
+class _CheckBoxItem extends StatelessWidget {
+  final String label;
+  final bool value;
+  final ValueChanged<bool?> onChanged;
+  const _CheckBoxItem({
+    required this.label,
+    required this.value,
+    required this.onChanged,
+  });
+  @override
+  Widget build(BuildContext context) => InkWell(
+    onTap: () => onChanged(!value),
+    child: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Checkbox(
+          value: value,
+          activeColor: const Color(0xFF83ACA9),
+          onChanged: onChanged,
+        ),
+        Text(label, style: const TextStyle(color: Colors.black)),
+      ],
+    ),
+  );
+}
+
+class _BodyCheckInput extends StatelessWidget {
+  final String label;
+  final TextEditingController controller;
+  const _BodyCheckInput(this.label, this.controller);
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.symmetric(vertical: 4),
+    child: Row(
+      children: [
+        SizedBox(
+          width: 70,
+          child: Text(
+            label,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: TextField(
+            controller: controller,
+            decoration: const InputDecoration(
+              isDense: true,
+              contentPadding: EdgeInsets.symmetric(
+                horizontal: 10,
+                vertical: 10,
+              ),
+              hintText: '請輸入檢查資訊',
+              border: OutlineInputBorder(),
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+class _PhotoGrid extends StatelessWidget {
+  final String title;
+  const _PhotoGrid({required this.title});
+  @override
+  Widget build(BuildContext context) => GridView.builder(
+    shrinkWrap: true,
+    physics: const NeverScrollableScrollPhysics(),
+    itemCount: 6,
+    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+      crossAxisCount: 3,
+      mainAxisSpacing: 12,
+      crossAxisSpacing: 12,
+      childAspectRatio: 1,
+    ),
+    itemBuilder: (context, index) => Column(
+      children: [
+        Expanded(
+          child: Container(
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.black12),
+              borderRadius: BorderRadius.circular(8),
+              color: Colors.grey[200],
+            ),
+            child: const Center(
+              child: Icon(Icons.add_a_photo, size: 48, color: Colors.grey),
+            ),
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text('$title${index + 1}', style: const TextStyle(fontSize: 12)),
+      ],
+    ),
+  );
+}
+
+class _HealthDataTable extends StatelessWidget {
+  final List<Map<String, String>> healthData;
+  final VoidCallback onAdd;
+  const _HealthDataTable({required this.healthData, required this.onAdd});
+  @override
+  Widget build(BuildContext context) => Column(
+    children: [
+      Container(
+        width: double.infinity,
+        color: const Color(0xFFF1F3F6),
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+        child: const Row(
+          children: [
+            Expanded(
+              flex: 2,
+              child: Text('姓名', style: TextStyle(fontWeight: FontWeight.bold)),
+            ),
+            Expanded(
+              flex: 2,
+              child: Text('關係', style: TextStyle(fontWeight: FontWeight.bold)),
+            ),
+            Expanded(
+              flex: 2,
+              child: Text('體溫', style: TextStyle(fontWeight: FontWeight.bold)),
+            ),
+          ],
+        ),
+      ),
+      ...healthData.map(
+        (row) => Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+          child: Row(
+            children: [
+              Expanded(flex: 2, child: Text(row["name"] ?? "")),
+              Expanded(flex: 2, child: Text(row["relation"] ?? "")),
+              Expanded(flex: 2, child: Text(row["temp"] ?? "")),
+            ],
+          ),
+        ),
+      ),
+      InkWell(
+        onTap: onAdd,
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+          child: const Text('加入資料行', style: TextStyle(color: Colors.blue)),
+        ),
+      ),
+    ],
+  );
+}
+
+class _RadioCircle extends StatelessWidget {
+  final String label;
+  final int value;
+  final int? groupValue;
+  final ValueChanged<int?> onChanged;
+  const _RadioCircle({
+    required this.label,
+    required this.value,
+    required this.groupValue,
+    required this.onChanged,
+  });
+  @override
+  Widget build(BuildContext context) => _RadioItem(
+    label,
+    value: value,
+    groupValue: groupValue,
+    onChanged: onChanged,
+  );
+}
+
+class _PrescriptionTable extends StatelessWidget {
+  final List<Map<String, String>> prescriptionRows;
+  final VoidCallback onAdd;
+  const _PrescriptionTable({
+    required this.prescriptionRows,
+    required this.onAdd,
+  });
+  @override
+  Widget build(BuildContext context) => Column(
+    children: [
+      Container(
+        width: double.infinity,
+        color: const Color(0xFFF1F3F6),
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+        child: const Row(
+          children: [
+            Expanded(
+              flex: 2,
+              child: Text(
+                '藥品名稱',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+            Expanded(
+              flex: 2,
+              child: Text(
+                '使用方式',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+            Expanded(
+              flex: 2,
+              child: Text(
+                '服用頻率',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+            Expanded(
+              flex: 2,
+              child: Text(
+                '服用天數',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+            Expanded(
+              flex: 2,
+              child: Text(
+                '劑量單位',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+            Expanded(
+              flex: 2,
+              child: Text('備註', style: TextStyle(fontWeight: FontWeight.bold)),
+            ),
+          ],
+        ),
+      ),
+      ...prescriptionRows.map(
+        (row) => Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+          child: Row(
+            children: [
+              Expanded(flex: 2, child: Text(row['藥品名稱'] ?? '')),
+              Expanded(flex: 2, child: Text(row['使用方式'] ?? '')),
+              Expanded(flex: 2, child: Text(row['服用頻率'] ?? '')),
+              Expanded(flex: 2, child: Text(row['服用天數'] ?? '')),
+              Expanded(flex: 2, child: Text(row['劑量單位'] ?? '')),
+              Expanded(flex: 2, child: Text(row['備註'] ?? '')),
+            ],
+          ),
+        ),
+      ),
+      InkWell(
+        onTap: onAdd,
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+          child: const Text('加入資料行', style: TextStyle(color: Colors.blue)),
+        ),
+      ),
+    ],
+  );
+}
+
+class _HelperTable extends StatelessWidget {
+  final List<String> selectedHelpers;
+  final VoidCallback onAdd;
+  const _HelperTable({required this.selectedHelpers, required this.onAdd});
+  @override
+  Widget build(BuildContext context) => Container(
+    width: double.infinity,
+    color: const Color(0xFFF1F3F6),
+    padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _SectionTitle('協助人員姓名'),
+        if (selectedHelpers.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: selectedHelpers
+                  .map(
+                    (helper) =>
+                        Text(helper, style: const TextStyle(fontSize: 16)),
+                  )
+                  .toList(),
+            ),
+          )
+        else
+          const Text('尚未選擇協助人員', style: TextStyle(color: Colors.grey)),
+        const SizedBox(height: 12),
+        InkWell(
+          onTap: onAdd,
+          child: const Text('加入協助人員', style: TextStyle(color: Colors.blue)),
+        ),
+        const SizedBox(height: 24),
+      ],
+    ),
+  );
+}
