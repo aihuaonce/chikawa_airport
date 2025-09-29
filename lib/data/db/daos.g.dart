@@ -26,3 +26,13 @@ mixin _$MedicalCertificatesDaoMixin on DatabaseAccessor<AppDatabase> {
   $MedicalCertificatesTable get medicalCertificates =>
       attachedDatabase.medicalCertificates;
 }
+mixin _$UndertakingsDaoMixin on DatabaseAccessor<AppDatabase> {
+  $UndertakingsTable get undertakings => attachedDatabase.undertakings;
+}
+mixin _$ElectronicDocumentsDaoMixin on DatabaseAccessor<AppDatabase> {
+  $ElectronicDocumentsTable get electronicDocuments =>
+      attachedDatabase.electronicDocuments;
+}
+mixin _$NursingRecordsDaoMixin on DatabaseAccessor<AppDatabase> {
+  $NursingRecordsTable get nursingRecords => attachedDatabase.nursingRecords;
+}

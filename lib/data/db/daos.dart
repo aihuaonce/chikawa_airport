@@ -584,3 +584,103 @@ class MedicalCertificatesDao extends DatabaseAccessor<AppDatabase>
     }
   }
 }
+
+@DriftAccessor(tables: [Undertakings])
+class UndertakingsDao extends DatabaseAccessor<AppDatabase> with _$UndertakingsDaoMixin {
+  UndertakingsDao(AppDatabase db) : super(db);
+
+  // 透過 visitId 取得資料
+  Future<Undertaking?> getByVisitId(int visitId) =>
+      (select(undertakings)..where((t) => t.visitId.equals(visitId))).getSingleOrNull();
+
+  // 新增或更新資料
+  Future<void> upsertByVisitId({
+    required int visitId,
+    String? signerName,
+    String? signerId,
+    required bool isSelf,
+    String? relation,
+    String? address,
+    String? phone,
+    String? doctor,
+    Uint8List? signatureBytes,
+  }) async {
+    final companion = UndertakingsCompanion(
+      visitId: Value(visitId),
+      signerName: Value(signerName),
+      signerId: Value(signerId),
+      isSelf: Value(isSelf),
+      relation: Value(relation),
+      address: Value(address),
+      phone: Value(phone),
+      doctor: Value(doctor),
+      signatureBytes: Value(signatureBytes),
+      updatedAt: Value(DateTime.now()),
+    );
+
+    final existing = await getByVisitId(visitId);
+    if (existing == null) {
+      await into(undertakings).insert(companion);
+    } else {
+      await (update(undertakings)..where((t) => t.visitId.equals(visitId))).write(companion);
+    }
+  }
+}
+
+@DriftAccessor(tables: [ElectronicDocuments])
+class ElectronicDocumentsDao extends DatabaseAccessor<AppDatabase> with _$ElectronicDocumentsDaoMixin {
+  ElectronicDocumentsDao(AppDatabase db) : super(db);
+
+  // 透過 visitId 取得資料
+  Future<ElectronicDocument?> getByVisitId(int visitId) =>
+      (select(electronicDocuments)..where((t) => t.visitId.equals(visitId))).getSingleOrNull();
+
+  // 新增或更新資料
+  Future<void> upsertByVisitId({
+    required int visitId,
+    int? toSelectedIndex,
+    int? fromSelectedIndex,
+  }) async {
+    final companion = ElectronicDocumentsCompanion(
+      visitId: Value(visitId),
+      toSelectedIndex: Value(toSelectedIndex),
+      fromSelectedIndex: Value(fromSelectedIndex),
+      updatedAt: Value(DateTime.now()),
+    );
+
+    final existing = await getByVisitId(visitId);
+    if (existing == null) {
+      await into(electronicDocuments).insert(companion);
+    } else {
+      await (update(electronicDocuments)..where((t) => t.visitId.equals(visitId))).write(companion);
+    }
+  }
+}
+
+@DriftAccessor(tables: [NursingRecords])
+class NursingRecordsDao extends DatabaseAccessor<AppDatabase> with _$NursingRecordsDaoMixin {
+  NursingRecordsDao(AppDatabase db) : super(db);
+
+  // 透過 visitId 取得資料
+  Future<NursingRecord?> getByVisitId(int visitId) =>
+      (select(nursingRecords)..where((t) => t.visitId.equals(visitId))).getSingleOrNull();
+
+  // 新增或更新資料
+  Future<void> upsertByVisitId({
+    required int visitId,
+    required List<Map<String, dynamic>> records, // 傳入 Map 列表
+  }) async {
+    final companion = NursingRecordsCompanion(
+      visitId: Value(visitId),
+      recordsJson: Value(jsonEncode(records)), // 序列化為 JSON
+      updatedAt: Value(DateTime.now()),
+    );
+
+    final existing = await getByVisitId(visitId);
+    if (existing == null) {
+      await into(nursingRecords).insert(companion);
+    } else {
+      await (update(nursingRecords)..where((t) => t.visitId.equals(visitId))).write(companion);
+    }
+  }
+}

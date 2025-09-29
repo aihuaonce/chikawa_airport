@@ -18,6 +18,9 @@ part 'app_database.g.dart';
     Treatments,
     MedicalCosts,
     MedicalCertificates,
+    Undertakings,
+    ElectronicDocuments,
+    NursingRecords,
     // 之後還有 Treatments, MedicalCosts, Diagnoses... 全部加在這裡
   ],
   daos: [
@@ -28,6 +31,9 @@ part 'app_database.g.dart';
     TreatmentsDao,
     MedicalCostsDao,
     MedicalCertificatesDao,
+    UndertakingsDao,
+    ElectronicDocumentsDao,
+    NursingRecordsDao,
     // 之後還有 TreatmentsDao, MedicalCostsDao, DiagnosesDao... 全部加在這裡
   ],
 )

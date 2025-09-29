@@ -6,6 +6,9 @@ import 'FlightLog.dart';
 import 'Plan.dart';
 import 'MedicalExpenses.dart';
 import 'MedicalCertificate.dart';
+import 'Undertaking.dart';
+import 'ElectronicDocuments.dart';
+import 'NursingRecord.dart';
 
 class RouteItem {
   final String label;
@@ -39,6 +42,19 @@ final List<RouteItem> routeItems = [
     label: '診斷書',
     builder: (visitId, key) =>
         MedicalCertificatePage(key: key, visitId: visitId),
+  ),
+  RouteItem(
+    label: '拒絕轉診切結書',
+    builder: (visitId, key) => UndertakingPage(key: key, visitId: visitId),
+  ),
+  RouteItem(
+    label: '電傳文件',
+    builder: (visitId, key) =>
+        ElectronicDocumentsPage(key: key, visitId: visitId),
+  ),
+  RouteItem(
+    label: '護理記錄',
+    builder: (visitId, key) => NursingRecordPage(key: key, visitId: visitId),
   ),
   // 未來其他頁面...
 ];

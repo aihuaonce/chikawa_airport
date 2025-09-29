@@ -278,3 +278,51 @@ class MedicalCertificates extends Table {
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
   DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
 }
+
+class Undertakings extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get visitId => integer().unique()();
+
+  // 中文區塊欄位
+  TextColumn get signerName => text().nullable()();
+  TextColumn get signerId => text().nullable()();
+  BoolColumn get isSelf => boolean().withDefault(const Constant(false))();
+  TextColumn get relation => text().nullable()();
+  TextColumn get address => text().nullable()();
+  TextColumn get phone => text().nullable()();
+  TextColumn get doctor => text().nullable()();
+
+  // 簽名圖片資料
+  BlobColumn get signatureBytes => blob().nullable()();
+  
+  // 紀錄時間
+  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+  DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
+}
+
+class ElectronicDocuments extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get visitId => integer().unique()();
+
+  // TO 選項的索引
+  IntColumn get toSelectedIndex => integer().nullable()();
+
+  // FROM 選項的索引
+  IntColumn get fromSelectedIndex => integer().nullable()();
+  
+  // 紀錄時間
+  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+  DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
+}
+
+class NursingRecords extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get visitId => integer().unique()();
+
+  // 將多筆護理記錄的 List<Map> 轉換為 JSON 字串儲存
+  TextColumn get recordsJson => text().nullable()();
+  
+  // 紀錄時間
+  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+  DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
+}

@@ -9236,6 +9236,1488 @@ class MedicalCertificatesCompanion extends UpdateCompanion<MedicalCertificate> {
   }
 }
 
+class $UndertakingsTable extends Undertakings
+    with TableInfo<$UndertakingsTable, Undertaking> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $UndertakingsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _visitIdMeta = const VerificationMeta(
+    'visitId',
+  );
+  @override
+  late final GeneratedColumn<int> visitId = GeneratedColumn<int>(
+    'visit_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'),
+  );
+  static const VerificationMeta _signerNameMeta = const VerificationMeta(
+    'signerName',
+  );
+  @override
+  late final GeneratedColumn<String> signerName = GeneratedColumn<String>(
+    'signer_name',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _signerIdMeta = const VerificationMeta(
+    'signerId',
+  );
+  @override
+  late final GeneratedColumn<String> signerId = GeneratedColumn<String>(
+    'signer_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _isSelfMeta = const VerificationMeta('isSelf');
+  @override
+  late final GeneratedColumn<bool> isSelf = GeneratedColumn<bool>(
+    'is_self',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_self" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _relationMeta = const VerificationMeta(
+    'relation',
+  );
+  @override
+  late final GeneratedColumn<String> relation = GeneratedColumn<String>(
+    'relation',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _addressMeta = const VerificationMeta(
+    'address',
+  );
+  @override
+  late final GeneratedColumn<String> address = GeneratedColumn<String>(
+    'address',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _phoneMeta = const VerificationMeta('phone');
+  @override
+  late final GeneratedColumn<String> phone = GeneratedColumn<String>(
+    'phone',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _doctorMeta = const VerificationMeta('doctor');
+  @override
+  late final GeneratedColumn<String> doctor = GeneratedColumn<String>(
+    'doctor',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _signatureBytesMeta = const VerificationMeta(
+    'signatureBytes',
+  );
+  @override
+  late final GeneratedColumn<Uint8List> signatureBytes =
+      GeneratedColumn<Uint8List>(
+        'signature_bytes',
+        aliasedName,
+        true,
+        type: DriftSqlType.blob,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    visitId,
+    signerName,
+    signerId,
+    isSelf,
+    relation,
+    address,
+    phone,
+    doctor,
+    signatureBytes,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'undertakings';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Undertaking> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('visit_id')) {
+      context.handle(
+        _visitIdMeta,
+        visitId.isAcceptableOrUnknown(data['visit_id']!, _visitIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_visitIdMeta);
+    }
+    if (data.containsKey('signer_name')) {
+      context.handle(
+        _signerNameMeta,
+        signerName.isAcceptableOrUnknown(data['signer_name']!, _signerNameMeta),
+      );
+    }
+    if (data.containsKey('signer_id')) {
+      context.handle(
+        _signerIdMeta,
+        signerId.isAcceptableOrUnknown(data['signer_id']!, _signerIdMeta),
+      );
+    }
+    if (data.containsKey('is_self')) {
+      context.handle(
+        _isSelfMeta,
+        isSelf.isAcceptableOrUnknown(data['is_self']!, _isSelfMeta),
+      );
+    }
+    if (data.containsKey('relation')) {
+      context.handle(
+        _relationMeta,
+        relation.isAcceptableOrUnknown(data['relation']!, _relationMeta),
+      );
+    }
+    if (data.containsKey('address')) {
+      context.handle(
+        _addressMeta,
+        address.isAcceptableOrUnknown(data['address']!, _addressMeta),
+      );
+    }
+    if (data.containsKey('phone')) {
+      context.handle(
+        _phoneMeta,
+        phone.isAcceptableOrUnknown(data['phone']!, _phoneMeta),
+      );
+    }
+    if (data.containsKey('doctor')) {
+      context.handle(
+        _doctorMeta,
+        doctor.isAcceptableOrUnknown(data['doctor']!, _doctorMeta),
+      );
+    }
+    if (data.containsKey('signature_bytes')) {
+      context.handle(
+        _signatureBytesMeta,
+        signatureBytes.isAcceptableOrUnknown(
+          data['signature_bytes']!,
+          _signatureBytesMeta,
+        ),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  Undertaking map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Undertaking(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      visitId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}visit_id'],
+      )!,
+      signerName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}signer_name'],
+      ),
+      signerId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}signer_id'],
+      ),
+      isSelf: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_self'],
+      )!,
+      relation: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}relation'],
+      ),
+      address: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}address'],
+      ),
+      phone: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}phone'],
+      ),
+      doctor: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}doctor'],
+      ),
+      signatureBytes: attachedDatabase.typeMapping.read(
+        DriftSqlType.blob,
+        data['${effectivePrefix}signature_bytes'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $UndertakingsTable createAlias(String alias) {
+    return $UndertakingsTable(attachedDatabase, alias);
+  }
+}
+
+class Undertaking extends DataClass implements Insertable<Undertaking> {
+  final int id;
+  final int visitId;
+  final String? signerName;
+  final String? signerId;
+  final bool isSelf;
+  final String? relation;
+  final String? address;
+  final String? phone;
+  final String? doctor;
+  final Uint8List? signatureBytes;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  const Undertaking({
+    required this.id,
+    required this.visitId,
+    this.signerName,
+    this.signerId,
+    required this.isSelf,
+    this.relation,
+    this.address,
+    this.phone,
+    this.doctor,
+    this.signatureBytes,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['visit_id'] = Variable<int>(visitId);
+    if (!nullToAbsent || signerName != null) {
+      map['signer_name'] = Variable<String>(signerName);
+    }
+    if (!nullToAbsent || signerId != null) {
+      map['signer_id'] = Variable<String>(signerId);
+    }
+    map['is_self'] = Variable<bool>(isSelf);
+    if (!nullToAbsent || relation != null) {
+      map['relation'] = Variable<String>(relation);
+    }
+    if (!nullToAbsent || address != null) {
+      map['address'] = Variable<String>(address);
+    }
+    if (!nullToAbsent || phone != null) {
+      map['phone'] = Variable<String>(phone);
+    }
+    if (!nullToAbsent || doctor != null) {
+      map['doctor'] = Variable<String>(doctor);
+    }
+    if (!nullToAbsent || signatureBytes != null) {
+      map['signature_bytes'] = Variable<Uint8List>(signatureBytes);
+    }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  UndertakingsCompanion toCompanion(bool nullToAbsent) {
+    return UndertakingsCompanion(
+      id: Value(id),
+      visitId: Value(visitId),
+      signerName: signerName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(signerName),
+      signerId: signerId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(signerId),
+      isSelf: Value(isSelf),
+      relation: relation == null && nullToAbsent
+          ? const Value.absent()
+          : Value(relation),
+      address: address == null && nullToAbsent
+          ? const Value.absent()
+          : Value(address),
+      phone: phone == null && nullToAbsent
+          ? const Value.absent()
+          : Value(phone),
+      doctor: doctor == null && nullToAbsent
+          ? const Value.absent()
+          : Value(doctor),
+      signatureBytes: signatureBytes == null && nullToAbsent
+          ? const Value.absent()
+          : Value(signatureBytes),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory Undertaking.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Undertaking(
+      id: serializer.fromJson<int>(json['id']),
+      visitId: serializer.fromJson<int>(json['visitId']),
+      signerName: serializer.fromJson<String?>(json['signerName']),
+      signerId: serializer.fromJson<String?>(json['signerId']),
+      isSelf: serializer.fromJson<bool>(json['isSelf']),
+      relation: serializer.fromJson<String?>(json['relation']),
+      address: serializer.fromJson<String?>(json['address']),
+      phone: serializer.fromJson<String?>(json['phone']),
+      doctor: serializer.fromJson<String?>(json['doctor']),
+      signatureBytes: serializer.fromJson<Uint8List?>(json['signatureBytes']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'visitId': serializer.toJson<int>(visitId),
+      'signerName': serializer.toJson<String?>(signerName),
+      'signerId': serializer.toJson<String?>(signerId),
+      'isSelf': serializer.toJson<bool>(isSelf),
+      'relation': serializer.toJson<String?>(relation),
+      'address': serializer.toJson<String?>(address),
+      'phone': serializer.toJson<String?>(phone),
+      'doctor': serializer.toJson<String?>(doctor),
+      'signatureBytes': serializer.toJson<Uint8List?>(signatureBytes),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  Undertaking copyWith({
+    int? id,
+    int? visitId,
+    Value<String?> signerName = const Value.absent(),
+    Value<String?> signerId = const Value.absent(),
+    bool? isSelf,
+    Value<String?> relation = const Value.absent(),
+    Value<String?> address = const Value.absent(),
+    Value<String?> phone = const Value.absent(),
+    Value<String?> doctor = const Value.absent(),
+    Value<Uint8List?> signatureBytes = const Value.absent(),
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) => Undertaking(
+    id: id ?? this.id,
+    visitId: visitId ?? this.visitId,
+    signerName: signerName.present ? signerName.value : this.signerName,
+    signerId: signerId.present ? signerId.value : this.signerId,
+    isSelf: isSelf ?? this.isSelf,
+    relation: relation.present ? relation.value : this.relation,
+    address: address.present ? address.value : this.address,
+    phone: phone.present ? phone.value : this.phone,
+    doctor: doctor.present ? doctor.value : this.doctor,
+    signatureBytes: signatureBytes.present
+        ? signatureBytes.value
+        : this.signatureBytes,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  Undertaking copyWithCompanion(UndertakingsCompanion data) {
+    return Undertaking(
+      id: data.id.present ? data.id.value : this.id,
+      visitId: data.visitId.present ? data.visitId.value : this.visitId,
+      signerName: data.signerName.present
+          ? data.signerName.value
+          : this.signerName,
+      signerId: data.signerId.present ? data.signerId.value : this.signerId,
+      isSelf: data.isSelf.present ? data.isSelf.value : this.isSelf,
+      relation: data.relation.present ? data.relation.value : this.relation,
+      address: data.address.present ? data.address.value : this.address,
+      phone: data.phone.present ? data.phone.value : this.phone,
+      doctor: data.doctor.present ? data.doctor.value : this.doctor,
+      signatureBytes: data.signatureBytes.present
+          ? data.signatureBytes.value
+          : this.signatureBytes,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Undertaking(')
+          ..write('id: $id, ')
+          ..write('visitId: $visitId, ')
+          ..write('signerName: $signerName, ')
+          ..write('signerId: $signerId, ')
+          ..write('isSelf: $isSelf, ')
+          ..write('relation: $relation, ')
+          ..write('address: $address, ')
+          ..write('phone: $phone, ')
+          ..write('doctor: $doctor, ')
+          ..write('signatureBytes: $signatureBytes, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    visitId,
+    signerName,
+    signerId,
+    isSelf,
+    relation,
+    address,
+    phone,
+    doctor,
+    $driftBlobEquality.hash(signatureBytes),
+    createdAt,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Undertaking &&
+          other.id == this.id &&
+          other.visitId == this.visitId &&
+          other.signerName == this.signerName &&
+          other.signerId == this.signerId &&
+          other.isSelf == this.isSelf &&
+          other.relation == this.relation &&
+          other.address == this.address &&
+          other.phone == this.phone &&
+          other.doctor == this.doctor &&
+          $driftBlobEquality.equals(
+            other.signatureBytes,
+            this.signatureBytes,
+          ) &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class UndertakingsCompanion extends UpdateCompanion<Undertaking> {
+  final Value<int> id;
+  final Value<int> visitId;
+  final Value<String?> signerName;
+  final Value<String?> signerId;
+  final Value<bool> isSelf;
+  final Value<String?> relation;
+  final Value<String?> address;
+  final Value<String?> phone;
+  final Value<String?> doctor;
+  final Value<Uint8List?> signatureBytes;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  const UndertakingsCompanion({
+    this.id = const Value.absent(),
+    this.visitId = const Value.absent(),
+    this.signerName = const Value.absent(),
+    this.signerId = const Value.absent(),
+    this.isSelf = const Value.absent(),
+    this.relation = const Value.absent(),
+    this.address = const Value.absent(),
+    this.phone = const Value.absent(),
+    this.doctor = const Value.absent(),
+    this.signatureBytes = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  });
+  UndertakingsCompanion.insert({
+    this.id = const Value.absent(),
+    required int visitId,
+    this.signerName = const Value.absent(),
+    this.signerId = const Value.absent(),
+    this.isSelf = const Value.absent(),
+    this.relation = const Value.absent(),
+    this.address = const Value.absent(),
+    this.phone = const Value.absent(),
+    this.doctor = const Value.absent(),
+    this.signatureBytes = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  }) : visitId = Value(visitId);
+  static Insertable<Undertaking> custom({
+    Expression<int>? id,
+    Expression<int>? visitId,
+    Expression<String>? signerName,
+    Expression<String>? signerId,
+    Expression<bool>? isSelf,
+    Expression<String>? relation,
+    Expression<String>? address,
+    Expression<String>? phone,
+    Expression<String>? doctor,
+    Expression<Uint8List>? signatureBytes,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (visitId != null) 'visit_id': visitId,
+      if (signerName != null) 'signer_name': signerName,
+      if (signerId != null) 'signer_id': signerId,
+      if (isSelf != null) 'is_self': isSelf,
+      if (relation != null) 'relation': relation,
+      if (address != null) 'address': address,
+      if (phone != null) 'phone': phone,
+      if (doctor != null) 'doctor': doctor,
+      if (signatureBytes != null) 'signature_bytes': signatureBytes,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+    });
+  }
+
+  UndertakingsCompanion copyWith({
+    Value<int>? id,
+    Value<int>? visitId,
+    Value<String?>? signerName,
+    Value<String?>? signerId,
+    Value<bool>? isSelf,
+    Value<String?>? relation,
+    Value<String?>? address,
+    Value<String?>? phone,
+    Value<String?>? doctor,
+    Value<Uint8List?>? signatureBytes,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+  }) {
+    return UndertakingsCompanion(
+      id: id ?? this.id,
+      visitId: visitId ?? this.visitId,
+      signerName: signerName ?? this.signerName,
+      signerId: signerId ?? this.signerId,
+      isSelf: isSelf ?? this.isSelf,
+      relation: relation ?? this.relation,
+      address: address ?? this.address,
+      phone: phone ?? this.phone,
+      doctor: doctor ?? this.doctor,
+      signatureBytes: signatureBytes ?? this.signatureBytes,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (visitId.present) {
+      map['visit_id'] = Variable<int>(visitId.value);
+    }
+    if (signerName.present) {
+      map['signer_name'] = Variable<String>(signerName.value);
+    }
+    if (signerId.present) {
+      map['signer_id'] = Variable<String>(signerId.value);
+    }
+    if (isSelf.present) {
+      map['is_self'] = Variable<bool>(isSelf.value);
+    }
+    if (relation.present) {
+      map['relation'] = Variable<String>(relation.value);
+    }
+    if (address.present) {
+      map['address'] = Variable<String>(address.value);
+    }
+    if (phone.present) {
+      map['phone'] = Variable<String>(phone.value);
+    }
+    if (doctor.present) {
+      map['doctor'] = Variable<String>(doctor.value);
+    }
+    if (signatureBytes.present) {
+      map['signature_bytes'] = Variable<Uint8List>(signatureBytes.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('UndertakingsCompanion(')
+          ..write('id: $id, ')
+          ..write('visitId: $visitId, ')
+          ..write('signerName: $signerName, ')
+          ..write('signerId: $signerId, ')
+          ..write('isSelf: $isSelf, ')
+          ..write('relation: $relation, ')
+          ..write('address: $address, ')
+          ..write('phone: $phone, ')
+          ..write('doctor: $doctor, ')
+          ..write('signatureBytes: $signatureBytes, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $ElectronicDocumentsTable extends ElectronicDocuments
+    with TableInfo<$ElectronicDocumentsTable, ElectronicDocument> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ElectronicDocumentsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _visitIdMeta = const VerificationMeta(
+    'visitId',
+  );
+  @override
+  late final GeneratedColumn<int> visitId = GeneratedColumn<int>(
+    'visit_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'),
+  );
+  static const VerificationMeta _toSelectedIndexMeta = const VerificationMeta(
+    'toSelectedIndex',
+  );
+  @override
+  late final GeneratedColumn<int> toSelectedIndex = GeneratedColumn<int>(
+    'to_selected_index',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _fromSelectedIndexMeta = const VerificationMeta(
+    'fromSelectedIndex',
+  );
+  @override
+  late final GeneratedColumn<int> fromSelectedIndex = GeneratedColumn<int>(
+    'from_selected_index',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    visitId,
+    toSelectedIndex,
+    fromSelectedIndex,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'electronic_documents';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ElectronicDocument> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('visit_id')) {
+      context.handle(
+        _visitIdMeta,
+        visitId.isAcceptableOrUnknown(data['visit_id']!, _visitIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_visitIdMeta);
+    }
+    if (data.containsKey('to_selected_index')) {
+      context.handle(
+        _toSelectedIndexMeta,
+        toSelectedIndex.isAcceptableOrUnknown(
+          data['to_selected_index']!,
+          _toSelectedIndexMeta,
+        ),
+      );
+    }
+    if (data.containsKey('from_selected_index')) {
+      context.handle(
+        _fromSelectedIndexMeta,
+        fromSelectedIndex.isAcceptableOrUnknown(
+          data['from_selected_index']!,
+          _fromSelectedIndexMeta,
+        ),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  ElectronicDocument map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ElectronicDocument(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      visitId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}visit_id'],
+      )!,
+      toSelectedIndex: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}to_selected_index'],
+      ),
+      fromSelectedIndex: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}from_selected_index'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $ElectronicDocumentsTable createAlias(String alias) {
+    return $ElectronicDocumentsTable(attachedDatabase, alias);
+  }
+}
+
+class ElectronicDocument extends DataClass
+    implements Insertable<ElectronicDocument> {
+  final int id;
+  final int visitId;
+  final int? toSelectedIndex;
+  final int? fromSelectedIndex;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  const ElectronicDocument({
+    required this.id,
+    required this.visitId,
+    this.toSelectedIndex,
+    this.fromSelectedIndex,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['visit_id'] = Variable<int>(visitId);
+    if (!nullToAbsent || toSelectedIndex != null) {
+      map['to_selected_index'] = Variable<int>(toSelectedIndex);
+    }
+    if (!nullToAbsent || fromSelectedIndex != null) {
+      map['from_selected_index'] = Variable<int>(fromSelectedIndex);
+    }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  ElectronicDocumentsCompanion toCompanion(bool nullToAbsent) {
+    return ElectronicDocumentsCompanion(
+      id: Value(id),
+      visitId: Value(visitId),
+      toSelectedIndex: toSelectedIndex == null && nullToAbsent
+          ? const Value.absent()
+          : Value(toSelectedIndex),
+      fromSelectedIndex: fromSelectedIndex == null && nullToAbsent
+          ? const Value.absent()
+          : Value(fromSelectedIndex),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory ElectronicDocument.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ElectronicDocument(
+      id: serializer.fromJson<int>(json['id']),
+      visitId: serializer.fromJson<int>(json['visitId']),
+      toSelectedIndex: serializer.fromJson<int?>(json['toSelectedIndex']),
+      fromSelectedIndex: serializer.fromJson<int?>(json['fromSelectedIndex']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'visitId': serializer.toJson<int>(visitId),
+      'toSelectedIndex': serializer.toJson<int?>(toSelectedIndex),
+      'fromSelectedIndex': serializer.toJson<int?>(fromSelectedIndex),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  ElectronicDocument copyWith({
+    int? id,
+    int? visitId,
+    Value<int?> toSelectedIndex = const Value.absent(),
+    Value<int?> fromSelectedIndex = const Value.absent(),
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) => ElectronicDocument(
+    id: id ?? this.id,
+    visitId: visitId ?? this.visitId,
+    toSelectedIndex: toSelectedIndex.present
+        ? toSelectedIndex.value
+        : this.toSelectedIndex,
+    fromSelectedIndex: fromSelectedIndex.present
+        ? fromSelectedIndex.value
+        : this.fromSelectedIndex,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  ElectronicDocument copyWithCompanion(ElectronicDocumentsCompanion data) {
+    return ElectronicDocument(
+      id: data.id.present ? data.id.value : this.id,
+      visitId: data.visitId.present ? data.visitId.value : this.visitId,
+      toSelectedIndex: data.toSelectedIndex.present
+          ? data.toSelectedIndex.value
+          : this.toSelectedIndex,
+      fromSelectedIndex: data.fromSelectedIndex.present
+          ? data.fromSelectedIndex.value
+          : this.fromSelectedIndex,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ElectronicDocument(')
+          ..write('id: $id, ')
+          ..write('visitId: $visitId, ')
+          ..write('toSelectedIndex: $toSelectedIndex, ')
+          ..write('fromSelectedIndex: $fromSelectedIndex, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    visitId,
+    toSelectedIndex,
+    fromSelectedIndex,
+    createdAt,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ElectronicDocument &&
+          other.id == this.id &&
+          other.visitId == this.visitId &&
+          other.toSelectedIndex == this.toSelectedIndex &&
+          other.fromSelectedIndex == this.fromSelectedIndex &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class ElectronicDocumentsCompanion extends UpdateCompanion<ElectronicDocument> {
+  final Value<int> id;
+  final Value<int> visitId;
+  final Value<int?> toSelectedIndex;
+  final Value<int?> fromSelectedIndex;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  const ElectronicDocumentsCompanion({
+    this.id = const Value.absent(),
+    this.visitId = const Value.absent(),
+    this.toSelectedIndex = const Value.absent(),
+    this.fromSelectedIndex = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  });
+  ElectronicDocumentsCompanion.insert({
+    this.id = const Value.absent(),
+    required int visitId,
+    this.toSelectedIndex = const Value.absent(),
+    this.fromSelectedIndex = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  }) : visitId = Value(visitId);
+  static Insertable<ElectronicDocument> custom({
+    Expression<int>? id,
+    Expression<int>? visitId,
+    Expression<int>? toSelectedIndex,
+    Expression<int>? fromSelectedIndex,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (visitId != null) 'visit_id': visitId,
+      if (toSelectedIndex != null) 'to_selected_index': toSelectedIndex,
+      if (fromSelectedIndex != null) 'from_selected_index': fromSelectedIndex,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+    });
+  }
+
+  ElectronicDocumentsCompanion copyWith({
+    Value<int>? id,
+    Value<int>? visitId,
+    Value<int?>? toSelectedIndex,
+    Value<int?>? fromSelectedIndex,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+  }) {
+    return ElectronicDocumentsCompanion(
+      id: id ?? this.id,
+      visitId: visitId ?? this.visitId,
+      toSelectedIndex: toSelectedIndex ?? this.toSelectedIndex,
+      fromSelectedIndex: fromSelectedIndex ?? this.fromSelectedIndex,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (visitId.present) {
+      map['visit_id'] = Variable<int>(visitId.value);
+    }
+    if (toSelectedIndex.present) {
+      map['to_selected_index'] = Variable<int>(toSelectedIndex.value);
+    }
+    if (fromSelectedIndex.present) {
+      map['from_selected_index'] = Variable<int>(fromSelectedIndex.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ElectronicDocumentsCompanion(')
+          ..write('id: $id, ')
+          ..write('visitId: $visitId, ')
+          ..write('toSelectedIndex: $toSelectedIndex, ')
+          ..write('fromSelectedIndex: $fromSelectedIndex, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $NursingRecordsTable extends NursingRecords
+    with TableInfo<$NursingRecordsTable, NursingRecord> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $NursingRecordsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _visitIdMeta = const VerificationMeta(
+    'visitId',
+  );
+  @override
+  late final GeneratedColumn<int> visitId = GeneratedColumn<int>(
+    'visit_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'),
+  );
+  static const VerificationMeta _recordsJsonMeta = const VerificationMeta(
+    'recordsJson',
+  );
+  @override
+  late final GeneratedColumn<String> recordsJson = GeneratedColumn<String>(
+    'records_json',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    visitId,
+    recordsJson,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'nursing_records';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<NursingRecord> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('visit_id')) {
+      context.handle(
+        _visitIdMeta,
+        visitId.isAcceptableOrUnknown(data['visit_id']!, _visitIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_visitIdMeta);
+    }
+    if (data.containsKey('records_json')) {
+      context.handle(
+        _recordsJsonMeta,
+        recordsJson.isAcceptableOrUnknown(
+          data['records_json']!,
+          _recordsJsonMeta,
+        ),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  NursingRecord map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return NursingRecord(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      visitId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}visit_id'],
+      )!,
+      recordsJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}records_json'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $NursingRecordsTable createAlias(String alias) {
+    return $NursingRecordsTable(attachedDatabase, alias);
+  }
+}
+
+class NursingRecord extends DataClass implements Insertable<NursingRecord> {
+  final int id;
+  final int visitId;
+  final String? recordsJson;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  const NursingRecord({
+    required this.id,
+    required this.visitId,
+    this.recordsJson,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['visit_id'] = Variable<int>(visitId);
+    if (!nullToAbsent || recordsJson != null) {
+      map['records_json'] = Variable<String>(recordsJson);
+    }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  NursingRecordsCompanion toCompanion(bool nullToAbsent) {
+    return NursingRecordsCompanion(
+      id: Value(id),
+      visitId: Value(visitId),
+      recordsJson: recordsJson == null && nullToAbsent
+          ? const Value.absent()
+          : Value(recordsJson),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory NursingRecord.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return NursingRecord(
+      id: serializer.fromJson<int>(json['id']),
+      visitId: serializer.fromJson<int>(json['visitId']),
+      recordsJson: serializer.fromJson<String?>(json['recordsJson']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'visitId': serializer.toJson<int>(visitId),
+      'recordsJson': serializer.toJson<String?>(recordsJson),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  NursingRecord copyWith({
+    int? id,
+    int? visitId,
+    Value<String?> recordsJson = const Value.absent(),
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) => NursingRecord(
+    id: id ?? this.id,
+    visitId: visitId ?? this.visitId,
+    recordsJson: recordsJson.present ? recordsJson.value : this.recordsJson,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  NursingRecord copyWithCompanion(NursingRecordsCompanion data) {
+    return NursingRecord(
+      id: data.id.present ? data.id.value : this.id,
+      visitId: data.visitId.present ? data.visitId.value : this.visitId,
+      recordsJson: data.recordsJson.present
+          ? data.recordsJson.value
+          : this.recordsJson,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('NursingRecord(')
+          ..write('id: $id, ')
+          ..write('visitId: $visitId, ')
+          ..write('recordsJson: $recordsJson, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, visitId, recordsJson, createdAt, updatedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is NursingRecord &&
+          other.id == this.id &&
+          other.visitId == this.visitId &&
+          other.recordsJson == this.recordsJson &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class NursingRecordsCompanion extends UpdateCompanion<NursingRecord> {
+  final Value<int> id;
+  final Value<int> visitId;
+  final Value<String?> recordsJson;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  const NursingRecordsCompanion({
+    this.id = const Value.absent(),
+    this.visitId = const Value.absent(),
+    this.recordsJson = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  });
+  NursingRecordsCompanion.insert({
+    this.id = const Value.absent(),
+    required int visitId,
+    this.recordsJson = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  }) : visitId = Value(visitId);
+  static Insertable<NursingRecord> custom({
+    Expression<int>? id,
+    Expression<int>? visitId,
+    Expression<String>? recordsJson,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (visitId != null) 'visit_id': visitId,
+      if (recordsJson != null) 'records_json': recordsJson,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+    });
+  }
+
+  NursingRecordsCompanion copyWith({
+    Value<int>? id,
+    Value<int>? visitId,
+    Value<String?>? recordsJson,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+  }) {
+    return NursingRecordsCompanion(
+      id: id ?? this.id,
+      visitId: visitId ?? this.visitId,
+      recordsJson: recordsJson ?? this.recordsJson,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (visitId.present) {
+      map['visit_id'] = Variable<int>(visitId.value);
+    }
+    if (recordsJson.present) {
+      map['records_json'] = Variable<String>(recordsJson.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('NursingRecordsCompanion(')
+          ..write('id: $id, ')
+          ..write('visitId: $visitId, ')
+          ..write('recordsJson: $recordsJson, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -9251,6 +10733,10 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $MedicalCostsTable medicalCosts = $MedicalCostsTable(this);
   late final $MedicalCertificatesTable medicalCertificates =
       $MedicalCertificatesTable(this);
+  late final $UndertakingsTable undertakings = $UndertakingsTable(this);
+  late final $ElectronicDocumentsTable electronicDocuments =
+      $ElectronicDocumentsTable(this);
+  late final $NursingRecordsTable nursingRecords = $NursingRecordsTable(this);
   late final VisitsDao visitsDao = VisitsDao(this as AppDatabase);
   late final PatientProfilesDao patientProfilesDao = PatientProfilesDao(
     this as AppDatabase,
@@ -9265,6 +10751,14 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   );
   late final MedicalCertificatesDao medicalCertificatesDao =
       MedicalCertificatesDao(this as AppDatabase);
+  late final UndertakingsDao undertakingsDao = UndertakingsDao(
+    this as AppDatabase,
+  );
+  late final ElectronicDocumentsDao electronicDocumentsDao =
+      ElectronicDocumentsDao(this as AppDatabase);
+  late final NursingRecordsDao nursingRecordsDao = NursingRecordsDao(
+    this as AppDatabase,
+  );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -9277,6 +10771,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     treatments,
     medicalCosts,
     medicalCertificates,
+    undertakings,
+    electronicDocuments,
+    nursingRecords,
   ];
 }
 
@@ -13212,6 +14709,768 @@ typedef $$MedicalCertificatesTableProcessedTableManager =
       MedicalCertificate,
       PrefetchHooks Function()
     >;
+typedef $$UndertakingsTableCreateCompanionBuilder =
+    UndertakingsCompanion Function({
+      Value<int> id,
+      required int visitId,
+      Value<String?> signerName,
+      Value<String?> signerId,
+      Value<bool> isSelf,
+      Value<String?> relation,
+      Value<String?> address,
+      Value<String?> phone,
+      Value<String?> doctor,
+      Value<Uint8List?> signatureBytes,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+    });
+typedef $$UndertakingsTableUpdateCompanionBuilder =
+    UndertakingsCompanion Function({
+      Value<int> id,
+      Value<int> visitId,
+      Value<String?> signerName,
+      Value<String?> signerId,
+      Value<bool> isSelf,
+      Value<String?> relation,
+      Value<String?> address,
+      Value<String?> phone,
+      Value<String?> doctor,
+      Value<Uint8List?> signatureBytes,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+    });
+
+class $$UndertakingsTableFilterComposer
+    extends Composer<_$AppDatabase, $UndertakingsTable> {
+  $$UndertakingsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get visitId => $composableBuilder(
+    column: $table.visitId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get signerName => $composableBuilder(
+    column: $table.signerName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get signerId => $composableBuilder(
+    column: $table.signerId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isSelf => $composableBuilder(
+    column: $table.isSelf,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get relation => $composableBuilder(
+    column: $table.relation,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get address => $composableBuilder(
+    column: $table.address,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get phone => $composableBuilder(
+    column: $table.phone,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get doctor => $composableBuilder(
+    column: $table.doctor,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<Uint8List> get signatureBytes => $composableBuilder(
+    column: $table.signatureBytes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$UndertakingsTableOrderingComposer
+    extends Composer<_$AppDatabase, $UndertakingsTable> {
+  $$UndertakingsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get visitId => $composableBuilder(
+    column: $table.visitId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get signerName => $composableBuilder(
+    column: $table.signerName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get signerId => $composableBuilder(
+    column: $table.signerId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isSelf => $composableBuilder(
+    column: $table.isSelf,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get relation => $composableBuilder(
+    column: $table.relation,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get address => $composableBuilder(
+    column: $table.address,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get phone => $composableBuilder(
+    column: $table.phone,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get doctor => $composableBuilder(
+    column: $table.doctor,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<Uint8List> get signatureBytes => $composableBuilder(
+    column: $table.signatureBytes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$UndertakingsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $UndertakingsTable> {
+  $$UndertakingsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get visitId =>
+      $composableBuilder(column: $table.visitId, builder: (column) => column);
+
+  GeneratedColumn<String> get signerName => $composableBuilder(
+    column: $table.signerName,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get signerId =>
+      $composableBuilder(column: $table.signerId, builder: (column) => column);
+
+  GeneratedColumn<bool> get isSelf =>
+      $composableBuilder(column: $table.isSelf, builder: (column) => column);
+
+  GeneratedColumn<String> get relation =>
+      $composableBuilder(column: $table.relation, builder: (column) => column);
+
+  GeneratedColumn<String> get address =>
+      $composableBuilder(column: $table.address, builder: (column) => column);
+
+  GeneratedColumn<String> get phone =>
+      $composableBuilder(column: $table.phone, builder: (column) => column);
+
+  GeneratedColumn<String> get doctor =>
+      $composableBuilder(column: $table.doctor, builder: (column) => column);
+
+  GeneratedColumn<Uint8List> get signatureBytes => $composableBuilder(
+    column: $table.signatureBytes,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$UndertakingsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $UndertakingsTable,
+          Undertaking,
+          $$UndertakingsTableFilterComposer,
+          $$UndertakingsTableOrderingComposer,
+          $$UndertakingsTableAnnotationComposer,
+          $$UndertakingsTableCreateCompanionBuilder,
+          $$UndertakingsTableUpdateCompanionBuilder,
+          (
+            Undertaking,
+            BaseReferences<_$AppDatabase, $UndertakingsTable, Undertaking>,
+          ),
+          Undertaking,
+          PrefetchHooks Function()
+        > {
+  $$UndertakingsTableTableManager(_$AppDatabase db, $UndertakingsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$UndertakingsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$UndertakingsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$UndertakingsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> visitId = const Value.absent(),
+                Value<String?> signerName = const Value.absent(),
+                Value<String?> signerId = const Value.absent(),
+                Value<bool> isSelf = const Value.absent(),
+                Value<String?> relation = const Value.absent(),
+                Value<String?> address = const Value.absent(),
+                Value<String?> phone = const Value.absent(),
+                Value<String?> doctor = const Value.absent(),
+                Value<Uint8List?> signatureBytes = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+              }) => UndertakingsCompanion(
+                id: id,
+                visitId: visitId,
+                signerName: signerName,
+                signerId: signerId,
+                isSelf: isSelf,
+                relation: relation,
+                address: address,
+                phone: phone,
+                doctor: doctor,
+                signatureBytes: signatureBytes,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int visitId,
+                Value<String?> signerName = const Value.absent(),
+                Value<String?> signerId = const Value.absent(),
+                Value<bool> isSelf = const Value.absent(),
+                Value<String?> relation = const Value.absent(),
+                Value<String?> address = const Value.absent(),
+                Value<String?> phone = const Value.absent(),
+                Value<String?> doctor = const Value.absent(),
+                Value<Uint8List?> signatureBytes = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+              }) => UndertakingsCompanion.insert(
+                id: id,
+                visitId: visitId,
+                signerName: signerName,
+                signerId: signerId,
+                isSelf: isSelf,
+                relation: relation,
+                address: address,
+                phone: phone,
+                doctor: doctor,
+                signatureBytes: signatureBytes,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$UndertakingsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $UndertakingsTable,
+      Undertaking,
+      $$UndertakingsTableFilterComposer,
+      $$UndertakingsTableOrderingComposer,
+      $$UndertakingsTableAnnotationComposer,
+      $$UndertakingsTableCreateCompanionBuilder,
+      $$UndertakingsTableUpdateCompanionBuilder,
+      (
+        Undertaking,
+        BaseReferences<_$AppDatabase, $UndertakingsTable, Undertaking>,
+      ),
+      Undertaking,
+      PrefetchHooks Function()
+    >;
+typedef $$ElectronicDocumentsTableCreateCompanionBuilder =
+    ElectronicDocumentsCompanion Function({
+      Value<int> id,
+      required int visitId,
+      Value<int?> toSelectedIndex,
+      Value<int?> fromSelectedIndex,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+    });
+typedef $$ElectronicDocumentsTableUpdateCompanionBuilder =
+    ElectronicDocumentsCompanion Function({
+      Value<int> id,
+      Value<int> visitId,
+      Value<int?> toSelectedIndex,
+      Value<int?> fromSelectedIndex,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+    });
+
+class $$ElectronicDocumentsTableFilterComposer
+    extends Composer<_$AppDatabase, $ElectronicDocumentsTable> {
+  $$ElectronicDocumentsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get visitId => $composableBuilder(
+    column: $table.visitId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get toSelectedIndex => $composableBuilder(
+    column: $table.toSelectedIndex,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get fromSelectedIndex => $composableBuilder(
+    column: $table.fromSelectedIndex,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$ElectronicDocumentsTableOrderingComposer
+    extends Composer<_$AppDatabase, $ElectronicDocumentsTable> {
+  $$ElectronicDocumentsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get visitId => $composableBuilder(
+    column: $table.visitId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get toSelectedIndex => $composableBuilder(
+    column: $table.toSelectedIndex,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get fromSelectedIndex => $composableBuilder(
+    column: $table.fromSelectedIndex,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$ElectronicDocumentsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ElectronicDocumentsTable> {
+  $$ElectronicDocumentsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get visitId =>
+      $composableBuilder(column: $table.visitId, builder: (column) => column);
+
+  GeneratedColumn<int> get toSelectedIndex => $composableBuilder(
+    column: $table.toSelectedIndex,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get fromSelectedIndex => $composableBuilder(
+    column: $table.fromSelectedIndex,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$ElectronicDocumentsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $ElectronicDocumentsTable,
+          ElectronicDocument,
+          $$ElectronicDocumentsTableFilterComposer,
+          $$ElectronicDocumentsTableOrderingComposer,
+          $$ElectronicDocumentsTableAnnotationComposer,
+          $$ElectronicDocumentsTableCreateCompanionBuilder,
+          $$ElectronicDocumentsTableUpdateCompanionBuilder,
+          (
+            ElectronicDocument,
+            BaseReferences<
+              _$AppDatabase,
+              $ElectronicDocumentsTable,
+              ElectronicDocument
+            >,
+          ),
+          ElectronicDocument,
+          PrefetchHooks Function()
+        > {
+  $$ElectronicDocumentsTableTableManager(
+    _$AppDatabase db,
+    $ElectronicDocumentsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ElectronicDocumentsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ElectronicDocumentsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$ElectronicDocumentsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> visitId = const Value.absent(),
+                Value<int?> toSelectedIndex = const Value.absent(),
+                Value<int?> fromSelectedIndex = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+              }) => ElectronicDocumentsCompanion(
+                id: id,
+                visitId: visitId,
+                toSelectedIndex: toSelectedIndex,
+                fromSelectedIndex: fromSelectedIndex,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int visitId,
+                Value<int?> toSelectedIndex = const Value.absent(),
+                Value<int?> fromSelectedIndex = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+              }) => ElectronicDocumentsCompanion.insert(
+                id: id,
+                visitId: visitId,
+                toSelectedIndex: toSelectedIndex,
+                fromSelectedIndex: fromSelectedIndex,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$ElectronicDocumentsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $ElectronicDocumentsTable,
+      ElectronicDocument,
+      $$ElectronicDocumentsTableFilterComposer,
+      $$ElectronicDocumentsTableOrderingComposer,
+      $$ElectronicDocumentsTableAnnotationComposer,
+      $$ElectronicDocumentsTableCreateCompanionBuilder,
+      $$ElectronicDocumentsTableUpdateCompanionBuilder,
+      (
+        ElectronicDocument,
+        BaseReferences<
+          _$AppDatabase,
+          $ElectronicDocumentsTable,
+          ElectronicDocument
+        >,
+      ),
+      ElectronicDocument,
+      PrefetchHooks Function()
+    >;
+typedef $$NursingRecordsTableCreateCompanionBuilder =
+    NursingRecordsCompanion Function({
+      Value<int> id,
+      required int visitId,
+      Value<String?> recordsJson,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+    });
+typedef $$NursingRecordsTableUpdateCompanionBuilder =
+    NursingRecordsCompanion Function({
+      Value<int> id,
+      Value<int> visitId,
+      Value<String?> recordsJson,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+    });
+
+class $$NursingRecordsTableFilterComposer
+    extends Composer<_$AppDatabase, $NursingRecordsTable> {
+  $$NursingRecordsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get visitId => $composableBuilder(
+    column: $table.visitId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get recordsJson => $composableBuilder(
+    column: $table.recordsJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$NursingRecordsTableOrderingComposer
+    extends Composer<_$AppDatabase, $NursingRecordsTable> {
+  $$NursingRecordsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get visitId => $composableBuilder(
+    column: $table.visitId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get recordsJson => $composableBuilder(
+    column: $table.recordsJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$NursingRecordsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $NursingRecordsTable> {
+  $$NursingRecordsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get visitId =>
+      $composableBuilder(column: $table.visitId, builder: (column) => column);
+
+  GeneratedColumn<String> get recordsJson => $composableBuilder(
+    column: $table.recordsJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$NursingRecordsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $NursingRecordsTable,
+          NursingRecord,
+          $$NursingRecordsTableFilterComposer,
+          $$NursingRecordsTableOrderingComposer,
+          $$NursingRecordsTableAnnotationComposer,
+          $$NursingRecordsTableCreateCompanionBuilder,
+          $$NursingRecordsTableUpdateCompanionBuilder,
+          (
+            NursingRecord,
+            BaseReferences<_$AppDatabase, $NursingRecordsTable, NursingRecord>,
+          ),
+          NursingRecord,
+          PrefetchHooks Function()
+        > {
+  $$NursingRecordsTableTableManager(
+    _$AppDatabase db,
+    $NursingRecordsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$NursingRecordsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$NursingRecordsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$NursingRecordsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> visitId = const Value.absent(),
+                Value<String?> recordsJson = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+              }) => NursingRecordsCompanion(
+                id: id,
+                visitId: visitId,
+                recordsJson: recordsJson,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int visitId,
+                Value<String?> recordsJson = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+              }) => NursingRecordsCompanion.insert(
+                id: id,
+                visitId: visitId,
+                recordsJson: recordsJson,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$NursingRecordsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $NursingRecordsTable,
+      NursingRecord,
+      $$NursingRecordsTableFilterComposer,
+      $$NursingRecordsTableOrderingComposer,
+      $$NursingRecordsTableAnnotationComposer,
+      $$NursingRecordsTableCreateCompanionBuilder,
+      $$NursingRecordsTableUpdateCompanionBuilder,
+      (
+        NursingRecord,
+        BaseReferences<_$AppDatabase, $NursingRecordsTable, NursingRecord>,
+      ),
+      NursingRecord,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -13230,4 +15489,10 @@ class $AppDatabaseManager {
       $$MedicalCostsTableTableManager(_db, _db.medicalCosts);
   $$MedicalCertificatesTableTableManager get medicalCertificates =>
       $$MedicalCertificatesTableTableManager(_db, _db.medicalCertificates);
+  $$UndertakingsTableTableManager get undertakings =>
+      $$UndertakingsTableTableManager(_db, _db.undertakings);
+  $$ElectronicDocumentsTableTableManager get electronicDocuments =>
+      $$ElectronicDocumentsTableTableManager(_db, _db.electronicDocuments);
+  $$NursingRecordsTableTableManager get nursingRecords =>
+      $$NursingRecordsTableTableManager(_db, _db.nursingRecords);
 }
