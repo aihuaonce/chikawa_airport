@@ -544,3 +544,43 @@ class MedicalCostsDao extends DatabaseAccessor<AppDatabase>
     }
   }
 }
+
+@DriftAccessor(tables: [MedicalCertificates])
+class MedicalCertificatesDao extends DatabaseAccessor<AppDatabase>
+    with _$MedicalCertificatesDaoMixin {
+  MedicalCertificatesDao(AppDatabase db) : super(db);
+
+  // 透過 visitId 取得資料
+  Future<MedicalCertificate?> getByVisitId(int visitId) => (select(
+    medicalCertificates,
+  )..where((t) => t.visitId.equals(visitId))).getSingleOrNull();
+
+  // 新增或更新資料
+  Future<void> upsertByVisitId({
+    required int visitId,
+    String? diagnosis,
+    int? instructionOption,
+    String? chineseInstruction,
+    String? englishInstruction,
+    DateTime? issueDate,
+  }) async {
+    final companion = MedicalCertificatesCompanion(
+      visitId: Value(visitId),
+      diagnosis: Value(diagnosis),
+      instructionOption: Value(instructionOption),
+      chineseInstruction: Value(chineseInstruction),
+      englishInstruction: Value(englishInstruction),
+      issueDate: Value(issueDate),
+      updatedAt: Value(DateTime.now()),
+    );
+
+    final existing = await getByVisitId(visitId);
+    if (existing == null) {
+      await into(medicalCertificates).insert(companion);
+    } else {
+      await (update(
+        medicalCertificates,
+      )..where((t) => t.visitId.equals(visitId))).write(companion);
+    }
+  }
+}

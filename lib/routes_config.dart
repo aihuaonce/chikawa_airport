@@ -5,6 +5,7 @@ import 'AccidentRecord.dart';
 import 'FlightLog.dart';
 import 'Plan.dart';
 import 'MedicalExpenses.dart';
+import 'MedicalCertificate.dart';
 
 class RouteItem {
   final String label;
@@ -33,6 +34,11 @@ final List<RouteItem> routeItems = [
   RouteItem(
     label: '醫療費用',
     builder: (visitId, key) => MedicalExpensesPage(key: key, visitId: visitId),
+  ),
+  RouteItem(
+    label: '診斷書',
+    builder: (visitId, key) =>
+        MedicalCertificatePage(key: key, visitId: visitId),
   ),
   // 未來其他頁面...
 ];

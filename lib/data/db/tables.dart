@@ -256,3 +256,25 @@ class MedicalCosts extends Table {
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
   DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
 }
+
+class MedicalCertificates extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get visitId => integer().unique()();
+
+  // 診斷內容
+  TextColumn get diagnosis => text().nullable()();
+
+  // 囑言片語選項
+  IntColumn get instructionOption => integer().nullable()();
+
+  // 中、英文囑言
+  TextColumn get chineseInstruction => text().nullable()();
+  TextColumn get englishInstruction => text().nullable()();
+
+  // 開立日期
+  DateTimeColumn get issueDate => dateTime().nullable()();
+
+  // 紀錄時間
+  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+  DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
+}

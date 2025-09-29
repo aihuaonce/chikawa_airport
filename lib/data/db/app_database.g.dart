@@ -8658,6 +8658,584 @@ class MedicalCostsCompanion extends UpdateCompanion<MedicalCost> {
   }
 }
 
+class $MedicalCertificatesTable extends MedicalCertificates
+    with TableInfo<$MedicalCertificatesTable, MedicalCertificate> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $MedicalCertificatesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _visitIdMeta = const VerificationMeta(
+    'visitId',
+  );
+  @override
+  late final GeneratedColumn<int> visitId = GeneratedColumn<int>(
+    'visit_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'),
+  );
+  static const VerificationMeta _diagnosisMeta = const VerificationMeta(
+    'diagnosis',
+  );
+  @override
+  late final GeneratedColumn<String> diagnosis = GeneratedColumn<String>(
+    'diagnosis',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _instructionOptionMeta = const VerificationMeta(
+    'instructionOption',
+  );
+  @override
+  late final GeneratedColumn<int> instructionOption = GeneratedColumn<int>(
+    'instruction_option',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _chineseInstructionMeta =
+      const VerificationMeta('chineseInstruction');
+  @override
+  late final GeneratedColumn<String> chineseInstruction =
+      GeneratedColumn<String>(
+        'chinese_instruction',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _englishInstructionMeta =
+      const VerificationMeta('englishInstruction');
+  @override
+  late final GeneratedColumn<String> englishInstruction =
+      GeneratedColumn<String>(
+        'english_instruction',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _issueDateMeta = const VerificationMeta(
+    'issueDate',
+  );
+  @override
+  late final GeneratedColumn<DateTime> issueDate = GeneratedColumn<DateTime>(
+    'issue_date',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    visitId,
+    diagnosis,
+    instructionOption,
+    chineseInstruction,
+    englishInstruction,
+    issueDate,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'medical_certificates';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<MedicalCertificate> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('visit_id')) {
+      context.handle(
+        _visitIdMeta,
+        visitId.isAcceptableOrUnknown(data['visit_id']!, _visitIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_visitIdMeta);
+    }
+    if (data.containsKey('diagnosis')) {
+      context.handle(
+        _diagnosisMeta,
+        diagnosis.isAcceptableOrUnknown(data['diagnosis']!, _diagnosisMeta),
+      );
+    }
+    if (data.containsKey('instruction_option')) {
+      context.handle(
+        _instructionOptionMeta,
+        instructionOption.isAcceptableOrUnknown(
+          data['instruction_option']!,
+          _instructionOptionMeta,
+        ),
+      );
+    }
+    if (data.containsKey('chinese_instruction')) {
+      context.handle(
+        _chineseInstructionMeta,
+        chineseInstruction.isAcceptableOrUnknown(
+          data['chinese_instruction']!,
+          _chineseInstructionMeta,
+        ),
+      );
+    }
+    if (data.containsKey('english_instruction')) {
+      context.handle(
+        _englishInstructionMeta,
+        englishInstruction.isAcceptableOrUnknown(
+          data['english_instruction']!,
+          _englishInstructionMeta,
+        ),
+      );
+    }
+    if (data.containsKey('issue_date')) {
+      context.handle(
+        _issueDateMeta,
+        issueDate.isAcceptableOrUnknown(data['issue_date']!, _issueDateMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  MedicalCertificate map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return MedicalCertificate(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      visitId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}visit_id'],
+      )!,
+      diagnosis: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}diagnosis'],
+      ),
+      instructionOption: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}instruction_option'],
+      ),
+      chineseInstruction: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}chinese_instruction'],
+      ),
+      englishInstruction: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}english_instruction'],
+      ),
+      issueDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}issue_date'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $MedicalCertificatesTable createAlias(String alias) {
+    return $MedicalCertificatesTable(attachedDatabase, alias);
+  }
+}
+
+class MedicalCertificate extends DataClass
+    implements Insertable<MedicalCertificate> {
+  final int id;
+  final int visitId;
+  final String? diagnosis;
+  final int? instructionOption;
+  final String? chineseInstruction;
+  final String? englishInstruction;
+  final DateTime? issueDate;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  const MedicalCertificate({
+    required this.id,
+    required this.visitId,
+    this.diagnosis,
+    this.instructionOption,
+    this.chineseInstruction,
+    this.englishInstruction,
+    this.issueDate,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['visit_id'] = Variable<int>(visitId);
+    if (!nullToAbsent || diagnosis != null) {
+      map['diagnosis'] = Variable<String>(diagnosis);
+    }
+    if (!nullToAbsent || instructionOption != null) {
+      map['instruction_option'] = Variable<int>(instructionOption);
+    }
+    if (!nullToAbsent || chineseInstruction != null) {
+      map['chinese_instruction'] = Variable<String>(chineseInstruction);
+    }
+    if (!nullToAbsent || englishInstruction != null) {
+      map['english_instruction'] = Variable<String>(englishInstruction);
+    }
+    if (!nullToAbsent || issueDate != null) {
+      map['issue_date'] = Variable<DateTime>(issueDate);
+    }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  MedicalCertificatesCompanion toCompanion(bool nullToAbsent) {
+    return MedicalCertificatesCompanion(
+      id: Value(id),
+      visitId: Value(visitId),
+      diagnosis: diagnosis == null && nullToAbsent
+          ? const Value.absent()
+          : Value(diagnosis),
+      instructionOption: instructionOption == null && nullToAbsent
+          ? const Value.absent()
+          : Value(instructionOption),
+      chineseInstruction: chineseInstruction == null && nullToAbsent
+          ? const Value.absent()
+          : Value(chineseInstruction),
+      englishInstruction: englishInstruction == null && nullToAbsent
+          ? const Value.absent()
+          : Value(englishInstruction),
+      issueDate: issueDate == null && nullToAbsent
+          ? const Value.absent()
+          : Value(issueDate),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory MedicalCertificate.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return MedicalCertificate(
+      id: serializer.fromJson<int>(json['id']),
+      visitId: serializer.fromJson<int>(json['visitId']),
+      diagnosis: serializer.fromJson<String?>(json['diagnosis']),
+      instructionOption: serializer.fromJson<int?>(json['instructionOption']),
+      chineseInstruction: serializer.fromJson<String?>(
+        json['chineseInstruction'],
+      ),
+      englishInstruction: serializer.fromJson<String?>(
+        json['englishInstruction'],
+      ),
+      issueDate: serializer.fromJson<DateTime?>(json['issueDate']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'visitId': serializer.toJson<int>(visitId),
+      'diagnosis': serializer.toJson<String?>(diagnosis),
+      'instructionOption': serializer.toJson<int?>(instructionOption),
+      'chineseInstruction': serializer.toJson<String?>(chineseInstruction),
+      'englishInstruction': serializer.toJson<String?>(englishInstruction),
+      'issueDate': serializer.toJson<DateTime?>(issueDate),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  MedicalCertificate copyWith({
+    int? id,
+    int? visitId,
+    Value<String?> diagnosis = const Value.absent(),
+    Value<int?> instructionOption = const Value.absent(),
+    Value<String?> chineseInstruction = const Value.absent(),
+    Value<String?> englishInstruction = const Value.absent(),
+    Value<DateTime?> issueDate = const Value.absent(),
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) => MedicalCertificate(
+    id: id ?? this.id,
+    visitId: visitId ?? this.visitId,
+    diagnosis: diagnosis.present ? diagnosis.value : this.diagnosis,
+    instructionOption: instructionOption.present
+        ? instructionOption.value
+        : this.instructionOption,
+    chineseInstruction: chineseInstruction.present
+        ? chineseInstruction.value
+        : this.chineseInstruction,
+    englishInstruction: englishInstruction.present
+        ? englishInstruction.value
+        : this.englishInstruction,
+    issueDate: issueDate.present ? issueDate.value : this.issueDate,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  MedicalCertificate copyWithCompanion(MedicalCertificatesCompanion data) {
+    return MedicalCertificate(
+      id: data.id.present ? data.id.value : this.id,
+      visitId: data.visitId.present ? data.visitId.value : this.visitId,
+      diagnosis: data.diagnosis.present ? data.diagnosis.value : this.diagnosis,
+      instructionOption: data.instructionOption.present
+          ? data.instructionOption.value
+          : this.instructionOption,
+      chineseInstruction: data.chineseInstruction.present
+          ? data.chineseInstruction.value
+          : this.chineseInstruction,
+      englishInstruction: data.englishInstruction.present
+          ? data.englishInstruction.value
+          : this.englishInstruction,
+      issueDate: data.issueDate.present ? data.issueDate.value : this.issueDate,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MedicalCertificate(')
+          ..write('id: $id, ')
+          ..write('visitId: $visitId, ')
+          ..write('diagnosis: $diagnosis, ')
+          ..write('instructionOption: $instructionOption, ')
+          ..write('chineseInstruction: $chineseInstruction, ')
+          ..write('englishInstruction: $englishInstruction, ')
+          ..write('issueDate: $issueDate, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    visitId,
+    diagnosis,
+    instructionOption,
+    chineseInstruction,
+    englishInstruction,
+    issueDate,
+    createdAt,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is MedicalCertificate &&
+          other.id == this.id &&
+          other.visitId == this.visitId &&
+          other.diagnosis == this.diagnosis &&
+          other.instructionOption == this.instructionOption &&
+          other.chineseInstruction == this.chineseInstruction &&
+          other.englishInstruction == this.englishInstruction &&
+          other.issueDate == this.issueDate &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class MedicalCertificatesCompanion extends UpdateCompanion<MedicalCertificate> {
+  final Value<int> id;
+  final Value<int> visitId;
+  final Value<String?> diagnosis;
+  final Value<int?> instructionOption;
+  final Value<String?> chineseInstruction;
+  final Value<String?> englishInstruction;
+  final Value<DateTime?> issueDate;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  const MedicalCertificatesCompanion({
+    this.id = const Value.absent(),
+    this.visitId = const Value.absent(),
+    this.diagnosis = const Value.absent(),
+    this.instructionOption = const Value.absent(),
+    this.chineseInstruction = const Value.absent(),
+    this.englishInstruction = const Value.absent(),
+    this.issueDate = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  });
+  MedicalCertificatesCompanion.insert({
+    this.id = const Value.absent(),
+    required int visitId,
+    this.diagnosis = const Value.absent(),
+    this.instructionOption = const Value.absent(),
+    this.chineseInstruction = const Value.absent(),
+    this.englishInstruction = const Value.absent(),
+    this.issueDate = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  }) : visitId = Value(visitId);
+  static Insertable<MedicalCertificate> custom({
+    Expression<int>? id,
+    Expression<int>? visitId,
+    Expression<String>? diagnosis,
+    Expression<int>? instructionOption,
+    Expression<String>? chineseInstruction,
+    Expression<String>? englishInstruction,
+    Expression<DateTime>? issueDate,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (visitId != null) 'visit_id': visitId,
+      if (diagnosis != null) 'diagnosis': diagnosis,
+      if (instructionOption != null) 'instruction_option': instructionOption,
+      if (chineseInstruction != null) 'chinese_instruction': chineseInstruction,
+      if (englishInstruction != null) 'english_instruction': englishInstruction,
+      if (issueDate != null) 'issue_date': issueDate,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+    });
+  }
+
+  MedicalCertificatesCompanion copyWith({
+    Value<int>? id,
+    Value<int>? visitId,
+    Value<String?>? diagnosis,
+    Value<int?>? instructionOption,
+    Value<String?>? chineseInstruction,
+    Value<String?>? englishInstruction,
+    Value<DateTime?>? issueDate,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+  }) {
+    return MedicalCertificatesCompanion(
+      id: id ?? this.id,
+      visitId: visitId ?? this.visitId,
+      diagnosis: diagnosis ?? this.diagnosis,
+      instructionOption: instructionOption ?? this.instructionOption,
+      chineseInstruction: chineseInstruction ?? this.chineseInstruction,
+      englishInstruction: englishInstruction ?? this.englishInstruction,
+      issueDate: issueDate ?? this.issueDate,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (visitId.present) {
+      map['visit_id'] = Variable<int>(visitId.value);
+    }
+    if (diagnosis.present) {
+      map['diagnosis'] = Variable<String>(diagnosis.value);
+    }
+    if (instructionOption.present) {
+      map['instruction_option'] = Variable<int>(instructionOption.value);
+    }
+    if (chineseInstruction.present) {
+      map['chinese_instruction'] = Variable<String>(chineseInstruction.value);
+    }
+    if (englishInstruction.present) {
+      map['english_instruction'] = Variable<String>(englishInstruction.value);
+    }
+    if (issueDate.present) {
+      map['issue_date'] = Variable<DateTime>(issueDate.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MedicalCertificatesCompanion(')
+          ..write('id: $id, ')
+          ..write('visitId: $visitId, ')
+          ..write('diagnosis: $diagnosis, ')
+          ..write('instructionOption: $instructionOption, ')
+          ..write('chineseInstruction: $chineseInstruction, ')
+          ..write('englishInstruction: $englishInstruction, ')
+          ..write('issueDate: $issueDate, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -8671,6 +9249,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $FlightLogsTable flightLogs = $FlightLogsTable(this);
   late final $TreatmentsTable treatments = $TreatmentsTable(this);
   late final $MedicalCostsTable medicalCosts = $MedicalCostsTable(this);
+  late final $MedicalCertificatesTable medicalCertificates =
+      $MedicalCertificatesTable(this);
   late final VisitsDao visitsDao = VisitsDao(this as AppDatabase);
   late final PatientProfilesDao patientProfilesDao = PatientProfilesDao(
     this as AppDatabase,
@@ -8683,6 +9263,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final MedicalCostsDao medicalCostsDao = MedicalCostsDao(
     this as AppDatabase,
   );
+  late final MedicalCertificatesDao medicalCertificatesDao =
+      MedicalCertificatesDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -8694,6 +9276,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     flightLogs,
     treatments,
     medicalCosts,
+    medicalCertificates,
   ];
 }
 
@@ -12337,6 +12920,298 @@ typedef $$MedicalCostsTableProcessedTableManager =
       MedicalCost,
       PrefetchHooks Function()
     >;
+typedef $$MedicalCertificatesTableCreateCompanionBuilder =
+    MedicalCertificatesCompanion Function({
+      Value<int> id,
+      required int visitId,
+      Value<String?> diagnosis,
+      Value<int?> instructionOption,
+      Value<String?> chineseInstruction,
+      Value<String?> englishInstruction,
+      Value<DateTime?> issueDate,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+    });
+typedef $$MedicalCertificatesTableUpdateCompanionBuilder =
+    MedicalCertificatesCompanion Function({
+      Value<int> id,
+      Value<int> visitId,
+      Value<String?> diagnosis,
+      Value<int?> instructionOption,
+      Value<String?> chineseInstruction,
+      Value<String?> englishInstruction,
+      Value<DateTime?> issueDate,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+    });
+
+class $$MedicalCertificatesTableFilterComposer
+    extends Composer<_$AppDatabase, $MedicalCertificatesTable> {
+  $$MedicalCertificatesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get visitId => $composableBuilder(
+    column: $table.visitId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get diagnosis => $composableBuilder(
+    column: $table.diagnosis,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get instructionOption => $composableBuilder(
+    column: $table.instructionOption,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get chineseInstruction => $composableBuilder(
+    column: $table.chineseInstruction,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get englishInstruction => $composableBuilder(
+    column: $table.englishInstruction,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get issueDate => $composableBuilder(
+    column: $table.issueDate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$MedicalCertificatesTableOrderingComposer
+    extends Composer<_$AppDatabase, $MedicalCertificatesTable> {
+  $$MedicalCertificatesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get visitId => $composableBuilder(
+    column: $table.visitId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get diagnosis => $composableBuilder(
+    column: $table.diagnosis,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get instructionOption => $composableBuilder(
+    column: $table.instructionOption,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get chineseInstruction => $composableBuilder(
+    column: $table.chineseInstruction,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get englishInstruction => $composableBuilder(
+    column: $table.englishInstruction,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get issueDate => $composableBuilder(
+    column: $table.issueDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$MedicalCertificatesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $MedicalCertificatesTable> {
+  $$MedicalCertificatesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get visitId =>
+      $composableBuilder(column: $table.visitId, builder: (column) => column);
+
+  GeneratedColumn<String> get diagnosis =>
+      $composableBuilder(column: $table.diagnosis, builder: (column) => column);
+
+  GeneratedColumn<int> get instructionOption => $composableBuilder(
+    column: $table.instructionOption,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get chineseInstruction => $composableBuilder(
+    column: $table.chineseInstruction,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get englishInstruction => $composableBuilder(
+    column: $table.englishInstruction,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get issueDate =>
+      $composableBuilder(column: $table.issueDate, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$MedicalCertificatesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $MedicalCertificatesTable,
+          MedicalCertificate,
+          $$MedicalCertificatesTableFilterComposer,
+          $$MedicalCertificatesTableOrderingComposer,
+          $$MedicalCertificatesTableAnnotationComposer,
+          $$MedicalCertificatesTableCreateCompanionBuilder,
+          $$MedicalCertificatesTableUpdateCompanionBuilder,
+          (
+            MedicalCertificate,
+            BaseReferences<
+              _$AppDatabase,
+              $MedicalCertificatesTable,
+              MedicalCertificate
+            >,
+          ),
+          MedicalCertificate,
+          PrefetchHooks Function()
+        > {
+  $$MedicalCertificatesTableTableManager(
+    _$AppDatabase db,
+    $MedicalCertificatesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$MedicalCertificatesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$MedicalCertificatesTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$MedicalCertificatesTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> visitId = const Value.absent(),
+                Value<String?> diagnosis = const Value.absent(),
+                Value<int?> instructionOption = const Value.absent(),
+                Value<String?> chineseInstruction = const Value.absent(),
+                Value<String?> englishInstruction = const Value.absent(),
+                Value<DateTime?> issueDate = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+              }) => MedicalCertificatesCompanion(
+                id: id,
+                visitId: visitId,
+                diagnosis: diagnosis,
+                instructionOption: instructionOption,
+                chineseInstruction: chineseInstruction,
+                englishInstruction: englishInstruction,
+                issueDate: issueDate,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int visitId,
+                Value<String?> diagnosis = const Value.absent(),
+                Value<int?> instructionOption = const Value.absent(),
+                Value<String?> chineseInstruction = const Value.absent(),
+                Value<String?> englishInstruction = const Value.absent(),
+                Value<DateTime?> issueDate = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+              }) => MedicalCertificatesCompanion.insert(
+                id: id,
+                visitId: visitId,
+                diagnosis: diagnosis,
+                instructionOption: instructionOption,
+                chineseInstruction: chineseInstruction,
+                englishInstruction: englishInstruction,
+                issueDate: issueDate,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$MedicalCertificatesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $MedicalCertificatesTable,
+      MedicalCertificate,
+      $$MedicalCertificatesTableFilterComposer,
+      $$MedicalCertificatesTableOrderingComposer,
+      $$MedicalCertificatesTableAnnotationComposer,
+      $$MedicalCertificatesTableCreateCompanionBuilder,
+      $$MedicalCertificatesTableUpdateCompanionBuilder,
+      (
+        MedicalCertificate,
+        BaseReferences<
+          _$AppDatabase,
+          $MedicalCertificatesTable,
+          MedicalCertificate
+        >,
+      ),
+      MedicalCertificate,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -12353,4 +13228,6 @@ class $AppDatabaseManager {
       $$TreatmentsTableTableManager(_db, _db.treatments);
   $$MedicalCostsTableTableManager get medicalCosts =>
       $$MedicalCostsTableTableManager(_db, _db.medicalCosts);
+  $$MedicalCertificatesTableTableManager get medicalCertificates =>
+      $$MedicalCertificatesTableTableManager(_db, _db.medicalCertificates);
 }

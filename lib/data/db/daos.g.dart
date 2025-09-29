@@ -22,3 +22,7 @@ mixin _$TreatmentsDaoMixin on DatabaseAccessor<AppDatabase> {
 mixin _$MedicalCostsDaoMixin on DatabaseAccessor<AppDatabase> {
   $MedicalCostsTable get medicalCosts => attachedDatabase.medicalCosts;
 }
+mixin _$MedicalCertificatesDaoMixin on DatabaseAccessor<AppDatabase> {
+  $MedicalCertificatesTable get medicalCertificates =>
+      attachedDatabase.medicalCertificates;
+}

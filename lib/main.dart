@@ -6,6 +6,7 @@ import 'data/models/accident_data.dart';
 import 'data/models/flightlog_data.dart';
 import 'data/models/plan_data.dart';
 import 'data/models/medical_costs_data.dart';
+import 'data/models/certificate_data.dart';
 import 'data/db/app_database.dart';
 import 'home.dart';
 
@@ -19,6 +20,7 @@ void main() {
         ChangeNotifierProvider(create: (_) => AccidentData()),
         ChangeNotifierProvider(create: (_) => PlanData()),
         ChangeNotifierProvider(create: (_) => MedicalCostsData()),
+        ChangeNotifierProvider(create: (_) => CertificateData()),
 
         Provider(create: (_) => db),
         Provider(create: (_) => db.visitsDao),
@@ -27,6 +29,7 @@ void main() {
         Provider(create: (_) => db.accidentRecordsDao),
         Provider(create: (_) => db.treatmentsDao),
         Provider(create: (_) => db.medicalCostsDao),
+        Provider(create: (_) => db.medicalCertificatesDao),
       ],
       child: const MyApp(),
     ),

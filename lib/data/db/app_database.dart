@@ -17,6 +17,7 @@ part 'app_database.g.dart';
     FlightLogs,
     Treatments,
     MedicalCosts,
+    MedicalCertificates,
     // 之後還有 Treatments, MedicalCosts, Diagnoses... 全部加在這裡
   ],
   daos: [
@@ -26,6 +27,7 @@ part 'app_database.g.dart';
     FlightLogsDao,
     TreatmentsDao,
     MedicalCostsDao,
+    MedicalCertificatesDao,
     // 之後還有 TreatmentsDao, MedicalCostsDao, DiagnosesDao... 全部加在這裡
   ],
 )
