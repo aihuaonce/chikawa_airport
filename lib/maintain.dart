@@ -10,70 +10,31 @@ class MaintainPage extends StatefulWidget {
 }
 
 class _MaintainPageState extends State<MaintainPage> {
-  // ------ 外觀 ------
   static const double _cardRadius = 14;
 
-  // ------ 資料（可在此先放預設值；之後可接後端改寫）------
-  // 用 key 區分各個維護清單
+  // ===== 色號（你之前給的）=====
+  static const _light = Color(0xFF83ACA9); // 淺綠色
+  static const _dark = Color(0xFF274C4A);  // 深綠色
+
+  // ===== 搜尋欄控制器 =====
+  final TextEditingController _searchCtrl = TextEditingController();
+  String _searchQuery = '';
+
+  // ===== 測試資料 =====
   final Map<String, List<String>> _lists = {
-    // 個人資料頁面
     'gender': ['男', '女'],
     'arrive_reason': ['航空公司機組員', '旅客/民眾', '機場內部員工'],
     'nationality': ['臺灣', '美國', '日本', '越南', '印尼'],
     'other_nationality': [],
-
-    // 飛航記錄頁面
-    'airline': [
-      'BR長榮航空',
-      'CI中華航空',
-      'CX國泰航空',
-      'UA聯合航空',
-      'KL荷蘭航空',
-      'CZ中國南方航空',
-      'IT台灣虎航',
-      'EK阿聯酋航空',
-      'CA中國國際航空',
-    ],
-    'airline_other': [
-      'JX星宇航空',
-      'AE華信航空',
-      'B7立榮航空',
-      'MU中國東方航空',
-      'MF廈門航空',
-      'MM樂桃航空',
-      'KE大韓航空',
-      'OZ韓亞航空',
-    ],
-    'origin': [
-      'TPE台北 / 台灣',
-      'HKG香港 / 香港',
-      'LAX洛杉磯 / 美國',
-      'TYO東京 / 日本',
-      'BKK曼谷 / 泰國',
-      'SHA上海 / 中國',
-    ],
-    'via': [
-      'MNL馬尼拉 / 菲律賓',
-      'SFO舊金山 / 美國',
-      'SIN新加坡 / 新加坡',
-    ],
-    'destination': [
-      'TPE台北 / 台灣',
-      'HKG香港 / 香港',
-      'LAX洛杉磯 / 美國',
-      'TYO東京 / 日本',
-      'BKK曼谷 / 泰國',
-      'SHA上海 / 中國',
-    ],
-    'travel_status': ['出境', '入境', '過境', '轉機', '迫降', '轉降', '備降', '其他'],
+    'airline': ['BR長榮航空', 'CI中華航空', 'CX國泰航空'],
+    'travel_status': ['出境', '入境', '過境'],
   };
 
-  // ------ 彈窗：通用維護對話框 ------
+  // ===== 彈窗 =====
   Future<void> _openMaintainDialog({
     required String key,
     required String title,
   }) async {
-    // 這裡用 StatefulBuilder 讓彈窗內能即時刷新
     await showDialog(
       context: context,
       builder: (ctx) {
@@ -85,7 +46,6 @@ class _MaintainPageState extends State<MaintainPage> {
               final text = await _showAddDialog(context: ctx, title: '新增 $title');
               if (text == null || text.trim().isEmpty) return;
 
-              // 更新資料：外層 setState 讓頁面狀態也保留；setLocal 刷新彈窗內容
               setState(() {
                 _lists[key] = [...items, text.trim()];
               });
@@ -102,48 +62,47 @@ class _MaintainPageState extends State<MaintainPage> {
                     Align(
                       alignment: Alignment.centerLeft,
                       child: FilledButton.icon(
+                        style: FilledButton.styleFrom(
+                          backgroundColor: _light,
+                          foregroundColor: Colors.white,
+                        ).copyWith(
+                          backgroundColor: WidgetStateProperty.resolveWith((states) {
+                            if (states.contains(WidgetState.pressed)) return _dark;
+                            return _light;
+                          }),
+                        ),
                         onPressed: addItem,
                         icon: const Icon(Icons.add),
                         label: const Text('新增'),
                       ),
                     ),
                     const SizedBox(height: 10),
-                    ConstrainedBox(
-                      constraints: const BoxConstraints(maxHeight: 360),
-                      child: items.isEmpty
-                          ? const Center(
-                              child: Padding(
-                                padding: EdgeInsets.symmetric(vertical: 24),
-                                child: Text('目前沒有資料'),
-                              ),
-                            )
-                          : ListView.separated(
-                              shrinkWrap: true,
-                              itemCount: items.length,
-                              separatorBuilder: (_, __) =>
-                                  const Divider(height: 1),
-                              itemBuilder: (_, i) {
-                                final val = items[i];
-                                return ListTile(
-                                  dense: true,
-                                  title: Text(val),
-                                  onTap: () {
-                                    // 這裡先單純關閉彈窗；需要的話可在這裡做選擇回傳
-                                    Navigator.of(ctx).pop();
+                    items.isEmpty
+                        ? const Center(child: Padding(
+                          padding: EdgeInsets.symmetric(vertical: 24),
+                          child: Text('目前沒有資料'),
+                        ))
+                        : ListView.separated(
+                            shrinkWrap: true,
+                            itemCount: items.length,
+                            separatorBuilder: (_, __) => const Divider(height: 1),
+                            itemBuilder: (_, i) {
+                              final val = items[i];
+                              return ListTile(
+                                dense: true,
+                                title: Text(val),
+                                trailing: IconButton(
+                                  icon: const Icon(Icons.delete_outline),
+                                  onPressed: () {
+                                    setState(() {
+                                      _lists[key] = List.of(items)..removeAt(i);
+                                    });
+                                    setLocal(() {});
                                   },
-                                  trailing: IconButton(
-                                    icon: const Icon(Icons.delete_outline),
-                                    onPressed: () {
-                                      setState(() {
-                                        _lists[key] = List.of(items)..removeAt(i);
-                                      });
-                                      setLocal(() {});
-                                    },
-                                  ),
-                                );
-                              },
-                            ),
-                    ),
+                                ),
+                              );
+                            },
+                          ),
                   ],
                 ),
               ),
@@ -160,7 +119,6 @@ class _MaintainPageState extends State<MaintainPage> {
     );
   }
 
-  // ------ 小輸入彈窗（供「新增」使用）------
   Future<String?> _showAddDialog({
     required BuildContext context,
     required String title,
@@ -186,6 +144,15 @@ class _MaintainPageState extends State<MaintainPage> {
               child: const Text('取消'),
             ),
             FilledButton(
+              style: FilledButton.styleFrom(
+                backgroundColor: _light,
+                foregroundColor: Colors.white,
+              ).copyWith(
+                backgroundColor: WidgetStateProperty.resolveWith((states) {
+                  if (states.contains(WidgetState.pressed)) return _dark;
+                  return _light;
+                }),
+              ),
               onPressed: () => Navigator.of(ctx).pop(ctrl.text.trim()),
               child: const Text('新增'),
             ),
@@ -195,11 +162,11 @@ class _MaintainPageState extends State<MaintainPage> {
     );
   }
 
-  // ------ UI ------
+  // ===== UI =====
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFEFF7F7),
+      backgroundColor:Colors.white,
       appBar: AppBar(
         title: const Text('各式單據內列表'),
         leading: IconButton(
@@ -213,72 +180,38 @@ class _MaintainPageState extends State<MaintainPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // ===== 搜尋欄 =====
+              TextField(
+                controller: _searchCtrl,
+                decoration: const InputDecoration(
+                  hintText: '搜尋項目…',
+                  prefixIcon: Icon(Icons.search),
+                  border: OutlineInputBorder(),
+                ),
+                onChanged: (val) {
+                  setState(() => _searchQuery = val.trim());
+                },
+              ),
+              const SizedBox(height: 16),
+
+              // ===== 個人資料 =====
               _sectionCard(
                 title: '個人資料頁面',
                 children: [
-                  _maintainTile(
-                    label: '性別',
-                    onTap: () => _openMaintainDialog(
-                      key: 'gender',
-                      title: '性別',
-                    ),
-                  ),
-                  _maintainTile(
-                    label: '為何至機場',
-                    onTap: () => _openMaintainDialog(
-                      key: 'arrive_reason',
-                      title: '為何至機場',
-                    ),
-                  ),
-                  _maintainTile(
-                    label: '國籍',
-                    onTap: () => _openMaintainDialog(
-                      key: 'nationality',
-                      title: '國籍',
-                    ),
-                  ),
-                  _maintainTile(
-                    label: '其他國籍',
-                    onTap: () => _openMaintainDialog(
-                      key: 'other_nationality',
-                      title: '其他國籍',
-                    ),
-                  ),
+                  _maintainTile('性別', 'gender'),
+                  _maintainTile('為何至機場', 'arrive_reason'),
+                  _maintainTile('國籍', 'nationality'),
+                  _maintainTile('其他國籍', 'other_nationality'),
                 ],
               ),
               const SizedBox(height: 16),
+
+              // ===== 飛航紀錄 =====
               _sectionCard(
                 title: '飛航記錄頁面',
                 children: [
-                  _maintainTile(
-                    label: '航空公司',
-                    onTap: () =>
-                        _openMaintainDialog(key: 'airline', title: '航空公司'),
-                  ),
-                  _maintainTile(
-                    label: '其他航空公司',
-                    onTap: () => _openMaintainDialog(
-                        key: 'airline_other', title: '其他航空公司'),
-                  ),
-                  _maintainTile(
-                    label: '啟程地',
-                    onTap: () =>
-                        _openMaintainDialog(key: 'origin', title: '啟程地'),
-                  ),
-                  _maintainTile(
-                    label: '經過地',
-                    onTap: () => _openMaintainDialog(key: 'via', title: '經過地'),
-                  ),
-                  _maintainTile(
-                    label: '目的地',
-                    onTap: () => _openMaintainDialog(
-                        key: 'destination', title: '目的地'),
-                  ),
-                  _maintainTile(
-                    label: '旅行狀態',
-                    onTap: () => _openMaintainDialog(
-                        key: 'travel_status', title: '旅行狀態'),
-                  ),
+                  _maintainTile('航空公司', 'airline'),
+                  _maintainTile('旅行狀態', 'travel_status'),
                 ],
               ),
             ],
@@ -288,12 +221,9 @@ class _MaintainPageState extends State<MaintainPage> {
     );
   }
 
-  // 區塊卡片
-  Widget _sectionCard({
-    required String title,
-    required List<Widget> children,
-  }) {
+  Widget _sectionCard({required String title, required List<Widget> children}) {
     return Container(
+      margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(_cardRadius),
@@ -317,18 +247,9 @@ class _MaintainPageState extends State<MaintainPage> {
                 topRight: Radius.circular(_cardRadius),
               ),
             ),
-            child: Row(
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w800,
-                    color: Colors.black87,
-                  ),
-                ),
-              ],
-            ),
+            child: Text(title,
+                style: const TextStyle(
+                    fontSize: 16, fontWeight: FontWeight.w800, color: Colors.black87)),
           ),
           ...children,
         ],
@@ -336,13 +257,15 @@ class _MaintainPageState extends State<MaintainPage> {
     );
   }
 
-  // 單一維護項目列
-  Widget _maintainTile({
-    required String label,
-    required VoidCallback onTap,
-  }) {
+  Widget _maintainTile(String label, String key) {
+    // 套用搜尋篩選
+    if (_searchQuery.isNotEmpty &&
+        !label.toLowerCase().contains(_searchQuery.toLowerCase())) {
+      return const SizedBox.shrink();
+    }
+
     return InkWell(
-      onTap: onTap,
+      onTap: () => _openMaintainDialog(key: key, title: label),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: const BoxDecoration(
@@ -352,12 +275,7 @@ class _MaintainPageState extends State<MaintainPage> {
         ),
         child: Row(
           children: [
-            Expanded(
-              child: Text(
-                label,
-                style: const TextStyle(fontSize: 16, color: Colors.black87),
-              ),
-            ),
+            Expanded(child: Text(label, style: const TextStyle(fontSize: 16))),
             const Icon(Icons.chevron_right),
           ],
         ),
