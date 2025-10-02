@@ -158,6 +158,17 @@ class _Nav2PageState extends State<Nav2Page> with WidgetsBindingObserver {
         hasErrors = true;
         errorMessages.add('公共資料: ${e.toString()}');
       }
+
+      // ✅ 關鍵修改：儲存完成後，清除快取並重建所有頁面
+      // 這樣下次切換到頁面時會重新執行 initState，從資料庫載入最新資料
+      debugPrint("🔄 清除頁面快取並重建...");
+      _cachedPages.clear();
+      _pageKeys.clear();
+      _initializePageKeys();
+
+      // 延遲一下再重建，確保狀態已清除
+      await Future.delayed(const Duration(milliseconds: 200));
+      _buildAllPages();
     } catch (e) {
       hasErrors = true;
       errorMessages.add('系統錯誤: ${e.toString()}');

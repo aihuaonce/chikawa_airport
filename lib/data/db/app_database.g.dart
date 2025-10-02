@@ -729,6 +729,17 @@ class $PatientProfilesTable extends PatientProfiles
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _bodyMapJsonMeta = const VerificationMeta(
+    'bodyMapJson',
+  );
+  @override
+  late final GeneratedColumn<String> bodyMapJson = GeneratedColumn<String>(
+    'body_map_json',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _createdAtMeta = const VerificationMeta(
     'createdAt',
   );
@@ -766,6 +777,7 @@ class $PatientProfilesTable extends PatientProfiles
     address,
     phone,
     photoPath,
+    bodyMapJson,
     createdAt,
     updatedAt,
   ];
@@ -849,6 +861,15 @@ class $PatientProfilesTable extends PatientProfiles
         photoPath.isAcceptableOrUnknown(data['photo_path']!, _photoPathMeta),
       );
     }
+    if (data.containsKey('body_map_json')) {
+      context.handle(
+        _bodyMapJsonMeta,
+        bodyMapJson.isAcceptableOrUnknown(
+          data['body_map_json']!,
+          _bodyMapJsonMeta,
+        ),
+      );
+    }
     if (data.containsKey('created_at')) {
       context.handle(
         _createdAtMeta,
@@ -866,6 +887,10 @@ class $PatientProfilesTable extends PatientProfiles
 
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+    {visitId},
+  ];
   @override
   PatientProfile map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
@@ -914,6 +939,10 @@ class $PatientProfilesTable extends PatientProfiles
         DriftSqlType.string,
         data['${effectivePrefix}photo_path'],
       ),
+      bodyMapJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}body_map_json'],
+      ),
       createdAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}created_at'],
@@ -943,6 +972,7 @@ class PatientProfile extends DataClass implements Insertable<PatientProfile> {
   final String? address;
   final String? phone;
   final String? photoPath;
+  final String? bodyMapJson;
   final DateTime createdAt;
   final DateTime updatedAt;
   const PatientProfile({
@@ -957,6 +987,7 @@ class PatientProfile extends DataClass implements Insertable<PatientProfile> {
     this.address,
     this.phone,
     this.photoPath,
+    this.bodyMapJson,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -992,6 +1023,9 @@ class PatientProfile extends DataClass implements Insertable<PatientProfile> {
     if (!nullToAbsent || photoPath != null) {
       map['photo_path'] = Variable<String>(photoPath);
     }
+    if (!nullToAbsent || bodyMapJson != null) {
+      map['body_map_json'] = Variable<String>(bodyMapJson);
+    }
     map['created_at'] = Variable<DateTime>(createdAt);
     map['updated_at'] = Variable<DateTime>(updatedAt);
     return map;
@@ -1026,6 +1060,9 @@ class PatientProfile extends DataClass implements Insertable<PatientProfile> {
       photoPath: photoPath == null && nullToAbsent
           ? const Value.absent()
           : Value(photoPath),
+      bodyMapJson: bodyMapJson == null && nullToAbsent
+          ? const Value.absent()
+          : Value(bodyMapJson),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
     );
@@ -1048,6 +1085,7 @@ class PatientProfile extends DataClass implements Insertable<PatientProfile> {
       address: serializer.fromJson<String?>(json['address']),
       phone: serializer.fromJson<String?>(json['phone']),
       photoPath: serializer.fromJson<String?>(json['photoPath']),
+      bodyMapJson: serializer.fromJson<String?>(json['bodyMapJson']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
     );
@@ -1067,6 +1105,7 @@ class PatientProfile extends DataClass implements Insertable<PatientProfile> {
       'address': serializer.toJson<String?>(address),
       'phone': serializer.toJson<String?>(phone),
       'photoPath': serializer.toJson<String?>(photoPath),
+      'bodyMapJson': serializer.toJson<String?>(bodyMapJson),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
     };
@@ -1084,6 +1123,7 @@ class PatientProfile extends DataClass implements Insertable<PatientProfile> {
     Value<String?> address = const Value.absent(),
     Value<String?> phone = const Value.absent(),
     Value<String?> photoPath = const Value.absent(),
+    Value<String?> bodyMapJson = const Value.absent(),
     DateTime? createdAt,
     DateTime? updatedAt,
   }) => PatientProfile(
@@ -1098,6 +1138,7 @@ class PatientProfile extends DataClass implements Insertable<PatientProfile> {
     address: address.present ? address.value : this.address,
     phone: phone.present ? phone.value : this.phone,
     photoPath: photoPath.present ? photoPath.value : this.photoPath,
+    bodyMapJson: bodyMapJson.present ? bodyMapJson.value : this.bodyMapJson,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
   );
@@ -1116,6 +1157,9 @@ class PatientProfile extends DataClass implements Insertable<PatientProfile> {
       address: data.address.present ? data.address.value : this.address,
       phone: data.phone.present ? data.phone.value : this.phone,
       photoPath: data.photoPath.present ? data.photoPath.value : this.photoPath,
+      bodyMapJson: data.bodyMapJson.present
+          ? data.bodyMapJson.value
+          : this.bodyMapJson,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
@@ -1135,6 +1179,7 @@ class PatientProfile extends DataClass implements Insertable<PatientProfile> {
           ..write('address: $address, ')
           ..write('phone: $phone, ')
           ..write('photoPath: $photoPath, ')
+          ..write('bodyMapJson: $bodyMapJson, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
           ..write(')'))
@@ -1154,6 +1199,7 @@ class PatientProfile extends DataClass implements Insertable<PatientProfile> {
     address,
     phone,
     photoPath,
+    bodyMapJson,
     createdAt,
     updatedAt,
   );
@@ -1172,6 +1218,7 @@ class PatientProfile extends DataClass implements Insertable<PatientProfile> {
           other.address == this.address &&
           other.phone == this.phone &&
           other.photoPath == this.photoPath &&
+          other.bodyMapJson == this.bodyMapJson &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt);
 }
@@ -1188,6 +1235,7 @@ class PatientProfilesCompanion extends UpdateCompanion<PatientProfile> {
   final Value<String?> address;
   final Value<String?> phone;
   final Value<String?> photoPath;
+  final Value<String?> bodyMapJson;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
   const PatientProfilesCompanion({
@@ -1202,6 +1250,7 @@ class PatientProfilesCompanion extends UpdateCompanion<PatientProfile> {
     this.address = const Value.absent(),
     this.phone = const Value.absent(),
     this.photoPath = const Value.absent(),
+    this.bodyMapJson = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
   });
@@ -1217,6 +1266,7 @@ class PatientProfilesCompanion extends UpdateCompanion<PatientProfile> {
     this.address = const Value.absent(),
     this.phone = const Value.absent(),
     this.photoPath = const Value.absent(),
+    this.bodyMapJson = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
   }) : visitId = Value(visitId);
@@ -1232,6 +1282,7 @@ class PatientProfilesCompanion extends UpdateCompanion<PatientProfile> {
     Expression<String>? address,
     Expression<String>? phone,
     Expression<String>? photoPath,
+    Expression<String>? bodyMapJson,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
   }) {
@@ -1247,6 +1298,7 @@ class PatientProfilesCompanion extends UpdateCompanion<PatientProfile> {
       if (address != null) 'address': address,
       if (phone != null) 'phone': phone,
       if (photoPath != null) 'photo_path': photoPath,
+      if (bodyMapJson != null) 'body_map_json': bodyMapJson,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
     });
@@ -1264,6 +1316,7 @@ class PatientProfilesCompanion extends UpdateCompanion<PatientProfile> {
     Value<String?>? address,
     Value<String?>? phone,
     Value<String?>? photoPath,
+    Value<String?>? bodyMapJson,
     Value<DateTime>? createdAt,
     Value<DateTime>? updatedAt,
   }) {
@@ -1279,6 +1332,7 @@ class PatientProfilesCompanion extends UpdateCompanion<PatientProfile> {
       address: address ?? this.address,
       phone: phone ?? this.phone,
       photoPath: photoPath ?? this.photoPath,
+      bodyMapJson: bodyMapJson ?? this.bodyMapJson,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
@@ -1320,6 +1374,9 @@ class PatientProfilesCompanion extends UpdateCompanion<PatientProfile> {
     if (photoPath.present) {
       map['photo_path'] = Variable<String>(photoPath.value);
     }
+    if (bodyMapJson.present) {
+      map['body_map_json'] = Variable<String>(bodyMapJson.value);
+    }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
@@ -1343,6 +1400,7 @@ class PatientProfilesCompanion extends UpdateCompanion<PatientProfile> {
           ..write('address: $address, ')
           ..write('phone: $phone, ')
           ..write('photoPath: $photoPath, ')
+          ..write('bodyMapJson: $bodyMapJson, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
           ..write(')'))
@@ -11079,6 +11137,7 @@ typedef $$PatientProfilesTableCreateCompanionBuilder =
       Value<String?> address,
       Value<String?> phone,
       Value<String?> photoPath,
+      Value<String?> bodyMapJson,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
     });
@@ -11095,6 +11154,7 @@ typedef $$PatientProfilesTableUpdateCompanionBuilder =
       Value<String?> address,
       Value<String?> phone,
       Value<String?> photoPath,
+      Value<String?> bodyMapJson,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
     });
@@ -11160,6 +11220,11 @@ class $$PatientProfilesTableFilterComposer
 
   ColumnFilters<String> get photoPath => $composableBuilder(
     column: $table.photoPath,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get bodyMapJson => $composableBuilder(
+    column: $table.bodyMapJson,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -11238,6 +11303,11 @@ class $$PatientProfilesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get bodyMapJson => $composableBuilder(
+    column: $table.bodyMapJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
     column: $table.createdAt,
     builder: (column) => ColumnOrderings(column),
@@ -11292,6 +11362,11 @@ class $$PatientProfilesTableAnnotationComposer
 
   GeneratedColumn<String> get photoPath =>
       $composableBuilder(column: $table.photoPath, builder: (column) => column);
+
+  GeneratedColumn<String> get bodyMapJson => $composableBuilder(
+    column: $table.bodyMapJson,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
@@ -11348,6 +11423,7 @@ class $$PatientProfilesTableTableManager
                 Value<String?> address = const Value.absent(),
                 Value<String?> phone = const Value.absent(),
                 Value<String?> photoPath = const Value.absent(),
+                Value<String?> bodyMapJson = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
               }) => PatientProfilesCompanion(
@@ -11362,6 +11438,7 @@ class $$PatientProfilesTableTableManager
                 address: address,
                 phone: phone,
                 photoPath: photoPath,
+                bodyMapJson: bodyMapJson,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
               ),
@@ -11378,6 +11455,7 @@ class $$PatientProfilesTableTableManager
                 Value<String?> address = const Value.absent(),
                 Value<String?> phone = const Value.absent(),
                 Value<String?> photoPath = const Value.absent(),
+                Value<String?> bodyMapJson = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
               }) => PatientProfilesCompanion.insert(
@@ -11392,6 +11470,7 @@ class $$PatientProfilesTableTableManager
                 address: address,
                 phone: phone,
                 photoPath: photoPath,
+                bodyMapJson: bodyMapJson,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
               ),

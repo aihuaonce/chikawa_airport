@@ -82,12 +82,15 @@ class PatientProfilesDao extends DatabaseAccessor<AppDatabase>
     with _$PatientProfilesDaoMixin {
   PatientProfilesDao(AppDatabase db) : super(db);
 
-  // 抓本頁資料
+  /// 根據 visitId 獲取單筆 PatientProfile 資料
   Future<PatientProfile?> getByVisitId(int visitId) => (select(
     patientProfiles,
   )..where((t) => t.visitId.equals(visitId))).getSingleOrNull();
 
-  // 儲存（沒有就 insert，有就 update），並順便回寫 Visits 摘要
+  /// 儲存個人資料（沒有就 insert，有就 update），並同步更新 Visits 表的摘要
+  ///
+  /// [核心修正]：所有 nullable 的參數在更新時都使用了 Value.absent() 處理。
+  /// 這可以防止在只更新部分欄位時，其他未提供的欄位被 null 覆蓋。
   Future<void> upsertByVisitId({
     required int visitId,
     DateTime? birthday,
@@ -98,54 +101,86 @@ class PatientProfilesDao extends DatabaseAccessor<AppDatabase>
     String? address,
     String? phone,
     String? photoPath,
+    String? bodyMapJson, // 雖然也處理了，但建議使用專門的 upsertBodyMap
   }) async {
     final existing = await getByVisitId(visitId);
     final now = DateTime.now();
 
+    // 建立要寫入的資料包 (Companion)
+    // 當傳入的參數為 null 時，使用 Value.absent() 來避免覆蓋現有資料
+    final companion = PatientProfilesCompanion(
+      visitId: Value(visitId),
+      birthday: birthday == null ? const Value.absent() : Value(birthday),
+      gender: gender == null ? const Value.absent() : Value(gender),
+      reason: reason == null ? const Value.absent() : Value(reason),
+      nationality: nationality == null
+          ? const Value.absent()
+          : Value(nationality),
+      idNumber: idNumber == null ? const Value.absent() : Value(idNumber),
+      address: address == null ? const Value.absent() : Value(address),
+      phone: phone == null ? const Value.absent() : Value(phone),
+      photoPath: photoPath == null ? const Value.absent() : Value(photoPath),
+      bodyMapJson: bodyMapJson == null
+          ? const Value.absent()
+          : Value(bodyMapJson),
+      updatedAt: Value(now), // 每次更新都刷新時間
+    );
+
     if (existing == null) {
-      await into(patientProfiles).insert(
-        PatientProfilesCompanion.insert(
-          visitId: visitId,
-          birthday: Value(birthday),
-          gender: Value(gender),
-          reason: Value(reason),
-          nationality: Value(nationality),
-          idNumber: Value(idNumber),
-          address: Value(address),
-          phone: Value(phone),
-          photoPath: Value(photoPath),
-          updatedAt: Value(now),
-        ),
-      );
+      // 找不到現有紀錄，執行 insert
+      // 注意：insert 時，Drift 會自動將 absent 的值設為 default value 或 null
+      await into(patientProfiles).insert(companion);
     } else {
+      // 找到現有紀錄，執行 update
       await (update(
         patientProfiles,
-      )..where((t) => t.visitId.equals(visitId))).write(
-        PatientProfilesCompanion(
-          birthday: Value(birthday),
-          gender: Value(gender),
-          reason: Value(reason),
-          nationality: Value(nationality),
-          idNumber: Value(idNumber),
-          address: Value(address),
-          phone: Value(phone),
-          photoPath: Value(photoPath),
-          updatedAt: Value(now),
-        ),
-      );
+      )..where((t) => t.visitId.equals(visitId))).write(companion);
     }
 
-    // 回寫 HomePage 列表所需摘要
+    // 回寫 HomePage 列表所需的摘要
+    // 這裡同樣使用 Value.absent() 來確保只更新有值的欄位
     await (update(visits)..where((t) => t.visitId.equals(visitId))).write(
       VisitsCompanion(
         gender: gender == null ? const Value.absent() : Value(gender),
         nationality: nationality == null
             ? const Value.absent()
             : Value(nationality),
-        uploadedAt: Value(now),
+        // uploadedAt: Value(now), // 根據您的業務邏輯決定是否每次都更新
         updatedAt: Value(now),
       ),
     );
+  }
+
+  /// 專門用來更新 BodyMap 的方法 (這個方法是正確的，予以保留)
+  Future<void> upsertBodyMap(int visitId, String? bodyMapJson) async {
+    print('開始存 BodyMap visitId: $visitId');
+    final now = DateTime.now();
+
+    // 這裡只需要更新 bodyMapJson 和 updatedAt
+    final companion = PatientProfilesCompanion(
+      bodyMapJson: Value(bodyMapJson),
+      updatedAt: Value(now),
+    );
+
+    final existing = await getByVisitId(visitId);
+    if (existing == null) {
+      print('沒有現有資料，執行 insert');
+      // 如果沒有資料，需要連同 visitId 一起 insert
+      await into(patientProfiles).insert(
+        PatientProfilesCompanion(
+          visitId: Value(visitId),
+          bodyMapJson: Value(bodyMapJson),
+          updatedAt: Value(now),
+          // 根據您的資料庫設計，可能還需要 createdAt
+        ),
+      );
+    } else {
+      print('已有資料，執行 update');
+      await (update(
+        patientProfiles,
+      )..where((t) => t.visitId.equals(visitId))).write(companion);
+    }
+    print('BodyMap 存入完成');
   }
 }
 
@@ -586,12 +621,14 @@ class MedicalCertificatesDao extends DatabaseAccessor<AppDatabase>
 }
 
 @DriftAccessor(tables: [Undertakings])
-class UndertakingsDao extends DatabaseAccessor<AppDatabase> with _$UndertakingsDaoMixin {
+class UndertakingsDao extends DatabaseAccessor<AppDatabase>
+    with _$UndertakingsDaoMixin {
   UndertakingsDao(AppDatabase db) : super(db);
 
   // 透過 visitId 取得資料
-  Future<Undertaking?> getByVisitId(int visitId) =>
-      (select(undertakings)..where((t) => t.visitId.equals(visitId))).getSingleOrNull();
+  Future<Undertaking?> getByVisitId(int visitId) => (select(
+    undertakings,
+  )..where((t) => t.visitId.equals(visitId))).getSingleOrNull();
 
   // 新增或更新資料
   Future<void> upsertByVisitId({
@@ -622,18 +659,22 @@ class UndertakingsDao extends DatabaseAccessor<AppDatabase> with _$UndertakingsD
     if (existing == null) {
       await into(undertakings).insert(companion);
     } else {
-      await (update(undertakings)..where((t) => t.visitId.equals(visitId))).write(companion);
+      await (update(
+        undertakings,
+      )..where((t) => t.visitId.equals(visitId))).write(companion);
     }
   }
 }
 
 @DriftAccessor(tables: [ElectronicDocuments])
-class ElectronicDocumentsDao extends DatabaseAccessor<AppDatabase> with _$ElectronicDocumentsDaoMixin {
+class ElectronicDocumentsDao extends DatabaseAccessor<AppDatabase>
+    with _$ElectronicDocumentsDaoMixin {
   ElectronicDocumentsDao(AppDatabase db) : super(db);
 
   // 透過 visitId 取得資料
-  Future<ElectronicDocument?> getByVisitId(int visitId) =>
-      (select(electronicDocuments)..where((t) => t.visitId.equals(visitId))).getSingleOrNull();
+  Future<ElectronicDocument?> getByVisitId(int visitId) => (select(
+    electronicDocuments,
+  )..where((t) => t.visitId.equals(visitId))).getSingleOrNull();
 
   // 新增或更新資料
   Future<void> upsertByVisitId({
@@ -652,18 +693,22 @@ class ElectronicDocumentsDao extends DatabaseAccessor<AppDatabase> with _$Electr
     if (existing == null) {
       await into(electronicDocuments).insert(companion);
     } else {
-      await (update(electronicDocuments)..where((t) => t.visitId.equals(visitId))).write(companion);
+      await (update(
+        electronicDocuments,
+      )..where((t) => t.visitId.equals(visitId))).write(companion);
     }
   }
 }
 
 @DriftAccessor(tables: [NursingRecords])
-class NursingRecordsDao extends DatabaseAccessor<AppDatabase> with _$NursingRecordsDaoMixin {
+class NursingRecordsDao extends DatabaseAccessor<AppDatabase>
+    with _$NursingRecordsDaoMixin {
   NursingRecordsDao(AppDatabase db) : super(db);
 
   // 透過 visitId 取得資料
-  Future<NursingRecord?> getByVisitId(int visitId) =>
-      (select(nursingRecords)..where((t) => t.visitId.equals(visitId))).getSingleOrNull();
+  Future<NursingRecord?> getByVisitId(int visitId) => (select(
+    nursingRecords,
+  )..where((t) => t.visitId.equals(visitId))).getSingleOrNull();
 
   // 新增或更新資料
   Future<void> upsertByVisitId({
@@ -680,7 +725,9 @@ class NursingRecordsDao extends DatabaseAccessor<AppDatabase> with _$NursingReco
     if (existing == null) {
       await into(nursingRecords).insert(companion);
     } else {
-      await (update(nursingRecords)..where((t) => t.visitId.equals(visitId))).write(companion);
+      await (update(
+        nursingRecords,
+      )..where((t) => t.visitId.equals(visitId))).write(companion);
     }
   }
 }

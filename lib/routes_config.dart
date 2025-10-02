@@ -9,6 +9,7 @@ import 'MedicalCertificate.dart';
 import 'Undertaking.dart';
 import 'ElectronicDocuments.dart';
 import 'NursingRecord.dart';
+import 'BodyMap.dart';
 
 class RouteItem {
   final String label;
@@ -55,6 +56,10 @@ final List<RouteItem> routeItems = [
   RouteItem(
     label: '護理記錄',
     builder: (visitId, key) => NursingRecordPage(key: key, visitId: visitId),
+  ),
+  RouteItem(
+    label: "人形圖",
+    builder: (visitId, key) => BodyMapPage(key: key, visitId: visitId),
   ),
   // 未來其他頁面...
 ];

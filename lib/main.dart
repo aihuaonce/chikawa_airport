@@ -1,4 +1,5 @@
 // main.dart
+import 'package:chikawa_airport/data/db/daos.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'data/models/patient_data.dart';
@@ -10,14 +11,17 @@ import 'data/models/certificate_data.dart';
 import 'data/models/undertaking_data.dart';
 import 'data/models/electronic_document_data.dart';
 import 'data/models/nursing_record_data.dart';
+import 'data/models/body_map_data.dart';
 import 'data/db/app_database.dart';
 import 'home.dart';
 
 void main() {
   final db = AppDatabase();
+
   runApp(
     MultiProvider(
       providers: [
+        // ChangeNotifier
         ChangeNotifierProvider(create: (_) => PatientData()),
         ChangeNotifierProvider(create: (_) => FlightLogData()),
         ChangeNotifierProvider(create: (_) => AccidentData()),
@@ -27,18 +31,26 @@ void main() {
         ChangeNotifierProvider(create: (_) => UndertakingData()),
         ChangeNotifierProvider(create: (_) => ElectronicDocumentData()),
         ChangeNotifierProvider(create: (_) => NursingRecordData()),
+        ChangeNotifierProvider(create: (_) => BodyMapData()),
 
-        Provider(create: (_) => db),
-        Provider(create: (_) => db.visitsDao),
-        Provider(create: (_) => db.patientProfilesDao),
-        Provider(create: (_) => db.flightLogsDao),
-        Provider(create: (_) => db.accidentRecordsDao),
-        Provider(create: (_) => db.treatmentsDao),
-        Provider(create: (_) => db.medicalCostsDao),
-        Provider(create: (_) => db.medicalCertificatesDao),
-        Provider(create: (_) => db.undertakingsDao),
-        Provider(create: (_) => db.electronicDocumentsDao),
-        Provider(create: (_) => db.nursingRecordsDao),
+        // Database instance
+        Provider<AppDatabase>.value(value: db),
+
+        // DAOs 注入，確保使用同一個 db
+        Provider<VisitsDao>(create: (_) => db.visitsDao),
+        Provider<PatientProfilesDao>(create: (_) => db.patientProfilesDao),
+        Provider<FlightLogsDao>(create: (_) => db.flightLogsDao),
+        Provider<AccidentRecordsDao>(create: (_) => db.accidentRecordsDao),
+        Provider<TreatmentsDao>(create: (_) => db.treatmentsDao),
+        Provider<MedicalCostsDao>(create: (_) => db.medicalCostsDao),
+        Provider<MedicalCertificatesDao>(
+          create: (_) => db.medicalCertificatesDao,
+        ),
+        Provider<UndertakingsDao>(create: (_) => db.undertakingsDao),
+        Provider<ElectronicDocumentsDao>(
+          create: (_) => db.electronicDocumentsDao,
+        ),
+        Provider<NursingRecordsDao>(create: (_) => db.nursingRecordsDao),
       ],
       child: const MyApp(),
     ),

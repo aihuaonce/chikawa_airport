@@ -45,8 +45,15 @@ class PatientProfiles extends Table {
   TextColumn get phone => text().nullable()();
   TextColumn get photoPath => text().nullable()();
 
+  TextColumn get bodyMapJson => text().nullable()();
+
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
   DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
+
+  @override
+  List<Set<Column>> get uniqueKeys => [
+    {visitId},
+  ];
 
   @override
   List<Set<Column>> get indexes => [
@@ -294,7 +301,7 @@ class Undertakings extends Table {
 
   // 簽名圖片資料
   BlobColumn get signatureBytes => blob().nullable()();
-  
+
   // 紀錄時間
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
   DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
@@ -309,7 +316,7 @@ class ElectronicDocuments extends Table {
 
   // FROM 選項的索引
   IntColumn get fromSelectedIndex => integer().nullable()();
-  
+
   // 紀錄時間
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
   DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
@@ -321,7 +328,7 @@ class NursingRecords extends Table {
 
   // 將多筆護理記錄的 List<Map> 轉換為 JSON 字串儲存
   TextColumn get recordsJson => text().nullable()();
-  
+
   // 紀錄時間
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
   DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
