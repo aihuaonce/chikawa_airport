@@ -258,16 +258,16 @@ class _ReferralFormPageState extends State<ReferralFormPage> {
             children: [
               const Text("檢查及治療摘要", style: TextStyle(fontWeight: FontWeight.bold)),
               const SizedBox(height: 8),
-              Text("1. 最近一次檢查結果"),
+              Text("1. 最近一次檢查結果日期"),
               TextButton(
                 onPressed: () => _pickDate(context, (d) => setState(() => today = d)),
-                child: Text("日期：${today.toLocal()}".split(' ')[0]),
+                child: Text("${today.toLocal()}".split(' ')[0]),
               ),
               const SizedBox(height: 8),
-              Text("2. 最近一次用藥或手術名稱"),
+              Text("2. 最近一次用藥或手術名稱日期"),
               TextButton(
                 onPressed: () => _pickDate(context, (d) => setState(() => today = d)),
-                child: Text("日期：${today.toLocal()}".split(' ')[0]),
+                child: Text("${today.toLocal()}".split(' ')[0]),
               ),
             ],
           ),
@@ -387,7 +387,7 @@ class _ReferralFormPageState extends State<ReferralFormPage> {
         Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
         const SizedBox(width: 8),
         SizedBox(
-          width: 120,
+          width: 180,
           child: DropdownButtonFormField<String>(
             items: items.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
             onChanged: (val) {
