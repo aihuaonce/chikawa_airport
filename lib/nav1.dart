@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'maintain/maintain_menu_sheet.dart';
+// ⭐ 改這裡：不要再用 bottom sheet 了，改成導到 MaintainPage
+import 'maintain.dart';
 
 // 先創建一個簡單的 Provider 類別來管理導航狀態
 class NavigationProvider extends ChangeNotifier {
@@ -16,7 +17,7 @@ class NavigationProvider extends ChangeNotifier {
 
 // --- 顏色定義 ---
 const _light = Color(0xFF83ACA9); // 淺綠色 (未選中)
-const _dark = Color(0xFF274C4A); // 深綠色 (選中)
+const _dark = Color(0xFF274C4A);  // 深綠色 (選中)
 const _navBarBg = Color(0xFFFFFFFF); // 導航列背景色使用白色
 
 class Nav1Page extends StatelessWidget {
@@ -55,8 +56,7 @@ class Nav1Page extends StatelessWidget {
                   scrollDirection: Axis.horizontal,
                   child: Row(
                     children: List.generate(items.length, (i) {
-                      final bool isActive =
-                          i == navigationProvider.selectedIndex;
+                      final bool isActive = i == navigationProvider.selectedIndex;
                       return Padding(
                         padding: const EdgeInsets.only(right: 8),
                         child: _PillButton(
@@ -84,10 +84,8 @@ class Nav1Page extends StatelessWidget {
                   ),
                 ),
                 onPressed: () {
-                  // TODO: 實作呼叫救護車的功能
-                  ScaffoldMessenger.of(
-                    context,
-                  ).showSnackBar(const SnackBar(content: Text('呼叫救護車功能')));
+                  ScaffoldMessenger.of(context)
+                      .showSnackBar(const SnackBar(content: Text('呼叫救護車功能')));
                 },
                 child: const Text('呼叫救護車'),
               ),
@@ -95,7 +93,6 @@ class Nav1Page extends StatelessWidget {
               // 圓形頭像
               const CircleAvatar(
                 radius: 18,
-                // 由於沒有提供圖片，使用淺綠色背景代替
                 // backgroundImage: AssetImage('assets/avatar.jpg'),
                 backgroundColor: _light,
               ),
@@ -108,10 +105,7 @@ class Nav1Page extends StatelessWidget {
 
   // 處理導航邏輯
   void _handleNavigation(BuildContext context, int index) {
-    final navigationProvider = Provider.of<NavigationProvider>(
-      context,
-      listen: false,
-    );
+    final navigationProvider = Provider.of<NavigationProvider>(context, listen: false);
 
     switch (index) {
       case 0:
@@ -121,12 +115,11 @@ class Nav1Page extends StatelessWidget {
         navigationProvider.setSelectedIndex(index);
         break;
       case 4:
-        // 各式列表維護 - 打開底部下拉選單
-        showModalBottomSheet(
-          context: context,
-          isScrollControlled: true,
-          backgroundColor: Colors.transparent,
-          builder: (_) => const MaintainMenuSheet(),
+        // ⭐ 改這裡：改成 push 到 MaintainPage（和你開 Nav4Page 的寫法一樣）
+        navigationProvider.setSelectedIndex(index); // 可選：讓 pill 高亮
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const MaintainPage()),
         );
         break;
       default:
