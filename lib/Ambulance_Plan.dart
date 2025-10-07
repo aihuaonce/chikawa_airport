@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:signature/signature.dart';
+import 'dart:typed_data';
 
 class AmbulancePlanPage extends StatefulWidget {
   const AmbulancePlanPage({super.key});
@@ -22,6 +24,10 @@ class _AmbulancePlanPageState extends State<AmbulancePlanPage> {
 
   // 時間狀態
   DateTime receivingTime = DateTime.now();
+
+  // 加入資料行
+  List<Map<String, String>> medicationRecords = [];
+  List<Map<String, dynamic>> paramedicRecords = [];
 
   // 選擇狀態
   Map<String, bool> emergencyTreatments = {
@@ -181,6 +187,42 @@ class _AmbulancePlanPageState extends State<AmbulancePlanPage> {
                         ),
                         Expanded(
                           child: Text('執行者', textAlign: TextAlign.center),
+                        ),
+                      ],
+                    ),
+                  ),
+                  ...medicationRecords.map(
+                    (row) => Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            row['time'] ?? '',
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                        Expanded(
+                          child: Text(
+                            row['name'] ?? '',
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                        Expanded(
+                          child: Text(
+                            row['route'] ?? '',
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                        Expanded(
+                          child: Text(
+                            row['dose'] ?? '',
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                        Expanded(
+                          child: Text(
+                            row['executor'] ?? '',
+                            textAlign: TextAlign.center,
+                          ),
                         ),
                       ],
                     ),
@@ -390,6 +432,47 @@ class _AmbulancePlanPageState extends State<AmbulancePlanPage> {
                       ],
                     ),
                   ),
+                  ...paramedicRecords.map(
+                    (row) => Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            row['name'] ?? '',
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                        Expanded(
+                          child: Container(
+                            height: 120,
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.grey.shade300),
+                              color: Colors.white,
+                            ),
+                            child: row['signature'] == null
+                                ? const Center(
+                                    child: Text(
+                                      '簽章',
+                                      style: TextStyle(color: Colors.grey),
+                                    ),
+                                  )
+                                : Image.memory(
+                                    row['signature'],
+                                    fit: BoxFit.contain,
+                                  ),
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.delete, color: Colors.red),
+                          onPressed: () {
+                            setState(() {
+                              paramedicRecords.remove(row);
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
                   InkWell(
                     onTap: () => _showParamedicDialog(context),
                     child: Container(
@@ -439,10 +522,17 @@ class _AmbulancePlanPageState extends State<AmbulancePlanPage> {
                       style: TextStyle(fontWeight: FontWeight.w500),
                     ),
                   ),
-                  const Text('2025年10月01日 21時26分31秒'),
+                  Text(
+                    DateFormat('yyyy年MM月dd日 HH時mm分ss秒').format(receivingTime),
+                    style: const TextStyle(fontSize: 15),
+                  ),
                   const Spacer(),
                   ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      setState(() {
+                        receivingTime = DateTime.now();
+                      });
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.purple,
                       foregroundColor: white,
@@ -624,23 +714,128 @@ class _AmbulancePlanPageState extends State<AmbulancePlanPage> {
   }
 
   // 給藥紀錄彈窗
-  void _showMedicationDialog(BuildContext context) {
-    showDialog(
+  Future<void> _showMedicationDialog(BuildContext context) async {
+    DateTime recordTime = DateTime.now();
+    final nameController = TextEditingController();
+    final routeController = TextEditingController();
+    final doseController = TextEditingController();
+    final executorController = TextEditingController();
+
+    Map<String, String>? result = await showDialog<Map<String, String>>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('新增給藥紀錄'),
-        content: const Text('給藥紀錄表單內容'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('取消'),
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text('創建 藥物紀錄'),
+              content: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Text(
+                          '時間',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(width: 16),
+                        Text(
+                          DateFormat(
+                            'yyyy年MM月dd日 HH時mm分ss秒',
+                          ).format(recordTime),
+                        ),
+                        const SizedBox(width: 16),
+                        ElevatedButton(
+                          onPressed: () {
+                            setState(() {
+                              recordTime = DateTime.now();
+                            });
+                          },
+                          child: const Text('更新時間'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.purple,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 6,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    _DialogInput('藥名', nameController, '請輸入藥名'),
+                    const SizedBox(height: 8),
+                    _DialogInput('途徑', routeController, '請輸入途徑'),
+                    const SizedBox(height: 8),
+                    _DialogInput('劑量', doseController, '請輸入劑量'),
+                    const SizedBox(height: 8),
+                    _DialogInput('執行者', executorController, '請輸入執行者'),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('捨棄'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context, {
+                      'time': DateFormat(
+                        'yyyy年MM月dd日 HH時mm分ss秒',
+                      ).format(recordTime),
+                      'name': nameController.text,
+                      'route': routeController.text,
+                      'dose': doseController.text,
+                      'executor': executorController.text,
+                    });
+                  },
+                  child: const Text('儲存並關閉'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+
+    if (result != null) {
+      setState(() {
+        medicationRecords.add(result);
+      });
+    }
+  }
+
+  // Dialog 輸入欄位元件
+  Widget _DialogInput(
+    String label,
+    TextEditingController controller,
+    String hint,
+  ) {
+    return Row(
+      children: [
+        SizedBox(
+          width: 60,
+          child: Text(
+            label,
+            style: const TextStyle(fontWeight: FontWeight.bold),
           ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('儲存'),
+        ),
+        Expanded(
+          child: TextField(
+            controller: controller,
+            decoration: InputDecoration(
+              hintText: hint,
+              border: const OutlineInputBorder(),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 8,
+                vertical: 6,
+              ),
+            ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -666,24 +861,172 @@ class _AmbulancePlanPageState extends State<AmbulancePlanPage> {
   }
 
   // 隨車救護人員彈窗
-  void _showParamedicDialog(BuildContext context) {
-    showDialog(
+  Future<void> _showParamedicDialog(BuildContext context) async {
+    final nameController = TextEditingController();
+    Uint8List? signatureBytes;
+
+    Map<String, dynamic>? result = await showDialog<Map<String, dynamic>>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('新增隨車救護人員'),
-        content: const Text('救護人員表單內容'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('取消'),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('儲存'),
-          ),
-        ],
-      ),
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text('創建 隨車救護人員記錄'),
+              content: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const SizedBox(
+                          width: 60,
+                          child: Text(
+                            '姓名',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        Expanded(
+                          child: TextField(
+                            controller: nameController,
+                            decoration: const InputDecoration(
+                              hintText: '請輸入姓名',
+                              border: OutlineInputBorder(),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        const SizedBox(
+                          width: 60,
+                          child: Text(
+                            '簽名',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () async {
+                              final bytes = await _showSignatureDialog(
+                                context,
+                                signatureBytes,
+                              );
+                              if (bytes != null) {
+                                setState(() {
+                                  signatureBytes = bytes;
+                                });
+                              }
+                            },
+                            child: Container(
+                              height: 120,
+                              decoration: BoxDecoration(
+                                border: Border.all(color: Colors.grey),
+                                color: Colors.white,
+                              ),
+                              child: signatureBytes == null
+                                  ? const Center(
+                                      child: Text(
+                                        '簽章',
+                                        style: TextStyle(color: Colors.grey),
+                                      ),
+                                    )
+                                  : Image.memory(
+                                      signatureBytes!,
+                                      fit: BoxFit.contain,
+                                    ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('捨棄'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context, {
+                      'name': nameController.text,
+                      'signature': signatureBytes,
+                    });
+                  },
+                  child: const Text('儲存並關閉'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context, {
+                      'name': nameController.text,
+                      'signature': signatureBytes,
+                      'addMore': true,
+                    });
+                  },
+                  child: const Text('儲存，新增另項'),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
+
+    if (result != null) {
+      setState(() {
+        paramedicRecords.add(result);
+      });
+      if (result['addMore'] == true) {
+        _showParamedicDialog(context);
+      }
+    }
+  }
+
+  Future<Uint8List?> _showSignatureDialog(
+    BuildContext context,
+    Uint8List? initial,
+  ) async {
+    SignatureController controller = SignatureController();
+    Uint8List? result = await showDialog<Uint8List>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('發出您的簽章'),
+          content: SizedBox(
+            width: 500,
+            height: 200,
+            child: Signature(
+              controller: controller,
+              backgroundColor: Colors.white,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                controller.clear();
+              },
+              child: const Text('清除'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                final bytes = await controller.toPngBytes();
+                Navigator.pop(context, bytes);
+              },
+              child: const Text('採納並簽署'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('取消'),
+            ),
+          ],
+        );
+      },
+    );
+    controller.dispose();
+    return result;
   }
 
   @override
