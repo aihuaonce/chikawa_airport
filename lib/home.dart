@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import 'data/db/app_database.dart';
 import 'data/db/daos.dart';
 import 'nav2.dart';
-import 'nav1.dart';
 import 'data/models/accident_data.dart';
 import 'data/models/flightlog_data.dart';
 import 'data/models/patient_data.dart';
@@ -183,8 +182,6 @@ class _HomePageState extends State<HomePage> {
         padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
         child: Column(
           children: [
-            const Nav1Page(),
-            const SizedBox(height: 24),
             Row(
               children: [
                 ElevatedButton(

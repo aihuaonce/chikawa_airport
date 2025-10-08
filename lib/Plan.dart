@@ -1,3 +1,4 @@
+//plan.dart
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -178,6 +179,11 @@ class _PlanPageState extends State<PlanPage>
   Future<void> saveData() async {
     try {
       _syncControllersToData();
+
+      // 【核心修改】在儲存前執行條件檢查與建立
+      await _handleConditionalCreation();
+
+      // 執行原有的儲存邏輯
       await _saveData();
     } catch (e) {
       if (mounted) {
@@ -186,6 +192,62 @@ class _PlanPageState extends State<PlanPage>
         ).showSnackBar(SnackBar(content: Text('儲存計畫與處置頁面失敗: $e')));
       }
       rethrow;
+    }
+  }
+
+  Future<void> _handleConditionalCreation() async {
+    final planData = context.read<PlanData>();
+
+    // 只有當 "建議轉診" 被勾選時才需要繼續
+    if (planData.suggestReferral == false) {
+      return;
+    }
+
+    // 【修改】獲取所有需要的 DAO
+    final treatmentsDao = context.read<TreatmentsDao>();
+    final referralFormsDao = context.read<ReferralFormsDao>();
+    final ambulanceRecordsDao = context.read<AmbulanceRecordsDao>();
+
+    // 1. 讀取資料庫中【儲存前】的原始 Treatment 資料
+    final oldTreatment = await treatmentsDao.getByVisitId(widget.visitId);
+
+    // 2. 條件檢查：
+    //    - 舊資料不存在 (這是第一次儲存)，且新資料勾選了轉診
+    //    - 或者，舊資料的轉診狀態為 false，而新資料變成了 true
+    final shouldCreate =
+        (oldTreatment == null || oldTreatment.suggestReferral == false);
+
+    if (shouldCreate) {
+      bool recordCreated = false; // 用一個旗標來判斷是否需要顯示提示
+
+      // --- 建立救護車紀錄 ---
+      bool ambulanceRecordExists = await ambulanceRecordsDao
+          .recordExistsForVisit(widget.visitId);
+      if (!ambulanceRecordExists) {
+        debugPrint('條件滿足！正在為 Visit ${widget.visitId} 建立救護車紀錄...');
+        await ambulanceRecordsDao.createRecordForVisit(widget.visitId);
+        recordCreated = true;
+      }
+
+      // --- 建立轉診單紀錄 ---
+      bool referralFormExists = await referralFormsDao.formExistsForVisit(
+        widget.visitId,
+      );
+      if (!referralFormExists) {
+        debugPrint('條件滿足！正在為 Visit ${widget.visitId} 建立轉診單...');
+        await referralFormsDao.createFormForVisit(widget.visitId);
+        recordCreated = true;
+      }
+
+      // 如果有任何一筆紀錄被建立，就顯示一個統一的提示
+      if (mounted && recordCreated) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('已自動建立轉診單與救護車紀錄！'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
     }
   }
 
@@ -458,6 +520,7 @@ class _PlanPageState extends State<PlanPage>
     final planData = context.read<PlanData>();
     await dao.upsertByVisitId(
       visitId: widget.visitId,
+      // ... 所有 planData 的欄位維持不變 ...
       screeningChecked: planData.screeningChecked,
       screeningMethods: planData.screeningMethods,
       otherScreeningMethod: planData.otherScreeningMethod,
@@ -499,7 +562,7 @@ class _PlanPageState extends State<PlanPage>
       ekgReading: planData.ekgReading,
       sugarChecked: planData.sugarChecked,
       sugarReading: planData.sugarReading,
-      suggestReferral: planData.suggestReferral,
+      suggestReferral: planData.suggestReferral, // 這裡會儲存最新的狀態
       intubationChecked: planData.intubationChecked,
       cprChecked: planData.cprChecked,
       oxygenTherapyChecked: planData.oxygenTherapyChecked,

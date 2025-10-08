@@ -1,43 +1,40 @@
 import 'package:flutter/material.dart';
-import 'maintain/maintain_menu_sheet.dart'; // 保持第一個程式碼的引入
+import 'package:provider/provider.dart'; // 【重要】取消註解
+import 'maintain/maintain_menu_sheet.dart';
+import 'providers/app_navigation_provider.dart'; // 【重要】取消註解
 
 // --- 顏色定義 ---
-const _light = Color(0xFF83ACA9); // 淺綠色 (未選中)
-const _dark = Color(0xFF274C4A); // 深綠色 (選中)
-const _navBarBg = Color(0xFFFFFFFF); // 導航列背景色使用白色
+const lightColor = Color(0xFF83ACA9);
+const darkColor = Color(0xFF274C4A);
+const navBarBg = Color(0xFFFFFFFF);
 
-// 遵循新架構：使用 StatefulWidget 來管理選取狀態
-class Nav1Page extends StatefulWidget {
+// 【修改】Nav1Page 現在可以是 StatelessWidget，因為狀態由 Provider 管理
+class Nav1Page extends StatelessWidget {
   const Nav1Page({super.key});
 
   @override
-  State<Nav1Page> createState() => _Nav1PageState();
-}
-
-class _Nav1PageState extends State<Nav1Page> {
-  // 使用第一個程式碼的完整項目列表
-  final List<String> items = <String>[
-    '機場出診單',
-    '急救紀錄單',
-    '救護車紀錄單',
-    '查看報表',
-    '各式列表維護',
-  ];
-  // 狀態管理從 Provider 移到 StatefulWidget 內部
-  int _selectedIndex = 0;
-
-  @override
   Widget build(BuildContext context) {
+    // 【修改】從 Provider 中讀取當前選中的索引
+    final appNavProvider = context.watch<AppNavigationProvider>();
+    final selectedIndex = appNavProvider.selectedIndex;
+
+    final List<String> items = <String>[
+      '機場出診單', // index 0
+      '急救紀錄單', // index 1
+      '救護車紀錄單', // index 2
+      '查看報表', // index 3
+      '各式列表維護', // index 4
+    ];
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      // 保持第一個程式碼的導航列樣式：白色背景 + 陰影
       decoration: BoxDecoration(
-        color: _navBarBg,
+        color: navBarBg,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.1),
             blurRadius: 4,
-            offset: const Offset(0, 2), // 底部陰影
+            offset: const Offset(0, 2),
           ),
         ],
       ),
@@ -48,13 +45,12 @@ class _Nav1PageState extends State<Nav1Page> {
               scrollDirection: Axis.horizontal,
               child: Row(
                 children: List.generate(items.length, (i) {
-                  final bool isActive = i == _selectedIndex;
                   return Padding(
                     padding: const EdgeInsets.only(right: 8),
                     child: _PillButton(
                       label: items[i],
-                      active: isActive,
-                      // 使用內部狀態管理方法
+                      // 【修改】按鈕是否 active，由 Provider 的狀態決定
+                      active: i == selectedIndex,
                       onTap: () => _handleNavigation(context, i),
                     ),
                   );
@@ -63,7 +59,6 @@ class _Nav1PageState extends State<Nav1Page> {
             ),
           ),
           const SizedBox(width: 12),
-          // 呼叫救護車按鈕 (樣式和功能保留)
           FilledButton(
             style: FilledButton.styleFrom(
               backgroundColor: const Color(0xFFE74C3C),
@@ -81,27 +76,25 @@ class _Nav1PageState extends State<Nav1Page> {
             child: const Text('呼叫救護車'),
           ),
           const SizedBox(width: 12),
-          // 圓形頭像 (樣式保留)
-          const CircleAvatar(radius: 18, backgroundColor: _light),
+          const CircleAvatar(radius: 18, backgroundColor: lightColor),
         ],
       ),
     );
   }
 
-  // 處理導航邏輯 (從第一個程式碼移植過來，並將 Provider 呼叫移除)
   void _handleNavigation(BuildContext context, int index) {
+    // 【修改】使用 context.read 來呼叫 Provider 的方法
+    final appNavProvider = context.read<AppNavigationProvider>();
+
     switch (index) {
-      case 0:
-      case 1:
-      case 2:
-      case 3:
-        // 設定新的選取狀態，觸發 UI 更新
-        setState(() {
-          _selectedIndex = index;
-        });
+      case 0: // 機場出診單 (對應 HomePage)
+      case 1: // 急救紀錄單 (對應 Home2Page)
+      case 2: // 救護車紀錄單 (對應 Home3Page)
+      case 3: // 查看報表 (對應 Home4Page, 假設)
+        // 【重要】更新 Provider 中的選中索引，這會觸發 MainPage 重建
+        appNavProvider.setSelectedIndex(index);
         break;
       case 4:
-        // 各式列表維護 - 打開底部下拉選單 (不切換選取狀態，保持第一個程式碼的邏輯)
         showModalBottomSheet(
           context: context,
           isScrollControlled: true,
@@ -115,8 +108,7 @@ class _Nav1PageState extends State<Nav1Page> {
   }
 }
 
-// --- 導航列選項按鈕元件 ---
-// 保持第一個程式碼的邏輯和樣式
+// --- _PillButton 維持不變 ---
 class _PillButton extends StatelessWidget {
   final String label;
   final bool active;
@@ -130,9 +122,8 @@ class _PillButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 顏色邏輯：選中用深綠色(_dark)，未選中用淺綠色(_light)
-    final Color bg = active ? _dark : _light;
-    const Color fg = Colors.white; // 前景色固定白色
+    final Color bg = active ? darkColor : lightColor;
+    const Color fg = Colors.white;
 
     return InkWell(
       borderRadius: BorderRadius.circular(15),

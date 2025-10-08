@@ -5,7 +5,7 @@ import 'AccidentRecord.dart';
 import 'PersonalInformation.dart';
 import 'data/models/patient_data.dart';
 import 'data/db/daos.dart';
-import 'routes_config.dart';
+import 'providers/routes_config.dart';
 import 'widgets/nav_common.dart';
 
 mixin SavableStateMixin<T extends StatefulWidget> on State<T> {

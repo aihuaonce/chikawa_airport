@@ -21,6 +21,11 @@ part 'app_database.g.dart';
     Undertakings,
     ElectronicDocuments,
     NursingRecords,
+    ReferralForms,
+    AmbulanceRecords,
+    MedicationRecords,
+    VitalSignsRecords,
+    ParamedicRecords,
     // 之後還有 Treatments, MedicalCosts, Diagnoses... 全部加在這裡
   ],
   daos: [
@@ -34,6 +39,11 @@ part 'app_database.g.dart';
     UndertakingsDao,
     ElectronicDocumentsDao,
     NursingRecordsDao,
+    ReferralFormsDao,
+    AmbulanceRecordsDao,
+    MedicationRecordsDao,
+    VitalSignsRecordsDao,
+    ParamedicRecordsDao,
     // 之後還有 TreatmentsDao, MedicalCostsDao, DiagnosesDao... 全部加在這裡
   ],
 )

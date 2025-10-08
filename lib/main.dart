@@ -1,7 +1,9 @@
-// main.dart
 import 'package:chikawa_airport/data/db/daos.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
+// Providers
+import 'providers/app_navigation_provider.dart';
 import 'data/models/patient_data.dart';
 import 'data/models/accident_data.dart';
 import 'data/models/flightlog_data.dart';
@@ -12,8 +14,11 @@ import 'data/models/undertaking_data.dart';
 import 'data/models/electronic_document_data.dart';
 import 'data/models/nursing_record_data.dart';
 import 'data/models/body_map_data.dart';
+import 'data/models/referral_data.dart';
+
+// Database & UI
 import 'data/db/app_database.dart';
-import 'home.dart';
+import 'main_page.dart';
 
 void main() {
   final db = AppDatabase();
@@ -21,7 +26,8 @@ void main() {
   runApp(
     MultiProvider(
       providers: [
-        // ChangeNotifier
+        // --- 狀態管理 Provider (ChangeNotifier) ---
+        ChangeNotifierProvider(create: (_) => AppNavigationProvider()),
         ChangeNotifierProvider(create: (_) => PatientData()),
         ChangeNotifierProvider(create: (_) => FlightLogData()),
         ChangeNotifierProvider(create: (_) => AccidentData()),
@@ -32,11 +38,12 @@ void main() {
         ChangeNotifierProvider(create: (_) => ElectronicDocumentData()),
         ChangeNotifierProvider(create: (_) => NursingRecordData()),
         ChangeNotifierProvider(create: (_) => BodyMapData()),
+        ChangeNotifierProvider(create: (_) => ReferralData()),
 
-        // Database instance
+        // --- 資料庫實例 Provider ---
         Provider<AppDatabase>.value(value: db),
 
-        // DAOs 注入，確保使用同一個 db
+        // --- DAO 注入 ---
         Provider<VisitsDao>(create: (_) => db.visitsDao),
         Provider<PatientProfilesDao>(create: (_) => db.patientProfilesDao),
         Provider<FlightLogsDao>(create: (_) => db.flightLogsDao),
@@ -51,6 +58,13 @@ void main() {
           create: (_) => db.electronicDocumentsDao,
         ),
         Provider<NursingRecordsDao>(create: (_) => db.nursingRecordsDao),
+        Provider<ReferralFormsDao>(create: (_) => db.referralFormsDao),
+
+        // 【【【 請在這裡加入這四行新的 DAO 註冊 】】】
+        Provider<AmbulanceRecordsDao>(create: (_) => db.ambulanceRecordsDao),
+        Provider<MedicationRecordsDao>(create: (_) => db.medicationRecordsDao),
+        Provider<VitalSignsRecordsDao>(create: (_) => db.vitalSignsRecordsDao),
+        Provider<ParamedicRecordsDao>(create: (_) => db.paramedicRecordsDao),
       ],
       child: const MyApp(),
     ),
@@ -65,7 +79,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Hospital App',
       theme: ThemeData(primarySwatch: Colors.blue),
-      home: const HomePage(),
+      home: const MainPage(),
+      debugShowCheckedModeBanner: false, // 建議加入此行以移除右上角的 Debug 標籤
     );
   }
 }

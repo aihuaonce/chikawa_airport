@@ -1,5 +1,6 @@
 import 'dart:convert';
-
+import 'dart:typed_data';
+import 'package:chikawa_airport/data/models/AmbulanceView_Data.dart';
 import 'package:drift/drift.dart';
 import 'app_database.dart';
 import 'tables.dart';
@@ -86,6 +87,12 @@ class PatientProfilesDao extends DatabaseAccessor<AppDatabase>
   Future<PatientProfile?> getByVisitId(int visitId) => (select(
     patientProfiles,
   )..where((t) => t.visitId.equals(visitId))).getSingleOrNull();
+
+  Future<void> updatePatientProfile(PatientProfilesCompanion entry) async {
+    // 使用 insertOnConflictUpdate 是一個非常穩健的作法
+    // 它會嘗試插入，如果發現 visitId (unique key) 衝突，就會自動改成更新
+    await into(patientProfiles).insertOnConflictUpdate(entry);
+  }
 
   /// 儲存個人資料（沒有就 insert，有就 update），並同步更新 Visits 表的摘要
   ///
@@ -730,4 +737,226 @@ class NursingRecordsDao extends DatabaseAccessor<AppDatabase>
       )..where((t) => t.visitId.equals(visitId))).write(companion);
     }
   }
+}
+
+@DriftAccessor(tables: [ReferralForms])
+class ReferralFormsDao extends DatabaseAccessor<AppDatabase>
+    with _$ReferralFormsDaoMixin {
+  ReferralFormsDao(AppDatabase db) : super(db);
+
+  // 根據 visitId 獲取資料
+  Future<ReferralForm?> getByVisitId(int visitId) => (select(
+    referralForms,
+  )..where((t) => t.visitId.equals(visitId))).getSingleOrNull();
+
+  /// 建立一筆與 visitId 關聯的空的轉診單
+  Future<int> createFormForVisit(int visitId) {
+    // 只插入 visitId，其他欄位使用資料庫的預設值或留空
+    return into(
+      referralForms,
+    ).insert(ReferralFormsCompanion.insert(visitId: visitId));
+  }
+
+  Future<bool> formExistsForVisit(int visitId) async {
+    final existing = await (select(
+      referralForms,
+    )..where((tbl) => tbl.visitId.equals(visitId))).getSingleOrNull();
+    return existing != null;
+  }
+
+  // 新增或更新資料
+  Future<void> upsertByVisitId({
+    required int visitId,
+    String? contactName,
+    String? contactPhone,
+    String? contactAddress,
+    String? mainDiagnosis,
+    String? subDiagnosis1,
+    String? subDiagnosis2,
+    DateTime? lastExamDate,
+    DateTime? lastMedicationDate,
+    int? referralPurposeIdx,
+    String? furtherExamDetail,
+    String? otherPurposeDetail,
+    int? doctorIdx,
+    String? otherDoctorName,
+    int? deptIdx,
+    String? otherDeptName,
+    Uint8List? doctorSignature,
+    DateTime? issueDate,
+    DateTime? appointmentDate,
+    String? appointmentDept,
+    String? appointmentRoom,
+    String? appointmentNumber,
+    String? referralHospitalName,
+    int? referralDeptIdx,
+    String? otherReferralDept,
+    String? referralDoctorName,
+    String? referralAddress,
+    String? referralPhone,
+    Uint8List? consentSignature,
+    String? relationToPatient,
+    DateTime? consentDateTime,
+  }) async {
+    final companion = ReferralFormsCompanion(
+      visitId: Value(visitId),
+      contactName: Value(contactName),
+      contactPhone: Value(contactPhone),
+      contactAddress: Value(contactAddress),
+      mainDiagnosis: Value(mainDiagnosis),
+      subDiagnosis1: Value(subDiagnosis1),
+      subDiagnosis2: Value(subDiagnosis2),
+      lastExamDate: Value(lastExamDate),
+      lastMedicationDate: Value(lastMedicationDate),
+      referralPurposeIdx: Value(referralPurposeIdx),
+      furtherExamDetail: Value(furtherExamDetail),
+      otherPurposeDetail: Value(otherPurposeDetail),
+      doctorIdx: Value(doctorIdx),
+      otherDoctorName: Value(otherDoctorName),
+      deptIdx: Value(deptIdx),
+      otherDeptName: Value(otherDeptName),
+      doctorSignature: Value(doctorSignature),
+      issueDate: Value(issueDate),
+      appointmentDate: Value(appointmentDate),
+      appointmentDept: Value(appointmentDept),
+      appointmentRoom: Value(appointmentRoom),
+      appointmentNumber: Value(appointmentNumber),
+      referralHospitalName: Value(referralHospitalName),
+      referralDeptIdx: Value(referralDeptIdx),
+      otherReferralDept: Value(otherReferralDept),
+      referralDoctorName: Value(referralDoctorName),
+      referralAddress: Value(referralAddress),
+      referralPhone: Value(referralPhone),
+      consentSignature: Value(consentSignature),
+      relationToPatient: Value(relationToPatient),
+      consentDateTime: Value(consentDateTime),
+      updatedAt: Value(DateTime.now()),
+    );
+
+    final existing = await getByVisitId(visitId);
+    if (existing == null) {
+      await into(referralForms).insert(companion);
+    } else {
+      await (update(
+        referralForms,
+      )..where((t) => t.visitId.equals(visitId))).write(companion);
+    }
+  }
+}
+
+@DriftAccessor(tables: [AmbulanceRecords, Visits, Treatments])
+class AmbulanceRecordsDao extends DatabaseAccessor<AppDatabase>
+    with _$AmbulanceRecordsDaoMixin {
+  AmbulanceRecordsDao(AppDatabase db) : super(db);
+
+  // 【核心】watch 方法，現在使用由 mixin 正確注入的查詢工具
+  Stream<List<DetailedAmbulanceViewData>> watchAllDetailedRecords({
+    String keyword = '',
+  }) {
+    final query = select(ambulanceRecords).join([
+      innerJoin(visits, visits.visitId.equalsExp(ambulanceRecords.visitId)),
+
+      // 使用 leftOuterJoin，這個方法是由 mixin 提供的
+      leftOuterJoin(treatments, treatments.visitId.equalsExp(visits.visitId)),
+    ]);
+
+    if (keyword.isNotEmpty) {
+      query.where(
+        visits.patientName.like('%$keyword%') |
+            ambulanceRecords.chiefComplaint.like('%$keyword%') |
+            ambulanceRecords.destinationHospital.like('%$keyword%'),
+      );
+    }
+
+    query.orderBy([OrderingTerm.desc(ambulanceRecords.dutyTime)]);
+
+    return query.watch().map((rows) {
+      return rows.map((row) {
+        return DetailedAmbulanceViewData(
+          record: row.readTable(ambulanceRecords),
+          visit: row.readTable(visits),
+          treatment: row.readTableOrNull(treatments),
+        );
+      }).toList();
+    });
+  }
+
+  Future<AmbulanceRecord?> getByVisitId(int visitId) {
+    return (select(
+      ambulanceRecords,
+    )..where((tbl) => tbl.visitId.equals(visitId))).getSingleOrNull();
+  }
+
+  // --- 其他必要的方法 ---
+
+  Future<int> createRecordForVisit(int visitId) {
+    return into(ambulanceRecords).insert(
+      AmbulanceRecordsCompanion.insert(
+        visitId: visitId,
+        dutyTime: Value(DateTime.now()),
+      ),
+    );
+  }
+
+  Future<bool> recordExistsForVisit(int visitId) async {
+    final existing = await (select(
+      ambulanceRecords,
+    )..where((tbl) => tbl.visitId.equals(visitId))).getSingleOrNull();
+    return existing != null;
+  }
+
+  // 您之後會需要一個方法來儲存來自 Nav5Page 的資料
+  Future<void> updateAmbulanceRecord(AmbulanceRecordsCompanion entry) {
+    return (update(
+      ambulanceRecords,
+    )..where((t) => t.visitId.equals(entry.visitId.value))).write(entry);
+  }
+}
+
+@DriftAccessor(tables: [MedicationRecords])
+class MedicationRecordsDao extends DatabaseAccessor<AppDatabase>
+    with _$MedicationRecordsDaoMixin {
+  MedicationRecordsDao(AppDatabase db) : super(db);
+
+  Stream<List<MedicationRecord>> watchRecordsForVisit(int visitId) => (select(
+    medicationRecords,
+  )..where((tbl) => tbl.visitId.equals(visitId))).watch();
+
+  Future<int> addRecord(MedicationRecordsCompanion entry) =>
+      into(medicationRecords).insert(entry);
+
+  Future<void> deleteRecord(int id) =>
+      (delete(medicationRecords)..where((tbl) => tbl.id.equals(id))).go();
+}
+
+@DriftAccessor(tables: [VitalSignsRecords])
+class VitalSignsRecordsDao extends DatabaseAccessor<AppDatabase>
+    with _$VitalSignsRecordsDaoMixin {
+  VitalSignsRecordsDao(AppDatabase db) : super(db);
+
+  Stream<List<VitalSignsRecord>> watchRecordsForVisit(int visitId) => (select(
+    vitalSignsRecords,
+  )..where((tbl) => tbl.visitId.equals(visitId))).watch();
+
+  Future<int> addRecord(VitalSignsRecordsCompanion entry) =>
+      into(vitalSignsRecords).insert(entry);
+
+  Future<void> deleteRecord(int id) =>
+      (delete(vitalSignsRecords)..where((tbl) => tbl.id.equals(id))).go();
+}
+
+@DriftAccessor(tables: [ParamedicRecords])
+class ParamedicRecordsDao extends DatabaseAccessor<AppDatabase>
+    with _$ParamedicRecordsDaoMixin {
+  ParamedicRecordsDao(AppDatabase db) : super(db);
+
+  Stream<List<ParamedicRecord>> watchRecordsForVisit(int visitId) => (select(
+    paramedicRecords,
+  )..where((tbl) => tbl.visitId.equals(visitId))).watch();
+
+  Future<int> addRecord(ParamedicRecordsCompanion entry) =>
+      into(paramedicRecords).insert(entry);
+
+  Future<void> deleteRecord(int id) =>
+      (delete(paramedicRecords)..where((tbl) => tbl.id.equals(id))).go();
 }

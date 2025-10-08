@@ -1,15 +1,16 @@
 // routes_config.dart
 import 'package:flutter/material.dart';
-import 'PersonalInformation.dart';
-import 'AccidentRecord.dart';
-import 'FlightLog.dart';
-import 'Plan.dart';
-import 'MedicalExpenses.dart';
-import 'MedicalCertificate.dart';
-import 'Undertaking.dart';
-import 'ElectronicDocuments.dart';
-import 'NursingRecord.dart';
-import 'BodyMap.dart';
+import '../PersonalInformation.dart';
+import '../AccidentRecord.dart';
+import '../FlightLog.dart';
+import '../Plan.dart';
+import '../MedicalExpenses.dart';
+import '../MedicalCertificate.dart';
+import '../Undertaking.dart';
+import '../ElectronicDocuments.dart';
+import '../NursingRecord.dart';
+import '../BodyMap.dart';
+import '../ReferralForm.dart';
 
 class RouteItem {
   final String label;
@@ -60,6 +61,10 @@ final List<RouteItem> routeItems = [
   RouteItem(
     label: "人形圖",
     builder: (visitId, key) => BodyMapPage(key: key, visitId: visitId),
+  ),
+  RouteItem(
+    label: '轉診單',
+    builder: (visitId, key) => ReferralFormPage(key: key, visitId: visitId),
   ),
   // 未來其他頁面...
 ];

@@ -44,6 +44,7 @@ dependencies:
   signature: ^6.3.0
   image_painter: ^0.7.1
   flutter_painter_v2: ^2.1.0+1
+  intl: ^0.20.2
 
 dev_dependencies:
   flutter_test:

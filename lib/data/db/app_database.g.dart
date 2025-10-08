@@ -10776,6 +10776,7619 @@ class NursingRecordsCompanion extends UpdateCompanion<NursingRecord> {
   }
 }
 
+class $ReferralFormsTable extends ReferralForms
+    with TableInfo<$ReferralFormsTable, ReferralForm> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ReferralFormsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _visitIdMeta = const VerificationMeta(
+    'visitId',
+  );
+  @override
+  late final GeneratedColumn<int> visitId = GeneratedColumn<int>(
+    'visit_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'),
+  );
+  static const VerificationMeta _contactNameMeta = const VerificationMeta(
+    'contactName',
+  );
+  @override
+  late final GeneratedColumn<String> contactName = GeneratedColumn<String>(
+    'contact_name',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _contactPhoneMeta = const VerificationMeta(
+    'contactPhone',
+  );
+  @override
+  late final GeneratedColumn<String> contactPhone = GeneratedColumn<String>(
+    'contact_phone',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _contactAddressMeta = const VerificationMeta(
+    'contactAddress',
+  );
+  @override
+  late final GeneratedColumn<String> contactAddress = GeneratedColumn<String>(
+    'contact_address',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _mainDiagnosisMeta = const VerificationMeta(
+    'mainDiagnosis',
+  );
+  @override
+  late final GeneratedColumn<String> mainDiagnosis = GeneratedColumn<String>(
+    'main_diagnosis',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _subDiagnosis1Meta = const VerificationMeta(
+    'subDiagnosis1',
+  );
+  @override
+  late final GeneratedColumn<String> subDiagnosis1 = GeneratedColumn<String>(
+    'sub_diagnosis1',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _subDiagnosis2Meta = const VerificationMeta(
+    'subDiagnosis2',
+  );
+  @override
+  late final GeneratedColumn<String> subDiagnosis2 = GeneratedColumn<String>(
+    'sub_diagnosis2',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _lastExamDateMeta = const VerificationMeta(
+    'lastExamDate',
+  );
+  @override
+  late final GeneratedColumn<DateTime> lastExamDate = GeneratedColumn<DateTime>(
+    'last_exam_date',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _lastMedicationDateMeta =
+      const VerificationMeta('lastMedicationDate');
+  @override
+  late final GeneratedColumn<DateTime> lastMedicationDate =
+      GeneratedColumn<DateTime>(
+        'last_medication_date',
+        aliasedName,
+        true,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _referralPurposeIdxMeta =
+      const VerificationMeta('referralPurposeIdx');
+  @override
+  late final GeneratedColumn<int> referralPurposeIdx = GeneratedColumn<int>(
+    'referral_purpose_idx',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _furtherExamDetailMeta = const VerificationMeta(
+    'furtherExamDetail',
+  );
+  @override
+  late final GeneratedColumn<String> furtherExamDetail =
+      GeneratedColumn<String>(
+        'further_exam_detail',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _otherPurposeDetailMeta =
+      const VerificationMeta('otherPurposeDetail');
+  @override
+  late final GeneratedColumn<String> otherPurposeDetail =
+      GeneratedColumn<String>(
+        'other_purpose_detail',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _doctorIdxMeta = const VerificationMeta(
+    'doctorIdx',
+  );
+  @override
+  late final GeneratedColumn<int> doctorIdx = GeneratedColumn<int>(
+    'doctor_idx',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _otherDoctorNameMeta = const VerificationMeta(
+    'otherDoctorName',
+  );
+  @override
+  late final GeneratedColumn<String> otherDoctorName = GeneratedColumn<String>(
+    'other_doctor_name',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _deptIdxMeta = const VerificationMeta(
+    'deptIdx',
+  );
+  @override
+  late final GeneratedColumn<int> deptIdx = GeneratedColumn<int>(
+    'dept_idx',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _otherDeptNameMeta = const VerificationMeta(
+    'otherDeptName',
+  );
+  @override
+  late final GeneratedColumn<String> otherDeptName = GeneratedColumn<String>(
+    'other_dept_name',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _doctorSignatureMeta = const VerificationMeta(
+    'doctorSignature',
+  );
+  @override
+  late final GeneratedColumn<Uint8List> doctorSignature =
+      GeneratedColumn<Uint8List>(
+        'doctor_signature',
+        aliasedName,
+        true,
+        type: DriftSqlType.blob,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _issueDateMeta = const VerificationMeta(
+    'issueDate',
+  );
+  @override
+  late final GeneratedColumn<DateTime> issueDate = GeneratedColumn<DateTime>(
+    'issue_date',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _appointmentDateMeta = const VerificationMeta(
+    'appointmentDate',
+  );
+  @override
+  late final GeneratedColumn<DateTime> appointmentDate =
+      GeneratedColumn<DateTime>(
+        'appointment_date',
+        aliasedName,
+        true,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _appointmentDeptMeta = const VerificationMeta(
+    'appointmentDept',
+  );
+  @override
+  late final GeneratedColumn<String> appointmentDept = GeneratedColumn<String>(
+    'appointment_dept',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _appointmentRoomMeta = const VerificationMeta(
+    'appointmentRoom',
+  );
+  @override
+  late final GeneratedColumn<String> appointmentRoom = GeneratedColumn<String>(
+    'appointment_room',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _appointmentNumberMeta = const VerificationMeta(
+    'appointmentNumber',
+  );
+  @override
+  late final GeneratedColumn<String> appointmentNumber =
+      GeneratedColumn<String>(
+        'appointment_number',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _referralHospitalNameMeta =
+      const VerificationMeta('referralHospitalName');
+  @override
+  late final GeneratedColumn<String> referralHospitalName =
+      GeneratedColumn<String>(
+        'referral_hospital_name',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _referralDeptIdxMeta = const VerificationMeta(
+    'referralDeptIdx',
+  );
+  @override
+  late final GeneratedColumn<int> referralDeptIdx = GeneratedColumn<int>(
+    'referral_dept_idx',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _otherReferralDeptMeta = const VerificationMeta(
+    'otherReferralDept',
+  );
+  @override
+  late final GeneratedColumn<String> otherReferralDept =
+      GeneratedColumn<String>(
+        'other_referral_dept',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _referralDoctorNameMeta =
+      const VerificationMeta('referralDoctorName');
+  @override
+  late final GeneratedColumn<String> referralDoctorName =
+      GeneratedColumn<String>(
+        'referral_doctor_name',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _referralAddressMeta = const VerificationMeta(
+    'referralAddress',
+  );
+  @override
+  late final GeneratedColumn<String> referralAddress = GeneratedColumn<String>(
+    'referral_address',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _referralPhoneMeta = const VerificationMeta(
+    'referralPhone',
+  );
+  @override
+  late final GeneratedColumn<String> referralPhone = GeneratedColumn<String>(
+    'referral_phone',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _consentSignatureMeta = const VerificationMeta(
+    'consentSignature',
+  );
+  @override
+  late final GeneratedColumn<Uint8List> consentSignature =
+      GeneratedColumn<Uint8List>(
+        'consent_signature',
+        aliasedName,
+        true,
+        type: DriftSqlType.blob,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _relationToPatientMeta = const VerificationMeta(
+    'relationToPatient',
+  );
+  @override
+  late final GeneratedColumn<String> relationToPatient =
+      GeneratedColumn<String>(
+        'relation_to_patient',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _consentDateTimeMeta = const VerificationMeta(
+    'consentDateTime',
+  );
+  @override
+  late final GeneratedColumn<DateTime> consentDateTime =
+      GeneratedColumn<DateTime>(
+        'consent_date_time',
+        aliasedName,
+        true,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    visitId,
+    contactName,
+    contactPhone,
+    contactAddress,
+    mainDiagnosis,
+    subDiagnosis1,
+    subDiagnosis2,
+    lastExamDate,
+    lastMedicationDate,
+    referralPurposeIdx,
+    furtherExamDetail,
+    otherPurposeDetail,
+    doctorIdx,
+    otherDoctorName,
+    deptIdx,
+    otherDeptName,
+    doctorSignature,
+    issueDate,
+    appointmentDate,
+    appointmentDept,
+    appointmentRoom,
+    appointmentNumber,
+    referralHospitalName,
+    referralDeptIdx,
+    otherReferralDept,
+    referralDoctorName,
+    referralAddress,
+    referralPhone,
+    consentSignature,
+    relationToPatient,
+    consentDateTime,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'referral_forms';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ReferralForm> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('visit_id')) {
+      context.handle(
+        _visitIdMeta,
+        visitId.isAcceptableOrUnknown(data['visit_id']!, _visitIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_visitIdMeta);
+    }
+    if (data.containsKey('contact_name')) {
+      context.handle(
+        _contactNameMeta,
+        contactName.isAcceptableOrUnknown(
+          data['contact_name']!,
+          _contactNameMeta,
+        ),
+      );
+    }
+    if (data.containsKey('contact_phone')) {
+      context.handle(
+        _contactPhoneMeta,
+        contactPhone.isAcceptableOrUnknown(
+          data['contact_phone']!,
+          _contactPhoneMeta,
+        ),
+      );
+    }
+    if (data.containsKey('contact_address')) {
+      context.handle(
+        _contactAddressMeta,
+        contactAddress.isAcceptableOrUnknown(
+          data['contact_address']!,
+          _contactAddressMeta,
+        ),
+      );
+    }
+    if (data.containsKey('main_diagnosis')) {
+      context.handle(
+        _mainDiagnosisMeta,
+        mainDiagnosis.isAcceptableOrUnknown(
+          data['main_diagnosis']!,
+          _mainDiagnosisMeta,
+        ),
+      );
+    }
+    if (data.containsKey('sub_diagnosis1')) {
+      context.handle(
+        _subDiagnosis1Meta,
+        subDiagnosis1.isAcceptableOrUnknown(
+          data['sub_diagnosis1']!,
+          _subDiagnosis1Meta,
+        ),
+      );
+    }
+    if (data.containsKey('sub_diagnosis2')) {
+      context.handle(
+        _subDiagnosis2Meta,
+        subDiagnosis2.isAcceptableOrUnknown(
+          data['sub_diagnosis2']!,
+          _subDiagnosis2Meta,
+        ),
+      );
+    }
+    if (data.containsKey('last_exam_date')) {
+      context.handle(
+        _lastExamDateMeta,
+        lastExamDate.isAcceptableOrUnknown(
+          data['last_exam_date']!,
+          _lastExamDateMeta,
+        ),
+      );
+    }
+    if (data.containsKey('last_medication_date')) {
+      context.handle(
+        _lastMedicationDateMeta,
+        lastMedicationDate.isAcceptableOrUnknown(
+          data['last_medication_date']!,
+          _lastMedicationDateMeta,
+        ),
+      );
+    }
+    if (data.containsKey('referral_purpose_idx')) {
+      context.handle(
+        _referralPurposeIdxMeta,
+        referralPurposeIdx.isAcceptableOrUnknown(
+          data['referral_purpose_idx']!,
+          _referralPurposeIdxMeta,
+        ),
+      );
+    }
+    if (data.containsKey('further_exam_detail')) {
+      context.handle(
+        _furtherExamDetailMeta,
+        furtherExamDetail.isAcceptableOrUnknown(
+          data['further_exam_detail']!,
+          _furtherExamDetailMeta,
+        ),
+      );
+    }
+    if (data.containsKey('other_purpose_detail')) {
+      context.handle(
+        _otherPurposeDetailMeta,
+        otherPurposeDetail.isAcceptableOrUnknown(
+          data['other_purpose_detail']!,
+          _otherPurposeDetailMeta,
+        ),
+      );
+    }
+    if (data.containsKey('doctor_idx')) {
+      context.handle(
+        _doctorIdxMeta,
+        doctorIdx.isAcceptableOrUnknown(data['doctor_idx']!, _doctorIdxMeta),
+      );
+    }
+    if (data.containsKey('other_doctor_name')) {
+      context.handle(
+        _otherDoctorNameMeta,
+        otherDoctorName.isAcceptableOrUnknown(
+          data['other_doctor_name']!,
+          _otherDoctorNameMeta,
+        ),
+      );
+    }
+    if (data.containsKey('dept_idx')) {
+      context.handle(
+        _deptIdxMeta,
+        deptIdx.isAcceptableOrUnknown(data['dept_idx']!, _deptIdxMeta),
+      );
+    }
+    if (data.containsKey('other_dept_name')) {
+      context.handle(
+        _otherDeptNameMeta,
+        otherDeptName.isAcceptableOrUnknown(
+          data['other_dept_name']!,
+          _otherDeptNameMeta,
+        ),
+      );
+    }
+    if (data.containsKey('doctor_signature')) {
+      context.handle(
+        _doctorSignatureMeta,
+        doctorSignature.isAcceptableOrUnknown(
+          data['doctor_signature']!,
+          _doctorSignatureMeta,
+        ),
+      );
+    }
+    if (data.containsKey('issue_date')) {
+      context.handle(
+        _issueDateMeta,
+        issueDate.isAcceptableOrUnknown(data['issue_date']!, _issueDateMeta),
+      );
+    }
+    if (data.containsKey('appointment_date')) {
+      context.handle(
+        _appointmentDateMeta,
+        appointmentDate.isAcceptableOrUnknown(
+          data['appointment_date']!,
+          _appointmentDateMeta,
+        ),
+      );
+    }
+    if (data.containsKey('appointment_dept')) {
+      context.handle(
+        _appointmentDeptMeta,
+        appointmentDept.isAcceptableOrUnknown(
+          data['appointment_dept']!,
+          _appointmentDeptMeta,
+        ),
+      );
+    }
+    if (data.containsKey('appointment_room')) {
+      context.handle(
+        _appointmentRoomMeta,
+        appointmentRoom.isAcceptableOrUnknown(
+          data['appointment_room']!,
+          _appointmentRoomMeta,
+        ),
+      );
+    }
+    if (data.containsKey('appointment_number')) {
+      context.handle(
+        _appointmentNumberMeta,
+        appointmentNumber.isAcceptableOrUnknown(
+          data['appointment_number']!,
+          _appointmentNumberMeta,
+        ),
+      );
+    }
+    if (data.containsKey('referral_hospital_name')) {
+      context.handle(
+        _referralHospitalNameMeta,
+        referralHospitalName.isAcceptableOrUnknown(
+          data['referral_hospital_name']!,
+          _referralHospitalNameMeta,
+        ),
+      );
+    }
+    if (data.containsKey('referral_dept_idx')) {
+      context.handle(
+        _referralDeptIdxMeta,
+        referralDeptIdx.isAcceptableOrUnknown(
+          data['referral_dept_idx']!,
+          _referralDeptIdxMeta,
+        ),
+      );
+    }
+    if (data.containsKey('other_referral_dept')) {
+      context.handle(
+        _otherReferralDeptMeta,
+        otherReferralDept.isAcceptableOrUnknown(
+          data['other_referral_dept']!,
+          _otherReferralDeptMeta,
+        ),
+      );
+    }
+    if (data.containsKey('referral_doctor_name')) {
+      context.handle(
+        _referralDoctorNameMeta,
+        referralDoctorName.isAcceptableOrUnknown(
+          data['referral_doctor_name']!,
+          _referralDoctorNameMeta,
+        ),
+      );
+    }
+    if (data.containsKey('referral_address')) {
+      context.handle(
+        _referralAddressMeta,
+        referralAddress.isAcceptableOrUnknown(
+          data['referral_address']!,
+          _referralAddressMeta,
+        ),
+      );
+    }
+    if (data.containsKey('referral_phone')) {
+      context.handle(
+        _referralPhoneMeta,
+        referralPhone.isAcceptableOrUnknown(
+          data['referral_phone']!,
+          _referralPhoneMeta,
+        ),
+      );
+    }
+    if (data.containsKey('consent_signature')) {
+      context.handle(
+        _consentSignatureMeta,
+        consentSignature.isAcceptableOrUnknown(
+          data['consent_signature']!,
+          _consentSignatureMeta,
+        ),
+      );
+    }
+    if (data.containsKey('relation_to_patient')) {
+      context.handle(
+        _relationToPatientMeta,
+        relationToPatient.isAcceptableOrUnknown(
+          data['relation_to_patient']!,
+          _relationToPatientMeta,
+        ),
+      );
+    }
+    if (data.containsKey('consent_date_time')) {
+      context.handle(
+        _consentDateTimeMeta,
+        consentDateTime.isAcceptableOrUnknown(
+          data['consent_date_time']!,
+          _consentDateTimeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  ReferralForm map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ReferralForm(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      visitId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}visit_id'],
+      )!,
+      contactName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}contact_name'],
+      ),
+      contactPhone: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}contact_phone'],
+      ),
+      contactAddress: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}contact_address'],
+      ),
+      mainDiagnosis: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}main_diagnosis'],
+      ),
+      subDiagnosis1: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}sub_diagnosis1'],
+      ),
+      subDiagnosis2: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}sub_diagnosis2'],
+      ),
+      lastExamDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}last_exam_date'],
+      ),
+      lastMedicationDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}last_medication_date'],
+      ),
+      referralPurposeIdx: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}referral_purpose_idx'],
+      ),
+      furtherExamDetail: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}further_exam_detail'],
+      ),
+      otherPurposeDetail: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}other_purpose_detail'],
+      ),
+      doctorIdx: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}doctor_idx'],
+      ),
+      otherDoctorName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}other_doctor_name'],
+      ),
+      deptIdx: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}dept_idx'],
+      ),
+      otherDeptName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}other_dept_name'],
+      ),
+      doctorSignature: attachedDatabase.typeMapping.read(
+        DriftSqlType.blob,
+        data['${effectivePrefix}doctor_signature'],
+      ),
+      issueDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}issue_date'],
+      ),
+      appointmentDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}appointment_date'],
+      ),
+      appointmentDept: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}appointment_dept'],
+      ),
+      appointmentRoom: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}appointment_room'],
+      ),
+      appointmentNumber: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}appointment_number'],
+      ),
+      referralHospitalName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}referral_hospital_name'],
+      ),
+      referralDeptIdx: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}referral_dept_idx'],
+      ),
+      otherReferralDept: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}other_referral_dept'],
+      ),
+      referralDoctorName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}referral_doctor_name'],
+      ),
+      referralAddress: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}referral_address'],
+      ),
+      referralPhone: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}referral_phone'],
+      ),
+      consentSignature: attachedDatabase.typeMapping.read(
+        DriftSqlType.blob,
+        data['${effectivePrefix}consent_signature'],
+      ),
+      relationToPatient: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}relation_to_patient'],
+      ),
+      consentDateTime: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}consent_date_time'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $ReferralFormsTable createAlias(String alias) {
+    return $ReferralFormsTable(attachedDatabase, alias);
+  }
+}
+
+class ReferralForm extends DataClass implements Insertable<ReferralForm> {
+  final int id;
+  final int visitId;
+  final String? contactName;
+  final String? contactPhone;
+  final String? contactAddress;
+  final String? mainDiagnosis;
+  final String? subDiagnosis1;
+  final String? subDiagnosis2;
+  final DateTime? lastExamDate;
+  final DateTime? lastMedicationDate;
+  final int? referralPurposeIdx;
+  final String? furtherExamDetail;
+  final String? otherPurposeDetail;
+  final int? doctorIdx;
+  final String? otherDoctorName;
+  final int? deptIdx;
+  final String? otherDeptName;
+  final Uint8List? doctorSignature;
+  final DateTime? issueDate;
+  final DateTime? appointmentDate;
+  final String? appointmentDept;
+  final String? appointmentRoom;
+  final String? appointmentNumber;
+  final String? referralHospitalName;
+  final int? referralDeptIdx;
+  final String? otherReferralDept;
+  final String? referralDoctorName;
+  final String? referralAddress;
+  final String? referralPhone;
+  final Uint8List? consentSignature;
+  final String? relationToPatient;
+  final DateTime? consentDateTime;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  const ReferralForm({
+    required this.id,
+    required this.visitId,
+    this.contactName,
+    this.contactPhone,
+    this.contactAddress,
+    this.mainDiagnosis,
+    this.subDiagnosis1,
+    this.subDiagnosis2,
+    this.lastExamDate,
+    this.lastMedicationDate,
+    this.referralPurposeIdx,
+    this.furtherExamDetail,
+    this.otherPurposeDetail,
+    this.doctorIdx,
+    this.otherDoctorName,
+    this.deptIdx,
+    this.otherDeptName,
+    this.doctorSignature,
+    this.issueDate,
+    this.appointmentDate,
+    this.appointmentDept,
+    this.appointmentRoom,
+    this.appointmentNumber,
+    this.referralHospitalName,
+    this.referralDeptIdx,
+    this.otherReferralDept,
+    this.referralDoctorName,
+    this.referralAddress,
+    this.referralPhone,
+    this.consentSignature,
+    this.relationToPatient,
+    this.consentDateTime,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['visit_id'] = Variable<int>(visitId);
+    if (!nullToAbsent || contactName != null) {
+      map['contact_name'] = Variable<String>(contactName);
+    }
+    if (!nullToAbsent || contactPhone != null) {
+      map['contact_phone'] = Variable<String>(contactPhone);
+    }
+    if (!nullToAbsent || contactAddress != null) {
+      map['contact_address'] = Variable<String>(contactAddress);
+    }
+    if (!nullToAbsent || mainDiagnosis != null) {
+      map['main_diagnosis'] = Variable<String>(mainDiagnosis);
+    }
+    if (!nullToAbsent || subDiagnosis1 != null) {
+      map['sub_diagnosis1'] = Variable<String>(subDiagnosis1);
+    }
+    if (!nullToAbsent || subDiagnosis2 != null) {
+      map['sub_diagnosis2'] = Variable<String>(subDiagnosis2);
+    }
+    if (!nullToAbsent || lastExamDate != null) {
+      map['last_exam_date'] = Variable<DateTime>(lastExamDate);
+    }
+    if (!nullToAbsent || lastMedicationDate != null) {
+      map['last_medication_date'] = Variable<DateTime>(lastMedicationDate);
+    }
+    if (!nullToAbsent || referralPurposeIdx != null) {
+      map['referral_purpose_idx'] = Variable<int>(referralPurposeIdx);
+    }
+    if (!nullToAbsent || furtherExamDetail != null) {
+      map['further_exam_detail'] = Variable<String>(furtherExamDetail);
+    }
+    if (!nullToAbsent || otherPurposeDetail != null) {
+      map['other_purpose_detail'] = Variable<String>(otherPurposeDetail);
+    }
+    if (!nullToAbsent || doctorIdx != null) {
+      map['doctor_idx'] = Variable<int>(doctorIdx);
+    }
+    if (!nullToAbsent || otherDoctorName != null) {
+      map['other_doctor_name'] = Variable<String>(otherDoctorName);
+    }
+    if (!nullToAbsent || deptIdx != null) {
+      map['dept_idx'] = Variable<int>(deptIdx);
+    }
+    if (!nullToAbsent || otherDeptName != null) {
+      map['other_dept_name'] = Variable<String>(otherDeptName);
+    }
+    if (!nullToAbsent || doctorSignature != null) {
+      map['doctor_signature'] = Variable<Uint8List>(doctorSignature);
+    }
+    if (!nullToAbsent || issueDate != null) {
+      map['issue_date'] = Variable<DateTime>(issueDate);
+    }
+    if (!nullToAbsent || appointmentDate != null) {
+      map['appointment_date'] = Variable<DateTime>(appointmentDate);
+    }
+    if (!nullToAbsent || appointmentDept != null) {
+      map['appointment_dept'] = Variable<String>(appointmentDept);
+    }
+    if (!nullToAbsent || appointmentRoom != null) {
+      map['appointment_room'] = Variable<String>(appointmentRoom);
+    }
+    if (!nullToAbsent || appointmentNumber != null) {
+      map['appointment_number'] = Variable<String>(appointmentNumber);
+    }
+    if (!nullToAbsent || referralHospitalName != null) {
+      map['referral_hospital_name'] = Variable<String>(referralHospitalName);
+    }
+    if (!nullToAbsent || referralDeptIdx != null) {
+      map['referral_dept_idx'] = Variable<int>(referralDeptIdx);
+    }
+    if (!nullToAbsent || otherReferralDept != null) {
+      map['other_referral_dept'] = Variable<String>(otherReferralDept);
+    }
+    if (!nullToAbsent || referralDoctorName != null) {
+      map['referral_doctor_name'] = Variable<String>(referralDoctorName);
+    }
+    if (!nullToAbsent || referralAddress != null) {
+      map['referral_address'] = Variable<String>(referralAddress);
+    }
+    if (!nullToAbsent || referralPhone != null) {
+      map['referral_phone'] = Variable<String>(referralPhone);
+    }
+    if (!nullToAbsent || consentSignature != null) {
+      map['consent_signature'] = Variable<Uint8List>(consentSignature);
+    }
+    if (!nullToAbsent || relationToPatient != null) {
+      map['relation_to_patient'] = Variable<String>(relationToPatient);
+    }
+    if (!nullToAbsent || consentDateTime != null) {
+      map['consent_date_time'] = Variable<DateTime>(consentDateTime);
+    }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  ReferralFormsCompanion toCompanion(bool nullToAbsent) {
+    return ReferralFormsCompanion(
+      id: Value(id),
+      visitId: Value(visitId),
+      contactName: contactName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(contactName),
+      contactPhone: contactPhone == null && nullToAbsent
+          ? const Value.absent()
+          : Value(contactPhone),
+      contactAddress: contactAddress == null && nullToAbsent
+          ? const Value.absent()
+          : Value(contactAddress),
+      mainDiagnosis: mainDiagnosis == null && nullToAbsent
+          ? const Value.absent()
+          : Value(mainDiagnosis),
+      subDiagnosis1: subDiagnosis1 == null && nullToAbsent
+          ? const Value.absent()
+          : Value(subDiagnosis1),
+      subDiagnosis2: subDiagnosis2 == null && nullToAbsent
+          ? const Value.absent()
+          : Value(subDiagnosis2),
+      lastExamDate: lastExamDate == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastExamDate),
+      lastMedicationDate: lastMedicationDate == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastMedicationDate),
+      referralPurposeIdx: referralPurposeIdx == null && nullToAbsent
+          ? const Value.absent()
+          : Value(referralPurposeIdx),
+      furtherExamDetail: furtherExamDetail == null && nullToAbsent
+          ? const Value.absent()
+          : Value(furtherExamDetail),
+      otherPurposeDetail: otherPurposeDetail == null && nullToAbsent
+          ? const Value.absent()
+          : Value(otherPurposeDetail),
+      doctorIdx: doctorIdx == null && nullToAbsent
+          ? const Value.absent()
+          : Value(doctorIdx),
+      otherDoctorName: otherDoctorName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(otherDoctorName),
+      deptIdx: deptIdx == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deptIdx),
+      otherDeptName: otherDeptName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(otherDeptName),
+      doctorSignature: doctorSignature == null && nullToAbsent
+          ? const Value.absent()
+          : Value(doctorSignature),
+      issueDate: issueDate == null && nullToAbsent
+          ? const Value.absent()
+          : Value(issueDate),
+      appointmentDate: appointmentDate == null && nullToAbsent
+          ? const Value.absent()
+          : Value(appointmentDate),
+      appointmentDept: appointmentDept == null && nullToAbsent
+          ? const Value.absent()
+          : Value(appointmentDept),
+      appointmentRoom: appointmentRoom == null && nullToAbsent
+          ? const Value.absent()
+          : Value(appointmentRoom),
+      appointmentNumber: appointmentNumber == null && nullToAbsent
+          ? const Value.absent()
+          : Value(appointmentNumber),
+      referralHospitalName: referralHospitalName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(referralHospitalName),
+      referralDeptIdx: referralDeptIdx == null && nullToAbsent
+          ? const Value.absent()
+          : Value(referralDeptIdx),
+      otherReferralDept: otherReferralDept == null && nullToAbsent
+          ? const Value.absent()
+          : Value(otherReferralDept),
+      referralDoctorName: referralDoctorName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(referralDoctorName),
+      referralAddress: referralAddress == null && nullToAbsent
+          ? const Value.absent()
+          : Value(referralAddress),
+      referralPhone: referralPhone == null && nullToAbsent
+          ? const Value.absent()
+          : Value(referralPhone),
+      consentSignature: consentSignature == null && nullToAbsent
+          ? const Value.absent()
+          : Value(consentSignature),
+      relationToPatient: relationToPatient == null && nullToAbsent
+          ? const Value.absent()
+          : Value(relationToPatient),
+      consentDateTime: consentDateTime == null && nullToAbsent
+          ? const Value.absent()
+          : Value(consentDateTime),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory ReferralForm.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ReferralForm(
+      id: serializer.fromJson<int>(json['id']),
+      visitId: serializer.fromJson<int>(json['visitId']),
+      contactName: serializer.fromJson<String?>(json['contactName']),
+      contactPhone: serializer.fromJson<String?>(json['contactPhone']),
+      contactAddress: serializer.fromJson<String?>(json['contactAddress']),
+      mainDiagnosis: serializer.fromJson<String?>(json['mainDiagnosis']),
+      subDiagnosis1: serializer.fromJson<String?>(json['subDiagnosis1']),
+      subDiagnosis2: serializer.fromJson<String?>(json['subDiagnosis2']),
+      lastExamDate: serializer.fromJson<DateTime?>(json['lastExamDate']),
+      lastMedicationDate: serializer.fromJson<DateTime?>(
+        json['lastMedicationDate'],
+      ),
+      referralPurposeIdx: serializer.fromJson<int?>(json['referralPurposeIdx']),
+      furtherExamDetail: serializer.fromJson<String?>(
+        json['furtherExamDetail'],
+      ),
+      otherPurposeDetail: serializer.fromJson<String?>(
+        json['otherPurposeDetail'],
+      ),
+      doctorIdx: serializer.fromJson<int?>(json['doctorIdx']),
+      otherDoctorName: serializer.fromJson<String?>(json['otherDoctorName']),
+      deptIdx: serializer.fromJson<int?>(json['deptIdx']),
+      otherDeptName: serializer.fromJson<String?>(json['otherDeptName']),
+      doctorSignature: serializer.fromJson<Uint8List?>(json['doctorSignature']),
+      issueDate: serializer.fromJson<DateTime?>(json['issueDate']),
+      appointmentDate: serializer.fromJson<DateTime?>(json['appointmentDate']),
+      appointmentDept: serializer.fromJson<String?>(json['appointmentDept']),
+      appointmentRoom: serializer.fromJson<String?>(json['appointmentRoom']),
+      appointmentNumber: serializer.fromJson<String?>(
+        json['appointmentNumber'],
+      ),
+      referralHospitalName: serializer.fromJson<String?>(
+        json['referralHospitalName'],
+      ),
+      referralDeptIdx: serializer.fromJson<int?>(json['referralDeptIdx']),
+      otherReferralDept: serializer.fromJson<String?>(
+        json['otherReferralDept'],
+      ),
+      referralDoctorName: serializer.fromJson<String?>(
+        json['referralDoctorName'],
+      ),
+      referralAddress: serializer.fromJson<String?>(json['referralAddress']),
+      referralPhone: serializer.fromJson<String?>(json['referralPhone']),
+      consentSignature: serializer.fromJson<Uint8List?>(
+        json['consentSignature'],
+      ),
+      relationToPatient: serializer.fromJson<String?>(
+        json['relationToPatient'],
+      ),
+      consentDateTime: serializer.fromJson<DateTime?>(json['consentDateTime']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'visitId': serializer.toJson<int>(visitId),
+      'contactName': serializer.toJson<String?>(contactName),
+      'contactPhone': serializer.toJson<String?>(contactPhone),
+      'contactAddress': serializer.toJson<String?>(contactAddress),
+      'mainDiagnosis': serializer.toJson<String?>(mainDiagnosis),
+      'subDiagnosis1': serializer.toJson<String?>(subDiagnosis1),
+      'subDiagnosis2': serializer.toJson<String?>(subDiagnosis2),
+      'lastExamDate': serializer.toJson<DateTime?>(lastExamDate),
+      'lastMedicationDate': serializer.toJson<DateTime?>(lastMedicationDate),
+      'referralPurposeIdx': serializer.toJson<int?>(referralPurposeIdx),
+      'furtherExamDetail': serializer.toJson<String?>(furtherExamDetail),
+      'otherPurposeDetail': serializer.toJson<String?>(otherPurposeDetail),
+      'doctorIdx': serializer.toJson<int?>(doctorIdx),
+      'otherDoctorName': serializer.toJson<String?>(otherDoctorName),
+      'deptIdx': serializer.toJson<int?>(deptIdx),
+      'otherDeptName': serializer.toJson<String?>(otherDeptName),
+      'doctorSignature': serializer.toJson<Uint8List?>(doctorSignature),
+      'issueDate': serializer.toJson<DateTime?>(issueDate),
+      'appointmentDate': serializer.toJson<DateTime?>(appointmentDate),
+      'appointmentDept': serializer.toJson<String?>(appointmentDept),
+      'appointmentRoom': serializer.toJson<String?>(appointmentRoom),
+      'appointmentNumber': serializer.toJson<String?>(appointmentNumber),
+      'referralHospitalName': serializer.toJson<String?>(referralHospitalName),
+      'referralDeptIdx': serializer.toJson<int?>(referralDeptIdx),
+      'otherReferralDept': serializer.toJson<String?>(otherReferralDept),
+      'referralDoctorName': serializer.toJson<String?>(referralDoctorName),
+      'referralAddress': serializer.toJson<String?>(referralAddress),
+      'referralPhone': serializer.toJson<String?>(referralPhone),
+      'consentSignature': serializer.toJson<Uint8List?>(consentSignature),
+      'relationToPatient': serializer.toJson<String?>(relationToPatient),
+      'consentDateTime': serializer.toJson<DateTime?>(consentDateTime),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  ReferralForm copyWith({
+    int? id,
+    int? visitId,
+    Value<String?> contactName = const Value.absent(),
+    Value<String?> contactPhone = const Value.absent(),
+    Value<String?> contactAddress = const Value.absent(),
+    Value<String?> mainDiagnosis = const Value.absent(),
+    Value<String?> subDiagnosis1 = const Value.absent(),
+    Value<String?> subDiagnosis2 = const Value.absent(),
+    Value<DateTime?> lastExamDate = const Value.absent(),
+    Value<DateTime?> lastMedicationDate = const Value.absent(),
+    Value<int?> referralPurposeIdx = const Value.absent(),
+    Value<String?> furtherExamDetail = const Value.absent(),
+    Value<String?> otherPurposeDetail = const Value.absent(),
+    Value<int?> doctorIdx = const Value.absent(),
+    Value<String?> otherDoctorName = const Value.absent(),
+    Value<int?> deptIdx = const Value.absent(),
+    Value<String?> otherDeptName = const Value.absent(),
+    Value<Uint8List?> doctorSignature = const Value.absent(),
+    Value<DateTime?> issueDate = const Value.absent(),
+    Value<DateTime?> appointmentDate = const Value.absent(),
+    Value<String?> appointmentDept = const Value.absent(),
+    Value<String?> appointmentRoom = const Value.absent(),
+    Value<String?> appointmentNumber = const Value.absent(),
+    Value<String?> referralHospitalName = const Value.absent(),
+    Value<int?> referralDeptIdx = const Value.absent(),
+    Value<String?> otherReferralDept = const Value.absent(),
+    Value<String?> referralDoctorName = const Value.absent(),
+    Value<String?> referralAddress = const Value.absent(),
+    Value<String?> referralPhone = const Value.absent(),
+    Value<Uint8List?> consentSignature = const Value.absent(),
+    Value<String?> relationToPatient = const Value.absent(),
+    Value<DateTime?> consentDateTime = const Value.absent(),
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) => ReferralForm(
+    id: id ?? this.id,
+    visitId: visitId ?? this.visitId,
+    contactName: contactName.present ? contactName.value : this.contactName,
+    contactPhone: contactPhone.present ? contactPhone.value : this.contactPhone,
+    contactAddress: contactAddress.present
+        ? contactAddress.value
+        : this.contactAddress,
+    mainDiagnosis: mainDiagnosis.present
+        ? mainDiagnosis.value
+        : this.mainDiagnosis,
+    subDiagnosis1: subDiagnosis1.present
+        ? subDiagnosis1.value
+        : this.subDiagnosis1,
+    subDiagnosis2: subDiagnosis2.present
+        ? subDiagnosis2.value
+        : this.subDiagnosis2,
+    lastExamDate: lastExamDate.present ? lastExamDate.value : this.lastExamDate,
+    lastMedicationDate: lastMedicationDate.present
+        ? lastMedicationDate.value
+        : this.lastMedicationDate,
+    referralPurposeIdx: referralPurposeIdx.present
+        ? referralPurposeIdx.value
+        : this.referralPurposeIdx,
+    furtherExamDetail: furtherExamDetail.present
+        ? furtherExamDetail.value
+        : this.furtherExamDetail,
+    otherPurposeDetail: otherPurposeDetail.present
+        ? otherPurposeDetail.value
+        : this.otherPurposeDetail,
+    doctorIdx: doctorIdx.present ? doctorIdx.value : this.doctorIdx,
+    otherDoctorName: otherDoctorName.present
+        ? otherDoctorName.value
+        : this.otherDoctorName,
+    deptIdx: deptIdx.present ? deptIdx.value : this.deptIdx,
+    otherDeptName: otherDeptName.present
+        ? otherDeptName.value
+        : this.otherDeptName,
+    doctorSignature: doctorSignature.present
+        ? doctorSignature.value
+        : this.doctorSignature,
+    issueDate: issueDate.present ? issueDate.value : this.issueDate,
+    appointmentDate: appointmentDate.present
+        ? appointmentDate.value
+        : this.appointmentDate,
+    appointmentDept: appointmentDept.present
+        ? appointmentDept.value
+        : this.appointmentDept,
+    appointmentRoom: appointmentRoom.present
+        ? appointmentRoom.value
+        : this.appointmentRoom,
+    appointmentNumber: appointmentNumber.present
+        ? appointmentNumber.value
+        : this.appointmentNumber,
+    referralHospitalName: referralHospitalName.present
+        ? referralHospitalName.value
+        : this.referralHospitalName,
+    referralDeptIdx: referralDeptIdx.present
+        ? referralDeptIdx.value
+        : this.referralDeptIdx,
+    otherReferralDept: otherReferralDept.present
+        ? otherReferralDept.value
+        : this.otherReferralDept,
+    referralDoctorName: referralDoctorName.present
+        ? referralDoctorName.value
+        : this.referralDoctorName,
+    referralAddress: referralAddress.present
+        ? referralAddress.value
+        : this.referralAddress,
+    referralPhone: referralPhone.present
+        ? referralPhone.value
+        : this.referralPhone,
+    consentSignature: consentSignature.present
+        ? consentSignature.value
+        : this.consentSignature,
+    relationToPatient: relationToPatient.present
+        ? relationToPatient.value
+        : this.relationToPatient,
+    consentDateTime: consentDateTime.present
+        ? consentDateTime.value
+        : this.consentDateTime,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  ReferralForm copyWithCompanion(ReferralFormsCompanion data) {
+    return ReferralForm(
+      id: data.id.present ? data.id.value : this.id,
+      visitId: data.visitId.present ? data.visitId.value : this.visitId,
+      contactName: data.contactName.present
+          ? data.contactName.value
+          : this.contactName,
+      contactPhone: data.contactPhone.present
+          ? data.contactPhone.value
+          : this.contactPhone,
+      contactAddress: data.contactAddress.present
+          ? data.contactAddress.value
+          : this.contactAddress,
+      mainDiagnosis: data.mainDiagnosis.present
+          ? data.mainDiagnosis.value
+          : this.mainDiagnosis,
+      subDiagnosis1: data.subDiagnosis1.present
+          ? data.subDiagnosis1.value
+          : this.subDiagnosis1,
+      subDiagnosis2: data.subDiagnosis2.present
+          ? data.subDiagnosis2.value
+          : this.subDiagnosis2,
+      lastExamDate: data.lastExamDate.present
+          ? data.lastExamDate.value
+          : this.lastExamDate,
+      lastMedicationDate: data.lastMedicationDate.present
+          ? data.lastMedicationDate.value
+          : this.lastMedicationDate,
+      referralPurposeIdx: data.referralPurposeIdx.present
+          ? data.referralPurposeIdx.value
+          : this.referralPurposeIdx,
+      furtherExamDetail: data.furtherExamDetail.present
+          ? data.furtherExamDetail.value
+          : this.furtherExamDetail,
+      otherPurposeDetail: data.otherPurposeDetail.present
+          ? data.otherPurposeDetail.value
+          : this.otherPurposeDetail,
+      doctorIdx: data.doctorIdx.present ? data.doctorIdx.value : this.doctorIdx,
+      otherDoctorName: data.otherDoctorName.present
+          ? data.otherDoctorName.value
+          : this.otherDoctorName,
+      deptIdx: data.deptIdx.present ? data.deptIdx.value : this.deptIdx,
+      otherDeptName: data.otherDeptName.present
+          ? data.otherDeptName.value
+          : this.otherDeptName,
+      doctorSignature: data.doctorSignature.present
+          ? data.doctorSignature.value
+          : this.doctorSignature,
+      issueDate: data.issueDate.present ? data.issueDate.value : this.issueDate,
+      appointmentDate: data.appointmentDate.present
+          ? data.appointmentDate.value
+          : this.appointmentDate,
+      appointmentDept: data.appointmentDept.present
+          ? data.appointmentDept.value
+          : this.appointmentDept,
+      appointmentRoom: data.appointmentRoom.present
+          ? data.appointmentRoom.value
+          : this.appointmentRoom,
+      appointmentNumber: data.appointmentNumber.present
+          ? data.appointmentNumber.value
+          : this.appointmentNumber,
+      referralHospitalName: data.referralHospitalName.present
+          ? data.referralHospitalName.value
+          : this.referralHospitalName,
+      referralDeptIdx: data.referralDeptIdx.present
+          ? data.referralDeptIdx.value
+          : this.referralDeptIdx,
+      otherReferralDept: data.otherReferralDept.present
+          ? data.otherReferralDept.value
+          : this.otherReferralDept,
+      referralDoctorName: data.referralDoctorName.present
+          ? data.referralDoctorName.value
+          : this.referralDoctorName,
+      referralAddress: data.referralAddress.present
+          ? data.referralAddress.value
+          : this.referralAddress,
+      referralPhone: data.referralPhone.present
+          ? data.referralPhone.value
+          : this.referralPhone,
+      consentSignature: data.consentSignature.present
+          ? data.consentSignature.value
+          : this.consentSignature,
+      relationToPatient: data.relationToPatient.present
+          ? data.relationToPatient.value
+          : this.relationToPatient,
+      consentDateTime: data.consentDateTime.present
+          ? data.consentDateTime.value
+          : this.consentDateTime,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ReferralForm(')
+          ..write('id: $id, ')
+          ..write('visitId: $visitId, ')
+          ..write('contactName: $contactName, ')
+          ..write('contactPhone: $contactPhone, ')
+          ..write('contactAddress: $contactAddress, ')
+          ..write('mainDiagnosis: $mainDiagnosis, ')
+          ..write('subDiagnosis1: $subDiagnosis1, ')
+          ..write('subDiagnosis2: $subDiagnosis2, ')
+          ..write('lastExamDate: $lastExamDate, ')
+          ..write('lastMedicationDate: $lastMedicationDate, ')
+          ..write('referralPurposeIdx: $referralPurposeIdx, ')
+          ..write('furtherExamDetail: $furtherExamDetail, ')
+          ..write('otherPurposeDetail: $otherPurposeDetail, ')
+          ..write('doctorIdx: $doctorIdx, ')
+          ..write('otherDoctorName: $otherDoctorName, ')
+          ..write('deptIdx: $deptIdx, ')
+          ..write('otherDeptName: $otherDeptName, ')
+          ..write('doctorSignature: $doctorSignature, ')
+          ..write('issueDate: $issueDate, ')
+          ..write('appointmentDate: $appointmentDate, ')
+          ..write('appointmentDept: $appointmentDept, ')
+          ..write('appointmentRoom: $appointmentRoom, ')
+          ..write('appointmentNumber: $appointmentNumber, ')
+          ..write('referralHospitalName: $referralHospitalName, ')
+          ..write('referralDeptIdx: $referralDeptIdx, ')
+          ..write('otherReferralDept: $otherReferralDept, ')
+          ..write('referralDoctorName: $referralDoctorName, ')
+          ..write('referralAddress: $referralAddress, ')
+          ..write('referralPhone: $referralPhone, ')
+          ..write('consentSignature: $consentSignature, ')
+          ..write('relationToPatient: $relationToPatient, ')
+          ..write('consentDateTime: $consentDateTime, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hashAll([
+    id,
+    visitId,
+    contactName,
+    contactPhone,
+    contactAddress,
+    mainDiagnosis,
+    subDiagnosis1,
+    subDiagnosis2,
+    lastExamDate,
+    lastMedicationDate,
+    referralPurposeIdx,
+    furtherExamDetail,
+    otherPurposeDetail,
+    doctorIdx,
+    otherDoctorName,
+    deptIdx,
+    otherDeptName,
+    $driftBlobEquality.hash(doctorSignature),
+    issueDate,
+    appointmentDate,
+    appointmentDept,
+    appointmentRoom,
+    appointmentNumber,
+    referralHospitalName,
+    referralDeptIdx,
+    otherReferralDept,
+    referralDoctorName,
+    referralAddress,
+    referralPhone,
+    $driftBlobEquality.hash(consentSignature),
+    relationToPatient,
+    consentDateTime,
+    createdAt,
+    updatedAt,
+  ]);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ReferralForm &&
+          other.id == this.id &&
+          other.visitId == this.visitId &&
+          other.contactName == this.contactName &&
+          other.contactPhone == this.contactPhone &&
+          other.contactAddress == this.contactAddress &&
+          other.mainDiagnosis == this.mainDiagnosis &&
+          other.subDiagnosis1 == this.subDiagnosis1 &&
+          other.subDiagnosis2 == this.subDiagnosis2 &&
+          other.lastExamDate == this.lastExamDate &&
+          other.lastMedicationDate == this.lastMedicationDate &&
+          other.referralPurposeIdx == this.referralPurposeIdx &&
+          other.furtherExamDetail == this.furtherExamDetail &&
+          other.otherPurposeDetail == this.otherPurposeDetail &&
+          other.doctorIdx == this.doctorIdx &&
+          other.otherDoctorName == this.otherDoctorName &&
+          other.deptIdx == this.deptIdx &&
+          other.otherDeptName == this.otherDeptName &&
+          $driftBlobEquality.equals(
+            other.doctorSignature,
+            this.doctorSignature,
+          ) &&
+          other.issueDate == this.issueDate &&
+          other.appointmentDate == this.appointmentDate &&
+          other.appointmentDept == this.appointmentDept &&
+          other.appointmentRoom == this.appointmentRoom &&
+          other.appointmentNumber == this.appointmentNumber &&
+          other.referralHospitalName == this.referralHospitalName &&
+          other.referralDeptIdx == this.referralDeptIdx &&
+          other.otherReferralDept == this.otherReferralDept &&
+          other.referralDoctorName == this.referralDoctorName &&
+          other.referralAddress == this.referralAddress &&
+          other.referralPhone == this.referralPhone &&
+          $driftBlobEquality.equals(
+            other.consentSignature,
+            this.consentSignature,
+          ) &&
+          other.relationToPatient == this.relationToPatient &&
+          other.consentDateTime == this.consentDateTime &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class ReferralFormsCompanion extends UpdateCompanion<ReferralForm> {
+  final Value<int> id;
+  final Value<int> visitId;
+  final Value<String?> contactName;
+  final Value<String?> contactPhone;
+  final Value<String?> contactAddress;
+  final Value<String?> mainDiagnosis;
+  final Value<String?> subDiagnosis1;
+  final Value<String?> subDiagnosis2;
+  final Value<DateTime?> lastExamDate;
+  final Value<DateTime?> lastMedicationDate;
+  final Value<int?> referralPurposeIdx;
+  final Value<String?> furtherExamDetail;
+  final Value<String?> otherPurposeDetail;
+  final Value<int?> doctorIdx;
+  final Value<String?> otherDoctorName;
+  final Value<int?> deptIdx;
+  final Value<String?> otherDeptName;
+  final Value<Uint8List?> doctorSignature;
+  final Value<DateTime?> issueDate;
+  final Value<DateTime?> appointmentDate;
+  final Value<String?> appointmentDept;
+  final Value<String?> appointmentRoom;
+  final Value<String?> appointmentNumber;
+  final Value<String?> referralHospitalName;
+  final Value<int?> referralDeptIdx;
+  final Value<String?> otherReferralDept;
+  final Value<String?> referralDoctorName;
+  final Value<String?> referralAddress;
+  final Value<String?> referralPhone;
+  final Value<Uint8List?> consentSignature;
+  final Value<String?> relationToPatient;
+  final Value<DateTime?> consentDateTime;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  const ReferralFormsCompanion({
+    this.id = const Value.absent(),
+    this.visitId = const Value.absent(),
+    this.contactName = const Value.absent(),
+    this.contactPhone = const Value.absent(),
+    this.contactAddress = const Value.absent(),
+    this.mainDiagnosis = const Value.absent(),
+    this.subDiagnosis1 = const Value.absent(),
+    this.subDiagnosis2 = const Value.absent(),
+    this.lastExamDate = const Value.absent(),
+    this.lastMedicationDate = const Value.absent(),
+    this.referralPurposeIdx = const Value.absent(),
+    this.furtherExamDetail = const Value.absent(),
+    this.otherPurposeDetail = const Value.absent(),
+    this.doctorIdx = const Value.absent(),
+    this.otherDoctorName = const Value.absent(),
+    this.deptIdx = const Value.absent(),
+    this.otherDeptName = const Value.absent(),
+    this.doctorSignature = const Value.absent(),
+    this.issueDate = const Value.absent(),
+    this.appointmentDate = const Value.absent(),
+    this.appointmentDept = const Value.absent(),
+    this.appointmentRoom = const Value.absent(),
+    this.appointmentNumber = const Value.absent(),
+    this.referralHospitalName = const Value.absent(),
+    this.referralDeptIdx = const Value.absent(),
+    this.otherReferralDept = const Value.absent(),
+    this.referralDoctorName = const Value.absent(),
+    this.referralAddress = const Value.absent(),
+    this.referralPhone = const Value.absent(),
+    this.consentSignature = const Value.absent(),
+    this.relationToPatient = const Value.absent(),
+    this.consentDateTime = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  });
+  ReferralFormsCompanion.insert({
+    this.id = const Value.absent(),
+    required int visitId,
+    this.contactName = const Value.absent(),
+    this.contactPhone = const Value.absent(),
+    this.contactAddress = const Value.absent(),
+    this.mainDiagnosis = const Value.absent(),
+    this.subDiagnosis1 = const Value.absent(),
+    this.subDiagnosis2 = const Value.absent(),
+    this.lastExamDate = const Value.absent(),
+    this.lastMedicationDate = const Value.absent(),
+    this.referralPurposeIdx = const Value.absent(),
+    this.furtherExamDetail = const Value.absent(),
+    this.otherPurposeDetail = const Value.absent(),
+    this.doctorIdx = const Value.absent(),
+    this.otherDoctorName = const Value.absent(),
+    this.deptIdx = const Value.absent(),
+    this.otherDeptName = const Value.absent(),
+    this.doctorSignature = const Value.absent(),
+    this.issueDate = const Value.absent(),
+    this.appointmentDate = const Value.absent(),
+    this.appointmentDept = const Value.absent(),
+    this.appointmentRoom = const Value.absent(),
+    this.appointmentNumber = const Value.absent(),
+    this.referralHospitalName = const Value.absent(),
+    this.referralDeptIdx = const Value.absent(),
+    this.otherReferralDept = const Value.absent(),
+    this.referralDoctorName = const Value.absent(),
+    this.referralAddress = const Value.absent(),
+    this.referralPhone = const Value.absent(),
+    this.consentSignature = const Value.absent(),
+    this.relationToPatient = const Value.absent(),
+    this.consentDateTime = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  }) : visitId = Value(visitId);
+  static Insertable<ReferralForm> custom({
+    Expression<int>? id,
+    Expression<int>? visitId,
+    Expression<String>? contactName,
+    Expression<String>? contactPhone,
+    Expression<String>? contactAddress,
+    Expression<String>? mainDiagnosis,
+    Expression<String>? subDiagnosis1,
+    Expression<String>? subDiagnosis2,
+    Expression<DateTime>? lastExamDate,
+    Expression<DateTime>? lastMedicationDate,
+    Expression<int>? referralPurposeIdx,
+    Expression<String>? furtherExamDetail,
+    Expression<String>? otherPurposeDetail,
+    Expression<int>? doctorIdx,
+    Expression<String>? otherDoctorName,
+    Expression<int>? deptIdx,
+    Expression<String>? otherDeptName,
+    Expression<Uint8List>? doctorSignature,
+    Expression<DateTime>? issueDate,
+    Expression<DateTime>? appointmentDate,
+    Expression<String>? appointmentDept,
+    Expression<String>? appointmentRoom,
+    Expression<String>? appointmentNumber,
+    Expression<String>? referralHospitalName,
+    Expression<int>? referralDeptIdx,
+    Expression<String>? otherReferralDept,
+    Expression<String>? referralDoctorName,
+    Expression<String>? referralAddress,
+    Expression<String>? referralPhone,
+    Expression<Uint8List>? consentSignature,
+    Expression<String>? relationToPatient,
+    Expression<DateTime>? consentDateTime,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (visitId != null) 'visit_id': visitId,
+      if (contactName != null) 'contact_name': contactName,
+      if (contactPhone != null) 'contact_phone': contactPhone,
+      if (contactAddress != null) 'contact_address': contactAddress,
+      if (mainDiagnosis != null) 'main_diagnosis': mainDiagnosis,
+      if (subDiagnosis1 != null) 'sub_diagnosis1': subDiagnosis1,
+      if (subDiagnosis2 != null) 'sub_diagnosis2': subDiagnosis2,
+      if (lastExamDate != null) 'last_exam_date': lastExamDate,
+      if (lastMedicationDate != null)
+        'last_medication_date': lastMedicationDate,
+      if (referralPurposeIdx != null)
+        'referral_purpose_idx': referralPurposeIdx,
+      if (furtherExamDetail != null) 'further_exam_detail': furtherExamDetail,
+      if (otherPurposeDetail != null)
+        'other_purpose_detail': otherPurposeDetail,
+      if (doctorIdx != null) 'doctor_idx': doctorIdx,
+      if (otherDoctorName != null) 'other_doctor_name': otherDoctorName,
+      if (deptIdx != null) 'dept_idx': deptIdx,
+      if (otherDeptName != null) 'other_dept_name': otherDeptName,
+      if (doctorSignature != null) 'doctor_signature': doctorSignature,
+      if (issueDate != null) 'issue_date': issueDate,
+      if (appointmentDate != null) 'appointment_date': appointmentDate,
+      if (appointmentDept != null) 'appointment_dept': appointmentDept,
+      if (appointmentRoom != null) 'appointment_room': appointmentRoom,
+      if (appointmentNumber != null) 'appointment_number': appointmentNumber,
+      if (referralHospitalName != null)
+        'referral_hospital_name': referralHospitalName,
+      if (referralDeptIdx != null) 'referral_dept_idx': referralDeptIdx,
+      if (otherReferralDept != null) 'other_referral_dept': otherReferralDept,
+      if (referralDoctorName != null)
+        'referral_doctor_name': referralDoctorName,
+      if (referralAddress != null) 'referral_address': referralAddress,
+      if (referralPhone != null) 'referral_phone': referralPhone,
+      if (consentSignature != null) 'consent_signature': consentSignature,
+      if (relationToPatient != null) 'relation_to_patient': relationToPatient,
+      if (consentDateTime != null) 'consent_date_time': consentDateTime,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+    });
+  }
+
+  ReferralFormsCompanion copyWith({
+    Value<int>? id,
+    Value<int>? visitId,
+    Value<String?>? contactName,
+    Value<String?>? contactPhone,
+    Value<String?>? contactAddress,
+    Value<String?>? mainDiagnosis,
+    Value<String?>? subDiagnosis1,
+    Value<String?>? subDiagnosis2,
+    Value<DateTime?>? lastExamDate,
+    Value<DateTime?>? lastMedicationDate,
+    Value<int?>? referralPurposeIdx,
+    Value<String?>? furtherExamDetail,
+    Value<String?>? otherPurposeDetail,
+    Value<int?>? doctorIdx,
+    Value<String?>? otherDoctorName,
+    Value<int?>? deptIdx,
+    Value<String?>? otherDeptName,
+    Value<Uint8List?>? doctorSignature,
+    Value<DateTime?>? issueDate,
+    Value<DateTime?>? appointmentDate,
+    Value<String?>? appointmentDept,
+    Value<String?>? appointmentRoom,
+    Value<String?>? appointmentNumber,
+    Value<String?>? referralHospitalName,
+    Value<int?>? referralDeptIdx,
+    Value<String?>? otherReferralDept,
+    Value<String?>? referralDoctorName,
+    Value<String?>? referralAddress,
+    Value<String?>? referralPhone,
+    Value<Uint8List?>? consentSignature,
+    Value<String?>? relationToPatient,
+    Value<DateTime?>? consentDateTime,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+  }) {
+    return ReferralFormsCompanion(
+      id: id ?? this.id,
+      visitId: visitId ?? this.visitId,
+      contactName: contactName ?? this.contactName,
+      contactPhone: contactPhone ?? this.contactPhone,
+      contactAddress: contactAddress ?? this.contactAddress,
+      mainDiagnosis: mainDiagnosis ?? this.mainDiagnosis,
+      subDiagnosis1: subDiagnosis1 ?? this.subDiagnosis1,
+      subDiagnosis2: subDiagnosis2 ?? this.subDiagnosis2,
+      lastExamDate: lastExamDate ?? this.lastExamDate,
+      lastMedicationDate: lastMedicationDate ?? this.lastMedicationDate,
+      referralPurposeIdx: referralPurposeIdx ?? this.referralPurposeIdx,
+      furtherExamDetail: furtherExamDetail ?? this.furtherExamDetail,
+      otherPurposeDetail: otherPurposeDetail ?? this.otherPurposeDetail,
+      doctorIdx: doctorIdx ?? this.doctorIdx,
+      otherDoctorName: otherDoctorName ?? this.otherDoctorName,
+      deptIdx: deptIdx ?? this.deptIdx,
+      otherDeptName: otherDeptName ?? this.otherDeptName,
+      doctorSignature: doctorSignature ?? this.doctorSignature,
+      issueDate: issueDate ?? this.issueDate,
+      appointmentDate: appointmentDate ?? this.appointmentDate,
+      appointmentDept: appointmentDept ?? this.appointmentDept,
+      appointmentRoom: appointmentRoom ?? this.appointmentRoom,
+      appointmentNumber: appointmentNumber ?? this.appointmentNumber,
+      referralHospitalName: referralHospitalName ?? this.referralHospitalName,
+      referralDeptIdx: referralDeptIdx ?? this.referralDeptIdx,
+      otherReferralDept: otherReferralDept ?? this.otherReferralDept,
+      referralDoctorName: referralDoctorName ?? this.referralDoctorName,
+      referralAddress: referralAddress ?? this.referralAddress,
+      referralPhone: referralPhone ?? this.referralPhone,
+      consentSignature: consentSignature ?? this.consentSignature,
+      relationToPatient: relationToPatient ?? this.relationToPatient,
+      consentDateTime: consentDateTime ?? this.consentDateTime,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (visitId.present) {
+      map['visit_id'] = Variable<int>(visitId.value);
+    }
+    if (contactName.present) {
+      map['contact_name'] = Variable<String>(contactName.value);
+    }
+    if (contactPhone.present) {
+      map['contact_phone'] = Variable<String>(contactPhone.value);
+    }
+    if (contactAddress.present) {
+      map['contact_address'] = Variable<String>(contactAddress.value);
+    }
+    if (mainDiagnosis.present) {
+      map['main_diagnosis'] = Variable<String>(mainDiagnosis.value);
+    }
+    if (subDiagnosis1.present) {
+      map['sub_diagnosis1'] = Variable<String>(subDiagnosis1.value);
+    }
+    if (subDiagnosis2.present) {
+      map['sub_diagnosis2'] = Variable<String>(subDiagnosis2.value);
+    }
+    if (lastExamDate.present) {
+      map['last_exam_date'] = Variable<DateTime>(lastExamDate.value);
+    }
+    if (lastMedicationDate.present) {
+      map['last_medication_date'] = Variable<DateTime>(
+        lastMedicationDate.value,
+      );
+    }
+    if (referralPurposeIdx.present) {
+      map['referral_purpose_idx'] = Variable<int>(referralPurposeIdx.value);
+    }
+    if (furtherExamDetail.present) {
+      map['further_exam_detail'] = Variable<String>(furtherExamDetail.value);
+    }
+    if (otherPurposeDetail.present) {
+      map['other_purpose_detail'] = Variable<String>(otherPurposeDetail.value);
+    }
+    if (doctorIdx.present) {
+      map['doctor_idx'] = Variable<int>(doctorIdx.value);
+    }
+    if (otherDoctorName.present) {
+      map['other_doctor_name'] = Variable<String>(otherDoctorName.value);
+    }
+    if (deptIdx.present) {
+      map['dept_idx'] = Variable<int>(deptIdx.value);
+    }
+    if (otherDeptName.present) {
+      map['other_dept_name'] = Variable<String>(otherDeptName.value);
+    }
+    if (doctorSignature.present) {
+      map['doctor_signature'] = Variable<Uint8List>(doctorSignature.value);
+    }
+    if (issueDate.present) {
+      map['issue_date'] = Variable<DateTime>(issueDate.value);
+    }
+    if (appointmentDate.present) {
+      map['appointment_date'] = Variable<DateTime>(appointmentDate.value);
+    }
+    if (appointmentDept.present) {
+      map['appointment_dept'] = Variable<String>(appointmentDept.value);
+    }
+    if (appointmentRoom.present) {
+      map['appointment_room'] = Variable<String>(appointmentRoom.value);
+    }
+    if (appointmentNumber.present) {
+      map['appointment_number'] = Variable<String>(appointmentNumber.value);
+    }
+    if (referralHospitalName.present) {
+      map['referral_hospital_name'] = Variable<String>(
+        referralHospitalName.value,
+      );
+    }
+    if (referralDeptIdx.present) {
+      map['referral_dept_idx'] = Variable<int>(referralDeptIdx.value);
+    }
+    if (otherReferralDept.present) {
+      map['other_referral_dept'] = Variable<String>(otherReferralDept.value);
+    }
+    if (referralDoctorName.present) {
+      map['referral_doctor_name'] = Variable<String>(referralDoctorName.value);
+    }
+    if (referralAddress.present) {
+      map['referral_address'] = Variable<String>(referralAddress.value);
+    }
+    if (referralPhone.present) {
+      map['referral_phone'] = Variable<String>(referralPhone.value);
+    }
+    if (consentSignature.present) {
+      map['consent_signature'] = Variable<Uint8List>(consentSignature.value);
+    }
+    if (relationToPatient.present) {
+      map['relation_to_patient'] = Variable<String>(relationToPatient.value);
+    }
+    if (consentDateTime.present) {
+      map['consent_date_time'] = Variable<DateTime>(consentDateTime.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ReferralFormsCompanion(')
+          ..write('id: $id, ')
+          ..write('visitId: $visitId, ')
+          ..write('contactName: $contactName, ')
+          ..write('contactPhone: $contactPhone, ')
+          ..write('contactAddress: $contactAddress, ')
+          ..write('mainDiagnosis: $mainDiagnosis, ')
+          ..write('subDiagnosis1: $subDiagnosis1, ')
+          ..write('subDiagnosis2: $subDiagnosis2, ')
+          ..write('lastExamDate: $lastExamDate, ')
+          ..write('lastMedicationDate: $lastMedicationDate, ')
+          ..write('referralPurposeIdx: $referralPurposeIdx, ')
+          ..write('furtherExamDetail: $furtherExamDetail, ')
+          ..write('otherPurposeDetail: $otherPurposeDetail, ')
+          ..write('doctorIdx: $doctorIdx, ')
+          ..write('otherDoctorName: $otherDoctorName, ')
+          ..write('deptIdx: $deptIdx, ')
+          ..write('otherDeptName: $otherDeptName, ')
+          ..write('doctorSignature: $doctorSignature, ')
+          ..write('issueDate: $issueDate, ')
+          ..write('appointmentDate: $appointmentDate, ')
+          ..write('appointmentDept: $appointmentDept, ')
+          ..write('appointmentRoom: $appointmentRoom, ')
+          ..write('appointmentNumber: $appointmentNumber, ')
+          ..write('referralHospitalName: $referralHospitalName, ')
+          ..write('referralDeptIdx: $referralDeptIdx, ')
+          ..write('otherReferralDept: $otherReferralDept, ')
+          ..write('referralDoctorName: $referralDoctorName, ')
+          ..write('referralAddress: $referralAddress, ')
+          ..write('referralPhone: $referralPhone, ')
+          ..write('consentSignature: $consentSignature, ')
+          ..write('relationToPatient: $relationToPatient, ')
+          ..write('consentDateTime: $consentDateTime, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $AmbulanceRecordsTable extends AmbulanceRecords
+    with TableInfo<$AmbulanceRecordsTable, AmbulanceRecord> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $AmbulanceRecordsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _visitIdMeta = const VerificationMeta(
+    'visitId',
+  );
+  @override
+  late final GeneratedColumn<int> visitId = GeneratedColumn<int>(
+    'visit_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'),
+  );
+  static const VerificationMeta _plateNumberMeta = const VerificationMeta(
+    'plateNumber',
+  );
+  @override
+  late final GeneratedColumn<String> plateNumber = GeneratedColumn<String>(
+    'plate_number',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _placeGroupIdxMeta = const VerificationMeta(
+    'placeGroupIdx',
+  );
+  @override
+  late final GeneratedColumn<int> placeGroupIdx = GeneratedColumn<int>(
+    'place_group_idx',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _t1PlaceIdxMeta = const VerificationMeta(
+    't1PlaceIdx',
+  );
+  @override
+  late final GeneratedColumn<int> t1PlaceIdx = GeneratedColumn<int>(
+    't1_place_idx',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _t2PlaceIdxMeta = const VerificationMeta(
+    't2PlaceIdx',
+  );
+  @override
+  late final GeneratedColumn<int> t2PlaceIdx = GeneratedColumn<int>(
+    't2_place_idx',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _remotePlaceIdxMeta = const VerificationMeta(
+    'remotePlaceIdx',
+  );
+  @override
+  late final GeneratedColumn<int> remotePlaceIdx = GeneratedColumn<int>(
+    'remote_place_idx',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _cargoPlaceIdxMeta = const VerificationMeta(
+    'cargoPlaceIdx',
+  );
+  @override
+  late final GeneratedColumn<int> cargoPlaceIdx = GeneratedColumn<int>(
+    'cargo_place_idx',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _novotelPlaceIdxMeta = const VerificationMeta(
+    'novotelPlaceIdx',
+  );
+  @override
+  late final GeneratedColumn<int> novotelPlaceIdx = GeneratedColumn<int>(
+    'novotel_place_idx',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _cabinPlaceIdxMeta = const VerificationMeta(
+    'cabinPlaceIdx',
+  );
+  @override
+  late final GeneratedColumn<int> cabinPlaceIdx = GeneratedColumn<int>(
+    'cabin_place_idx',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _placeNoteMeta = const VerificationMeta(
+    'placeNote',
+  );
+  @override
+  late final GeneratedColumn<String> placeNote = GeneratedColumn<String>(
+    'place_note',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _dutyTimeMeta = const VerificationMeta(
+    'dutyTime',
+  );
+  @override
+  late final GeneratedColumn<DateTime> dutyTime = GeneratedColumn<DateTime>(
+    'duty_time',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _arriveSceneTimeMeta = const VerificationMeta(
+    'arriveSceneTime',
+  );
+  @override
+  late final GeneratedColumn<DateTime> arriveSceneTime =
+      GeneratedColumn<DateTime>(
+        'arrive_scene_time',
+        aliasedName,
+        true,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _leaveSceneTimeMeta = const VerificationMeta(
+    'leaveSceneTime',
+  );
+  @override
+  late final GeneratedColumn<DateTime> leaveSceneTime =
+      GeneratedColumn<DateTime>(
+        'leave_scene_time',
+        aliasedName,
+        true,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _arriveHospitalTimeMeta =
+      const VerificationMeta('arriveHospitalTime');
+  @override
+  late final GeneratedColumn<DateTime> arriveHospitalTime =
+      GeneratedColumn<DateTime>(
+        'arrive_hospital_time',
+        aliasedName,
+        true,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _leaveHospitalTimeMeta = const VerificationMeta(
+    'leaveHospitalTime',
+  );
+  @override
+  late final GeneratedColumn<DateTime> leaveHospitalTime =
+      GeneratedColumn<DateTime>(
+        'leave_hospital_time',
+        aliasedName,
+        true,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _backStandbyTimeMeta = const VerificationMeta(
+    'backStandbyTime',
+  );
+  @override
+  late final GeneratedColumn<DateTime> backStandbyTime =
+      GeneratedColumn<DateTime>(
+        'back_standby_time',
+        aliasedName,
+        true,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _destinationHospitalIdxMeta =
+      const VerificationMeta('destinationHospitalIdx');
+  @override
+  late final GeneratedColumn<int> destinationHospitalIdx = GeneratedColumn<int>(
+    'destination_hospital_idx',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _otherDestinationHospitalMeta =
+      const VerificationMeta('otherDestinationHospital');
+  @override
+  late final GeneratedColumn<String> otherDestinationHospital =
+      GeneratedColumn<String>(
+        'other_destination_hospital',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _destinationHospitalMeta =
+      const VerificationMeta('destinationHospital');
+  @override
+  late final GeneratedColumn<String> destinationHospital =
+      GeneratedColumn<String>(
+        'destination_hospital',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _patientBelongingsMeta = const VerificationMeta(
+    'patientBelongings',
+  );
+  @override
+  late final GeneratedColumn<String> patientBelongings =
+      GeneratedColumn<String>(
+        'patient_belongings',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _belongingsHandledMeta = const VerificationMeta(
+    'belongingsHandled',
+  );
+  @override
+  late final GeneratedColumn<String> belongingsHandled =
+      GeneratedColumn<String>(
+        'belongings_handled',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _custodianNameMeta = const VerificationMeta(
+    'custodianName',
+  );
+  @override
+  late final GeneratedColumn<String> custodianName = GeneratedColumn<String>(
+    'custodian_name',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _custodianSignatureMeta =
+      const VerificationMeta('custodianSignature');
+  @override
+  late final GeneratedColumn<Uint8List> custodianSignature =
+      GeneratedColumn<Uint8List>(
+        'custodian_signature',
+        aliasedName,
+        true,
+        type: DriftSqlType.blob,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _chiefComplaintMeta = const VerificationMeta(
+    'chiefComplaint',
+  );
+  @override
+  late final GeneratedColumn<String> chiefComplaint = GeneratedColumn<String>(
+    'chief_complaint',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _emergencyTreatmentsJsonMeta =
+      const VerificationMeta('emergencyTreatmentsJson');
+  @override
+  late final GeneratedColumn<String> emergencyTreatmentsJson =
+      GeneratedColumn<String>(
+        'emergency_treatments_json',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: const Constant('{}'),
+      );
+  static const VerificationMeta _airwayTreatmentsJsonMeta =
+      const VerificationMeta('airwayTreatmentsJson');
+  @override
+  late final GeneratedColumn<String> airwayTreatmentsJson =
+      GeneratedColumn<String>(
+        'airway_treatments_json',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: const Constant('{}'),
+      );
+  static const VerificationMeta _traumaTreatmentsJsonMeta =
+      const VerificationMeta('traumaTreatmentsJson');
+  @override
+  late final GeneratedColumn<String> traumaTreatmentsJson =
+      GeneratedColumn<String>(
+        'trauma_treatments_json',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: const Constant('{}'),
+      );
+  static const VerificationMeta _transportMethodsJsonMeta =
+      const VerificationMeta('transportMethodsJson');
+  @override
+  late final GeneratedColumn<String> transportMethodsJson =
+      GeneratedColumn<String>(
+        'transport_methods_json',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: const Constant('{}'),
+      );
+  static const VerificationMeta _cprMethodsJsonMeta = const VerificationMeta(
+    'cprMethodsJson',
+  );
+  @override
+  late final GeneratedColumn<String> cprMethodsJson = GeneratedColumn<String>(
+    'cpr_methods_json',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('{}'),
+  );
+  static const VerificationMeta _medicationProceduresJsonMeta =
+      const VerificationMeta('medicationProceduresJson');
+  @override
+  late final GeneratedColumn<String> medicationProceduresJson =
+      GeneratedColumn<String>(
+        'medication_procedures_json',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: const Constant('{}'),
+      );
+  static const VerificationMeta _otherEmergencyProceduresJsonMeta =
+      const VerificationMeta('otherEmergencyProceduresJson');
+  @override
+  late final GeneratedColumn<String> otherEmergencyProceduresJson =
+      GeneratedColumn<String>(
+        'other_emergency_procedures_json',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: const Constant('{}'),
+      );
+  static const VerificationMeta _bodyDiagramNoteMeta = const VerificationMeta(
+    'bodyDiagramNote',
+  );
+  @override
+  late final GeneratedColumn<String> bodyDiagramNote = GeneratedColumn<String>(
+    'body_diagram_note',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _bodyDiagramPathMeta = const VerificationMeta(
+    'bodyDiagramPath',
+  );
+  @override
+  late final GeneratedColumn<String> bodyDiagramPath = GeneratedColumn<String>(
+    'body_diagram_path',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _aslTypeMeta = const VerificationMeta(
+    'aslType',
+  );
+  @override
+  late final GeneratedColumn<String> aslType = GeneratedColumn<String>(
+    'asl_type',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _ettSizeMeta = const VerificationMeta(
+    'ettSize',
+  );
+  @override
+  late final GeneratedColumn<String> ettSize = GeneratedColumn<String>(
+    'ett_size',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _ettDepthMeta = const VerificationMeta(
+    'ettDepth',
+  );
+  @override
+  late final GeneratedColumn<String> ettDepth = GeneratedColumn<String>(
+    'ett_depth',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _manualDefibCountMeta = const VerificationMeta(
+    'manualDefibCount',
+  );
+  @override
+  late final GeneratedColumn<String> manualDefibCount = GeneratedColumn<String>(
+    'manual_defib_count',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _manualDefibJoulesMeta = const VerificationMeta(
+    'manualDefibJoules',
+  );
+  @override
+  late final GeneratedColumn<String> manualDefibJoules =
+      GeneratedColumn<String>(
+        'manual_defib_joules',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _guideNoteMeta = const VerificationMeta(
+    'guideNote',
+  );
+  @override
+  late final GeneratedColumn<String> guideNote = GeneratedColumn<String>(
+    'guide_note',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _receivingUnitMeta = const VerificationMeta(
+    'receivingUnit',
+  );
+  @override
+  late final GeneratedColumn<String> receivingUnit = GeneratedColumn<String>(
+    'receiving_unit',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _receivingTimeMeta = const VerificationMeta(
+    'receivingTime',
+  );
+  @override
+  late final GeneratedColumn<DateTime> receivingTime =
+      GeneratedColumn<DateTime>(
+        'receiving_time',
+        aliasedName,
+        true,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _isRejectionMeta = const VerificationMeta(
+    'isRejection',
+  );
+  @override
+  late final GeneratedColumn<bool> isRejection = GeneratedColumn<bool>(
+    'is_rejection',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_rejection" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _rejectionNameMeta = const VerificationMeta(
+    'rejectionName',
+  );
+  @override
+  late final GeneratedColumn<String> rejectionName = GeneratedColumn<String>(
+    'rejection_name',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _relationshipTypeMeta = const VerificationMeta(
+    'relationshipType',
+  );
+  @override
+  late final GeneratedColumn<String> relationshipType = GeneratedColumn<String>(
+    'relationship_type',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _contactNameMeta = const VerificationMeta(
+    'contactName',
+  );
+  @override
+  late final GeneratedColumn<String> contactName = GeneratedColumn<String>(
+    'contact_name',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _contactPhoneMeta = const VerificationMeta(
+    'contactPhone',
+  );
+  @override
+  late final GeneratedColumn<String> contactPhone = GeneratedColumn<String>(
+    'contact_phone',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _staffFeeMeta = const VerificationMeta(
+    'staffFee',
+  );
+  @override
+  late final GeneratedColumn<int> staffFee = GeneratedColumn<int>(
+    'staff_fee',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _oxygenFeeMeta = const VerificationMeta(
+    'oxygenFee',
+  );
+  @override
+  late final GeneratedColumn<int> oxygenFee = GeneratedColumn<int>(
+    'oxygen_fee',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _totalFeeMeta = const VerificationMeta(
+    'totalFee',
+  );
+  @override
+  late final GeneratedColumn<int> totalFee = GeneratedColumn<int>(
+    'total_fee',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _chargeStatusMeta = const VerificationMeta(
+    'chargeStatus',
+  );
+  @override
+  late final GeneratedColumn<String> chargeStatus = GeneratedColumn<String>(
+    'charge_status',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _paidTypeMeta = const VerificationMeta(
+    'paidType',
+  );
+  @override
+  late final GeneratedColumn<String> paidType = GeneratedColumn<String>(
+    'paid_type',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _unpaidTypeMeta = const VerificationMeta(
+    'unpaidType',
+  );
+  @override
+  late final GeneratedColumn<String> unpaidType = GeneratedColumn<String>(
+    'unpaid_type',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _traumaClassJsonMeta = const VerificationMeta(
+    'traumaClassJson',
+  );
+  @override
+  late final GeneratedColumn<String> traumaClassJson = GeneratedColumn<String>(
+    'trauma_class_json',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('[]'),
+  );
+  static const VerificationMeta _nonTraumaTypeJsonMeta = const VerificationMeta(
+    'nonTraumaTypeJson',
+  );
+  @override
+  late final GeneratedColumn<String> nonTraumaTypeJson =
+      GeneratedColumn<String>(
+        'non_trauma_type_json',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: const Constant('[]'),
+      );
+  static const VerificationMeta _nonTraumaAcutePickedJsonMeta =
+      const VerificationMeta('nonTraumaAcutePickedJson');
+  @override
+  late final GeneratedColumn<String> nonTraumaAcutePickedJson =
+      GeneratedColumn<String>(
+        'non_trauma_acute_picked_json',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: const Constant('[]'),
+      );
+  static const VerificationMeta _nonTraumaGeneralPickedJsonMeta =
+      const VerificationMeta('nonTraumaGeneralPickedJson');
+  @override
+  late final GeneratedColumn<String> nonTraumaGeneralPickedJson =
+      GeneratedColumn<String>(
+        'non_trauma_general_picked_json',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: const Constant('[]'),
+      );
+  static const VerificationMeta _traumaTypePickedJsonMeta =
+      const VerificationMeta('traumaTypePickedJson');
+  @override
+  late final GeneratedColumn<String> traumaTypePickedJson =
+      GeneratedColumn<String>(
+        'trauma_type_picked_json',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: const Constant('[]'),
+      );
+  static const VerificationMeta _traumaGeneralBodyPickedJsonMeta =
+      const VerificationMeta('traumaGeneralBodyPickedJson');
+  @override
+  late final GeneratedColumn<String> traumaGeneralBodyPickedJson =
+      GeneratedColumn<String>(
+        'trauma_general_body_picked_json',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: const Constant('[]'),
+      );
+  static const VerificationMeta _traumaMechanismPickedJsonMeta =
+      const VerificationMeta('traumaMechanismPickedJson');
+  @override
+  late final GeneratedColumn<String> traumaMechanismPickedJson =
+      GeneratedColumn<String>(
+        'trauma_mechanism_picked_json',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: const Constant('[]'),
+      );
+  static const VerificationMeta _allergyJsonMeta = const VerificationMeta(
+    'allergyJson',
+  );
+  @override
+  late final GeneratedColumn<String> allergyJson = GeneratedColumn<String>(
+    'allergy_json',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('[]'),
+  );
+  static const VerificationMeta _pmhJsonMeta = const VerificationMeta(
+    'pmhJson',
+  );
+  @override
+  late final GeneratedColumn<String> pmhJson = GeneratedColumn<String>(
+    'pmh_json',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('[]'),
+  );
+  static const VerificationMeta _allergyOtherMeta = const VerificationMeta(
+    'allergyOther',
+  );
+  @override
+  late final GeneratedColumn<String> allergyOther = GeneratedColumn<String>(
+    'allergy_other',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _pmhOtherMeta = const VerificationMeta(
+    'pmhOther',
+  );
+  @override
+  late final GeneratedColumn<String> pmhOther = GeneratedColumn<String>(
+    'pmh_other',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _nonTraumaAcuteOtherMeta =
+      const VerificationMeta('nonTraumaAcuteOther');
+  @override
+  late final GeneratedColumn<String> nonTraumaAcuteOther =
+      GeneratedColumn<String>(
+        'non_trauma_acute_other',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _traumaGeneralOtherMeta =
+      const VerificationMeta('traumaGeneralOther');
+  @override
+  late final GeneratedColumn<String> traumaGeneralOther =
+      GeneratedColumn<String>(
+        'trauma_general_other',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _fallHeightMeta = const VerificationMeta(
+    'fallHeight',
+  );
+  @override
+  late final GeneratedColumn<String> fallHeight = GeneratedColumn<String>(
+    'fall_height',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _burnDegreeMeta = const VerificationMeta(
+    'burnDegree',
+  );
+  @override
+  late final GeneratedColumn<String> burnDegree = GeneratedColumn<String>(
+    'burn_degree',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _burnAreaMeta = const VerificationMeta(
+    'burnArea',
+  );
+  @override
+  late final GeneratedColumn<String> burnArea = GeneratedColumn<String>(
+    'burn_area',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _traumaOtherMeta = const VerificationMeta(
+    'traumaOther',
+  );
+  @override
+  late final GeneratedColumn<String> traumaOther = GeneratedColumn<String>(
+    'trauma_other',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _isProxyStatementMeta = const VerificationMeta(
+    'isProxyStatement',
+  );
+  @override
+  late final GeneratedColumn<bool> isProxyStatement = GeneratedColumn<bool>(
+    'is_proxy_statement',
+    aliasedName,
+    true,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_proxy_statement" IN (0, 1))',
+    ),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    visitId,
+    plateNumber,
+    placeGroupIdx,
+    t1PlaceIdx,
+    t2PlaceIdx,
+    remotePlaceIdx,
+    cargoPlaceIdx,
+    novotelPlaceIdx,
+    cabinPlaceIdx,
+    placeNote,
+    dutyTime,
+    arriveSceneTime,
+    leaveSceneTime,
+    arriveHospitalTime,
+    leaveHospitalTime,
+    backStandbyTime,
+    destinationHospitalIdx,
+    otherDestinationHospital,
+    destinationHospital,
+    patientBelongings,
+    belongingsHandled,
+    custodianName,
+    custodianSignature,
+    chiefComplaint,
+    emergencyTreatmentsJson,
+    airwayTreatmentsJson,
+    traumaTreatmentsJson,
+    transportMethodsJson,
+    cprMethodsJson,
+    medicationProceduresJson,
+    otherEmergencyProceduresJson,
+    bodyDiagramNote,
+    bodyDiagramPath,
+    aslType,
+    ettSize,
+    ettDepth,
+    manualDefibCount,
+    manualDefibJoules,
+    guideNote,
+    receivingUnit,
+    receivingTime,
+    isRejection,
+    rejectionName,
+    relationshipType,
+    contactName,
+    contactPhone,
+    staffFee,
+    oxygenFee,
+    totalFee,
+    chargeStatus,
+    paidType,
+    unpaidType,
+    traumaClassJson,
+    nonTraumaTypeJson,
+    nonTraumaAcutePickedJson,
+    nonTraumaGeneralPickedJson,
+    traumaTypePickedJson,
+    traumaGeneralBodyPickedJson,
+    traumaMechanismPickedJson,
+    allergyJson,
+    pmhJson,
+    allergyOther,
+    pmhOther,
+    nonTraumaAcuteOther,
+    traumaGeneralOther,
+    fallHeight,
+    burnDegree,
+    burnArea,
+    traumaOther,
+    isProxyStatement,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'ambulance_records';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<AmbulanceRecord> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('visit_id')) {
+      context.handle(
+        _visitIdMeta,
+        visitId.isAcceptableOrUnknown(data['visit_id']!, _visitIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_visitIdMeta);
+    }
+    if (data.containsKey('plate_number')) {
+      context.handle(
+        _plateNumberMeta,
+        plateNumber.isAcceptableOrUnknown(
+          data['plate_number']!,
+          _plateNumberMeta,
+        ),
+      );
+    }
+    if (data.containsKey('place_group_idx')) {
+      context.handle(
+        _placeGroupIdxMeta,
+        placeGroupIdx.isAcceptableOrUnknown(
+          data['place_group_idx']!,
+          _placeGroupIdxMeta,
+        ),
+      );
+    }
+    if (data.containsKey('t1_place_idx')) {
+      context.handle(
+        _t1PlaceIdxMeta,
+        t1PlaceIdx.isAcceptableOrUnknown(
+          data['t1_place_idx']!,
+          _t1PlaceIdxMeta,
+        ),
+      );
+    }
+    if (data.containsKey('t2_place_idx')) {
+      context.handle(
+        _t2PlaceIdxMeta,
+        t2PlaceIdx.isAcceptableOrUnknown(
+          data['t2_place_idx']!,
+          _t2PlaceIdxMeta,
+        ),
+      );
+    }
+    if (data.containsKey('remote_place_idx')) {
+      context.handle(
+        _remotePlaceIdxMeta,
+        remotePlaceIdx.isAcceptableOrUnknown(
+          data['remote_place_idx']!,
+          _remotePlaceIdxMeta,
+        ),
+      );
+    }
+    if (data.containsKey('cargo_place_idx')) {
+      context.handle(
+        _cargoPlaceIdxMeta,
+        cargoPlaceIdx.isAcceptableOrUnknown(
+          data['cargo_place_idx']!,
+          _cargoPlaceIdxMeta,
+        ),
+      );
+    }
+    if (data.containsKey('novotel_place_idx')) {
+      context.handle(
+        _novotelPlaceIdxMeta,
+        novotelPlaceIdx.isAcceptableOrUnknown(
+          data['novotel_place_idx']!,
+          _novotelPlaceIdxMeta,
+        ),
+      );
+    }
+    if (data.containsKey('cabin_place_idx')) {
+      context.handle(
+        _cabinPlaceIdxMeta,
+        cabinPlaceIdx.isAcceptableOrUnknown(
+          data['cabin_place_idx']!,
+          _cabinPlaceIdxMeta,
+        ),
+      );
+    }
+    if (data.containsKey('place_note')) {
+      context.handle(
+        _placeNoteMeta,
+        placeNote.isAcceptableOrUnknown(data['place_note']!, _placeNoteMeta),
+      );
+    }
+    if (data.containsKey('duty_time')) {
+      context.handle(
+        _dutyTimeMeta,
+        dutyTime.isAcceptableOrUnknown(data['duty_time']!, _dutyTimeMeta),
+      );
+    }
+    if (data.containsKey('arrive_scene_time')) {
+      context.handle(
+        _arriveSceneTimeMeta,
+        arriveSceneTime.isAcceptableOrUnknown(
+          data['arrive_scene_time']!,
+          _arriveSceneTimeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('leave_scene_time')) {
+      context.handle(
+        _leaveSceneTimeMeta,
+        leaveSceneTime.isAcceptableOrUnknown(
+          data['leave_scene_time']!,
+          _leaveSceneTimeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('arrive_hospital_time')) {
+      context.handle(
+        _arriveHospitalTimeMeta,
+        arriveHospitalTime.isAcceptableOrUnknown(
+          data['arrive_hospital_time']!,
+          _arriveHospitalTimeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('leave_hospital_time')) {
+      context.handle(
+        _leaveHospitalTimeMeta,
+        leaveHospitalTime.isAcceptableOrUnknown(
+          data['leave_hospital_time']!,
+          _leaveHospitalTimeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('back_standby_time')) {
+      context.handle(
+        _backStandbyTimeMeta,
+        backStandbyTime.isAcceptableOrUnknown(
+          data['back_standby_time']!,
+          _backStandbyTimeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('destination_hospital_idx')) {
+      context.handle(
+        _destinationHospitalIdxMeta,
+        destinationHospitalIdx.isAcceptableOrUnknown(
+          data['destination_hospital_idx']!,
+          _destinationHospitalIdxMeta,
+        ),
+      );
+    }
+    if (data.containsKey('other_destination_hospital')) {
+      context.handle(
+        _otherDestinationHospitalMeta,
+        otherDestinationHospital.isAcceptableOrUnknown(
+          data['other_destination_hospital']!,
+          _otherDestinationHospitalMeta,
+        ),
+      );
+    }
+    if (data.containsKey('destination_hospital')) {
+      context.handle(
+        _destinationHospitalMeta,
+        destinationHospital.isAcceptableOrUnknown(
+          data['destination_hospital']!,
+          _destinationHospitalMeta,
+        ),
+      );
+    }
+    if (data.containsKey('patient_belongings')) {
+      context.handle(
+        _patientBelongingsMeta,
+        patientBelongings.isAcceptableOrUnknown(
+          data['patient_belongings']!,
+          _patientBelongingsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('belongings_handled')) {
+      context.handle(
+        _belongingsHandledMeta,
+        belongingsHandled.isAcceptableOrUnknown(
+          data['belongings_handled']!,
+          _belongingsHandledMeta,
+        ),
+      );
+    }
+    if (data.containsKey('custodian_name')) {
+      context.handle(
+        _custodianNameMeta,
+        custodianName.isAcceptableOrUnknown(
+          data['custodian_name']!,
+          _custodianNameMeta,
+        ),
+      );
+    }
+    if (data.containsKey('custodian_signature')) {
+      context.handle(
+        _custodianSignatureMeta,
+        custodianSignature.isAcceptableOrUnknown(
+          data['custodian_signature']!,
+          _custodianSignatureMeta,
+        ),
+      );
+    }
+    if (data.containsKey('chief_complaint')) {
+      context.handle(
+        _chiefComplaintMeta,
+        chiefComplaint.isAcceptableOrUnknown(
+          data['chief_complaint']!,
+          _chiefComplaintMeta,
+        ),
+      );
+    }
+    if (data.containsKey('emergency_treatments_json')) {
+      context.handle(
+        _emergencyTreatmentsJsonMeta,
+        emergencyTreatmentsJson.isAcceptableOrUnknown(
+          data['emergency_treatments_json']!,
+          _emergencyTreatmentsJsonMeta,
+        ),
+      );
+    }
+    if (data.containsKey('airway_treatments_json')) {
+      context.handle(
+        _airwayTreatmentsJsonMeta,
+        airwayTreatmentsJson.isAcceptableOrUnknown(
+          data['airway_treatments_json']!,
+          _airwayTreatmentsJsonMeta,
+        ),
+      );
+    }
+    if (data.containsKey('trauma_treatments_json')) {
+      context.handle(
+        _traumaTreatmentsJsonMeta,
+        traumaTreatmentsJson.isAcceptableOrUnknown(
+          data['trauma_treatments_json']!,
+          _traumaTreatmentsJsonMeta,
+        ),
+      );
+    }
+    if (data.containsKey('transport_methods_json')) {
+      context.handle(
+        _transportMethodsJsonMeta,
+        transportMethodsJson.isAcceptableOrUnknown(
+          data['transport_methods_json']!,
+          _transportMethodsJsonMeta,
+        ),
+      );
+    }
+    if (data.containsKey('cpr_methods_json')) {
+      context.handle(
+        _cprMethodsJsonMeta,
+        cprMethodsJson.isAcceptableOrUnknown(
+          data['cpr_methods_json']!,
+          _cprMethodsJsonMeta,
+        ),
+      );
+    }
+    if (data.containsKey('medication_procedures_json')) {
+      context.handle(
+        _medicationProceduresJsonMeta,
+        medicationProceduresJson.isAcceptableOrUnknown(
+          data['medication_procedures_json']!,
+          _medicationProceduresJsonMeta,
+        ),
+      );
+    }
+    if (data.containsKey('other_emergency_procedures_json')) {
+      context.handle(
+        _otherEmergencyProceduresJsonMeta,
+        otherEmergencyProceduresJson.isAcceptableOrUnknown(
+          data['other_emergency_procedures_json']!,
+          _otherEmergencyProceduresJsonMeta,
+        ),
+      );
+    }
+    if (data.containsKey('body_diagram_note')) {
+      context.handle(
+        _bodyDiagramNoteMeta,
+        bodyDiagramNote.isAcceptableOrUnknown(
+          data['body_diagram_note']!,
+          _bodyDiagramNoteMeta,
+        ),
+      );
+    }
+    if (data.containsKey('body_diagram_path')) {
+      context.handle(
+        _bodyDiagramPathMeta,
+        bodyDiagramPath.isAcceptableOrUnknown(
+          data['body_diagram_path']!,
+          _bodyDiagramPathMeta,
+        ),
+      );
+    }
+    if (data.containsKey('asl_type')) {
+      context.handle(
+        _aslTypeMeta,
+        aslType.isAcceptableOrUnknown(data['asl_type']!, _aslTypeMeta),
+      );
+    }
+    if (data.containsKey('ett_size')) {
+      context.handle(
+        _ettSizeMeta,
+        ettSize.isAcceptableOrUnknown(data['ett_size']!, _ettSizeMeta),
+      );
+    }
+    if (data.containsKey('ett_depth')) {
+      context.handle(
+        _ettDepthMeta,
+        ettDepth.isAcceptableOrUnknown(data['ett_depth']!, _ettDepthMeta),
+      );
+    }
+    if (data.containsKey('manual_defib_count')) {
+      context.handle(
+        _manualDefibCountMeta,
+        manualDefibCount.isAcceptableOrUnknown(
+          data['manual_defib_count']!,
+          _manualDefibCountMeta,
+        ),
+      );
+    }
+    if (data.containsKey('manual_defib_joules')) {
+      context.handle(
+        _manualDefibJoulesMeta,
+        manualDefibJoules.isAcceptableOrUnknown(
+          data['manual_defib_joules']!,
+          _manualDefibJoulesMeta,
+        ),
+      );
+    }
+    if (data.containsKey('guide_note')) {
+      context.handle(
+        _guideNoteMeta,
+        guideNote.isAcceptableOrUnknown(data['guide_note']!, _guideNoteMeta),
+      );
+    }
+    if (data.containsKey('receiving_unit')) {
+      context.handle(
+        _receivingUnitMeta,
+        receivingUnit.isAcceptableOrUnknown(
+          data['receiving_unit']!,
+          _receivingUnitMeta,
+        ),
+      );
+    }
+    if (data.containsKey('receiving_time')) {
+      context.handle(
+        _receivingTimeMeta,
+        receivingTime.isAcceptableOrUnknown(
+          data['receiving_time']!,
+          _receivingTimeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('is_rejection')) {
+      context.handle(
+        _isRejectionMeta,
+        isRejection.isAcceptableOrUnknown(
+          data['is_rejection']!,
+          _isRejectionMeta,
+        ),
+      );
+    }
+    if (data.containsKey('rejection_name')) {
+      context.handle(
+        _rejectionNameMeta,
+        rejectionName.isAcceptableOrUnknown(
+          data['rejection_name']!,
+          _rejectionNameMeta,
+        ),
+      );
+    }
+    if (data.containsKey('relationship_type')) {
+      context.handle(
+        _relationshipTypeMeta,
+        relationshipType.isAcceptableOrUnknown(
+          data['relationship_type']!,
+          _relationshipTypeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('contact_name')) {
+      context.handle(
+        _contactNameMeta,
+        contactName.isAcceptableOrUnknown(
+          data['contact_name']!,
+          _contactNameMeta,
+        ),
+      );
+    }
+    if (data.containsKey('contact_phone')) {
+      context.handle(
+        _contactPhoneMeta,
+        contactPhone.isAcceptableOrUnknown(
+          data['contact_phone']!,
+          _contactPhoneMeta,
+        ),
+      );
+    }
+    if (data.containsKey('staff_fee')) {
+      context.handle(
+        _staffFeeMeta,
+        staffFee.isAcceptableOrUnknown(data['staff_fee']!, _staffFeeMeta),
+      );
+    }
+    if (data.containsKey('oxygen_fee')) {
+      context.handle(
+        _oxygenFeeMeta,
+        oxygenFee.isAcceptableOrUnknown(data['oxygen_fee']!, _oxygenFeeMeta),
+      );
+    }
+    if (data.containsKey('total_fee')) {
+      context.handle(
+        _totalFeeMeta,
+        totalFee.isAcceptableOrUnknown(data['total_fee']!, _totalFeeMeta),
+      );
+    }
+    if (data.containsKey('charge_status')) {
+      context.handle(
+        _chargeStatusMeta,
+        chargeStatus.isAcceptableOrUnknown(
+          data['charge_status']!,
+          _chargeStatusMeta,
+        ),
+      );
+    }
+    if (data.containsKey('paid_type')) {
+      context.handle(
+        _paidTypeMeta,
+        paidType.isAcceptableOrUnknown(data['paid_type']!, _paidTypeMeta),
+      );
+    }
+    if (data.containsKey('unpaid_type')) {
+      context.handle(
+        _unpaidTypeMeta,
+        unpaidType.isAcceptableOrUnknown(data['unpaid_type']!, _unpaidTypeMeta),
+      );
+    }
+    if (data.containsKey('trauma_class_json')) {
+      context.handle(
+        _traumaClassJsonMeta,
+        traumaClassJson.isAcceptableOrUnknown(
+          data['trauma_class_json']!,
+          _traumaClassJsonMeta,
+        ),
+      );
+    }
+    if (data.containsKey('non_trauma_type_json')) {
+      context.handle(
+        _nonTraumaTypeJsonMeta,
+        nonTraumaTypeJson.isAcceptableOrUnknown(
+          data['non_trauma_type_json']!,
+          _nonTraumaTypeJsonMeta,
+        ),
+      );
+    }
+    if (data.containsKey('non_trauma_acute_picked_json')) {
+      context.handle(
+        _nonTraumaAcutePickedJsonMeta,
+        nonTraumaAcutePickedJson.isAcceptableOrUnknown(
+          data['non_trauma_acute_picked_json']!,
+          _nonTraumaAcutePickedJsonMeta,
+        ),
+      );
+    }
+    if (data.containsKey('non_trauma_general_picked_json')) {
+      context.handle(
+        _nonTraumaGeneralPickedJsonMeta,
+        nonTraumaGeneralPickedJson.isAcceptableOrUnknown(
+          data['non_trauma_general_picked_json']!,
+          _nonTraumaGeneralPickedJsonMeta,
+        ),
+      );
+    }
+    if (data.containsKey('trauma_type_picked_json')) {
+      context.handle(
+        _traumaTypePickedJsonMeta,
+        traumaTypePickedJson.isAcceptableOrUnknown(
+          data['trauma_type_picked_json']!,
+          _traumaTypePickedJsonMeta,
+        ),
+      );
+    }
+    if (data.containsKey('trauma_general_body_picked_json')) {
+      context.handle(
+        _traumaGeneralBodyPickedJsonMeta,
+        traumaGeneralBodyPickedJson.isAcceptableOrUnknown(
+          data['trauma_general_body_picked_json']!,
+          _traumaGeneralBodyPickedJsonMeta,
+        ),
+      );
+    }
+    if (data.containsKey('trauma_mechanism_picked_json')) {
+      context.handle(
+        _traumaMechanismPickedJsonMeta,
+        traumaMechanismPickedJson.isAcceptableOrUnknown(
+          data['trauma_mechanism_picked_json']!,
+          _traumaMechanismPickedJsonMeta,
+        ),
+      );
+    }
+    if (data.containsKey('allergy_json')) {
+      context.handle(
+        _allergyJsonMeta,
+        allergyJson.isAcceptableOrUnknown(
+          data['allergy_json']!,
+          _allergyJsonMeta,
+        ),
+      );
+    }
+    if (data.containsKey('pmh_json')) {
+      context.handle(
+        _pmhJsonMeta,
+        pmhJson.isAcceptableOrUnknown(data['pmh_json']!, _pmhJsonMeta),
+      );
+    }
+    if (data.containsKey('allergy_other')) {
+      context.handle(
+        _allergyOtherMeta,
+        allergyOther.isAcceptableOrUnknown(
+          data['allergy_other']!,
+          _allergyOtherMeta,
+        ),
+      );
+    }
+    if (data.containsKey('pmh_other')) {
+      context.handle(
+        _pmhOtherMeta,
+        pmhOther.isAcceptableOrUnknown(data['pmh_other']!, _pmhOtherMeta),
+      );
+    }
+    if (data.containsKey('non_trauma_acute_other')) {
+      context.handle(
+        _nonTraumaAcuteOtherMeta,
+        nonTraumaAcuteOther.isAcceptableOrUnknown(
+          data['non_trauma_acute_other']!,
+          _nonTraumaAcuteOtherMeta,
+        ),
+      );
+    }
+    if (data.containsKey('trauma_general_other')) {
+      context.handle(
+        _traumaGeneralOtherMeta,
+        traumaGeneralOther.isAcceptableOrUnknown(
+          data['trauma_general_other']!,
+          _traumaGeneralOtherMeta,
+        ),
+      );
+    }
+    if (data.containsKey('fall_height')) {
+      context.handle(
+        _fallHeightMeta,
+        fallHeight.isAcceptableOrUnknown(data['fall_height']!, _fallHeightMeta),
+      );
+    }
+    if (data.containsKey('burn_degree')) {
+      context.handle(
+        _burnDegreeMeta,
+        burnDegree.isAcceptableOrUnknown(data['burn_degree']!, _burnDegreeMeta),
+      );
+    }
+    if (data.containsKey('burn_area')) {
+      context.handle(
+        _burnAreaMeta,
+        burnArea.isAcceptableOrUnknown(data['burn_area']!, _burnAreaMeta),
+      );
+    }
+    if (data.containsKey('trauma_other')) {
+      context.handle(
+        _traumaOtherMeta,
+        traumaOther.isAcceptableOrUnknown(
+          data['trauma_other']!,
+          _traumaOtherMeta,
+        ),
+      );
+    }
+    if (data.containsKey('is_proxy_statement')) {
+      context.handle(
+        _isProxyStatementMeta,
+        isProxyStatement.isAcceptableOrUnknown(
+          data['is_proxy_statement']!,
+          _isProxyStatementMeta,
+        ),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  AmbulanceRecord map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return AmbulanceRecord(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      visitId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}visit_id'],
+      )!,
+      plateNumber: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}plate_number'],
+      ),
+      placeGroupIdx: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}place_group_idx'],
+      ),
+      t1PlaceIdx: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}t1_place_idx'],
+      ),
+      t2PlaceIdx: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}t2_place_idx'],
+      ),
+      remotePlaceIdx: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}remote_place_idx'],
+      ),
+      cargoPlaceIdx: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}cargo_place_idx'],
+      ),
+      novotelPlaceIdx: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}novotel_place_idx'],
+      ),
+      cabinPlaceIdx: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}cabin_place_idx'],
+      ),
+      placeNote: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}place_note'],
+      ),
+      dutyTime: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}duty_time'],
+      ),
+      arriveSceneTime: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}arrive_scene_time'],
+      ),
+      leaveSceneTime: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}leave_scene_time'],
+      ),
+      arriveHospitalTime: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}arrive_hospital_time'],
+      ),
+      leaveHospitalTime: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}leave_hospital_time'],
+      ),
+      backStandbyTime: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}back_standby_time'],
+      ),
+      destinationHospitalIdx: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}destination_hospital_idx'],
+      ),
+      otherDestinationHospital: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}other_destination_hospital'],
+      ),
+      destinationHospital: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}destination_hospital'],
+      ),
+      patientBelongings: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}patient_belongings'],
+      ),
+      belongingsHandled: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}belongings_handled'],
+      ),
+      custodianName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}custodian_name'],
+      ),
+      custodianSignature: attachedDatabase.typeMapping.read(
+        DriftSqlType.blob,
+        data['${effectivePrefix}custodian_signature'],
+      ),
+      chiefComplaint: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}chief_complaint'],
+      ),
+      emergencyTreatmentsJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}emergency_treatments_json'],
+      )!,
+      airwayTreatmentsJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}airway_treatments_json'],
+      )!,
+      traumaTreatmentsJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}trauma_treatments_json'],
+      )!,
+      transportMethodsJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}transport_methods_json'],
+      )!,
+      cprMethodsJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}cpr_methods_json'],
+      )!,
+      medicationProceduresJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}medication_procedures_json'],
+      )!,
+      otherEmergencyProceduresJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}other_emergency_procedures_json'],
+      )!,
+      bodyDiagramNote: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}body_diagram_note'],
+      ),
+      bodyDiagramPath: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}body_diagram_path'],
+      ),
+      aslType: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}asl_type'],
+      ),
+      ettSize: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}ett_size'],
+      ),
+      ettDepth: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}ett_depth'],
+      ),
+      manualDefibCount: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}manual_defib_count'],
+      ),
+      manualDefibJoules: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}manual_defib_joules'],
+      ),
+      guideNote: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}guide_note'],
+      ),
+      receivingUnit: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}receiving_unit'],
+      ),
+      receivingTime: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}receiving_time'],
+      ),
+      isRejection: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_rejection'],
+      )!,
+      rejectionName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}rejection_name'],
+      ),
+      relationshipType: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}relationship_type'],
+      ),
+      contactName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}contact_name'],
+      ),
+      contactPhone: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}contact_phone'],
+      ),
+      staffFee: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}staff_fee'],
+      ),
+      oxygenFee: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}oxygen_fee'],
+      ),
+      totalFee: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}total_fee'],
+      ),
+      chargeStatus: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}charge_status'],
+      ),
+      paidType: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}paid_type'],
+      ),
+      unpaidType: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}unpaid_type'],
+      ),
+      traumaClassJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}trauma_class_json'],
+      )!,
+      nonTraumaTypeJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}non_trauma_type_json'],
+      )!,
+      nonTraumaAcutePickedJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}non_trauma_acute_picked_json'],
+      )!,
+      nonTraumaGeneralPickedJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}non_trauma_general_picked_json'],
+      )!,
+      traumaTypePickedJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}trauma_type_picked_json'],
+      )!,
+      traumaGeneralBodyPickedJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}trauma_general_body_picked_json'],
+      )!,
+      traumaMechanismPickedJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}trauma_mechanism_picked_json'],
+      )!,
+      allergyJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}allergy_json'],
+      )!,
+      pmhJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}pmh_json'],
+      )!,
+      allergyOther: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}allergy_other'],
+      ),
+      pmhOther: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}pmh_other'],
+      ),
+      nonTraumaAcuteOther: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}non_trauma_acute_other'],
+      ),
+      traumaGeneralOther: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}trauma_general_other'],
+      ),
+      fallHeight: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}fall_height'],
+      ),
+      burnDegree: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}burn_degree'],
+      ),
+      burnArea: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}burn_area'],
+      ),
+      traumaOther: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}trauma_other'],
+      ),
+      isProxyStatement: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_proxy_statement'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $AmbulanceRecordsTable createAlias(String alias) {
+    return $AmbulanceRecordsTable(attachedDatabase, alias);
+  }
+}
+
+class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
+  final int id;
+  final int visitId;
+  final String? plateNumber;
+  final int? placeGroupIdx;
+  final int? t1PlaceIdx;
+  final int? t2PlaceIdx;
+  final int? remotePlaceIdx;
+  final int? cargoPlaceIdx;
+  final int? novotelPlaceIdx;
+  final int? cabinPlaceIdx;
+  final String? placeNote;
+  final DateTime? dutyTime;
+  final DateTime? arriveSceneTime;
+  final DateTime? leaveSceneTime;
+  final DateTime? arriveHospitalTime;
+  final DateTime? leaveHospitalTime;
+  final DateTime? backStandbyTime;
+  final int? destinationHospitalIdx;
+  final String? otherDestinationHospital;
+  final String? destinationHospital;
+  final String? patientBelongings;
+  final String? belongingsHandled;
+  final String? custodianName;
+  final Uint8List? custodianSignature;
+  final String? chiefComplaint;
+  final String emergencyTreatmentsJson;
+  final String airwayTreatmentsJson;
+  final String traumaTreatmentsJson;
+  final String transportMethodsJson;
+  final String cprMethodsJson;
+  final String medicationProceduresJson;
+  final String otherEmergencyProceduresJson;
+  final String? bodyDiagramNote;
+  final String? bodyDiagramPath;
+  final String? aslType;
+  final String? ettSize;
+  final String? ettDepth;
+  final String? manualDefibCount;
+  final String? manualDefibJoules;
+  final String? guideNote;
+  final String? receivingUnit;
+  final DateTime? receivingTime;
+  final bool isRejection;
+  final String? rejectionName;
+  final String? relationshipType;
+  final String? contactName;
+  final String? contactPhone;
+  final int? staffFee;
+  final int? oxygenFee;
+  final int? totalFee;
+  final String? chargeStatus;
+  final String? paidType;
+  final String? unpaidType;
+  final String traumaClassJson;
+  final String nonTraumaTypeJson;
+  final String nonTraumaAcutePickedJson;
+  final String nonTraumaGeneralPickedJson;
+  final String traumaTypePickedJson;
+  final String traumaGeneralBodyPickedJson;
+  final String traumaMechanismPickedJson;
+  final String allergyJson;
+  final String pmhJson;
+  final String? allergyOther;
+  final String? pmhOther;
+  final String? nonTraumaAcuteOther;
+  final String? traumaGeneralOther;
+  final String? fallHeight;
+  final String? burnDegree;
+  final String? burnArea;
+  final String? traumaOther;
+  final bool? isProxyStatement;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  const AmbulanceRecord({
+    required this.id,
+    required this.visitId,
+    this.plateNumber,
+    this.placeGroupIdx,
+    this.t1PlaceIdx,
+    this.t2PlaceIdx,
+    this.remotePlaceIdx,
+    this.cargoPlaceIdx,
+    this.novotelPlaceIdx,
+    this.cabinPlaceIdx,
+    this.placeNote,
+    this.dutyTime,
+    this.arriveSceneTime,
+    this.leaveSceneTime,
+    this.arriveHospitalTime,
+    this.leaveHospitalTime,
+    this.backStandbyTime,
+    this.destinationHospitalIdx,
+    this.otherDestinationHospital,
+    this.destinationHospital,
+    this.patientBelongings,
+    this.belongingsHandled,
+    this.custodianName,
+    this.custodianSignature,
+    this.chiefComplaint,
+    required this.emergencyTreatmentsJson,
+    required this.airwayTreatmentsJson,
+    required this.traumaTreatmentsJson,
+    required this.transportMethodsJson,
+    required this.cprMethodsJson,
+    required this.medicationProceduresJson,
+    required this.otherEmergencyProceduresJson,
+    this.bodyDiagramNote,
+    this.bodyDiagramPath,
+    this.aslType,
+    this.ettSize,
+    this.ettDepth,
+    this.manualDefibCount,
+    this.manualDefibJoules,
+    this.guideNote,
+    this.receivingUnit,
+    this.receivingTime,
+    required this.isRejection,
+    this.rejectionName,
+    this.relationshipType,
+    this.contactName,
+    this.contactPhone,
+    this.staffFee,
+    this.oxygenFee,
+    this.totalFee,
+    this.chargeStatus,
+    this.paidType,
+    this.unpaidType,
+    required this.traumaClassJson,
+    required this.nonTraumaTypeJson,
+    required this.nonTraumaAcutePickedJson,
+    required this.nonTraumaGeneralPickedJson,
+    required this.traumaTypePickedJson,
+    required this.traumaGeneralBodyPickedJson,
+    required this.traumaMechanismPickedJson,
+    required this.allergyJson,
+    required this.pmhJson,
+    this.allergyOther,
+    this.pmhOther,
+    this.nonTraumaAcuteOther,
+    this.traumaGeneralOther,
+    this.fallHeight,
+    this.burnDegree,
+    this.burnArea,
+    this.traumaOther,
+    this.isProxyStatement,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['visit_id'] = Variable<int>(visitId);
+    if (!nullToAbsent || plateNumber != null) {
+      map['plate_number'] = Variable<String>(plateNumber);
+    }
+    if (!nullToAbsent || placeGroupIdx != null) {
+      map['place_group_idx'] = Variable<int>(placeGroupIdx);
+    }
+    if (!nullToAbsent || t1PlaceIdx != null) {
+      map['t1_place_idx'] = Variable<int>(t1PlaceIdx);
+    }
+    if (!nullToAbsent || t2PlaceIdx != null) {
+      map['t2_place_idx'] = Variable<int>(t2PlaceIdx);
+    }
+    if (!nullToAbsent || remotePlaceIdx != null) {
+      map['remote_place_idx'] = Variable<int>(remotePlaceIdx);
+    }
+    if (!nullToAbsent || cargoPlaceIdx != null) {
+      map['cargo_place_idx'] = Variable<int>(cargoPlaceIdx);
+    }
+    if (!nullToAbsent || novotelPlaceIdx != null) {
+      map['novotel_place_idx'] = Variable<int>(novotelPlaceIdx);
+    }
+    if (!nullToAbsent || cabinPlaceIdx != null) {
+      map['cabin_place_idx'] = Variable<int>(cabinPlaceIdx);
+    }
+    if (!nullToAbsent || placeNote != null) {
+      map['place_note'] = Variable<String>(placeNote);
+    }
+    if (!nullToAbsent || dutyTime != null) {
+      map['duty_time'] = Variable<DateTime>(dutyTime);
+    }
+    if (!nullToAbsent || arriveSceneTime != null) {
+      map['arrive_scene_time'] = Variable<DateTime>(arriveSceneTime);
+    }
+    if (!nullToAbsent || leaveSceneTime != null) {
+      map['leave_scene_time'] = Variable<DateTime>(leaveSceneTime);
+    }
+    if (!nullToAbsent || arriveHospitalTime != null) {
+      map['arrive_hospital_time'] = Variable<DateTime>(arriveHospitalTime);
+    }
+    if (!nullToAbsent || leaveHospitalTime != null) {
+      map['leave_hospital_time'] = Variable<DateTime>(leaveHospitalTime);
+    }
+    if (!nullToAbsent || backStandbyTime != null) {
+      map['back_standby_time'] = Variable<DateTime>(backStandbyTime);
+    }
+    if (!nullToAbsent || destinationHospitalIdx != null) {
+      map['destination_hospital_idx'] = Variable<int>(destinationHospitalIdx);
+    }
+    if (!nullToAbsent || otherDestinationHospital != null) {
+      map['other_destination_hospital'] = Variable<String>(
+        otherDestinationHospital,
+      );
+    }
+    if (!nullToAbsent || destinationHospital != null) {
+      map['destination_hospital'] = Variable<String>(destinationHospital);
+    }
+    if (!nullToAbsent || patientBelongings != null) {
+      map['patient_belongings'] = Variable<String>(patientBelongings);
+    }
+    if (!nullToAbsent || belongingsHandled != null) {
+      map['belongings_handled'] = Variable<String>(belongingsHandled);
+    }
+    if (!nullToAbsent || custodianName != null) {
+      map['custodian_name'] = Variable<String>(custodianName);
+    }
+    if (!nullToAbsent || custodianSignature != null) {
+      map['custodian_signature'] = Variable<Uint8List>(custodianSignature);
+    }
+    if (!nullToAbsent || chiefComplaint != null) {
+      map['chief_complaint'] = Variable<String>(chiefComplaint);
+    }
+    map['emergency_treatments_json'] = Variable<String>(
+      emergencyTreatmentsJson,
+    );
+    map['airway_treatments_json'] = Variable<String>(airwayTreatmentsJson);
+    map['trauma_treatments_json'] = Variable<String>(traumaTreatmentsJson);
+    map['transport_methods_json'] = Variable<String>(transportMethodsJson);
+    map['cpr_methods_json'] = Variable<String>(cprMethodsJson);
+    map['medication_procedures_json'] = Variable<String>(
+      medicationProceduresJson,
+    );
+    map['other_emergency_procedures_json'] = Variable<String>(
+      otherEmergencyProceduresJson,
+    );
+    if (!nullToAbsent || bodyDiagramNote != null) {
+      map['body_diagram_note'] = Variable<String>(bodyDiagramNote);
+    }
+    if (!nullToAbsent || bodyDiagramPath != null) {
+      map['body_diagram_path'] = Variable<String>(bodyDiagramPath);
+    }
+    if (!nullToAbsent || aslType != null) {
+      map['asl_type'] = Variable<String>(aslType);
+    }
+    if (!nullToAbsent || ettSize != null) {
+      map['ett_size'] = Variable<String>(ettSize);
+    }
+    if (!nullToAbsent || ettDepth != null) {
+      map['ett_depth'] = Variable<String>(ettDepth);
+    }
+    if (!nullToAbsent || manualDefibCount != null) {
+      map['manual_defib_count'] = Variable<String>(manualDefibCount);
+    }
+    if (!nullToAbsent || manualDefibJoules != null) {
+      map['manual_defib_joules'] = Variable<String>(manualDefibJoules);
+    }
+    if (!nullToAbsent || guideNote != null) {
+      map['guide_note'] = Variable<String>(guideNote);
+    }
+    if (!nullToAbsent || receivingUnit != null) {
+      map['receiving_unit'] = Variable<String>(receivingUnit);
+    }
+    if (!nullToAbsent || receivingTime != null) {
+      map['receiving_time'] = Variable<DateTime>(receivingTime);
+    }
+    map['is_rejection'] = Variable<bool>(isRejection);
+    if (!nullToAbsent || rejectionName != null) {
+      map['rejection_name'] = Variable<String>(rejectionName);
+    }
+    if (!nullToAbsent || relationshipType != null) {
+      map['relationship_type'] = Variable<String>(relationshipType);
+    }
+    if (!nullToAbsent || contactName != null) {
+      map['contact_name'] = Variable<String>(contactName);
+    }
+    if (!nullToAbsent || contactPhone != null) {
+      map['contact_phone'] = Variable<String>(contactPhone);
+    }
+    if (!nullToAbsent || staffFee != null) {
+      map['staff_fee'] = Variable<int>(staffFee);
+    }
+    if (!nullToAbsent || oxygenFee != null) {
+      map['oxygen_fee'] = Variable<int>(oxygenFee);
+    }
+    if (!nullToAbsent || totalFee != null) {
+      map['total_fee'] = Variable<int>(totalFee);
+    }
+    if (!nullToAbsent || chargeStatus != null) {
+      map['charge_status'] = Variable<String>(chargeStatus);
+    }
+    if (!nullToAbsent || paidType != null) {
+      map['paid_type'] = Variable<String>(paidType);
+    }
+    if (!nullToAbsent || unpaidType != null) {
+      map['unpaid_type'] = Variable<String>(unpaidType);
+    }
+    map['trauma_class_json'] = Variable<String>(traumaClassJson);
+    map['non_trauma_type_json'] = Variable<String>(nonTraumaTypeJson);
+    map['non_trauma_acute_picked_json'] = Variable<String>(
+      nonTraumaAcutePickedJson,
+    );
+    map['non_trauma_general_picked_json'] = Variable<String>(
+      nonTraumaGeneralPickedJson,
+    );
+    map['trauma_type_picked_json'] = Variable<String>(traumaTypePickedJson);
+    map['trauma_general_body_picked_json'] = Variable<String>(
+      traumaGeneralBodyPickedJson,
+    );
+    map['trauma_mechanism_picked_json'] = Variable<String>(
+      traumaMechanismPickedJson,
+    );
+    map['allergy_json'] = Variable<String>(allergyJson);
+    map['pmh_json'] = Variable<String>(pmhJson);
+    if (!nullToAbsent || allergyOther != null) {
+      map['allergy_other'] = Variable<String>(allergyOther);
+    }
+    if (!nullToAbsent || pmhOther != null) {
+      map['pmh_other'] = Variable<String>(pmhOther);
+    }
+    if (!nullToAbsent || nonTraumaAcuteOther != null) {
+      map['non_trauma_acute_other'] = Variable<String>(nonTraumaAcuteOther);
+    }
+    if (!nullToAbsent || traumaGeneralOther != null) {
+      map['trauma_general_other'] = Variable<String>(traumaGeneralOther);
+    }
+    if (!nullToAbsent || fallHeight != null) {
+      map['fall_height'] = Variable<String>(fallHeight);
+    }
+    if (!nullToAbsent || burnDegree != null) {
+      map['burn_degree'] = Variable<String>(burnDegree);
+    }
+    if (!nullToAbsent || burnArea != null) {
+      map['burn_area'] = Variable<String>(burnArea);
+    }
+    if (!nullToAbsent || traumaOther != null) {
+      map['trauma_other'] = Variable<String>(traumaOther);
+    }
+    if (!nullToAbsent || isProxyStatement != null) {
+      map['is_proxy_statement'] = Variable<bool>(isProxyStatement);
+    }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  AmbulanceRecordsCompanion toCompanion(bool nullToAbsent) {
+    return AmbulanceRecordsCompanion(
+      id: Value(id),
+      visitId: Value(visitId),
+      plateNumber: plateNumber == null && nullToAbsent
+          ? const Value.absent()
+          : Value(plateNumber),
+      placeGroupIdx: placeGroupIdx == null && nullToAbsent
+          ? const Value.absent()
+          : Value(placeGroupIdx),
+      t1PlaceIdx: t1PlaceIdx == null && nullToAbsent
+          ? const Value.absent()
+          : Value(t1PlaceIdx),
+      t2PlaceIdx: t2PlaceIdx == null && nullToAbsent
+          ? const Value.absent()
+          : Value(t2PlaceIdx),
+      remotePlaceIdx: remotePlaceIdx == null && nullToAbsent
+          ? const Value.absent()
+          : Value(remotePlaceIdx),
+      cargoPlaceIdx: cargoPlaceIdx == null && nullToAbsent
+          ? const Value.absent()
+          : Value(cargoPlaceIdx),
+      novotelPlaceIdx: novotelPlaceIdx == null && nullToAbsent
+          ? const Value.absent()
+          : Value(novotelPlaceIdx),
+      cabinPlaceIdx: cabinPlaceIdx == null && nullToAbsent
+          ? const Value.absent()
+          : Value(cabinPlaceIdx),
+      placeNote: placeNote == null && nullToAbsent
+          ? const Value.absent()
+          : Value(placeNote),
+      dutyTime: dutyTime == null && nullToAbsent
+          ? const Value.absent()
+          : Value(dutyTime),
+      arriveSceneTime: arriveSceneTime == null && nullToAbsent
+          ? const Value.absent()
+          : Value(arriveSceneTime),
+      leaveSceneTime: leaveSceneTime == null && nullToAbsent
+          ? const Value.absent()
+          : Value(leaveSceneTime),
+      arriveHospitalTime: arriveHospitalTime == null && nullToAbsent
+          ? const Value.absent()
+          : Value(arriveHospitalTime),
+      leaveHospitalTime: leaveHospitalTime == null && nullToAbsent
+          ? const Value.absent()
+          : Value(leaveHospitalTime),
+      backStandbyTime: backStandbyTime == null && nullToAbsent
+          ? const Value.absent()
+          : Value(backStandbyTime),
+      destinationHospitalIdx: destinationHospitalIdx == null && nullToAbsent
+          ? const Value.absent()
+          : Value(destinationHospitalIdx),
+      otherDestinationHospital: otherDestinationHospital == null && nullToAbsent
+          ? const Value.absent()
+          : Value(otherDestinationHospital),
+      destinationHospital: destinationHospital == null && nullToAbsent
+          ? const Value.absent()
+          : Value(destinationHospital),
+      patientBelongings: patientBelongings == null && nullToAbsent
+          ? const Value.absent()
+          : Value(patientBelongings),
+      belongingsHandled: belongingsHandled == null && nullToAbsent
+          ? const Value.absent()
+          : Value(belongingsHandled),
+      custodianName: custodianName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(custodianName),
+      custodianSignature: custodianSignature == null && nullToAbsent
+          ? const Value.absent()
+          : Value(custodianSignature),
+      chiefComplaint: chiefComplaint == null && nullToAbsent
+          ? const Value.absent()
+          : Value(chiefComplaint),
+      emergencyTreatmentsJson: Value(emergencyTreatmentsJson),
+      airwayTreatmentsJson: Value(airwayTreatmentsJson),
+      traumaTreatmentsJson: Value(traumaTreatmentsJson),
+      transportMethodsJson: Value(transportMethodsJson),
+      cprMethodsJson: Value(cprMethodsJson),
+      medicationProceduresJson: Value(medicationProceduresJson),
+      otherEmergencyProceduresJson: Value(otherEmergencyProceduresJson),
+      bodyDiagramNote: bodyDiagramNote == null && nullToAbsent
+          ? const Value.absent()
+          : Value(bodyDiagramNote),
+      bodyDiagramPath: bodyDiagramPath == null && nullToAbsent
+          ? const Value.absent()
+          : Value(bodyDiagramPath),
+      aslType: aslType == null && nullToAbsent
+          ? const Value.absent()
+          : Value(aslType),
+      ettSize: ettSize == null && nullToAbsent
+          ? const Value.absent()
+          : Value(ettSize),
+      ettDepth: ettDepth == null && nullToAbsent
+          ? const Value.absent()
+          : Value(ettDepth),
+      manualDefibCount: manualDefibCount == null && nullToAbsent
+          ? const Value.absent()
+          : Value(manualDefibCount),
+      manualDefibJoules: manualDefibJoules == null && nullToAbsent
+          ? const Value.absent()
+          : Value(manualDefibJoules),
+      guideNote: guideNote == null && nullToAbsent
+          ? const Value.absent()
+          : Value(guideNote),
+      receivingUnit: receivingUnit == null && nullToAbsent
+          ? const Value.absent()
+          : Value(receivingUnit),
+      receivingTime: receivingTime == null && nullToAbsent
+          ? const Value.absent()
+          : Value(receivingTime),
+      isRejection: Value(isRejection),
+      rejectionName: rejectionName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(rejectionName),
+      relationshipType: relationshipType == null && nullToAbsent
+          ? const Value.absent()
+          : Value(relationshipType),
+      contactName: contactName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(contactName),
+      contactPhone: contactPhone == null && nullToAbsent
+          ? const Value.absent()
+          : Value(contactPhone),
+      staffFee: staffFee == null && nullToAbsent
+          ? const Value.absent()
+          : Value(staffFee),
+      oxygenFee: oxygenFee == null && nullToAbsent
+          ? const Value.absent()
+          : Value(oxygenFee),
+      totalFee: totalFee == null && nullToAbsent
+          ? const Value.absent()
+          : Value(totalFee),
+      chargeStatus: chargeStatus == null && nullToAbsent
+          ? const Value.absent()
+          : Value(chargeStatus),
+      paidType: paidType == null && nullToAbsent
+          ? const Value.absent()
+          : Value(paidType),
+      unpaidType: unpaidType == null && nullToAbsent
+          ? const Value.absent()
+          : Value(unpaidType),
+      traumaClassJson: Value(traumaClassJson),
+      nonTraumaTypeJson: Value(nonTraumaTypeJson),
+      nonTraumaAcutePickedJson: Value(nonTraumaAcutePickedJson),
+      nonTraumaGeneralPickedJson: Value(nonTraumaGeneralPickedJson),
+      traumaTypePickedJson: Value(traumaTypePickedJson),
+      traumaGeneralBodyPickedJson: Value(traumaGeneralBodyPickedJson),
+      traumaMechanismPickedJson: Value(traumaMechanismPickedJson),
+      allergyJson: Value(allergyJson),
+      pmhJson: Value(pmhJson),
+      allergyOther: allergyOther == null && nullToAbsent
+          ? const Value.absent()
+          : Value(allergyOther),
+      pmhOther: pmhOther == null && nullToAbsent
+          ? const Value.absent()
+          : Value(pmhOther),
+      nonTraumaAcuteOther: nonTraumaAcuteOther == null && nullToAbsent
+          ? const Value.absent()
+          : Value(nonTraumaAcuteOther),
+      traumaGeneralOther: traumaGeneralOther == null && nullToAbsent
+          ? const Value.absent()
+          : Value(traumaGeneralOther),
+      fallHeight: fallHeight == null && nullToAbsent
+          ? const Value.absent()
+          : Value(fallHeight),
+      burnDegree: burnDegree == null && nullToAbsent
+          ? const Value.absent()
+          : Value(burnDegree),
+      burnArea: burnArea == null && nullToAbsent
+          ? const Value.absent()
+          : Value(burnArea),
+      traumaOther: traumaOther == null && nullToAbsent
+          ? const Value.absent()
+          : Value(traumaOther),
+      isProxyStatement: isProxyStatement == null && nullToAbsent
+          ? const Value.absent()
+          : Value(isProxyStatement),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory AmbulanceRecord.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return AmbulanceRecord(
+      id: serializer.fromJson<int>(json['id']),
+      visitId: serializer.fromJson<int>(json['visitId']),
+      plateNumber: serializer.fromJson<String?>(json['plateNumber']),
+      placeGroupIdx: serializer.fromJson<int?>(json['placeGroupIdx']),
+      t1PlaceIdx: serializer.fromJson<int?>(json['t1PlaceIdx']),
+      t2PlaceIdx: serializer.fromJson<int?>(json['t2PlaceIdx']),
+      remotePlaceIdx: serializer.fromJson<int?>(json['remotePlaceIdx']),
+      cargoPlaceIdx: serializer.fromJson<int?>(json['cargoPlaceIdx']),
+      novotelPlaceIdx: serializer.fromJson<int?>(json['novotelPlaceIdx']),
+      cabinPlaceIdx: serializer.fromJson<int?>(json['cabinPlaceIdx']),
+      placeNote: serializer.fromJson<String?>(json['placeNote']),
+      dutyTime: serializer.fromJson<DateTime?>(json['dutyTime']),
+      arriveSceneTime: serializer.fromJson<DateTime?>(json['arriveSceneTime']),
+      leaveSceneTime: serializer.fromJson<DateTime?>(json['leaveSceneTime']),
+      arriveHospitalTime: serializer.fromJson<DateTime?>(
+        json['arriveHospitalTime'],
+      ),
+      leaveHospitalTime: serializer.fromJson<DateTime?>(
+        json['leaveHospitalTime'],
+      ),
+      backStandbyTime: serializer.fromJson<DateTime?>(json['backStandbyTime']),
+      destinationHospitalIdx: serializer.fromJson<int?>(
+        json['destinationHospitalIdx'],
+      ),
+      otherDestinationHospital: serializer.fromJson<String?>(
+        json['otherDestinationHospital'],
+      ),
+      destinationHospital: serializer.fromJson<String?>(
+        json['destinationHospital'],
+      ),
+      patientBelongings: serializer.fromJson<String?>(
+        json['patientBelongings'],
+      ),
+      belongingsHandled: serializer.fromJson<String?>(
+        json['belongingsHandled'],
+      ),
+      custodianName: serializer.fromJson<String?>(json['custodianName']),
+      custodianSignature: serializer.fromJson<Uint8List?>(
+        json['custodianSignature'],
+      ),
+      chiefComplaint: serializer.fromJson<String?>(json['chiefComplaint']),
+      emergencyTreatmentsJson: serializer.fromJson<String>(
+        json['emergencyTreatmentsJson'],
+      ),
+      airwayTreatmentsJson: serializer.fromJson<String>(
+        json['airwayTreatmentsJson'],
+      ),
+      traumaTreatmentsJson: serializer.fromJson<String>(
+        json['traumaTreatmentsJson'],
+      ),
+      transportMethodsJson: serializer.fromJson<String>(
+        json['transportMethodsJson'],
+      ),
+      cprMethodsJson: serializer.fromJson<String>(json['cprMethodsJson']),
+      medicationProceduresJson: serializer.fromJson<String>(
+        json['medicationProceduresJson'],
+      ),
+      otherEmergencyProceduresJson: serializer.fromJson<String>(
+        json['otherEmergencyProceduresJson'],
+      ),
+      bodyDiagramNote: serializer.fromJson<String?>(json['bodyDiagramNote']),
+      bodyDiagramPath: serializer.fromJson<String?>(json['bodyDiagramPath']),
+      aslType: serializer.fromJson<String?>(json['aslType']),
+      ettSize: serializer.fromJson<String?>(json['ettSize']),
+      ettDepth: serializer.fromJson<String?>(json['ettDepth']),
+      manualDefibCount: serializer.fromJson<String?>(json['manualDefibCount']),
+      manualDefibJoules: serializer.fromJson<String?>(
+        json['manualDefibJoules'],
+      ),
+      guideNote: serializer.fromJson<String?>(json['guideNote']),
+      receivingUnit: serializer.fromJson<String?>(json['receivingUnit']),
+      receivingTime: serializer.fromJson<DateTime?>(json['receivingTime']),
+      isRejection: serializer.fromJson<bool>(json['isRejection']),
+      rejectionName: serializer.fromJson<String?>(json['rejectionName']),
+      relationshipType: serializer.fromJson<String?>(json['relationshipType']),
+      contactName: serializer.fromJson<String?>(json['contactName']),
+      contactPhone: serializer.fromJson<String?>(json['contactPhone']),
+      staffFee: serializer.fromJson<int?>(json['staffFee']),
+      oxygenFee: serializer.fromJson<int?>(json['oxygenFee']),
+      totalFee: serializer.fromJson<int?>(json['totalFee']),
+      chargeStatus: serializer.fromJson<String?>(json['chargeStatus']),
+      paidType: serializer.fromJson<String?>(json['paidType']),
+      unpaidType: serializer.fromJson<String?>(json['unpaidType']),
+      traumaClassJson: serializer.fromJson<String>(json['traumaClassJson']),
+      nonTraumaTypeJson: serializer.fromJson<String>(json['nonTraumaTypeJson']),
+      nonTraumaAcutePickedJson: serializer.fromJson<String>(
+        json['nonTraumaAcutePickedJson'],
+      ),
+      nonTraumaGeneralPickedJson: serializer.fromJson<String>(
+        json['nonTraumaGeneralPickedJson'],
+      ),
+      traumaTypePickedJson: serializer.fromJson<String>(
+        json['traumaTypePickedJson'],
+      ),
+      traumaGeneralBodyPickedJson: serializer.fromJson<String>(
+        json['traumaGeneralBodyPickedJson'],
+      ),
+      traumaMechanismPickedJson: serializer.fromJson<String>(
+        json['traumaMechanismPickedJson'],
+      ),
+      allergyJson: serializer.fromJson<String>(json['allergyJson']),
+      pmhJson: serializer.fromJson<String>(json['pmhJson']),
+      allergyOther: serializer.fromJson<String?>(json['allergyOther']),
+      pmhOther: serializer.fromJson<String?>(json['pmhOther']),
+      nonTraumaAcuteOther: serializer.fromJson<String?>(
+        json['nonTraumaAcuteOther'],
+      ),
+      traumaGeneralOther: serializer.fromJson<String?>(
+        json['traumaGeneralOther'],
+      ),
+      fallHeight: serializer.fromJson<String?>(json['fallHeight']),
+      burnDegree: serializer.fromJson<String?>(json['burnDegree']),
+      burnArea: serializer.fromJson<String?>(json['burnArea']),
+      traumaOther: serializer.fromJson<String?>(json['traumaOther']),
+      isProxyStatement: serializer.fromJson<bool?>(json['isProxyStatement']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'visitId': serializer.toJson<int>(visitId),
+      'plateNumber': serializer.toJson<String?>(plateNumber),
+      'placeGroupIdx': serializer.toJson<int?>(placeGroupIdx),
+      't1PlaceIdx': serializer.toJson<int?>(t1PlaceIdx),
+      't2PlaceIdx': serializer.toJson<int?>(t2PlaceIdx),
+      'remotePlaceIdx': serializer.toJson<int?>(remotePlaceIdx),
+      'cargoPlaceIdx': serializer.toJson<int?>(cargoPlaceIdx),
+      'novotelPlaceIdx': serializer.toJson<int?>(novotelPlaceIdx),
+      'cabinPlaceIdx': serializer.toJson<int?>(cabinPlaceIdx),
+      'placeNote': serializer.toJson<String?>(placeNote),
+      'dutyTime': serializer.toJson<DateTime?>(dutyTime),
+      'arriveSceneTime': serializer.toJson<DateTime?>(arriveSceneTime),
+      'leaveSceneTime': serializer.toJson<DateTime?>(leaveSceneTime),
+      'arriveHospitalTime': serializer.toJson<DateTime?>(arriveHospitalTime),
+      'leaveHospitalTime': serializer.toJson<DateTime?>(leaveHospitalTime),
+      'backStandbyTime': serializer.toJson<DateTime?>(backStandbyTime),
+      'destinationHospitalIdx': serializer.toJson<int?>(destinationHospitalIdx),
+      'otherDestinationHospital': serializer.toJson<String?>(
+        otherDestinationHospital,
+      ),
+      'destinationHospital': serializer.toJson<String?>(destinationHospital),
+      'patientBelongings': serializer.toJson<String?>(patientBelongings),
+      'belongingsHandled': serializer.toJson<String?>(belongingsHandled),
+      'custodianName': serializer.toJson<String?>(custodianName),
+      'custodianSignature': serializer.toJson<Uint8List?>(custodianSignature),
+      'chiefComplaint': serializer.toJson<String?>(chiefComplaint),
+      'emergencyTreatmentsJson': serializer.toJson<String>(
+        emergencyTreatmentsJson,
+      ),
+      'airwayTreatmentsJson': serializer.toJson<String>(airwayTreatmentsJson),
+      'traumaTreatmentsJson': serializer.toJson<String>(traumaTreatmentsJson),
+      'transportMethodsJson': serializer.toJson<String>(transportMethodsJson),
+      'cprMethodsJson': serializer.toJson<String>(cprMethodsJson),
+      'medicationProceduresJson': serializer.toJson<String>(
+        medicationProceduresJson,
+      ),
+      'otherEmergencyProceduresJson': serializer.toJson<String>(
+        otherEmergencyProceduresJson,
+      ),
+      'bodyDiagramNote': serializer.toJson<String?>(bodyDiagramNote),
+      'bodyDiagramPath': serializer.toJson<String?>(bodyDiagramPath),
+      'aslType': serializer.toJson<String?>(aslType),
+      'ettSize': serializer.toJson<String?>(ettSize),
+      'ettDepth': serializer.toJson<String?>(ettDepth),
+      'manualDefibCount': serializer.toJson<String?>(manualDefibCount),
+      'manualDefibJoules': serializer.toJson<String?>(manualDefibJoules),
+      'guideNote': serializer.toJson<String?>(guideNote),
+      'receivingUnit': serializer.toJson<String?>(receivingUnit),
+      'receivingTime': serializer.toJson<DateTime?>(receivingTime),
+      'isRejection': serializer.toJson<bool>(isRejection),
+      'rejectionName': serializer.toJson<String?>(rejectionName),
+      'relationshipType': serializer.toJson<String?>(relationshipType),
+      'contactName': serializer.toJson<String?>(contactName),
+      'contactPhone': serializer.toJson<String?>(contactPhone),
+      'staffFee': serializer.toJson<int?>(staffFee),
+      'oxygenFee': serializer.toJson<int?>(oxygenFee),
+      'totalFee': serializer.toJson<int?>(totalFee),
+      'chargeStatus': serializer.toJson<String?>(chargeStatus),
+      'paidType': serializer.toJson<String?>(paidType),
+      'unpaidType': serializer.toJson<String?>(unpaidType),
+      'traumaClassJson': serializer.toJson<String>(traumaClassJson),
+      'nonTraumaTypeJson': serializer.toJson<String>(nonTraumaTypeJson),
+      'nonTraumaAcutePickedJson': serializer.toJson<String>(
+        nonTraumaAcutePickedJson,
+      ),
+      'nonTraumaGeneralPickedJson': serializer.toJson<String>(
+        nonTraumaGeneralPickedJson,
+      ),
+      'traumaTypePickedJson': serializer.toJson<String>(traumaTypePickedJson),
+      'traumaGeneralBodyPickedJson': serializer.toJson<String>(
+        traumaGeneralBodyPickedJson,
+      ),
+      'traumaMechanismPickedJson': serializer.toJson<String>(
+        traumaMechanismPickedJson,
+      ),
+      'allergyJson': serializer.toJson<String>(allergyJson),
+      'pmhJson': serializer.toJson<String>(pmhJson),
+      'allergyOther': serializer.toJson<String?>(allergyOther),
+      'pmhOther': serializer.toJson<String?>(pmhOther),
+      'nonTraumaAcuteOther': serializer.toJson<String?>(nonTraumaAcuteOther),
+      'traumaGeneralOther': serializer.toJson<String?>(traumaGeneralOther),
+      'fallHeight': serializer.toJson<String?>(fallHeight),
+      'burnDegree': serializer.toJson<String?>(burnDegree),
+      'burnArea': serializer.toJson<String?>(burnArea),
+      'traumaOther': serializer.toJson<String?>(traumaOther),
+      'isProxyStatement': serializer.toJson<bool?>(isProxyStatement),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  AmbulanceRecord copyWith({
+    int? id,
+    int? visitId,
+    Value<String?> plateNumber = const Value.absent(),
+    Value<int?> placeGroupIdx = const Value.absent(),
+    Value<int?> t1PlaceIdx = const Value.absent(),
+    Value<int?> t2PlaceIdx = const Value.absent(),
+    Value<int?> remotePlaceIdx = const Value.absent(),
+    Value<int?> cargoPlaceIdx = const Value.absent(),
+    Value<int?> novotelPlaceIdx = const Value.absent(),
+    Value<int?> cabinPlaceIdx = const Value.absent(),
+    Value<String?> placeNote = const Value.absent(),
+    Value<DateTime?> dutyTime = const Value.absent(),
+    Value<DateTime?> arriveSceneTime = const Value.absent(),
+    Value<DateTime?> leaveSceneTime = const Value.absent(),
+    Value<DateTime?> arriveHospitalTime = const Value.absent(),
+    Value<DateTime?> leaveHospitalTime = const Value.absent(),
+    Value<DateTime?> backStandbyTime = const Value.absent(),
+    Value<int?> destinationHospitalIdx = const Value.absent(),
+    Value<String?> otherDestinationHospital = const Value.absent(),
+    Value<String?> destinationHospital = const Value.absent(),
+    Value<String?> patientBelongings = const Value.absent(),
+    Value<String?> belongingsHandled = const Value.absent(),
+    Value<String?> custodianName = const Value.absent(),
+    Value<Uint8List?> custodianSignature = const Value.absent(),
+    Value<String?> chiefComplaint = const Value.absent(),
+    String? emergencyTreatmentsJson,
+    String? airwayTreatmentsJson,
+    String? traumaTreatmentsJson,
+    String? transportMethodsJson,
+    String? cprMethodsJson,
+    String? medicationProceduresJson,
+    String? otherEmergencyProceduresJson,
+    Value<String?> bodyDiagramNote = const Value.absent(),
+    Value<String?> bodyDiagramPath = const Value.absent(),
+    Value<String?> aslType = const Value.absent(),
+    Value<String?> ettSize = const Value.absent(),
+    Value<String?> ettDepth = const Value.absent(),
+    Value<String?> manualDefibCount = const Value.absent(),
+    Value<String?> manualDefibJoules = const Value.absent(),
+    Value<String?> guideNote = const Value.absent(),
+    Value<String?> receivingUnit = const Value.absent(),
+    Value<DateTime?> receivingTime = const Value.absent(),
+    bool? isRejection,
+    Value<String?> rejectionName = const Value.absent(),
+    Value<String?> relationshipType = const Value.absent(),
+    Value<String?> contactName = const Value.absent(),
+    Value<String?> contactPhone = const Value.absent(),
+    Value<int?> staffFee = const Value.absent(),
+    Value<int?> oxygenFee = const Value.absent(),
+    Value<int?> totalFee = const Value.absent(),
+    Value<String?> chargeStatus = const Value.absent(),
+    Value<String?> paidType = const Value.absent(),
+    Value<String?> unpaidType = const Value.absent(),
+    String? traumaClassJson,
+    String? nonTraumaTypeJson,
+    String? nonTraumaAcutePickedJson,
+    String? nonTraumaGeneralPickedJson,
+    String? traumaTypePickedJson,
+    String? traumaGeneralBodyPickedJson,
+    String? traumaMechanismPickedJson,
+    String? allergyJson,
+    String? pmhJson,
+    Value<String?> allergyOther = const Value.absent(),
+    Value<String?> pmhOther = const Value.absent(),
+    Value<String?> nonTraumaAcuteOther = const Value.absent(),
+    Value<String?> traumaGeneralOther = const Value.absent(),
+    Value<String?> fallHeight = const Value.absent(),
+    Value<String?> burnDegree = const Value.absent(),
+    Value<String?> burnArea = const Value.absent(),
+    Value<String?> traumaOther = const Value.absent(),
+    Value<bool?> isProxyStatement = const Value.absent(),
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) => AmbulanceRecord(
+    id: id ?? this.id,
+    visitId: visitId ?? this.visitId,
+    plateNumber: plateNumber.present ? plateNumber.value : this.plateNumber,
+    placeGroupIdx: placeGroupIdx.present
+        ? placeGroupIdx.value
+        : this.placeGroupIdx,
+    t1PlaceIdx: t1PlaceIdx.present ? t1PlaceIdx.value : this.t1PlaceIdx,
+    t2PlaceIdx: t2PlaceIdx.present ? t2PlaceIdx.value : this.t2PlaceIdx,
+    remotePlaceIdx: remotePlaceIdx.present
+        ? remotePlaceIdx.value
+        : this.remotePlaceIdx,
+    cargoPlaceIdx: cargoPlaceIdx.present
+        ? cargoPlaceIdx.value
+        : this.cargoPlaceIdx,
+    novotelPlaceIdx: novotelPlaceIdx.present
+        ? novotelPlaceIdx.value
+        : this.novotelPlaceIdx,
+    cabinPlaceIdx: cabinPlaceIdx.present
+        ? cabinPlaceIdx.value
+        : this.cabinPlaceIdx,
+    placeNote: placeNote.present ? placeNote.value : this.placeNote,
+    dutyTime: dutyTime.present ? dutyTime.value : this.dutyTime,
+    arriveSceneTime: arriveSceneTime.present
+        ? arriveSceneTime.value
+        : this.arriveSceneTime,
+    leaveSceneTime: leaveSceneTime.present
+        ? leaveSceneTime.value
+        : this.leaveSceneTime,
+    arriveHospitalTime: arriveHospitalTime.present
+        ? arriveHospitalTime.value
+        : this.arriveHospitalTime,
+    leaveHospitalTime: leaveHospitalTime.present
+        ? leaveHospitalTime.value
+        : this.leaveHospitalTime,
+    backStandbyTime: backStandbyTime.present
+        ? backStandbyTime.value
+        : this.backStandbyTime,
+    destinationHospitalIdx: destinationHospitalIdx.present
+        ? destinationHospitalIdx.value
+        : this.destinationHospitalIdx,
+    otherDestinationHospital: otherDestinationHospital.present
+        ? otherDestinationHospital.value
+        : this.otherDestinationHospital,
+    destinationHospital: destinationHospital.present
+        ? destinationHospital.value
+        : this.destinationHospital,
+    patientBelongings: patientBelongings.present
+        ? patientBelongings.value
+        : this.patientBelongings,
+    belongingsHandled: belongingsHandled.present
+        ? belongingsHandled.value
+        : this.belongingsHandled,
+    custodianName: custodianName.present
+        ? custodianName.value
+        : this.custodianName,
+    custodianSignature: custodianSignature.present
+        ? custodianSignature.value
+        : this.custodianSignature,
+    chiefComplaint: chiefComplaint.present
+        ? chiefComplaint.value
+        : this.chiefComplaint,
+    emergencyTreatmentsJson:
+        emergencyTreatmentsJson ?? this.emergencyTreatmentsJson,
+    airwayTreatmentsJson: airwayTreatmentsJson ?? this.airwayTreatmentsJson,
+    traumaTreatmentsJson: traumaTreatmentsJson ?? this.traumaTreatmentsJson,
+    transportMethodsJson: transportMethodsJson ?? this.transportMethodsJson,
+    cprMethodsJson: cprMethodsJson ?? this.cprMethodsJson,
+    medicationProceduresJson:
+        medicationProceduresJson ?? this.medicationProceduresJson,
+    otherEmergencyProceduresJson:
+        otherEmergencyProceduresJson ?? this.otherEmergencyProceduresJson,
+    bodyDiagramNote: bodyDiagramNote.present
+        ? bodyDiagramNote.value
+        : this.bodyDiagramNote,
+    bodyDiagramPath: bodyDiagramPath.present
+        ? bodyDiagramPath.value
+        : this.bodyDiagramPath,
+    aslType: aslType.present ? aslType.value : this.aslType,
+    ettSize: ettSize.present ? ettSize.value : this.ettSize,
+    ettDepth: ettDepth.present ? ettDepth.value : this.ettDepth,
+    manualDefibCount: manualDefibCount.present
+        ? manualDefibCount.value
+        : this.manualDefibCount,
+    manualDefibJoules: manualDefibJoules.present
+        ? manualDefibJoules.value
+        : this.manualDefibJoules,
+    guideNote: guideNote.present ? guideNote.value : this.guideNote,
+    receivingUnit: receivingUnit.present
+        ? receivingUnit.value
+        : this.receivingUnit,
+    receivingTime: receivingTime.present
+        ? receivingTime.value
+        : this.receivingTime,
+    isRejection: isRejection ?? this.isRejection,
+    rejectionName: rejectionName.present
+        ? rejectionName.value
+        : this.rejectionName,
+    relationshipType: relationshipType.present
+        ? relationshipType.value
+        : this.relationshipType,
+    contactName: contactName.present ? contactName.value : this.contactName,
+    contactPhone: contactPhone.present ? contactPhone.value : this.contactPhone,
+    staffFee: staffFee.present ? staffFee.value : this.staffFee,
+    oxygenFee: oxygenFee.present ? oxygenFee.value : this.oxygenFee,
+    totalFee: totalFee.present ? totalFee.value : this.totalFee,
+    chargeStatus: chargeStatus.present ? chargeStatus.value : this.chargeStatus,
+    paidType: paidType.present ? paidType.value : this.paidType,
+    unpaidType: unpaidType.present ? unpaidType.value : this.unpaidType,
+    traumaClassJson: traumaClassJson ?? this.traumaClassJson,
+    nonTraumaTypeJson: nonTraumaTypeJson ?? this.nonTraumaTypeJson,
+    nonTraumaAcutePickedJson:
+        nonTraumaAcutePickedJson ?? this.nonTraumaAcutePickedJson,
+    nonTraumaGeneralPickedJson:
+        nonTraumaGeneralPickedJson ?? this.nonTraumaGeneralPickedJson,
+    traumaTypePickedJson: traumaTypePickedJson ?? this.traumaTypePickedJson,
+    traumaGeneralBodyPickedJson:
+        traumaGeneralBodyPickedJson ?? this.traumaGeneralBodyPickedJson,
+    traumaMechanismPickedJson:
+        traumaMechanismPickedJson ?? this.traumaMechanismPickedJson,
+    allergyJson: allergyJson ?? this.allergyJson,
+    pmhJson: pmhJson ?? this.pmhJson,
+    allergyOther: allergyOther.present ? allergyOther.value : this.allergyOther,
+    pmhOther: pmhOther.present ? pmhOther.value : this.pmhOther,
+    nonTraumaAcuteOther: nonTraumaAcuteOther.present
+        ? nonTraumaAcuteOther.value
+        : this.nonTraumaAcuteOther,
+    traumaGeneralOther: traumaGeneralOther.present
+        ? traumaGeneralOther.value
+        : this.traumaGeneralOther,
+    fallHeight: fallHeight.present ? fallHeight.value : this.fallHeight,
+    burnDegree: burnDegree.present ? burnDegree.value : this.burnDegree,
+    burnArea: burnArea.present ? burnArea.value : this.burnArea,
+    traumaOther: traumaOther.present ? traumaOther.value : this.traumaOther,
+    isProxyStatement: isProxyStatement.present
+        ? isProxyStatement.value
+        : this.isProxyStatement,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  AmbulanceRecord copyWithCompanion(AmbulanceRecordsCompanion data) {
+    return AmbulanceRecord(
+      id: data.id.present ? data.id.value : this.id,
+      visitId: data.visitId.present ? data.visitId.value : this.visitId,
+      plateNumber: data.plateNumber.present
+          ? data.plateNumber.value
+          : this.plateNumber,
+      placeGroupIdx: data.placeGroupIdx.present
+          ? data.placeGroupIdx.value
+          : this.placeGroupIdx,
+      t1PlaceIdx: data.t1PlaceIdx.present
+          ? data.t1PlaceIdx.value
+          : this.t1PlaceIdx,
+      t2PlaceIdx: data.t2PlaceIdx.present
+          ? data.t2PlaceIdx.value
+          : this.t2PlaceIdx,
+      remotePlaceIdx: data.remotePlaceIdx.present
+          ? data.remotePlaceIdx.value
+          : this.remotePlaceIdx,
+      cargoPlaceIdx: data.cargoPlaceIdx.present
+          ? data.cargoPlaceIdx.value
+          : this.cargoPlaceIdx,
+      novotelPlaceIdx: data.novotelPlaceIdx.present
+          ? data.novotelPlaceIdx.value
+          : this.novotelPlaceIdx,
+      cabinPlaceIdx: data.cabinPlaceIdx.present
+          ? data.cabinPlaceIdx.value
+          : this.cabinPlaceIdx,
+      placeNote: data.placeNote.present ? data.placeNote.value : this.placeNote,
+      dutyTime: data.dutyTime.present ? data.dutyTime.value : this.dutyTime,
+      arriveSceneTime: data.arriveSceneTime.present
+          ? data.arriveSceneTime.value
+          : this.arriveSceneTime,
+      leaveSceneTime: data.leaveSceneTime.present
+          ? data.leaveSceneTime.value
+          : this.leaveSceneTime,
+      arriveHospitalTime: data.arriveHospitalTime.present
+          ? data.arriveHospitalTime.value
+          : this.arriveHospitalTime,
+      leaveHospitalTime: data.leaveHospitalTime.present
+          ? data.leaveHospitalTime.value
+          : this.leaveHospitalTime,
+      backStandbyTime: data.backStandbyTime.present
+          ? data.backStandbyTime.value
+          : this.backStandbyTime,
+      destinationHospitalIdx: data.destinationHospitalIdx.present
+          ? data.destinationHospitalIdx.value
+          : this.destinationHospitalIdx,
+      otherDestinationHospital: data.otherDestinationHospital.present
+          ? data.otherDestinationHospital.value
+          : this.otherDestinationHospital,
+      destinationHospital: data.destinationHospital.present
+          ? data.destinationHospital.value
+          : this.destinationHospital,
+      patientBelongings: data.patientBelongings.present
+          ? data.patientBelongings.value
+          : this.patientBelongings,
+      belongingsHandled: data.belongingsHandled.present
+          ? data.belongingsHandled.value
+          : this.belongingsHandled,
+      custodianName: data.custodianName.present
+          ? data.custodianName.value
+          : this.custodianName,
+      custodianSignature: data.custodianSignature.present
+          ? data.custodianSignature.value
+          : this.custodianSignature,
+      chiefComplaint: data.chiefComplaint.present
+          ? data.chiefComplaint.value
+          : this.chiefComplaint,
+      emergencyTreatmentsJson: data.emergencyTreatmentsJson.present
+          ? data.emergencyTreatmentsJson.value
+          : this.emergencyTreatmentsJson,
+      airwayTreatmentsJson: data.airwayTreatmentsJson.present
+          ? data.airwayTreatmentsJson.value
+          : this.airwayTreatmentsJson,
+      traumaTreatmentsJson: data.traumaTreatmentsJson.present
+          ? data.traumaTreatmentsJson.value
+          : this.traumaTreatmentsJson,
+      transportMethodsJson: data.transportMethodsJson.present
+          ? data.transportMethodsJson.value
+          : this.transportMethodsJson,
+      cprMethodsJson: data.cprMethodsJson.present
+          ? data.cprMethodsJson.value
+          : this.cprMethodsJson,
+      medicationProceduresJson: data.medicationProceduresJson.present
+          ? data.medicationProceduresJson.value
+          : this.medicationProceduresJson,
+      otherEmergencyProceduresJson: data.otherEmergencyProceduresJson.present
+          ? data.otherEmergencyProceduresJson.value
+          : this.otherEmergencyProceduresJson,
+      bodyDiagramNote: data.bodyDiagramNote.present
+          ? data.bodyDiagramNote.value
+          : this.bodyDiagramNote,
+      bodyDiagramPath: data.bodyDiagramPath.present
+          ? data.bodyDiagramPath.value
+          : this.bodyDiagramPath,
+      aslType: data.aslType.present ? data.aslType.value : this.aslType,
+      ettSize: data.ettSize.present ? data.ettSize.value : this.ettSize,
+      ettDepth: data.ettDepth.present ? data.ettDepth.value : this.ettDepth,
+      manualDefibCount: data.manualDefibCount.present
+          ? data.manualDefibCount.value
+          : this.manualDefibCount,
+      manualDefibJoules: data.manualDefibJoules.present
+          ? data.manualDefibJoules.value
+          : this.manualDefibJoules,
+      guideNote: data.guideNote.present ? data.guideNote.value : this.guideNote,
+      receivingUnit: data.receivingUnit.present
+          ? data.receivingUnit.value
+          : this.receivingUnit,
+      receivingTime: data.receivingTime.present
+          ? data.receivingTime.value
+          : this.receivingTime,
+      isRejection: data.isRejection.present
+          ? data.isRejection.value
+          : this.isRejection,
+      rejectionName: data.rejectionName.present
+          ? data.rejectionName.value
+          : this.rejectionName,
+      relationshipType: data.relationshipType.present
+          ? data.relationshipType.value
+          : this.relationshipType,
+      contactName: data.contactName.present
+          ? data.contactName.value
+          : this.contactName,
+      contactPhone: data.contactPhone.present
+          ? data.contactPhone.value
+          : this.contactPhone,
+      staffFee: data.staffFee.present ? data.staffFee.value : this.staffFee,
+      oxygenFee: data.oxygenFee.present ? data.oxygenFee.value : this.oxygenFee,
+      totalFee: data.totalFee.present ? data.totalFee.value : this.totalFee,
+      chargeStatus: data.chargeStatus.present
+          ? data.chargeStatus.value
+          : this.chargeStatus,
+      paidType: data.paidType.present ? data.paidType.value : this.paidType,
+      unpaidType: data.unpaidType.present
+          ? data.unpaidType.value
+          : this.unpaidType,
+      traumaClassJson: data.traumaClassJson.present
+          ? data.traumaClassJson.value
+          : this.traumaClassJson,
+      nonTraumaTypeJson: data.nonTraumaTypeJson.present
+          ? data.nonTraumaTypeJson.value
+          : this.nonTraumaTypeJson,
+      nonTraumaAcutePickedJson: data.nonTraumaAcutePickedJson.present
+          ? data.nonTraumaAcutePickedJson.value
+          : this.nonTraumaAcutePickedJson,
+      nonTraumaGeneralPickedJson: data.nonTraumaGeneralPickedJson.present
+          ? data.nonTraumaGeneralPickedJson.value
+          : this.nonTraumaGeneralPickedJson,
+      traumaTypePickedJson: data.traumaTypePickedJson.present
+          ? data.traumaTypePickedJson.value
+          : this.traumaTypePickedJson,
+      traumaGeneralBodyPickedJson: data.traumaGeneralBodyPickedJson.present
+          ? data.traumaGeneralBodyPickedJson.value
+          : this.traumaGeneralBodyPickedJson,
+      traumaMechanismPickedJson: data.traumaMechanismPickedJson.present
+          ? data.traumaMechanismPickedJson.value
+          : this.traumaMechanismPickedJson,
+      allergyJson: data.allergyJson.present
+          ? data.allergyJson.value
+          : this.allergyJson,
+      pmhJson: data.pmhJson.present ? data.pmhJson.value : this.pmhJson,
+      allergyOther: data.allergyOther.present
+          ? data.allergyOther.value
+          : this.allergyOther,
+      pmhOther: data.pmhOther.present ? data.pmhOther.value : this.pmhOther,
+      nonTraumaAcuteOther: data.nonTraumaAcuteOther.present
+          ? data.nonTraumaAcuteOther.value
+          : this.nonTraumaAcuteOther,
+      traumaGeneralOther: data.traumaGeneralOther.present
+          ? data.traumaGeneralOther.value
+          : this.traumaGeneralOther,
+      fallHeight: data.fallHeight.present
+          ? data.fallHeight.value
+          : this.fallHeight,
+      burnDegree: data.burnDegree.present
+          ? data.burnDegree.value
+          : this.burnDegree,
+      burnArea: data.burnArea.present ? data.burnArea.value : this.burnArea,
+      traumaOther: data.traumaOther.present
+          ? data.traumaOther.value
+          : this.traumaOther,
+      isProxyStatement: data.isProxyStatement.present
+          ? data.isProxyStatement.value
+          : this.isProxyStatement,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AmbulanceRecord(')
+          ..write('id: $id, ')
+          ..write('visitId: $visitId, ')
+          ..write('plateNumber: $plateNumber, ')
+          ..write('placeGroupIdx: $placeGroupIdx, ')
+          ..write('t1PlaceIdx: $t1PlaceIdx, ')
+          ..write('t2PlaceIdx: $t2PlaceIdx, ')
+          ..write('remotePlaceIdx: $remotePlaceIdx, ')
+          ..write('cargoPlaceIdx: $cargoPlaceIdx, ')
+          ..write('novotelPlaceIdx: $novotelPlaceIdx, ')
+          ..write('cabinPlaceIdx: $cabinPlaceIdx, ')
+          ..write('placeNote: $placeNote, ')
+          ..write('dutyTime: $dutyTime, ')
+          ..write('arriveSceneTime: $arriveSceneTime, ')
+          ..write('leaveSceneTime: $leaveSceneTime, ')
+          ..write('arriveHospitalTime: $arriveHospitalTime, ')
+          ..write('leaveHospitalTime: $leaveHospitalTime, ')
+          ..write('backStandbyTime: $backStandbyTime, ')
+          ..write('destinationHospitalIdx: $destinationHospitalIdx, ')
+          ..write('otherDestinationHospital: $otherDestinationHospital, ')
+          ..write('destinationHospital: $destinationHospital, ')
+          ..write('patientBelongings: $patientBelongings, ')
+          ..write('belongingsHandled: $belongingsHandled, ')
+          ..write('custodianName: $custodianName, ')
+          ..write('custodianSignature: $custodianSignature, ')
+          ..write('chiefComplaint: $chiefComplaint, ')
+          ..write('emergencyTreatmentsJson: $emergencyTreatmentsJson, ')
+          ..write('airwayTreatmentsJson: $airwayTreatmentsJson, ')
+          ..write('traumaTreatmentsJson: $traumaTreatmentsJson, ')
+          ..write('transportMethodsJson: $transportMethodsJson, ')
+          ..write('cprMethodsJson: $cprMethodsJson, ')
+          ..write('medicationProceduresJson: $medicationProceduresJson, ')
+          ..write(
+            'otherEmergencyProceduresJson: $otherEmergencyProceduresJson, ',
+          )
+          ..write('bodyDiagramNote: $bodyDiagramNote, ')
+          ..write('bodyDiagramPath: $bodyDiagramPath, ')
+          ..write('aslType: $aslType, ')
+          ..write('ettSize: $ettSize, ')
+          ..write('ettDepth: $ettDepth, ')
+          ..write('manualDefibCount: $manualDefibCount, ')
+          ..write('manualDefibJoules: $manualDefibJoules, ')
+          ..write('guideNote: $guideNote, ')
+          ..write('receivingUnit: $receivingUnit, ')
+          ..write('receivingTime: $receivingTime, ')
+          ..write('isRejection: $isRejection, ')
+          ..write('rejectionName: $rejectionName, ')
+          ..write('relationshipType: $relationshipType, ')
+          ..write('contactName: $contactName, ')
+          ..write('contactPhone: $contactPhone, ')
+          ..write('staffFee: $staffFee, ')
+          ..write('oxygenFee: $oxygenFee, ')
+          ..write('totalFee: $totalFee, ')
+          ..write('chargeStatus: $chargeStatus, ')
+          ..write('paidType: $paidType, ')
+          ..write('unpaidType: $unpaidType, ')
+          ..write('traumaClassJson: $traumaClassJson, ')
+          ..write('nonTraumaTypeJson: $nonTraumaTypeJson, ')
+          ..write('nonTraumaAcutePickedJson: $nonTraumaAcutePickedJson, ')
+          ..write('nonTraumaGeneralPickedJson: $nonTraumaGeneralPickedJson, ')
+          ..write('traumaTypePickedJson: $traumaTypePickedJson, ')
+          ..write('traumaGeneralBodyPickedJson: $traumaGeneralBodyPickedJson, ')
+          ..write('traumaMechanismPickedJson: $traumaMechanismPickedJson, ')
+          ..write('allergyJson: $allergyJson, ')
+          ..write('pmhJson: $pmhJson, ')
+          ..write('allergyOther: $allergyOther, ')
+          ..write('pmhOther: $pmhOther, ')
+          ..write('nonTraumaAcuteOther: $nonTraumaAcuteOther, ')
+          ..write('traumaGeneralOther: $traumaGeneralOther, ')
+          ..write('fallHeight: $fallHeight, ')
+          ..write('burnDegree: $burnDegree, ')
+          ..write('burnArea: $burnArea, ')
+          ..write('traumaOther: $traumaOther, ')
+          ..write('isProxyStatement: $isProxyStatement, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hashAll([
+    id,
+    visitId,
+    plateNumber,
+    placeGroupIdx,
+    t1PlaceIdx,
+    t2PlaceIdx,
+    remotePlaceIdx,
+    cargoPlaceIdx,
+    novotelPlaceIdx,
+    cabinPlaceIdx,
+    placeNote,
+    dutyTime,
+    arriveSceneTime,
+    leaveSceneTime,
+    arriveHospitalTime,
+    leaveHospitalTime,
+    backStandbyTime,
+    destinationHospitalIdx,
+    otherDestinationHospital,
+    destinationHospital,
+    patientBelongings,
+    belongingsHandled,
+    custodianName,
+    $driftBlobEquality.hash(custodianSignature),
+    chiefComplaint,
+    emergencyTreatmentsJson,
+    airwayTreatmentsJson,
+    traumaTreatmentsJson,
+    transportMethodsJson,
+    cprMethodsJson,
+    medicationProceduresJson,
+    otherEmergencyProceduresJson,
+    bodyDiagramNote,
+    bodyDiagramPath,
+    aslType,
+    ettSize,
+    ettDepth,
+    manualDefibCount,
+    manualDefibJoules,
+    guideNote,
+    receivingUnit,
+    receivingTime,
+    isRejection,
+    rejectionName,
+    relationshipType,
+    contactName,
+    contactPhone,
+    staffFee,
+    oxygenFee,
+    totalFee,
+    chargeStatus,
+    paidType,
+    unpaidType,
+    traumaClassJson,
+    nonTraumaTypeJson,
+    nonTraumaAcutePickedJson,
+    nonTraumaGeneralPickedJson,
+    traumaTypePickedJson,
+    traumaGeneralBodyPickedJson,
+    traumaMechanismPickedJson,
+    allergyJson,
+    pmhJson,
+    allergyOther,
+    pmhOther,
+    nonTraumaAcuteOther,
+    traumaGeneralOther,
+    fallHeight,
+    burnDegree,
+    burnArea,
+    traumaOther,
+    isProxyStatement,
+    createdAt,
+    updatedAt,
+  ]);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is AmbulanceRecord &&
+          other.id == this.id &&
+          other.visitId == this.visitId &&
+          other.plateNumber == this.plateNumber &&
+          other.placeGroupIdx == this.placeGroupIdx &&
+          other.t1PlaceIdx == this.t1PlaceIdx &&
+          other.t2PlaceIdx == this.t2PlaceIdx &&
+          other.remotePlaceIdx == this.remotePlaceIdx &&
+          other.cargoPlaceIdx == this.cargoPlaceIdx &&
+          other.novotelPlaceIdx == this.novotelPlaceIdx &&
+          other.cabinPlaceIdx == this.cabinPlaceIdx &&
+          other.placeNote == this.placeNote &&
+          other.dutyTime == this.dutyTime &&
+          other.arriveSceneTime == this.arriveSceneTime &&
+          other.leaveSceneTime == this.leaveSceneTime &&
+          other.arriveHospitalTime == this.arriveHospitalTime &&
+          other.leaveHospitalTime == this.leaveHospitalTime &&
+          other.backStandbyTime == this.backStandbyTime &&
+          other.destinationHospitalIdx == this.destinationHospitalIdx &&
+          other.otherDestinationHospital == this.otherDestinationHospital &&
+          other.destinationHospital == this.destinationHospital &&
+          other.patientBelongings == this.patientBelongings &&
+          other.belongingsHandled == this.belongingsHandled &&
+          other.custodianName == this.custodianName &&
+          $driftBlobEquality.equals(
+            other.custodianSignature,
+            this.custodianSignature,
+          ) &&
+          other.chiefComplaint == this.chiefComplaint &&
+          other.emergencyTreatmentsJson == this.emergencyTreatmentsJson &&
+          other.airwayTreatmentsJson == this.airwayTreatmentsJson &&
+          other.traumaTreatmentsJson == this.traumaTreatmentsJson &&
+          other.transportMethodsJson == this.transportMethodsJson &&
+          other.cprMethodsJson == this.cprMethodsJson &&
+          other.medicationProceduresJson == this.medicationProceduresJson &&
+          other.otherEmergencyProceduresJson ==
+              this.otherEmergencyProceduresJson &&
+          other.bodyDiagramNote == this.bodyDiagramNote &&
+          other.bodyDiagramPath == this.bodyDiagramPath &&
+          other.aslType == this.aslType &&
+          other.ettSize == this.ettSize &&
+          other.ettDepth == this.ettDepth &&
+          other.manualDefibCount == this.manualDefibCount &&
+          other.manualDefibJoules == this.manualDefibJoules &&
+          other.guideNote == this.guideNote &&
+          other.receivingUnit == this.receivingUnit &&
+          other.receivingTime == this.receivingTime &&
+          other.isRejection == this.isRejection &&
+          other.rejectionName == this.rejectionName &&
+          other.relationshipType == this.relationshipType &&
+          other.contactName == this.contactName &&
+          other.contactPhone == this.contactPhone &&
+          other.staffFee == this.staffFee &&
+          other.oxygenFee == this.oxygenFee &&
+          other.totalFee == this.totalFee &&
+          other.chargeStatus == this.chargeStatus &&
+          other.paidType == this.paidType &&
+          other.unpaidType == this.unpaidType &&
+          other.traumaClassJson == this.traumaClassJson &&
+          other.nonTraumaTypeJson == this.nonTraumaTypeJson &&
+          other.nonTraumaAcutePickedJson == this.nonTraumaAcutePickedJson &&
+          other.nonTraumaGeneralPickedJson == this.nonTraumaGeneralPickedJson &&
+          other.traumaTypePickedJson == this.traumaTypePickedJson &&
+          other.traumaGeneralBodyPickedJson ==
+              this.traumaGeneralBodyPickedJson &&
+          other.traumaMechanismPickedJson == this.traumaMechanismPickedJson &&
+          other.allergyJson == this.allergyJson &&
+          other.pmhJson == this.pmhJson &&
+          other.allergyOther == this.allergyOther &&
+          other.pmhOther == this.pmhOther &&
+          other.nonTraumaAcuteOther == this.nonTraumaAcuteOther &&
+          other.traumaGeneralOther == this.traumaGeneralOther &&
+          other.fallHeight == this.fallHeight &&
+          other.burnDegree == this.burnDegree &&
+          other.burnArea == this.burnArea &&
+          other.traumaOther == this.traumaOther &&
+          other.isProxyStatement == this.isProxyStatement &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class AmbulanceRecordsCompanion extends UpdateCompanion<AmbulanceRecord> {
+  final Value<int> id;
+  final Value<int> visitId;
+  final Value<String?> plateNumber;
+  final Value<int?> placeGroupIdx;
+  final Value<int?> t1PlaceIdx;
+  final Value<int?> t2PlaceIdx;
+  final Value<int?> remotePlaceIdx;
+  final Value<int?> cargoPlaceIdx;
+  final Value<int?> novotelPlaceIdx;
+  final Value<int?> cabinPlaceIdx;
+  final Value<String?> placeNote;
+  final Value<DateTime?> dutyTime;
+  final Value<DateTime?> arriveSceneTime;
+  final Value<DateTime?> leaveSceneTime;
+  final Value<DateTime?> arriveHospitalTime;
+  final Value<DateTime?> leaveHospitalTime;
+  final Value<DateTime?> backStandbyTime;
+  final Value<int?> destinationHospitalIdx;
+  final Value<String?> otherDestinationHospital;
+  final Value<String?> destinationHospital;
+  final Value<String?> patientBelongings;
+  final Value<String?> belongingsHandled;
+  final Value<String?> custodianName;
+  final Value<Uint8List?> custodianSignature;
+  final Value<String?> chiefComplaint;
+  final Value<String> emergencyTreatmentsJson;
+  final Value<String> airwayTreatmentsJson;
+  final Value<String> traumaTreatmentsJson;
+  final Value<String> transportMethodsJson;
+  final Value<String> cprMethodsJson;
+  final Value<String> medicationProceduresJson;
+  final Value<String> otherEmergencyProceduresJson;
+  final Value<String?> bodyDiagramNote;
+  final Value<String?> bodyDiagramPath;
+  final Value<String?> aslType;
+  final Value<String?> ettSize;
+  final Value<String?> ettDepth;
+  final Value<String?> manualDefibCount;
+  final Value<String?> manualDefibJoules;
+  final Value<String?> guideNote;
+  final Value<String?> receivingUnit;
+  final Value<DateTime?> receivingTime;
+  final Value<bool> isRejection;
+  final Value<String?> rejectionName;
+  final Value<String?> relationshipType;
+  final Value<String?> contactName;
+  final Value<String?> contactPhone;
+  final Value<int?> staffFee;
+  final Value<int?> oxygenFee;
+  final Value<int?> totalFee;
+  final Value<String?> chargeStatus;
+  final Value<String?> paidType;
+  final Value<String?> unpaidType;
+  final Value<String> traumaClassJson;
+  final Value<String> nonTraumaTypeJson;
+  final Value<String> nonTraumaAcutePickedJson;
+  final Value<String> nonTraumaGeneralPickedJson;
+  final Value<String> traumaTypePickedJson;
+  final Value<String> traumaGeneralBodyPickedJson;
+  final Value<String> traumaMechanismPickedJson;
+  final Value<String> allergyJson;
+  final Value<String> pmhJson;
+  final Value<String?> allergyOther;
+  final Value<String?> pmhOther;
+  final Value<String?> nonTraumaAcuteOther;
+  final Value<String?> traumaGeneralOther;
+  final Value<String?> fallHeight;
+  final Value<String?> burnDegree;
+  final Value<String?> burnArea;
+  final Value<String?> traumaOther;
+  final Value<bool?> isProxyStatement;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  const AmbulanceRecordsCompanion({
+    this.id = const Value.absent(),
+    this.visitId = const Value.absent(),
+    this.plateNumber = const Value.absent(),
+    this.placeGroupIdx = const Value.absent(),
+    this.t1PlaceIdx = const Value.absent(),
+    this.t2PlaceIdx = const Value.absent(),
+    this.remotePlaceIdx = const Value.absent(),
+    this.cargoPlaceIdx = const Value.absent(),
+    this.novotelPlaceIdx = const Value.absent(),
+    this.cabinPlaceIdx = const Value.absent(),
+    this.placeNote = const Value.absent(),
+    this.dutyTime = const Value.absent(),
+    this.arriveSceneTime = const Value.absent(),
+    this.leaveSceneTime = const Value.absent(),
+    this.arriveHospitalTime = const Value.absent(),
+    this.leaveHospitalTime = const Value.absent(),
+    this.backStandbyTime = const Value.absent(),
+    this.destinationHospitalIdx = const Value.absent(),
+    this.otherDestinationHospital = const Value.absent(),
+    this.destinationHospital = const Value.absent(),
+    this.patientBelongings = const Value.absent(),
+    this.belongingsHandled = const Value.absent(),
+    this.custodianName = const Value.absent(),
+    this.custodianSignature = const Value.absent(),
+    this.chiefComplaint = const Value.absent(),
+    this.emergencyTreatmentsJson = const Value.absent(),
+    this.airwayTreatmentsJson = const Value.absent(),
+    this.traumaTreatmentsJson = const Value.absent(),
+    this.transportMethodsJson = const Value.absent(),
+    this.cprMethodsJson = const Value.absent(),
+    this.medicationProceduresJson = const Value.absent(),
+    this.otherEmergencyProceduresJson = const Value.absent(),
+    this.bodyDiagramNote = const Value.absent(),
+    this.bodyDiagramPath = const Value.absent(),
+    this.aslType = const Value.absent(),
+    this.ettSize = const Value.absent(),
+    this.ettDepth = const Value.absent(),
+    this.manualDefibCount = const Value.absent(),
+    this.manualDefibJoules = const Value.absent(),
+    this.guideNote = const Value.absent(),
+    this.receivingUnit = const Value.absent(),
+    this.receivingTime = const Value.absent(),
+    this.isRejection = const Value.absent(),
+    this.rejectionName = const Value.absent(),
+    this.relationshipType = const Value.absent(),
+    this.contactName = const Value.absent(),
+    this.contactPhone = const Value.absent(),
+    this.staffFee = const Value.absent(),
+    this.oxygenFee = const Value.absent(),
+    this.totalFee = const Value.absent(),
+    this.chargeStatus = const Value.absent(),
+    this.paidType = const Value.absent(),
+    this.unpaidType = const Value.absent(),
+    this.traumaClassJson = const Value.absent(),
+    this.nonTraumaTypeJson = const Value.absent(),
+    this.nonTraumaAcutePickedJson = const Value.absent(),
+    this.nonTraumaGeneralPickedJson = const Value.absent(),
+    this.traumaTypePickedJson = const Value.absent(),
+    this.traumaGeneralBodyPickedJson = const Value.absent(),
+    this.traumaMechanismPickedJson = const Value.absent(),
+    this.allergyJson = const Value.absent(),
+    this.pmhJson = const Value.absent(),
+    this.allergyOther = const Value.absent(),
+    this.pmhOther = const Value.absent(),
+    this.nonTraumaAcuteOther = const Value.absent(),
+    this.traumaGeneralOther = const Value.absent(),
+    this.fallHeight = const Value.absent(),
+    this.burnDegree = const Value.absent(),
+    this.burnArea = const Value.absent(),
+    this.traumaOther = const Value.absent(),
+    this.isProxyStatement = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  });
+  AmbulanceRecordsCompanion.insert({
+    this.id = const Value.absent(),
+    required int visitId,
+    this.plateNumber = const Value.absent(),
+    this.placeGroupIdx = const Value.absent(),
+    this.t1PlaceIdx = const Value.absent(),
+    this.t2PlaceIdx = const Value.absent(),
+    this.remotePlaceIdx = const Value.absent(),
+    this.cargoPlaceIdx = const Value.absent(),
+    this.novotelPlaceIdx = const Value.absent(),
+    this.cabinPlaceIdx = const Value.absent(),
+    this.placeNote = const Value.absent(),
+    this.dutyTime = const Value.absent(),
+    this.arriveSceneTime = const Value.absent(),
+    this.leaveSceneTime = const Value.absent(),
+    this.arriveHospitalTime = const Value.absent(),
+    this.leaveHospitalTime = const Value.absent(),
+    this.backStandbyTime = const Value.absent(),
+    this.destinationHospitalIdx = const Value.absent(),
+    this.otherDestinationHospital = const Value.absent(),
+    this.destinationHospital = const Value.absent(),
+    this.patientBelongings = const Value.absent(),
+    this.belongingsHandled = const Value.absent(),
+    this.custodianName = const Value.absent(),
+    this.custodianSignature = const Value.absent(),
+    this.chiefComplaint = const Value.absent(),
+    this.emergencyTreatmentsJson = const Value.absent(),
+    this.airwayTreatmentsJson = const Value.absent(),
+    this.traumaTreatmentsJson = const Value.absent(),
+    this.transportMethodsJson = const Value.absent(),
+    this.cprMethodsJson = const Value.absent(),
+    this.medicationProceduresJson = const Value.absent(),
+    this.otherEmergencyProceduresJson = const Value.absent(),
+    this.bodyDiagramNote = const Value.absent(),
+    this.bodyDiagramPath = const Value.absent(),
+    this.aslType = const Value.absent(),
+    this.ettSize = const Value.absent(),
+    this.ettDepth = const Value.absent(),
+    this.manualDefibCount = const Value.absent(),
+    this.manualDefibJoules = const Value.absent(),
+    this.guideNote = const Value.absent(),
+    this.receivingUnit = const Value.absent(),
+    this.receivingTime = const Value.absent(),
+    this.isRejection = const Value.absent(),
+    this.rejectionName = const Value.absent(),
+    this.relationshipType = const Value.absent(),
+    this.contactName = const Value.absent(),
+    this.contactPhone = const Value.absent(),
+    this.staffFee = const Value.absent(),
+    this.oxygenFee = const Value.absent(),
+    this.totalFee = const Value.absent(),
+    this.chargeStatus = const Value.absent(),
+    this.paidType = const Value.absent(),
+    this.unpaidType = const Value.absent(),
+    this.traumaClassJson = const Value.absent(),
+    this.nonTraumaTypeJson = const Value.absent(),
+    this.nonTraumaAcutePickedJson = const Value.absent(),
+    this.nonTraumaGeneralPickedJson = const Value.absent(),
+    this.traumaTypePickedJson = const Value.absent(),
+    this.traumaGeneralBodyPickedJson = const Value.absent(),
+    this.traumaMechanismPickedJson = const Value.absent(),
+    this.allergyJson = const Value.absent(),
+    this.pmhJson = const Value.absent(),
+    this.allergyOther = const Value.absent(),
+    this.pmhOther = const Value.absent(),
+    this.nonTraumaAcuteOther = const Value.absent(),
+    this.traumaGeneralOther = const Value.absent(),
+    this.fallHeight = const Value.absent(),
+    this.burnDegree = const Value.absent(),
+    this.burnArea = const Value.absent(),
+    this.traumaOther = const Value.absent(),
+    this.isProxyStatement = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  }) : visitId = Value(visitId);
+  static Insertable<AmbulanceRecord> custom({
+    Expression<int>? id,
+    Expression<int>? visitId,
+    Expression<String>? plateNumber,
+    Expression<int>? placeGroupIdx,
+    Expression<int>? t1PlaceIdx,
+    Expression<int>? t2PlaceIdx,
+    Expression<int>? remotePlaceIdx,
+    Expression<int>? cargoPlaceIdx,
+    Expression<int>? novotelPlaceIdx,
+    Expression<int>? cabinPlaceIdx,
+    Expression<String>? placeNote,
+    Expression<DateTime>? dutyTime,
+    Expression<DateTime>? arriveSceneTime,
+    Expression<DateTime>? leaveSceneTime,
+    Expression<DateTime>? arriveHospitalTime,
+    Expression<DateTime>? leaveHospitalTime,
+    Expression<DateTime>? backStandbyTime,
+    Expression<int>? destinationHospitalIdx,
+    Expression<String>? otherDestinationHospital,
+    Expression<String>? destinationHospital,
+    Expression<String>? patientBelongings,
+    Expression<String>? belongingsHandled,
+    Expression<String>? custodianName,
+    Expression<Uint8List>? custodianSignature,
+    Expression<String>? chiefComplaint,
+    Expression<String>? emergencyTreatmentsJson,
+    Expression<String>? airwayTreatmentsJson,
+    Expression<String>? traumaTreatmentsJson,
+    Expression<String>? transportMethodsJson,
+    Expression<String>? cprMethodsJson,
+    Expression<String>? medicationProceduresJson,
+    Expression<String>? otherEmergencyProceduresJson,
+    Expression<String>? bodyDiagramNote,
+    Expression<String>? bodyDiagramPath,
+    Expression<String>? aslType,
+    Expression<String>? ettSize,
+    Expression<String>? ettDepth,
+    Expression<String>? manualDefibCount,
+    Expression<String>? manualDefibJoules,
+    Expression<String>? guideNote,
+    Expression<String>? receivingUnit,
+    Expression<DateTime>? receivingTime,
+    Expression<bool>? isRejection,
+    Expression<String>? rejectionName,
+    Expression<String>? relationshipType,
+    Expression<String>? contactName,
+    Expression<String>? contactPhone,
+    Expression<int>? staffFee,
+    Expression<int>? oxygenFee,
+    Expression<int>? totalFee,
+    Expression<String>? chargeStatus,
+    Expression<String>? paidType,
+    Expression<String>? unpaidType,
+    Expression<String>? traumaClassJson,
+    Expression<String>? nonTraumaTypeJson,
+    Expression<String>? nonTraumaAcutePickedJson,
+    Expression<String>? nonTraumaGeneralPickedJson,
+    Expression<String>? traumaTypePickedJson,
+    Expression<String>? traumaGeneralBodyPickedJson,
+    Expression<String>? traumaMechanismPickedJson,
+    Expression<String>? allergyJson,
+    Expression<String>? pmhJson,
+    Expression<String>? allergyOther,
+    Expression<String>? pmhOther,
+    Expression<String>? nonTraumaAcuteOther,
+    Expression<String>? traumaGeneralOther,
+    Expression<String>? fallHeight,
+    Expression<String>? burnDegree,
+    Expression<String>? burnArea,
+    Expression<String>? traumaOther,
+    Expression<bool>? isProxyStatement,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (visitId != null) 'visit_id': visitId,
+      if (plateNumber != null) 'plate_number': plateNumber,
+      if (placeGroupIdx != null) 'place_group_idx': placeGroupIdx,
+      if (t1PlaceIdx != null) 't1_place_idx': t1PlaceIdx,
+      if (t2PlaceIdx != null) 't2_place_idx': t2PlaceIdx,
+      if (remotePlaceIdx != null) 'remote_place_idx': remotePlaceIdx,
+      if (cargoPlaceIdx != null) 'cargo_place_idx': cargoPlaceIdx,
+      if (novotelPlaceIdx != null) 'novotel_place_idx': novotelPlaceIdx,
+      if (cabinPlaceIdx != null) 'cabin_place_idx': cabinPlaceIdx,
+      if (placeNote != null) 'place_note': placeNote,
+      if (dutyTime != null) 'duty_time': dutyTime,
+      if (arriveSceneTime != null) 'arrive_scene_time': arriveSceneTime,
+      if (leaveSceneTime != null) 'leave_scene_time': leaveSceneTime,
+      if (arriveHospitalTime != null)
+        'arrive_hospital_time': arriveHospitalTime,
+      if (leaveHospitalTime != null) 'leave_hospital_time': leaveHospitalTime,
+      if (backStandbyTime != null) 'back_standby_time': backStandbyTime,
+      if (destinationHospitalIdx != null)
+        'destination_hospital_idx': destinationHospitalIdx,
+      if (otherDestinationHospital != null)
+        'other_destination_hospital': otherDestinationHospital,
+      if (destinationHospital != null)
+        'destination_hospital': destinationHospital,
+      if (patientBelongings != null) 'patient_belongings': patientBelongings,
+      if (belongingsHandled != null) 'belongings_handled': belongingsHandled,
+      if (custodianName != null) 'custodian_name': custodianName,
+      if (custodianSignature != null) 'custodian_signature': custodianSignature,
+      if (chiefComplaint != null) 'chief_complaint': chiefComplaint,
+      if (emergencyTreatmentsJson != null)
+        'emergency_treatments_json': emergencyTreatmentsJson,
+      if (airwayTreatmentsJson != null)
+        'airway_treatments_json': airwayTreatmentsJson,
+      if (traumaTreatmentsJson != null)
+        'trauma_treatments_json': traumaTreatmentsJson,
+      if (transportMethodsJson != null)
+        'transport_methods_json': transportMethodsJson,
+      if (cprMethodsJson != null) 'cpr_methods_json': cprMethodsJson,
+      if (medicationProceduresJson != null)
+        'medication_procedures_json': medicationProceduresJson,
+      if (otherEmergencyProceduresJson != null)
+        'other_emergency_procedures_json': otherEmergencyProceduresJson,
+      if (bodyDiagramNote != null) 'body_diagram_note': bodyDiagramNote,
+      if (bodyDiagramPath != null) 'body_diagram_path': bodyDiagramPath,
+      if (aslType != null) 'asl_type': aslType,
+      if (ettSize != null) 'ett_size': ettSize,
+      if (ettDepth != null) 'ett_depth': ettDepth,
+      if (manualDefibCount != null) 'manual_defib_count': manualDefibCount,
+      if (manualDefibJoules != null) 'manual_defib_joules': manualDefibJoules,
+      if (guideNote != null) 'guide_note': guideNote,
+      if (receivingUnit != null) 'receiving_unit': receivingUnit,
+      if (receivingTime != null) 'receiving_time': receivingTime,
+      if (isRejection != null) 'is_rejection': isRejection,
+      if (rejectionName != null) 'rejection_name': rejectionName,
+      if (relationshipType != null) 'relationship_type': relationshipType,
+      if (contactName != null) 'contact_name': contactName,
+      if (contactPhone != null) 'contact_phone': contactPhone,
+      if (staffFee != null) 'staff_fee': staffFee,
+      if (oxygenFee != null) 'oxygen_fee': oxygenFee,
+      if (totalFee != null) 'total_fee': totalFee,
+      if (chargeStatus != null) 'charge_status': chargeStatus,
+      if (paidType != null) 'paid_type': paidType,
+      if (unpaidType != null) 'unpaid_type': unpaidType,
+      if (traumaClassJson != null) 'trauma_class_json': traumaClassJson,
+      if (nonTraumaTypeJson != null) 'non_trauma_type_json': nonTraumaTypeJson,
+      if (nonTraumaAcutePickedJson != null)
+        'non_trauma_acute_picked_json': nonTraumaAcutePickedJson,
+      if (nonTraumaGeneralPickedJson != null)
+        'non_trauma_general_picked_json': nonTraumaGeneralPickedJson,
+      if (traumaTypePickedJson != null)
+        'trauma_type_picked_json': traumaTypePickedJson,
+      if (traumaGeneralBodyPickedJson != null)
+        'trauma_general_body_picked_json': traumaGeneralBodyPickedJson,
+      if (traumaMechanismPickedJson != null)
+        'trauma_mechanism_picked_json': traumaMechanismPickedJson,
+      if (allergyJson != null) 'allergy_json': allergyJson,
+      if (pmhJson != null) 'pmh_json': pmhJson,
+      if (allergyOther != null) 'allergy_other': allergyOther,
+      if (pmhOther != null) 'pmh_other': pmhOther,
+      if (nonTraumaAcuteOther != null)
+        'non_trauma_acute_other': nonTraumaAcuteOther,
+      if (traumaGeneralOther != null)
+        'trauma_general_other': traumaGeneralOther,
+      if (fallHeight != null) 'fall_height': fallHeight,
+      if (burnDegree != null) 'burn_degree': burnDegree,
+      if (burnArea != null) 'burn_area': burnArea,
+      if (traumaOther != null) 'trauma_other': traumaOther,
+      if (isProxyStatement != null) 'is_proxy_statement': isProxyStatement,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+    });
+  }
+
+  AmbulanceRecordsCompanion copyWith({
+    Value<int>? id,
+    Value<int>? visitId,
+    Value<String?>? plateNumber,
+    Value<int?>? placeGroupIdx,
+    Value<int?>? t1PlaceIdx,
+    Value<int?>? t2PlaceIdx,
+    Value<int?>? remotePlaceIdx,
+    Value<int?>? cargoPlaceIdx,
+    Value<int?>? novotelPlaceIdx,
+    Value<int?>? cabinPlaceIdx,
+    Value<String?>? placeNote,
+    Value<DateTime?>? dutyTime,
+    Value<DateTime?>? arriveSceneTime,
+    Value<DateTime?>? leaveSceneTime,
+    Value<DateTime?>? arriveHospitalTime,
+    Value<DateTime?>? leaveHospitalTime,
+    Value<DateTime?>? backStandbyTime,
+    Value<int?>? destinationHospitalIdx,
+    Value<String?>? otherDestinationHospital,
+    Value<String?>? destinationHospital,
+    Value<String?>? patientBelongings,
+    Value<String?>? belongingsHandled,
+    Value<String?>? custodianName,
+    Value<Uint8List?>? custodianSignature,
+    Value<String?>? chiefComplaint,
+    Value<String>? emergencyTreatmentsJson,
+    Value<String>? airwayTreatmentsJson,
+    Value<String>? traumaTreatmentsJson,
+    Value<String>? transportMethodsJson,
+    Value<String>? cprMethodsJson,
+    Value<String>? medicationProceduresJson,
+    Value<String>? otherEmergencyProceduresJson,
+    Value<String?>? bodyDiagramNote,
+    Value<String?>? bodyDiagramPath,
+    Value<String?>? aslType,
+    Value<String?>? ettSize,
+    Value<String?>? ettDepth,
+    Value<String?>? manualDefibCount,
+    Value<String?>? manualDefibJoules,
+    Value<String?>? guideNote,
+    Value<String?>? receivingUnit,
+    Value<DateTime?>? receivingTime,
+    Value<bool>? isRejection,
+    Value<String?>? rejectionName,
+    Value<String?>? relationshipType,
+    Value<String?>? contactName,
+    Value<String?>? contactPhone,
+    Value<int?>? staffFee,
+    Value<int?>? oxygenFee,
+    Value<int?>? totalFee,
+    Value<String?>? chargeStatus,
+    Value<String?>? paidType,
+    Value<String?>? unpaidType,
+    Value<String>? traumaClassJson,
+    Value<String>? nonTraumaTypeJson,
+    Value<String>? nonTraumaAcutePickedJson,
+    Value<String>? nonTraumaGeneralPickedJson,
+    Value<String>? traumaTypePickedJson,
+    Value<String>? traumaGeneralBodyPickedJson,
+    Value<String>? traumaMechanismPickedJson,
+    Value<String>? allergyJson,
+    Value<String>? pmhJson,
+    Value<String?>? allergyOther,
+    Value<String?>? pmhOther,
+    Value<String?>? nonTraumaAcuteOther,
+    Value<String?>? traumaGeneralOther,
+    Value<String?>? fallHeight,
+    Value<String?>? burnDegree,
+    Value<String?>? burnArea,
+    Value<String?>? traumaOther,
+    Value<bool?>? isProxyStatement,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+  }) {
+    return AmbulanceRecordsCompanion(
+      id: id ?? this.id,
+      visitId: visitId ?? this.visitId,
+      plateNumber: plateNumber ?? this.plateNumber,
+      placeGroupIdx: placeGroupIdx ?? this.placeGroupIdx,
+      t1PlaceIdx: t1PlaceIdx ?? this.t1PlaceIdx,
+      t2PlaceIdx: t2PlaceIdx ?? this.t2PlaceIdx,
+      remotePlaceIdx: remotePlaceIdx ?? this.remotePlaceIdx,
+      cargoPlaceIdx: cargoPlaceIdx ?? this.cargoPlaceIdx,
+      novotelPlaceIdx: novotelPlaceIdx ?? this.novotelPlaceIdx,
+      cabinPlaceIdx: cabinPlaceIdx ?? this.cabinPlaceIdx,
+      placeNote: placeNote ?? this.placeNote,
+      dutyTime: dutyTime ?? this.dutyTime,
+      arriveSceneTime: arriveSceneTime ?? this.arriveSceneTime,
+      leaveSceneTime: leaveSceneTime ?? this.leaveSceneTime,
+      arriveHospitalTime: arriveHospitalTime ?? this.arriveHospitalTime,
+      leaveHospitalTime: leaveHospitalTime ?? this.leaveHospitalTime,
+      backStandbyTime: backStandbyTime ?? this.backStandbyTime,
+      destinationHospitalIdx:
+          destinationHospitalIdx ?? this.destinationHospitalIdx,
+      otherDestinationHospital:
+          otherDestinationHospital ?? this.otherDestinationHospital,
+      destinationHospital: destinationHospital ?? this.destinationHospital,
+      patientBelongings: patientBelongings ?? this.patientBelongings,
+      belongingsHandled: belongingsHandled ?? this.belongingsHandled,
+      custodianName: custodianName ?? this.custodianName,
+      custodianSignature: custodianSignature ?? this.custodianSignature,
+      chiefComplaint: chiefComplaint ?? this.chiefComplaint,
+      emergencyTreatmentsJson:
+          emergencyTreatmentsJson ?? this.emergencyTreatmentsJson,
+      airwayTreatmentsJson: airwayTreatmentsJson ?? this.airwayTreatmentsJson,
+      traumaTreatmentsJson: traumaTreatmentsJson ?? this.traumaTreatmentsJson,
+      transportMethodsJson: transportMethodsJson ?? this.transportMethodsJson,
+      cprMethodsJson: cprMethodsJson ?? this.cprMethodsJson,
+      medicationProceduresJson:
+          medicationProceduresJson ?? this.medicationProceduresJson,
+      otherEmergencyProceduresJson:
+          otherEmergencyProceduresJson ?? this.otherEmergencyProceduresJson,
+      bodyDiagramNote: bodyDiagramNote ?? this.bodyDiagramNote,
+      bodyDiagramPath: bodyDiagramPath ?? this.bodyDiagramPath,
+      aslType: aslType ?? this.aslType,
+      ettSize: ettSize ?? this.ettSize,
+      ettDepth: ettDepth ?? this.ettDepth,
+      manualDefibCount: manualDefibCount ?? this.manualDefibCount,
+      manualDefibJoules: manualDefibJoules ?? this.manualDefibJoules,
+      guideNote: guideNote ?? this.guideNote,
+      receivingUnit: receivingUnit ?? this.receivingUnit,
+      receivingTime: receivingTime ?? this.receivingTime,
+      isRejection: isRejection ?? this.isRejection,
+      rejectionName: rejectionName ?? this.rejectionName,
+      relationshipType: relationshipType ?? this.relationshipType,
+      contactName: contactName ?? this.contactName,
+      contactPhone: contactPhone ?? this.contactPhone,
+      staffFee: staffFee ?? this.staffFee,
+      oxygenFee: oxygenFee ?? this.oxygenFee,
+      totalFee: totalFee ?? this.totalFee,
+      chargeStatus: chargeStatus ?? this.chargeStatus,
+      paidType: paidType ?? this.paidType,
+      unpaidType: unpaidType ?? this.unpaidType,
+      traumaClassJson: traumaClassJson ?? this.traumaClassJson,
+      nonTraumaTypeJson: nonTraumaTypeJson ?? this.nonTraumaTypeJson,
+      nonTraumaAcutePickedJson:
+          nonTraumaAcutePickedJson ?? this.nonTraumaAcutePickedJson,
+      nonTraumaGeneralPickedJson:
+          nonTraumaGeneralPickedJson ?? this.nonTraumaGeneralPickedJson,
+      traumaTypePickedJson: traumaTypePickedJson ?? this.traumaTypePickedJson,
+      traumaGeneralBodyPickedJson:
+          traumaGeneralBodyPickedJson ?? this.traumaGeneralBodyPickedJson,
+      traumaMechanismPickedJson:
+          traumaMechanismPickedJson ?? this.traumaMechanismPickedJson,
+      allergyJson: allergyJson ?? this.allergyJson,
+      pmhJson: pmhJson ?? this.pmhJson,
+      allergyOther: allergyOther ?? this.allergyOther,
+      pmhOther: pmhOther ?? this.pmhOther,
+      nonTraumaAcuteOther: nonTraumaAcuteOther ?? this.nonTraumaAcuteOther,
+      traumaGeneralOther: traumaGeneralOther ?? this.traumaGeneralOther,
+      fallHeight: fallHeight ?? this.fallHeight,
+      burnDegree: burnDegree ?? this.burnDegree,
+      burnArea: burnArea ?? this.burnArea,
+      traumaOther: traumaOther ?? this.traumaOther,
+      isProxyStatement: isProxyStatement ?? this.isProxyStatement,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (visitId.present) {
+      map['visit_id'] = Variable<int>(visitId.value);
+    }
+    if (plateNumber.present) {
+      map['plate_number'] = Variable<String>(plateNumber.value);
+    }
+    if (placeGroupIdx.present) {
+      map['place_group_idx'] = Variable<int>(placeGroupIdx.value);
+    }
+    if (t1PlaceIdx.present) {
+      map['t1_place_idx'] = Variable<int>(t1PlaceIdx.value);
+    }
+    if (t2PlaceIdx.present) {
+      map['t2_place_idx'] = Variable<int>(t2PlaceIdx.value);
+    }
+    if (remotePlaceIdx.present) {
+      map['remote_place_idx'] = Variable<int>(remotePlaceIdx.value);
+    }
+    if (cargoPlaceIdx.present) {
+      map['cargo_place_idx'] = Variable<int>(cargoPlaceIdx.value);
+    }
+    if (novotelPlaceIdx.present) {
+      map['novotel_place_idx'] = Variable<int>(novotelPlaceIdx.value);
+    }
+    if (cabinPlaceIdx.present) {
+      map['cabin_place_idx'] = Variable<int>(cabinPlaceIdx.value);
+    }
+    if (placeNote.present) {
+      map['place_note'] = Variable<String>(placeNote.value);
+    }
+    if (dutyTime.present) {
+      map['duty_time'] = Variable<DateTime>(dutyTime.value);
+    }
+    if (arriveSceneTime.present) {
+      map['arrive_scene_time'] = Variable<DateTime>(arriveSceneTime.value);
+    }
+    if (leaveSceneTime.present) {
+      map['leave_scene_time'] = Variable<DateTime>(leaveSceneTime.value);
+    }
+    if (arriveHospitalTime.present) {
+      map['arrive_hospital_time'] = Variable<DateTime>(
+        arriveHospitalTime.value,
+      );
+    }
+    if (leaveHospitalTime.present) {
+      map['leave_hospital_time'] = Variable<DateTime>(leaveHospitalTime.value);
+    }
+    if (backStandbyTime.present) {
+      map['back_standby_time'] = Variable<DateTime>(backStandbyTime.value);
+    }
+    if (destinationHospitalIdx.present) {
+      map['destination_hospital_idx'] = Variable<int>(
+        destinationHospitalIdx.value,
+      );
+    }
+    if (otherDestinationHospital.present) {
+      map['other_destination_hospital'] = Variable<String>(
+        otherDestinationHospital.value,
+      );
+    }
+    if (destinationHospital.present) {
+      map['destination_hospital'] = Variable<String>(destinationHospital.value);
+    }
+    if (patientBelongings.present) {
+      map['patient_belongings'] = Variable<String>(patientBelongings.value);
+    }
+    if (belongingsHandled.present) {
+      map['belongings_handled'] = Variable<String>(belongingsHandled.value);
+    }
+    if (custodianName.present) {
+      map['custodian_name'] = Variable<String>(custodianName.value);
+    }
+    if (custodianSignature.present) {
+      map['custodian_signature'] = Variable<Uint8List>(
+        custodianSignature.value,
+      );
+    }
+    if (chiefComplaint.present) {
+      map['chief_complaint'] = Variable<String>(chiefComplaint.value);
+    }
+    if (emergencyTreatmentsJson.present) {
+      map['emergency_treatments_json'] = Variable<String>(
+        emergencyTreatmentsJson.value,
+      );
+    }
+    if (airwayTreatmentsJson.present) {
+      map['airway_treatments_json'] = Variable<String>(
+        airwayTreatmentsJson.value,
+      );
+    }
+    if (traumaTreatmentsJson.present) {
+      map['trauma_treatments_json'] = Variable<String>(
+        traumaTreatmentsJson.value,
+      );
+    }
+    if (transportMethodsJson.present) {
+      map['transport_methods_json'] = Variable<String>(
+        transportMethodsJson.value,
+      );
+    }
+    if (cprMethodsJson.present) {
+      map['cpr_methods_json'] = Variable<String>(cprMethodsJson.value);
+    }
+    if (medicationProceduresJson.present) {
+      map['medication_procedures_json'] = Variable<String>(
+        medicationProceduresJson.value,
+      );
+    }
+    if (otherEmergencyProceduresJson.present) {
+      map['other_emergency_procedures_json'] = Variable<String>(
+        otherEmergencyProceduresJson.value,
+      );
+    }
+    if (bodyDiagramNote.present) {
+      map['body_diagram_note'] = Variable<String>(bodyDiagramNote.value);
+    }
+    if (bodyDiagramPath.present) {
+      map['body_diagram_path'] = Variable<String>(bodyDiagramPath.value);
+    }
+    if (aslType.present) {
+      map['asl_type'] = Variable<String>(aslType.value);
+    }
+    if (ettSize.present) {
+      map['ett_size'] = Variable<String>(ettSize.value);
+    }
+    if (ettDepth.present) {
+      map['ett_depth'] = Variable<String>(ettDepth.value);
+    }
+    if (manualDefibCount.present) {
+      map['manual_defib_count'] = Variable<String>(manualDefibCount.value);
+    }
+    if (manualDefibJoules.present) {
+      map['manual_defib_joules'] = Variable<String>(manualDefibJoules.value);
+    }
+    if (guideNote.present) {
+      map['guide_note'] = Variable<String>(guideNote.value);
+    }
+    if (receivingUnit.present) {
+      map['receiving_unit'] = Variable<String>(receivingUnit.value);
+    }
+    if (receivingTime.present) {
+      map['receiving_time'] = Variable<DateTime>(receivingTime.value);
+    }
+    if (isRejection.present) {
+      map['is_rejection'] = Variable<bool>(isRejection.value);
+    }
+    if (rejectionName.present) {
+      map['rejection_name'] = Variable<String>(rejectionName.value);
+    }
+    if (relationshipType.present) {
+      map['relationship_type'] = Variable<String>(relationshipType.value);
+    }
+    if (contactName.present) {
+      map['contact_name'] = Variable<String>(contactName.value);
+    }
+    if (contactPhone.present) {
+      map['contact_phone'] = Variable<String>(contactPhone.value);
+    }
+    if (staffFee.present) {
+      map['staff_fee'] = Variable<int>(staffFee.value);
+    }
+    if (oxygenFee.present) {
+      map['oxygen_fee'] = Variable<int>(oxygenFee.value);
+    }
+    if (totalFee.present) {
+      map['total_fee'] = Variable<int>(totalFee.value);
+    }
+    if (chargeStatus.present) {
+      map['charge_status'] = Variable<String>(chargeStatus.value);
+    }
+    if (paidType.present) {
+      map['paid_type'] = Variable<String>(paidType.value);
+    }
+    if (unpaidType.present) {
+      map['unpaid_type'] = Variable<String>(unpaidType.value);
+    }
+    if (traumaClassJson.present) {
+      map['trauma_class_json'] = Variable<String>(traumaClassJson.value);
+    }
+    if (nonTraumaTypeJson.present) {
+      map['non_trauma_type_json'] = Variable<String>(nonTraumaTypeJson.value);
+    }
+    if (nonTraumaAcutePickedJson.present) {
+      map['non_trauma_acute_picked_json'] = Variable<String>(
+        nonTraumaAcutePickedJson.value,
+      );
+    }
+    if (nonTraumaGeneralPickedJson.present) {
+      map['non_trauma_general_picked_json'] = Variable<String>(
+        nonTraumaGeneralPickedJson.value,
+      );
+    }
+    if (traumaTypePickedJson.present) {
+      map['trauma_type_picked_json'] = Variable<String>(
+        traumaTypePickedJson.value,
+      );
+    }
+    if (traumaGeneralBodyPickedJson.present) {
+      map['trauma_general_body_picked_json'] = Variable<String>(
+        traumaGeneralBodyPickedJson.value,
+      );
+    }
+    if (traumaMechanismPickedJson.present) {
+      map['trauma_mechanism_picked_json'] = Variable<String>(
+        traumaMechanismPickedJson.value,
+      );
+    }
+    if (allergyJson.present) {
+      map['allergy_json'] = Variable<String>(allergyJson.value);
+    }
+    if (pmhJson.present) {
+      map['pmh_json'] = Variable<String>(pmhJson.value);
+    }
+    if (allergyOther.present) {
+      map['allergy_other'] = Variable<String>(allergyOther.value);
+    }
+    if (pmhOther.present) {
+      map['pmh_other'] = Variable<String>(pmhOther.value);
+    }
+    if (nonTraumaAcuteOther.present) {
+      map['non_trauma_acute_other'] = Variable<String>(
+        nonTraumaAcuteOther.value,
+      );
+    }
+    if (traumaGeneralOther.present) {
+      map['trauma_general_other'] = Variable<String>(traumaGeneralOther.value);
+    }
+    if (fallHeight.present) {
+      map['fall_height'] = Variable<String>(fallHeight.value);
+    }
+    if (burnDegree.present) {
+      map['burn_degree'] = Variable<String>(burnDegree.value);
+    }
+    if (burnArea.present) {
+      map['burn_area'] = Variable<String>(burnArea.value);
+    }
+    if (traumaOther.present) {
+      map['trauma_other'] = Variable<String>(traumaOther.value);
+    }
+    if (isProxyStatement.present) {
+      map['is_proxy_statement'] = Variable<bool>(isProxyStatement.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AmbulanceRecordsCompanion(')
+          ..write('id: $id, ')
+          ..write('visitId: $visitId, ')
+          ..write('plateNumber: $plateNumber, ')
+          ..write('placeGroupIdx: $placeGroupIdx, ')
+          ..write('t1PlaceIdx: $t1PlaceIdx, ')
+          ..write('t2PlaceIdx: $t2PlaceIdx, ')
+          ..write('remotePlaceIdx: $remotePlaceIdx, ')
+          ..write('cargoPlaceIdx: $cargoPlaceIdx, ')
+          ..write('novotelPlaceIdx: $novotelPlaceIdx, ')
+          ..write('cabinPlaceIdx: $cabinPlaceIdx, ')
+          ..write('placeNote: $placeNote, ')
+          ..write('dutyTime: $dutyTime, ')
+          ..write('arriveSceneTime: $arriveSceneTime, ')
+          ..write('leaveSceneTime: $leaveSceneTime, ')
+          ..write('arriveHospitalTime: $arriveHospitalTime, ')
+          ..write('leaveHospitalTime: $leaveHospitalTime, ')
+          ..write('backStandbyTime: $backStandbyTime, ')
+          ..write('destinationHospitalIdx: $destinationHospitalIdx, ')
+          ..write('otherDestinationHospital: $otherDestinationHospital, ')
+          ..write('destinationHospital: $destinationHospital, ')
+          ..write('patientBelongings: $patientBelongings, ')
+          ..write('belongingsHandled: $belongingsHandled, ')
+          ..write('custodianName: $custodianName, ')
+          ..write('custodianSignature: $custodianSignature, ')
+          ..write('chiefComplaint: $chiefComplaint, ')
+          ..write('emergencyTreatmentsJson: $emergencyTreatmentsJson, ')
+          ..write('airwayTreatmentsJson: $airwayTreatmentsJson, ')
+          ..write('traumaTreatmentsJson: $traumaTreatmentsJson, ')
+          ..write('transportMethodsJson: $transportMethodsJson, ')
+          ..write('cprMethodsJson: $cprMethodsJson, ')
+          ..write('medicationProceduresJson: $medicationProceduresJson, ')
+          ..write(
+            'otherEmergencyProceduresJson: $otherEmergencyProceduresJson, ',
+          )
+          ..write('bodyDiagramNote: $bodyDiagramNote, ')
+          ..write('bodyDiagramPath: $bodyDiagramPath, ')
+          ..write('aslType: $aslType, ')
+          ..write('ettSize: $ettSize, ')
+          ..write('ettDepth: $ettDepth, ')
+          ..write('manualDefibCount: $manualDefibCount, ')
+          ..write('manualDefibJoules: $manualDefibJoules, ')
+          ..write('guideNote: $guideNote, ')
+          ..write('receivingUnit: $receivingUnit, ')
+          ..write('receivingTime: $receivingTime, ')
+          ..write('isRejection: $isRejection, ')
+          ..write('rejectionName: $rejectionName, ')
+          ..write('relationshipType: $relationshipType, ')
+          ..write('contactName: $contactName, ')
+          ..write('contactPhone: $contactPhone, ')
+          ..write('staffFee: $staffFee, ')
+          ..write('oxygenFee: $oxygenFee, ')
+          ..write('totalFee: $totalFee, ')
+          ..write('chargeStatus: $chargeStatus, ')
+          ..write('paidType: $paidType, ')
+          ..write('unpaidType: $unpaidType, ')
+          ..write('traumaClassJson: $traumaClassJson, ')
+          ..write('nonTraumaTypeJson: $nonTraumaTypeJson, ')
+          ..write('nonTraumaAcutePickedJson: $nonTraumaAcutePickedJson, ')
+          ..write('nonTraumaGeneralPickedJson: $nonTraumaGeneralPickedJson, ')
+          ..write('traumaTypePickedJson: $traumaTypePickedJson, ')
+          ..write('traumaGeneralBodyPickedJson: $traumaGeneralBodyPickedJson, ')
+          ..write('traumaMechanismPickedJson: $traumaMechanismPickedJson, ')
+          ..write('allergyJson: $allergyJson, ')
+          ..write('pmhJson: $pmhJson, ')
+          ..write('allergyOther: $allergyOther, ')
+          ..write('pmhOther: $pmhOther, ')
+          ..write('nonTraumaAcuteOther: $nonTraumaAcuteOther, ')
+          ..write('traumaGeneralOther: $traumaGeneralOther, ')
+          ..write('fallHeight: $fallHeight, ')
+          ..write('burnDegree: $burnDegree, ')
+          ..write('burnArea: $burnArea, ')
+          ..write('traumaOther: $traumaOther, ')
+          ..write('isProxyStatement: $isProxyStatement, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $MedicationRecordsTable extends MedicationRecords
+    with TableInfo<$MedicationRecordsTable, MedicationRecord> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $MedicationRecordsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _visitIdMeta = const VerificationMeta(
+    'visitId',
+  );
+  @override
+  late final GeneratedColumn<int> visitId = GeneratedColumn<int>(
+    'visit_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES visits (visit_id)',
+    ),
+  );
+  static const VerificationMeta _recordTimeMeta = const VerificationMeta(
+    'recordTime',
+  );
+  @override
+  late final GeneratedColumn<DateTime> recordTime = GeneratedColumn<DateTime>(
+    'record_time',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _routeMeta = const VerificationMeta('route');
+  @override
+  late final GeneratedColumn<String> route = GeneratedColumn<String>(
+    'route',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _doseMeta = const VerificationMeta('dose');
+  @override
+  late final GeneratedColumn<String> dose = GeneratedColumn<String>(
+    'dose',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _executorMeta = const VerificationMeta(
+    'executor',
+  );
+  @override
+  late final GeneratedColumn<String> executor = GeneratedColumn<String>(
+    'executor',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    visitId,
+    recordTime,
+    name,
+    route,
+    dose,
+    executor,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'medication_records';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<MedicationRecord> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('visit_id')) {
+      context.handle(
+        _visitIdMeta,
+        visitId.isAcceptableOrUnknown(data['visit_id']!, _visitIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_visitIdMeta);
+    }
+    if (data.containsKey('record_time')) {
+      context.handle(
+        _recordTimeMeta,
+        recordTime.isAcceptableOrUnknown(data['record_time']!, _recordTimeMeta),
+      );
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    }
+    if (data.containsKey('route')) {
+      context.handle(
+        _routeMeta,
+        route.isAcceptableOrUnknown(data['route']!, _routeMeta),
+      );
+    }
+    if (data.containsKey('dose')) {
+      context.handle(
+        _doseMeta,
+        dose.isAcceptableOrUnknown(data['dose']!, _doseMeta),
+      );
+    }
+    if (data.containsKey('executor')) {
+      context.handle(
+        _executorMeta,
+        executor.isAcceptableOrUnknown(data['executor']!, _executorMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  MedicationRecord map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return MedicationRecord(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      visitId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}visit_id'],
+      )!,
+      recordTime: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}record_time'],
+      ),
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      ),
+      route: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}route'],
+      ),
+      dose: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}dose'],
+      ),
+      executor: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}executor'],
+      ),
+    );
+  }
+
+  @override
+  $MedicationRecordsTable createAlias(String alias) {
+    return $MedicationRecordsTable(attachedDatabase, alias);
+  }
+}
+
+class MedicationRecord extends DataClass
+    implements Insertable<MedicationRecord> {
+  final int id;
+  final int visitId;
+  final DateTime? recordTime;
+  final String? name;
+  final String? route;
+  final String? dose;
+  final String? executor;
+  const MedicationRecord({
+    required this.id,
+    required this.visitId,
+    this.recordTime,
+    this.name,
+    this.route,
+    this.dose,
+    this.executor,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['visit_id'] = Variable<int>(visitId);
+    if (!nullToAbsent || recordTime != null) {
+      map['record_time'] = Variable<DateTime>(recordTime);
+    }
+    if (!nullToAbsent || name != null) {
+      map['name'] = Variable<String>(name);
+    }
+    if (!nullToAbsent || route != null) {
+      map['route'] = Variable<String>(route);
+    }
+    if (!nullToAbsent || dose != null) {
+      map['dose'] = Variable<String>(dose);
+    }
+    if (!nullToAbsent || executor != null) {
+      map['executor'] = Variable<String>(executor);
+    }
+    return map;
+  }
+
+  MedicationRecordsCompanion toCompanion(bool nullToAbsent) {
+    return MedicationRecordsCompanion(
+      id: Value(id),
+      visitId: Value(visitId),
+      recordTime: recordTime == null && nullToAbsent
+          ? const Value.absent()
+          : Value(recordTime),
+      name: name == null && nullToAbsent ? const Value.absent() : Value(name),
+      route: route == null && nullToAbsent
+          ? const Value.absent()
+          : Value(route),
+      dose: dose == null && nullToAbsent ? const Value.absent() : Value(dose),
+      executor: executor == null && nullToAbsent
+          ? const Value.absent()
+          : Value(executor),
+    );
+  }
+
+  factory MedicationRecord.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return MedicationRecord(
+      id: serializer.fromJson<int>(json['id']),
+      visitId: serializer.fromJson<int>(json['visitId']),
+      recordTime: serializer.fromJson<DateTime?>(json['recordTime']),
+      name: serializer.fromJson<String?>(json['name']),
+      route: serializer.fromJson<String?>(json['route']),
+      dose: serializer.fromJson<String?>(json['dose']),
+      executor: serializer.fromJson<String?>(json['executor']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'visitId': serializer.toJson<int>(visitId),
+      'recordTime': serializer.toJson<DateTime?>(recordTime),
+      'name': serializer.toJson<String?>(name),
+      'route': serializer.toJson<String?>(route),
+      'dose': serializer.toJson<String?>(dose),
+      'executor': serializer.toJson<String?>(executor),
+    };
+  }
+
+  MedicationRecord copyWith({
+    int? id,
+    int? visitId,
+    Value<DateTime?> recordTime = const Value.absent(),
+    Value<String?> name = const Value.absent(),
+    Value<String?> route = const Value.absent(),
+    Value<String?> dose = const Value.absent(),
+    Value<String?> executor = const Value.absent(),
+  }) => MedicationRecord(
+    id: id ?? this.id,
+    visitId: visitId ?? this.visitId,
+    recordTime: recordTime.present ? recordTime.value : this.recordTime,
+    name: name.present ? name.value : this.name,
+    route: route.present ? route.value : this.route,
+    dose: dose.present ? dose.value : this.dose,
+    executor: executor.present ? executor.value : this.executor,
+  );
+  MedicationRecord copyWithCompanion(MedicationRecordsCompanion data) {
+    return MedicationRecord(
+      id: data.id.present ? data.id.value : this.id,
+      visitId: data.visitId.present ? data.visitId.value : this.visitId,
+      recordTime: data.recordTime.present
+          ? data.recordTime.value
+          : this.recordTime,
+      name: data.name.present ? data.name.value : this.name,
+      route: data.route.present ? data.route.value : this.route,
+      dose: data.dose.present ? data.dose.value : this.dose,
+      executor: data.executor.present ? data.executor.value : this.executor,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MedicationRecord(')
+          ..write('id: $id, ')
+          ..write('visitId: $visitId, ')
+          ..write('recordTime: $recordTime, ')
+          ..write('name: $name, ')
+          ..write('route: $route, ')
+          ..write('dose: $dose, ')
+          ..write('executor: $executor')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, visitId, recordTime, name, route, dose, executor);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is MedicationRecord &&
+          other.id == this.id &&
+          other.visitId == this.visitId &&
+          other.recordTime == this.recordTime &&
+          other.name == this.name &&
+          other.route == this.route &&
+          other.dose == this.dose &&
+          other.executor == this.executor);
+}
+
+class MedicationRecordsCompanion extends UpdateCompanion<MedicationRecord> {
+  final Value<int> id;
+  final Value<int> visitId;
+  final Value<DateTime?> recordTime;
+  final Value<String?> name;
+  final Value<String?> route;
+  final Value<String?> dose;
+  final Value<String?> executor;
+  const MedicationRecordsCompanion({
+    this.id = const Value.absent(),
+    this.visitId = const Value.absent(),
+    this.recordTime = const Value.absent(),
+    this.name = const Value.absent(),
+    this.route = const Value.absent(),
+    this.dose = const Value.absent(),
+    this.executor = const Value.absent(),
+  });
+  MedicationRecordsCompanion.insert({
+    this.id = const Value.absent(),
+    required int visitId,
+    this.recordTime = const Value.absent(),
+    this.name = const Value.absent(),
+    this.route = const Value.absent(),
+    this.dose = const Value.absent(),
+    this.executor = const Value.absent(),
+  }) : visitId = Value(visitId);
+  static Insertable<MedicationRecord> custom({
+    Expression<int>? id,
+    Expression<int>? visitId,
+    Expression<DateTime>? recordTime,
+    Expression<String>? name,
+    Expression<String>? route,
+    Expression<String>? dose,
+    Expression<String>? executor,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (visitId != null) 'visit_id': visitId,
+      if (recordTime != null) 'record_time': recordTime,
+      if (name != null) 'name': name,
+      if (route != null) 'route': route,
+      if (dose != null) 'dose': dose,
+      if (executor != null) 'executor': executor,
+    });
+  }
+
+  MedicationRecordsCompanion copyWith({
+    Value<int>? id,
+    Value<int>? visitId,
+    Value<DateTime?>? recordTime,
+    Value<String?>? name,
+    Value<String?>? route,
+    Value<String?>? dose,
+    Value<String?>? executor,
+  }) {
+    return MedicationRecordsCompanion(
+      id: id ?? this.id,
+      visitId: visitId ?? this.visitId,
+      recordTime: recordTime ?? this.recordTime,
+      name: name ?? this.name,
+      route: route ?? this.route,
+      dose: dose ?? this.dose,
+      executor: executor ?? this.executor,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (visitId.present) {
+      map['visit_id'] = Variable<int>(visitId.value);
+    }
+    if (recordTime.present) {
+      map['record_time'] = Variable<DateTime>(recordTime.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (route.present) {
+      map['route'] = Variable<String>(route.value);
+    }
+    if (dose.present) {
+      map['dose'] = Variable<String>(dose.value);
+    }
+    if (executor.present) {
+      map['executor'] = Variable<String>(executor.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MedicationRecordsCompanion(')
+          ..write('id: $id, ')
+          ..write('visitId: $visitId, ')
+          ..write('recordTime: $recordTime, ')
+          ..write('name: $name, ')
+          ..write('route: $route, ')
+          ..write('dose: $dose, ')
+          ..write('executor: $executor')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $VitalSignsRecordsTable extends VitalSignsRecords
+    with TableInfo<$VitalSignsRecordsTable, VitalSignsRecord> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $VitalSignsRecordsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _visitIdMeta = const VerificationMeta(
+    'visitId',
+  );
+  @override
+  late final GeneratedColumn<int> visitId = GeneratedColumn<int>(
+    'visit_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES visits (visit_id)',
+    ),
+  );
+  static const VerificationMeta _recordTimeMeta = const VerificationMeta(
+    'recordTime',
+  );
+  @override
+  late final GeneratedColumn<DateTime> recordTime = GeneratedColumn<DateTime>(
+    'record_time',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _atHospitalMeta = const VerificationMeta(
+    'atHospital',
+  );
+  @override
+  late final GeneratedColumn<bool> atHospital = GeneratedColumn<bool>(
+    'at_hospital',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("at_hospital" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _triageStationMeta = const VerificationMeta(
+    'triageStation',
+  );
+  @override
+  late final GeneratedColumn<String> triageStation = GeneratedColumn<String>(
+    'triage_station',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _consciousnessMeta = const VerificationMeta(
+    'consciousness',
+  );
+  @override
+  late final GeneratedColumn<String> consciousness = GeneratedColumn<String>(
+    'consciousness',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _temperatureMeta = const VerificationMeta(
+    'temperature',
+  );
+  @override
+  late final GeneratedColumn<String> temperature = GeneratedColumn<String>(
+    'temperature',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _pulseMeta = const VerificationMeta('pulse');
+  @override
+  late final GeneratedColumn<String> pulse = GeneratedColumn<String>(
+    'pulse',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _respirationMeta = const VerificationMeta(
+    'respiration',
+  );
+  @override
+  late final GeneratedColumn<String> respiration = GeneratedColumn<String>(
+    'respiration',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _bloodPressureMeta = const VerificationMeta(
+    'bloodPressure',
+  );
+  @override
+  late final GeneratedColumn<String> bloodPressure = GeneratedColumn<String>(
+    'blood_pressure',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _spo2Meta = const VerificationMeta('spo2');
+  @override
+  late final GeneratedColumn<String> spo2 = GeneratedColumn<String>(
+    'spo2',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _gcsMeta = const VerificationMeta('gcs');
+  @override
+  late final GeneratedColumn<String> gcs = GeneratedColumn<String>(
+    'gcs',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    visitId,
+    recordTime,
+    atHospital,
+    triageStation,
+    consciousness,
+    temperature,
+    pulse,
+    respiration,
+    bloodPressure,
+    spo2,
+    gcs,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'vital_signs_records';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<VitalSignsRecord> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('visit_id')) {
+      context.handle(
+        _visitIdMeta,
+        visitId.isAcceptableOrUnknown(data['visit_id']!, _visitIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_visitIdMeta);
+    }
+    if (data.containsKey('record_time')) {
+      context.handle(
+        _recordTimeMeta,
+        recordTime.isAcceptableOrUnknown(data['record_time']!, _recordTimeMeta),
+      );
+    }
+    if (data.containsKey('at_hospital')) {
+      context.handle(
+        _atHospitalMeta,
+        atHospital.isAcceptableOrUnknown(data['at_hospital']!, _atHospitalMeta),
+      );
+    }
+    if (data.containsKey('triage_station')) {
+      context.handle(
+        _triageStationMeta,
+        triageStation.isAcceptableOrUnknown(
+          data['triage_station']!,
+          _triageStationMeta,
+        ),
+      );
+    }
+    if (data.containsKey('consciousness')) {
+      context.handle(
+        _consciousnessMeta,
+        consciousness.isAcceptableOrUnknown(
+          data['consciousness']!,
+          _consciousnessMeta,
+        ),
+      );
+    }
+    if (data.containsKey('temperature')) {
+      context.handle(
+        _temperatureMeta,
+        temperature.isAcceptableOrUnknown(
+          data['temperature']!,
+          _temperatureMeta,
+        ),
+      );
+    }
+    if (data.containsKey('pulse')) {
+      context.handle(
+        _pulseMeta,
+        pulse.isAcceptableOrUnknown(data['pulse']!, _pulseMeta),
+      );
+    }
+    if (data.containsKey('respiration')) {
+      context.handle(
+        _respirationMeta,
+        respiration.isAcceptableOrUnknown(
+          data['respiration']!,
+          _respirationMeta,
+        ),
+      );
+    }
+    if (data.containsKey('blood_pressure')) {
+      context.handle(
+        _bloodPressureMeta,
+        bloodPressure.isAcceptableOrUnknown(
+          data['blood_pressure']!,
+          _bloodPressureMeta,
+        ),
+      );
+    }
+    if (data.containsKey('spo2')) {
+      context.handle(
+        _spo2Meta,
+        spo2.isAcceptableOrUnknown(data['spo2']!, _spo2Meta),
+      );
+    }
+    if (data.containsKey('gcs')) {
+      context.handle(
+        _gcsMeta,
+        gcs.isAcceptableOrUnknown(data['gcs']!, _gcsMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  VitalSignsRecord map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return VitalSignsRecord(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      visitId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}visit_id'],
+      )!,
+      recordTime: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}record_time'],
+      ),
+      atHospital: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}at_hospital'],
+      )!,
+      triageStation: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}triage_station'],
+      ),
+      consciousness: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}consciousness'],
+      ),
+      temperature: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}temperature'],
+      ),
+      pulse: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}pulse'],
+      ),
+      respiration: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}respiration'],
+      ),
+      bloodPressure: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}blood_pressure'],
+      ),
+      spo2: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}spo2'],
+      ),
+      gcs: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}gcs'],
+      ),
+    );
+  }
+
+  @override
+  $VitalSignsRecordsTable createAlias(String alias) {
+    return $VitalSignsRecordsTable(attachedDatabase, alias);
+  }
+}
+
+class VitalSignsRecord extends DataClass
+    implements Insertable<VitalSignsRecord> {
+  final int id;
+  final int visitId;
+  final DateTime? recordTime;
+  final bool atHospital;
+  final String? triageStation;
+  final String? consciousness;
+  final String? temperature;
+  final String? pulse;
+  final String? respiration;
+  final String? bloodPressure;
+  final String? spo2;
+  final String? gcs;
+  const VitalSignsRecord({
+    required this.id,
+    required this.visitId,
+    this.recordTime,
+    required this.atHospital,
+    this.triageStation,
+    this.consciousness,
+    this.temperature,
+    this.pulse,
+    this.respiration,
+    this.bloodPressure,
+    this.spo2,
+    this.gcs,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['visit_id'] = Variable<int>(visitId);
+    if (!nullToAbsent || recordTime != null) {
+      map['record_time'] = Variable<DateTime>(recordTime);
+    }
+    map['at_hospital'] = Variable<bool>(atHospital);
+    if (!nullToAbsent || triageStation != null) {
+      map['triage_station'] = Variable<String>(triageStation);
+    }
+    if (!nullToAbsent || consciousness != null) {
+      map['consciousness'] = Variable<String>(consciousness);
+    }
+    if (!nullToAbsent || temperature != null) {
+      map['temperature'] = Variable<String>(temperature);
+    }
+    if (!nullToAbsent || pulse != null) {
+      map['pulse'] = Variable<String>(pulse);
+    }
+    if (!nullToAbsent || respiration != null) {
+      map['respiration'] = Variable<String>(respiration);
+    }
+    if (!nullToAbsent || bloodPressure != null) {
+      map['blood_pressure'] = Variable<String>(bloodPressure);
+    }
+    if (!nullToAbsent || spo2 != null) {
+      map['spo2'] = Variable<String>(spo2);
+    }
+    if (!nullToAbsent || gcs != null) {
+      map['gcs'] = Variable<String>(gcs);
+    }
+    return map;
+  }
+
+  VitalSignsRecordsCompanion toCompanion(bool nullToAbsent) {
+    return VitalSignsRecordsCompanion(
+      id: Value(id),
+      visitId: Value(visitId),
+      recordTime: recordTime == null && nullToAbsent
+          ? const Value.absent()
+          : Value(recordTime),
+      atHospital: Value(atHospital),
+      triageStation: triageStation == null && nullToAbsent
+          ? const Value.absent()
+          : Value(triageStation),
+      consciousness: consciousness == null && nullToAbsent
+          ? const Value.absent()
+          : Value(consciousness),
+      temperature: temperature == null && nullToAbsent
+          ? const Value.absent()
+          : Value(temperature),
+      pulse: pulse == null && nullToAbsent
+          ? const Value.absent()
+          : Value(pulse),
+      respiration: respiration == null && nullToAbsent
+          ? const Value.absent()
+          : Value(respiration),
+      bloodPressure: bloodPressure == null && nullToAbsent
+          ? const Value.absent()
+          : Value(bloodPressure),
+      spo2: spo2 == null && nullToAbsent ? const Value.absent() : Value(spo2),
+      gcs: gcs == null && nullToAbsent ? const Value.absent() : Value(gcs),
+    );
+  }
+
+  factory VitalSignsRecord.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return VitalSignsRecord(
+      id: serializer.fromJson<int>(json['id']),
+      visitId: serializer.fromJson<int>(json['visitId']),
+      recordTime: serializer.fromJson<DateTime?>(json['recordTime']),
+      atHospital: serializer.fromJson<bool>(json['atHospital']),
+      triageStation: serializer.fromJson<String?>(json['triageStation']),
+      consciousness: serializer.fromJson<String?>(json['consciousness']),
+      temperature: serializer.fromJson<String?>(json['temperature']),
+      pulse: serializer.fromJson<String?>(json['pulse']),
+      respiration: serializer.fromJson<String?>(json['respiration']),
+      bloodPressure: serializer.fromJson<String?>(json['bloodPressure']),
+      spo2: serializer.fromJson<String?>(json['spo2']),
+      gcs: serializer.fromJson<String?>(json['gcs']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'visitId': serializer.toJson<int>(visitId),
+      'recordTime': serializer.toJson<DateTime?>(recordTime),
+      'atHospital': serializer.toJson<bool>(atHospital),
+      'triageStation': serializer.toJson<String?>(triageStation),
+      'consciousness': serializer.toJson<String?>(consciousness),
+      'temperature': serializer.toJson<String?>(temperature),
+      'pulse': serializer.toJson<String?>(pulse),
+      'respiration': serializer.toJson<String?>(respiration),
+      'bloodPressure': serializer.toJson<String?>(bloodPressure),
+      'spo2': serializer.toJson<String?>(spo2),
+      'gcs': serializer.toJson<String?>(gcs),
+    };
+  }
+
+  VitalSignsRecord copyWith({
+    int? id,
+    int? visitId,
+    Value<DateTime?> recordTime = const Value.absent(),
+    bool? atHospital,
+    Value<String?> triageStation = const Value.absent(),
+    Value<String?> consciousness = const Value.absent(),
+    Value<String?> temperature = const Value.absent(),
+    Value<String?> pulse = const Value.absent(),
+    Value<String?> respiration = const Value.absent(),
+    Value<String?> bloodPressure = const Value.absent(),
+    Value<String?> spo2 = const Value.absent(),
+    Value<String?> gcs = const Value.absent(),
+  }) => VitalSignsRecord(
+    id: id ?? this.id,
+    visitId: visitId ?? this.visitId,
+    recordTime: recordTime.present ? recordTime.value : this.recordTime,
+    atHospital: atHospital ?? this.atHospital,
+    triageStation: triageStation.present
+        ? triageStation.value
+        : this.triageStation,
+    consciousness: consciousness.present
+        ? consciousness.value
+        : this.consciousness,
+    temperature: temperature.present ? temperature.value : this.temperature,
+    pulse: pulse.present ? pulse.value : this.pulse,
+    respiration: respiration.present ? respiration.value : this.respiration,
+    bloodPressure: bloodPressure.present
+        ? bloodPressure.value
+        : this.bloodPressure,
+    spo2: spo2.present ? spo2.value : this.spo2,
+    gcs: gcs.present ? gcs.value : this.gcs,
+  );
+  VitalSignsRecord copyWithCompanion(VitalSignsRecordsCompanion data) {
+    return VitalSignsRecord(
+      id: data.id.present ? data.id.value : this.id,
+      visitId: data.visitId.present ? data.visitId.value : this.visitId,
+      recordTime: data.recordTime.present
+          ? data.recordTime.value
+          : this.recordTime,
+      atHospital: data.atHospital.present
+          ? data.atHospital.value
+          : this.atHospital,
+      triageStation: data.triageStation.present
+          ? data.triageStation.value
+          : this.triageStation,
+      consciousness: data.consciousness.present
+          ? data.consciousness.value
+          : this.consciousness,
+      temperature: data.temperature.present
+          ? data.temperature.value
+          : this.temperature,
+      pulse: data.pulse.present ? data.pulse.value : this.pulse,
+      respiration: data.respiration.present
+          ? data.respiration.value
+          : this.respiration,
+      bloodPressure: data.bloodPressure.present
+          ? data.bloodPressure.value
+          : this.bloodPressure,
+      spo2: data.spo2.present ? data.spo2.value : this.spo2,
+      gcs: data.gcs.present ? data.gcs.value : this.gcs,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('VitalSignsRecord(')
+          ..write('id: $id, ')
+          ..write('visitId: $visitId, ')
+          ..write('recordTime: $recordTime, ')
+          ..write('atHospital: $atHospital, ')
+          ..write('triageStation: $triageStation, ')
+          ..write('consciousness: $consciousness, ')
+          ..write('temperature: $temperature, ')
+          ..write('pulse: $pulse, ')
+          ..write('respiration: $respiration, ')
+          ..write('bloodPressure: $bloodPressure, ')
+          ..write('spo2: $spo2, ')
+          ..write('gcs: $gcs')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    visitId,
+    recordTime,
+    atHospital,
+    triageStation,
+    consciousness,
+    temperature,
+    pulse,
+    respiration,
+    bloodPressure,
+    spo2,
+    gcs,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is VitalSignsRecord &&
+          other.id == this.id &&
+          other.visitId == this.visitId &&
+          other.recordTime == this.recordTime &&
+          other.atHospital == this.atHospital &&
+          other.triageStation == this.triageStation &&
+          other.consciousness == this.consciousness &&
+          other.temperature == this.temperature &&
+          other.pulse == this.pulse &&
+          other.respiration == this.respiration &&
+          other.bloodPressure == this.bloodPressure &&
+          other.spo2 == this.spo2 &&
+          other.gcs == this.gcs);
+}
+
+class VitalSignsRecordsCompanion extends UpdateCompanion<VitalSignsRecord> {
+  final Value<int> id;
+  final Value<int> visitId;
+  final Value<DateTime?> recordTime;
+  final Value<bool> atHospital;
+  final Value<String?> triageStation;
+  final Value<String?> consciousness;
+  final Value<String?> temperature;
+  final Value<String?> pulse;
+  final Value<String?> respiration;
+  final Value<String?> bloodPressure;
+  final Value<String?> spo2;
+  final Value<String?> gcs;
+  const VitalSignsRecordsCompanion({
+    this.id = const Value.absent(),
+    this.visitId = const Value.absent(),
+    this.recordTime = const Value.absent(),
+    this.atHospital = const Value.absent(),
+    this.triageStation = const Value.absent(),
+    this.consciousness = const Value.absent(),
+    this.temperature = const Value.absent(),
+    this.pulse = const Value.absent(),
+    this.respiration = const Value.absent(),
+    this.bloodPressure = const Value.absent(),
+    this.spo2 = const Value.absent(),
+    this.gcs = const Value.absent(),
+  });
+  VitalSignsRecordsCompanion.insert({
+    this.id = const Value.absent(),
+    required int visitId,
+    this.recordTime = const Value.absent(),
+    this.atHospital = const Value.absent(),
+    this.triageStation = const Value.absent(),
+    this.consciousness = const Value.absent(),
+    this.temperature = const Value.absent(),
+    this.pulse = const Value.absent(),
+    this.respiration = const Value.absent(),
+    this.bloodPressure = const Value.absent(),
+    this.spo2 = const Value.absent(),
+    this.gcs = const Value.absent(),
+  }) : visitId = Value(visitId);
+  static Insertable<VitalSignsRecord> custom({
+    Expression<int>? id,
+    Expression<int>? visitId,
+    Expression<DateTime>? recordTime,
+    Expression<bool>? atHospital,
+    Expression<String>? triageStation,
+    Expression<String>? consciousness,
+    Expression<String>? temperature,
+    Expression<String>? pulse,
+    Expression<String>? respiration,
+    Expression<String>? bloodPressure,
+    Expression<String>? spo2,
+    Expression<String>? gcs,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (visitId != null) 'visit_id': visitId,
+      if (recordTime != null) 'record_time': recordTime,
+      if (atHospital != null) 'at_hospital': atHospital,
+      if (triageStation != null) 'triage_station': triageStation,
+      if (consciousness != null) 'consciousness': consciousness,
+      if (temperature != null) 'temperature': temperature,
+      if (pulse != null) 'pulse': pulse,
+      if (respiration != null) 'respiration': respiration,
+      if (bloodPressure != null) 'blood_pressure': bloodPressure,
+      if (spo2 != null) 'spo2': spo2,
+      if (gcs != null) 'gcs': gcs,
+    });
+  }
+
+  VitalSignsRecordsCompanion copyWith({
+    Value<int>? id,
+    Value<int>? visitId,
+    Value<DateTime?>? recordTime,
+    Value<bool>? atHospital,
+    Value<String?>? triageStation,
+    Value<String?>? consciousness,
+    Value<String?>? temperature,
+    Value<String?>? pulse,
+    Value<String?>? respiration,
+    Value<String?>? bloodPressure,
+    Value<String?>? spo2,
+    Value<String?>? gcs,
+  }) {
+    return VitalSignsRecordsCompanion(
+      id: id ?? this.id,
+      visitId: visitId ?? this.visitId,
+      recordTime: recordTime ?? this.recordTime,
+      atHospital: atHospital ?? this.atHospital,
+      triageStation: triageStation ?? this.triageStation,
+      consciousness: consciousness ?? this.consciousness,
+      temperature: temperature ?? this.temperature,
+      pulse: pulse ?? this.pulse,
+      respiration: respiration ?? this.respiration,
+      bloodPressure: bloodPressure ?? this.bloodPressure,
+      spo2: spo2 ?? this.spo2,
+      gcs: gcs ?? this.gcs,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (visitId.present) {
+      map['visit_id'] = Variable<int>(visitId.value);
+    }
+    if (recordTime.present) {
+      map['record_time'] = Variable<DateTime>(recordTime.value);
+    }
+    if (atHospital.present) {
+      map['at_hospital'] = Variable<bool>(atHospital.value);
+    }
+    if (triageStation.present) {
+      map['triage_station'] = Variable<String>(triageStation.value);
+    }
+    if (consciousness.present) {
+      map['consciousness'] = Variable<String>(consciousness.value);
+    }
+    if (temperature.present) {
+      map['temperature'] = Variable<String>(temperature.value);
+    }
+    if (pulse.present) {
+      map['pulse'] = Variable<String>(pulse.value);
+    }
+    if (respiration.present) {
+      map['respiration'] = Variable<String>(respiration.value);
+    }
+    if (bloodPressure.present) {
+      map['blood_pressure'] = Variable<String>(bloodPressure.value);
+    }
+    if (spo2.present) {
+      map['spo2'] = Variable<String>(spo2.value);
+    }
+    if (gcs.present) {
+      map['gcs'] = Variable<String>(gcs.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('VitalSignsRecordsCompanion(')
+          ..write('id: $id, ')
+          ..write('visitId: $visitId, ')
+          ..write('recordTime: $recordTime, ')
+          ..write('atHospital: $atHospital, ')
+          ..write('triageStation: $triageStation, ')
+          ..write('consciousness: $consciousness, ')
+          ..write('temperature: $temperature, ')
+          ..write('pulse: $pulse, ')
+          ..write('respiration: $respiration, ')
+          ..write('bloodPressure: $bloodPressure, ')
+          ..write('spo2: $spo2, ')
+          ..write('gcs: $gcs')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $ParamedicRecordsTable extends ParamedicRecords
+    with TableInfo<$ParamedicRecordsTable, ParamedicRecord> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ParamedicRecordsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _visitIdMeta = const VerificationMeta(
+    'visitId',
+  );
+  @override
+  late final GeneratedColumn<int> visitId = GeneratedColumn<int>(
+    'visit_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES visits (visit_id)',
+    ),
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _signatureMeta = const VerificationMeta(
+    'signature',
+  );
+  @override
+  late final GeneratedColumn<Uint8List> signature = GeneratedColumn<Uint8List>(
+    'signature',
+    aliasedName,
+    true,
+    type: DriftSqlType.blob,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, visitId, name, signature];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'paramedic_records';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ParamedicRecord> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('visit_id')) {
+      context.handle(
+        _visitIdMeta,
+        visitId.isAcceptableOrUnknown(data['visit_id']!, _visitIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_visitIdMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    }
+    if (data.containsKey('signature')) {
+      context.handle(
+        _signatureMeta,
+        signature.isAcceptableOrUnknown(data['signature']!, _signatureMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  ParamedicRecord map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ParamedicRecord(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      visitId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}visit_id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      ),
+      signature: attachedDatabase.typeMapping.read(
+        DriftSqlType.blob,
+        data['${effectivePrefix}signature'],
+      ),
+    );
+  }
+
+  @override
+  $ParamedicRecordsTable createAlias(String alias) {
+    return $ParamedicRecordsTable(attachedDatabase, alias);
+  }
+}
+
+class ParamedicRecord extends DataClass implements Insertable<ParamedicRecord> {
+  final int id;
+  final int visitId;
+  final String? name;
+  final Uint8List? signature;
+  const ParamedicRecord({
+    required this.id,
+    required this.visitId,
+    this.name,
+    this.signature,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['visit_id'] = Variable<int>(visitId);
+    if (!nullToAbsent || name != null) {
+      map['name'] = Variable<String>(name);
+    }
+    if (!nullToAbsent || signature != null) {
+      map['signature'] = Variable<Uint8List>(signature);
+    }
+    return map;
+  }
+
+  ParamedicRecordsCompanion toCompanion(bool nullToAbsent) {
+    return ParamedicRecordsCompanion(
+      id: Value(id),
+      visitId: Value(visitId),
+      name: name == null && nullToAbsent ? const Value.absent() : Value(name),
+      signature: signature == null && nullToAbsent
+          ? const Value.absent()
+          : Value(signature),
+    );
+  }
+
+  factory ParamedicRecord.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ParamedicRecord(
+      id: serializer.fromJson<int>(json['id']),
+      visitId: serializer.fromJson<int>(json['visitId']),
+      name: serializer.fromJson<String?>(json['name']),
+      signature: serializer.fromJson<Uint8List?>(json['signature']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'visitId': serializer.toJson<int>(visitId),
+      'name': serializer.toJson<String?>(name),
+      'signature': serializer.toJson<Uint8List?>(signature),
+    };
+  }
+
+  ParamedicRecord copyWith({
+    int? id,
+    int? visitId,
+    Value<String?> name = const Value.absent(),
+    Value<Uint8List?> signature = const Value.absent(),
+  }) => ParamedicRecord(
+    id: id ?? this.id,
+    visitId: visitId ?? this.visitId,
+    name: name.present ? name.value : this.name,
+    signature: signature.present ? signature.value : this.signature,
+  );
+  ParamedicRecord copyWithCompanion(ParamedicRecordsCompanion data) {
+    return ParamedicRecord(
+      id: data.id.present ? data.id.value : this.id,
+      visitId: data.visitId.present ? data.visitId.value : this.visitId,
+      name: data.name.present ? data.name.value : this.name,
+      signature: data.signature.present ? data.signature.value : this.signature,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ParamedicRecord(')
+          ..write('id: $id, ')
+          ..write('visitId: $visitId, ')
+          ..write('name: $name, ')
+          ..write('signature: $signature')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, visitId, name, $driftBlobEquality.hash(signature));
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ParamedicRecord &&
+          other.id == this.id &&
+          other.visitId == this.visitId &&
+          other.name == this.name &&
+          $driftBlobEquality.equals(other.signature, this.signature));
+}
+
+class ParamedicRecordsCompanion extends UpdateCompanion<ParamedicRecord> {
+  final Value<int> id;
+  final Value<int> visitId;
+  final Value<String?> name;
+  final Value<Uint8List?> signature;
+  const ParamedicRecordsCompanion({
+    this.id = const Value.absent(),
+    this.visitId = const Value.absent(),
+    this.name = const Value.absent(),
+    this.signature = const Value.absent(),
+  });
+  ParamedicRecordsCompanion.insert({
+    this.id = const Value.absent(),
+    required int visitId,
+    this.name = const Value.absent(),
+    this.signature = const Value.absent(),
+  }) : visitId = Value(visitId);
+  static Insertable<ParamedicRecord> custom({
+    Expression<int>? id,
+    Expression<int>? visitId,
+    Expression<String>? name,
+    Expression<Uint8List>? signature,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (visitId != null) 'visit_id': visitId,
+      if (name != null) 'name': name,
+      if (signature != null) 'signature': signature,
+    });
+  }
+
+  ParamedicRecordsCompanion copyWith({
+    Value<int>? id,
+    Value<int>? visitId,
+    Value<String?>? name,
+    Value<Uint8List?>? signature,
+  }) {
+    return ParamedicRecordsCompanion(
+      id: id ?? this.id,
+      visitId: visitId ?? this.visitId,
+      name: name ?? this.name,
+      signature: signature ?? this.signature,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (visitId.present) {
+      map['visit_id'] = Variable<int>(visitId.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (signature.present) {
+      map['signature'] = Variable<Uint8List>(signature.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ParamedicRecordsCompanion(')
+          ..write('id: $id, ')
+          ..write('visitId: $visitId, ')
+          ..write('name: $name, ')
+          ..write('signature: $signature')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -10795,6 +18408,17 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $ElectronicDocumentsTable electronicDocuments =
       $ElectronicDocumentsTable(this);
   late final $NursingRecordsTable nursingRecords = $NursingRecordsTable(this);
+  late final $ReferralFormsTable referralForms = $ReferralFormsTable(this);
+  late final $AmbulanceRecordsTable ambulanceRecords = $AmbulanceRecordsTable(
+    this,
+  );
+  late final $MedicationRecordsTable medicationRecords =
+      $MedicationRecordsTable(this);
+  late final $VitalSignsRecordsTable vitalSignsRecords =
+      $VitalSignsRecordsTable(this);
+  late final $ParamedicRecordsTable paramedicRecords = $ParamedicRecordsTable(
+    this,
+  );
   late final VisitsDao visitsDao = VisitsDao(this as AppDatabase);
   late final PatientProfilesDao patientProfilesDao = PatientProfilesDao(
     this as AppDatabase,
@@ -10817,6 +18441,21 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final NursingRecordsDao nursingRecordsDao = NursingRecordsDao(
     this as AppDatabase,
   );
+  late final ReferralFormsDao referralFormsDao = ReferralFormsDao(
+    this as AppDatabase,
+  );
+  late final AmbulanceRecordsDao ambulanceRecordsDao = AmbulanceRecordsDao(
+    this as AppDatabase,
+  );
+  late final MedicationRecordsDao medicationRecordsDao = MedicationRecordsDao(
+    this as AppDatabase,
+  );
+  late final VitalSignsRecordsDao vitalSignsRecordsDao = VitalSignsRecordsDao(
+    this as AppDatabase,
+  );
+  late final ParamedicRecordsDao paramedicRecordsDao = ParamedicRecordsDao(
+    this as AppDatabase,
+  );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -10832,6 +18471,11 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     undertakings,
     electronicDocuments,
     nursingRecords,
+    referralForms,
+    ambulanceRecords,
+    medicationRecords,
+    vitalSignsRecords,
+    paramedicRecords,
   ];
 }
 
@@ -10861,6 +18505,88 @@ typedef $$VisitsTableUpdateCompanionBuilder =
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
     });
+
+final class $$VisitsTableReferences
+    extends BaseReferences<_$AppDatabase, $VisitsTable, Visit> {
+  $$VisitsTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static MultiTypedResultKey<$MedicationRecordsTable, List<MedicationRecord>>
+  _medicationRecordsRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.medicationRecords,
+        aliasName: $_aliasNameGenerator(
+          db.visits.visitId,
+          db.medicationRecords.visitId,
+        ),
+      );
+
+  $$MedicationRecordsTableProcessedTableManager get medicationRecordsRefs {
+    final manager =
+        $$MedicationRecordsTableTableManager(
+          $_db,
+          $_db.medicationRecords,
+        ).filter(
+          (f) => f.visitId.visitId.sqlEquals($_itemColumn<int>('visit_id')!),
+        );
+
+    final cache = $_typedResult.readTableOrNull(
+      _medicationRecordsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$VitalSignsRecordsTable, List<VitalSignsRecord>>
+  _vitalSignsRecordsRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.vitalSignsRecords,
+        aliasName: $_aliasNameGenerator(
+          db.visits.visitId,
+          db.vitalSignsRecords.visitId,
+        ),
+      );
+
+  $$VitalSignsRecordsTableProcessedTableManager get vitalSignsRecordsRefs {
+    final manager =
+        $$VitalSignsRecordsTableTableManager(
+          $_db,
+          $_db.vitalSignsRecords,
+        ).filter(
+          (f) => f.visitId.visitId.sqlEquals($_itemColumn<int>('visit_id')!),
+        );
+
+    final cache = $_typedResult.readTableOrNull(
+      _vitalSignsRecordsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$ParamedicRecordsTable, List<ParamedicRecord>>
+  _paramedicRecordsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.paramedicRecords,
+    aliasName: $_aliasNameGenerator(
+      db.visits.visitId,
+      db.paramedicRecords.visitId,
+    ),
+  );
+
+  $$ParamedicRecordsTableProcessedTableManager get paramedicRecordsRefs {
+    final manager =
+        $$ParamedicRecordsTableTableManager($_db, $_db.paramedicRecords).filter(
+          (f) => f.visitId.visitId.sqlEquals($_itemColumn<int>('visit_id')!),
+        );
+
+    final cache = $_typedResult.readTableOrNull(
+      _paramedicRecordsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
 
 class $$VisitsTableFilterComposer
     extends Composer<_$AppDatabase, $VisitsTable> {
@@ -10920,6 +18646,81 @@ class $$VisitsTableFilterComposer
     column: $table.updatedAt,
     builder: (column) => ColumnFilters(column),
   );
+
+  Expression<bool> medicationRecordsRefs(
+    Expression<bool> Function($$MedicationRecordsTableFilterComposer f) f,
+  ) {
+    final $$MedicationRecordsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.visitId,
+      referencedTable: $db.medicationRecords,
+      getReferencedColumn: (t) => t.visitId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MedicationRecordsTableFilterComposer(
+            $db: $db,
+            $table: $db.medicationRecords,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> vitalSignsRecordsRefs(
+    Expression<bool> Function($$VitalSignsRecordsTableFilterComposer f) f,
+  ) {
+    final $$VitalSignsRecordsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.visitId,
+      referencedTable: $db.vitalSignsRecords,
+      getReferencedColumn: (t) => t.visitId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$VitalSignsRecordsTableFilterComposer(
+            $db: $db,
+            $table: $db.vitalSignsRecords,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> paramedicRecordsRefs(
+    Expression<bool> Function($$ParamedicRecordsTableFilterComposer f) f,
+  ) {
+    final $$ParamedicRecordsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.visitId,
+      referencedTable: $db.paramedicRecords,
+      getReferencedColumn: (t) => t.visitId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ParamedicRecordsTableFilterComposer(
+            $db: $db,
+            $table: $db.paramedicRecords,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$VisitsTableOrderingComposer
@@ -11026,6 +18827,83 @@ class $$VisitsTableAnnotationComposer
 
   GeneratedColumn<DateTime> get updatedAt =>
       $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  Expression<T> medicationRecordsRefs<T extends Object>(
+    Expression<T> Function($$MedicationRecordsTableAnnotationComposer a) f,
+  ) {
+    final $$MedicationRecordsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.visitId,
+          referencedTable: $db.medicationRecords,
+          getReferencedColumn: (t) => t.visitId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$MedicationRecordsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.medicationRecords,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<T> vitalSignsRecordsRefs<T extends Object>(
+    Expression<T> Function($$VitalSignsRecordsTableAnnotationComposer a) f,
+  ) {
+    final $$VitalSignsRecordsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.visitId,
+          referencedTable: $db.vitalSignsRecords,
+          getReferencedColumn: (t) => t.visitId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$VitalSignsRecordsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.vitalSignsRecords,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<T> paramedicRecordsRefs<T extends Object>(
+    Expression<T> Function($$ParamedicRecordsTableAnnotationComposer a) f,
+  ) {
+    final $$ParamedicRecordsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.visitId,
+      referencedTable: $db.paramedicRecords,
+      getReferencedColumn: (t) => t.visitId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ParamedicRecordsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.paramedicRecords,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$VisitsTableTableManager
@@ -11039,9 +18917,13 @@ class $$VisitsTableTableManager
           $$VisitsTableAnnotationComposer,
           $$VisitsTableCreateCompanionBuilder,
           $$VisitsTableUpdateCompanionBuilder,
-          (Visit, BaseReferences<_$AppDatabase, $VisitsTable, Visit>),
+          (Visit, $$VisitsTableReferences),
           Visit,
-          PrefetchHooks Function()
+          PrefetchHooks Function({
+            bool medicationRecordsRefs,
+            bool vitalSignsRecordsRefs,
+            bool paramedicRecordsRefs,
+          })
         > {
   $$VisitsTableTableManager(_$AppDatabase db, $VisitsTable table)
     : super(
@@ -11103,9 +18985,94 @@ class $$VisitsTableTableManager
                 updatedAt: updatedAt,
               ),
           withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .map(
+                (e) =>
+                    (e.readTable(table), $$VisitsTableReferences(db, table, e)),
+              )
               .toList(),
-          prefetchHooksCallback: null,
+          prefetchHooksCallback:
+              ({
+                medicationRecordsRefs = false,
+                vitalSignsRecordsRefs = false,
+                paramedicRecordsRefs = false,
+              }) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (medicationRecordsRefs) db.medicationRecords,
+                    if (vitalSignsRecordsRefs) db.vitalSignsRecords,
+                    if (paramedicRecordsRefs) db.paramedicRecords,
+                  ],
+                  addJoins: null,
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (medicationRecordsRefs)
+                        await $_getPrefetchedData<
+                          Visit,
+                          $VisitsTable,
+                          MedicationRecord
+                        >(
+                          currentTable: table,
+                          referencedTable: $$VisitsTableReferences
+                              ._medicationRecordsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$VisitsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).medicationRecordsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.visitId == item.visitId,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (vitalSignsRecordsRefs)
+                        await $_getPrefetchedData<
+                          Visit,
+                          $VisitsTable,
+                          VitalSignsRecord
+                        >(
+                          currentTable: table,
+                          referencedTable: $$VisitsTableReferences
+                              ._vitalSignsRecordsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$VisitsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).vitalSignsRecordsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.visitId == item.visitId,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (paramedicRecordsRefs)
+                        await $_getPrefetchedData<
+                          Visit,
+                          $VisitsTable,
+                          ParamedicRecord
+                        >(
+                          currentTable: table,
+                          referencedTable: $$VisitsTableReferences
+                              ._paramedicRecordsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$VisitsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).paramedicRecordsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.visitId == item.visitId,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
+              },
         ),
       );
 }
@@ -11120,9 +19087,13 @@ typedef $$VisitsTableProcessedTableManager =
       $$VisitsTableAnnotationComposer,
       $$VisitsTableCreateCompanionBuilder,
       $$VisitsTableUpdateCompanionBuilder,
-      (Visit, BaseReferences<_$AppDatabase, $VisitsTable, Visit>),
+      (Visit, $$VisitsTableReferences),
       Visit,
-      PrefetchHooks Function()
+      PrefetchHooks Function({
+        bool medicationRecordsRefs,
+        bool vitalSignsRecordsRefs,
+        bool paramedicRecordsRefs,
+      })
     >;
 typedef $$PatientProfilesTableCreateCompanionBuilder =
     PatientProfilesCompanion Function({
@@ -15550,6 +23521,3560 @@ typedef $$NursingRecordsTableProcessedTableManager =
       NursingRecord,
       PrefetchHooks Function()
     >;
+typedef $$ReferralFormsTableCreateCompanionBuilder =
+    ReferralFormsCompanion Function({
+      Value<int> id,
+      required int visitId,
+      Value<String?> contactName,
+      Value<String?> contactPhone,
+      Value<String?> contactAddress,
+      Value<String?> mainDiagnosis,
+      Value<String?> subDiagnosis1,
+      Value<String?> subDiagnosis2,
+      Value<DateTime?> lastExamDate,
+      Value<DateTime?> lastMedicationDate,
+      Value<int?> referralPurposeIdx,
+      Value<String?> furtherExamDetail,
+      Value<String?> otherPurposeDetail,
+      Value<int?> doctorIdx,
+      Value<String?> otherDoctorName,
+      Value<int?> deptIdx,
+      Value<String?> otherDeptName,
+      Value<Uint8List?> doctorSignature,
+      Value<DateTime?> issueDate,
+      Value<DateTime?> appointmentDate,
+      Value<String?> appointmentDept,
+      Value<String?> appointmentRoom,
+      Value<String?> appointmentNumber,
+      Value<String?> referralHospitalName,
+      Value<int?> referralDeptIdx,
+      Value<String?> otherReferralDept,
+      Value<String?> referralDoctorName,
+      Value<String?> referralAddress,
+      Value<String?> referralPhone,
+      Value<Uint8List?> consentSignature,
+      Value<String?> relationToPatient,
+      Value<DateTime?> consentDateTime,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+    });
+typedef $$ReferralFormsTableUpdateCompanionBuilder =
+    ReferralFormsCompanion Function({
+      Value<int> id,
+      Value<int> visitId,
+      Value<String?> contactName,
+      Value<String?> contactPhone,
+      Value<String?> contactAddress,
+      Value<String?> mainDiagnosis,
+      Value<String?> subDiagnosis1,
+      Value<String?> subDiagnosis2,
+      Value<DateTime?> lastExamDate,
+      Value<DateTime?> lastMedicationDate,
+      Value<int?> referralPurposeIdx,
+      Value<String?> furtherExamDetail,
+      Value<String?> otherPurposeDetail,
+      Value<int?> doctorIdx,
+      Value<String?> otherDoctorName,
+      Value<int?> deptIdx,
+      Value<String?> otherDeptName,
+      Value<Uint8List?> doctorSignature,
+      Value<DateTime?> issueDate,
+      Value<DateTime?> appointmentDate,
+      Value<String?> appointmentDept,
+      Value<String?> appointmentRoom,
+      Value<String?> appointmentNumber,
+      Value<String?> referralHospitalName,
+      Value<int?> referralDeptIdx,
+      Value<String?> otherReferralDept,
+      Value<String?> referralDoctorName,
+      Value<String?> referralAddress,
+      Value<String?> referralPhone,
+      Value<Uint8List?> consentSignature,
+      Value<String?> relationToPatient,
+      Value<DateTime?> consentDateTime,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+    });
+
+class $$ReferralFormsTableFilterComposer
+    extends Composer<_$AppDatabase, $ReferralFormsTable> {
+  $$ReferralFormsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get visitId => $composableBuilder(
+    column: $table.visitId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get contactName => $composableBuilder(
+    column: $table.contactName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get contactPhone => $composableBuilder(
+    column: $table.contactPhone,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get contactAddress => $composableBuilder(
+    column: $table.contactAddress,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get mainDiagnosis => $composableBuilder(
+    column: $table.mainDiagnosis,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get subDiagnosis1 => $composableBuilder(
+    column: $table.subDiagnosis1,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get subDiagnosis2 => $composableBuilder(
+    column: $table.subDiagnosis2,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get lastExamDate => $composableBuilder(
+    column: $table.lastExamDate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get lastMedicationDate => $composableBuilder(
+    column: $table.lastMedicationDate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get referralPurposeIdx => $composableBuilder(
+    column: $table.referralPurposeIdx,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get furtherExamDetail => $composableBuilder(
+    column: $table.furtherExamDetail,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get otherPurposeDetail => $composableBuilder(
+    column: $table.otherPurposeDetail,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get doctorIdx => $composableBuilder(
+    column: $table.doctorIdx,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get otherDoctorName => $composableBuilder(
+    column: $table.otherDoctorName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get deptIdx => $composableBuilder(
+    column: $table.deptIdx,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get otherDeptName => $composableBuilder(
+    column: $table.otherDeptName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<Uint8List> get doctorSignature => $composableBuilder(
+    column: $table.doctorSignature,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get issueDate => $composableBuilder(
+    column: $table.issueDate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get appointmentDate => $composableBuilder(
+    column: $table.appointmentDate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get appointmentDept => $composableBuilder(
+    column: $table.appointmentDept,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get appointmentRoom => $composableBuilder(
+    column: $table.appointmentRoom,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get appointmentNumber => $composableBuilder(
+    column: $table.appointmentNumber,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get referralHospitalName => $composableBuilder(
+    column: $table.referralHospitalName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get referralDeptIdx => $composableBuilder(
+    column: $table.referralDeptIdx,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get otherReferralDept => $composableBuilder(
+    column: $table.otherReferralDept,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get referralDoctorName => $composableBuilder(
+    column: $table.referralDoctorName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get referralAddress => $composableBuilder(
+    column: $table.referralAddress,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get referralPhone => $composableBuilder(
+    column: $table.referralPhone,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<Uint8List> get consentSignature => $composableBuilder(
+    column: $table.consentSignature,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get relationToPatient => $composableBuilder(
+    column: $table.relationToPatient,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get consentDateTime => $composableBuilder(
+    column: $table.consentDateTime,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$ReferralFormsTableOrderingComposer
+    extends Composer<_$AppDatabase, $ReferralFormsTable> {
+  $$ReferralFormsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get visitId => $composableBuilder(
+    column: $table.visitId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get contactName => $composableBuilder(
+    column: $table.contactName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get contactPhone => $composableBuilder(
+    column: $table.contactPhone,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get contactAddress => $composableBuilder(
+    column: $table.contactAddress,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get mainDiagnosis => $composableBuilder(
+    column: $table.mainDiagnosis,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get subDiagnosis1 => $composableBuilder(
+    column: $table.subDiagnosis1,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get subDiagnosis2 => $composableBuilder(
+    column: $table.subDiagnosis2,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get lastExamDate => $composableBuilder(
+    column: $table.lastExamDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get lastMedicationDate => $composableBuilder(
+    column: $table.lastMedicationDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get referralPurposeIdx => $composableBuilder(
+    column: $table.referralPurposeIdx,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get furtherExamDetail => $composableBuilder(
+    column: $table.furtherExamDetail,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get otherPurposeDetail => $composableBuilder(
+    column: $table.otherPurposeDetail,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get doctorIdx => $composableBuilder(
+    column: $table.doctorIdx,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get otherDoctorName => $composableBuilder(
+    column: $table.otherDoctorName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get deptIdx => $composableBuilder(
+    column: $table.deptIdx,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get otherDeptName => $composableBuilder(
+    column: $table.otherDeptName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<Uint8List> get doctorSignature => $composableBuilder(
+    column: $table.doctorSignature,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get issueDate => $composableBuilder(
+    column: $table.issueDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get appointmentDate => $composableBuilder(
+    column: $table.appointmentDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get appointmentDept => $composableBuilder(
+    column: $table.appointmentDept,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get appointmentRoom => $composableBuilder(
+    column: $table.appointmentRoom,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get appointmentNumber => $composableBuilder(
+    column: $table.appointmentNumber,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get referralHospitalName => $composableBuilder(
+    column: $table.referralHospitalName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get referralDeptIdx => $composableBuilder(
+    column: $table.referralDeptIdx,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get otherReferralDept => $composableBuilder(
+    column: $table.otherReferralDept,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get referralDoctorName => $composableBuilder(
+    column: $table.referralDoctorName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get referralAddress => $composableBuilder(
+    column: $table.referralAddress,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get referralPhone => $composableBuilder(
+    column: $table.referralPhone,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<Uint8List> get consentSignature => $composableBuilder(
+    column: $table.consentSignature,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get relationToPatient => $composableBuilder(
+    column: $table.relationToPatient,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get consentDateTime => $composableBuilder(
+    column: $table.consentDateTime,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$ReferralFormsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ReferralFormsTable> {
+  $$ReferralFormsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get visitId =>
+      $composableBuilder(column: $table.visitId, builder: (column) => column);
+
+  GeneratedColumn<String> get contactName => $composableBuilder(
+    column: $table.contactName,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get contactPhone => $composableBuilder(
+    column: $table.contactPhone,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get contactAddress => $composableBuilder(
+    column: $table.contactAddress,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get mainDiagnosis => $composableBuilder(
+    column: $table.mainDiagnosis,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get subDiagnosis1 => $composableBuilder(
+    column: $table.subDiagnosis1,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get subDiagnosis2 => $composableBuilder(
+    column: $table.subDiagnosis2,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get lastExamDate => $composableBuilder(
+    column: $table.lastExamDate,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get lastMedicationDate => $composableBuilder(
+    column: $table.lastMedicationDate,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get referralPurposeIdx => $composableBuilder(
+    column: $table.referralPurposeIdx,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get furtherExamDetail => $composableBuilder(
+    column: $table.furtherExamDetail,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get otherPurposeDetail => $composableBuilder(
+    column: $table.otherPurposeDetail,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get doctorIdx =>
+      $composableBuilder(column: $table.doctorIdx, builder: (column) => column);
+
+  GeneratedColumn<String> get otherDoctorName => $composableBuilder(
+    column: $table.otherDoctorName,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get deptIdx =>
+      $composableBuilder(column: $table.deptIdx, builder: (column) => column);
+
+  GeneratedColumn<String> get otherDeptName => $composableBuilder(
+    column: $table.otherDeptName,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<Uint8List> get doctorSignature => $composableBuilder(
+    column: $table.doctorSignature,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get issueDate =>
+      $composableBuilder(column: $table.issueDate, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get appointmentDate => $composableBuilder(
+    column: $table.appointmentDate,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get appointmentDept => $composableBuilder(
+    column: $table.appointmentDept,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get appointmentRoom => $composableBuilder(
+    column: $table.appointmentRoom,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get appointmentNumber => $composableBuilder(
+    column: $table.appointmentNumber,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get referralHospitalName => $composableBuilder(
+    column: $table.referralHospitalName,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get referralDeptIdx => $composableBuilder(
+    column: $table.referralDeptIdx,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get otherReferralDept => $composableBuilder(
+    column: $table.otherReferralDept,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get referralDoctorName => $composableBuilder(
+    column: $table.referralDoctorName,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get referralAddress => $composableBuilder(
+    column: $table.referralAddress,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get referralPhone => $composableBuilder(
+    column: $table.referralPhone,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<Uint8List> get consentSignature => $composableBuilder(
+    column: $table.consentSignature,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get relationToPatient => $composableBuilder(
+    column: $table.relationToPatient,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get consentDateTime => $composableBuilder(
+    column: $table.consentDateTime,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$ReferralFormsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $ReferralFormsTable,
+          ReferralForm,
+          $$ReferralFormsTableFilterComposer,
+          $$ReferralFormsTableOrderingComposer,
+          $$ReferralFormsTableAnnotationComposer,
+          $$ReferralFormsTableCreateCompanionBuilder,
+          $$ReferralFormsTableUpdateCompanionBuilder,
+          (
+            ReferralForm,
+            BaseReferences<_$AppDatabase, $ReferralFormsTable, ReferralForm>,
+          ),
+          ReferralForm,
+          PrefetchHooks Function()
+        > {
+  $$ReferralFormsTableTableManager(_$AppDatabase db, $ReferralFormsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ReferralFormsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ReferralFormsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ReferralFormsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> visitId = const Value.absent(),
+                Value<String?> contactName = const Value.absent(),
+                Value<String?> contactPhone = const Value.absent(),
+                Value<String?> contactAddress = const Value.absent(),
+                Value<String?> mainDiagnosis = const Value.absent(),
+                Value<String?> subDiagnosis1 = const Value.absent(),
+                Value<String?> subDiagnosis2 = const Value.absent(),
+                Value<DateTime?> lastExamDate = const Value.absent(),
+                Value<DateTime?> lastMedicationDate = const Value.absent(),
+                Value<int?> referralPurposeIdx = const Value.absent(),
+                Value<String?> furtherExamDetail = const Value.absent(),
+                Value<String?> otherPurposeDetail = const Value.absent(),
+                Value<int?> doctorIdx = const Value.absent(),
+                Value<String?> otherDoctorName = const Value.absent(),
+                Value<int?> deptIdx = const Value.absent(),
+                Value<String?> otherDeptName = const Value.absent(),
+                Value<Uint8List?> doctorSignature = const Value.absent(),
+                Value<DateTime?> issueDate = const Value.absent(),
+                Value<DateTime?> appointmentDate = const Value.absent(),
+                Value<String?> appointmentDept = const Value.absent(),
+                Value<String?> appointmentRoom = const Value.absent(),
+                Value<String?> appointmentNumber = const Value.absent(),
+                Value<String?> referralHospitalName = const Value.absent(),
+                Value<int?> referralDeptIdx = const Value.absent(),
+                Value<String?> otherReferralDept = const Value.absent(),
+                Value<String?> referralDoctorName = const Value.absent(),
+                Value<String?> referralAddress = const Value.absent(),
+                Value<String?> referralPhone = const Value.absent(),
+                Value<Uint8List?> consentSignature = const Value.absent(),
+                Value<String?> relationToPatient = const Value.absent(),
+                Value<DateTime?> consentDateTime = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+              }) => ReferralFormsCompanion(
+                id: id,
+                visitId: visitId,
+                contactName: contactName,
+                contactPhone: contactPhone,
+                contactAddress: contactAddress,
+                mainDiagnosis: mainDiagnosis,
+                subDiagnosis1: subDiagnosis1,
+                subDiagnosis2: subDiagnosis2,
+                lastExamDate: lastExamDate,
+                lastMedicationDate: lastMedicationDate,
+                referralPurposeIdx: referralPurposeIdx,
+                furtherExamDetail: furtherExamDetail,
+                otherPurposeDetail: otherPurposeDetail,
+                doctorIdx: doctorIdx,
+                otherDoctorName: otherDoctorName,
+                deptIdx: deptIdx,
+                otherDeptName: otherDeptName,
+                doctorSignature: doctorSignature,
+                issueDate: issueDate,
+                appointmentDate: appointmentDate,
+                appointmentDept: appointmentDept,
+                appointmentRoom: appointmentRoom,
+                appointmentNumber: appointmentNumber,
+                referralHospitalName: referralHospitalName,
+                referralDeptIdx: referralDeptIdx,
+                otherReferralDept: otherReferralDept,
+                referralDoctorName: referralDoctorName,
+                referralAddress: referralAddress,
+                referralPhone: referralPhone,
+                consentSignature: consentSignature,
+                relationToPatient: relationToPatient,
+                consentDateTime: consentDateTime,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int visitId,
+                Value<String?> contactName = const Value.absent(),
+                Value<String?> contactPhone = const Value.absent(),
+                Value<String?> contactAddress = const Value.absent(),
+                Value<String?> mainDiagnosis = const Value.absent(),
+                Value<String?> subDiagnosis1 = const Value.absent(),
+                Value<String?> subDiagnosis2 = const Value.absent(),
+                Value<DateTime?> lastExamDate = const Value.absent(),
+                Value<DateTime?> lastMedicationDate = const Value.absent(),
+                Value<int?> referralPurposeIdx = const Value.absent(),
+                Value<String?> furtherExamDetail = const Value.absent(),
+                Value<String?> otherPurposeDetail = const Value.absent(),
+                Value<int?> doctorIdx = const Value.absent(),
+                Value<String?> otherDoctorName = const Value.absent(),
+                Value<int?> deptIdx = const Value.absent(),
+                Value<String?> otherDeptName = const Value.absent(),
+                Value<Uint8List?> doctorSignature = const Value.absent(),
+                Value<DateTime?> issueDate = const Value.absent(),
+                Value<DateTime?> appointmentDate = const Value.absent(),
+                Value<String?> appointmentDept = const Value.absent(),
+                Value<String?> appointmentRoom = const Value.absent(),
+                Value<String?> appointmentNumber = const Value.absent(),
+                Value<String?> referralHospitalName = const Value.absent(),
+                Value<int?> referralDeptIdx = const Value.absent(),
+                Value<String?> otherReferralDept = const Value.absent(),
+                Value<String?> referralDoctorName = const Value.absent(),
+                Value<String?> referralAddress = const Value.absent(),
+                Value<String?> referralPhone = const Value.absent(),
+                Value<Uint8List?> consentSignature = const Value.absent(),
+                Value<String?> relationToPatient = const Value.absent(),
+                Value<DateTime?> consentDateTime = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+              }) => ReferralFormsCompanion.insert(
+                id: id,
+                visitId: visitId,
+                contactName: contactName,
+                contactPhone: contactPhone,
+                contactAddress: contactAddress,
+                mainDiagnosis: mainDiagnosis,
+                subDiagnosis1: subDiagnosis1,
+                subDiagnosis2: subDiagnosis2,
+                lastExamDate: lastExamDate,
+                lastMedicationDate: lastMedicationDate,
+                referralPurposeIdx: referralPurposeIdx,
+                furtherExamDetail: furtherExamDetail,
+                otherPurposeDetail: otherPurposeDetail,
+                doctorIdx: doctorIdx,
+                otherDoctorName: otherDoctorName,
+                deptIdx: deptIdx,
+                otherDeptName: otherDeptName,
+                doctorSignature: doctorSignature,
+                issueDate: issueDate,
+                appointmentDate: appointmentDate,
+                appointmentDept: appointmentDept,
+                appointmentRoom: appointmentRoom,
+                appointmentNumber: appointmentNumber,
+                referralHospitalName: referralHospitalName,
+                referralDeptIdx: referralDeptIdx,
+                otherReferralDept: otherReferralDept,
+                referralDoctorName: referralDoctorName,
+                referralAddress: referralAddress,
+                referralPhone: referralPhone,
+                consentSignature: consentSignature,
+                relationToPatient: relationToPatient,
+                consentDateTime: consentDateTime,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$ReferralFormsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $ReferralFormsTable,
+      ReferralForm,
+      $$ReferralFormsTableFilterComposer,
+      $$ReferralFormsTableOrderingComposer,
+      $$ReferralFormsTableAnnotationComposer,
+      $$ReferralFormsTableCreateCompanionBuilder,
+      $$ReferralFormsTableUpdateCompanionBuilder,
+      (
+        ReferralForm,
+        BaseReferences<_$AppDatabase, $ReferralFormsTable, ReferralForm>,
+      ),
+      ReferralForm,
+      PrefetchHooks Function()
+    >;
+typedef $$AmbulanceRecordsTableCreateCompanionBuilder =
+    AmbulanceRecordsCompanion Function({
+      Value<int> id,
+      required int visitId,
+      Value<String?> plateNumber,
+      Value<int?> placeGroupIdx,
+      Value<int?> t1PlaceIdx,
+      Value<int?> t2PlaceIdx,
+      Value<int?> remotePlaceIdx,
+      Value<int?> cargoPlaceIdx,
+      Value<int?> novotelPlaceIdx,
+      Value<int?> cabinPlaceIdx,
+      Value<String?> placeNote,
+      Value<DateTime?> dutyTime,
+      Value<DateTime?> arriveSceneTime,
+      Value<DateTime?> leaveSceneTime,
+      Value<DateTime?> arriveHospitalTime,
+      Value<DateTime?> leaveHospitalTime,
+      Value<DateTime?> backStandbyTime,
+      Value<int?> destinationHospitalIdx,
+      Value<String?> otherDestinationHospital,
+      Value<String?> destinationHospital,
+      Value<String?> patientBelongings,
+      Value<String?> belongingsHandled,
+      Value<String?> custodianName,
+      Value<Uint8List?> custodianSignature,
+      Value<String?> chiefComplaint,
+      Value<String> emergencyTreatmentsJson,
+      Value<String> airwayTreatmentsJson,
+      Value<String> traumaTreatmentsJson,
+      Value<String> transportMethodsJson,
+      Value<String> cprMethodsJson,
+      Value<String> medicationProceduresJson,
+      Value<String> otherEmergencyProceduresJson,
+      Value<String?> bodyDiagramNote,
+      Value<String?> bodyDiagramPath,
+      Value<String?> aslType,
+      Value<String?> ettSize,
+      Value<String?> ettDepth,
+      Value<String?> manualDefibCount,
+      Value<String?> manualDefibJoules,
+      Value<String?> guideNote,
+      Value<String?> receivingUnit,
+      Value<DateTime?> receivingTime,
+      Value<bool> isRejection,
+      Value<String?> rejectionName,
+      Value<String?> relationshipType,
+      Value<String?> contactName,
+      Value<String?> contactPhone,
+      Value<int?> staffFee,
+      Value<int?> oxygenFee,
+      Value<int?> totalFee,
+      Value<String?> chargeStatus,
+      Value<String?> paidType,
+      Value<String?> unpaidType,
+      Value<String> traumaClassJson,
+      Value<String> nonTraumaTypeJson,
+      Value<String> nonTraumaAcutePickedJson,
+      Value<String> nonTraumaGeneralPickedJson,
+      Value<String> traumaTypePickedJson,
+      Value<String> traumaGeneralBodyPickedJson,
+      Value<String> traumaMechanismPickedJson,
+      Value<String> allergyJson,
+      Value<String> pmhJson,
+      Value<String?> allergyOther,
+      Value<String?> pmhOther,
+      Value<String?> nonTraumaAcuteOther,
+      Value<String?> traumaGeneralOther,
+      Value<String?> fallHeight,
+      Value<String?> burnDegree,
+      Value<String?> burnArea,
+      Value<String?> traumaOther,
+      Value<bool?> isProxyStatement,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+    });
+typedef $$AmbulanceRecordsTableUpdateCompanionBuilder =
+    AmbulanceRecordsCompanion Function({
+      Value<int> id,
+      Value<int> visitId,
+      Value<String?> plateNumber,
+      Value<int?> placeGroupIdx,
+      Value<int?> t1PlaceIdx,
+      Value<int?> t2PlaceIdx,
+      Value<int?> remotePlaceIdx,
+      Value<int?> cargoPlaceIdx,
+      Value<int?> novotelPlaceIdx,
+      Value<int?> cabinPlaceIdx,
+      Value<String?> placeNote,
+      Value<DateTime?> dutyTime,
+      Value<DateTime?> arriveSceneTime,
+      Value<DateTime?> leaveSceneTime,
+      Value<DateTime?> arriveHospitalTime,
+      Value<DateTime?> leaveHospitalTime,
+      Value<DateTime?> backStandbyTime,
+      Value<int?> destinationHospitalIdx,
+      Value<String?> otherDestinationHospital,
+      Value<String?> destinationHospital,
+      Value<String?> patientBelongings,
+      Value<String?> belongingsHandled,
+      Value<String?> custodianName,
+      Value<Uint8List?> custodianSignature,
+      Value<String?> chiefComplaint,
+      Value<String> emergencyTreatmentsJson,
+      Value<String> airwayTreatmentsJson,
+      Value<String> traumaTreatmentsJson,
+      Value<String> transportMethodsJson,
+      Value<String> cprMethodsJson,
+      Value<String> medicationProceduresJson,
+      Value<String> otherEmergencyProceduresJson,
+      Value<String?> bodyDiagramNote,
+      Value<String?> bodyDiagramPath,
+      Value<String?> aslType,
+      Value<String?> ettSize,
+      Value<String?> ettDepth,
+      Value<String?> manualDefibCount,
+      Value<String?> manualDefibJoules,
+      Value<String?> guideNote,
+      Value<String?> receivingUnit,
+      Value<DateTime?> receivingTime,
+      Value<bool> isRejection,
+      Value<String?> rejectionName,
+      Value<String?> relationshipType,
+      Value<String?> contactName,
+      Value<String?> contactPhone,
+      Value<int?> staffFee,
+      Value<int?> oxygenFee,
+      Value<int?> totalFee,
+      Value<String?> chargeStatus,
+      Value<String?> paidType,
+      Value<String?> unpaidType,
+      Value<String> traumaClassJson,
+      Value<String> nonTraumaTypeJson,
+      Value<String> nonTraumaAcutePickedJson,
+      Value<String> nonTraumaGeneralPickedJson,
+      Value<String> traumaTypePickedJson,
+      Value<String> traumaGeneralBodyPickedJson,
+      Value<String> traumaMechanismPickedJson,
+      Value<String> allergyJson,
+      Value<String> pmhJson,
+      Value<String?> allergyOther,
+      Value<String?> pmhOther,
+      Value<String?> nonTraumaAcuteOther,
+      Value<String?> traumaGeneralOther,
+      Value<String?> fallHeight,
+      Value<String?> burnDegree,
+      Value<String?> burnArea,
+      Value<String?> traumaOther,
+      Value<bool?> isProxyStatement,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+    });
+
+class $$AmbulanceRecordsTableFilterComposer
+    extends Composer<_$AppDatabase, $AmbulanceRecordsTable> {
+  $$AmbulanceRecordsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get visitId => $composableBuilder(
+    column: $table.visitId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get plateNumber => $composableBuilder(
+    column: $table.plateNumber,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get placeGroupIdx => $composableBuilder(
+    column: $table.placeGroupIdx,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get t1PlaceIdx => $composableBuilder(
+    column: $table.t1PlaceIdx,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get t2PlaceIdx => $composableBuilder(
+    column: $table.t2PlaceIdx,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get remotePlaceIdx => $composableBuilder(
+    column: $table.remotePlaceIdx,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get cargoPlaceIdx => $composableBuilder(
+    column: $table.cargoPlaceIdx,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get novotelPlaceIdx => $composableBuilder(
+    column: $table.novotelPlaceIdx,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get cabinPlaceIdx => $composableBuilder(
+    column: $table.cabinPlaceIdx,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get placeNote => $composableBuilder(
+    column: $table.placeNote,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get dutyTime => $composableBuilder(
+    column: $table.dutyTime,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get arriveSceneTime => $composableBuilder(
+    column: $table.arriveSceneTime,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get leaveSceneTime => $composableBuilder(
+    column: $table.leaveSceneTime,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get arriveHospitalTime => $composableBuilder(
+    column: $table.arriveHospitalTime,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get leaveHospitalTime => $composableBuilder(
+    column: $table.leaveHospitalTime,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get backStandbyTime => $composableBuilder(
+    column: $table.backStandbyTime,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get destinationHospitalIdx => $composableBuilder(
+    column: $table.destinationHospitalIdx,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get otherDestinationHospital => $composableBuilder(
+    column: $table.otherDestinationHospital,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get destinationHospital => $composableBuilder(
+    column: $table.destinationHospital,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get patientBelongings => $composableBuilder(
+    column: $table.patientBelongings,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get belongingsHandled => $composableBuilder(
+    column: $table.belongingsHandled,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get custodianName => $composableBuilder(
+    column: $table.custodianName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<Uint8List> get custodianSignature => $composableBuilder(
+    column: $table.custodianSignature,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get chiefComplaint => $composableBuilder(
+    column: $table.chiefComplaint,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get emergencyTreatmentsJson => $composableBuilder(
+    column: $table.emergencyTreatmentsJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get airwayTreatmentsJson => $composableBuilder(
+    column: $table.airwayTreatmentsJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get traumaTreatmentsJson => $composableBuilder(
+    column: $table.traumaTreatmentsJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get transportMethodsJson => $composableBuilder(
+    column: $table.transportMethodsJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get cprMethodsJson => $composableBuilder(
+    column: $table.cprMethodsJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get medicationProceduresJson => $composableBuilder(
+    column: $table.medicationProceduresJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get otherEmergencyProceduresJson => $composableBuilder(
+    column: $table.otherEmergencyProceduresJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get bodyDiagramNote => $composableBuilder(
+    column: $table.bodyDiagramNote,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get bodyDiagramPath => $composableBuilder(
+    column: $table.bodyDiagramPath,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get aslType => $composableBuilder(
+    column: $table.aslType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get ettSize => $composableBuilder(
+    column: $table.ettSize,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get ettDepth => $composableBuilder(
+    column: $table.ettDepth,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get manualDefibCount => $composableBuilder(
+    column: $table.manualDefibCount,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get manualDefibJoules => $composableBuilder(
+    column: $table.manualDefibJoules,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get guideNote => $composableBuilder(
+    column: $table.guideNote,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get receivingUnit => $composableBuilder(
+    column: $table.receivingUnit,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get receivingTime => $composableBuilder(
+    column: $table.receivingTime,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isRejection => $composableBuilder(
+    column: $table.isRejection,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get rejectionName => $composableBuilder(
+    column: $table.rejectionName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get relationshipType => $composableBuilder(
+    column: $table.relationshipType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get contactName => $composableBuilder(
+    column: $table.contactName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get contactPhone => $composableBuilder(
+    column: $table.contactPhone,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get staffFee => $composableBuilder(
+    column: $table.staffFee,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get oxygenFee => $composableBuilder(
+    column: $table.oxygenFee,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get totalFee => $composableBuilder(
+    column: $table.totalFee,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get chargeStatus => $composableBuilder(
+    column: $table.chargeStatus,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get paidType => $composableBuilder(
+    column: $table.paidType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get unpaidType => $composableBuilder(
+    column: $table.unpaidType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get traumaClassJson => $composableBuilder(
+    column: $table.traumaClassJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get nonTraumaTypeJson => $composableBuilder(
+    column: $table.nonTraumaTypeJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get nonTraumaAcutePickedJson => $composableBuilder(
+    column: $table.nonTraumaAcutePickedJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get nonTraumaGeneralPickedJson => $composableBuilder(
+    column: $table.nonTraumaGeneralPickedJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get traumaTypePickedJson => $composableBuilder(
+    column: $table.traumaTypePickedJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get traumaGeneralBodyPickedJson => $composableBuilder(
+    column: $table.traumaGeneralBodyPickedJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get traumaMechanismPickedJson => $composableBuilder(
+    column: $table.traumaMechanismPickedJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get allergyJson => $composableBuilder(
+    column: $table.allergyJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get pmhJson => $composableBuilder(
+    column: $table.pmhJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get allergyOther => $composableBuilder(
+    column: $table.allergyOther,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get pmhOther => $composableBuilder(
+    column: $table.pmhOther,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get nonTraumaAcuteOther => $composableBuilder(
+    column: $table.nonTraumaAcuteOther,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get traumaGeneralOther => $composableBuilder(
+    column: $table.traumaGeneralOther,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get fallHeight => $composableBuilder(
+    column: $table.fallHeight,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get burnDegree => $composableBuilder(
+    column: $table.burnDegree,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get burnArea => $composableBuilder(
+    column: $table.burnArea,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get traumaOther => $composableBuilder(
+    column: $table.traumaOther,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isProxyStatement => $composableBuilder(
+    column: $table.isProxyStatement,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$AmbulanceRecordsTableOrderingComposer
+    extends Composer<_$AppDatabase, $AmbulanceRecordsTable> {
+  $$AmbulanceRecordsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get visitId => $composableBuilder(
+    column: $table.visitId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get plateNumber => $composableBuilder(
+    column: $table.plateNumber,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get placeGroupIdx => $composableBuilder(
+    column: $table.placeGroupIdx,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get t1PlaceIdx => $composableBuilder(
+    column: $table.t1PlaceIdx,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get t2PlaceIdx => $composableBuilder(
+    column: $table.t2PlaceIdx,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get remotePlaceIdx => $composableBuilder(
+    column: $table.remotePlaceIdx,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get cargoPlaceIdx => $composableBuilder(
+    column: $table.cargoPlaceIdx,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get novotelPlaceIdx => $composableBuilder(
+    column: $table.novotelPlaceIdx,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get cabinPlaceIdx => $composableBuilder(
+    column: $table.cabinPlaceIdx,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get placeNote => $composableBuilder(
+    column: $table.placeNote,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get dutyTime => $composableBuilder(
+    column: $table.dutyTime,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get arriveSceneTime => $composableBuilder(
+    column: $table.arriveSceneTime,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get leaveSceneTime => $composableBuilder(
+    column: $table.leaveSceneTime,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get arriveHospitalTime => $composableBuilder(
+    column: $table.arriveHospitalTime,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get leaveHospitalTime => $composableBuilder(
+    column: $table.leaveHospitalTime,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get backStandbyTime => $composableBuilder(
+    column: $table.backStandbyTime,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get destinationHospitalIdx => $composableBuilder(
+    column: $table.destinationHospitalIdx,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get otherDestinationHospital => $composableBuilder(
+    column: $table.otherDestinationHospital,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get destinationHospital => $composableBuilder(
+    column: $table.destinationHospital,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get patientBelongings => $composableBuilder(
+    column: $table.patientBelongings,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get belongingsHandled => $composableBuilder(
+    column: $table.belongingsHandled,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get custodianName => $composableBuilder(
+    column: $table.custodianName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<Uint8List> get custodianSignature => $composableBuilder(
+    column: $table.custodianSignature,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get chiefComplaint => $composableBuilder(
+    column: $table.chiefComplaint,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get emergencyTreatmentsJson => $composableBuilder(
+    column: $table.emergencyTreatmentsJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get airwayTreatmentsJson => $composableBuilder(
+    column: $table.airwayTreatmentsJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get traumaTreatmentsJson => $composableBuilder(
+    column: $table.traumaTreatmentsJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get transportMethodsJson => $composableBuilder(
+    column: $table.transportMethodsJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get cprMethodsJson => $composableBuilder(
+    column: $table.cprMethodsJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get medicationProceduresJson => $composableBuilder(
+    column: $table.medicationProceduresJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get otherEmergencyProceduresJson =>
+      $composableBuilder(
+        column: $table.otherEmergencyProceduresJson,
+        builder: (column) => ColumnOrderings(column),
+      );
+
+  ColumnOrderings<String> get bodyDiagramNote => $composableBuilder(
+    column: $table.bodyDiagramNote,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get bodyDiagramPath => $composableBuilder(
+    column: $table.bodyDiagramPath,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get aslType => $composableBuilder(
+    column: $table.aslType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get ettSize => $composableBuilder(
+    column: $table.ettSize,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get ettDepth => $composableBuilder(
+    column: $table.ettDepth,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get manualDefibCount => $composableBuilder(
+    column: $table.manualDefibCount,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get manualDefibJoules => $composableBuilder(
+    column: $table.manualDefibJoules,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get guideNote => $composableBuilder(
+    column: $table.guideNote,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get receivingUnit => $composableBuilder(
+    column: $table.receivingUnit,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get receivingTime => $composableBuilder(
+    column: $table.receivingTime,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isRejection => $composableBuilder(
+    column: $table.isRejection,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get rejectionName => $composableBuilder(
+    column: $table.rejectionName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get relationshipType => $composableBuilder(
+    column: $table.relationshipType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get contactName => $composableBuilder(
+    column: $table.contactName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get contactPhone => $composableBuilder(
+    column: $table.contactPhone,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get staffFee => $composableBuilder(
+    column: $table.staffFee,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get oxygenFee => $composableBuilder(
+    column: $table.oxygenFee,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get totalFee => $composableBuilder(
+    column: $table.totalFee,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get chargeStatus => $composableBuilder(
+    column: $table.chargeStatus,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get paidType => $composableBuilder(
+    column: $table.paidType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get unpaidType => $composableBuilder(
+    column: $table.unpaidType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get traumaClassJson => $composableBuilder(
+    column: $table.traumaClassJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get nonTraumaTypeJson => $composableBuilder(
+    column: $table.nonTraumaTypeJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get nonTraumaAcutePickedJson => $composableBuilder(
+    column: $table.nonTraumaAcutePickedJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get nonTraumaGeneralPickedJson => $composableBuilder(
+    column: $table.nonTraumaGeneralPickedJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get traumaTypePickedJson => $composableBuilder(
+    column: $table.traumaTypePickedJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get traumaGeneralBodyPickedJson => $composableBuilder(
+    column: $table.traumaGeneralBodyPickedJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get traumaMechanismPickedJson => $composableBuilder(
+    column: $table.traumaMechanismPickedJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get allergyJson => $composableBuilder(
+    column: $table.allergyJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get pmhJson => $composableBuilder(
+    column: $table.pmhJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get allergyOther => $composableBuilder(
+    column: $table.allergyOther,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get pmhOther => $composableBuilder(
+    column: $table.pmhOther,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get nonTraumaAcuteOther => $composableBuilder(
+    column: $table.nonTraumaAcuteOther,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get traumaGeneralOther => $composableBuilder(
+    column: $table.traumaGeneralOther,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get fallHeight => $composableBuilder(
+    column: $table.fallHeight,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get burnDegree => $composableBuilder(
+    column: $table.burnDegree,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get burnArea => $composableBuilder(
+    column: $table.burnArea,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get traumaOther => $composableBuilder(
+    column: $table.traumaOther,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isProxyStatement => $composableBuilder(
+    column: $table.isProxyStatement,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$AmbulanceRecordsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $AmbulanceRecordsTable> {
+  $$AmbulanceRecordsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get visitId =>
+      $composableBuilder(column: $table.visitId, builder: (column) => column);
+
+  GeneratedColumn<String> get plateNumber => $composableBuilder(
+    column: $table.plateNumber,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get placeGroupIdx => $composableBuilder(
+    column: $table.placeGroupIdx,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get t1PlaceIdx => $composableBuilder(
+    column: $table.t1PlaceIdx,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get t2PlaceIdx => $composableBuilder(
+    column: $table.t2PlaceIdx,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get remotePlaceIdx => $composableBuilder(
+    column: $table.remotePlaceIdx,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get cargoPlaceIdx => $composableBuilder(
+    column: $table.cargoPlaceIdx,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get novotelPlaceIdx => $composableBuilder(
+    column: $table.novotelPlaceIdx,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get cabinPlaceIdx => $composableBuilder(
+    column: $table.cabinPlaceIdx,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get placeNote =>
+      $composableBuilder(column: $table.placeNote, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get dutyTime =>
+      $composableBuilder(column: $table.dutyTime, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get arriveSceneTime => $composableBuilder(
+    column: $table.arriveSceneTime,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get leaveSceneTime => $composableBuilder(
+    column: $table.leaveSceneTime,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get arriveHospitalTime => $composableBuilder(
+    column: $table.arriveHospitalTime,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get leaveHospitalTime => $composableBuilder(
+    column: $table.leaveHospitalTime,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get backStandbyTime => $composableBuilder(
+    column: $table.backStandbyTime,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get destinationHospitalIdx => $composableBuilder(
+    column: $table.destinationHospitalIdx,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get otherDestinationHospital => $composableBuilder(
+    column: $table.otherDestinationHospital,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get destinationHospital => $composableBuilder(
+    column: $table.destinationHospital,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get patientBelongings => $composableBuilder(
+    column: $table.patientBelongings,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get belongingsHandled => $composableBuilder(
+    column: $table.belongingsHandled,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get custodianName => $composableBuilder(
+    column: $table.custodianName,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<Uint8List> get custodianSignature => $composableBuilder(
+    column: $table.custodianSignature,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get chiefComplaint => $composableBuilder(
+    column: $table.chiefComplaint,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get emergencyTreatmentsJson => $composableBuilder(
+    column: $table.emergencyTreatmentsJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get airwayTreatmentsJson => $composableBuilder(
+    column: $table.airwayTreatmentsJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get traumaTreatmentsJson => $composableBuilder(
+    column: $table.traumaTreatmentsJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get transportMethodsJson => $composableBuilder(
+    column: $table.transportMethodsJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get cprMethodsJson => $composableBuilder(
+    column: $table.cprMethodsJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get medicationProceduresJson => $composableBuilder(
+    column: $table.medicationProceduresJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get otherEmergencyProceduresJson =>
+      $composableBuilder(
+        column: $table.otherEmergencyProceduresJson,
+        builder: (column) => column,
+      );
+
+  GeneratedColumn<String> get bodyDiagramNote => $composableBuilder(
+    column: $table.bodyDiagramNote,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get bodyDiagramPath => $composableBuilder(
+    column: $table.bodyDiagramPath,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get aslType =>
+      $composableBuilder(column: $table.aslType, builder: (column) => column);
+
+  GeneratedColumn<String> get ettSize =>
+      $composableBuilder(column: $table.ettSize, builder: (column) => column);
+
+  GeneratedColumn<String> get ettDepth =>
+      $composableBuilder(column: $table.ettDepth, builder: (column) => column);
+
+  GeneratedColumn<String> get manualDefibCount => $composableBuilder(
+    column: $table.manualDefibCount,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get manualDefibJoules => $composableBuilder(
+    column: $table.manualDefibJoules,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get guideNote =>
+      $composableBuilder(column: $table.guideNote, builder: (column) => column);
+
+  GeneratedColumn<String> get receivingUnit => $composableBuilder(
+    column: $table.receivingUnit,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get receivingTime => $composableBuilder(
+    column: $table.receivingTime,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get isRejection => $composableBuilder(
+    column: $table.isRejection,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get rejectionName => $composableBuilder(
+    column: $table.rejectionName,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get relationshipType => $composableBuilder(
+    column: $table.relationshipType,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get contactName => $composableBuilder(
+    column: $table.contactName,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get contactPhone => $composableBuilder(
+    column: $table.contactPhone,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get staffFee =>
+      $composableBuilder(column: $table.staffFee, builder: (column) => column);
+
+  GeneratedColumn<int> get oxygenFee =>
+      $composableBuilder(column: $table.oxygenFee, builder: (column) => column);
+
+  GeneratedColumn<int> get totalFee =>
+      $composableBuilder(column: $table.totalFee, builder: (column) => column);
+
+  GeneratedColumn<String> get chargeStatus => $composableBuilder(
+    column: $table.chargeStatus,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get paidType =>
+      $composableBuilder(column: $table.paidType, builder: (column) => column);
+
+  GeneratedColumn<String> get unpaidType => $composableBuilder(
+    column: $table.unpaidType,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get traumaClassJson => $composableBuilder(
+    column: $table.traumaClassJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get nonTraumaTypeJson => $composableBuilder(
+    column: $table.nonTraumaTypeJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get nonTraumaAcutePickedJson => $composableBuilder(
+    column: $table.nonTraumaAcutePickedJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get nonTraumaGeneralPickedJson => $composableBuilder(
+    column: $table.nonTraumaGeneralPickedJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get traumaTypePickedJson => $composableBuilder(
+    column: $table.traumaTypePickedJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get traumaGeneralBodyPickedJson => $composableBuilder(
+    column: $table.traumaGeneralBodyPickedJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get traumaMechanismPickedJson => $composableBuilder(
+    column: $table.traumaMechanismPickedJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get allergyJson => $composableBuilder(
+    column: $table.allergyJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get pmhJson =>
+      $composableBuilder(column: $table.pmhJson, builder: (column) => column);
+
+  GeneratedColumn<String> get allergyOther => $composableBuilder(
+    column: $table.allergyOther,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get pmhOther =>
+      $composableBuilder(column: $table.pmhOther, builder: (column) => column);
+
+  GeneratedColumn<String> get nonTraumaAcuteOther => $composableBuilder(
+    column: $table.nonTraumaAcuteOther,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get traumaGeneralOther => $composableBuilder(
+    column: $table.traumaGeneralOther,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get fallHeight => $composableBuilder(
+    column: $table.fallHeight,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get burnDegree => $composableBuilder(
+    column: $table.burnDegree,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get burnArea =>
+      $composableBuilder(column: $table.burnArea, builder: (column) => column);
+
+  GeneratedColumn<String> get traumaOther => $composableBuilder(
+    column: $table.traumaOther,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get isProxyStatement => $composableBuilder(
+    column: $table.isProxyStatement,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$AmbulanceRecordsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $AmbulanceRecordsTable,
+          AmbulanceRecord,
+          $$AmbulanceRecordsTableFilterComposer,
+          $$AmbulanceRecordsTableOrderingComposer,
+          $$AmbulanceRecordsTableAnnotationComposer,
+          $$AmbulanceRecordsTableCreateCompanionBuilder,
+          $$AmbulanceRecordsTableUpdateCompanionBuilder,
+          (
+            AmbulanceRecord,
+            BaseReferences<
+              _$AppDatabase,
+              $AmbulanceRecordsTable,
+              AmbulanceRecord
+            >,
+          ),
+          AmbulanceRecord,
+          PrefetchHooks Function()
+        > {
+  $$AmbulanceRecordsTableTableManager(
+    _$AppDatabase db,
+    $AmbulanceRecordsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$AmbulanceRecordsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$AmbulanceRecordsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$AmbulanceRecordsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> visitId = const Value.absent(),
+                Value<String?> plateNumber = const Value.absent(),
+                Value<int?> placeGroupIdx = const Value.absent(),
+                Value<int?> t1PlaceIdx = const Value.absent(),
+                Value<int?> t2PlaceIdx = const Value.absent(),
+                Value<int?> remotePlaceIdx = const Value.absent(),
+                Value<int?> cargoPlaceIdx = const Value.absent(),
+                Value<int?> novotelPlaceIdx = const Value.absent(),
+                Value<int?> cabinPlaceIdx = const Value.absent(),
+                Value<String?> placeNote = const Value.absent(),
+                Value<DateTime?> dutyTime = const Value.absent(),
+                Value<DateTime?> arriveSceneTime = const Value.absent(),
+                Value<DateTime?> leaveSceneTime = const Value.absent(),
+                Value<DateTime?> arriveHospitalTime = const Value.absent(),
+                Value<DateTime?> leaveHospitalTime = const Value.absent(),
+                Value<DateTime?> backStandbyTime = const Value.absent(),
+                Value<int?> destinationHospitalIdx = const Value.absent(),
+                Value<String?> otherDestinationHospital = const Value.absent(),
+                Value<String?> destinationHospital = const Value.absent(),
+                Value<String?> patientBelongings = const Value.absent(),
+                Value<String?> belongingsHandled = const Value.absent(),
+                Value<String?> custodianName = const Value.absent(),
+                Value<Uint8List?> custodianSignature = const Value.absent(),
+                Value<String?> chiefComplaint = const Value.absent(),
+                Value<String> emergencyTreatmentsJson = const Value.absent(),
+                Value<String> airwayTreatmentsJson = const Value.absent(),
+                Value<String> traumaTreatmentsJson = const Value.absent(),
+                Value<String> transportMethodsJson = const Value.absent(),
+                Value<String> cprMethodsJson = const Value.absent(),
+                Value<String> medicationProceduresJson = const Value.absent(),
+                Value<String> otherEmergencyProceduresJson =
+                    const Value.absent(),
+                Value<String?> bodyDiagramNote = const Value.absent(),
+                Value<String?> bodyDiagramPath = const Value.absent(),
+                Value<String?> aslType = const Value.absent(),
+                Value<String?> ettSize = const Value.absent(),
+                Value<String?> ettDepth = const Value.absent(),
+                Value<String?> manualDefibCount = const Value.absent(),
+                Value<String?> manualDefibJoules = const Value.absent(),
+                Value<String?> guideNote = const Value.absent(),
+                Value<String?> receivingUnit = const Value.absent(),
+                Value<DateTime?> receivingTime = const Value.absent(),
+                Value<bool> isRejection = const Value.absent(),
+                Value<String?> rejectionName = const Value.absent(),
+                Value<String?> relationshipType = const Value.absent(),
+                Value<String?> contactName = const Value.absent(),
+                Value<String?> contactPhone = const Value.absent(),
+                Value<int?> staffFee = const Value.absent(),
+                Value<int?> oxygenFee = const Value.absent(),
+                Value<int?> totalFee = const Value.absent(),
+                Value<String?> chargeStatus = const Value.absent(),
+                Value<String?> paidType = const Value.absent(),
+                Value<String?> unpaidType = const Value.absent(),
+                Value<String> traumaClassJson = const Value.absent(),
+                Value<String> nonTraumaTypeJson = const Value.absent(),
+                Value<String> nonTraumaAcutePickedJson = const Value.absent(),
+                Value<String> nonTraumaGeneralPickedJson = const Value.absent(),
+                Value<String> traumaTypePickedJson = const Value.absent(),
+                Value<String> traumaGeneralBodyPickedJson =
+                    const Value.absent(),
+                Value<String> traumaMechanismPickedJson = const Value.absent(),
+                Value<String> allergyJson = const Value.absent(),
+                Value<String> pmhJson = const Value.absent(),
+                Value<String?> allergyOther = const Value.absent(),
+                Value<String?> pmhOther = const Value.absent(),
+                Value<String?> nonTraumaAcuteOther = const Value.absent(),
+                Value<String?> traumaGeneralOther = const Value.absent(),
+                Value<String?> fallHeight = const Value.absent(),
+                Value<String?> burnDegree = const Value.absent(),
+                Value<String?> burnArea = const Value.absent(),
+                Value<String?> traumaOther = const Value.absent(),
+                Value<bool?> isProxyStatement = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+              }) => AmbulanceRecordsCompanion(
+                id: id,
+                visitId: visitId,
+                plateNumber: plateNumber,
+                placeGroupIdx: placeGroupIdx,
+                t1PlaceIdx: t1PlaceIdx,
+                t2PlaceIdx: t2PlaceIdx,
+                remotePlaceIdx: remotePlaceIdx,
+                cargoPlaceIdx: cargoPlaceIdx,
+                novotelPlaceIdx: novotelPlaceIdx,
+                cabinPlaceIdx: cabinPlaceIdx,
+                placeNote: placeNote,
+                dutyTime: dutyTime,
+                arriveSceneTime: arriveSceneTime,
+                leaveSceneTime: leaveSceneTime,
+                arriveHospitalTime: arriveHospitalTime,
+                leaveHospitalTime: leaveHospitalTime,
+                backStandbyTime: backStandbyTime,
+                destinationHospitalIdx: destinationHospitalIdx,
+                otherDestinationHospital: otherDestinationHospital,
+                destinationHospital: destinationHospital,
+                patientBelongings: patientBelongings,
+                belongingsHandled: belongingsHandled,
+                custodianName: custodianName,
+                custodianSignature: custodianSignature,
+                chiefComplaint: chiefComplaint,
+                emergencyTreatmentsJson: emergencyTreatmentsJson,
+                airwayTreatmentsJson: airwayTreatmentsJson,
+                traumaTreatmentsJson: traumaTreatmentsJson,
+                transportMethodsJson: transportMethodsJson,
+                cprMethodsJson: cprMethodsJson,
+                medicationProceduresJson: medicationProceduresJson,
+                otherEmergencyProceduresJson: otherEmergencyProceduresJson,
+                bodyDiagramNote: bodyDiagramNote,
+                bodyDiagramPath: bodyDiagramPath,
+                aslType: aslType,
+                ettSize: ettSize,
+                ettDepth: ettDepth,
+                manualDefibCount: manualDefibCount,
+                manualDefibJoules: manualDefibJoules,
+                guideNote: guideNote,
+                receivingUnit: receivingUnit,
+                receivingTime: receivingTime,
+                isRejection: isRejection,
+                rejectionName: rejectionName,
+                relationshipType: relationshipType,
+                contactName: contactName,
+                contactPhone: contactPhone,
+                staffFee: staffFee,
+                oxygenFee: oxygenFee,
+                totalFee: totalFee,
+                chargeStatus: chargeStatus,
+                paidType: paidType,
+                unpaidType: unpaidType,
+                traumaClassJson: traumaClassJson,
+                nonTraumaTypeJson: nonTraumaTypeJson,
+                nonTraumaAcutePickedJson: nonTraumaAcutePickedJson,
+                nonTraumaGeneralPickedJson: nonTraumaGeneralPickedJson,
+                traumaTypePickedJson: traumaTypePickedJson,
+                traumaGeneralBodyPickedJson: traumaGeneralBodyPickedJson,
+                traumaMechanismPickedJson: traumaMechanismPickedJson,
+                allergyJson: allergyJson,
+                pmhJson: pmhJson,
+                allergyOther: allergyOther,
+                pmhOther: pmhOther,
+                nonTraumaAcuteOther: nonTraumaAcuteOther,
+                traumaGeneralOther: traumaGeneralOther,
+                fallHeight: fallHeight,
+                burnDegree: burnDegree,
+                burnArea: burnArea,
+                traumaOther: traumaOther,
+                isProxyStatement: isProxyStatement,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int visitId,
+                Value<String?> plateNumber = const Value.absent(),
+                Value<int?> placeGroupIdx = const Value.absent(),
+                Value<int?> t1PlaceIdx = const Value.absent(),
+                Value<int?> t2PlaceIdx = const Value.absent(),
+                Value<int?> remotePlaceIdx = const Value.absent(),
+                Value<int?> cargoPlaceIdx = const Value.absent(),
+                Value<int?> novotelPlaceIdx = const Value.absent(),
+                Value<int?> cabinPlaceIdx = const Value.absent(),
+                Value<String?> placeNote = const Value.absent(),
+                Value<DateTime?> dutyTime = const Value.absent(),
+                Value<DateTime?> arriveSceneTime = const Value.absent(),
+                Value<DateTime?> leaveSceneTime = const Value.absent(),
+                Value<DateTime?> arriveHospitalTime = const Value.absent(),
+                Value<DateTime?> leaveHospitalTime = const Value.absent(),
+                Value<DateTime?> backStandbyTime = const Value.absent(),
+                Value<int?> destinationHospitalIdx = const Value.absent(),
+                Value<String?> otherDestinationHospital = const Value.absent(),
+                Value<String?> destinationHospital = const Value.absent(),
+                Value<String?> patientBelongings = const Value.absent(),
+                Value<String?> belongingsHandled = const Value.absent(),
+                Value<String?> custodianName = const Value.absent(),
+                Value<Uint8List?> custodianSignature = const Value.absent(),
+                Value<String?> chiefComplaint = const Value.absent(),
+                Value<String> emergencyTreatmentsJson = const Value.absent(),
+                Value<String> airwayTreatmentsJson = const Value.absent(),
+                Value<String> traumaTreatmentsJson = const Value.absent(),
+                Value<String> transportMethodsJson = const Value.absent(),
+                Value<String> cprMethodsJson = const Value.absent(),
+                Value<String> medicationProceduresJson = const Value.absent(),
+                Value<String> otherEmergencyProceduresJson =
+                    const Value.absent(),
+                Value<String?> bodyDiagramNote = const Value.absent(),
+                Value<String?> bodyDiagramPath = const Value.absent(),
+                Value<String?> aslType = const Value.absent(),
+                Value<String?> ettSize = const Value.absent(),
+                Value<String?> ettDepth = const Value.absent(),
+                Value<String?> manualDefibCount = const Value.absent(),
+                Value<String?> manualDefibJoules = const Value.absent(),
+                Value<String?> guideNote = const Value.absent(),
+                Value<String?> receivingUnit = const Value.absent(),
+                Value<DateTime?> receivingTime = const Value.absent(),
+                Value<bool> isRejection = const Value.absent(),
+                Value<String?> rejectionName = const Value.absent(),
+                Value<String?> relationshipType = const Value.absent(),
+                Value<String?> contactName = const Value.absent(),
+                Value<String?> contactPhone = const Value.absent(),
+                Value<int?> staffFee = const Value.absent(),
+                Value<int?> oxygenFee = const Value.absent(),
+                Value<int?> totalFee = const Value.absent(),
+                Value<String?> chargeStatus = const Value.absent(),
+                Value<String?> paidType = const Value.absent(),
+                Value<String?> unpaidType = const Value.absent(),
+                Value<String> traumaClassJson = const Value.absent(),
+                Value<String> nonTraumaTypeJson = const Value.absent(),
+                Value<String> nonTraumaAcutePickedJson = const Value.absent(),
+                Value<String> nonTraumaGeneralPickedJson = const Value.absent(),
+                Value<String> traumaTypePickedJson = const Value.absent(),
+                Value<String> traumaGeneralBodyPickedJson =
+                    const Value.absent(),
+                Value<String> traumaMechanismPickedJson = const Value.absent(),
+                Value<String> allergyJson = const Value.absent(),
+                Value<String> pmhJson = const Value.absent(),
+                Value<String?> allergyOther = const Value.absent(),
+                Value<String?> pmhOther = const Value.absent(),
+                Value<String?> nonTraumaAcuteOther = const Value.absent(),
+                Value<String?> traumaGeneralOther = const Value.absent(),
+                Value<String?> fallHeight = const Value.absent(),
+                Value<String?> burnDegree = const Value.absent(),
+                Value<String?> burnArea = const Value.absent(),
+                Value<String?> traumaOther = const Value.absent(),
+                Value<bool?> isProxyStatement = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+              }) => AmbulanceRecordsCompanion.insert(
+                id: id,
+                visitId: visitId,
+                plateNumber: plateNumber,
+                placeGroupIdx: placeGroupIdx,
+                t1PlaceIdx: t1PlaceIdx,
+                t2PlaceIdx: t2PlaceIdx,
+                remotePlaceIdx: remotePlaceIdx,
+                cargoPlaceIdx: cargoPlaceIdx,
+                novotelPlaceIdx: novotelPlaceIdx,
+                cabinPlaceIdx: cabinPlaceIdx,
+                placeNote: placeNote,
+                dutyTime: dutyTime,
+                arriveSceneTime: arriveSceneTime,
+                leaveSceneTime: leaveSceneTime,
+                arriveHospitalTime: arriveHospitalTime,
+                leaveHospitalTime: leaveHospitalTime,
+                backStandbyTime: backStandbyTime,
+                destinationHospitalIdx: destinationHospitalIdx,
+                otherDestinationHospital: otherDestinationHospital,
+                destinationHospital: destinationHospital,
+                patientBelongings: patientBelongings,
+                belongingsHandled: belongingsHandled,
+                custodianName: custodianName,
+                custodianSignature: custodianSignature,
+                chiefComplaint: chiefComplaint,
+                emergencyTreatmentsJson: emergencyTreatmentsJson,
+                airwayTreatmentsJson: airwayTreatmentsJson,
+                traumaTreatmentsJson: traumaTreatmentsJson,
+                transportMethodsJson: transportMethodsJson,
+                cprMethodsJson: cprMethodsJson,
+                medicationProceduresJson: medicationProceduresJson,
+                otherEmergencyProceduresJson: otherEmergencyProceduresJson,
+                bodyDiagramNote: bodyDiagramNote,
+                bodyDiagramPath: bodyDiagramPath,
+                aslType: aslType,
+                ettSize: ettSize,
+                ettDepth: ettDepth,
+                manualDefibCount: manualDefibCount,
+                manualDefibJoules: manualDefibJoules,
+                guideNote: guideNote,
+                receivingUnit: receivingUnit,
+                receivingTime: receivingTime,
+                isRejection: isRejection,
+                rejectionName: rejectionName,
+                relationshipType: relationshipType,
+                contactName: contactName,
+                contactPhone: contactPhone,
+                staffFee: staffFee,
+                oxygenFee: oxygenFee,
+                totalFee: totalFee,
+                chargeStatus: chargeStatus,
+                paidType: paidType,
+                unpaidType: unpaidType,
+                traumaClassJson: traumaClassJson,
+                nonTraumaTypeJson: nonTraumaTypeJson,
+                nonTraumaAcutePickedJson: nonTraumaAcutePickedJson,
+                nonTraumaGeneralPickedJson: nonTraumaGeneralPickedJson,
+                traumaTypePickedJson: traumaTypePickedJson,
+                traumaGeneralBodyPickedJson: traumaGeneralBodyPickedJson,
+                traumaMechanismPickedJson: traumaMechanismPickedJson,
+                allergyJson: allergyJson,
+                pmhJson: pmhJson,
+                allergyOther: allergyOther,
+                pmhOther: pmhOther,
+                nonTraumaAcuteOther: nonTraumaAcuteOther,
+                traumaGeneralOther: traumaGeneralOther,
+                fallHeight: fallHeight,
+                burnDegree: burnDegree,
+                burnArea: burnArea,
+                traumaOther: traumaOther,
+                isProxyStatement: isProxyStatement,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$AmbulanceRecordsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $AmbulanceRecordsTable,
+      AmbulanceRecord,
+      $$AmbulanceRecordsTableFilterComposer,
+      $$AmbulanceRecordsTableOrderingComposer,
+      $$AmbulanceRecordsTableAnnotationComposer,
+      $$AmbulanceRecordsTableCreateCompanionBuilder,
+      $$AmbulanceRecordsTableUpdateCompanionBuilder,
+      (
+        AmbulanceRecord,
+        BaseReferences<_$AppDatabase, $AmbulanceRecordsTable, AmbulanceRecord>,
+      ),
+      AmbulanceRecord,
+      PrefetchHooks Function()
+    >;
+typedef $$MedicationRecordsTableCreateCompanionBuilder =
+    MedicationRecordsCompanion Function({
+      Value<int> id,
+      required int visitId,
+      Value<DateTime?> recordTime,
+      Value<String?> name,
+      Value<String?> route,
+      Value<String?> dose,
+      Value<String?> executor,
+    });
+typedef $$MedicationRecordsTableUpdateCompanionBuilder =
+    MedicationRecordsCompanion Function({
+      Value<int> id,
+      Value<int> visitId,
+      Value<DateTime?> recordTime,
+      Value<String?> name,
+      Value<String?> route,
+      Value<String?> dose,
+      Value<String?> executor,
+    });
+
+final class $$MedicationRecordsTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $MedicationRecordsTable,
+          MedicationRecord
+        > {
+  $$MedicationRecordsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $VisitsTable _visitIdTable(_$AppDatabase db) => db.visits.createAlias(
+    $_aliasNameGenerator(db.medicationRecords.visitId, db.visits.visitId),
+  );
+
+  $$VisitsTableProcessedTableManager get visitId {
+    final $_column = $_itemColumn<int>('visit_id')!;
+
+    final manager = $$VisitsTableTableManager(
+      $_db,
+      $_db.visits,
+    ).filter((f) => f.visitId.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_visitIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$MedicationRecordsTableFilterComposer
+    extends Composer<_$AppDatabase, $MedicationRecordsTable> {
+  $$MedicationRecordsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get recordTime => $composableBuilder(
+    column: $table.recordTime,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get route => $composableBuilder(
+    column: $table.route,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get dose => $composableBuilder(
+    column: $table.dose,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get executor => $composableBuilder(
+    column: $table.executor,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$VisitsTableFilterComposer get visitId {
+    final $$VisitsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.visitId,
+      referencedTable: $db.visits,
+      getReferencedColumn: (t) => t.visitId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$VisitsTableFilterComposer(
+            $db: $db,
+            $table: $db.visits,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$MedicationRecordsTableOrderingComposer
+    extends Composer<_$AppDatabase, $MedicationRecordsTable> {
+  $$MedicationRecordsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get recordTime => $composableBuilder(
+    column: $table.recordTime,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get route => $composableBuilder(
+    column: $table.route,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get dose => $composableBuilder(
+    column: $table.dose,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get executor => $composableBuilder(
+    column: $table.executor,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$VisitsTableOrderingComposer get visitId {
+    final $$VisitsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.visitId,
+      referencedTable: $db.visits,
+      getReferencedColumn: (t) => t.visitId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$VisitsTableOrderingComposer(
+            $db: $db,
+            $table: $db.visits,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$MedicationRecordsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $MedicationRecordsTable> {
+  $$MedicationRecordsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get recordTime => $composableBuilder(
+    column: $table.recordTime,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get route =>
+      $composableBuilder(column: $table.route, builder: (column) => column);
+
+  GeneratedColumn<String> get dose =>
+      $composableBuilder(column: $table.dose, builder: (column) => column);
+
+  GeneratedColumn<String> get executor =>
+      $composableBuilder(column: $table.executor, builder: (column) => column);
+
+  $$VisitsTableAnnotationComposer get visitId {
+    final $$VisitsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.visitId,
+      referencedTable: $db.visits,
+      getReferencedColumn: (t) => t.visitId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$VisitsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.visits,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$MedicationRecordsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $MedicationRecordsTable,
+          MedicationRecord,
+          $$MedicationRecordsTableFilterComposer,
+          $$MedicationRecordsTableOrderingComposer,
+          $$MedicationRecordsTableAnnotationComposer,
+          $$MedicationRecordsTableCreateCompanionBuilder,
+          $$MedicationRecordsTableUpdateCompanionBuilder,
+          (MedicationRecord, $$MedicationRecordsTableReferences),
+          MedicationRecord,
+          PrefetchHooks Function({bool visitId})
+        > {
+  $$MedicationRecordsTableTableManager(
+    _$AppDatabase db,
+    $MedicationRecordsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$MedicationRecordsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$MedicationRecordsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$MedicationRecordsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> visitId = const Value.absent(),
+                Value<DateTime?> recordTime = const Value.absent(),
+                Value<String?> name = const Value.absent(),
+                Value<String?> route = const Value.absent(),
+                Value<String?> dose = const Value.absent(),
+                Value<String?> executor = const Value.absent(),
+              }) => MedicationRecordsCompanion(
+                id: id,
+                visitId: visitId,
+                recordTime: recordTime,
+                name: name,
+                route: route,
+                dose: dose,
+                executor: executor,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int visitId,
+                Value<DateTime?> recordTime = const Value.absent(),
+                Value<String?> name = const Value.absent(),
+                Value<String?> route = const Value.absent(),
+                Value<String?> dose = const Value.absent(),
+                Value<String?> executor = const Value.absent(),
+              }) => MedicationRecordsCompanion.insert(
+                id: id,
+                visitId: visitId,
+                recordTime: recordTime,
+                name: name,
+                route: route,
+                dose: dose,
+                executor: executor,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$MedicationRecordsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({visitId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (visitId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.visitId,
+                                referencedTable:
+                                    $$MedicationRecordsTableReferences
+                                        ._visitIdTable(db),
+                                referencedColumn:
+                                    $$MedicationRecordsTableReferences
+                                        ._visitIdTable(db)
+                                        .visitId,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$MedicationRecordsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $MedicationRecordsTable,
+      MedicationRecord,
+      $$MedicationRecordsTableFilterComposer,
+      $$MedicationRecordsTableOrderingComposer,
+      $$MedicationRecordsTableAnnotationComposer,
+      $$MedicationRecordsTableCreateCompanionBuilder,
+      $$MedicationRecordsTableUpdateCompanionBuilder,
+      (MedicationRecord, $$MedicationRecordsTableReferences),
+      MedicationRecord,
+      PrefetchHooks Function({bool visitId})
+    >;
+typedef $$VitalSignsRecordsTableCreateCompanionBuilder =
+    VitalSignsRecordsCompanion Function({
+      Value<int> id,
+      required int visitId,
+      Value<DateTime?> recordTime,
+      Value<bool> atHospital,
+      Value<String?> triageStation,
+      Value<String?> consciousness,
+      Value<String?> temperature,
+      Value<String?> pulse,
+      Value<String?> respiration,
+      Value<String?> bloodPressure,
+      Value<String?> spo2,
+      Value<String?> gcs,
+    });
+typedef $$VitalSignsRecordsTableUpdateCompanionBuilder =
+    VitalSignsRecordsCompanion Function({
+      Value<int> id,
+      Value<int> visitId,
+      Value<DateTime?> recordTime,
+      Value<bool> atHospital,
+      Value<String?> triageStation,
+      Value<String?> consciousness,
+      Value<String?> temperature,
+      Value<String?> pulse,
+      Value<String?> respiration,
+      Value<String?> bloodPressure,
+      Value<String?> spo2,
+      Value<String?> gcs,
+    });
+
+final class $$VitalSignsRecordsTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $VitalSignsRecordsTable,
+          VitalSignsRecord
+        > {
+  $$VitalSignsRecordsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $VisitsTable _visitIdTable(_$AppDatabase db) => db.visits.createAlias(
+    $_aliasNameGenerator(db.vitalSignsRecords.visitId, db.visits.visitId),
+  );
+
+  $$VisitsTableProcessedTableManager get visitId {
+    final $_column = $_itemColumn<int>('visit_id')!;
+
+    final manager = $$VisitsTableTableManager(
+      $_db,
+      $_db.visits,
+    ).filter((f) => f.visitId.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_visitIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$VitalSignsRecordsTableFilterComposer
+    extends Composer<_$AppDatabase, $VitalSignsRecordsTable> {
+  $$VitalSignsRecordsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get recordTime => $composableBuilder(
+    column: $table.recordTime,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get atHospital => $composableBuilder(
+    column: $table.atHospital,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get triageStation => $composableBuilder(
+    column: $table.triageStation,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get consciousness => $composableBuilder(
+    column: $table.consciousness,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get temperature => $composableBuilder(
+    column: $table.temperature,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get pulse => $composableBuilder(
+    column: $table.pulse,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get respiration => $composableBuilder(
+    column: $table.respiration,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get bloodPressure => $composableBuilder(
+    column: $table.bloodPressure,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get spo2 => $composableBuilder(
+    column: $table.spo2,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get gcs => $composableBuilder(
+    column: $table.gcs,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$VisitsTableFilterComposer get visitId {
+    final $$VisitsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.visitId,
+      referencedTable: $db.visits,
+      getReferencedColumn: (t) => t.visitId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$VisitsTableFilterComposer(
+            $db: $db,
+            $table: $db.visits,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$VitalSignsRecordsTableOrderingComposer
+    extends Composer<_$AppDatabase, $VitalSignsRecordsTable> {
+  $$VitalSignsRecordsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get recordTime => $composableBuilder(
+    column: $table.recordTime,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get atHospital => $composableBuilder(
+    column: $table.atHospital,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get triageStation => $composableBuilder(
+    column: $table.triageStation,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get consciousness => $composableBuilder(
+    column: $table.consciousness,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get temperature => $composableBuilder(
+    column: $table.temperature,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get pulse => $composableBuilder(
+    column: $table.pulse,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get respiration => $composableBuilder(
+    column: $table.respiration,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get bloodPressure => $composableBuilder(
+    column: $table.bloodPressure,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get spo2 => $composableBuilder(
+    column: $table.spo2,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get gcs => $composableBuilder(
+    column: $table.gcs,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$VisitsTableOrderingComposer get visitId {
+    final $$VisitsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.visitId,
+      referencedTable: $db.visits,
+      getReferencedColumn: (t) => t.visitId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$VisitsTableOrderingComposer(
+            $db: $db,
+            $table: $db.visits,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$VitalSignsRecordsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $VitalSignsRecordsTable> {
+  $$VitalSignsRecordsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get recordTime => $composableBuilder(
+    column: $table.recordTime,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get atHospital => $composableBuilder(
+    column: $table.atHospital,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get triageStation => $composableBuilder(
+    column: $table.triageStation,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get consciousness => $composableBuilder(
+    column: $table.consciousness,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get temperature => $composableBuilder(
+    column: $table.temperature,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get pulse =>
+      $composableBuilder(column: $table.pulse, builder: (column) => column);
+
+  GeneratedColumn<String> get respiration => $composableBuilder(
+    column: $table.respiration,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get bloodPressure => $composableBuilder(
+    column: $table.bloodPressure,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get spo2 =>
+      $composableBuilder(column: $table.spo2, builder: (column) => column);
+
+  GeneratedColumn<String> get gcs =>
+      $composableBuilder(column: $table.gcs, builder: (column) => column);
+
+  $$VisitsTableAnnotationComposer get visitId {
+    final $$VisitsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.visitId,
+      referencedTable: $db.visits,
+      getReferencedColumn: (t) => t.visitId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$VisitsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.visits,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$VitalSignsRecordsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $VitalSignsRecordsTable,
+          VitalSignsRecord,
+          $$VitalSignsRecordsTableFilterComposer,
+          $$VitalSignsRecordsTableOrderingComposer,
+          $$VitalSignsRecordsTableAnnotationComposer,
+          $$VitalSignsRecordsTableCreateCompanionBuilder,
+          $$VitalSignsRecordsTableUpdateCompanionBuilder,
+          (VitalSignsRecord, $$VitalSignsRecordsTableReferences),
+          VitalSignsRecord,
+          PrefetchHooks Function({bool visitId})
+        > {
+  $$VitalSignsRecordsTableTableManager(
+    _$AppDatabase db,
+    $VitalSignsRecordsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$VitalSignsRecordsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$VitalSignsRecordsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$VitalSignsRecordsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> visitId = const Value.absent(),
+                Value<DateTime?> recordTime = const Value.absent(),
+                Value<bool> atHospital = const Value.absent(),
+                Value<String?> triageStation = const Value.absent(),
+                Value<String?> consciousness = const Value.absent(),
+                Value<String?> temperature = const Value.absent(),
+                Value<String?> pulse = const Value.absent(),
+                Value<String?> respiration = const Value.absent(),
+                Value<String?> bloodPressure = const Value.absent(),
+                Value<String?> spo2 = const Value.absent(),
+                Value<String?> gcs = const Value.absent(),
+              }) => VitalSignsRecordsCompanion(
+                id: id,
+                visitId: visitId,
+                recordTime: recordTime,
+                atHospital: atHospital,
+                triageStation: triageStation,
+                consciousness: consciousness,
+                temperature: temperature,
+                pulse: pulse,
+                respiration: respiration,
+                bloodPressure: bloodPressure,
+                spo2: spo2,
+                gcs: gcs,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int visitId,
+                Value<DateTime?> recordTime = const Value.absent(),
+                Value<bool> atHospital = const Value.absent(),
+                Value<String?> triageStation = const Value.absent(),
+                Value<String?> consciousness = const Value.absent(),
+                Value<String?> temperature = const Value.absent(),
+                Value<String?> pulse = const Value.absent(),
+                Value<String?> respiration = const Value.absent(),
+                Value<String?> bloodPressure = const Value.absent(),
+                Value<String?> spo2 = const Value.absent(),
+                Value<String?> gcs = const Value.absent(),
+              }) => VitalSignsRecordsCompanion.insert(
+                id: id,
+                visitId: visitId,
+                recordTime: recordTime,
+                atHospital: atHospital,
+                triageStation: triageStation,
+                consciousness: consciousness,
+                temperature: temperature,
+                pulse: pulse,
+                respiration: respiration,
+                bloodPressure: bloodPressure,
+                spo2: spo2,
+                gcs: gcs,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$VitalSignsRecordsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({visitId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (visitId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.visitId,
+                                referencedTable:
+                                    $$VitalSignsRecordsTableReferences
+                                        ._visitIdTable(db),
+                                referencedColumn:
+                                    $$VitalSignsRecordsTableReferences
+                                        ._visitIdTable(db)
+                                        .visitId,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$VitalSignsRecordsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $VitalSignsRecordsTable,
+      VitalSignsRecord,
+      $$VitalSignsRecordsTableFilterComposer,
+      $$VitalSignsRecordsTableOrderingComposer,
+      $$VitalSignsRecordsTableAnnotationComposer,
+      $$VitalSignsRecordsTableCreateCompanionBuilder,
+      $$VitalSignsRecordsTableUpdateCompanionBuilder,
+      (VitalSignsRecord, $$VitalSignsRecordsTableReferences),
+      VitalSignsRecord,
+      PrefetchHooks Function({bool visitId})
+    >;
+typedef $$ParamedicRecordsTableCreateCompanionBuilder =
+    ParamedicRecordsCompanion Function({
+      Value<int> id,
+      required int visitId,
+      Value<String?> name,
+      Value<Uint8List?> signature,
+    });
+typedef $$ParamedicRecordsTableUpdateCompanionBuilder =
+    ParamedicRecordsCompanion Function({
+      Value<int> id,
+      Value<int> visitId,
+      Value<String?> name,
+      Value<Uint8List?> signature,
+    });
+
+final class $$ParamedicRecordsTableReferences
+    extends
+        BaseReferences<_$AppDatabase, $ParamedicRecordsTable, ParamedicRecord> {
+  $$ParamedicRecordsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $VisitsTable _visitIdTable(_$AppDatabase db) => db.visits.createAlias(
+    $_aliasNameGenerator(db.paramedicRecords.visitId, db.visits.visitId),
+  );
+
+  $$VisitsTableProcessedTableManager get visitId {
+    final $_column = $_itemColumn<int>('visit_id')!;
+
+    final manager = $$VisitsTableTableManager(
+      $_db,
+      $_db.visits,
+    ).filter((f) => f.visitId.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_visitIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$ParamedicRecordsTableFilterComposer
+    extends Composer<_$AppDatabase, $ParamedicRecordsTable> {
+  $$ParamedicRecordsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<Uint8List> get signature => $composableBuilder(
+    column: $table.signature,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$VisitsTableFilterComposer get visitId {
+    final $$VisitsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.visitId,
+      referencedTable: $db.visits,
+      getReferencedColumn: (t) => t.visitId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$VisitsTableFilterComposer(
+            $db: $db,
+            $table: $db.visits,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ParamedicRecordsTableOrderingComposer
+    extends Composer<_$AppDatabase, $ParamedicRecordsTable> {
+  $$ParamedicRecordsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<Uint8List> get signature => $composableBuilder(
+    column: $table.signature,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$VisitsTableOrderingComposer get visitId {
+    final $$VisitsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.visitId,
+      referencedTable: $db.visits,
+      getReferencedColumn: (t) => t.visitId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$VisitsTableOrderingComposer(
+            $db: $db,
+            $table: $db.visits,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ParamedicRecordsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ParamedicRecordsTable> {
+  $$ParamedicRecordsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<Uint8List> get signature =>
+      $composableBuilder(column: $table.signature, builder: (column) => column);
+
+  $$VisitsTableAnnotationComposer get visitId {
+    final $$VisitsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.visitId,
+      referencedTable: $db.visits,
+      getReferencedColumn: (t) => t.visitId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$VisitsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.visits,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ParamedicRecordsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $ParamedicRecordsTable,
+          ParamedicRecord,
+          $$ParamedicRecordsTableFilterComposer,
+          $$ParamedicRecordsTableOrderingComposer,
+          $$ParamedicRecordsTableAnnotationComposer,
+          $$ParamedicRecordsTableCreateCompanionBuilder,
+          $$ParamedicRecordsTableUpdateCompanionBuilder,
+          (ParamedicRecord, $$ParamedicRecordsTableReferences),
+          ParamedicRecord,
+          PrefetchHooks Function({bool visitId})
+        > {
+  $$ParamedicRecordsTableTableManager(
+    _$AppDatabase db,
+    $ParamedicRecordsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ParamedicRecordsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ParamedicRecordsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ParamedicRecordsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> visitId = const Value.absent(),
+                Value<String?> name = const Value.absent(),
+                Value<Uint8List?> signature = const Value.absent(),
+              }) => ParamedicRecordsCompanion(
+                id: id,
+                visitId: visitId,
+                name: name,
+                signature: signature,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int visitId,
+                Value<String?> name = const Value.absent(),
+                Value<Uint8List?> signature = const Value.absent(),
+              }) => ParamedicRecordsCompanion.insert(
+                id: id,
+                visitId: visitId,
+                name: name,
+                signature: signature,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$ParamedicRecordsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({visitId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (visitId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.visitId,
+                                referencedTable:
+                                    $$ParamedicRecordsTableReferences
+                                        ._visitIdTable(db),
+                                referencedColumn:
+                                    $$ParamedicRecordsTableReferences
+                                        ._visitIdTable(db)
+                                        .visitId,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$ParamedicRecordsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $ParamedicRecordsTable,
+      ParamedicRecord,
+      $$ParamedicRecordsTableFilterComposer,
+      $$ParamedicRecordsTableOrderingComposer,
+      $$ParamedicRecordsTableAnnotationComposer,
+      $$ParamedicRecordsTableCreateCompanionBuilder,
+      $$ParamedicRecordsTableUpdateCompanionBuilder,
+      (ParamedicRecord, $$ParamedicRecordsTableReferences),
+      ParamedicRecord,
+      PrefetchHooks Function({bool visitId})
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -15574,4 +27099,14 @@ class $AppDatabaseManager {
       $$ElectronicDocumentsTableTableManager(_db, _db.electronicDocuments);
   $$NursingRecordsTableTableManager get nursingRecords =>
       $$NursingRecordsTableTableManager(_db, _db.nursingRecords);
+  $$ReferralFormsTableTableManager get referralForms =>
+      $$ReferralFormsTableTableManager(_db, _db.referralForms);
+  $$AmbulanceRecordsTableTableManager get ambulanceRecords =>
+      $$AmbulanceRecordsTableTableManager(_db, _db.ambulanceRecords);
+  $$MedicationRecordsTableTableManager get medicationRecords =>
+      $$MedicationRecordsTableTableManager(_db, _db.medicationRecords);
+  $$VitalSignsRecordsTableTableManager get vitalSignsRecords =>
+      $$VitalSignsRecordsTableTableManager(_db, _db.vitalSignsRecords);
+  $$ParamedicRecordsTableTableManager get paramedicRecords =>
+      $$ParamedicRecordsTableTableManager(_db, _db.paramedicRecords);
 }
