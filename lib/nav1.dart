@@ -58,25 +58,6 @@ class Nav1Page extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(width: 12),
-          FilledButton(
-            style: FilledButton.styleFrom(
-              backgroundColor: const Color(0xFFE74C3C),
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(14),
-              ),
-            ),
-            onPressed: () {
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(const SnackBar(content: Text('呼叫救護車功能')));
-            },
-            child: const Text('呼叫救護車'),
-          ),
-          const SizedBox(width: 12),
-          const CircleAvatar(radius: 18, backgroundColor: lightColor),
         ],
       ),
     );
