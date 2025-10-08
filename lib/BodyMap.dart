@@ -134,16 +134,47 @@ class _BodyMapPageState extends State<BodyMapPage>
 
       if (dataModel.bodyMapJson != null &&
           dataModel.bodyMapJson!.trim().isNotEmpty) {
-        // ...
-      } else {}
+        try {
+          final List<dynamic> jsonData = jsonDecode(dataModel.bodyMapJson!);
+          debugPrint("📝 JSON 解析數量: ${jsonData.length}");
 
-      setState(() {
-        _loading = false;
-      });
-    } catch (e, stackTrace) {
+          final drawables = <Drawable>[];
+
+          for (var json in jsonData) {
+            try {
+              final d = _drawableFromJson(Map<String, dynamic>.from(json));
+              if (d != null) {
+                drawables.add(d);
+                debugPrint("✅ 解析成功 Drawable: $d");
+              } else {
+                debugPrint("⚠️ Drawable 解析結果為 null: $json");
+              }
+            } catch (e) {
+              debugPrint("❌ 解析單筆 Drawable 失敗: $json , 錯誤: $e");
+            }
+          }
+
+          debugPrint("🎨 最終解析出的 drawables 數量: ${drawables.length}");
+
+          if (drawables.isNotEmpty) {
+            _controller!.addDrawables(drawables);
+            debugPrint("✨ 成功加入到 Controller: ${drawables.length} 個");
+          } else {
+            debugPrint("⚠️ 沒有任何 Drawable 被還原到畫布");
+          }
+        } catch (e) {
+          debugPrint("❌ 整體 JSON 解析失敗: $e");
+        }
+      } else {
+        debugPrint("⚠️ bodyMapJson 為空，沒有任何圖可以還原");
+      }
+
+      setState(() => _loading = false);
+    } catch (e) {
+      debugPrint("載入 BodyMap 發生錯誤: $e");
       if (mounted) {
         setState(() {
-          _errorMessage = "無法載入人形圖資源: $e"; // 顯示更精確的錯誤訊息
+          _errorMessage = "載入圖片失敗: $e";
           _loading = false;
         });
       }
