@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:drift/drift.dart' show Value;
 
-// 引入 nav5.dart 以獲取 AmbulanceDataProvider
-import 'nav5.dart';
+// 引入 nav5.dart 以獲取 AmbulanceDataProvider 和 SavableStateMixin
+import 'nav5.dart'; // 假設 SavableStateMixin 定義在 nav5.dart 或其引用的檔案中
 
 class AmbulanceExpensesPage extends StatefulWidget {
   final int visitId;
@@ -13,15 +13,24 @@ class AmbulanceExpensesPage extends StatefulWidget {
   State<AmbulanceExpensesPage> createState() => _AmbulanceExpensesPageState();
 }
 
-class _AmbulanceExpensesPageState extends State<AmbulanceExpensesPage> {
-  // 為這個頁面上的所有文字輸入框建立 TextEditingController
-  final TextEditingController _staffFeeController = TextEditingController();
-  final TextEditingController _oxygenFeeController = TextEditingController();
+// ✅ 1. 引入 Mixins
+class _AmbulanceExpensesPageState extends State<AmbulanceExpensesPage>
+    with AutomaticKeepAliveClientMixin, SavableStateMixin {
+  final _staffFeeController = TextEditingController();
+  final _oxygenFeeController = TextEditingController();
+
+  // ✅ 2. 實現 wantKeepAlive
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
     super.initState();
-    // 在 initState 中，從 Provider 讀取一次資料，來設定 Controller 的初始值
+    _loadInitialData();
+  }
+
+  void _loadInitialData() {
+    // 使用 context.read 在 initState 中安全地讀取一次資料
     final dataProvider = context.read<AmbulanceDataProvider>();
     final recordData = dataProvider.ambulanceRecordData;
 
@@ -31,27 +40,65 @@ class _AmbulanceExpensesPageState extends State<AmbulanceExpensesPage> {
 
   @override
   void dispose() {
-    // 釋放所有 Controller 以避免記憶體洩漏
     _staffFeeController.dispose();
     _oxygenFeeController.dispose();
     super.dispose();
   }
 
-  // 總費用的計算現在直接在 build 方法中從 Provider 讀取，不再需要本地的 _totalFee 和 _updateTotalFee 方法
+  // ✅ 3. 實現 saveData 方法
+  @override
+  Future<void> saveData() async {
+    // 這個方法將由外部（如 Nav5Page 的統一儲存按鈕）呼叫
+    try {
+      final dataProvider = context.read<AmbulanceDataProvider>();
+      final recordData = dataProvider.ambulanceRecordData;
+
+      final staffFee = int.tryParse(_staffFeeController.text);
+      final oxygenFee = int.tryParse(_oxygenFeeController.text);
+      final totalFee = (staffFee ?? 0) + (oxygenFee ?? 0);
+
+      // 一次性更新所有相關欄位
+      dataProvider.updateAmbulanceRecord(
+        recordData.copyWith(
+          staffFee: Value(staffFee),
+          oxygenFee: Value(oxygenFee),
+          totalFee: Value(totalFee),
+          // chargeStatus, paidType 等欄位已經在 Provider 中，無需在這裡重複設定
+        ),
+      );
+    } catch (e) {
+      // 如果發生錯誤，將其拋出，讓呼叫者（儲存按鈕）處理
+      rethrow;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    const double inputWidth = 120; // 統一寬度
+    // ✅ 4. 必須呼叫 super.build(context)
+    super.build(context);
 
-    // 使用 Consumer 來監聽 DataProvider 的變化並建構 UI
+    const double inputWidth = 120;
+
     return Consumer<AmbulanceDataProvider>(
       builder: (context, dataProvider, child) {
         final recordData = dataProvider.ambulanceRecordData;
 
-        // 從 Provider 中即時計算總費用
+        // ✅ 5. 狀態同步：確保 Controller 的文字與 Provider 的資料一致
+        // 這可以防止在其他地方修改資料後，此頁面顯示舊資料
+        final providerStaffFee = recordData.staffFee.value?.toString() ?? '';
+        if (_staffFeeController.text != providerStaffFee) {
+          _staffFeeController.text = providerStaffFee;
+        }
+
+        final providerOxygenFee = recordData.oxygenFee.value?.toString() ?? '';
+        if (_oxygenFeeController.text != providerOxygenFee) {
+          _oxygenFeeController.text = providerOxygenFee;
+        }
+
+        // ✅ 6. 總費用從 Controller 即時計算，提供立即的 UI 反應
         final totalFee =
-            (recordData.staffFee.value ?? 0) +
-            (recordData.oxygenFee.value ?? 0);
+            (int.tryParse(_staffFeeController.text) ?? 0) +
+            (int.tryParse(_oxygenFeeController.text) ?? 0);
 
         return Padding(
           padding: const EdgeInsets.all(16),
@@ -78,16 +125,8 @@ class _AmbulanceExpensesPageState extends State<AmbulanceExpensesPage> {
                       hint: '請填寫整數',
                       inputWidth: inputWidth,
                       onChanged: (value) {
-                        final fee = int.tryParse(value);
-                        dataProvider.updateAmbulanceRecord(
-                          recordData.copyWith(
-                            staffFee: Value(fee),
-                            // 當費用更新時，也同步更新總費用
-                            totalFee: Value(
-                              (fee ?? 0) + (recordData.oxygenFee.value ?? 0),
-                            ),
-                          ),
-                        );
+                        // ✅ 7. onChanged 只更新本地狀態 (setState)，不直接呼叫 Provider
+                        setState(() {});
                       },
                     ),
                     const SizedBox(height: 12),
@@ -99,16 +138,7 @@ class _AmbulanceExpensesPageState extends State<AmbulanceExpensesPage> {
                       hint: '請填寫整數',
                       inputWidth: inputWidth,
                       onChanged: (value) {
-                        final fee = int.tryParse(value);
-                        dataProvider.updateAmbulanceRecord(
-                          recordData.copyWith(
-                            oxygenFee: Value(fee),
-                            // 當費用更新時，也同步更新總費用
-                            totalFee: Value(
-                              (recordData.staffFee.value ?? 0) + (fee ?? 0),
-                            ),
-                          ),
-                        );
+                        setState(() {});
                       },
                     ),
                     const SizedBox(height: 12),
@@ -129,7 +159,7 @@ class _AmbulanceExpensesPageState extends State<AmbulanceExpensesPage> {
                           child: Align(
                             alignment: Alignment.centerRight,
                             child: Text(
-                              '$totalFee', // 直接顯示計算後的總費用
+                              '$totalFee', // 顯示從 Controller 計算的總費用
                               style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w500,
@@ -155,12 +185,16 @@ class _AmbulanceExpensesPageState extends State<AmbulanceExpensesPage> {
                       children: ['已收費', '連新國際醫院代收', '未收費'].map((option) {
                         return _buildRadioOption(
                           option,
-                          recordData
-                              .chargeStatus
-                              .value, // groupValue 來自 Provider
+                          recordData.chargeStatus.value,
                           (val) {
+                            // ✅ 8. Radio Button 這類簡單選項可以直接更新 Provider
                             dataProvider.updateAmbulanceRecord(
-                              recordData.copyWith(chargeStatus: Value(val)),
+                              recordData.copyWith(
+                                chargeStatus: Value(val),
+                                // 清空依賴於 chargeStatus 的選項
+                                paidType: const Value(null),
+                                unpaidType: const Value(null),
+                              ),
                             );
                           },
                         );
@@ -183,7 +217,7 @@ class _AmbulanceExpensesPageState extends State<AmbulanceExpensesPage> {
                         children: ['現金', '刷卡'].map((option) {
                           return _buildRadioOption(
                             option,
-                            recordData.paidType.value, // groupValue 來自 Provider
+                            recordData.paidType.value,
                             (val) {
                               dataProvider.updateAmbulanceRecord(
                                 recordData.copyWith(paidType: Value(val)),
@@ -203,15 +237,14 @@ class _AmbulanceExpensesPageState extends State<AmbulanceExpensesPage> {
                           fontSize: 16,
                         ),
                       ),
+
                       const SizedBox(height: 6),
                       Wrap(
                         spacing: 12,
                         children: ['欠款', '匯款', '統一請款'].map((option) {
                           return _buildRadioOption(
                             option,
-                            recordData
-                                .unpaidType
-                                .value, // groupValue 來自 Provider
+                            recordData.unpaidType.value,
                             (val) {
                               dataProvider.updateAmbulanceRecord(
                                 recordData.copyWith(unpaidType: Value(val)),
@@ -231,14 +264,14 @@ class _AmbulanceExpensesPageState extends State<AmbulanceExpensesPage> {
     );
   }
 
-  // --- 小積木 (Helper Widgets) ---
+  // --- Helper Widgets (無需修改) ---
 
   Widget _buildTitleWithInput({
     required String title,
     required TextEditingController controller,
     required String hint,
     required double inputWidth,
-    required ValueChanged<String> onChanged, // 新增 onChanged 回調
+    required ValueChanged<String> onChanged,
   }) {
     return Row(
       children: [
@@ -265,7 +298,7 @@ class _AmbulanceExpensesPageState extends State<AmbulanceExpensesPage> {
                 borderSide: BorderSide(color: Colors.blue, width: 2),
               ),
             ),
-            onChanged: onChanged, // 綁定 onChanged 事件
+            onChanged: onChanged,
           ),
         ),
       ],

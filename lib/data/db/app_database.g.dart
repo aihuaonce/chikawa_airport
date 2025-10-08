@@ -13171,6 +13171,28 @@ class $AmbulanceRecordsTable extends AmbulanceRecords
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _airwayOtherMeta = const VerificationMeta(
+    'airwayOther',
+  );
+  @override
+  late final GeneratedColumn<String> airwayOther = GeneratedColumn<String>(
+    'airway_other',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _otherEmergencyOtherMeta =
+      const VerificationMeta('otherEmergencyOther');
+  @override
+  late final GeneratedColumn<String> otherEmergencyOther =
+      GeneratedColumn<String>(
+        'other_emergency_other',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
   static const VerificationMeta _aslTypeMeta = const VerificationMeta(
     'aslType',
   );
@@ -13657,6 +13679,8 @@ class $AmbulanceRecordsTable extends AmbulanceRecords
     otherEmergencyProceduresJson,
     bodyDiagramNote,
     bodyDiagramPath,
+    airwayOther,
+    otherEmergencyOther,
     aslType,
     ettSize,
     ettDepth,
@@ -13999,6 +14023,24 @@ class $AmbulanceRecordsTable extends AmbulanceRecords
         bodyDiagramPath.isAcceptableOrUnknown(
           data['body_diagram_path']!,
           _bodyDiagramPathMeta,
+        ),
+      );
+    }
+    if (data.containsKey('airway_other')) {
+      context.handle(
+        _airwayOtherMeta,
+        airwayOther.isAcceptableOrUnknown(
+          data['airway_other']!,
+          _airwayOtherMeta,
+        ),
+      );
+    }
+    if (data.containsKey('other_emergency_other')) {
+      context.handle(
+        _otherEmergencyOtherMeta,
+        otherEmergencyOther.isAcceptableOrUnknown(
+          data['other_emergency_other']!,
+          _otherEmergencyOtherMeta,
         ),
       );
     }
@@ -14450,6 +14492,14 @@ class $AmbulanceRecordsTable extends AmbulanceRecords
         DriftSqlType.string,
         data['${effectivePrefix}body_diagram_path'],
       ),
+      airwayOther: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}airway_other'],
+      ),
+      otherEmergencyOther: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}other_emergency_other'],
+      ),
       aslType: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}asl_type'],
@@ -14650,6 +14700,8 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
   final String otherEmergencyProceduresJson;
   final String? bodyDiagramNote;
   final String? bodyDiagramPath;
+  final String? airwayOther;
+  final String? otherEmergencyOther;
   final String? aslType;
   final String? ettSize;
   final String? ettDepth;
@@ -14724,6 +14776,8 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
     required this.otherEmergencyProceduresJson,
     this.bodyDiagramNote,
     this.bodyDiagramPath,
+    this.airwayOther,
+    this.otherEmergencyOther,
     this.aslType,
     this.ettSize,
     this.ettDepth,
@@ -14858,6 +14912,12 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
     }
     if (!nullToAbsent || bodyDiagramPath != null) {
       map['body_diagram_path'] = Variable<String>(bodyDiagramPath);
+    }
+    if (!nullToAbsent || airwayOther != null) {
+      map['airway_other'] = Variable<String>(airwayOther);
+    }
+    if (!nullToAbsent || otherEmergencyOther != null) {
+      map['other_emergency_other'] = Variable<String>(otherEmergencyOther);
     }
     if (!nullToAbsent || aslType != null) {
       map['asl_type'] = Variable<String>(aslType);
@@ -15049,6 +15109,12 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
       bodyDiagramPath: bodyDiagramPath == null && nullToAbsent
           ? const Value.absent()
           : Value(bodyDiagramPath),
+      airwayOther: airwayOther == null && nullToAbsent
+          ? const Value.absent()
+          : Value(airwayOther),
+      otherEmergencyOther: otherEmergencyOther == null && nullToAbsent
+          ? const Value.absent()
+          : Value(otherEmergencyOther),
       aslType: aslType == null && nullToAbsent
           ? const Value.absent()
           : Value(aslType),
@@ -15213,6 +15279,10 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
       ),
       bodyDiagramNote: serializer.fromJson<String?>(json['bodyDiagramNote']),
       bodyDiagramPath: serializer.fromJson<String?>(json['bodyDiagramPath']),
+      airwayOther: serializer.fromJson<String?>(json['airwayOther']),
+      otherEmergencyOther: serializer.fromJson<String?>(
+        json['otherEmergencyOther'],
+      ),
       aslType: serializer.fromJson<String?>(json['aslType']),
       ettSize: serializer.fromJson<String?>(json['ettSize']),
       ettDepth: serializer.fromJson<String?>(json['ettDepth']),
@@ -15316,6 +15386,8 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
       ),
       'bodyDiagramNote': serializer.toJson<String?>(bodyDiagramNote),
       'bodyDiagramPath': serializer.toJson<String?>(bodyDiagramPath),
+      'airwayOther': serializer.toJson<String?>(airwayOther),
+      'otherEmergencyOther': serializer.toJson<String?>(otherEmergencyOther),
       'aslType': serializer.toJson<String?>(aslType),
       'ettSize': serializer.toJson<String?>(ettSize),
       'ettDepth': serializer.toJson<String?>(ettDepth),
@@ -15401,6 +15473,8 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
     String? otherEmergencyProceduresJson,
     Value<String?> bodyDiagramNote = const Value.absent(),
     Value<String?> bodyDiagramPath = const Value.absent(),
+    Value<String?> airwayOther = const Value.absent(),
+    Value<String?> otherEmergencyOther = const Value.absent(),
     Value<String?> aslType = const Value.absent(),
     Value<String?> ettSize = const Value.absent(),
     Value<String?> ettDepth = const Value.absent(),
@@ -15518,6 +15592,10 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
     bodyDiagramPath: bodyDiagramPath.present
         ? bodyDiagramPath.value
         : this.bodyDiagramPath,
+    airwayOther: airwayOther.present ? airwayOther.value : this.airwayOther,
+    otherEmergencyOther: otherEmergencyOther.present
+        ? otherEmergencyOther.value
+        : this.otherEmergencyOther,
     aslType: aslType.present ? aslType.value : this.aslType,
     ettSize: ettSize.present ? ettSize.value : this.ettSize,
     ettDepth: ettDepth.present ? ettDepth.value : this.ettDepth,
@@ -15676,6 +15754,12 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
       bodyDiagramPath: data.bodyDiagramPath.present
           ? data.bodyDiagramPath.value
           : this.bodyDiagramPath,
+      airwayOther: data.airwayOther.present
+          ? data.airwayOther.value
+          : this.airwayOther,
+      otherEmergencyOther: data.otherEmergencyOther.present
+          ? data.otherEmergencyOther.value
+          : this.otherEmergencyOther,
       aslType: data.aslType.present ? data.aslType.value : this.aslType,
       ettSize: data.ettSize.present ? data.ettSize.value : this.ettSize,
       ettDepth: data.ettDepth.present ? data.ettDepth.value : this.ettDepth,
@@ -15809,6 +15893,8 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
           )
           ..write('bodyDiagramNote: $bodyDiagramNote, ')
           ..write('bodyDiagramPath: $bodyDiagramPath, ')
+          ..write('airwayOther: $airwayOther, ')
+          ..write('otherEmergencyOther: $otherEmergencyOther, ')
           ..write('aslType: $aslType, ')
           ..write('ettSize: $ettSize, ')
           ..write('ettDepth: $ettDepth, ')
@@ -15888,6 +15974,8 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
     otherEmergencyProceduresJson,
     bodyDiagramNote,
     bodyDiagramPath,
+    airwayOther,
+    otherEmergencyOther,
     aslType,
     ettSize,
     ettDepth,
@@ -15970,6 +16058,8 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
               this.otherEmergencyProceduresJson &&
           other.bodyDiagramNote == this.bodyDiagramNote &&
           other.bodyDiagramPath == this.bodyDiagramPath &&
+          other.airwayOther == this.airwayOther &&
+          other.otherEmergencyOther == this.otherEmergencyOther &&
           other.aslType == this.aslType &&
           other.ettSize == this.ettSize &&
           other.ettDepth == this.ettDepth &&
@@ -16047,6 +16137,8 @@ class AmbulanceRecordsCompanion extends UpdateCompanion<AmbulanceRecord> {
   final Value<String> otherEmergencyProceduresJson;
   final Value<String?> bodyDiagramNote;
   final Value<String?> bodyDiagramPath;
+  final Value<String?> airwayOther;
+  final Value<String?> otherEmergencyOther;
   final Value<String?> aslType;
   final Value<String?> ettSize;
   final Value<String?> ettDepth;
@@ -16121,6 +16213,8 @@ class AmbulanceRecordsCompanion extends UpdateCompanion<AmbulanceRecord> {
     this.otherEmergencyProceduresJson = const Value.absent(),
     this.bodyDiagramNote = const Value.absent(),
     this.bodyDiagramPath = const Value.absent(),
+    this.airwayOther = const Value.absent(),
+    this.otherEmergencyOther = const Value.absent(),
     this.aslType = const Value.absent(),
     this.ettSize = const Value.absent(),
     this.ettDepth = const Value.absent(),
@@ -16196,6 +16290,8 @@ class AmbulanceRecordsCompanion extends UpdateCompanion<AmbulanceRecord> {
     this.otherEmergencyProceduresJson = const Value.absent(),
     this.bodyDiagramNote = const Value.absent(),
     this.bodyDiagramPath = const Value.absent(),
+    this.airwayOther = const Value.absent(),
+    this.otherEmergencyOther = const Value.absent(),
     this.aslType = const Value.absent(),
     this.ettSize = const Value.absent(),
     this.ettDepth = const Value.absent(),
@@ -16271,6 +16367,8 @@ class AmbulanceRecordsCompanion extends UpdateCompanion<AmbulanceRecord> {
     Expression<String>? otherEmergencyProceduresJson,
     Expression<String>? bodyDiagramNote,
     Expression<String>? bodyDiagramPath,
+    Expression<String>? airwayOther,
+    Expression<String>? otherEmergencyOther,
     Expression<String>? aslType,
     Expression<String>? ettSize,
     Expression<String>? ettDepth,
@@ -16356,6 +16454,9 @@ class AmbulanceRecordsCompanion extends UpdateCompanion<AmbulanceRecord> {
         'other_emergency_procedures_json': otherEmergencyProceduresJson,
       if (bodyDiagramNote != null) 'body_diagram_note': bodyDiagramNote,
       if (bodyDiagramPath != null) 'body_diagram_path': bodyDiagramPath,
+      if (airwayOther != null) 'airway_other': airwayOther,
+      if (otherEmergencyOther != null)
+        'other_emergency_other': otherEmergencyOther,
       if (aslType != null) 'asl_type': aslType,
       if (ettSize != null) 'ett_size': ettSize,
       if (ettDepth != null) 'ett_depth': ettDepth,
@@ -16440,6 +16541,8 @@ class AmbulanceRecordsCompanion extends UpdateCompanion<AmbulanceRecord> {
     Value<String>? otherEmergencyProceduresJson,
     Value<String?>? bodyDiagramNote,
     Value<String?>? bodyDiagramPath,
+    Value<String?>? airwayOther,
+    Value<String?>? otherEmergencyOther,
     Value<String?>? aslType,
     Value<String?>? ettSize,
     Value<String?>? ettDepth,
@@ -16520,6 +16623,8 @@ class AmbulanceRecordsCompanion extends UpdateCompanion<AmbulanceRecord> {
           otherEmergencyProceduresJson ?? this.otherEmergencyProceduresJson,
       bodyDiagramNote: bodyDiagramNote ?? this.bodyDiagramNote,
       bodyDiagramPath: bodyDiagramPath ?? this.bodyDiagramPath,
+      airwayOther: airwayOther ?? this.airwayOther,
+      otherEmergencyOther: otherEmergencyOther ?? this.otherEmergencyOther,
       aslType: aslType ?? this.aslType,
       ettSize: ettSize ?? this.ettSize,
       ettDepth: ettDepth ?? this.ettDepth,
@@ -16690,6 +16795,14 @@ class AmbulanceRecordsCompanion extends UpdateCompanion<AmbulanceRecord> {
     }
     if (bodyDiagramPath.present) {
       map['body_diagram_path'] = Variable<String>(bodyDiagramPath.value);
+    }
+    if (airwayOther.present) {
+      map['airway_other'] = Variable<String>(airwayOther.value);
+    }
+    if (otherEmergencyOther.present) {
+      map['other_emergency_other'] = Variable<String>(
+        otherEmergencyOther.value,
+      );
     }
     if (aslType.present) {
       map['asl_type'] = Variable<String>(aslType.value);
@@ -16862,6 +16975,8 @@ class AmbulanceRecordsCompanion extends UpdateCompanion<AmbulanceRecord> {
           )
           ..write('bodyDiagramNote: $bodyDiagramNote, ')
           ..write('bodyDiagramPath: $bodyDiagramPath, ')
+          ..write('airwayOther: $airwayOther, ')
+          ..write('otherEmergencyOther: $otherEmergencyOther, ')
           ..write('aslType: $aslType, ')
           ..write('ettSize: $ettSize, ')
           ..write('ettDepth: $ettDepth, ')
@@ -24356,6 +24471,8 @@ typedef $$AmbulanceRecordsTableCreateCompanionBuilder =
       Value<String> otherEmergencyProceduresJson,
       Value<String?> bodyDiagramNote,
       Value<String?> bodyDiagramPath,
+      Value<String?> airwayOther,
+      Value<String?> otherEmergencyOther,
       Value<String?> aslType,
       Value<String?> ettSize,
       Value<String?> ettDepth,
@@ -24432,6 +24549,8 @@ typedef $$AmbulanceRecordsTableUpdateCompanionBuilder =
       Value<String> otherEmergencyProceduresJson,
       Value<String?> bodyDiagramNote,
       Value<String?> bodyDiagramPath,
+      Value<String?> airwayOther,
+      Value<String?> otherEmergencyOther,
       Value<String?> aslType,
       Value<String?> ettSize,
       Value<String?> ettDepth,
@@ -24649,6 +24768,16 @@ class $$AmbulanceRecordsTableFilterComposer
 
   ColumnFilters<String> get bodyDiagramPath => $composableBuilder(
     column: $table.bodyDiagramPath,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get airwayOther => $composableBuilder(
+    column: $table.airwayOther,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get otherEmergencyOther => $composableBuilder(
+    column: $table.otherEmergencyOther,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -25028,6 +25157,16 @@ class $$AmbulanceRecordsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get airwayOther => $composableBuilder(
+    column: $table.airwayOther,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get otherEmergencyOther => $composableBuilder(
+    column: $table.otherEmergencyOther,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get aslType => $composableBuilder(
     column: $table.aslType,
     builder: (column) => ColumnOrderings(column),
@@ -25396,6 +25535,16 @@ class $$AmbulanceRecordsTableAnnotationComposer
     builder: (column) => column,
   );
 
+  GeneratedColumn<String> get airwayOther => $composableBuilder(
+    column: $table.airwayOther,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get otherEmergencyOther => $composableBuilder(
+    column: $table.otherEmergencyOther,
+    builder: (column) => column,
+  );
+
   GeneratedColumn<String> get aslType =>
       $composableBuilder(column: $table.aslType, builder: (column) => column);
 
@@ -25638,6 +25787,8 @@ class $$AmbulanceRecordsTableTableManager
                     const Value.absent(),
                 Value<String?> bodyDiagramNote = const Value.absent(),
                 Value<String?> bodyDiagramPath = const Value.absent(),
+                Value<String?> airwayOther = const Value.absent(),
+                Value<String?> otherEmergencyOther = const Value.absent(),
                 Value<String?> aslType = const Value.absent(),
                 Value<String?> ettSize = const Value.absent(),
                 Value<String?> ettDepth = const Value.absent(),
@@ -25713,6 +25864,8 @@ class $$AmbulanceRecordsTableTableManager
                 otherEmergencyProceduresJson: otherEmergencyProceduresJson,
                 bodyDiagramNote: bodyDiagramNote,
                 bodyDiagramPath: bodyDiagramPath,
+                airwayOther: airwayOther,
+                otherEmergencyOther: otherEmergencyOther,
                 aslType: aslType,
                 ettSize: ettSize,
                 ettDepth: ettDepth,
@@ -25790,6 +25943,8 @@ class $$AmbulanceRecordsTableTableManager
                     const Value.absent(),
                 Value<String?> bodyDiagramNote = const Value.absent(),
                 Value<String?> bodyDiagramPath = const Value.absent(),
+                Value<String?> airwayOther = const Value.absent(),
+                Value<String?> otherEmergencyOther = const Value.absent(),
                 Value<String?> aslType = const Value.absent(),
                 Value<String?> ettSize = const Value.absent(),
                 Value<String?> ettDepth = const Value.absent(),
@@ -25865,6 +26020,8 @@ class $$AmbulanceRecordsTableTableManager
                 otherEmergencyProceduresJson: otherEmergencyProceduresJson,
                 bodyDiagramNote: bodyDiagramNote,
                 bodyDiagramPath: bodyDiagramPath,
+                airwayOther: airwayOther,
+                otherEmergencyOther: otherEmergencyOther,
                 aslType: aslType,
                 ettSize: ettSize,
                 ettDepth: ettDepth,

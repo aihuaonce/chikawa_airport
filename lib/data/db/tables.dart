@@ -449,6 +449,9 @@ class AmbulanceRecords extends Table {
   TextColumn get bodyDiagramNote => text().nullable()();
   TextColumn get bodyDiagramPath => text().nullable()();
 
+  TextColumn get airwayOther => text().nullable()();
+  TextColumn get otherEmergencyOther => text().nullable()();
+
   TextColumn get aslType => text().nullable()();
   TextColumn get ettSize => text().nullable()();
   TextColumn get ettDepth => text().nullable()();

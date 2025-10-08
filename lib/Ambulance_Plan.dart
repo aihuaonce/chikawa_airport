@@ -17,7 +17,8 @@ class AmbulancePlanPage extends StatefulWidget {
   State<AmbulancePlanPage> createState() => _AmbulancePlanPageState();
 }
 
-class _AmbulancePlanPageState extends State<AmbulancePlanPage> {
+class _AmbulancePlanPageState extends State<AmbulancePlanPage>
+    with AutomaticKeepAliveClientMixin, SavableStateMixin {
   // --- 顏色定義 ---
   static const Color primaryLight = Color(0xFF83ACA9);
   static const Color primaryDark = Color(0xFF274C4A);
@@ -78,7 +79,7 @@ class _AmbulancePlanPageState extends State<AmbulancePlanPage> {
     '其他',
   ];
 
-  // --- 文字控制器 ---
+  // --- 本地 UI 狀態 ---
   final Map<String, TextEditingController> _controllers = {
     'guideController': TextEditingController(),
     'receivingUnitController': TextEditingController(),
@@ -95,9 +96,44 @@ class _AmbulancePlanPageState extends State<AmbulancePlanPage> {
     'rejectionNameController': TextEditingController(),
   };
 
+  Map<String, bool> _emergencyTreatments = {};
+  Map<String, bool> _airwayTreatments = {};
+  Map<String, bool> _traumaTreatments = {};
+  Map<String, bool> _transportMethods = {};
+  Map<String, bool> _cprMethods = {};
+  Map<String, bool> _medicationProcedures = {};
+  Map<String, bool> _otherEmergencyProcedures = {};
+
+  String? _aslType;
+  bool? _isRejection;
+  String? _relationshipType;
+  DateTime? _receivingTime;
+
+  @override
+  bool get wantKeepAlive => true;
+
   @override
   void initState() {
     super.initState();
+    _loadInitialData();
+  }
+
+  Map<String, bool> _jsonToMap(String? jsonString) {
+    if (jsonString == null || jsonString.isEmpty) return {};
+    try {
+      final decoded = jsonDecode(jsonString);
+      if (decoded is Map) {
+        return Map<String, bool>.from(
+          decoded.map((key, value) => MapEntry(key.toString(), value as bool)),
+        );
+      }
+      return {};
+    } catch (e) {
+      return {};
+    }
+  }
+
+  void _loadInitialData() {
     final dataProvider = context.read<AmbulanceDataProvider>();
     final recordData = dataProvider.ambulanceRecordData;
 
@@ -110,6 +146,12 @@ class _AmbulancePlanPageState extends State<AmbulancePlanPage> {
         recordData.contactPhone.value ?? '';
     _controllers['bodyDiagramNoteController']!.text =
         recordData.bodyDiagramNote.value ?? '';
+    _controllers['airwayOtherController']!.text =
+        recordData.airwayOther.value ?? '';
+    _controllers['traumaOtherController']!.text =
+        recordData.traumaOther.value ?? '';
+    _controllers['otherEmergencyOtherController']!.text =
+        recordData.otherEmergencyOther.value ?? '';
     _controllers['ettSizeController']!.text = recordData.ettSize.value ?? '';
     _controllers['ettDepthController']!.text = recordData.ettDepth.value ?? '';
     _controllers['manualDefibCountController']!.text =
@@ -118,6 +160,23 @@ class _AmbulancePlanPageState extends State<AmbulancePlanPage> {
         recordData.manualDefibJoules.value ?? '';
     _controllers['rejectionNameController']!.text =
         recordData.rejectionName.value ?? '';
+
+    _emergencyTreatments = _jsonToMap(recordData.emergencyTreatmentsJson.value);
+    _airwayTreatments = _jsonToMap(recordData.airwayTreatmentsJson.value);
+    _traumaTreatments = _jsonToMap(recordData.traumaTreatmentsJson.value);
+    _transportMethods = _jsonToMap(recordData.transportMethodsJson.value);
+    _cprMethods = _jsonToMap(recordData.cprMethodsJson.value);
+    _medicationProcedures = _jsonToMap(
+      recordData.medicationProceduresJson.value,
+    );
+    _otherEmergencyProcedures = _jsonToMap(
+      recordData.otherEmergencyProceduresJson.value,
+    );
+
+    _aslType = recordData.aslType.value;
+    _isRejection = recordData.isRejection.value;
+    _relationshipType = recordData.relationshipType.value;
+    _receivingTime = recordData.receivingTime.value;
   }
 
   @override
@@ -127,181 +186,184 @@ class _AmbulancePlanPageState extends State<AmbulancePlanPage> {
   }
 
   @override
+  Future<void> saveData() async {
+    final dataProvider = context.read<AmbulanceDataProvider>();
+
+    dataProvider.updateAmbulanceRecord(
+      dataProvider.ambulanceRecordData.copyWith(
+        guideNote: Value(_controllers['guideController']!.text),
+        receivingUnit: Value(_controllers['receivingUnitController']!.text),
+        contactName: Value(_controllers['contactNameController']!.text),
+        contactPhone: Value(_controllers['contactPhoneController']!.text),
+        bodyDiagramNote: Value(_controllers['bodyDiagramNoteController']!.text),
+        airwayOther: Value(_controllers['airwayOtherController']!.text),
+        traumaOther: Value(_controllers['traumaOtherController']!.text),
+        otherEmergencyOther: Value(
+          _controllers['otherEmergencyOtherController']!.text,
+        ),
+        ettSize: Value(_controllers['ettSizeController']!.text),
+        ettDepth: Value(_controllers['ettDepthController']!.text),
+        manualDefibCount: Value(
+          _controllers['manualDefibCountController']!.text,
+        ),
+        manualDefibJoules: Value(
+          _controllers['manualDefibJoulesController']!.text,
+        ),
+        rejectionName: Value(_controllers['rejectionNameController']!.text),
+
+        emergencyTreatmentsJson: Value(jsonEncode(_emergencyTreatments)),
+        airwayTreatmentsJson: Value(jsonEncode(_airwayTreatments)),
+        traumaTreatmentsJson: Value(jsonEncode(_traumaTreatments)),
+        transportMethodsJson: Value(jsonEncode(_transportMethods)),
+        cprMethodsJson: Value(jsonEncode(_cprMethods)),
+        medicationProceduresJson: Value(jsonEncode(_medicationProcedures)),
+        otherEmergencyProceduresJson: Value(
+          jsonEncode(_otherEmergencyProcedures),
+        ),
+
+        aslType: Value(_aslType),
+        isRejection: Value(_isRejection ?? false),
+        relationshipType: Value(_relationshipType),
+        receivingTime: Value(_receivingTime),
+      ),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Consumer<AmbulanceDataProvider>(
-      builder: (context, dataProvider, child) {
-        final recordData = dataProvider.ambulanceRecordData;
+    super.build(context);
+    final dataProvider = context.watch<AmbulanceDataProvider>();
 
-        Map<String, bool> getJsonMap(Value<String> jsonValue) {
-          try {
-            return Map<String, bool>.from(jsonDecode(jsonValue.value));
-          } catch (e) {
-            return {};
-          }
-        }
-
-        final emergencyTreatments = getJsonMap(
-          recordData.emergencyTreatmentsJson,
-        );
-
-        return Container(
-          color: const Color(0xFFF5F5F5),
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildSectionHeader('急救處置'),
-                const SizedBox(height: 12),
-                _buildCheckboxGroup(
-                  dataProvider,
-                  'emergencyTreatmentsJson',
-                  emergencyTreatmentOptions,
-                ),
-                const SizedBox(height: 20),
-
-                if (emergencyTreatments['呼吸道處置'] == true)
-                  _buildAirwayOptions(dataProvider),
-                if (emergencyTreatments['創傷處置'] == true)
-                  _buildTraumaOptions(dataProvider),
-                if (emergencyTreatments['搬運'] == true)
-                  _buildTransportOptions(dataProvider),
-                if (emergencyTreatments['心肺復甦術'] == true)
-                  _buildCprOptions(dataProvider),
-                if (emergencyTreatments['藥物處置'] == true)
-                  _buildMedicationOptions(dataProvider),
-                if (emergencyTreatments['其他處置'] == true)
-                  _buildOtherEmergencyOptions(dataProvider),
-
-                _buildSectionHeader('人形圖'),
-                const SizedBox(height: 12),
-                Center(
-                  child: Container(
-                    width: 200,
-                    height: 200,
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade200,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: primaryLight),
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.add_a_photo,
-                          size: 60,
-                          color: Colors.grey.shade400,
-                        ),
-                        const SizedBox(height: 8),
-                        Icon(
-                          Icons.add_circle_outline,
-                          size: 40,
-                          color: Colors.grey.shade400,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Center(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('開啟人形圖編輯功能')),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: primaryDark,
-                      foregroundColor: white,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 24,
-                        vertical: 12,
-                      ),
-                    ),
-                    child: const Text('點擊按鈕開始編輯人形圖'),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                _buildTextField(
-                  label: '人形圖備註',
-                  controller: _controllers['bodyDiagramNoteController']!,
-                  hint: '請填寫備註內容',
-                  onChanged: (val) => dataProvider.updateAmbulanceRecord(
-                    recordData.copyWith(bodyDiagramNote: Value(val)),
-                  ),
-                ),
-                const SizedBox(height: 20),
-
-                _buildMedicationTable(context, dataProvider),
-                const SizedBox(height: 20),
-
-                _buildASLSection(dataProvider),
-                const SizedBox(height: 12),
-
-                _buildTextField(
-                  label: '線上指導醫師指導說明',
-                  controller: _controllers['guideController']!,
-                  hint: '請填寫指導說明',
-                  onChanged: (val) => dataProvider.updateAmbulanceRecord(
-                    recordData.copyWith(guideNote: Value(val)),
-                  ),
-                ),
-                const SizedBox(height: 20),
-
-                _buildVitalSignsTable(context, dataProvider),
-                const SizedBox(height: 20),
-
-                _buildParamedicTable(context, dataProvider),
-                const SizedBox(height: 20),
-
-                _buildTextField(
-                  label: '接收單位',
-                  controller: _controllers['receivingUnitController']!,
-                  hint: '請填寫接收單位',
-                  onChanged: (val) => dataProvider.updateAmbulanceRecord(
-                    recordData.copyWith(receivingUnit: Value(val)),
-                  ),
-                ),
-                const SizedBox(height: 12),
-
-                _buildReceivingTime(dataProvider),
-                const SizedBox(height: 12),
-
-                _buildRejectionSection(dataProvider),
-                const SizedBox(height: 12),
-
-                _buildRelationshipSection(dataProvider),
-                const SizedBox(height: 12),
-
-                _buildTextField(
-                  label: '關係人姓名',
-                  controller: _controllers['contactNameController']!,
-                  hint: '請填寫關係人的姓名',
-                  onChanged: (val) => dataProvider.updateAmbulanceRecord(
-                    recordData.copyWith(contactName: Value(val)),
-                  ),
-                ),
-                const SizedBox(height: 12),
-
-                _buildTextField(
-                  label: '關係人連絡電話',
-                  controller: _controllers['contactPhoneController']!,
-                  hint: '請填寫關係人的連絡電話',
-                  onChanged: (val) => dataProvider.updateAmbulanceRecord(
-                    recordData.copyWith(contactPhone: Value(val)),
-                  ),
-                ),
-                const SizedBox(height: 24),
-              ],
+    return Container(
+      color: const Color(0xFFF5F5F5),
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildSectionHeader('急救處置'),
+            const SizedBox(height: 12),
+            _buildCheckboxGroup(
+              options: emergencyTreatmentOptions,
+              selectionMap: _emergencyTreatments,
+              onChanged: (option, newValue) {
+                setState(() => _emergencyTreatments[option] = newValue);
+              },
             ),
-          ),
-        );
-      },
+            const SizedBox(height: 20),
+
+            if (_emergencyTreatments['呼吸道處置'] == true) _buildAirwayOptions(),
+            if (_emergencyTreatments['創傷處置'] == true) _buildTraumaOptions(),
+            if (_emergencyTreatments['搬運'] == true) _buildTransportOptions(),
+            if (_emergencyTreatments['心肺復甦術'] == true) _buildCprOptions(),
+            if (_emergencyTreatments['藥物處置'] == true) _buildMedicationOptions(),
+            if (_emergencyTreatments['其他處置'] == true)
+              _buildOtherEmergencyOptions(),
+
+            _buildSectionHeader('人形圖'),
+            const SizedBox(height: 12),
+            Center(
+              child: Container(
+                width: 200,
+                height: 200,
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade200,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: primaryLight),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.add_a_photo,
+                      size: 60,
+                      color: Colors.grey.shade400,
+                    ),
+                    const SizedBox(height: 8),
+                    Icon(
+                      Icons.add_circle_outline,
+                      size: 40,
+                      color: Colors.grey.shade400,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Center(
+              child: ElevatedButton(
+                onPressed: () => ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(const SnackBar(content: Text('開啟人形圖編輯功能'))),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: primaryDark,
+                  foregroundColor: white,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 12,
+                  ),
+                ),
+                child: const Text('點擊按鈕開始編輯人形圖'),
+              ),
+            ),
+            const SizedBox(height: 12),
+            _buildTextField(
+              label: '人形圖備註',
+              controller: _controllers['bodyDiagramNoteController']!,
+              hint: '請填寫備註內容',
+            ),
+            const SizedBox(height: 20),
+
+            _buildMedicationTable(context, dataProvider),
+            const SizedBox(height: 20),
+
+            _buildASLSection(),
+            const SizedBox(height: 12),
+
+            _buildTextField(
+              label: '線上指導醫師指導說明',
+              controller: _controllers['guideController']!,
+              hint: '請填寫指導說明',
+            ),
+            const SizedBox(height: 20),
+
+            _buildVitalSignsTable(context, dataProvider),
+            const SizedBox(height: 20),
+
+            _buildParamedicTable(context, dataProvider),
+            const SizedBox(height: 20),
+
+            _buildTextField(
+              label: '接收單位',
+              controller: _controllers['receivingUnitController']!,
+              hint: '請填寫接收單位',
+            ),
+            const SizedBox(height: 12),
+            _buildReceivingTime(),
+            const SizedBox(height: 12),
+            _buildRejectionSection(),
+            const SizedBox(height: 12),
+            _buildRelationshipSection(),
+            const SizedBox(height: 12),
+            _buildTextField(
+              label: '關係人姓名',
+              controller: _controllers['contactNameController']!,
+              hint: '請填寫關係人的姓名',
+            ),
+            const SizedBox(height: 12),
+            _buildTextField(
+              label: '關係人連絡電話',
+              controller: _controllers['contactPhoneController']!,
+              hint: '請填寫關係人的連絡電話',
+            ),
+            const SizedBox(height: 24),
+          ],
+        ),
+      ),
     );
   }
 
   // --- UI 小積木 ---
-
   Widget _buildSectionHeader(String title) => Text(
     title,
     style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
@@ -323,476 +385,329 @@ class _AmbulancePlanPageState extends State<AmbulancePlanPage> {
     ],
   );
 
-  Widget _buildCheckboxGroup(
-    AmbulanceDataProvider provider,
-    String fieldName,
-    List<String> options,
-  ) {
-    Map<String, bool> getJsonMap(Value<String> jsonValue) {
-      try {
-        return Map<String, bool>.from(jsonDecode(jsonValue.value));
-      } catch (e) {
-        return {};
-      }
-    }
-
-    // 根據欄位名稱選擇對應的 JSON 欄位
-    Value<String> jsonValue;
-    switch (fieldName) {
-      case 'emergencyTreatmentsJson':
-        jsonValue = provider.ambulanceRecordData.emergencyTreatmentsJson;
-        break;
-      case 'airwayTreatmentsJson':
-        jsonValue = provider.ambulanceRecordData.airwayTreatmentsJson;
-        break;
-      case 'traumaTreatmentsJson':
-        jsonValue = provider.ambulanceRecordData.traumaTreatmentsJson;
-        break;
-      case 'transportMethodsJson':
-        jsonValue = provider.ambulanceRecordData.transportMethodsJson;
-        break;
-      case 'cprMethodsJson':
-        jsonValue = provider.ambulanceRecordData.cprMethodsJson;
-        break;
-      case 'medicationProceduresJson':
-        jsonValue = provider.ambulanceRecordData.medicationProceduresJson;
-        break;
-      case 'otherEmergencyProceduresJson':
-        jsonValue = provider.ambulanceRecordData.otherEmergencyProceduresJson;
-        break;
-      default:
-        jsonValue = const Value('{}');
-    }
-
-    final currentMap = getJsonMap(jsonValue);
-
-    return Wrap(
-      spacing: 16,
-      runSpacing: 8,
-      children: options
-          .map(
-            (option) => _buildCheckbox(
-              label: option,
-              value: currentMap[option] ?? false,
-              // ✅ 改呼叫 updateJsonSet
-              onChanged: (newValue) =>
-                  provider.updateJsonSet(fieldName, option, newValue),
-            ),
-          )
-          .toList(),
-    );
-  }
+  Widget _buildCheckboxGroup({
+    required List<String> options,
+    required Map<String, bool> selectionMap,
+    required Function(String, bool) onChanged,
+  }) => Wrap(
+    spacing: 16,
+    runSpacing: 8,
+    children: options
+        .map(
+          (option) => _buildCheckbox(
+            label: option,
+            value: selectionMap[option] ?? false,
+            onChanged: (newValue) => onChanged(option, newValue),
+          ),
+        )
+        .toList(),
+  );
 
   Widget _buildTextField({
     required String label,
     required TextEditingController controller,
     required String hint,
-    required ValueChanged<String> onChanged,
-  }) {
-    return Row(
-      children: [
-        SizedBox(
-          width: 120,
-          child: Text(
-            label,
-            style: const TextStyle(fontWeight: FontWeight.w500),
-          ),
-        ),
-        Expanded(
-          child: TextField(
-            controller: controller,
-            decoration: InputDecoration(
-              hintText: hint,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(4),
-                borderSide: const BorderSide(color: primaryLight),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(4),
-                borderSide: const BorderSide(color: primaryLight),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(4),
-                borderSide: const BorderSide(color: primaryDark, width: 2),
-              ),
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: 8,
-              ),
-            ),
-            onChanged: onChanged,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildExpandableCheckboxSection(
-    AmbulanceDataProvider provider,
-    String title,
-    String fieldName,
-    List<String> options,
-    String? otherControllerKey,
-  ) {
-    Map<String, bool> getJsonMap(Value<String> jsonValue) {
-      try {
-        return Map<String, bool>.from(jsonDecode(jsonValue.value));
-      } catch (e) {
-        return {};
-      }
-    }
-
-    // 同樣直接選擇對應的欄位
-    Value<String> jsonValue;
-    switch (fieldName) {
-      case 'airwayTreatmentsJson':
-        jsonValue = provider.ambulanceRecordData.airwayTreatmentsJson;
-        break;
-      case 'traumaTreatmentsJson':
-        jsonValue = provider.ambulanceRecordData.traumaTreatmentsJson;
-        break;
-      case 'transportMethodsJson':
-        jsonValue = provider.ambulanceRecordData.transportMethodsJson;
-        break;
-      case 'cprMethodsJson':
-        jsonValue = provider.ambulanceRecordData.cprMethodsJson;
-        break;
-      case 'medicationProceduresJson':
-        jsonValue = provider.ambulanceRecordData.medicationProceduresJson;
-        break;
-      case 'otherEmergencyProceduresJson':
-        jsonValue = provider.ambulanceRecordData.otherEmergencyProceduresJson;
-        break;
-      default:
-        jsonValue = const Value('{}');
-    }
-
-    final currentMap = getJsonMap(jsonValue);
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildSectionHeader(title),
-        const SizedBox(height: 8),
-        _buildCheckboxGroup(provider, fieldName, options),
-        if (otherControllerKey != null && currentMap['其他'] == true)
-          Padding(
-            padding: const EdgeInsets.only(top: 8.0),
-            child: _buildTextField(
-              label: '其他',
-              controller: _controllers[otherControllerKey]!,
-              hint: '請填寫其他的處置',
-              onChanged: (val) {
-                // 這裡可補上對應更新邏輯
-              },
-            ),
-          ),
-        const SizedBox(height: 20),
-      ],
-    );
-  }
-
-  Widget _buildAirwayOptions(AmbulanceDataProvider provider) =>
-      _buildExpandableCheckboxSection(
-        provider,
-        '呼吸道處置',
-        'airwayTreatmentsJson',
-        airwayTreatmentOptions,
-        'airwayOtherController',
-      );
-
-  Widget _buildTraumaOptions(AmbulanceDataProvider provider) =>
-      _buildExpandableCheckboxSection(
-        provider,
-        '創傷處置',
-        'traumaTreatmentsJson',
-        traumaTreatmentOptions,
-        'traumaOtherController',
-      );
-
-  Widget _buildTransportOptions(AmbulanceDataProvider provider) =>
-      _buildExpandableCheckboxSection(
-        provider,
-        '搬運',
-        'transportMethodsJson',
-        transportMethodOptions,
-        null,
-      );
-
-  Widget _buildCprOptions(AmbulanceDataProvider provider) =>
-      _buildExpandableCheckboxSection(
-        provider,
-        '心肺復甦術',
-        'cprMethodsJson',
-        cprMethodOptions,
-        null,
-      );
-
-  Widget _buildMedicationOptions(AmbulanceDataProvider provider) =>
-      _buildExpandableCheckboxSection(
-        provider,
-        '藥物處置',
-        'medicationProceduresJson',
-        medicationProcedureOptions,
-        null,
-      );
-
-  Widget _buildOtherEmergencyOptions(AmbulanceDataProvider provider) =>
-      _buildExpandableCheckboxSection(
-        provider,
-        '急救-其他處置',
-        'otherEmergencyProceduresJson',
-        otherEmergencyProcedureOptions,
-        'otherEmergencyOtherController',
-      );
-
-  Widget _buildASLSection(AmbulanceDataProvider provider) {
-    final recordData = provider.ambulanceRecordData;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            const SizedBox(
-              width: 120,
-              child: Text(
-                'ASL處理',
-                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
-              ),
-            ),
-            _buildCheckbox(
-              label: '氣管內管',
-              value: recordData.aslType.value == '氣管內管',
-              onChanged: (v) {
-                provider.updateAmbulanceRecord(
-                  recordData.copyWith(aslType: Value(v ? '氣管內管' : null)),
-                );
-              },
-            ),
-            const SizedBox(width: 16),
-            _buildCheckbox(
-              label: '手動電擊',
-              value: recordData.aslType.value == '手動電擊',
-              onChanged: (v) {
-                provider.updateAmbulanceRecord(
-                  recordData.copyWith(aslType: Value(v ? '手動電擊' : null)),
-                );
-              },
-            ),
-          ],
-        ),
-        if (recordData.aslType.value == '氣管內管')
-          Padding(
-            padding: const EdgeInsets.only(top: 8.0),
-            child: Column(
-              children: [
-                _buildTextField(
-                  label: '氣管內管號碼',
-                  controller: _controllers['ettSizeController']!,
-                  hint: '請填寫氣管內管號碼',
-                  onChanged: (v) => provider.updateAmbulanceRecord(
-                    recordData.copyWith(ettSize: Value(v)),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                _buildTextField(
-                  label: '氣管內管固定公分數(cm)',
-                  controller: _controllers['ettDepthController']!,
-                  hint: '請填寫固定公分數(cm)',
-                  onChanged: (v) => provider.updateAmbulanceRecord(
-                    recordData.copyWith(ettDepth: Value(v)),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        if (recordData.aslType.value == '手動電擊')
-          Padding(
-            padding: const EdgeInsets.only(top: 8.0),
-            child: Column(
-              children: [
-                _buildTextField(
-                  label: '手動電擊次數',
-                  controller: _controllers['manualDefibCountController']!,
-                  hint: '請填寫手動電擊次數',
-                  onChanged: (v) => provider.updateAmbulanceRecord(
-                    recordData.copyWith(manualDefibCount: Value(v)),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                _buildTextField(
-                  label: '手動電擊焦耳數',
-                  controller: _controllers['manualDefibJoulesController']!,
-                  hint: '請填寫手動電擊焦耳數',
-                  onChanged: (v) => provider.updateAmbulanceRecord(
-                    recordData.copyWith(manualDefibJoules: Value(v)),
-                  ),
-                ),
-              ],
-            ),
-          ),
-      ],
-    );
-  }
-
-  Widget _buildReceivingTime(AmbulanceDataProvider provider) {
-    final recordData = provider.ambulanceRecordData;
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: white,
-        borderRadius: BorderRadius.circular(8),
+  }) => Row(
+    children: [
+      SizedBox(
+        width: 120,
+        child: Text(label, style: const TextStyle(fontWeight: FontWeight.w500)),
       ),
-      child: Row(
+      Expanded(
+        child: TextField(
+          controller: controller,
+          decoration: InputDecoration(
+            hintText: hint,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(4),
+              borderSide: const BorderSide(color: primaryLight),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(4),
+              borderSide: const BorderSide(color: primaryLight),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(4),
+              borderSide: const BorderSide(color: primaryDark, width: 2),
+            ),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: 8,
+            ),
+          ),
+        ),
+      ),
+    ],
+  );
+
+  Widget _buildExpandableCheckboxSection({
+    required String title,
+    required List<String> options,
+    required Map<String, bool> selectionMap,
+    required Function(String, bool) onChanged,
+    String? otherControllerKey,
+  }) => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      _buildSectionHeader(title),
+      const SizedBox(height: 8),
+      _buildCheckboxGroup(
+        options: options,
+        selectionMap: selectionMap,
+        onChanged: onChanged,
+      ),
+      if (otherControllerKey != null && selectionMap['其他'] == true)
+        Padding(
+          padding: const EdgeInsets.only(top: 8.0),
+          child: _buildTextField(
+            label: '其他說明',
+            controller: _controllers[otherControllerKey]!,
+            hint: '請填寫其他處置說明',
+          ),
+        ),
+      const SizedBox(height: 20),
+    ],
+  );
+
+  Widget _buildAirwayOptions() => _buildExpandableCheckboxSection(
+    title: '呼吸道處置',
+    options: airwayTreatmentOptions,
+    selectionMap: _airwayTreatments,
+    onChanged: (option, value) =>
+        setState(() => _airwayTreatments[option] = value),
+    otherControllerKey: 'airwayOtherController',
+  );
+
+  Widget _buildTraumaOptions() => _buildExpandableCheckboxSection(
+    title: '創傷處置',
+    options: traumaTreatmentOptions,
+    selectionMap: _traumaTreatments,
+    onChanged: (option, value) =>
+        setState(() => _traumaTreatments[option] = value),
+    otherControllerKey: 'traumaOtherController',
+  );
+
+  Widget _buildTransportOptions() => _buildExpandableCheckboxSection(
+    title: '搬運',
+    options: transportMethodOptions,
+    selectionMap: _transportMethods,
+    onChanged: (option, value) =>
+        setState(() => _transportMethods[option] = value),
+  );
+
+  Widget _buildCprOptions() => _buildExpandableCheckboxSection(
+    title: '心肺復甦術',
+    options: cprMethodOptions,
+    selectionMap: _cprMethods,
+    onChanged: (option, value) => setState(() => _cprMethods[option] = value),
+  );
+
+  Widget _buildMedicationOptions() => _buildExpandableCheckboxSection(
+    title: '藥物處置',
+    options: medicationProcedureOptions,
+    selectionMap: _medicationProcedures,
+    onChanged: (option, value) =>
+        setState(() => _medicationProcedures[option] = value),
+  );
+
+  Widget _buildOtherEmergencyOptions() => _buildExpandableCheckboxSection(
+    title: '急救-其他處置',
+    options: otherEmergencyProcedureOptions,
+    selectionMap: _otherEmergencyProcedures,
+    onChanged: (option, value) =>
+        setState(() => _otherEmergencyProcedures[option] = value),
+    otherControllerKey: 'otherEmergencyOtherController',
+  );
+
+  Widget _buildASLSection() => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Row(
         children: [
           const SizedBox(
             width: 120,
-            child: Text('接收時間', style: TextStyle(fontWeight: FontWeight.w500)),
-          ),
-          Text(
-            DateFormat(
-              'yyyy年MM月dd日 HH時mm分',
-            ).format(recordData.receivingTime.value ?? DateTime.now()),
-            style: const TextStyle(fontSize: 15),
-          ),
-          const Spacer(),
-          ElevatedButton(
-            onPressed: () => provider.updateAmbulanceRecord(
-              recordData.copyWith(receivingTime: Value(DateTime.now())),
+            child: Text(
+              'ASL處理',
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
             ),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.purple,
-              foregroundColor: white,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            ),
-            child: const Text('更新時間'),
+          ),
+          _buildCheckbox(
+            label: '氣管內管',
+            value: _aslType == '氣管內管',
+            onChanged: (v) => setState(() => _aslType = v ? '氣管內管' : null),
+          ),
+          const SizedBox(width: 16),
+          _buildCheckbox(
+            label: '手動電擊',
+            value: _aslType == '手動電擊',
+            onChanged: (v) => setState(() => _aslType = v ? '手動電擊' : null),
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildRejectionSection(AmbulanceDataProvider provider) {
-    final recordData = provider.ambulanceRecordData;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            const SizedBox(
-              width: 120,
-              child: Text(
-                '是否拒絕送醫',
-                style: TextStyle(fontWeight: FontWeight.w500),
+      if (_aslType == '氣管內管')
+        Padding(
+          padding: const EdgeInsets.only(top: 8.0),
+          child: Column(
+            children: [
+              _buildTextField(
+                label: '氣管內管號碼',
+                controller: _controllers['ettSizeController']!,
+                hint: '請填寫號碼',
               ),
-            ),
-            Radio<bool>(
-              value: false,
-              groupValue: recordData.isRejection.value,
-              onChanged: (v) => provider.updateAmbulanceRecord(
-                recordData.copyWith(isRejection: Value(v!)),
+              const SizedBox(height: 12),
+              _buildTextField(
+                label: '固定公分數(cm)',
+                controller: _controllers['ettDepthController']!,
+                hint: '請填寫公分數',
               ),
-              activeColor: primaryDark,
-            ),
-            const Text('否'),
-            const SizedBox(width: 16),
-            Radio<bool>(
-              value: true,
-              groupValue: recordData.isRejection.value,
-              onChanged: (v) => provider.updateAmbulanceRecord(
-                recordData.copyWith(isRejection: Value(v!)),
-              ),
-              activeColor: primaryDark,
-            ),
-            const Text('是'),
-          ],
-        ),
-        if (recordData.isRejection.value == true)
-          Container(
-            margin: const EdgeInsets.only(top: 12),
-            padding: const EdgeInsets.all(16.0),
-            decoration: BoxDecoration(
-              color: const Color(0xFFFAEFE3),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  '拒絕醫療聲明:',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                ),
-                const SizedBox(height: 8),
-                const Text('本人聲明,救護人員以解釋病情與送醫之需要,但我拒絕救護與送醫。'),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    const Text('姓名:'),
-                    Expanded(
-                      child: TextField(
-                        controller: _controllers['rejectionNameController']!,
-                        decoration: const InputDecoration(
-                          hintText: '請填寫姓名',
-                          isDense: true,
-                          contentPadding: EdgeInsets.symmetric(vertical: 8),
-                        ),
-                        onChanged: (val) => provider.updateAmbulanceRecord(
-                          recordData.copyWith(rejectionName: Value(val)),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
+            ],
           ),
-      ],
-    );
-  }
+        ),
+      if (_aslType == '手動電擊')
+        Padding(
+          padding: const EdgeInsets.only(top: 8.0),
+          child: Column(
+            children: [
+              _buildTextField(
+                label: '手動電擊次數',
+                controller: _controllers['manualDefibCountController']!,
+                hint: '請填寫次數',
+              ),
+              const SizedBox(height: 12),
+              _buildTextField(
+                label: '手動電擊焦耳數',
+                controller: _controllers['manualDefibJoulesController']!,
+                hint: '請填寫焦耳數',
+              ),
+            ],
+          ),
+        ),
+    ],
+  );
 
-  Widget _buildRelationshipSection(AmbulanceDataProvider provider) {
-    final recordData = provider.ambulanceRecordData;
-    return Row(
+  Widget _buildReceivingTime() => Container(
+    padding: const EdgeInsets.all(12),
+    decoration: BoxDecoration(
+      color: white,
+      borderRadius: BorderRadius.circular(8),
+    ),
+    child: Row(
       children: [
         const SizedBox(
           width: 120,
-          child: Text('關係人身分', style: TextStyle(fontWeight: FontWeight.w500)),
+          child: Text('接收時間', style: TextStyle(fontWeight: FontWeight.w500)),
         ),
-        Radio<String>(
-          value: '病患',
-          groupValue: recordData.relationshipType.value,
-          onChanged: (v) => provider.updateAmbulanceRecord(
-            recordData.copyWith(relationshipType: Value(v)),
+        Text(
+          DateFormat(
+            'yyyy年MM月dd日 HH時mm分',
+          ).format(_receivingTime ?? DateTime.now()),
+          style: const TextStyle(fontSize: 15),
+        ),
+        const Spacer(),
+        ElevatedButton(
+          onPressed: () => setState(() => _receivingTime = DateTime.now()),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: primaryLight,
+            foregroundColor: white,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           ),
-          activeColor: primaryDark,
+          child: const Text('更新時間'),
         ),
-        const Text('病患'),
-        const SizedBox(width: 16),
-        Radio<String>(
-          value: '家屬',
-          groupValue: recordData.relationshipType.value,
-          onChanged: (v) => provider.updateAmbulanceRecord(
-            recordData.copyWith(relationshipType: Value(v)),
-          ),
-          activeColor: primaryDark,
-        ),
-        const Text('家屬'),
-        const SizedBox(width: 16),
-        Radio<String>(
-          value: '關係人',
-          groupValue: recordData.relationshipType.value,
-          onChanged: (v) => provider.updateAmbulanceRecord(
-            recordData.copyWith(relationshipType: Value(v)),
-          ),
-          activeColor: primaryDark,
-        ),
-        const Text('關係人'),
       ],
-    );
-  }
+    ),
+  );
 
-  // --- 動態表格 ---
+  Widget _buildRejectionSection() => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Row(
+        children: [
+          const SizedBox(
+            width: 120,
+            child: Text(
+              '是否拒絕送醫',
+              style: TextStyle(fontWeight: FontWeight.w500),
+            ),
+          ),
+          Radio<bool>(
+            value: false,
+            groupValue: _isRejection,
+            onChanged: (v) => setState(() => _isRejection = v),
+            activeColor: primaryDark,
+          ),
+          const Text('否'),
+          const SizedBox(width: 16),
+          Radio<bool>(
+            value: true,
+            groupValue: _isRejection,
+            onChanged: (v) => setState(() => _isRejection = v),
+            activeColor: primaryDark,
+          ),
+          const Text('是'),
+        ],
+      ),
+      if (_isRejection == true)
+        Container(
+          margin: const EdgeInsets.only(top: 12),
+          padding: const EdgeInsets.all(16.0),
+          decoration: BoxDecoration(
+            color: const Color(0xFFFAEFE3),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                '拒絕醫療聲明:',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              ),
+              const SizedBox(height: 8),
+              const Text('本人聲明,救護人員以解釋病情與送醫之需要,但我拒絕救護與送醫。'),
+              const SizedBox(height: 12),
+              _buildTextField(
+                label: '姓名',
+                controller: _controllers['rejectionNameController']!,
+                hint: '請填寫姓名',
+              ),
+            ],
+          ),
+        ),
+    ],
+  );
 
+  Widget _buildRelationshipSection() => Row(
+    children: [
+      const SizedBox(
+        width: 120,
+        child: Text('關係人身分', style: TextStyle(fontWeight: FontWeight.w500)),
+      ),
+      Radio<String>(
+        value: '病患',
+        groupValue: _relationshipType,
+        onChanged: (v) => setState(() => _relationshipType = v),
+        activeColor: primaryDark,
+      ),
+      const Text('病患'),
+      const SizedBox(width: 16),
+      Radio<String>(
+        value: '家屬',
+        groupValue: _relationshipType,
+        onChanged: (v) => setState(() => _relationshipType = v),
+        activeColor: primaryDark,
+      ),
+      const Text('家屬'),
+      const SizedBox(width: 16),
+      Radio<String>(
+        value: '關係人',
+        groupValue: _relationshipType,
+        onChanged: (v) => setState(() => _relationshipType = v),
+        activeColor: primaryDark,
+      ),
+      const Text('關係人'),
+    ],
+  );
+
+  // --- 動態表格與對話框 (保持不變) ---
   Widget _buildMedicationTable(
     BuildContext context,
     AmbulanceDataProvider provider,
@@ -1217,8 +1132,7 @@ class _AmbulancePlanPageState extends State<AmbulancePlanPage> {
     );
   }
 
-  // --- 對話框 ---
-
+  // 所有 _show...Dialog 方法也都保持不變
   Future<MedicationRecordsCompanion?> _showMedicationDialog(
     BuildContext context,
   ) async {
@@ -1659,7 +1573,7 @@ class _AmbulancePlanPageState extends State<AmbulancePlanPage> {
               onPressed: () async {
                 if (controller.isNotEmpty) {
                   final bytes = await controller.toPngBytes();
-                  Navigator.pop(context, bytes);
+                  if (context.mounted) Navigator.pop(context, bytes);
                 }
               },
               child: const Text('採納並簽署'),
@@ -1671,7 +1585,6 @@ class _AmbulancePlanPageState extends State<AmbulancePlanPage> {
   }
 
   // --- 對話框輔助 Widget ---
-
   Widget _buildDialogRow(String label, Widget child) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
