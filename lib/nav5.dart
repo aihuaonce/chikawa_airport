@@ -19,6 +19,7 @@ mixin SavableStateMixin<T extends StatefulWidget> on State<T> {
 // ===================================================================
 class AmbulanceDataProvider extends ChangeNotifier {
   // ... (保持原有的 AmbulanceDataProvider 內容) ...
+  final VisitsDao _visitsDao;
   final AmbulanceRecordsDao _ambulanceRecordsDao;
   final PatientProfilesDao _patientProfilesDao;
   final MedicationRecordsDao _medicationRecordsDao;
@@ -44,12 +45,14 @@ class AmbulanceDataProvider extends ChangeNotifier {
 
   AmbulanceDataProvider({
     required this.visitId,
+    required VisitsDao visitsDao,
     required AmbulanceRecordsDao ambulanceRecordsDao,
     required PatientProfilesDao patientProfilesDao,
     required MedicationRecordsDao medicationRecordsDao,
     required VitalSignsRecordsDao vitalSignsRecordsDao,
     required ParamedicRecordsDao paramedicRecordsDao,
-  }) : _ambulanceRecordsDao = ambulanceRecordsDao,
+  }) : _visitsDao = visitsDao,
+       _ambulanceRecordsDao = ambulanceRecordsDao,
        _patientProfilesDao = patientProfilesDao,
        _medicationRecordsDao = medicationRecordsDao,
        _vitalSignsRecordsDao = vitalSignsRecordsDao,
@@ -181,9 +184,17 @@ class AmbulanceDataProvider extends ChangeNotifier {
   }
 
   Future<void> saveChanges() async {
+    final profileData = _patientProfileData;
+
     await Future.wait([
       _ambulanceRecordsDao.updateAmbulanceRecord(_ambulanceRecordData),
       _patientProfilesDao.updatePatientProfile(_patientProfileData),
+      _visitsDao.updateVisitSummary(
+        visitId,
+        gender: profileData.gender.value,
+        nationality: profileData.nationality.value,
+        uploadedAt: DateTime.now(),
+      ),
     ]);
   }
 }
@@ -219,6 +230,7 @@ class Nav5Page extends StatelessWidget {
         ChangeNotifierProvider(
           create: (context) => AmbulanceDataProvider(
             visitId: visitId,
+            visitsDao: context.read<VisitsDao>(),
             ambulanceRecordsDao: context.read<AmbulanceRecordsDao>(),
             patientProfilesDao: context.read<PatientProfilesDao>(),
             medicationRecordsDao: context.read<MedicationRecordsDao>(),

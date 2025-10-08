@@ -207,7 +207,6 @@ class _HomePageState extends State<HomePage> {
                             Nav2Page(visitId: visitId, initialIndex: 0),
                       ),
                     );
-                    if (mounted) setState(() {});
                   },
                   child: const Text('+新增病患資料'),
                 ),
