@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'dart:convert';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_painter_v2/flutter_painter.dart';
 import 'package:provider/provider.dart';
 import 'data/db/daos.dart';
@@ -27,6 +28,7 @@ class _BodyMapPageState extends State<BodyMapPage>
   PainterController? _controller;
   bool _loading = true;
   String? _errorMessage;
+  ui.Image? _backgroundImage;
 
   @override
   void initState() {
@@ -37,6 +39,7 @@ class _BodyMapPageState extends State<BodyMapPage>
   @override
   void dispose() {
     _controller?.dispose();
+    _backgroundImage?.dispose();
     super.dispose();
   }
 
@@ -106,12 +109,11 @@ class _BodyMapPageState extends State<BodyMapPage>
       final dataModel = context.read<BodyMapData>();
       final dao = context.read<PatientProfilesDao>();
 
-      // 讀取最新 BodyMap JSON
       final profile = await dao.getByVisitId(widget.visitId);
       dataModel.setBodyMap(profile?.bodyMapJson);
-      debugPrint("📥 從 DB 讀取 JSON: ${dataModel.bodyMapJson}");
 
-      final backgroundImage = await _loadBodyMapBackground();
+      _backgroundImage = await _loadBodyMapBackground();
+
       if (!mounted) return;
 
       _controller = PainterController(
@@ -128,52 +130,20 @@ class _BodyMapPageState extends State<BodyMapPage>
           scale: const ScaleSettings(enabled: true, minScale: 1, maxScale: 5),
         ),
       );
-      _controller!.background = backgroundImage.backgroundDrawable;
+      _controller!.background = _backgroundImage!.backgroundDrawable;
 
-      // 準備還原 Drawables
       if (dataModel.bodyMapJson != null &&
           dataModel.bodyMapJson!.trim().isNotEmpty) {
-        try {
-          final List<dynamic> jsonData = jsonDecode(dataModel.bodyMapJson!);
-          debugPrint("📝 JSON 解析數量: ${jsonData.length}");
+        // ...
+      } else {}
 
-          final drawables = <Drawable>[];
-
-          for (var json in jsonData) {
-            try {
-              final d = _drawableFromJson(Map<String, dynamic>.from(json));
-              if (d != null) {
-                drawables.add(d);
-                debugPrint("✅ 解析成功 Drawable: $d");
-              } else {
-                debugPrint("⚠️ Drawable 解析結果為 null: $json");
-              }
-            } catch (e) {
-              debugPrint("❌ 解析單筆 Drawable 失敗: $json , 錯誤: $e");
-            }
-          }
-
-          debugPrint("🎨 最終解析出的 drawables 數量: ${drawables.length}");
-
-          if (drawables.isNotEmpty) {
-            _controller!.addDrawables(drawables);
-            debugPrint("✨ 成功加入到 Controller: ${drawables.length} 個");
-          } else {
-            debugPrint("⚠️ 沒有任何 Drawable 被還原到畫布");
-          }
-        } catch (e) {
-          debugPrint("❌ 整體 JSON 解析失敗: $e");
-        }
-      } else {
-        debugPrint("⚠️ bodyMapJson 為空，沒有任何圖可以還原");
-      }
-
-      setState(() => _loading = false);
-    } catch (e) {
-      debugPrint("載入 BodyMap 發生錯誤: $e");
+      setState(() {
+        _loading = false;
+      });
+    } catch (e, stackTrace) {
       if (mounted) {
         setState(() {
-          _errorMessage = "載入圖片失敗: $e";
+          _errorMessage = "無法載入人形圖資源: $e"; // 顯示更精確的錯誤訊息
           _loading = false;
         });
       }
@@ -181,18 +151,21 @@ class _BodyMapPageState extends State<BodyMapPage>
   }
 
   Future<ui.Image> _loadBodyMapBackground() async {
-    final recorder = ui.PictureRecorder();
-    final canvas = Canvas(recorder);
-    final paint = Paint()
-      ..color = Colors.white
-      ..style = PaintingStyle.fill;
-    canvas.drawRect(const Rect.fromLTWH(0, 0, 600, 1000), paint);
-    paint
-      ..color = Colors.grey[300]!
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2;
-    final picture = recorder.endRecording();
-    return await picture.toImage(600, 1000);
+    try {
+      const String imagePath = 'assets/images/body_diagram_placeholder.jpg';
+
+      final ByteData data = await rootBundle.load(imagePath);
+
+      final Uint8List bytes = data.buffer.asUint8List();
+
+      final ui.Codec codec = await ui.instantiateImageCodec(bytes);
+
+      final ui.FrameInfo frameInfo = await codec.getNextFrame();
+
+      return frameInfo.image;
+    } catch (e) {
+      rethrow;
+    }
   }
 
   Drawable? _drawableFromJson(Map<String, dynamic> json) {
@@ -301,17 +274,35 @@ class _BodyMapPageState extends State<BodyMapPage>
       );
     }
 
-    if (_controller == null) return const Center(child: Text("無法載入繪圖板"));
+    if (_controller == null || _backgroundImage == null) {
+      return const Center(child: Text("無法初始化繪圖板資源，請重試。"));
+    }
 
     return Container(
       color: const Color(0xFFE6F6FB),
-      child: Column(
+      child: Stack(
         children: [
-          ValueListenableBuilder<PainterControllerValue>(
-            valueListenable: _controller!,
-            builder: (context, _, __) => _buildToolbar(),
+          // 🎨 放大一點點的繪圖板
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: AspectRatio(
+                aspectRatio: _backgroundImage!.width / _backgroundImage!.height,
+                child: FlutterPainter(controller: _controller!),
+              ),
+            ),
           ),
-          Expanded(child: FlutterPainter(controller: _controller!)),
+
+          // 🧰 懸浮在左邊的垂直工具列
+          Positioned(
+            top: 50,
+            left: 8,
+            bottom: 50,
+            child: ValueListenableBuilder<PainterControllerValue>(
+              valueListenable: _controller!,
+              builder: (context, _, __) => _buildVerticalToolbar(),
+            ),
+          ),
         ],
       ),
     );
@@ -320,66 +311,98 @@ class _BodyMapPageState extends State<BodyMapPage>
   // ===============================================
   // Helper Widgets
   // ===============================================
-  Widget _buildToolbar() {
+  Widget _buildVerticalToolbar() {
     return Container(
-      padding: const EdgeInsets.all(8),
-      color: Colors.white,
-      child: Row(
-        children: [
-          IconButton(
-            icon: Icon(
-              Icons.brush,
-              color: _controller!.freeStyleMode == FreeStyleMode.draw
-                  ? Theme.of(context).colorScheme.secondary
-                  : null,
-            ),
-            onPressed: () =>
-                setState(() => _controller!.freeStyleMode = FreeStyleMode.draw),
-            tooltip: "自由繪圖",
-          ),
-          IconButton(
-            icon: const Icon(Icons.text_fields),
-            onPressed: () => _controller!.addText(),
-            tooltip: "新增文字",
-          ),
-          const Spacer(),
-          IconButton(
-            icon: const Icon(Icons.undo),
-            onPressed: _controller!.canUndo ? () => _controller!.undo() : null,
-            tooltip: "撤銷",
-          ),
-          IconButton(
-            icon: const Icon(Icons.redo),
-            onPressed: _controller!.canRedo ? () => _controller!.redo() : null,
-            tooltip: "重做",
-          ),
-          IconButton(
-            icon: Icon(
-              Icons.delete_outline,
-              color: _controller!.freeStyleMode == FreeStyleMode.erase
-                  ? Theme.of(context).colorScheme.secondary
-                  : null,
-            ),
-            onPressed: () => setState(
-              () => _controller!.freeStyleMode = FreeStyleMode.erase,
-            ),
-            tooltip: "橡皮擦",
-          ),
-          IconButton(
-            icon: const Icon(Icons.clear),
-            onPressed: () => _showClearConfirmationDialog(),
-            tooltip: "清除全部",
-          ),
-          const VerticalDivider(),
-          _buildColorPicker(),
-          _buildStrokeWidthPicker(),
-          const VerticalDivider(),
-          IconButton(
-            icon: const Icon(Icons.download),
-            onPressed: _exportAsImage,
-            tooltip: "匯出圖片",
+      width: 52,
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.9),
+        borderRadius: const BorderRadius.only(
+          topRight: Radius.circular(12),
+          bottomRight: Radius.circular(12),
+        ),
+        boxShadow: const [
+          BoxShadow(
+            color: Colors.black26,
+            blurRadius: 6,
+            offset: Offset(2, 2), // 陰影往右下
           ),
         ],
+      ),
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            IconButton(
+              icon: Icon(
+                Icons.pan_tool,
+                color: _controller!.freeStyleMode == FreeStyleMode.none
+                    ? Theme.of(context).colorScheme.secondary
+                    : null,
+              ),
+              onPressed: () => setState(() {
+                _controller!.freeStyleMode = FreeStyleMode.none;
+              }),
+              tooltip: "移動 / 縮放",
+            ),
+            IconButton(
+              icon: Icon(
+                Icons.brush,
+                color: _controller!.freeStyleMode == FreeStyleMode.draw
+                    ? Theme.of(context).colorScheme.secondary
+                    : null,
+              ),
+              onPressed: () => setState(() {
+                _controller!.freeStyleMode = FreeStyleMode.draw;
+              }),
+              tooltip: "自由繪圖",
+            ),
+            IconButton(
+              icon: const Icon(Icons.text_fields),
+              onPressed: () => _controller!.addText(),
+              tooltip: "新增文字",
+            ),
+            IconButton(
+              icon: const Icon(Icons.undo),
+              onPressed: _controller!.canUndo
+                  ? () => _controller!.undo()
+                  : null,
+              tooltip: "撤銷",
+            ),
+            IconButton(
+              icon: const Icon(Icons.redo),
+              onPressed: _controller!.canRedo
+                  ? () => _controller!.redo()
+                  : null,
+              tooltip: "重做",
+            ),
+            IconButton(
+              icon: Icon(
+                Icons.delete_outline,
+                color: _controller!.freeStyleMode == FreeStyleMode.erase
+                    ? Theme.of(context).colorScheme.secondary
+                    : null,
+              ),
+              onPressed: () => setState(() {
+                _controller!.freeStyleMode = FreeStyleMode.erase;
+              }),
+              tooltip: "橡皮擦",
+            ),
+            IconButton(
+              icon: const Icon(Icons.clear),
+              onPressed: _showClearConfirmationDialog,
+              tooltip: "清除全部",
+            ),
+            const Divider(),
+            _buildColorPicker(),
+            _buildStrokeWidthPicker(),
+            const Divider(),
+            IconButton(
+              icon: const Icon(Icons.download),
+              onPressed: _exportAsImage,
+              tooltip: "匯出圖片",
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -468,13 +491,23 @@ class _BodyMapPageState extends State<BodyMapPage>
   Future<void> _exportAsImage() async {
     if (_controller == null) return;
     try {
-      final image = await _controller!.renderImage(const Size(600, 1000));
+      // 確保使用背景圖的實際大小來渲染
+      final image = await _controller!.renderImage(
+        Size(
+          _backgroundImage!.width.toDouble(),
+          _backgroundImage!.height.toDouble(),
+        ),
+      );
       final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
       final bytes = byteData!.buffer.asUint8List();
+
+      // 這裡您可以實作儲存檔案或分享的功能
+      // 例如：使用 `image_gallery_saver` 或 `share_plus` 套件
+
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(const SnackBar(content: Text("圖片已匯出 (功能待實作)")));
+        ).showSnackBar(const SnackBar(content: Text("圖片已成功渲染 (待儲存)")));
       }
     } catch (e) {
       debugPrint("匯出圖片失敗: $e");

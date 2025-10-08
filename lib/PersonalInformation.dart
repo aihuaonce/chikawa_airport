@@ -537,40 +537,6 @@ class _PersonalInformationPageState extends State<PersonalInformationPage>
                         _onTextFieldChanged();
                       },
                     ),
-                    const SizedBox(height: 24),
-                    // 手動儲存按鈕（可選）
-                    Center(
-                      child: ElevatedButton.icon(
-                        onPressed: () async {
-                          try {
-                            await saveData();
-                            if (mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('個人資料已儲存'),
-                                  backgroundColor: Colors.green,
-                                ),
-                              );
-                            }
-                          } catch (e) {
-                            if (mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text('儲存失敗: ${e.toString()}'),
-                                  backgroundColor: Colors.red,
-                                ),
-                              );
-                            }
-                          }
-                        },
-                        icon: const Icon(Icons.save),
-                        label: const Text('儲存個人資料'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF83ACA9),
-                          foregroundColor: Colors.white,
-                        ),
-                      ),
-                    ),
                   ],
                 ),
               ),

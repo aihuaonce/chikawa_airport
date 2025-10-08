@@ -346,7 +346,6 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage>
                     Container(
                       width: double.infinity,
                       decoration: BoxDecoration(
-                        color: const Color(0xFFFFE7CC),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       padding: const EdgeInsets.fromLTRB(12, 8, 12, 12),

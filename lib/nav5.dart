@@ -193,7 +193,7 @@ class AmbulanceDataProvider extends ChangeNotifier {
         visitId,
         gender: profileData.gender.value,
         nationality: profileData.nationality.value,
-        uploadedAt: DateTime.now(),
+        uploadedAt: DateTime.now(), // 更新 "更新時間" 欄位
       ),
     ]);
   }

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:chikawa_airport/nav3.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'AccidentRecord.dart';
@@ -350,7 +351,10 @@ class _Nav2PageState extends State<Nav2Page> with WidgetsBindingObserver {
                       ),
               ],
             ),
-            const SizedBox(height: 24),
+            const Padding(
+              padding: EdgeInsets.only(top: 12),
+              child: Nav3Section(),
+            ),
             // 頁面內容
             Expanded(
               child: _cachedPages.isEmpty

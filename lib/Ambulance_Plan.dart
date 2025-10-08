@@ -19,12 +19,7 @@ class AmbulancePlanPage extends StatefulWidget {
 
 class _AmbulancePlanPageState extends State<AmbulancePlanPage>
     with AutomaticKeepAliveClientMixin, SavableStateMixin {
-  // --- 顏色定義 ---
-  static const Color primaryLight = Color(0xFF83ACA9);
-  static const Color primaryDark = Color(0xFF274C4A);
-  static const Color white = Color(0xFFFFFFFF);
-
-  // --- 選項列表 ---
+  // 選項列表
   static const List<String> emergencyTreatmentOptions = [
     '呼吸道處置',
     '創傷處置',
@@ -79,7 +74,7 @@ class _AmbulancePlanPageState extends State<AmbulancePlanPage>
     '其他',
   ];
 
-  // --- 本地 UI 狀態 ---
+  // 本地 UI 狀態
   final Map<String, TextEditingController> _controllers = {
     'guideController': TextEditingController(),
     'receivingUnitController': TextEditingController(),
@@ -210,7 +205,6 @@ class _AmbulancePlanPageState extends State<AmbulancePlanPage>
           _controllers['manualDefibJoulesController']!.text,
         ),
         rejectionName: Value(_controllers['rejectionNameController']!.text),
-
         emergencyTreatmentsJson: Value(jsonEncode(_emergencyTreatments)),
         airwayTreatmentsJson: Value(jsonEncode(_airwayTreatments)),
         traumaTreatmentsJson: Value(jsonEncode(_traumaTreatments)),
@@ -220,7 +214,6 @@ class _AmbulancePlanPageState extends State<AmbulancePlanPage>
         otherEmergencyProceduresJson: Value(
           jsonEncode(_otherEmergencyProcedures),
         ),
-
         aslType: Value(_aslType),
         isRejection: Value(_isRejection ?? false),
         relationshipType: Value(_relationshipType),
@@ -234,480 +227,463 @@ class _AmbulancePlanPageState extends State<AmbulancePlanPage>
     super.build(context);
     final dataProvider = context.watch<AmbulanceDataProvider>();
 
-    return Container(
-      color: const Color(0xFFF5F5F5),
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildSectionHeader('急救處置'),
-            const SizedBox(height: 12),
-            _buildCheckboxGroup(
-              options: emergencyTreatmentOptions,
-              selectionMap: _emergencyTreatments,
-              onChanged: (option, newValue) {
-                setState(() => _emergencyTreatments[option] = newValue);
-              },
-            ),
-            const SizedBox(height: 20),
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Center(
+        child: Card(
+          color: Colors.white,
+          elevation: 3,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Container(
+            width: 1100,
+            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 24),
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // 急救處置
+                  _buildSectionTitle('急救處置:'),
+                  const SizedBox(height: 6),
+                  Wrap(
+                    spacing: 12,
+                    children: emergencyTreatmentOptions.map((option) {
+                      return _buildCheckboxOption(
+                        option,
+                        _emergencyTreatments[option] ?? false,
+                        (val) =>
+                            setState(() => _emergencyTreatments[option] = val),
+                      );
+                    }).toList(),
+                  ),
+                  const SizedBox(height: 12),
 
-            if (_emergencyTreatments['呼吸道處置'] == true) _buildAirwayOptions(),
-            if (_emergencyTreatments['創傷處置'] == true) _buildTraumaOptions(),
-            if (_emergencyTreatments['搬運'] == true) _buildTransportOptions(),
-            if (_emergencyTreatments['心肺復甦術'] == true) _buildCprOptions(),
-            if (_emergencyTreatments['藥物處置'] == true) _buildMedicationOptions(),
-            if (_emergencyTreatments['其他處置'] == true)
-              _buildOtherEmergencyOptions(),
+                  if (_emergencyTreatments['呼吸道處置'] == true)
+                    _buildSubOptions(
+                      '呼吸道處置:',
+                      airwayTreatmentOptions,
+                      _airwayTreatments,
+                      'airwayOtherController',
+                    ),
+                  if (_emergencyTreatments['創傷處置'] == true)
+                    _buildSubOptions(
+                      '創傷處置:',
+                      traumaTreatmentOptions,
+                      _traumaTreatments,
+                      'traumaOtherController',
+                    ),
+                  if (_emergencyTreatments['搬運'] == true)
+                    _buildSubOptions(
+                      '搬運:',
+                      transportMethodOptions,
+                      _transportMethods,
+                      null,
+                    ),
+                  if (_emergencyTreatments['心肺復甦術'] == true)
+                    _buildSubOptions(
+                      '心肺復甦術:',
+                      cprMethodOptions,
+                      _cprMethods,
+                      null,
+                    ),
+                  if (_emergencyTreatments['藥物處置'] == true)
+                    _buildSubOptions(
+                      '藥物處置:',
+                      medicationProcedureOptions,
+                      _medicationProcedures,
+                      null,
+                    ),
+                  if (_emergencyTreatments['其他處置'] == true)
+                    _buildSubOptions(
+                      '急救-其他處置:',
+                      otherEmergencyProcedureOptions,
+                      _otherEmergencyProcedures,
+                      'otherEmergencyOtherController',
+                    ),
 
-            _buildSectionHeader('人形圖'),
-            const SizedBox(height: 12),
-            Center(
-              child: Container(
-                width: 200,
-                height: 200,
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade200,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: primaryLight),
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.add_a_photo,
-                      size: 60,
-                      color: Colors.grey.shade400,
+                  // 人形圖
+                  _buildSectionTitle('人形圖:'),
+                  const SizedBox(height: 6),
+                  Center(
+                    child: Container(
+                      width: 200,
+                      height: 200,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade200,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.grey.shade400),
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.add_a_photo,
+                            size: 60,
+                            color: Colors.grey.shade400,
+                          ),
+                          const SizedBox(height: 8),
+                          Icon(
+                            Icons.add_circle_outline,
+                            size: 40,
+                            color: Colors.grey.shade400,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Center(
+                    child: ElevatedButton(
+                      onPressed: () =>
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('開啟人形圖編輯功能')),
+                          ),
+                      child: const Text('點擊按鈕開始編輯人形圖'),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  _buildTitleWithInput(
+                    '人形圖備註:',
+                    _controllers['bodyDiagramNoteController']!,
+                    '請填寫備註內容',
+                  ),
+                  const SizedBox(height: 12),
+
+                  // 給藥紀錄表
+                  _buildMedicationTable(context, dataProvider),
+                  const SizedBox(height: 12),
+
+                  // ASL處理
+                  _buildSectionTitle('ASL處理:'),
+                  const SizedBox(height: 6),
+                  Wrap(
+                    spacing: 12,
+                    children: [
+                      _buildCheckboxOption(
+                        '氣管內管',
+                        _aslType == '氣管內管',
+                        (v) => setState(() => _aslType = v ? '氣管內管' : null),
+                      ),
+                      _buildCheckboxOption(
+                        '手動電擊',
+                        _aslType == '手動電擊',
+                        (v) => setState(() => _aslType = v ? '手動電擊' : null),
+                      ),
+                    ],
+                  ),
+                  if (_aslType == '氣管內管') ...[
+                    const SizedBox(height: 8),
+                    _buildTitleWithInput(
+                      '氣管內管號碼:',
+                      _controllers['ettSizeController']!,
+                      '請填寫號碼',
                     ),
                     const SizedBox(height: 8),
-                    Icon(
-                      Icons.add_circle_outline,
-                      size: 40,
-                      color: Colors.grey.shade400,
+                    _buildTitleWithInput(
+                      '固定公分數(cm):',
+                      _controllers['ettDepthController']!,
+                      '請填寫公分數',
                     ),
                   ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
-            Center(
-              child: ElevatedButton(
-                onPressed: () => ScaffoldMessenger.of(
-                  context,
-                ).showSnackBar(const SnackBar(content: Text('開啟人形圖編輯功能'))),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryDark,
-                  foregroundColor: white,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 12,
+                  if (_aslType == '手動電擊') ...[
+                    const SizedBox(height: 8),
+                    _buildTitleWithInput(
+                      '手動電擊次數:',
+                      _controllers['manualDefibCountController']!,
+                      '請填寫次數',
+                    ),
+                    const SizedBox(height: 8),
+                    _buildTitleWithInput(
+                      '手動電擊焦耳數:',
+                      _controllers['manualDefibJoulesController']!,
+                      '請填寫焦耳數',
+                    ),
+                  ],
+                  const SizedBox(height: 12),
+
+                  _buildTitleWithInput(
+                    '線上指導醫師指導說明:',
+                    _controllers['guideController']!,
+                    '請填寫指導說明',
                   ),
-                ),
-                child: const Text('點擊按鈕開始編輯人形圖'),
+                  const SizedBox(height: 12),
+
+                  // 生命徵象紀錄表
+                  _buildVitalSignsTable(context, dataProvider),
+                  const SizedBox(height: 12),
+
+                  // 隨車救護人員紀錄表
+                  _buildParamedicTable(context, dataProvider),
+                  const SizedBox(height: 12),
+
+                  _buildTitleWithInput(
+                    '接收單位:',
+                    _controllers['receivingUnitController']!,
+                    '請填寫接收單位',
+                  ),
+                  const SizedBox(height: 8),
+
+                  // 接收時間
+                  Row(
+                    children: [
+                      const Text(
+                        '接收時間:',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      const Spacer(),
+                      Text(
+                        DateFormat(
+                          'yyyy年MM月dd日 HH時mm分',
+                        ).format(_receivingTime ?? DateTime.now()),
+                      ),
+                      const SizedBox(width: 8),
+                      ElevatedButton(
+                        onPressed: () =>
+                            setState(() => _receivingTime = DateTime.now()),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.purple,
+                          foregroundColor: Colors.white,
+                        ),
+                        child: const Text('更新時間'),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+
+                  // 拒絕送醫
+                  _buildSectionTitle('是否拒絕送醫:'),
+                  const SizedBox(height: 6),
+                  Wrap(
+                    spacing: 12,
+                    children: [
+                      _buildRadioOption(
+                        '否',
+                        false,
+                        _isRejection,
+                        (v) => setState(() => _isRejection = v),
+                      ),
+                      _buildRadioOption(
+                        '是',
+                        true,
+                        _isRejection,
+                        (v) => setState(() => _isRejection = v),
+                      ),
+                    ],
+                  ),
+                  if (_isRejection == true) ...[
+                    const SizedBox(height: 8),
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFAEFE3),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            '拒絕醫療聲明:',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          const Text(
+                            '本人聲明,救護人員以解釋病情與送醫之需要,但我拒絕救護與送醫。',
+                            style: TextStyle(fontSize: 13),
+                          ),
+                          const SizedBox(height: 8),
+                          Row(
+                            children: [
+                              const Text(
+                                '姓名: ',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              Expanded(
+                                child: TextField(
+                                  controller:
+                                      _controllers['rejectionNameController']!,
+                                  decoration: const InputDecoration(
+                                    hintText: '請填寫姓名',
+                                    isDense: true,
+                                    contentPadding: EdgeInsets.symmetric(
+                                      vertical: 4,
+                                    ),
+                                    enabledBorder: UnderlineInputBorder(
+                                      borderSide: BorderSide(
+                                        color: Colors.grey,
+                                        width: 1,
+                                      ),
+                                    ),
+                                    focusedBorder: UnderlineInputBorder(
+                                      borderSide: BorderSide(
+                                        color: Colors.blue,
+                                        width: 2,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                  const SizedBox(height: 12),
+
+                  // 關係人身分
+                  _buildSectionTitle('關係人身分:'),
+                  const SizedBox(height: 6),
+                  Wrap(
+                    spacing: 12,
+                    children: ['病患', '家屬', '關係人'].map((option) {
+                      return _buildRadioOption(
+                        option,
+                        option,
+                        _relationshipType,
+                        (v) => setState(() => _relationshipType = v),
+                      );
+                    }).toList(),
+                  ),
+                  const SizedBox(height: 12),
+
+                  _buildTitleWithInput(
+                    '關係人姓名:',
+                    _controllers['contactNameController']!,
+                    '請填寫關係人的姓名',
+                  ),
+                  const SizedBox(height: 8),
+                  _buildTitleWithInput(
+                    '關係人連絡電話:',
+                    _controllers['contactPhoneController']!,
+                    '請填寫關係人的連絡電話',
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 12),
-            _buildTextField(
-              label: '人形圖備註',
-              controller: _controllers['bodyDiagramNoteController']!,
-              hint: '請填寫備註內容',
-            ),
-            const SizedBox(height: 20),
-
-            _buildMedicationTable(context, dataProvider),
-            const SizedBox(height: 20),
-
-            _buildASLSection(),
-            const SizedBox(height: 12),
-
-            _buildTextField(
-              label: '線上指導醫師指導說明',
-              controller: _controllers['guideController']!,
-              hint: '請填寫指導說明',
-            ),
-            const SizedBox(height: 20),
-
-            _buildVitalSignsTable(context, dataProvider),
-            const SizedBox(height: 20),
-
-            _buildParamedicTable(context, dataProvider),
-            const SizedBox(height: 20),
-
-            _buildTextField(
-              label: '接收單位',
-              controller: _controllers['receivingUnitController']!,
-              hint: '請填寫接收單位',
-            ),
-            const SizedBox(height: 12),
-            _buildReceivingTime(),
-            const SizedBox(height: 12),
-            _buildRejectionSection(),
-            const SizedBox(height: 12),
-            _buildRelationshipSection(),
-            const SizedBox(height: 12),
-            _buildTextField(
-              label: '關係人姓名',
-              controller: _controllers['contactNameController']!,
-              hint: '請填寫關係人的姓名',
-            ),
-            const SizedBox(height: 12),
-            _buildTextField(
-              label: '關係人連絡電話',
-              controller: _controllers['contactPhoneController']!,
-              hint: '請填寫關係人的連絡電話',
-            ),
-            const SizedBox(height: 24),
-          ],
+          ),
         ),
       ),
     );
   }
 
-  // --- UI 小積木 ---
-  Widget _buildSectionHeader(String title) => Text(
-    title,
-    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-  );
+  // Helper Widgets
+  Widget _buildSectionTitle(String title) {
+    return Text(
+      title,
+      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+    );
+  }
 
-  Widget _buildCheckbox({
-    required String label,
-    required bool value,
-    required ValueChanged<bool> onChanged,
-  }) => Row(
-    mainAxisSize: MainAxisSize.min,
-    children: [
-      Checkbox(
-        value: value,
-        onChanged: (newValue) => onChanged(newValue ?? false),
-        activeColor: primaryDark,
-      ),
-      Text(label),
-    ],
-  );
-
-  Widget _buildCheckboxGroup({
-    required List<String> options,
-    required Map<String, bool> selectionMap,
-    required Function(String, bool) onChanged,
-  }) => Wrap(
-    spacing: 16,
-    runSpacing: 8,
-    children: options
-        .map(
-          (option) => _buildCheckbox(
-            label: option,
-            value: selectionMap[option] ?? false,
-            onChanged: (newValue) => onChanged(option, newValue),
-          ),
-        )
-        .toList(),
-  );
-
-  Widget _buildTextField({
-    required String label,
-    required TextEditingController controller,
-    required String hint,
-  }) => Row(
-    children: [
-      SizedBox(
-        width: 120,
-        child: Text(label, style: const TextStyle(fontWeight: FontWeight.w500)),
-      ),
-      Expanded(
-        child: TextField(
-          controller: controller,
-          decoration: InputDecoration(
-            hintText: hint,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(4),
-              borderSide: const BorderSide(color: primaryLight),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(4),
-              borderSide: const BorderSide(color: primaryLight),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(4),
-              borderSide: const BorderSide(color: primaryDark, width: 2),
-            ),
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 12,
-              vertical: 8,
-            ),
-          ),
-        ),
-      ),
-    ],
-  );
-
-  Widget _buildExpandableCheckboxSection({
-    required String title,
-    required List<String> options,
-    required Map<String, bool> selectionMap,
-    required Function(String, bool) onChanged,
-    String? otherControllerKey,
-  }) => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      _buildSectionHeader(title),
-      const SizedBox(height: 8),
-      _buildCheckboxGroup(
-        options: options,
-        selectionMap: selectionMap,
-        onChanged: onChanged,
-      ),
-      if (otherControllerKey != null && selectionMap['其他'] == true)
-        Padding(
-          padding: const EdgeInsets.only(top: 8.0),
-          child: _buildTextField(
-            label: '其他說明',
-            controller: _controllers[otherControllerKey]!,
-            hint: '請填寫其他處置說明',
-          ),
-        ),
-      const SizedBox(height: 20),
-    ],
-  );
-
-  Widget _buildAirwayOptions() => _buildExpandableCheckboxSection(
-    title: '呼吸道處置',
-    options: airwayTreatmentOptions,
-    selectionMap: _airwayTreatments,
-    onChanged: (option, value) =>
-        setState(() => _airwayTreatments[option] = value),
-    otherControllerKey: 'airwayOtherController',
-  );
-
-  Widget _buildTraumaOptions() => _buildExpandableCheckboxSection(
-    title: '創傷處置',
-    options: traumaTreatmentOptions,
-    selectionMap: _traumaTreatments,
-    onChanged: (option, value) =>
-        setState(() => _traumaTreatments[option] = value),
-    otherControllerKey: 'traumaOtherController',
-  );
-
-  Widget _buildTransportOptions() => _buildExpandableCheckboxSection(
-    title: '搬運',
-    options: transportMethodOptions,
-    selectionMap: _transportMethods,
-    onChanged: (option, value) =>
-        setState(() => _transportMethods[option] = value),
-  );
-
-  Widget _buildCprOptions() => _buildExpandableCheckboxSection(
-    title: '心肺復甦術',
-    options: cprMethodOptions,
-    selectionMap: _cprMethods,
-    onChanged: (option, value) => setState(() => _cprMethods[option] = value),
-  );
-
-  Widget _buildMedicationOptions() => _buildExpandableCheckboxSection(
-    title: '藥物處置',
-    options: medicationProcedureOptions,
-    selectionMap: _medicationProcedures,
-    onChanged: (option, value) =>
-        setState(() => _medicationProcedures[option] = value),
-  );
-
-  Widget _buildOtherEmergencyOptions() => _buildExpandableCheckboxSection(
-    title: '急救-其他處置',
-    options: otherEmergencyProcedureOptions,
-    selectionMap: _otherEmergencyProcedures,
-    onChanged: (option, value) =>
-        setState(() => _otherEmergencyProcedures[option] = value),
-    otherControllerKey: 'otherEmergencyOtherController',
-  );
-
-  Widget _buildASLSection() => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Row(
-        children: [
-          const SizedBox(
-            width: 120,
-            child: Text(
-              'ASL處理',
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
-            ),
-          ),
-          _buildCheckbox(
-            label: '氣管內管',
-            value: _aslType == '氣管內管',
-            onChanged: (v) => setState(() => _aslType = v ? '氣管內管' : null),
-          ),
-          const SizedBox(width: 16),
-          _buildCheckbox(
-            label: '手動電擊',
-            value: _aslType == '手動電擊',
-            onChanged: (v) => setState(() => _aslType = v ? '手動電擊' : null),
-          ),
-        ],
-      ),
-      if (_aslType == '氣管內管')
-        Padding(
-          padding: const EdgeInsets.only(top: 8.0),
-          child: Column(
-            children: [
-              _buildTextField(
-                label: '氣管內管號碼',
-                controller: _controllers['ettSizeController']!,
-                hint: '請填寫號碼',
-              ),
-              const SizedBox(height: 12),
-              _buildTextField(
-                label: '固定公分數(cm)',
-                controller: _controllers['ettDepthController']!,
-                hint: '請填寫公分數',
-              ),
-            ],
-          ),
-        ),
-      if (_aslType == '手動電擊')
-        Padding(
-          padding: const EdgeInsets.only(top: 8.0),
-          child: Column(
-            children: [
-              _buildTextField(
-                label: '手動電擊次數',
-                controller: _controllers['manualDefibCountController']!,
-                hint: '請填寫次數',
-              ),
-              const SizedBox(height: 12),
-              _buildTextField(
-                label: '手動電擊焦耳數',
-                controller: _controllers['manualDefibJoulesController']!,
-                hint: '請填寫焦耳數',
-              ),
-            ],
-          ),
-        ),
-    ],
-  );
-
-  Widget _buildReceivingTime() => Container(
-    padding: const EdgeInsets.all(12),
-    decoration: BoxDecoration(
-      color: white,
-      borderRadius: BorderRadius.circular(8),
-    ),
-    child: Row(
+  Widget _buildTitleWithInput(
+    String title,
+    TextEditingController controller,
+    String hint,
+  ) {
+    return Row(
       children: [
-        const SizedBox(
-          width: 120,
-          child: Text('接收時間', style: TextStyle(fontWeight: FontWeight.w500)),
-        ),
-        Text(
-          DateFormat(
-            'yyyy年MM月dd日 HH時mm分',
-          ).format(_receivingTime ?? DateTime.now()),
-          style: const TextStyle(fontSize: 15),
-        ),
+        Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
         const Spacer(),
-        ElevatedButton(
-          onPressed: () => setState(() => _receivingTime = DateTime.now()),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: primaryLight,
-            foregroundColor: white,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        SizedBox(
+          width: 350,
+          child: TextField(
+            controller: controller,
+            textAlign: TextAlign.right,
+            decoration: InputDecoration(
+              hintText: hint,
+              hintStyle: const TextStyle(color: Colors.grey, fontSize: 13),
+              isDense: true,
+              contentPadding: const EdgeInsets.symmetric(vertical: 4),
+              enabledBorder: const UnderlineInputBorder(
+                borderSide: BorderSide(color: Colors.grey, width: 1),
+              ),
+              focusedBorder: const UnderlineInputBorder(
+                borderSide: BorderSide(color: Colors.blue, width: 2),
+              ),
+            ),
           ),
-          child: const Text('更新時間'),
         ),
       ],
-    ),
-  );
+    );
+  }
 
-  Widget _buildRejectionSection() => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Row(
-        children: [
-          const SizedBox(
-            width: 120,
-            child: Text(
-              '是否拒絕送醫',
-              style: TextStyle(fontWeight: FontWeight.w500),
-            ),
-          ),
-          Radio<bool>(
-            value: false,
-            groupValue: _isRejection,
-            onChanged: (v) => setState(() => _isRejection = v),
-            activeColor: primaryDark,
-          ),
-          const Text('否'),
-          const SizedBox(width: 16),
-          Radio<bool>(
-            value: true,
-            groupValue: _isRejection,
-            onChanged: (v) => setState(() => _isRejection = v),
-            activeColor: primaryDark,
-          ),
-          const Text('是'),
-        ],
-      ),
-      if (_isRejection == true)
-        Container(
-          margin: const EdgeInsets.only(top: 12),
-          padding: const EdgeInsets.all(16.0),
-          decoration: BoxDecoration(
-            color: const Color(0xFFFAEFE3),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                '拒絕醫療聲明:',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-              ),
-              const SizedBox(height: 8),
-              const Text('本人聲明,救護人員以解釋病情與送醫之需要,但我拒絕救護與送醫。'),
-              const SizedBox(height: 12),
-              _buildTextField(
-                label: '姓名',
-                controller: _controllers['rejectionNameController']!,
-                hint: '請填寫姓名',
-              ),
-            ],
-          ),
+  Widget _buildCheckboxOption(
+    String text,
+    bool value,
+    Function(bool) onChanged,
+  ) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Checkbox(
+          value: value,
+          onChanged: (val) => onChanged(val ?? false),
+          visualDensity: VisualDensity.compact,
+          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
         ),
-    ],
-  );
+        Text(text, style: const TextStyle(fontSize: 14)),
+      ],
+    );
+  }
 
-  Widget _buildRelationshipSection() => Row(
-    children: [
-      const SizedBox(
-        width: 120,
-        child: Text('關係人身分', style: TextStyle(fontWeight: FontWeight.w500)),
-      ),
-      Radio<String>(
-        value: '病患',
-        groupValue: _relationshipType,
-        onChanged: (v) => setState(() => _relationshipType = v),
-        activeColor: primaryDark,
-      ),
-      const Text('病患'),
-      const SizedBox(width: 16),
-      Radio<String>(
-        value: '家屬',
-        groupValue: _relationshipType,
-        onChanged: (v) => setState(() => _relationshipType = v),
-        activeColor: primaryDark,
-      ),
-      const Text('家屬'),
-      const SizedBox(width: 16),
-      Radio<String>(
-        value: '關係人',
-        groupValue: _relationshipType,
-        onChanged: (v) => setState(() => _relationshipType = v),
-        activeColor: primaryDark,
-      ),
-      const Text('關係人'),
-    ],
-  );
+  Widget _buildRadioOption<T>(
+    String text,
+    T value,
+    T? groupValue,
+    Function(T?) onChanged,
+  ) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Radio<T>(
+          value: value,
+          groupValue: groupValue,
+          onChanged: onChanged,
+          visualDensity: VisualDensity.compact,
+          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        ),
+        Text(text, style: const TextStyle(fontSize: 14)),
+      ],
+    );
+  }
 
-  // --- 動態表格與對話框 (保持不變) ---
+  Widget _buildSubOptions(
+    String title,
+    List<String> options,
+    Map<String, bool> stateMap,
+    String? otherControllerKey,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+        const SizedBox(height: 6),
+        Wrap(
+          spacing: 12,
+          children: options.map((option) {
+            return _buildCheckboxOption(
+              option,
+              stateMap[option] ?? false,
+              (val) => setState(() => stateMap[option] = val),
+            );
+          }).toList(),
+        ),
+        if (otherControllerKey != null && stateMap['其他'] == true) ...[
+          const SizedBox(height: 8),
+          _buildTitleWithInput(
+            '其他說明:',
+            _controllers[otherControllerKey]!,
+            '請填寫其他處置說明',
+          ),
+        ],
+        const SizedBox(height: 12),
+      ],
+    );
+  }
+
   Widget _buildMedicationTable(
     BuildContext context,
     AmbulanceDataProvider provider,
@@ -717,105 +693,124 @@ class _AmbulancePlanPageState extends State<AmbulancePlanPage>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionHeader('給藥紀錄表'),
-        const SizedBox(height: 8),
-        Container(
-          clipBehavior: Clip.antiAlias,
-          decoration: BoxDecoration(
-            color: white,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: primaryLight),
-          ),
-          child: Column(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF5F5F5),
-                  border: Border(bottom: BorderSide(color: primaryLight)),
-                ),
-                child: const Row(
-                  children: [
-                    Expanded(child: Text('時間', textAlign: TextAlign.center)),
-                    Expanded(child: Text('藥名', textAlign: TextAlign.center)),
-                    Expanded(child: Text('途徑', textAlign: TextAlign.center)),
-                    Expanded(child: Text('劑量', textAlign: TextAlign.center)),
-                    Expanded(child: Text('執行者', textAlign: TextAlign.center)),
-                  ],
-                ),
-              ),
-              ...records.map(
-                (record) => Padding(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 8.0,
-                    horizontal: 4.0,
-                  ),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          record.recordTime != null
-                              ? DateFormat('HH:mm').format(record.recordTime!)
-                              : '',
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                      Expanded(
-                        child: Text(
-                          record.name ?? '',
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                      Expanded(
-                        child: Text(
-                          record.route ?? '',
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                      Expanded(
-                        child: Text(
-                          record.dose ?? '',
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                      Expanded(
-                        child: Text(
-                          record.executor ?? '',
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ],
+        _buildSectionTitle('給藥紀錄表:'),
+        const SizedBox(height: 6),
+        Table(
+          border: TableBorder.all(color: Colors.grey.shade300),
+          columnWidths: const {
+            0: FlexColumnWidth(1),
+            1: FlexColumnWidth(1.5),
+            2: FlexColumnWidth(1),
+            3: FlexColumnWidth(1),
+            4: FlexColumnWidth(1.5),
+          },
+          children: [
+            TableRow(
+              decoration: BoxDecoration(color: Colors.grey.shade100),
+              children: const [
+                Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Text(
+                    '時間',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ),
-              ),
-              InkWell(
-                onTap: () async {
-                  final result = await _showMedicationDialog(context);
-                  if (result != null) {
-                    await provider.addMedicationRecord(result);
-                  }
-                },
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(12),
-                  color: const Color(0xFFF5F5F5),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.add, color: primaryDark, size: 20),
-                      const SizedBox(width: 8),
-                      Text(
-                        '加入資料行',
-                        style: TextStyle(
-                          color: primaryDark,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
+                Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Text(
+                    '藥名',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ),
+                Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Text(
+                    '途徑',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Text(
+                    '劑量',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Text(
+                    '執行者',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
+            ),
+            ...records.map(
+              (record) => TableRow(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      record.recordTime != null
+                          ? DateFormat('HH:mm').format(record.recordTime!)
+                          : '',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(fontSize: 13),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      record.name ?? '',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(fontSize: 13),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      record.route ?? '',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(fontSize: 13),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      record.dose ?? '',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(fontSize: 13),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      record.executor ?? '',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(fontSize: 13),
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
+          ],
+        ),
+        const SizedBox(height: 4),
+        Center(
+          child: TextButton.icon(
+            onPressed: () async {
+              final result = await _showMedicationDialog(context);
+              if (result != null) {
+                await provider.addMedicationRecord(result);
+              }
+            },
+            icon: const Icon(Icons.add),
+            label: const Text('加入資料行'),
           ),
         ),
       ],
@@ -831,182 +826,176 @@ class _AmbulancePlanPageState extends State<AmbulancePlanPage>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionHeader('生命徵象紀錄表'),
-        const SizedBox(height: 8),
-        Container(
-          clipBehavior: Clip.antiAlias,
-          decoration: BoxDecoration(
-            color: white,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: primaryLight),
-          ),
-          child: Column(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF5F5F5),
-                  border: Border(bottom: BorderSide(color: primaryLight)),
-                ),
-                child: const Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        '時間',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 13),
-                      ),
-                    ),
-                    Expanded(
-                      child: Text(
-                        '意識',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 13),
-                      ),
-                    ),
-                    Expanded(
-                      child: Text(
-                        '體溫',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 13),
-                      ),
-                    ),
-                    Expanded(
-                      child: Text(
-                        '脈搏',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 13),
-                      ),
-                    ),
-                    Expanded(
-                      child: Text(
-                        '呼吸',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 13),
-                      ),
-                    ),
-                    Expanded(
-                      child: Text(
-                        '血壓',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 13),
-                      ),
-                    ),
-                    Expanded(
-                      child: Text(
-                        '血氧',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 13),
-                      ),
-                    ),
-                    Expanded(
-                      child: Text(
-                        'GCS',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 13),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              ...records.map(
-                (record) => Padding(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 8.0,
-                    horizontal: 4.0,
-                  ),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          record.recordTime != null
-                              ? DateFormat('HH:mm').format(record.recordTime!)
-                              : '',
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(fontSize: 13),
-                        ),
-                      ),
-                      Expanded(
-                        child: Text(
-                          record.consciousness ?? '',
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(fontSize: 13),
-                        ),
-                      ),
-                      Expanded(
-                        child: Text(
-                          record.temperature ?? '',
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(fontSize: 13),
-                        ),
-                      ),
-                      Expanded(
-                        child: Text(
-                          record.pulse ?? '',
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(fontSize: 13),
-                        ),
-                      ),
-                      Expanded(
-                        child: Text(
-                          record.respiration ?? '',
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(fontSize: 13),
-                        ),
-                      ),
-                      Expanded(
-                        child: Text(
-                          record.bloodPressure ?? '',
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(fontSize: 13),
-                        ),
-                      ),
-                      Expanded(
-                        child: Text(
-                          record.spo2 ?? '',
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(fontSize: 13),
-                        ),
-                      ),
-                      Expanded(
-                        child: Text(
-                          record.gcs ?? '',
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(fontSize: 13),
-                        ),
-                      ),
-                    ],
+        _buildSectionTitle('生命徵象紀錄表:'),
+        const SizedBox(height: 6),
+        Table(
+          border: TableBorder.all(color: Colors.grey.shade300),
+          defaultColumnWidth: const IntrinsicColumnWidth(),
+          columnWidths: const {
+            0: FlexColumnWidth(1.2),
+            1: FlexColumnWidth(0.8),
+            2: FlexColumnWidth(1.0),
+            3: FlexColumnWidth(1.0),
+            4: FlexColumnWidth(1.0),
+            5: FlexColumnWidth(1.3),
+            6: FlexColumnWidth(1.0),
+            7: FlexColumnWidth(1.5),
+          },
+          children: [
+            TableRow(
+              decoration: BoxDecoration(color: Colors.grey.shade100),
+              children: const [
+                Padding(
+                  padding: EdgeInsets.all(6.0),
+                  child: Text(
+                    '時間',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
                   ),
                 ),
-              ),
-              InkWell(
-                onTap: () async {
-                  final result = await _showVitalSignsDialog(context);
-                  if (result != null) {
-                    await provider.addVitalSignsRecord(result);
-                  }
-                },
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(12),
-                  color: const Color(0xFFF5F5F5),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.add, color: primaryDark, size: 20),
-                      const SizedBox(width: 8),
-                      Text(
-                        '加入資料行',
-                        style: TextStyle(
-                          color: primaryDark,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
+                Padding(
+                  padding: EdgeInsets.all(6.0),
+                  child: Text(
+                    '意識',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
                   ),
                 ),
+                Padding(
+                  padding: EdgeInsets.all(6.0),
+                  child: Text(
+                    '體溫',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.all(6.0),
+                  child: Text(
+                    '脈搏',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.all(6.0),
+                  child: Text(
+                    '呼吸',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.all(6.0),
+                  child: Text(
+                    '血壓',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.all(6.0),
+                  child: Text(
+                    '血氧',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.all(6.0),
+                  child: Text(
+                    'GCS',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                  ),
+                ),
+              ],
+            ),
+            ...records.map(
+              (record) => TableRow(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(6.0),
+                    child: Text(
+                      record.recordTime != null
+                          ? DateFormat('HH:mm').format(record.recordTime!)
+                          : '',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(fontSize: 11),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(6.0),
+                    child: Text(
+                      record.consciousness ?? '',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(fontSize: 11),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(6.0),
+                    child: Text(
+                      record.temperature ?? '',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(fontSize: 11),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(6.0),
+                    child: Text(
+                      record.pulse ?? '',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(fontSize: 11),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(6.0),
+                    child: Text(
+                      record.respiration ?? '',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(fontSize: 11),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(6.0),
+                    child: Text(
+                      record.bloodPressure ?? '',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(fontSize: 11),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(6.0),
+                    child: Text(
+                      record.spo2 ?? '',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(fontSize: 11),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(6.0),
+                    child: Text(
+                      record.gcs ?? '',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(fontSize: 11),
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
+          ],
+        ),
+        const SizedBox(height: 4),
+        Center(
+          child: TextButton.icon(
+            onPressed: () async {
+              final result = await _showVitalSignsDialog(context);
+              if (result != null) {
+                await provider.addVitalSignsRecord(result);
+              }
+            },
+            icon: const Icon(Icons.add),
+            label: const Text('加入資料行'),
           ),
         ),
       ],
@@ -1022,117 +1011,106 @@ class _AmbulancePlanPageState extends State<AmbulancePlanPage>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionHeader('隨車救護人員紀錄表'),
-        const SizedBox(height: 8),
-        Container(
-          clipBehavior: Clip.antiAlias,
-          decoration: BoxDecoration(
-            color: white,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: primaryLight),
-          ),
-          child: Column(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF5F5F5),
-                  border: Border(bottom: BorderSide(color: primaryLight)),
-                ),
-                child: const Row(
-                  children: [
-                    Expanded(
-                      flex: 1,
-                      child: Text('姓名', textAlign: TextAlign.center),
-                    ),
-                    Expanded(
-                      flex: 2,
-                      child: Text('簽名', textAlign: TextAlign.center),
-                    ),
-                    SizedBox(width: 48),
-                  ],
-                ),
-              ),
-              ...records.map(
-                (record) => Padding(
-                  padding: const EdgeInsets.fromLTRB(8, 4, 0, 4),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Expanded(
-                        flex: 1,
-                        child: Text(
-                          record.name ?? '',
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                      Expanded(
-                        flex: 2,
-                        child: Container(
-                          height: 80,
-                          margin: const EdgeInsets.symmetric(horizontal: 4.0),
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey.shade300),
-                            color: Colors.grey.shade100,
-                          ),
-                          child: record.signature == null
-                              ? const Center(
-                                  child: Text(
-                                    '無簽名',
-                                    style: TextStyle(color: Colors.grey),
-                                  ),
-                                )
-                              : Image.memory(
-                                  record.signature!,
-                                  fit: BoxFit.contain,
-                                ),
-                        ),
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.delete, color: Colors.red),
-                        onPressed: () async {
-                          await provider.deleteParamedicRecord(record.id);
-                        },
-                      ),
-                    ],
+        _buildSectionTitle('隨車救護人員紀錄表:'),
+        const SizedBox(height: 6),
+        Table(
+          border: TableBorder.all(color: Colors.grey.shade300),
+          columnWidths: const {
+            0: FlexColumnWidth(1),
+            1: FlexColumnWidth(2),
+            2: FixedColumnWidth(48),
+          },
+          children: [
+            TableRow(
+              decoration: BoxDecoration(color: Colors.grey.shade100),
+              children: const [
+                Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Text(
+                    '姓名',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ),
-              ),
-              InkWell(
-                onTap: () async {
-                  final result = await _showParamedicDialog(context);
-                  if (result != null) {
-                    await provider.addParamedicRecord(result);
-                  }
-                },
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(12),
-                  color: const Color(0xFFF5F5F5),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.add, color: primaryDark, size: 20),
-                      const SizedBox(width: 8),
-                      Text(
-                        '加入資料行',
-                        style: TextStyle(
-                          color: primaryDark,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
+                Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Text(
+                    '簽名',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ),
+                SizedBox(),
+              ],
+            ),
+            ...records.map(
+              (record) => TableRow(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      record.name ?? '',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(fontSize: 13),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: Container(
+                      height: 60,
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey.shade300),
+                        color: Colors.grey.shade100,
+                      ),
+                      child: record.signature == null
+                          ? const Center(
+                              child: Text(
+                                '無簽名',
+                                style: TextStyle(color: Colors.grey),
+                              ),
+                            )
+                          : Image.memory(
+                              record.signature!,
+                              fit: BoxFit.contain,
+                            ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: IconButton(
+                      icon: const Icon(
+                        Icons.delete,
+                        color: Colors.red,
+                        size: 20,
+                      ),
+                      onPressed: () async {
+                        await provider.deleteParamedicRecord(record.id);
+                      },
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
+          ],
+        ),
+        const SizedBox(height: 4),
+        Center(
+          child: TextButton.icon(
+            onPressed: () async {
+              final result = await _showParamedicDialog(context);
+              if (result != null) {
+                await provider.addParamedicRecord(result);
+              }
+            },
+            icon: const Icon(Icons.add),
+            label: const Text('加入資料行'),
           ),
         ),
       ],
     );
   }
 
-  // 所有 _show...Dialog 方法也都保持不變
+  // 對話框
   Future<MedicationRecordsCompanion?> _showMedicationDialog(
     BuildContext context,
   ) async {
@@ -1152,37 +1130,59 @@ class _AmbulancePlanPageState extends State<AmbulancePlanPage>
               content: SingleChildScrollView(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    _buildDialogRow(
-                      '紀錄時間',
-                      Row(
-                        children: [
-                          Text(
-                            DateFormat(
-                              'yyyy年MM月dd日 HH時mm分ss秒',
-                            ).format(recordTime),
+                    Row(
+                      children: [
+                        Text(
+                          DateFormat(
+                            'yyyy年MM月dd日 HH時mm分ss秒',
+                          ).format(recordTime),
+                        ),
+                        const SizedBox(width: 8),
+                        ElevatedButton(
+                          onPressed: () =>
+                              setState(() => recordTime = DateTime.now()),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.purple,
+                            foregroundColor: Colors.white,
                           ),
-                          const SizedBox(width: 8),
-                          ElevatedButton(
-                            onPressed: () =>
-                                setState(() => recordTime = DateTime.now()),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.purple,
-                              foregroundColor: Colors.white,
-                            ),
-                            child: const Text('更新時間'),
-                          ),
-                        ],
-                      ),
+                          child: const Text('更新時間'),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 16),
-                    _buildDialogInput('藥名', nameController, '請輸入藥名'),
+                    TextField(
+                      controller: nameController,
+                      decoration: const InputDecoration(
+                        labelText: '藥名',
+                        hintText: '請輸入藥名',
+                      ),
+                    ),
                     const SizedBox(height: 8),
-                    _buildDialogInput('途徑', routeController, '請輸入途徑'),
+                    TextField(
+                      controller: routeController,
+                      decoration: const InputDecoration(
+                        labelText: '途徑',
+                        hintText: '請輸入途徑',
+                      ),
+                    ),
                     const SizedBox(height: 8),
-                    _buildDialogInput('劑量', doseController, '請輸入劑量'),
+                    TextField(
+                      controller: doseController,
+                      decoration: const InputDecoration(
+                        labelText: '劑量',
+                        hintText: '請輸入劑量',
+                      ),
+                    ),
                     const SizedBox(height: 8),
-                    _buildDialogInput('執行者', executorController, '請輸入執行者'),
+                    TextField(
+                      controller: executorController,
+                      decoration: const InputDecoration(
+                        labelText: '執行者',
+                        hintText: '請輸入執行者',
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -1244,134 +1244,126 @@ class _AmbulancePlanPageState extends State<AmbulancePlanPage>
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildDialogRow(
-                      '紀錄時間',
-                      Row(
-                        children: [
-                          Text(
-                            DateFormat(
-                              'yyyy年MM月dd日 HH時mm分ss秒',
-                            ).format(recordTime),
-                          ),
-                          const SizedBox(width: 8),
-                          ElevatedButton(
-                            onPressed: () =>
-                                setState(() => recordTime = DateTime.now()),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.purple,
-                              foregroundColor: Colors.white,
-                            ),
-                            child: const Text('更新時間'),
-                          ),
-                        ],
-                      ),
-                    ),
-                    _buildDialogRow(
-                      '是否抵達醫院後',
-                      Row(
-                        children: [
-                          Radio<bool>(
-                            value: true,
-                            groupValue: atHospital,
-                            onChanged: (v) => setState(() => atHospital = v!),
-                          ),
-                          const Text('是'),
-                          Radio<bool>(
-                            value: false,
-                            groupValue: atHospital,
-                            onChanged: (v) => setState(() => atHospital = v!),
-                          ),
-                          const Text('否'),
-                        ],
-                      ),
-                    ),
-                    _buildDialogRow(
-                      '檢傷站',
-                      Expanded(
-                        child: _buildDialogTextField(triageController, '請填寫'),
-                      ),
-                    ),
-                    _buildDialogRow(
-                      '意識情況',
-                      Row(
-                        children: [
-                          Radio<String>(
-                            value: '清',
-                            groupValue: consciousness,
-                            onChanged: (v) => setState(() => consciousness = v),
-                          ),
-                          const Text('清'),
-                          Radio<String>(
-                            value: '聲',
-                            groupValue: consciousness,
-                            onChanged: (v) => setState(() => consciousness = v),
-                          ),
-                          const Text('聲'),
-                          Radio<String>(
-                            value: '痛',
-                            groupValue: consciousness,
-                            onChanged: (v) => setState(() => consciousness = v),
-                          ),
-                          const Text('痛'),
-                          Radio<String>(
-                            value: '否',
-                            groupValue: consciousness,
-                            onChanged: (v) => setState(() => consciousness = v),
-                          ),
-                          const Text('否'),
-                        ],
-                      ),
-                    ),
-                    _buildDialogRow(
-                      '體溫(°C)',
-                      Expanded(
-                        child: _buildDialogTextField(tempController, '請填寫體溫度數'),
-                      ),
-                    ),
-                    _buildDialogRow(
-                      '脈搏(次/min)',
-                      Expanded(
-                        child: _buildDialogTextField(
-                          pulseController,
-                          '請填寫脈搏次數',
+                    Row(
+                      children: [
+                        Text(
+                          DateFormat(
+                            'yyyy年MM月dd日 HH時mm分ss秒',
+                          ).format(recordTime),
                         ),
-                      ),
+                        const SizedBox(width: 8),
+                        ElevatedButton(
+                          onPressed: () =>
+                              setState(() => recordTime = DateTime.now()),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.purple,
+                            foregroundColor: Colors.white,
+                          ),
+                          child: const Text('更新時間'),
+                        ),
+                      ],
                     ),
-                    _buildDialogRow(
-                      '呼吸(次/min)',
-                      Expanded(
-                        child: _buildDialogTextField(respController, '請填寫呼吸次數'),
-                      ),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        const Text('是否抵達醫院後:'),
+                        Radio<bool>(
+                          value: true,
+                          groupValue: atHospital,
+                          onChanged: (v) => setState(() => atHospital = v!),
+                        ),
+                        const Text('是'),
+                        Radio<bool>(
+                          value: false,
+                          groupValue: atHospital,
+                          onChanged: (v) => setState(() => atHospital = v!),
+                        ),
+                        const Text('否'),
+                      ],
                     ),
-                    _buildDialogRow(
-                      '血壓(mmHg)',
-                      Expanded(
-                        child: _buildDialogTextField(bpController, '請填寫血壓數值'),
-                      ),
+                    TextField(
+                      controller: triageController,
+                      decoration: const InputDecoration(labelText: '檢傷站'),
                     ),
-                    _buildDialogRow(
-                      '血氧(%)',
-                      Expanded(
-                        child: _buildDialogTextField(spo2Controller, '請填寫血氧濃度'),
-                      ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        const Text('意識情況:'),
+                        Radio<String>(
+                          value: '清',
+                          groupValue: consciousness,
+                          onChanged: (v) => setState(() => consciousness = v),
+                        ),
+                        const Text('清'),
+                        Radio<String>(
+                          value: '聲',
+                          groupValue: consciousness,
+                          onChanged: (v) => setState(() => consciousness = v),
+                        ),
+                        const Text('聲'),
+                        Radio<String>(
+                          value: '痛',
+                          groupValue: consciousness,
+                          onChanged: (v) => setState(() => consciousness = v),
+                        ),
+                        const Text('痛'),
+                        Radio<String>(
+                          value: '否',
+                          groupValue: consciousness,
+                          onChanged: (v) => setState(() => consciousness = v),
+                        ),
+                        const Text('否'),
+                      ],
                     ),
-                    _buildDialogRow(
-                      'GCS-E',
-                      Expanded(
-                        child: _buildDialogTextField(gcsEController, '請填寫'),
-                      ),
+                    TextField(
+                      controller: tempController,
+                      decoration: const InputDecoration(labelText: '體溫(°C)'),
                     ),
-                    _buildDialogRow(
-                      'GCS-V',
-                      Expanded(
-                        child: _buildDialogTextField(gcsVController, '請填寫'),
-                      ),
+                    TextField(
+                      controller: pulseController,
+                      decoration: const InputDecoration(labelText: '脈搏(次/min)'),
                     ),
-                    _buildDialogRow(
-                      'GCS-M',
-                      Expanded(
-                        child: _buildDialogTextField(gcsMController, '請填寫'),
-                      ),
+                    TextField(
+                      controller: respController,
+                      decoration: const InputDecoration(labelText: '呼吸(次/min)'),
+                    ),
+                    TextField(
+                      controller: bpController,
+                      decoration: const InputDecoration(labelText: '血壓(mmHg)'),
+                    ),
+                    TextField(
+                      controller: spo2Controller,
+                      decoration: const InputDecoration(labelText: '血氧(%)'),
+                    ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: gcsEController,
+                            decoration: const InputDecoration(
+                              labelText: 'GCS-E',
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: TextField(
+                            controller: gcsVController,
+                            decoration: const InputDecoration(
+                              labelText: 'GCS-V',
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: TextField(
+                            controller: gcsMController,
+                            decoration: const InputDecoration(
+                              labelText: 'GCS-M',
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -1437,71 +1429,51 @@ class _AmbulancePlanPageState extends State<AmbulancePlanPage>
               content: SingleChildScrollView(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Row(
-                      children: [
-                        const SizedBox(
-                          width: 60,
-                          child: Text(
-                            '姓名',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                        Expanded(
-                          child: TextField(
-                            controller: nameController,
-                            decoration: const InputDecoration(
-                              hintText: '請輸入姓名',
-                              border: OutlineInputBorder(),
-                            ),
-                          ),
-                        ),
-                      ],
+                    TextField(
+                      controller: nameController,
+                      decoration: const InputDecoration(
+                        labelText: '姓名',
+                        hintText: '請輸入姓名',
+                      ),
                     ),
                     const SizedBox(height: 16),
-                    Row(
-                      children: [
-                        const SizedBox(
-                          width: 60,
-                          child: Text(
-                            '簽名',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
+                    const Text(
+                      '簽名:',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 8),
+                    GestureDetector(
+                      onTap: () async {
+                        final bytes = await _showSignatureDialog(
+                          context,
+                          signatureController,
+                        );
+                        if (bytes != null) {
+                          setState(() {
+                            signatureBytes = bytes;
+                          });
+                        }
+                      },
+                      child: Container(
+                        height: 120,
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey),
+                          color: Colors.white,
                         ),
-                        Expanded(
-                          child: GestureDetector(
-                            onTap: () async {
-                              final bytes = await _showSignatureDialog(
-                                context,
-                                signatureController,
-                              );
-                              if (bytes != null) {
-                                setState(() {
-                                  signatureBytes = bytes;
-                                });
-                              }
-                            },
-                            child: Container(
-                              height: 120,
-                              decoration: BoxDecoration(
-                                border: Border.all(color: Colors.grey),
-                                color: Colors.white,
+                        child: signatureBytes == null
+                            ? const Center(
+                                child: Text(
+                                  '點此簽章',
+                                  style: TextStyle(color: Colors.grey),
+                                ),
+                              )
+                            : Image.memory(
+                                signatureBytes!,
+                                fit: BoxFit.contain,
                               ),
-                              child: signatureBytes == null
-                                  ? const Center(
-                                      child: Text(
-                                        '點此簽章',
-                                        style: TextStyle(color: Colors.grey),
-                                      ),
-                                    )
-                                  : Image.memory(
-                                      signatureBytes!,
-                                      fit: BoxFit.contain,
-                                    ),
-                            ),
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
                   ],
                 ),
@@ -1581,68 +1553,6 @@ class _AmbulancePlanPageState extends State<AmbulancePlanPage>
           ],
         );
       },
-    );
-  }
-
-  // --- 對話框輔助 Widget ---
-  Widget _buildDialogRow(String label, Widget child) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        children: [
-          SizedBox(
-            width: 120,
-            child: Text(
-              label,
-              style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
-          ),
-          child,
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDialogInput(
-    String label,
-    TextEditingController controller,
-    String hint,
-  ) {
-    return Row(
-      children: [
-        SizedBox(
-          width: 60,
-          child: Text(
-            label,
-            style: const TextStyle(fontWeight: FontWeight.bold),
-          ),
-        ),
-        Expanded(
-          child: TextField(
-            controller: controller,
-            decoration: InputDecoration(
-              hintText: hint,
-              border: const OutlineInputBorder(),
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 8,
-                vertical: 6,
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildDialogTextField(TextEditingController controller, String hint) {
-    return TextField(
-      controller: controller,
-      decoration: InputDecoration(
-        hintText: hint,
-        isDense: true,
-        border: const OutlineInputBorder(),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-      ),
     );
   }
 }
