@@ -12,6 +12,12 @@ class Visits extends Table {
   TextColumn get note => text().nullable()(); // 之後某頁回寫
   TextColumn get filledBy => text().nullable()(); // 之後某頁回寫
 
+  // ✅ 新增：急救記錄專用欄位
+  BoolColumn get hasEmergencyRecord =>
+      boolean().withDefault(const Constant(false))(); // 標記是否為急救記錄
+  DateTimeColumn get incidentDateTime => dateTime().nullable()(); // 事發時間
+  TextColumn get emergencyResult => text().nullable()(); // 急救結果
+
   DateTimeColumn get uploadedAt =>
       dateTime().withDefault(currentDateAndTime)(); // 建立/更新時間
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
@@ -24,6 +30,8 @@ class Visits extends Table {
     {nationality},
     {dept},
     {uploadedAt},
+    {hasEmergencyRecord}, // ✅ 新增索引
+    {incidentDateTime}, // ✅ 新增索引
   ];
 }
 
@@ -550,4 +558,95 @@ class ParamedicRecords extends Table {
 
   TextColumn get name => text().nullable()();
   BlobColumn get signature => blob().nullable()(); // 簽名
+}
+
+class EmergencyRecords extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get visitId => integer().unique()();
+
+  // Personal (個人資料)
+  TextColumn get patientName => text().nullable()(); // ✅ 新增：病患姓名
+  TextColumn get idNumber => text().nullable()();
+  TextColumn get passportNumber => text().nullable()();
+  TextColumn get gender => text().nullable()();
+  DateTimeColumn get birthDate => dateTime().nullable()();
+
+  // Flight (飛航記錄)
+  IntColumn get sourceIndex => integer().nullable()();
+  IntColumn get purposeIndex => integer().nullable()();
+  IntColumn get airlineIndex => integer().nullable()();
+  BoolColumn get useOtherAirline =>
+      boolean().withDefault(const Constant(false))();
+  TextColumn get selectedOtherAirline => text().nullable()();
+  TextColumn get nationality => text().nullable()();
+
+  // Accident (事故記錄)
+  DateTimeColumn get incidentDateTime => dateTime().nullable()();
+  IntColumn get placeGroupIdx => integer().nullable()();
+  IntColumn get t1Selected => integer().nullable()();
+  IntColumn get t2Selected => integer().nullable()();
+  IntColumn get remoteSelected => integer().nullable()();
+  IntColumn get cargoSelected => integer().nullable()();
+  IntColumn get novotelSelected => integer().nullable()();
+  IntColumn get cabinSelected => integer().nullable()();
+  TextColumn get placeNote => text().nullable()();
+
+  // Plan (處置記錄)
+  DateTimeColumn get firstAidStartTime => dateTime().nullable()();
+  DateTimeColumn get intubationStartTime => dateTime().nullable()();
+  DateTimeColumn get onIVLineStartTime => dateTime().nullable()();
+  DateTimeColumn get cardiacMassageStartTime => dateTime().nullable()();
+  DateTimeColumn get cardiacMassageEndTime => dateTime().nullable()();
+  DateTimeColumn get firstAidEndTime => dateTime().nullable()();
+
+  TextColumn get diagnosis => text().nullable()();
+  TextColumn get situation => text().nullable()();
+
+  // 病況
+  TextColumn get evmE => text().nullable()();
+  TextColumn get evmV => text().nullable()();
+  TextColumn get evmM => text().nullable()();
+  TextColumn get heartRate => text().nullable()();
+  TextColumn get respirationRate => text().nullable()();
+  TextColumn get bloodPressure => text().nullable()();
+  TextColumn get temperature => text().nullable()();
+  TextColumn get leftPupilSize => text().nullable()();
+  TextColumn get rightPupilSize => text().nullable()();
+  TextColumn get leftPupilReaction => text().nullable()();
+  TextColumn get rightPupilReaction => text().nullable()();
+
+  // 急救處置
+  TextColumn get insertionMethod => text().nullable()();
+  TextColumn get airwayContent => text().nullable()();
+  TextColumn get insertionRecord => text().nullable()();
+  TextColumn get ivNeedleSize => text().nullable()();
+  TextColumn get ivLineRecord => text().nullable()();
+  TextColumn get cardiacMassageRecord => text().nullable()();
+
+  // 急救結束與結果
+  TextColumn get endRecord => text().nullable()();
+  TextColumn get endResult => text().nullable()();
+  TextColumn get selectedHospital => text().nullable()();
+  TextColumn get otherHospital => text().nullable()();
+  TextColumn get otherEndResult => text().nullable()();
+  DateTimeColumn get deathTime => dateTime().nullable()();
+
+  // 參與人員
+  TextColumn get selectedDoctor => text().nullable()();
+  TextColumn get selectedNurse => text().nullable()();
+  TextColumn get selectedEMT => text().nullable()();
+  TextColumn get nurseSignature => text().nullable()();
+  TextColumn get emtSignature => text().nullable()();
+
+  // 協助人員列表（JSON）
+  TextColumn get selectedAssistantsJson =>
+      text().withDefault(const Constant('[]'))();
+
+  // 用藥記錄表（JSON）
+  TextColumn get medicationRecordsJson =>
+      text().withDefault(const Constant('[]'))();
+
+  // 記錄時間
+  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+  DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
 }

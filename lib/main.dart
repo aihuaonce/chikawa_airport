@@ -65,6 +65,7 @@ void main() {
         Provider<MedicationRecordsDao>(create: (_) => db.medicationRecordsDao),
         Provider<VitalSignsRecordsDao>(create: (_) => db.vitalSignsRecordsDao),
         Provider<ParamedicRecordsDao>(create: (_) => db.paramedicRecordsDao),
+        Provider<EmergencyRecordsDao>(create: (_) => db.emergencyRecordsDao),
       ],
       child: const MyApp(),
     ),

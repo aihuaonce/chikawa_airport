@@ -60,3 +60,8 @@ mixin _$ParamedicRecordsDaoMixin on DatabaseAccessor<AppDatabase> {
   $ParamedicRecordsTable get paramedicRecords =>
       attachedDatabase.paramedicRecords;
 }
+mixin _$EmergencyRecordsDaoMixin on DatabaseAccessor<AppDatabase> {
+  $EmergencyRecordsTable get emergencyRecords =>
+      attachedDatabase.emergencyRecords;
+  $VisitsTable get visits => attachedDatabase.visits;
+}

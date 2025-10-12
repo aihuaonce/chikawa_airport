@@ -83,6 +83,43 @@ class $VisitsTable extends Visits with TableInfo<$VisitsTable, Visit> {
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _hasEmergencyRecordMeta =
+      const VerificationMeta('hasEmergencyRecord');
+  @override
+  late final GeneratedColumn<bool> hasEmergencyRecord = GeneratedColumn<bool>(
+    'has_emergency_record',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("has_emergency_record" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _incidentDateTimeMeta = const VerificationMeta(
+    'incidentDateTime',
+  );
+  @override
+  late final GeneratedColumn<DateTime> incidentDateTime =
+      GeneratedColumn<DateTime>(
+        'incident_date_time',
+        aliasedName,
+        true,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _emergencyResultMeta = const VerificationMeta(
+    'emergencyResult',
+  );
+  @override
+  late final GeneratedColumn<String> emergencyResult = GeneratedColumn<String>(
+    'emergency_result',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _uploadedAtMeta = const VerificationMeta(
     'uploadedAt',
   );
@@ -128,6 +165,9 @@ class $VisitsTable extends Visits with TableInfo<$VisitsTable, Visit> {
     dept,
     note,
     filledBy,
+    hasEmergencyRecord,
+    incidentDateTime,
+    emergencyResult,
     uploadedAt,
     createdAt,
     updatedAt,
@@ -192,6 +232,33 @@ class $VisitsTable extends Visits with TableInfo<$VisitsTable, Visit> {
         filledBy.isAcceptableOrUnknown(data['filled_by']!, _filledByMeta),
       );
     }
+    if (data.containsKey('has_emergency_record')) {
+      context.handle(
+        _hasEmergencyRecordMeta,
+        hasEmergencyRecord.isAcceptableOrUnknown(
+          data['has_emergency_record']!,
+          _hasEmergencyRecordMeta,
+        ),
+      );
+    }
+    if (data.containsKey('incident_date_time')) {
+      context.handle(
+        _incidentDateTimeMeta,
+        incidentDateTime.isAcceptableOrUnknown(
+          data['incident_date_time']!,
+          _incidentDateTimeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('emergency_result')) {
+      context.handle(
+        _emergencyResultMeta,
+        emergencyResult.isAcceptableOrUnknown(
+          data['emergency_result']!,
+          _emergencyResultMeta,
+        ),
+      );
+    }
     if (data.containsKey('uploaded_at')) {
       context.handle(
         _uploadedAtMeta,
@@ -247,6 +314,18 @@ class $VisitsTable extends Visits with TableInfo<$VisitsTable, Visit> {
         DriftSqlType.string,
         data['${effectivePrefix}filled_by'],
       ),
+      hasEmergencyRecord: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}has_emergency_record'],
+      )!,
+      incidentDateTime: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}incident_date_time'],
+      ),
+      emergencyResult: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}emergency_result'],
+      ),
       uploadedAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}uploaded_at'],
@@ -276,6 +355,9 @@ class Visit extends DataClass implements Insertable<Visit> {
   final String? dept;
   final String? note;
   final String? filledBy;
+  final bool hasEmergencyRecord;
+  final DateTime? incidentDateTime;
+  final String? emergencyResult;
   final DateTime uploadedAt;
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -287,6 +369,9 @@ class Visit extends DataClass implements Insertable<Visit> {
     this.dept,
     this.note,
     this.filledBy,
+    required this.hasEmergencyRecord,
+    this.incidentDateTime,
+    this.emergencyResult,
     required this.uploadedAt,
     required this.createdAt,
     required this.updatedAt,
@@ -313,6 +398,13 @@ class Visit extends DataClass implements Insertable<Visit> {
     if (!nullToAbsent || filledBy != null) {
       map['filled_by'] = Variable<String>(filledBy);
     }
+    map['has_emergency_record'] = Variable<bool>(hasEmergencyRecord);
+    if (!nullToAbsent || incidentDateTime != null) {
+      map['incident_date_time'] = Variable<DateTime>(incidentDateTime);
+    }
+    if (!nullToAbsent || emergencyResult != null) {
+      map['emergency_result'] = Variable<String>(emergencyResult);
+    }
     map['uploaded_at'] = Variable<DateTime>(uploadedAt);
     map['created_at'] = Variable<DateTime>(createdAt);
     map['updated_at'] = Variable<DateTime>(updatedAt);
@@ -336,6 +428,13 @@ class Visit extends DataClass implements Insertable<Visit> {
       filledBy: filledBy == null && nullToAbsent
           ? const Value.absent()
           : Value(filledBy),
+      hasEmergencyRecord: Value(hasEmergencyRecord),
+      incidentDateTime: incidentDateTime == null && nullToAbsent
+          ? const Value.absent()
+          : Value(incidentDateTime),
+      emergencyResult: emergencyResult == null && nullToAbsent
+          ? const Value.absent()
+          : Value(emergencyResult),
       uploadedAt: Value(uploadedAt),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
@@ -355,6 +454,11 @@ class Visit extends DataClass implements Insertable<Visit> {
       dept: serializer.fromJson<String?>(json['dept']),
       note: serializer.fromJson<String?>(json['note']),
       filledBy: serializer.fromJson<String?>(json['filledBy']),
+      hasEmergencyRecord: serializer.fromJson<bool>(json['hasEmergencyRecord']),
+      incidentDateTime: serializer.fromJson<DateTime?>(
+        json['incidentDateTime'],
+      ),
+      emergencyResult: serializer.fromJson<String?>(json['emergencyResult']),
       uploadedAt: serializer.fromJson<DateTime>(json['uploadedAt']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
@@ -371,6 +475,9 @@ class Visit extends DataClass implements Insertable<Visit> {
       'dept': serializer.toJson<String?>(dept),
       'note': serializer.toJson<String?>(note),
       'filledBy': serializer.toJson<String?>(filledBy),
+      'hasEmergencyRecord': serializer.toJson<bool>(hasEmergencyRecord),
+      'incidentDateTime': serializer.toJson<DateTime?>(incidentDateTime),
+      'emergencyResult': serializer.toJson<String?>(emergencyResult),
       'uploadedAt': serializer.toJson<DateTime>(uploadedAt),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
@@ -385,6 +492,9 @@ class Visit extends DataClass implements Insertable<Visit> {
     Value<String?> dept = const Value.absent(),
     Value<String?> note = const Value.absent(),
     Value<String?> filledBy = const Value.absent(),
+    bool? hasEmergencyRecord,
+    Value<DateTime?> incidentDateTime = const Value.absent(),
+    Value<String?> emergencyResult = const Value.absent(),
     DateTime? uploadedAt,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -396,6 +506,13 @@ class Visit extends DataClass implements Insertable<Visit> {
     dept: dept.present ? dept.value : this.dept,
     note: note.present ? note.value : this.note,
     filledBy: filledBy.present ? filledBy.value : this.filledBy,
+    hasEmergencyRecord: hasEmergencyRecord ?? this.hasEmergencyRecord,
+    incidentDateTime: incidentDateTime.present
+        ? incidentDateTime.value
+        : this.incidentDateTime,
+    emergencyResult: emergencyResult.present
+        ? emergencyResult.value
+        : this.emergencyResult,
     uploadedAt: uploadedAt ?? this.uploadedAt,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
@@ -413,6 +530,15 @@ class Visit extends DataClass implements Insertable<Visit> {
       dept: data.dept.present ? data.dept.value : this.dept,
       note: data.note.present ? data.note.value : this.note,
       filledBy: data.filledBy.present ? data.filledBy.value : this.filledBy,
+      hasEmergencyRecord: data.hasEmergencyRecord.present
+          ? data.hasEmergencyRecord.value
+          : this.hasEmergencyRecord,
+      incidentDateTime: data.incidentDateTime.present
+          ? data.incidentDateTime.value
+          : this.incidentDateTime,
+      emergencyResult: data.emergencyResult.present
+          ? data.emergencyResult.value
+          : this.emergencyResult,
       uploadedAt: data.uploadedAt.present
           ? data.uploadedAt.value
           : this.uploadedAt,
@@ -431,6 +557,9 @@ class Visit extends DataClass implements Insertable<Visit> {
           ..write('dept: $dept, ')
           ..write('note: $note, ')
           ..write('filledBy: $filledBy, ')
+          ..write('hasEmergencyRecord: $hasEmergencyRecord, ')
+          ..write('incidentDateTime: $incidentDateTime, ')
+          ..write('emergencyResult: $emergencyResult, ')
           ..write('uploadedAt: $uploadedAt, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
@@ -447,6 +576,9 @@ class Visit extends DataClass implements Insertable<Visit> {
     dept,
     note,
     filledBy,
+    hasEmergencyRecord,
+    incidentDateTime,
+    emergencyResult,
     uploadedAt,
     createdAt,
     updatedAt,
@@ -462,6 +594,9 @@ class Visit extends DataClass implements Insertable<Visit> {
           other.dept == this.dept &&
           other.note == this.note &&
           other.filledBy == this.filledBy &&
+          other.hasEmergencyRecord == this.hasEmergencyRecord &&
+          other.incidentDateTime == this.incidentDateTime &&
+          other.emergencyResult == this.emergencyResult &&
           other.uploadedAt == this.uploadedAt &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt);
@@ -475,6 +610,9 @@ class VisitsCompanion extends UpdateCompanion<Visit> {
   final Value<String?> dept;
   final Value<String?> note;
   final Value<String?> filledBy;
+  final Value<bool> hasEmergencyRecord;
+  final Value<DateTime?> incidentDateTime;
+  final Value<String?> emergencyResult;
   final Value<DateTime> uploadedAt;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
@@ -486,6 +624,9 @@ class VisitsCompanion extends UpdateCompanion<Visit> {
     this.dept = const Value.absent(),
     this.note = const Value.absent(),
     this.filledBy = const Value.absent(),
+    this.hasEmergencyRecord = const Value.absent(),
+    this.incidentDateTime = const Value.absent(),
+    this.emergencyResult = const Value.absent(),
     this.uploadedAt = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
@@ -498,6 +639,9 @@ class VisitsCompanion extends UpdateCompanion<Visit> {
     this.dept = const Value.absent(),
     this.note = const Value.absent(),
     this.filledBy = const Value.absent(),
+    this.hasEmergencyRecord = const Value.absent(),
+    this.incidentDateTime = const Value.absent(),
+    this.emergencyResult = const Value.absent(),
     this.uploadedAt = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
@@ -510,6 +654,9 @@ class VisitsCompanion extends UpdateCompanion<Visit> {
     Expression<String>? dept,
     Expression<String>? note,
     Expression<String>? filledBy,
+    Expression<bool>? hasEmergencyRecord,
+    Expression<DateTime>? incidentDateTime,
+    Expression<String>? emergencyResult,
     Expression<DateTime>? uploadedAt,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
@@ -522,6 +669,10 @@ class VisitsCompanion extends UpdateCompanion<Visit> {
       if (dept != null) 'dept': dept,
       if (note != null) 'note': note,
       if (filledBy != null) 'filled_by': filledBy,
+      if (hasEmergencyRecord != null)
+        'has_emergency_record': hasEmergencyRecord,
+      if (incidentDateTime != null) 'incident_date_time': incidentDateTime,
+      if (emergencyResult != null) 'emergency_result': emergencyResult,
       if (uploadedAt != null) 'uploaded_at': uploadedAt,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
@@ -536,6 +687,9 @@ class VisitsCompanion extends UpdateCompanion<Visit> {
     Value<String?>? dept,
     Value<String?>? note,
     Value<String?>? filledBy,
+    Value<bool>? hasEmergencyRecord,
+    Value<DateTime?>? incidentDateTime,
+    Value<String?>? emergencyResult,
     Value<DateTime>? uploadedAt,
     Value<DateTime>? createdAt,
     Value<DateTime>? updatedAt,
@@ -548,6 +702,9 @@ class VisitsCompanion extends UpdateCompanion<Visit> {
       dept: dept ?? this.dept,
       note: note ?? this.note,
       filledBy: filledBy ?? this.filledBy,
+      hasEmergencyRecord: hasEmergencyRecord ?? this.hasEmergencyRecord,
+      incidentDateTime: incidentDateTime ?? this.incidentDateTime,
+      emergencyResult: emergencyResult ?? this.emergencyResult,
       uploadedAt: uploadedAt ?? this.uploadedAt,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -578,6 +735,15 @@ class VisitsCompanion extends UpdateCompanion<Visit> {
     if (filledBy.present) {
       map['filled_by'] = Variable<String>(filledBy.value);
     }
+    if (hasEmergencyRecord.present) {
+      map['has_emergency_record'] = Variable<bool>(hasEmergencyRecord.value);
+    }
+    if (incidentDateTime.present) {
+      map['incident_date_time'] = Variable<DateTime>(incidentDateTime.value);
+    }
+    if (emergencyResult.present) {
+      map['emergency_result'] = Variable<String>(emergencyResult.value);
+    }
     if (uploadedAt.present) {
       map['uploaded_at'] = Variable<DateTime>(uploadedAt.value);
     }
@@ -600,6 +766,9 @@ class VisitsCompanion extends UpdateCompanion<Visit> {
           ..write('dept: $dept, ')
           ..write('note: $note, ')
           ..write('filledBy: $filledBy, ')
+          ..write('hasEmergencyRecord: $hasEmergencyRecord, ')
+          ..write('incidentDateTime: $incidentDateTime, ')
+          ..write('emergencyResult: $emergencyResult, ')
           ..write('uploadedAt: $uploadedAt, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
@@ -18504,6 +18673,3483 @@ class ParamedicRecordsCompanion extends UpdateCompanion<ParamedicRecord> {
   }
 }
 
+class $EmergencyRecordsTable extends EmergencyRecords
+    with TableInfo<$EmergencyRecordsTable, EmergencyRecord> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $EmergencyRecordsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _visitIdMeta = const VerificationMeta(
+    'visitId',
+  );
+  @override
+  late final GeneratedColumn<int> visitId = GeneratedColumn<int>(
+    'visit_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'),
+  );
+  static const VerificationMeta _patientNameMeta = const VerificationMeta(
+    'patientName',
+  );
+  @override
+  late final GeneratedColumn<String> patientName = GeneratedColumn<String>(
+    'patient_name',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _idNumberMeta = const VerificationMeta(
+    'idNumber',
+  );
+  @override
+  late final GeneratedColumn<String> idNumber = GeneratedColumn<String>(
+    'id_number',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _passportNumberMeta = const VerificationMeta(
+    'passportNumber',
+  );
+  @override
+  late final GeneratedColumn<String> passportNumber = GeneratedColumn<String>(
+    'passport_number',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _genderMeta = const VerificationMeta('gender');
+  @override
+  late final GeneratedColumn<String> gender = GeneratedColumn<String>(
+    'gender',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _birthDateMeta = const VerificationMeta(
+    'birthDate',
+  );
+  @override
+  late final GeneratedColumn<DateTime> birthDate = GeneratedColumn<DateTime>(
+    'birth_date',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _sourceIndexMeta = const VerificationMeta(
+    'sourceIndex',
+  );
+  @override
+  late final GeneratedColumn<int> sourceIndex = GeneratedColumn<int>(
+    'source_index',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _purposeIndexMeta = const VerificationMeta(
+    'purposeIndex',
+  );
+  @override
+  late final GeneratedColumn<int> purposeIndex = GeneratedColumn<int>(
+    'purpose_index',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _airlineIndexMeta = const VerificationMeta(
+    'airlineIndex',
+  );
+  @override
+  late final GeneratedColumn<int> airlineIndex = GeneratedColumn<int>(
+    'airline_index',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _useOtherAirlineMeta = const VerificationMeta(
+    'useOtherAirline',
+  );
+  @override
+  late final GeneratedColumn<bool> useOtherAirline = GeneratedColumn<bool>(
+    'use_other_airline',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("use_other_airline" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _selectedOtherAirlineMeta =
+      const VerificationMeta('selectedOtherAirline');
+  @override
+  late final GeneratedColumn<String> selectedOtherAirline =
+      GeneratedColumn<String>(
+        'selected_other_airline',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _nationalityMeta = const VerificationMeta(
+    'nationality',
+  );
+  @override
+  late final GeneratedColumn<String> nationality = GeneratedColumn<String>(
+    'nationality',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _incidentDateTimeMeta = const VerificationMeta(
+    'incidentDateTime',
+  );
+  @override
+  late final GeneratedColumn<DateTime> incidentDateTime =
+      GeneratedColumn<DateTime>(
+        'incident_date_time',
+        aliasedName,
+        true,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _placeGroupIdxMeta = const VerificationMeta(
+    'placeGroupIdx',
+  );
+  @override
+  late final GeneratedColumn<int> placeGroupIdx = GeneratedColumn<int>(
+    'place_group_idx',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _t1SelectedMeta = const VerificationMeta(
+    't1Selected',
+  );
+  @override
+  late final GeneratedColumn<int> t1Selected = GeneratedColumn<int>(
+    't1_selected',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _t2SelectedMeta = const VerificationMeta(
+    't2Selected',
+  );
+  @override
+  late final GeneratedColumn<int> t2Selected = GeneratedColumn<int>(
+    't2_selected',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _remoteSelectedMeta = const VerificationMeta(
+    'remoteSelected',
+  );
+  @override
+  late final GeneratedColumn<int> remoteSelected = GeneratedColumn<int>(
+    'remote_selected',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _cargoSelectedMeta = const VerificationMeta(
+    'cargoSelected',
+  );
+  @override
+  late final GeneratedColumn<int> cargoSelected = GeneratedColumn<int>(
+    'cargo_selected',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _novotelSelectedMeta = const VerificationMeta(
+    'novotelSelected',
+  );
+  @override
+  late final GeneratedColumn<int> novotelSelected = GeneratedColumn<int>(
+    'novotel_selected',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _cabinSelectedMeta = const VerificationMeta(
+    'cabinSelected',
+  );
+  @override
+  late final GeneratedColumn<int> cabinSelected = GeneratedColumn<int>(
+    'cabin_selected',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _placeNoteMeta = const VerificationMeta(
+    'placeNote',
+  );
+  @override
+  late final GeneratedColumn<String> placeNote = GeneratedColumn<String>(
+    'place_note',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _firstAidStartTimeMeta = const VerificationMeta(
+    'firstAidStartTime',
+  );
+  @override
+  late final GeneratedColumn<DateTime> firstAidStartTime =
+      GeneratedColumn<DateTime>(
+        'first_aid_start_time',
+        aliasedName,
+        true,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _intubationStartTimeMeta =
+      const VerificationMeta('intubationStartTime');
+  @override
+  late final GeneratedColumn<DateTime> intubationStartTime =
+      GeneratedColumn<DateTime>(
+        'intubation_start_time',
+        aliasedName,
+        true,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _onIVLineStartTimeMeta = const VerificationMeta(
+    'onIVLineStartTime',
+  );
+  @override
+  late final GeneratedColumn<DateTime> onIVLineStartTime =
+      GeneratedColumn<DateTime>(
+        'on_i_v_line_start_time',
+        aliasedName,
+        true,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _cardiacMassageStartTimeMeta =
+      const VerificationMeta('cardiacMassageStartTime');
+  @override
+  late final GeneratedColumn<DateTime> cardiacMassageStartTime =
+      GeneratedColumn<DateTime>(
+        'cardiac_massage_start_time',
+        aliasedName,
+        true,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _cardiacMassageEndTimeMeta =
+      const VerificationMeta('cardiacMassageEndTime');
+  @override
+  late final GeneratedColumn<DateTime> cardiacMassageEndTime =
+      GeneratedColumn<DateTime>(
+        'cardiac_massage_end_time',
+        aliasedName,
+        true,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _firstAidEndTimeMeta = const VerificationMeta(
+    'firstAidEndTime',
+  );
+  @override
+  late final GeneratedColumn<DateTime> firstAidEndTime =
+      GeneratedColumn<DateTime>(
+        'first_aid_end_time',
+        aliasedName,
+        true,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _diagnosisMeta = const VerificationMeta(
+    'diagnosis',
+  );
+  @override
+  late final GeneratedColumn<String> diagnosis = GeneratedColumn<String>(
+    'diagnosis',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _situationMeta = const VerificationMeta(
+    'situation',
+  );
+  @override
+  late final GeneratedColumn<String> situation = GeneratedColumn<String>(
+    'situation',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _evmEMeta = const VerificationMeta('evmE');
+  @override
+  late final GeneratedColumn<String> evmE = GeneratedColumn<String>(
+    'evm_e',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _evmVMeta = const VerificationMeta('evmV');
+  @override
+  late final GeneratedColumn<String> evmV = GeneratedColumn<String>(
+    'evm_v',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _evmMMeta = const VerificationMeta('evmM');
+  @override
+  late final GeneratedColumn<String> evmM = GeneratedColumn<String>(
+    'evm_m',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _heartRateMeta = const VerificationMeta(
+    'heartRate',
+  );
+  @override
+  late final GeneratedColumn<String> heartRate = GeneratedColumn<String>(
+    'heart_rate',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _respirationRateMeta = const VerificationMeta(
+    'respirationRate',
+  );
+  @override
+  late final GeneratedColumn<String> respirationRate = GeneratedColumn<String>(
+    'respiration_rate',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _bloodPressureMeta = const VerificationMeta(
+    'bloodPressure',
+  );
+  @override
+  late final GeneratedColumn<String> bloodPressure = GeneratedColumn<String>(
+    'blood_pressure',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _temperatureMeta = const VerificationMeta(
+    'temperature',
+  );
+  @override
+  late final GeneratedColumn<String> temperature = GeneratedColumn<String>(
+    'temperature',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _leftPupilSizeMeta = const VerificationMeta(
+    'leftPupilSize',
+  );
+  @override
+  late final GeneratedColumn<String> leftPupilSize = GeneratedColumn<String>(
+    'left_pupil_size',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _rightPupilSizeMeta = const VerificationMeta(
+    'rightPupilSize',
+  );
+  @override
+  late final GeneratedColumn<String> rightPupilSize = GeneratedColumn<String>(
+    'right_pupil_size',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _leftPupilReactionMeta = const VerificationMeta(
+    'leftPupilReaction',
+  );
+  @override
+  late final GeneratedColumn<String> leftPupilReaction =
+      GeneratedColumn<String>(
+        'left_pupil_reaction',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _rightPupilReactionMeta =
+      const VerificationMeta('rightPupilReaction');
+  @override
+  late final GeneratedColumn<String> rightPupilReaction =
+      GeneratedColumn<String>(
+        'right_pupil_reaction',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _insertionMethodMeta = const VerificationMeta(
+    'insertionMethod',
+  );
+  @override
+  late final GeneratedColumn<String> insertionMethod = GeneratedColumn<String>(
+    'insertion_method',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _airwayContentMeta = const VerificationMeta(
+    'airwayContent',
+  );
+  @override
+  late final GeneratedColumn<String> airwayContent = GeneratedColumn<String>(
+    'airway_content',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _insertionRecordMeta = const VerificationMeta(
+    'insertionRecord',
+  );
+  @override
+  late final GeneratedColumn<String> insertionRecord = GeneratedColumn<String>(
+    'insertion_record',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _ivNeedleSizeMeta = const VerificationMeta(
+    'ivNeedleSize',
+  );
+  @override
+  late final GeneratedColumn<String> ivNeedleSize = GeneratedColumn<String>(
+    'iv_needle_size',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _ivLineRecordMeta = const VerificationMeta(
+    'ivLineRecord',
+  );
+  @override
+  late final GeneratedColumn<String> ivLineRecord = GeneratedColumn<String>(
+    'iv_line_record',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _cardiacMassageRecordMeta =
+      const VerificationMeta('cardiacMassageRecord');
+  @override
+  late final GeneratedColumn<String> cardiacMassageRecord =
+      GeneratedColumn<String>(
+        'cardiac_massage_record',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _endRecordMeta = const VerificationMeta(
+    'endRecord',
+  );
+  @override
+  late final GeneratedColumn<String> endRecord = GeneratedColumn<String>(
+    'end_record',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _endResultMeta = const VerificationMeta(
+    'endResult',
+  );
+  @override
+  late final GeneratedColumn<String> endResult = GeneratedColumn<String>(
+    'end_result',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _selectedHospitalMeta = const VerificationMeta(
+    'selectedHospital',
+  );
+  @override
+  late final GeneratedColumn<String> selectedHospital = GeneratedColumn<String>(
+    'selected_hospital',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _otherHospitalMeta = const VerificationMeta(
+    'otherHospital',
+  );
+  @override
+  late final GeneratedColumn<String> otherHospital = GeneratedColumn<String>(
+    'other_hospital',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _otherEndResultMeta = const VerificationMeta(
+    'otherEndResult',
+  );
+  @override
+  late final GeneratedColumn<String> otherEndResult = GeneratedColumn<String>(
+    'other_end_result',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _deathTimeMeta = const VerificationMeta(
+    'deathTime',
+  );
+  @override
+  late final GeneratedColumn<DateTime> deathTime = GeneratedColumn<DateTime>(
+    'death_time',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _selectedDoctorMeta = const VerificationMeta(
+    'selectedDoctor',
+  );
+  @override
+  late final GeneratedColumn<String> selectedDoctor = GeneratedColumn<String>(
+    'selected_doctor',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _selectedNurseMeta = const VerificationMeta(
+    'selectedNurse',
+  );
+  @override
+  late final GeneratedColumn<String> selectedNurse = GeneratedColumn<String>(
+    'selected_nurse',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _selectedEMTMeta = const VerificationMeta(
+    'selectedEMT',
+  );
+  @override
+  late final GeneratedColumn<String> selectedEMT = GeneratedColumn<String>(
+    'selected_e_m_t',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _nurseSignatureMeta = const VerificationMeta(
+    'nurseSignature',
+  );
+  @override
+  late final GeneratedColumn<String> nurseSignature = GeneratedColumn<String>(
+    'nurse_signature',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _emtSignatureMeta = const VerificationMeta(
+    'emtSignature',
+  );
+  @override
+  late final GeneratedColumn<String> emtSignature = GeneratedColumn<String>(
+    'emt_signature',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _selectedAssistantsJsonMeta =
+      const VerificationMeta('selectedAssistantsJson');
+  @override
+  late final GeneratedColumn<String> selectedAssistantsJson =
+      GeneratedColumn<String>(
+        'selected_assistants_json',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: const Constant('[]'),
+      );
+  static const VerificationMeta _medicationRecordsJsonMeta =
+      const VerificationMeta('medicationRecordsJson');
+  @override
+  late final GeneratedColumn<String> medicationRecordsJson =
+      GeneratedColumn<String>(
+        'medication_records_json',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: const Constant('[]'),
+      );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    visitId,
+    patientName,
+    idNumber,
+    passportNumber,
+    gender,
+    birthDate,
+    sourceIndex,
+    purposeIndex,
+    airlineIndex,
+    useOtherAirline,
+    selectedOtherAirline,
+    nationality,
+    incidentDateTime,
+    placeGroupIdx,
+    t1Selected,
+    t2Selected,
+    remoteSelected,
+    cargoSelected,
+    novotelSelected,
+    cabinSelected,
+    placeNote,
+    firstAidStartTime,
+    intubationStartTime,
+    onIVLineStartTime,
+    cardiacMassageStartTime,
+    cardiacMassageEndTime,
+    firstAidEndTime,
+    diagnosis,
+    situation,
+    evmE,
+    evmV,
+    evmM,
+    heartRate,
+    respirationRate,
+    bloodPressure,
+    temperature,
+    leftPupilSize,
+    rightPupilSize,
+    leftPupilReaction,
+    rightPupilReaction,
+    insertionMethod,
+    airwayContent,
+    insertionRecord,
+    ivNeedleSize,
+    ivLineRecord,
+    cardiacMassageRecord,
+    endRecord,
+    endResult,
+    selectedHospital,
+    otherHospital,
+    otherEndResult,
+    deathTime,
+    selectedDoctor,
+    selectedNurse,
+    selectedEMT,
+    nurseSignature,
+    emtSignature,
+    selectedAssistantsJson,
+    medicationRecordsJson,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'emergency_records';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<EmergencyRecord> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('visit_id')) {
+      context.handle(
+        _visitIdMeta,
+        visitId.isAcceptableOrUnknown(data['visit_id']!, _visitIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_visitIdMeta);
+    }
+    if (data.containsKey('patient_name')) {
+      context.handle(
+        _patientNameMeta,
+        patientName.isAcceptableOrUnknown(
+          data['patient_name']!,
+          _patientNameMeta,
+        ),
+      );
+    }
+    if (data.containsKey('id_number')) {
+      context.handle(
+        _idNumberMeta,
+        idNumber.isAcceptableOrUnknown(data['id_number']!, _idNumberMeta),
+      );
+    }
+    if (data.containsKey('passport_number')) {
+      context.handle(
+        _passportNumberMeta,
+        passportNumber.isAcceptableOrUnknown(
+          data['passport_number']!,
+          _passportNumberMeta,
+        ),
+      );
+    }
+    if (data.containsKey('gender')) {
+      context.handle(
+        _genderMeta,
+        gender.isAcceptableOrUnknown(data['gender']!, _genderMeta),
+      );
+    }
+    if (data.containsKey('birth_date')) {
+      context.handle(
+        _birthDateMeta,
+        birthDate.isAcceptableOrUnknown(data['birth_date']!, _birthDateMeta),
+      );
+    }
+    if (data.containsKey('source_index')) {
+      context.handle(
+        _sourceIndexMeta,
+        sourceIndex.isAcceptableOrUnknown(
+          data['source_index']!,
+          _sourceIndexMeta,
+        ),
+      );
+    }
+    if (data.containsKey('purpose_index')) {
+      context.handle(
+        _purposeIndexMeta,
+        purposeIndex.isAcceptableOrUnknown(
+          data['purpose_index']!,
+          _purposeIndexMeta,
+        ),
+      );
+    }
+    if (data.containsKey('airline_index')) {
+      context.handle(
+        _airlineIndexMeta,
+        airlineIndex.isAcceptableOrUnknown(
+          data['airline_index']!,
+          _airlineIndexMeta,
+        ),
+      );
+    }
+    if (data.containsKey('use_other_airline')) {
+      context.handle(
+        _useOtherAirlineMeta,
+        useOtherAirline.isAcceptableOrUnknown(
+          data['use_other_airline']!,
+          _useOtherAirlineMeta,
+        ),
+      );
+    }
+    if (data.containsKey('selected_other_airline')) {
+      context.handle(
+        _selectedOtherAirlineMeta,
+        selectedOtherAirline.isAcceptableOrUnknown(
+          data['selected_other_airline']!,
+          _selectedOtherAirlineMeta,
+        ),
+      );
+    }
+    if (data.containsKey('nationality')) {
+      context.handle(
+        _nationalityMeta,
+        nationality.isAcceptableOrUnknown(
+          data['nationality']!,
+          _nationalityMeta,
+        ),
+      );
+    }
+    if (data.containsKey('incident_date_time')) {
+      context.handle(
+        _incidentDateTimeMeta,
+        incidentDateTime.isAcceptableOrUnknown(
+          data['incident_date_time']!,
+          _incidentDateTimeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('place_group_idx')) {
+      context.handle(
+        _placeGroupIdxMeta,
+        placeGroupIdx.isAcceptableOrUnknown(
+          data['place_group_idx']!,
+          _placeGroupIdxMeta,
+        ),
+      );
+    }
+    if (data.containsKey('t1_selected')) {
+      context.handle(
+        _t1SelectedMeta,
+        t1Selected.isAcceptableOrUnknown(data['t1_selected']!, _t1SelectedMeta),
+      );
+    }
+    if (data.containsKey('t2_selected')) {
+      context.handle(
+        _t2SelectedMeta,
+        t2Selected.isAcceptableOrUnknown(data['t2_selected']!, _t2SelectedMeta),
+      );
+    }
+    if (data.containsKey('remote_selected')) {
+      context.handle(
+        _remoteSelectedMeta,
+        remoteSelected.isAcceptableOrUnknown(
+          data['remote_selected']!,
+          _remoteSelectedMeta,
+        ),
+      );
+    }
+    if (data.containsKey('cargo_selected')) {
+      context.handle(
+        _cargoSelectedMeta,
+        cargoSelected.isAcceptableOrUnknown(
+          data['cargo_selected']!,
+          _cargoSelectedMeta,
+        ),
+      );
+    }
+    if (data.containsKey('novotel_selected')) {
+      context.handle(
+        _novotelSelectedMeta,
+        novotelSelected.isAcceptableOrUnknown(
+          data['novotel_selected']!,
+          _novotelSelectedMeta,
+        ),
+      );
+    }
+    if (data.containsKey('cabin_selected')) {
+      context.handle(
+        _cabinSelectedMeta,
+        cabinSelected.isAcceptableOrUnknown(
+          data['cabin_selected']!,
+          _cabinSelectedMeta,
+        ),
+      );
+    }
+    if (data.containsKey('place_note')) {
+      context.handle(
+        _placeNoteMeta,
+        placeNote.isAcceptableOrUnknown(data['place_note']!, _placeNoteMeta),
+      );
+    }
+    if (data.containsKey('first_aid_start_time')) {
+      context.handle(
+        _firstAidStartTimeMeta,
+        firstAidStartTime.isAcceptableOrUnknown(
+          data['first_aid_start_time']!,
+          _firstAidStartTimeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('intubation_start_time')) {
+      context.handle(
+        _intubationStartTimeMeta,
+        intubationStartTime.isAcceptableOrUnknown(
+          data['intubation_start_time']!,
+          _intubationStartTimeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('on_i_v_line_start_time')) {
+      context.handle(
+        _onIVLineStartTimeMeta,
+        onIVLineStartTime.isAcceptableOrUnknown(
+          data['on_i_v_line_start_time']!,
+          _onIVLineStartTimeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('cardiac_massage_start_time')) {
+      context.handle(
+        _cardiacMassageStartTimeMeta,
+        cardiacMassageStartTime.isAcceptableOrUnknown(
+          data['cardiac_massage_start_time']!,
+          _cardiacMassageStartTimeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('cardiac_massage_end_time')) {
+      context.handle(
+        _cardiacMassageEndTimeMeta,
+        cardiacMassageEndTime.isAcceptableOrUnknown(
+          data['cardiac_massage_end_time']!,
+          _cardiacMassageEndTimeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('first_aid_end_time')) {
+      context.handle(
+        _firstAidEndTimeMeta,
+        firstAidEndTime.isAcceptableOrUnknown(
+          data['first_aid_end_time']!,
+          _firstAidEndTimeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('diagnosis')) {
+      context.handle(
+        _diagnosisMeta,
+        diagnosis.isAcceptableOrUnknown(data['diagnosis']!, _diagnosisMeta),
+      );
+    }
+    if (data.containsKey('situation')) {
+      context.handle(
+        _situationMeta,
+        situation.isAcceptableOrUnknown(data['situation']!, _situationMeta),
+      );
+    }
+    if (data.containsKey('evm_e')) {
+      context.handle(
+        _evmEMeta,
+        evmE.isAcceptableOrUnknown(data['evm_e']!, _evmEMeta),
+      );
+    }
+    if (data.containsKey('evm_v')) {
+      context.handle(
+        _evmVMeta,
+        evmV.isAcceptableOrUnknown(data['evm_v']!, _evmVMeta),
+      );
+    }
+    if (data.containsKey('evm_m')) {
+      context.handle(
+        _evmMMeta,
+        evmM.isAcceptableOrUnknown(data['evm_m']!, _evmMMeta),
+      );
+    }
+    if (data.containsKey('heart_rate')) {
+      context.handle(
+        _heartRateMeta,
+        heartRate.isAcceptableOrUnknown(data['heart_rate']!, _heartRateMeta),
+      );
+    }
+    if (data.containsKey('respiration_rate')) {
+      context.handle(
+        _respirationRateMeta,
+        respirationRate.isAcceptableOrUnknown(
+          data['respiration_rate']!,
+          _respirationRateMeta,
+        ),
+      );
+    }
+    if (data.containsKey('blood_pressure')) {
+      context.handle(
+        _bloodPressureMeta,
+        bloodPressure.isAcceptableOrUnknown(
+          data['blood_pressure']!,
+          _bloodPressureMeta,
+        ),
+      );
+    }
+    if (data.containsKey('temperature')) {
+      context.handle(
+        _temperatureMeta,
+        temperature.isAcceptableOrUnknown(
+          data['temperature']!,
+          _temperatureMeta,
+        ),
+      );
+    }
+    if (data.containsKey('left_pupil_size')) {
+      context.handle(
+        _leftPupilSizeMeta,
+        leftPupilSize.isAcceptableOrUnknown(
+          data['left_pupil_size']!,
+          _leftPupilSizeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('right_pupil_size')) {
+      context.handle(
+        _rightPupilSizeMeta,
+        rightPupilSize.isAcceptableOrUnknown(
+          data['right_pupil_size']!,
+          _rightPupilSizeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('left_pupil_reaction')) {
+      context.handle(
+        _leftPupilReactionMeta,
+        leftPupilReaction.isAcceptableOrUnknown(
+          data['left_pupil_reaction']!,
+          _leftPupilReactionMeta,
+        ),
+      );
+    }
+    if (data.containsKey('right_pupil_reaction')) {
+      context.handle(
+        _rightPupilReactionMeta,
+        rightPupilReaction.isAcceptableOrUnknown(
+          data['right_pupil_reaction']!,
+          _rightPupilReactionMeta,
+        ),
+      );
+    }
+    if (data.containsKey('insertion_method')) {
+      context.handle(
+        _insertionMethodMeta,
+        insertionMethod.isAcceptableOrUnknown(
+          data['insertion_method']!,
+          _insertionMethodMeta,
+        ),
+      );
+    }
+    if (data.containsKey('airway_content')) {
+      context.handle(
+        _airwayContentMeta,
+        airwayContent.isAcceptableOrUnknown(
+          data['airway_content']!,
+          _airwayContentMeta,
+        ),
+      );
+    }
+    if (data.containsKey('insertion_record')) {
+      context.handle(
+        _insertionRecordMeta,
+        insertionRecord.isAcceptableOrUnknown(
+          data['insertion_record']!,
+          _insertionRecordMeta,
+        ),
+      );
+    }
+    if (data.containsKey('iv_needle_size')) {
+      context.handle(
+        _ivNeedleSizeMeta,
+        ivNeedleSize.isAcceptableOrUnknown(
+          data['iv_needle_size']!,
+          _ivNeedleSizeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('iv_line_record')) {
+      context.handle(
+        _ivLineRecordMeta,
+        ivLineRecord.isAcceptableOrUnknown(
+          data['iv_line_record']!,
+          _ivLineRecordMeta,
+        ),
+      );
+    }
+    if (data.containsKey('cardiac_massage_record')) {
+      context.handle(
+        _cardiacMassageRecordMeta,
+        cardiacMassageRecord.isAcceptableOrUnknown(
+          data['cardiac_massage_record']!,
+          _cardiacMassageRecordMeta,
+        ),
+      );
+    }
+    if (data.containsKey('end_record')) {
+      context.handle(
+        _endRecordMeta,
+        endRecord.isAcceptableOrUnknown(data['end_record']!, _endRecordMeta),
+      );
+    }
+    if (data.containsKey('end_result')) {
+      context.handle(
+        _endResultMeta,
+        endResult.isAcceptableOrUnknown(data['end_result']!, _endResultMeta),
+      );
+    }
+    if (data.containsKey('selected_hospital')) {
+      context.handle(
+        _selectedHospitalMeta,
+        selectedHospital.isAcceptableOrUnknown(
+          data['selected_hospital']!,
+          _selectedHospitalMeta,
+        ),
+      );
+    }
+    if (data.containsKey('other_hospital')) {
+      context.handle(
+        _otherHospitalMeta,
+        otherHospital.isAcceptableOrUnknown(
+          data['other_hospital']!,
+          _otherHospitalMeta,
+        ),
+      );
+    }
+    if (data.containsKey('other_end_result')) {
+      context.handle(
+        _otherEndResultMeta,
+        otherEndResult.isAcceptableOrUnknown(
+          data['other_end_result']!,
+          _otherEndResultMeta,
+        ),
+      );
+    }
+    if (data.containsKey('death_time')) {
+      context.handle(
+        _deathTimeMeta,
+        deathTime.isAcceptableOrUnknown(data['death_time']!, _deathTimeMeta),
+      );
+    }
+    if (data.containsKey('selected_doctor')) {
+      context.handle(
+        _selectedDoctorMeta,
+        selectedDoctor.isAcceptableOrUnknown(
+          data['selected_doctor']!,
+          _selectedDoctorMeta,
+        ),
+      );
+    }
+    if (data.containsKey('selected_nurse')) {
+      context.handle(
+        _selectedNurseMeta,
+        selectedNurse.isAcceptableOrUnknown(
+          data['selected_nurse']!,
+          _selectedNurseMeta,
+        ),
+      );
+    }
+    if (data.containsKey('selected_e_m_t')) {
+      context.handle(
+        _selectedEMTMeta,
+        selectedEMT.isAcceptableOrUnknown(
+          data['selected_e_m_t']!,
+          _selectedEMTMeta,
+        ),
+      );
+    }
+    if (data.containsKey('nurse_signature')) {
+      context.handle(
+        _nurseSignatureMeta,
+        nurseSignature.isAcceptableOrUnknown(
+          data['nurse_signature']!,
+          _nurseSignatureMeta,
+        ),
+      );
+    }
+    if (data.containsKey('emt_signature')) {
+      context.handle(
+        _emtSignatureMeta,
+        emtSignature.isAcceptableOrUnknown(
+          data['emt_signature']!,
+          _emtSignatureMeta,
+        ),
+      );
+    }
+    if (data.containsKey('selected_assistants_json')) {
+      context.handle(
+        _selectedAssistantsJsonMeta,
+        selectedAssistantsJson.isAcceptableOrUnknown(
+          data['selected_assistants_json']!,
+          _selectedAssistantsJsonMeta,
+        ),
+      );
+    }
+    if (data.containsKey('medication_records_json')) {
+      context.handle(
+        _medicationRecordsJsonMeta,
+        medicationRecordsJson.isAcceptableOrUnknown(
+          data['medication_records_json']!,
+          _medicationRecordsJsonMeta,
+        ),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  EmergencyRecord map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return EmergencyRecord(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      visitId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}visit_id'],
+      )!,
+      patientName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}patient_name'],
+      ),
+      idNumber: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id_number'],
+      ),
+      passportNumber: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}passport_number'],
+      ),
+      gender: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}gender'],
+      ),
+      birthDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}birth_date'],
+      ),
+      sourceIndex: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}source_index'],
+      ),
+      purposeIndex: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}purpose_index'],
+      ),
+      airlineIndex: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}airline_index'],
+      ),
+      useOtherAirline: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}use_other_airline'],
+      )!,
+      selectedOtherAirline: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}selected_other_airline'],
+      ),
+      nationality: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}nationality'],
+      ),
+      incidentDateTime: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}incident_date_time'],
+      ),
+      placeGroupIdx: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}place_group_idx'],
+      ),
+      t1Selected: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}t1_selected'],
+      ),
+      t2Selected: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}t2_selected'],
+      ),
+      remoteSelected: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}remote_selected'],
+      ),
+      cargoSelected: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}cargo_selected'],
+      ),
+      novotelSelected: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}novotel_selected'],
+      ),
+      cabinSelected: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}cabin_selected'],
+      ),
+      placeNote: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}place_note'],
+      ),
+      firstAidStartTime: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}first_aid_start_time'],
+      ),
+      intubationStartTime: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}intubation_start_time'],
+      ),
+      onIVLineStartTime: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}on_i_v_line_start_time'],
+      ),
+      cardiacMassageStartTime: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}cardiac_massage_start_time'],
+      ),
+      cardiacMassageEndTime: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}cardiac_massage_end_time'],
+      ),
+      firstAidEndTime: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}first_aid_end_time'],
+      ),
+      diagnosis: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}diagnosis'],
+      ),
+      situation: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}situation'],
+      ),
+      evmE: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}evm_e'],
+      ),
+      evmV: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}evm_v'],
+      ),
+      evmM: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}evm_m'],
+      ),
+      heartRate: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}heart_rate'],
+      ),
+      respirationRate: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}respiration_rate'],
+      ),
+      bloodPressure: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}blood_pressure'],
+      ),
+      temperature: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}temperature'],
+      ),
+      leftPupilSize: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}left_pupil_size'],
+      ),
+      rightPupilSize: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}right_pupil_size'],
+      ),
+      leftPupilReaction: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}left_pupil_reaction'],
+      ),
+      rightPupilReaction: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}right_pupil_reaction'],
+      ),
+      insertionMethod: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}insertion_method'],
+      ),
+      airwayContent: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}airway_content'],
+      ),
+      insertionRecord: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}insertion_record'],
+      ),
+      ivNeedleSize: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}iv_needle_size'],
+      ),
+      ivLineRecord: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}iv_line_record'],
+      ),
+      cardiacMassageRecord: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}cardiac_massage_record'],
+      ),
+      endRecord: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}end_record'],
+      ),
+      endResult: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}end_result'],
+      ),
+      selectedHospital: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}selected_hospital'],
+      ),
+      otherHospital: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}other_hospital'],
+      ),
+      otherEndResult: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}other_end_result'],
+      ),
+      deathTime: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}death_time'],
+      ),
+      selectedDoctor: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}selected_doctor'],
+      ),
+      selectedNurse: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}selected_nurse'],
+      ),
+      selectedEMT: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}selected_e_m_t'],
+      ),
+      nurseSignature: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}nurse_signature'],
+      ),
+      emtSignature: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}emt_signature'],
+      ),
+      selectedAssistantsJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}selected_assistants_json'],
+      )!,
+      medicationRecordsJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}medication_records_json'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $EmergencyRecordsTable createAlias(String alias) {
+    return $EmergencyRecordsTable(attachedDatabase, alias);
+  }
+}
+
+class EmergencyRecord extends DataClass implements Insertable<EmergencyRecord> {
+  final int id;
+  final int visitId;
+  final String? patientName;
+  final String? idNumber;
+  final String? passportNumber;
+  final String? gender;
+  final DateTime? birthDate;
+  final int? sourceIndex;
+  final int? purposeIndex;
+  final int? airlineIndex;
+  final bool useOtherAirline;
+  final String? selectedOtherAirline;
+  final String? nationality;
+  final DateTime? incidentDateTime;
+  final int? placeGroupIdx;
+  final int? t1Selected;
+  final int? t2Selected;
+  final int? remoteSelected;
+  final int? cargoSelected;
+  final int? novotelSelected;
+  final int? cabinSelected;
+  final String? placeNote;
+  final DateTime? firstAidStartTime;
+  final DateTime? intubationStartTime;
+  final DateTime? onIVLineStartTime;
+  final DateTime? cardiacMassageStartTime;
+  final DateTime? cardiacMassageEndTime;
+  final DateTime? firstAidEndTime;
+  final String? diagnosis;
+  final String? situation;
+  final String? evmE;
+  final String? evmV;
+  final String? evmM;
+  final String? heartRate;
+  final String? respirationRate;
+  final String? bloodPressure;
+  final String? temperature;
+  final String? leftPupilSize;
+  final String? rightPupilSize;
+  final String? leftPupilReaction;
+  final String? rightPupilReaction;
+  final String? insertionMethod;
+  final String? airwayContent;
+  final String? insertionRecord;
+  final String? ivNeedleSize;
+  final String? ivLineRecord;
+  final String? cardiacMassageRecord;
+  final String? endRecord;
+  final String? endResult;
+  final String? selectedHospital;
+  final String? otherHospital;
+  final String? otherEndResult;
+  final DateTime? deathTime;
+  final String? selectedDoctor;
+  final String? selectedNurse;
+  final String? selectedEMT;
+  final String? nurseSignature;
+  final String? emtSignature;
+  final String selectedAssistantsJson;
+  final String medicationRecordsJson;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  const EmergencyRecord({
+    required this.id,
+    required this.visitId,
+    this.patientName,
+    this.idNumber,
+    this.passportNumber,
+    this.gender,
+    this.birthDate,
+    this.sourceIndex,
+    this.purposeIndex,
+    this.airlineIndex,
+    required this.useOtherAirline,
+    this.selectedOtherAirline,
+    this.nationality,
+    this.incidentDateTime,
+    this.placeGroupIdx,
+    this.t1Selected,
+    this.t2Selected,
+    this.remoteSelected,
+    this.cargoSelected,
+    this.novotelSelected,
+    this.cabinSelected,
+    this.placeNote,
+    this.firstAidStartTime,
+    this.intubationStartTime,
+    this.onIVLineStartTime,
+    this.cardiacMassageStartTime,
+    this.cardiacMassageEndTime,
+    this.firstAidEndTime,
+    this.diagnosis,
+    this.situation,
+    this.evmE,
+    this.evmV,
+    this.evmM,
+    this.heartRate,
+    this.respirationRate,
+    this.bloodPressure,
+    this.temperature,
+    this.leftPupilSize,
+    this.rightPupilSize,
+    this.leftPupilReaction,
+    this.rightPupilReaction,
+    this.insertionMethod,
+    this.airwayContent,
+    this.insertionRecord,
+    this.ivNeedleSize,
+    this.ivLineRecord,
+    this.cardiacMassageRecord,
+    this.endRecord,
+    this.endResult,
+    this.selectedHospital,
+    this.otherHospital,
+    this.otherEndResult,
+    this.deathTime,
+    this.selectedDoctor,
+    this.selectedNurse,
+    this.selectedEMT,
+    this.nurseSignature,
+    this.emtSignature,
+    required this.selectedAssistantsJson,
+    required this.medicationRecordsJson,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['visit_id'] = Variable<int>(visitId);
+    if (!nullToAbsent || patientName != null) {
+      map['patient_name'] = Variable<String>(patientName);
+    }
+    if (!nullToAbsent || idNumber != null) {
+      map['id_number'] = Variable<String>(idNumber);
+    }
+    if (!nullToAbsent || passportNumber != null) {
+      map['passport_number'] = Variable<String>(passportNumber);
+    }
+    if (!nullToAbsent || gender != null) {
+      map['gender'] = Variable<String>(gender);
+    }
+    if (!nullToAbsent || birthDate != null) {
+      map['birth_date'] = Variable<DateTime>(birthDate);
+    }
+    if (!nullToAbsent || sourceIndex != null) {
+      map['source_index'] = Variable<int>(sourceIndex);
+    }
+    if (!nullToAbsent || purposeIndex != null) {
+      map['purpose_index'] = Variable<int>(purposeIndex);
+    }
+    if (!nullToAbsent || airlineIndex != null) {
+      map['airline_index'] = Variable<int>(airlineIndex);
+    }
+    map['use_other_airline'] = Variable<bool>(useOtherAirline);
+    if (!nullToAbsent || selectedOtherAirline != null) {
+      map['selected_other_airline'] = Variable<String>(selectedOtherAirline);
+    }
+    if (!nullToAbsent || nationality != null) {
+      map['nationality'] = Variable<String>(nationality);
+    }
+    if (!nullToAbsent || incidentDateTime != null) {
+      map['incident_date_time'] = Variable<DateTime>(incidentDateTime);
+    }
+    if (!nullToAbsent || placeGroupIdx != null) {
+      map['place_group_idx'] = Variable<int>(placeGroupIdx);
+    }
+    if (!nullToAbsent || t1Selected != null) {
+      map['t1_selected'] = Variable<int>(t1Selected);
+    }
+    if (!nullToAbsent || t2Selected != null) {
+      map['t2_selected'] = Variable<int>(t2Selected);
+    }
+    if (!nullToAbsent || remoteSelected != null) {
+      map['remote_selected'] = Variable<int>(remoteSelected);
+    }
+    if (!nullToAbsent || cargoSelected != null) {
+      map['cargo_selected'] = Variable<int>(cargoSelected);
+    }
+    if (!nullToAbsent || novotelSelected != null) {
+      map['novotel_selected'] = Variable<int>(novotelSelected);
+    }
+    if (!nullToAbsent || cabinSelected != null) {
+      map['cabin_selected'] = Variable<int>(cabinSelected);
+    }
+    if (!nullToAbsent || placeNote != null) {
+      map['place_note'] = Variable<String>(placeNote);
+    }
+    if (!nullToAbsent || firstAidStartTime != null) {
+      map['first_aid_start_time'] = Variable<DateTime>(firstAidStartTime);
+    }
+    if (!nullToAbsent || intubationStartTime != null) {
+      map['intubation_start_time'] = Variable<DateTime>(intubationStartTime);
+    }
+    if (!nullToAbsent || onIVLineStartTime != null) {
+      map['on_i_v_line_start_time'] = Variable<DateTime>(onIVLineStartTime);
+    }
+    if (!nullToAbsent || cardiacMassageStartTime != null) {
+      map['cardiac_massage_start_time'] = Variable<DateTime>(
+        cardiacMassageStartTime,
+      );
+    }
+    if (!nullToAbsent || cardiacMassageEndTime != null) {
+      map['cardiac_massage_end_time'] = Variable<DateTime>(
+        cardiacMassageEndTime,
+      );
+    }
+    if (!nullToAbsent || firstAidEndTime != null) {
+      map['first_aid_end_time'] = Variable<DateTime>(firstAidEndTime);
+    }
+    if (!nullToAbsent || diagnosis != null) {
+      map['diagnosis'] = Variable<String>(diagnosis);
+    }
+    if (!nullToAbsent || situation != null) {
+      map['situation'] = Variable<String>(situation);
+    }
+    if (!nullToAbsent || evmE != null) {
+      map['evm_e'] = Variable<String>(evmE);
+    }
+    if (!nullToAbsent || evmV != null) {
+      map['evm_v'] = Variable<String>(evmV);
+    }
+    if (!nullToAbsent || evmM != null) {
+      map['evm_m'] = Variable<String>(evmM);
+    }
+    if (!nullToAbsent || heartRate != null) {
+      map['heart_rate'] = Variable<String>(heartRate);
+    }
+    if (!nullToAbsent || respirationRate != null) {
+      map['respiration_rate'] = Variable<String>(respirationRate);
+    }
+    if (!nullToAbsent || bloodPressure != null) {
+      map['blood_pressure'] = Variable<String>(bloodPressure);
+    }
+    if (!nullToAbsent || temperature != null) {
+      map['temperature'] = Variable<String>(temperature);
+    }
+    if (!nullToAbsent || leftPupilSize != null) {
+      map['left_pupil_size'] = Variable<String>(leftPupilSize);
+    }
+    if (!nullToAbsent || rightPupilSize != null) {
+      map['right_pupil_size'] = Variable<String>(rightPupilSize);
+    }
+    if (!nullToAbsent || leftPupilReaction != null) {
+      map['left_pupil_reaction'] = Variable<String>(leftPupilReaction);
+    }
+    if (!nullToAbsent || rightPupilReaction != null) {
+      map['right_pupil_reaction'] = Variable<String>(rightPupilReaction);
+    }
+    if (!nullToAbsent || insertionMethod != null) {
+      map['insertion_method'] = Variable<String>(insertionMethod);
+    }
+    if (!nullToAbsent || airwayContent != null) {
+      map['airway_content'] = Variable<String>(airwayContent);
+    }
+    if (!nullToAbsent || insertionRecord != null) {
+      map['insertion_record'] = Variable<String>(insertionRecord);
+    }
+    if (!nullToAbsent || ivNeedleSize != null) {
+      map['iv_needle_size'] = Variable<String>(ivNeedleSize);
+    }
+    if (!nullToAbsent || ivLineRecord != null) {
+      map['iv_line_record'] = Variable<String>(ivLineRecord);
+    }
+    if (!nullToAbsent || cardiacMassageRecord != null) {
+      map['cardiac_massage_record'] = Variable<String>(cardiacMassageRecord);
+    }
+    if (!nullToAbsent || endRecord != null) {
+      map['end_record'] = Variable<String>(endRecord);
+    }
+    if (!nullToAbsent || endResult != null) {
+      map['end_result'] = Variable<String>(endResult);
+    }
+    if (!nullToAbsent || selectedHospital != null) {
+      map['selected_hospital'] = Variable<String>(selectedHospital);
+    }
+    if (!nullToAbsent || otherHospital != null) {
+      map['other_hospital'] = Variable<String>(otherHospital);
+    }
+    if (!nullToAbsent || otherEndResult != null) {
+      map['other_end_result'] = Variable<String>(otherEndResult);
+    }
+    if (!nullToAbsent || deathTime != null) {
+      map['death_time'] = Variable<DateTime>(deathTime);
+    }
+    if (!nullToAbsent || selectedDoctor != null) {
+      map['selected_doctor'] = Variable<String>(selectedDoctor);
+    }
+    if (!nullToAbsent || selectedNurse != null) {
+      map['selected_nurse'] = Variable<String>(selectedNurse);
+    }
+    if (!nullToAbsent || selectedEMT != null) {
+      map['selected_e_m_t'] = Variable<String>(selectedEMT);
+    }
+    if (!nullToAbsent || nurseSignature != null) {
+      map['nurse_signature'] = Variable<String>(nurseSignature);
+    }
+    if (!nullToAbsent || emtSignature != null) {
+      map['emt_signature'] = Variable<String>(emtSignature);
+    }
+    map['selected_assistants_json'] = Variable<String>(selectedAssistantsJson);
+    map['medication_records_json'] = Variable<String>(medicationRecordsJson);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  EmergencyRecordsCompanion toCompanion(bool nullToAbsent) {
+    return EmergencyRecordsCompanion(
+      id: Value(id),
+      visitId: Value(visitId),
+      patientName: patientName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(patientName),
+      idNumber: idNumber == null && nullToAbsent
+          ? const Value.absent()
+          : Value(idNumber),
+      passportNumber: passportNumber == null && nullToAbsent
+          ? const Value.absent()
+          : Value(passportNumber),
+      gender: gender == null && nullToAbsent
+          ? const Value.absent()
+          : Value(gender),
+      birthDate: birthDate == null && nullToAbsent
+          ? const Value.absent()
+          : Value(birthDate),
+      sourceIndex: sourceIndex == null && nullToAbsent
+          ? const Value.absent()
+          : Value(sourceIndex),
+      purposeIndex: purposeIndex == null && nullToAbsent
+          ? const Value.absent()
+          : Value(purposeIndex),
+      airlineIndex: airlineIndex == null && nullToAbsent
+          ? const Value.absent()
+          : Value(airlineIndex),
+      useOtherAirline: Value(useOtherAirline),
+      selectedOtherAirline: selectedOtherAirline == null && nullToAbsent
+          ? const Value.absent()
+          : Value(selectedOtherAirline),
+      nationality: nationality == null && nullToAbsent
+          ? const Value.absent()
+          : Value(nationality),
+      incidentDateTime: incidentDateTime == null && nullToAbsent
+          ? const Value.absent()
+          : Value(incidentDateTime),
+      placeGroupIdx: placeGroupIdx == null && nullToAbsent
+          ? const Value.absent()
+          : Value(placeGroupIdx),
+      t1Selected: t1Selected == null && nullToAbsent
+          ? const Value.absent()
+          : Value(t1Selected),
+      t2Selected: t2Selected == null && nullToAbsent
+          ? const Value.absent()
+          : Value(t2Selected),
+      remoteSelected: remoteSelected == null && nullToAbsent
+          ? const Value.absent()
+          : Value(remoteSelected),
+      cargoSelected: cargoSelected == null && nullToAbsent
+          ? const Value.absent()
+          : Value(cargoSelected),
+      novotelSelected: novotelSelected == null && nullToAbsent
+          ? const Value.absent()
+          : Value(novotelSelected),
+      cabinSelected: cabinSelected == null && nullToAbsent
+          ? const Value.absent()
+          : Value(cabinSelected),
+      placeNote: placeNote == null && nullToAbsent
+          ? const Value.absent()
+          : Value(placeNote),
+      firstAidStartTime: firstAidStartTime == null && nullToAbsent
+          ? const Value.absent()
+          : Value(firstAidStartTime),
+      intubationStartTime: intubationStartTime == null && nullToAbsent
+          ? const Value.absent()
+          : Value(intubationStartTime),
+      onIVLineStartTime: onIVLineStartTime == null && nullToAbsent
+          ? const Value.absent()
+          : Value(onIVLineStartTime),
+      cardiacMassageStartTime: cardiacMassageStartTime == null && nullToAbsent
+          ? const Value.absent()
+          : Value(cardiacMassageStartTime),
+      cardiacMassageEndTime: cardiacMassageEndTime == null && nullToAbsent
+          ? const Value.absent()
+          : Value(cardiacMassageEndTime),
+      firstAidEndTime: firstAidEndTime == null && nullToAbsent
+          ? const Value.absent()
+          : Value(firstAidEndTime),
+      diagnosis: diagnosis == null && nullToAbsent
+          ? const Value.absent()
+          : Value(diagnosis),
+      situation: situation == null && nullToAbsent
+          ? const Value.absent()
+          : Value(situation),
+      evmE: evmE == null && nullToAbsent ? const Value.absent() : Value(evmE),
+      evmV: evmV == null && nullToAbsent ? const Value.absent() : Value(evmV),
+      evmM: evmM == null && nullToAbsent ? const Value.absent() : Value(evmM),
+      heartRate: heartRate == null && nullToAbsent
+          ? const Value.absent()
+          : Value(heartRate),
+      respirationRate: respirationRate == null && nullToAbsent
+          ? const Value.absent()
+          : Value(respirationRate),
+      bloodPressure: bloodPressure == null && nullToAbsent
+          ? const Value.absent()
+          : Value(bloodPressure),
+      temperature: temperature == null && nullToAbsent
+          ? const Value.absent()
+          : Value(temperature),
+      leftPupilSize: leftPupilSize == null && nullToAbsent
+          ? const Value.absent()
+          : Value(leftPupilSize),
+      rightPupilSize: rightPupilSize == null && nullToAbsent
+          ? const Value.absent()
+          : Value(rightPupilSize),
+      leftPupilReaction: leftPupilReaction == null && nullToAbsent
+          ? const Value.absent()
+          : Value(leftPupilReaction),
+      rightPupilReaction: rightPupilReaction == null && nullToAbsent
+          ? const Value.absent()
+          : Value(rightPupilReaction),
+      insertionMethod: insertionMethod == null && nullToAbsent
+          ? const Value.absent()
+          : Value(insertionMethod),
+      airwayContent: airwayContent == null && nullToAbsent
+          ? const Value.absent()
+          : Value(airwayContent),
+      insertionRecord: insertionRecord == null && nullToAbsent
+          ? const Value.absent()
+          : Value(insertionRecord),
+      ivNeedleSize: ivNeedleSize == null && nullToAbsent
+          ? const Value.absent()
+          : Value(ivNeedleSize),
+      ivLineRecord: ivLineRecord == null && nullToAbsent
+          ? const Value.absent()
+          : Value(ivLineRecord),
+      cardiacMassageRecord: cardiacMassageRecord == null && nullToAbsent
+          ? const Value.absent()
+          : Value(cardiacMassageRecord),
+      endRecord: endRecord == null && nullToAbsent
+          ? const Value.absent()
+          : Value(endRecord),
+      endResult: endResult == null && nullToAbsent
+          ? const Value.absent()
+          : Value(endResult),
+      selectedHospital: selectedHospital == null && nullToAbsent
+          ? const Value.absent()
+          : Value(selectedHospital),
+      otherHospital: otherHospital == null && nullToAbsent
+          ? const Value.absent()
+          : Value(otherHospital),
+      otherEndResult: otherEndResult == null && nullToAbsent
+          ? const Value.absent()
+          : Value(otherEndResult),
+      deathTime: deathTime == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deathTime),
+      selectedDoctor: selectedDoctor == null && nullToAbsent
+          ? const Value.absent()
+          : Value(selectedDoctor),
+      selectedNurse: selectedNurse == null && nullToAbsent
+          ? const Value.absent()
+          : Value(selectedNurse),
+      selectedEMT: selectedEMT == null && nullToAbsent
+          ? const Value.absent()
+          : Value(selectedEMT),
+      nurseSignature: nurseSignature == null && nullToAbsent
+          ? const Value.absent()
+          : Value(nurseSignature),
+      emtSignature: emtSignature == null && nullToAbsent
+          ? const Value.absent()
+          : Value(emtSignature),
+      selectedAssistantsJson: Value(selectedAssistantsJson),
+      medicationRecordsJson: Value(medicationRecordsJson),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory EmergencyRecord.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return EmergencyRecord(
+      id: serializer.fromJson<int>(json['id']),
+      visitId: serializer.fromJson<int>(json['visitId']),
+      patientName: serializer.fromJson<String?>(json['patientName']),
+      idNumber: serializer.fromJson<String?>(json['idNumber']),
+      passportNumber: serializer.fromJson<String?>(json['passportNumber']),
+      gender: serializer.fromJson<String?>(json['gender']),
+      birthDate: serializer.fromJson<DateTime?>(json['birthDate']),
+      sourceIndex: serializer.fromJson<int?>(json['sourceIndex']),
+      purposeIndex: serializer.fromJson<int?>(json['purposeIndex']),
+      airlineIndex: serializer.fromJson<int?>(json['airlineIndex']),
+      useOtherAirline: serializer.fromJson<bool>(json['useOtherAirline']),
+      selectedOtherAirline: serializer.fromJson<String?>(
+        json['selectedOtherAirline'],
+      ),
+      nationality: serializer.fromJson<String?>(json['nationality']),
+      incidentDateTime: serializer.fromJson<DateTime?>(
+        json['incidentDateTime'],
+      ),
+      placeGroupIdx: serializer.fromJson<int?>(json['placeGroupIdx']),
+      t1Selected: serializer.fromJson<int?>(json['t1Selected']),
+      t2Selected: serializer.fromJson<int?>(json['t2Selected']),
+      remoteSelected: serializer.fromJson<int?>(json['remoteSelected']),
+      cargoSelected: serializer.fromJson<int?>(json['cargoSelected']),
+      novotelSelected: serializer.fromJson<int?>(json['novotelSelected']),
+      cabinSelected: serializer.fromJson<int?>(json['cabinSelected']),
+      placeNote: serializer.fromJson<String?>(json['placeNote']),
+      firstAidStartTime: serializer.fromJson<DateTime?>(
+        json['firstAidStartTime'],
+      ),
+      intubationStartTime: serializer.fromJson<DateTime?>(
+        json['intubationStartTime'],
+      ),
+      onIVLineStartTime: serializer.fromJson<DateTime?>(
+        json['onIVLineStartTime'],
+      ),
+      cardiacMassageStartTime: serializer.fromJson<DateTime?>(
+        json['cardiacMassageStartTime'],
+      ),
+      cardiacMassageEndTime: serializer.fromJson<DateTime?>(
+        json['cardiacMassageEndTime'],
+      ),
+      firstAidEndTime: serializer.fromJson<DateTime?>(json['firstAidEndTime']),
+      diagnosis: serializer.fromJson<String?>(json['diagnosis']),
+      situation: serializer.fromJson<String?>(json['situation']),
+      evmE: serializer.fromJson<String?>(json['evmE']),
+      evmV: serializer.fromJson<String?>(json['evmV']),
+      evmM: serializer.fromJson<String?>(json['evmM']),
+      heartRate: serializer.fromJson<String?>(json['heartRate']),
+      respirationRate: serializer.fromJson<String?>(json['respirationRate']),
+      bloodPressure: serializer.fromJson<String?>(json['bloodPressure']),
+      temperature: serializer.fromJson<String?>(json['temperature']),
+      leftPupilSize: serializer.fromJson<String?>(json['leftPupilSize']),
+      rightPupilSize: serializer.fromJson<String?>(json['rightPupilSize']),
+      leftPupilReaction: serializer.fromJson<String?>(
+        json['leftPupilReaction'],
+      ),
+      rightPupilReaction: serializer.fromJson<String?>(
+        json['rightPupilReaction'],
+      ),
+      insertionMethod: serializer.fromJson<String?>(json['insertionMethod']),
+      airwayContent: serializer.fromJson<String?>(json['airwayContent']),
+      insertionRecord: serializer.fromJson<String?>(json['insertionRecord']),
+      ivNeedleSize: serializer.fromJson<String?>(json['ivNeedleSize']),
+      ivLineRecord: serializer.fromJson<String?>(json['ivLineRecord']),
+      cardiacMassageRecord: serializer.fromJson<String?>(
+        json['cardiacMassageRecord'],
+      ),
+      endRecord: serializer.fromJson<String?>(json['endRecord']),
+      endResult: serializer.fromJson<String?>(json['endResult']),
+      selectedHospital: serializer.fromJson<String?>(json['selectedHospital']),
+      otherHospital: serializer.fromJson<String?>(json['otherHospital']),
+      otherEndResult: serializer.fromJson<String?>(json['otherEndResult']),
+      deathTime: serializer.fromJson<DateTime?>(json['deathTime']),
+      selectedDoctor: serializer.fromJson<String?>(json['selectedDoctor']),
+      selectedNurse: serializer.fromJson<String?>(json['selectedNurse']),
+      selectedEMT: serializer.fromJson<String?>(json['selectedEMT']),
+      nurseSignature: serializer.fromJson<String?>(json['nurseSignature']),
+      emtSignature: serializer.fromJson<String?>(json['emtSignature']),
+      selectedAssistantsJson: serializer.fromJson<String>(
+        json['selectedAssistantsJson'],
+      ),
+      medicationRecordsJson: serializer.fromJson<String>(
+        json['medicationRecordsJson'],
+      ),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'visitId': serializer.toJson<int>(visitId),
+      'patientName': serializer.toJson<String?>(patientName),
+      'idNumber': serializer.toJson<String?>(idNumber),
+      'passportNumber': serializer.toJson<String?>(passportNumber),
+      'gender': serializer.toJson<String?>(gender),
+      'birthDate': serializer.toJson<DateTime?>(birthDate),
+      'sourceIndex': serializer.toJson<int?>(sourceIndex),
+      'purposeIndex': serializer.toJson<int?>(purposeIndex),
+      'airlineIndex': serializer.toJson<int?>(airlineIndex),
+      'useOtherAirline': serializer.toJson<bool>(useOtherAirline),
+      'selectedOtherAirline': serializer.toJson<String?>(selectedOtherAirline),
+      'nationality': serializer.toJson<String?>(nationality),
+      'incidentDateTime': serializer.toJson<DateTime?>(incidentDateTime),
+      'placeGroupIdx': serializer.toJson<int?>(placeGroupIdx),
+      't1Selected': serializer.toJson<int?>(t1Selected),
+      't2Selected': serializer.toJson<int?>(t2Selected),
+      'remoteSelected': serializer.toJson<int?>(remoteSelected),
+      'cargoSelected': serializer.toJson<int?>(cargoSelected),
+      'novotelSelected': serializer.toJson<int?>(novotelSelected),
+      'cabinSelected': serializer.toJson<int?>(cabinSelected),
+      'placeNote': serializer.toJson<String?>(placeNote),
+      'firstAidStartTime': serializer.toJson<DateTime?>(firstAidStartTime),
+      'intubationStartTime': serializer.toJson<DateTime?>(intubationStartTime),
+      'onIVLineStartTime': serializer.toJson<DateTime?>(onIVLineStartTime),
+      'cardiacMassageStartTime': serializer.toJson<DateTime?>(
+        cardiacMassageStartTime,
+      ),
+      'cardiacMassageEndTime': serializer.toJson<DateTime?>(
+        cardiacMassageEndTime,
+      ),
+      'firstAidEndTime': serializer.toJson<DateTime?>(firstAidEndTime),
+      'diagnosis': serializer.toJson<String?>(diagnosis),
+      'situation': serializer.toJson<String?>(situation),
+      'evmE': serializer.toJson<String?>(evmE),
+      'evmV': serializer.toJson<String?>(evmV),
+      'evmM': serializer.toJson<String?>(evmM),
+      'heartRate': serializer.toJson<String?>(heartRate),
+      'respirationRate': serializer.toJson<String?>(respirationRate),
+      'bloodPressure': serializer.toJson<String?>(bloodPressure),
+      'temperature': serializer.toJson<String?>(temperature),
+      'leftPupilSize': serializer.toJson<String?>(leftPupilSize),
+      'rightPupilSize': serializer.toJson<String?>(rightPupilSize),
+      'leftPupilReaction': serializer.toJson<String?>(leftPupilReaction),
+      'rightPupilReaction': serializer.toJson<String?>(rightPupilReaction),
+      'insertionMethod': serializer.toJson<String?>(insertionMethod),
+      'airwayContent': serializer.toJson<String?>(airwayContent),
+      'insertionRecord': serializer.toJson<String?>(insertionRecord),
+      'ivNeedleSize': serializer.toJson<String?>(ivNeedleSize),
+      'ivLineRecord': serializer.toJson<String?>(ivLineRecord),
+      'cardiacMassageRecord': serializer.toJson<String?>(cardiacMassageRecord),
+      'endRecord': serializer.toJson<String?>(endRecord),
+      'endResult': serializer.toJson<String?>(endResult),
+      'selectedHospital': serializer.toJson<String?>(selectedHospital),
+      'otherHospital': serializer.toJson<String?>(otherHospital),
+      'otherEndResult': serializer.toJson<String?>(otherEndResult),
+      'deathTime': serializer.toJson<DateTime?>(deathTime),
+      'selectedDoctor': serializer.toJson<String?>(selectedDoctor),
+      'selectedNurse': serializer.toJson<String?>(selectedNurse),
+      'selectedEMT': serializer.toJson<String?>(selectedEMT),
+      'nurseSignature': serializer.toJson<String?>(nurseSignature),
+      'emtSignature': serializer.toJson<String?>(emtSignature),
+      'selectedAssistantsJson': serializer.toJson<String>(
+        selectedAssistantsJson,
+      ),
+      'medicationRecordsJson': serializer.toJson<String>(medicationRecordsJson),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  EmergencyRecord copyWith({
+    int? id,
+    int? visitId,
+    Value<String?> patientName = const Value.absent(),
+    Value<String?> idNumber = const Value.absent(),
+    Value<String?> passportNumber = const Value.absent(),
+    Value<String?> gender = const Value.absent(),
+    Value<DateTime?> birthDate = const Value.absent(),
+    Value<int?> sourceIndex = const Value.absent(),
+    Value<int?> purposeIndex = const Value.absent(),
+    Value<int?> airlineIndex = const Value.absent(),
+    bool? useOtherAirline,
+    Value<String?> selectedOtherAirline = const Value.absent(),
+    Value<String?> nationality = const Value.absent(),
+    Value<DateTime?> incidentDateTime = const Value.absent(),
+    Value<int?> placeGroupIdx = const Value.absent(),
+    Value<int?> t1Selected = const Value.absent(),
+    Value<int?> t2Selected = const Value.absent(),
+    Value<int?> remoteSelected = const Value.absent(),
+    Value<int?> cargoSelected = const Value.absent(),
+    Value<int?> novotelSelected = const Value.absent(),
+    Value<int?> cabinSelected = const Value.absent(),
+    Value<String?> placeNote = const Value.absent(),
+    Value<DateTime?> firstAidStartTime = const Value.absent(),
+    Value<DateTime?> intubationStartTime = const Value.absent(),
+    Value<DateTime?> onIVLineStartTime = const Value.absent(),
+    Value<DateTime?> cardiacMassageStartTime = const Value.absent(),
+    Value<DateTime?> cardiacMassageEndTime = const Value.absent(),
+    Value<DateTime?> firstAidEndTime = const Value.absent(),
+    Value<String?> diagnosis = const Value.absent(),
+    Value<String?> situation = const Value.absent(),
+    Value<String?> evmE = const Value.absent(),
+    Value<String?> evmV = const Value.absent(),
+    Value<String?> evmM = const Value.absent(),
+    Value<String?> heartRate = const Value.absent(),
+    Value<String?> respirationRate = const Value.absent(),
+    Value<String?> bloodPressure = const Value.absent(),
+    Value<String?> temperature = const Value.absent(),
+    Value<String?> leftPupilSize = const Value.absent(),
+    Value<String?> rightPupilSize = const Value.absent(),
+    Value<String?> leftPupilReaction = const Value.absent(),
+    Value<String?> rightPupilReaction = const Value.absent(),
+    Value<String?> insertionMethod = const Value.absent(),
+    Value<String?> airwayContent = const Value.absent(),
+    Value<String?> insertionRecord = const Value.absent(),
+    Value<String?> ivNeedleSize = const Value.absent(),
+    Value<String?> ivLineRecord = const Value.absent(),
+    Value<String?> cardiacMassageRecord = const Value.absent(),
+    Value<String?> endRecord = const Value.absent(),
+    Value<String?> endResult = const Value.absent(),
+    Value<String?> selectedHospital = const Value.absent(),
+    Value<String?> otherHospital = const Value.absent(),
+    Value<String?> otherEndResult = const Value.absent(),
+    Value<DateTime?> deathTime = const Value.absent(),
+    Value<String?> selectedDoctor = const Value.absent(),
+    Value<String?> selectedNurse = const Value.absent(),
+    Value<String?> selectedEMT = const Value.absent(),
+    Value<String?> nurseSignature = const Value.absent(),
+    Value<String?> emtSignature = const Value.absent(),
+    String? selectedAssistantsJson,
+    String? medicationRecordsJson,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) => EmergencyRecord(
+    id: id ?? this.id,
+    visitId: visitId ?? this.visitId,
+    patientName: patientName.present ? patientName.value : this.patientName,
+    idNumber: idNumber.present ? idNumber.value : this.idNumber,
+    passportNumber: passportNumber.present
+        ? passportNumber.value
+        : this.passportNumber,
+    gender: gender.present ? gender.value : this.gender,
+    birthDate: birthDate.present ? birthDate.value : this.birthDate,
+    sourceIndex: sourceIndex.present ? sourceIndex.value : this.sourceIndex,
+    purposeIndex: purposeIndex.present ? purposeIndex.value : this.purposeIndex,
+    airlineIndex: airlineIndex.present ? airlineIndex.value : this.airlineIndex,
+    useOtherAirline: useOtherAirline ?? this.useOtherAirline,
+    selectedOtherAirline: selectedOtherAirline.present
+        ? selectedOtherAirline.value
+        : this.selectedOtherAirline,
+    nationality: nationality.present ? nationality.value : this.nationality,
+    incidentDateTime: incidentDateTime.present
+        ? incidentDateTime.value
+        : this.incidentDateTime,
+    placeGroupIdx: placeGroupIdx.present
+        ? placeGroupIdx.value
+        : this.placeGroupIdx,
+    t1Selected: t1Selected.present ? t1Selected.value : this.t1Selected,
+    t2Selected: t2Selected.present ? t2Selected.value : this.t2Selected,
+    remoteSelected: remoteSelected.present
+        ? remoteSelected.value
+        : this.remoteSelected,
+    cargoSelected: cargoSelected.present
+        ? cargoSelected.value
+        : this.cargoSelected,
+    novotelSelected: novotelSelected.present
+        ? novotelSelected.value
+        : this.novotelSelected,
+    cabinSelected: cabinSelected.present
+        ? cabinSelected.value
+        : this.cabinSelected,
+    placeNote: placeNote.present ? placeNote.value : this.placeNote,
+    firstAidStartTime: firstAidStartTime.present
+        ? firstAidStartTime.value
+        : this.firstAidStartTime,
+    intubationStartTime: intubationStartTime.present
+        ? intubationStartTime.value
+        : this.intubationStartTime,
+    onIVLineStartTime: onIVLineStartTime.present
+        ? onIVLineStartTime.value
+        : this.onIVLineStartTime,
+    cardiacMassageStartTime: cardiacMassageStartTime.present
+        ? cardiacMassageStartTime.value
+        : this.cardiacMassageStartTime,
+    cardiacMassageEndTime: cardiacMassageEndTime.present
+        ? cardiacMassageEndTime.value
+        : this.cardiacMassageEndTime,
+    firstAidEndTime: firstAidEndTime.present
+        ? firstAidEndTime.value
+        : this.firstAidEndTime,
+    diagnosis: diagnosis.present ? diagnosis.value : this.diagnosis,
+    situation: situation.present ? situation.value : this.situation,
+    evmE: evmE.present ? evmE.value : this.evmE,
+    evmV: evmV.present ? evmV.value : this.evmV,
+    evmM: evmM.present ? evmM.value : this.evmM,
+    heartRate: heartRate.present ? heartRate.value : this.heartRate,
+    respirationRate: respirationRate.present
+        ? respirationRate.value
+        : this.respirationRate,
+    bloodPressure: bloodPressure.present
+        ? bloodPressure.value
+        : this.bloodPressure,
+    temperature: temperature.present ? temperature.value : this.temperature,
+    leftPupilSize: leftPupilSize.present
+        ? leftPupilSize.value
+        : this.leftPupilSize,
+    rightPupilSize: rightPupilSize.present
+        ? rightPupilSize.value
+        : this.rightPupilSize,
+    leftPupilReaction: leftPupilReaction.present
+        ? leftPupilReaction.value
+        : this.leftPupilReaction,
+    rightPupilReaction: rightPupilReaction.present
+        ? rightPupilReaction.value
+        : this.rightPupilReaction,
+    insertionMethod: insertionMethod.present
+        ? insertionMethod.value
+        : this.insertionMethod,
+    airwayContent: airwayContent.present
+        ? airwayContent.value
+        : this.airwayContent,
+    insertionRecord: insertionRecord.present
+        ? insertionRecord.value
+        : this.insertionRecord,
+    ivNeedleSize: ivNeedleSize.present ? ivNeedleSize.value : this.ivNeedleSize,
+    ivLineRecord: ivLineRecord.present ? ivLineRecord.value : this.ivLineRecord,
+    cardiacMassageRecord: cardiacMassageRecord.present
+        ? cardiacMassageRecord.value
+        : this.cardiacMassageRecord,
+    endRecord: endRecord.present ? endRecord.value : this.endRecord,
+    endResult: endResult.present ? endResult.value : this.endResult,
+    selectedHospital: selectedHospital.present
+        ? selectedHospital.value
+        : this.selectedHospital,
+    otherHospital: otherHospital.present
+        ? otherHospital.value
+        : this.otherHospital,
+    otherEndResult: otherEndResult.present
+        ? otherEndResult.value
+        : this.otherEndResult,
+    deathTime: deathTime.present ? deathTime.value : this.deathTime,
+    selectedDoctor: selectedDoctor.present
+        ? selectedDoctor.value
+        : this.selectedDoctor,
+    selectedNurse: selectedNurse.present
+        ? selectedNurse.value
+        : this.selectedNurse,
+    selectedEMT: selectedEMT.present ? selectedEMT.value : this.selectedEMT,
+    nurseSignature: nurseSignature.present
+        ? nurseSignature.value
+        : this.nurseSignature,
+    emtSignature: emtSignature.present ? emtSignature.value : this.emtSignature,
+    selectedAssistantsJson:
+        selectedAssistantsJson ?? this.selectedAssistantsJson,
+    medicationRecordsJson: medicationRecordsJson ?? this.medicationRecordsJson,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  EmergencyRecord copyWithCompanion(EmergencyRecordsCompanion data) {
+    return EmergencyRecord(
+      id: data.id.present ? data.id.value : this.id,
+      visitId: data.visitId.present ? data.visitId.value : this.visitId,
+      patientName: data.patientName.present
+          ? data.patientName.value
+          : this.patientName,
+      idNumber: data.idNumber.present ? data.idNumber.value : this.idNumber,
+      passportNumber: data.passportNumber.present
+          ? data.passportNumber.value
+          : this.passportNumber,
+      gender: data.gender.present ? data.gender.value : this.gender,
+      birthDate: data.birthDate.present ? data.birthDate.value : this.birthDate,
+      sourceIndex: data.sourceIndex.present
+          ? data.sourceIndex.value
+          : this.sourceIndex,
+      purposeIndex: data.purposeIndex.present
+          ? data.purposeIndex.value
+          : this.purposeIndex,
+      airlineIndex: data.airlineIndex.present
+          ? data.airlineIndex.value
+          : this.airlineIndex,
+      useOtherAirline: data.useOtherAirline.present
+          ? data.useOtherAirline.value
+          : this.useOtherAirline,
+      selectedOtherAirline: data.selectedOtherAirline.present
+          ? data.selectedOtherAirline.value
+          : this.selectedOtherAirline,
+      nationality: data.nationality.present
+          ? data.nationality.value
+          : this.nationality,
+      incidentDateTime: data.incidentDateTime.present
+          ? data.incidentDateTime.value
+          : this.incidentDateTime,
+      placeGroupIdx: data.placeGroupIdx.present
+          ? data.placeGroupIdx.value
+          : this.placeGroupIdx,
+      t1Selected: data.t1Selected.present
+          ? data.t1Selected.value
+          : this.t1Selected,
+      t2Selected: data.t2Selected.present
+          ? data.t2Selected.value
+          : this.t2Selected,
+      remoteSelected: data.remoteSelected.present
+          ? data.remoteSelected.value
+          : this.remoteSelected,
+      cargoSelected: data.cargoSelected.present
+          ? data.cargoSelected.value
+          : this.cargoSelected,
+      novotelSelected: data.novotelSelected.present
+          ? data.novotelSelected.value
+          : this.novotelSelected,
+      cabinSelected: data.cabinSelected.present
+          ? data.cabinSelected.value
+          : this.cabinSelected,
+      placeNote: data.placeNote.present ? data.placeNote.value : this.placeNote,
+      firstAidStartTime: data.firstAidStartTime.present
+          ? data.firstAidStartTime.value
+          : this.firstAidStartTime,
+      intubationStartTime: data.intubationStartTime.present
+          ? data.intubationStartTime.value
+          : this.intubationStartTime,
+      onIVLineStartTime: data.onIVLineStartTime.present
+          ? data.onIVLineStartTime.value
+          : this.onIVLineStartTime,
+      cardiacMassageStartTime: data.cardiacMassageStartTime.present
+          ? data.cardiacMassageStartTime.value
+          : this.cardiacMassageStartTime,
+      cardiacMassageEndTime: data.cardiacMassageEndTime.present
+          ? data.cardiacMassageEndTime.value
+          : this.cardiacMassageEndTime,
+      firstAidEndTime: data.firstAidEndTime.present
+          ? data.firstAidEndTime.value
+          : this.firstAidEndTime,
+      diagnosis: data.diagnosis.present ? data.diagnosis.value : this.diagnosis,
+      situation: data.situation.present ? data.situation.value : this.situation,
+      evmE: data.evmE.present ? data.evmE.value : this.evmE,
+      evmV: data.evmV.present ? data.evmV.value : this.evmV,
+      evmM: data.evmM.present ? data.evmM.value : this.evmM,
+      heartRate: data.heartRate.present ? data.heartRate.value : this.heartRate,
+      respirationRate: data.respirationRate.present
+          ? data.respirationRate.value
+          : this.respirationRate,
+      bloodPressure: data.bloodPressure.present
+          ? data.bloodPressure.value
+          : this.bloodPressure,
+      temperature: data.temperature.present
+          ? data.temperature.value
+          : this.temperature,
+      leftPupilSize: data.leftPupilSize.present
+          ? data.leftPupilSize.value
+          : this.leftPupilSize,
+      rightPupilSize: data.rightPupilSize.present
+          ? data.rightPupilSize.value
+          : this.rightPupilSize,
+      leftPupilReaction: data.leftPupilReaction.present
+          ? data.leftPupilReaction.value
+          : this.leftPupilReaction,
+      rightPupilReaction: data.rightPupilReaction.present
+          ? data.rightPupilReaction.value
+          : this.rightPupilReaction,
+      insertionMethod: data.insertionMethod.present
+          ? data.insertionMethod.value
+          : this.insertionMethod,
+      airwayContent: data.airwayContent.present
+          ? data.airwayContent.value
+          : this.airwayContent,
+      insertionRecord: data.insertionRecord.present
+          ? data.insertionRecord.value
+          : this.insertionRecord,
+      ivNeedleSize: data.ivNeedleSize.present
+          ? data.ivNeedleSize.value
+          : this.ivNeedleSize,
+      ivLineRecord: data.ivLineRecord.present
+          ? data.ivLineRecord.value
+          : this.ivLineRecord,
+      cardiacMassageRecord: data.cardiacMassageRecord.present
+          ? data.cardiacMassageRecord.value
+          : this.cardiacMassageRecord,
+      endRecord: data.endRecord.present ? data.endRecord.value : this.endRecord,
+      endResult: data.endResult.present ? data.endResult.value : this.endResult,
+      selectedHospital: data.selectedHospital.present
+          ? data.selectedHospital.value
+          : this.selectedHospital,
+      otherHospital: data.otherHospital.present
+          ? data.otherHospital.value
+          : this.otherHospital,
+      otherEndResult: data.otherEndResult.present
+          ? data.otherEndResult.value
+          : this.otherEndResult,
+      deathTime: data.deathTime.present ? data.deathTime.value : this.deathTime,
+      selectedDoctor: data.selectedDoctor.present
+          ? data.selectedDoctor.value
+          : this.selectedDoctor,
+      selectedNurse: data.selectedNurse.present
+          ? data.selectedNurse.value
+          : this.selectedNurse,
+      selectedEMT: data.selectedEMT.present
+          ? data.selectedEMT.value
+          : this.selectedEMT,
+      nurseSignature: data.nurseSignature.present
+          ? data.nurseSignature.value
+          : this.nurseSignature,
+      emtSignature: data.emtSignature.present
+          ? data.emtSignature.value
+          : this.emtSignature,
+      selectedAssistantsJson: data.selectedAssistantsJson.present
+          ? data.selectedAssistantsJson.value
+          : this.selectedAssistantsJson,
+      medicationRecordsJson: data.medicationRecordsJson.present
+          ? data.medicationRecordsJson.value
+          : this.medicationRecordsJson,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('EmergencyRecord(')
+          ..write('id: $id, ')
+          ..write('visitId: $visitId, ')
+          ..write('patientName: $patientName, ')
+          ..write('idNumber: $idNumber, ')
+          ..write('passportNumber: $passportNumber, ')
+          ..write('gender: $gender, ')
+          ..write('birthDate: $birthDate, ')
+          ..write('sourceIndex: $sourceIndex, ')
+          ..write('purposeIndex: $purposeIndex, ')
+          ..write('airlineIndex: $airlineIndex, ')
+          ..write('useOtherAirline: $useOtherAirline, ')
+          ..write('selectedOtherAirline: $selectedOtherAirline, ')
+          ..write('nationality: $nationality, ')
+          ..write('incidentDateTime: $incidentDateTime, ')
+          ..write('placeGroupIdx: $placeGroupIdx, ')
+          ..write('t1Selected: $t1Selected, ')
+          ..write('t2Selected: $t2Selected, ')
+          ..write('remoteSelected: $remoteSelected, ')
+          ..write('cargoSelected: $cargoSelected, ')
+          ..write('novotelSelected: $novotelSelected, ')
+          ..write('cabinSelected: $cabinSelected, ')
+          ..write('placeNote: $placeNote, ')
+          ..write('firstAidStartTime: $firstAidStartTime, ')
+          ..write('intubationStartTime: $intubationStartTime, ')
+          ..write('onIVLineStartTime: $onIVLineStartTime, ')
+          ..write('cardiacMassageStartTime: $cardiacMassageStartTime, ')
+          ..write('cardiacMassageEndTime: $cardiacMassageEndTime, ')
+          ..write('firstAidEndTime: $firstAidEndTime, ')
+          ..write('diagnosis: $diagnosis, ')
+          ..write('situation: $situation, ')
+          ..write('evmE: $evmE, ')
+          ..write('evmV: $evmV, ')
+          ..write('evmM: $evmM, ')
+          ..write('heartRate: $heartRate, ')
+          ..write('respirationRate: $respirationRate, ')
+          ..write('bloodPressure: $bloodPressure, ')
+          ..write('temperature: $temperature, ')
+          ..write('leftPupilSize: $leftPupilSize, ')
+          ..write('rightPupilSize: $rightPupilSize, ')
+          ..write('leftPupilReaction: $leftPupilReaction, ')
+          ..write('rightPupilReaction: $rightPupilReaction, ')
+          ..write('insertionMethod: $insertionMethod, ')
+          ..write('airwayContent: $airwayContent, ')
+          ..write('insertionRecord: $insertionRecord, ')
+          ..write('ivNeedleSize: $ivNeedleSize, ')
+          ..write('ivLineRecord: $ivLineRecord, ')
+          ..write('cardiacMassageRecord: $cardiacMassageRecord, ')
+          ..write('endRecord: $endRecord, ')
+          ..write('endResult: $endResult, ')
+          ..write('selectedHospital: $selectedHospital, ')
+          ..write('otherHospital: $otherHospital, ')
+          ..write('otherEndResult: $otherEndResult, ')
+          ..write('deathTime: $deathTime, ')
+          ..write('selectedDoctor: $selectedDoctor, ')
+          ..write('selectedNurse: $selectedNurse, ')
+          ..write('selectedEMT: $selectedEMT, ')
+          ..write('nurseSignature: $nurseSignature, ')
+          ..write('emtSignature: $emtSignature, ')
+          ..write('selectedAssistantsJson: $selectedAssistantsJson, ')
+          ..write('medicationRecordsJson: $medicationRecordsJson, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hashAll([
+    id,
+    visitId,
+    patientName,
+    idNumber,
+    passportNumber,
+    gender,
+    birthDate,
+    sourceIndex,
+    purposeIndex,
+    airlineIndex,
+    useOtherAirline,
+    selectedOtherAirline,
+    nationality,
+    incidentDateTime,
+    placeGroupIdx,
+    t1Selected,
+    t2Selected,
+    remoteSelected,
+    cargoSelected,
+    novotelSelected,
+    cabinSelected,
+    placeNote,
+    firstAidStartTime,
+    intubationStartTime,
+    onIVLineStartTime,
+    cardiacMassageStartTime,
+    cardiacMassageEndTime,
+    firstAidEndTime,
+    diagnosis,
+    situation,
+    evmE,
+    evmV,
+    evmM,
+    heartRate,
+    respirationRate,
+    bloodPressure,
+    temperature,
+    leftPupilSize,
+    rightPupilSize,
+    leftPupilReaction,
+    rightPupilReaction,
+    insertionMethod,
+    airwayContent,
+    insertionRecord,
+    ivNeedleSize,
+    ivLineRecord,
+    cardiacMassageRecord,
+    endRecord,
+    endResult,
+    selectedHospital,
+    otherHospital,
+    otherEndResult,
+    deathTime,
+    selectedDoctor,
+    selectedNurse,
+    selectedEMT,
+    nurseSignature,
+    emtSignature,
+    selectedAssistantsJson,
+    medicationRecordsJson,
+    createdAt,
+    updatedAt,
+  ]);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is EmergencyRecord &&
+          other.id == this.id &&
+          other.visitId == this.visitId &&
+          other.patientName == this.patientName &&
+          other.idNumber == this.idNumber &&
+          other.passportNumber == this.passportNumber &&
+          other.gender == this.gender &&
+          other.birthDate == this.birthDate &&
+          other.sourceIndex == this.sourceIndex &&
+          other.purposeIndex == this.purposeIndex &&
+          other.airlineIndex == this.airlineIndex &&
+          other.useOtherAirline == this.useOtherAirline &&
+          other.selectedOtherAirline == this.selectedOtherAirline &&
+          other.nationality == this.nationality &&
+          other.incidentDateTime == this.incidentDateTime &&
+          other.placeGroupIdx == this.placeGroupIdx &&
+          other.t1Selected == this.t1Selected &&
+          other.t2Selected == this.t2Selected &&
+          other.remoteSelected == this.remoteSelected &&
+          other.cargoSelected == this.cargoSelected &&
+          other.novotelSelected == this.novotelSelected &&
+          other.cabinSelected == this.cabinSelected &&
+          other.placeNote == this.placeNote &&
+          other.firstAidStartTime == this.firstAidStartTime &&
+          other.intubationStartTime == this.intubationStartTime &&
+          other.onIVLineStartTime == this.onIVLineStartTime &&
+          other.cardiacMassageStartTime == this.cardiacMassageStartTime &&
+          other.cardiacMassageEndTime == this.cardiacMassageEndTime &&
+          other.firstAidEndTime == this.firstAidEndTime &&
+          other.diagnosis == this.diagnosis &&
+          other.situation == this.situation &&
+          other.evmE == this.evmE &&
+          other.evmV == this.evmV &&
+          other.evmM == this.evmM &&
+          other.heartRate == this.heartRate &&
+          other.respirationRate == this.respirationRate &&
+          other.bloodPressure == this.bloodPressure &&
+          other.temperature == this.temperature &&
+          other.leftPupilSize == this.leftPupilSize &&
+          other.rightPupilSize == this.rightPupilSize &&
+          other.leftPupilReaction == this.leftPupilReaction &&
+          other.rightPupilReaction == this.rightPupilReaction &&
+          other.insertionMethod == this.insertionMethod &&
+          other.airwayContent == this.airwayContent &&
+          other.insertionRecord == this.insertionRecord &&
+          other.ivNeedleSize == this.ivNeedleSize &&
+          other.ivLineRecord == this.ivLineRecord &&
+          other.cardiacMassageRecord == this.cardiacMassageRecord &&
+          other.endRecord == this.endRecord &&
+          other.endResult == this.endResult &&
+          other.selectedHospital == this.selectedHospital &&
+          other.otherHospital == this.otherHospital &&
+          other.otherEndResult == this.otherEndResult &&
+          other.deathTime == this.deathTime &&
+          other.selectedDoctor == this.selectedDoctor &&
+          other.selectedNurse == this.selectedNurse &&
+          other.selectedEMT == this.selectedEMT &&
+          other.nurseSignature == this.nurseSignature &&
+          other.emtSignature == this.emtSignature &&
+          other.selectedAssistantsJson == this.selectedAssistantsJson &&
+          other.medicationRecordsJson == this.medicationRecordsJson &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class EmergencyRecordsCompanion extends UpdateCompanion<EmergencyRecord> {
+  final Value<int> id;
+  final Value<int> visitId;
+  final Value<String?> patientName;
+  final Value<String?> idNumber;
+  final Value<String?> passportNumber;
+  final Value<String?> gender;
+  final Value<DateTime?> birthDate;
+  final Value<int?> sourceIndex;
+  final Value<int?> purposeIndex;
+  final Value<int?> airlineIndex;
+  final Value<bool> useOtherAirline;
+  final Value<String?> selectedOtherAirline;
+  final Value<String?> nationality;
+  final Value<DateTime?> incidentDateTime;
+  final Value<int?> placeGroupIdx;
+  final Value<int?> t1Selected;
+  final Value<int?> t2Selected;
+  final Value<int?> remoteSelected;
+  final Value<int?> cargoSelected;
+  final Value<int?> novotelSelected;
+  final Value<int?> cabinSelected;
+  final Value<String?> placeNote;
+  final Value<DateTime?> firstAidStartTime;
+  final Value<DateTime?> intubationStartTime;
+  final Value<DateTime?> onIVLineStartTime;
+  final Value<DateTime?> cardiacMassageStartTime;
+  final Value<DateTime?> cardiacMassageEndTime;
+  final Value<DateTime?> firstAidEndTime;
+  final Value<String?> diagnosis;
+  final Value<String?> situation;
+  final Value<String?> evmE;
+  final Value<String?> evmV;
+  final Value<String?> evmM;
+  final Value<String?> heartRate;
+  final Value<String?> respirationRate;
+  final Value<String?> bloodPressure;
+  final Value<String?> temperature;
+  final Value<String?> leftPupilSize;
+  final Value<String?> rightPupilSize;
+  final Value<String?> leftPupilReaction;
+  final Value<String?> rightPupilReaction;
+  final Value<String?> insertionMethod;
+  final Value<String?> airwayContent;
+  final Value<String?> insertionRecord;
+  final Value<String?> ivNeedleSize;
+  final Value<String?> ivLineRecord;
+  final Value<String?> cardiacMassageRecord;
+  final Value<String?> endRecord;
+  final Value<String?> endResult;
+  final Value<String?> selectedHospital;
+  final Value<String?> otherHospital;
+  final Value<String?> otherEndResult;
+  final Value<DateTime?> deathTime;
+  final Value<String?> selectedDoctor;
+  final Value<String?> selectedNurse;
+  final Value<String?> selectedEMT;
+  final Value<String?> nurseSignature;
+  final Value<String?> emtSignature;
+  final Value<String> selectedAssistantsJson;
+  final Value<String> medicationRecordsJson;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  const EmergencyRecordsCompanion({
+    this.id = const Value.absent(),
+    this.visitId = const Value.absent(),
+    this.patientName = const Value.absent(),
+    this.idNumber = const Value.absent(),
+    this.passportNumber = const Value.absent(),
+    this.gender = const Value.absent(),
+    this.birthDate = const Value.absent(),
+    this.sourceIndex = const Value.absent(),
+    this.purposeIndex = const Value.absent(),
+    this.airlineIndex = const Value.absent(),
+    this.useOtherAirline = const Value.absent(),
+    this.selectedOtherAirline = const Value.absent(),
+    this.nationality = const Value.absent(),
+    this.incidentDateTime = const Value.absent(),
+    this.placeGroupIdx = const Value.absent(),
+    this.t1Selected = const Value.absent(),
+    this.t2Selected = const Value.absent(),
+    this.remoteSelected = const Value.absent(),
+    this.cargoSelected = const Value.absent(),
+    this.novotelSelected = const Value.absent(),
+    this.cabinSelected = const Value.absent(),
+    this.placeNote = const Value.absent(),
+    this.firstAidStartTime = const Value.absent(),
+    this.intubationStartTime = const Value.absent(),
+    this.onIVLineStartTime = const Value.absent(),
+    this.cardiacMassageStartTime = const Value.absent(),
+    this.cardiacMassageEndTime = const Value.absent(),
+    this.firstAidEndTime = const Value.absent(),
+    this.diagnosis = const Value.absent(),
+    this.situation = const Value.absent(),
+    this.evmE = const Value.absent(),
+    this.evmV = const Value.absent(),
+    this.evmM = const Value.absent(),
+    this.heartRate = const Value.absent(),
+    this.respirationRate = const Value.absent(),
+    this.bloodPressure = const Value.absent(),
+    this.temperature = const Value.absent(),
+    this.leftPupilSize = const Value.absent(),
+    this.rightPupilSize = const Value.absent(),
+    this.leftPupilReaction = const Value.absent(),
+    this.rightPupilReaction = const Value.absent(),
+    this.insertionMethod = const Value.absent(),
+    this.airwayContent = const Value.absent(),
+    this.insertionRecord = const Value.absent(),
+    this.ivNeedleSize = const Value.absent(),
+    this.ivLineRecord = const Value.absent(),
+    this.cardiacMassageRecord = const Value.absent(),
+    this.endRecord = const Value.absent(),
+    this.endResult = const Value.absent(),
+    this.selectedHospital = const Value.absent(),
+    this.otherHospital = const Value.absent(),
+    this.otherEndResult = const Value.absent(),
+    this.deathTime = const Value.absent(),
+    this.selectedDoctor = const Value.absent(),
+    this.selectedNurse = const Value.absent(),
+    this.selectedEMT = const Value.absent(),
+    this.nurseSignature = const Value.absent(),
+    this.emtSignature = const Value.absent(),
+    this.selectedAssistantsJson = const Value.absent(),
+    this.medicationRecordsJson = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  });
+  EmergencyRecordsCompanion.insert({
+    this.id = const Value.absent(),
+    required int visitId,
+    this.patientName = const Value.absent(),
+    this.idNumber = const Value.absent(),
+    this.passportNumber = const Value.absent(),
+    this.gender = const Value.absent(),
+    this.birthDate = const Value.absent(),
+    this.sourceIndex = const Value.absent(),
+    this.purposeIndex = const Value.absent(),
+    this.airlineIndex = const Value.absent(),
+    this.useOtherAirline = const Value.absent(),
+    this.selectedOtherAirline = const Value.absent(),
+    this.nationality = const Value.absent(),
+    this.incidentDateTime = const Value.absent(),
+    this.placeGroupIdx = const Value.absent(),
+    this.t1Selected = const Value.absent(),
+    this.t2Selected = const Value.absent(),
+    this.remoteSelected = const Value.absent(),
+    this.cargoSelected = const Value.absent(),
+    this.novotelSelected = const Value.absent(),
+    this.cabinSelected = const Value.absent(),
+    this.placeNote = const Value.absent(),
+    this.firstAidStartTime = const Value.absent(),
+    this.intubationStartTime = const Value.absent(),
+    this.onIVLineStartTime = const Value.absent(),
+    this.cardiacMassageStartTime = const Value.absent(),
+    this.cardiacMassageEndTime = const Value.absent(),
+    this.firstAidEndTime = const Value.absent(),
+    this.diagnosis = const Value.absent(),
+    this.situation = const Value.absent(),
+    this.evmE = const Value.absent(),
+    this.evmV = const Value.absent(),
+    this.evmM = const Value.absent(),
+    this.heartRate = const Value.absent(),
+    this.respirationRate = const Value.absent(),
+    this.bloodPressure = const Value.absent(),
+    this.temperature = const Value.absent(),
+    this.leftPupilSize = const Value.absent(),
+    this.rightPupilSize = const Value.absent(),
+    this.leftPupilReaction = const Value.absent(),
+    this.rightPupilReaction = const Value.absent(),
+    this.insertionMethod = const Value.absent(),
+    this.airwayContent = const Value.absent(),
+    this.insertionRecord = const Value.absent(),
+    this.ivNeedleSize = const Value.absent(),
+    this.ivLineRecord = const Value.absent(),
+    this.cardiacMassageRecord = const Value.absent(),
+    this.endRecord = const Value.absent(),
+    this.endResult = const Value.absent(),
+    this.selectedHospital = const Value.absent(),
+    this.otherHospital = const Value.absent(),
+    this.otherEndResult = const Value.absent(),
+    this.deathTime = const Value.absent(),
+    this.selectedDoctor = const Value.absent(),
+    this.selectedNurse = const Value.absent(),
+    this.selectedEMT = const Value.absent(),
+    this.nurseSignature = const Value.absent(),
+    this.emtSignature = const Value.absent(),
+    this.selectedAssistantsJson = const Value.absent(),
+    this.medicationRecordsJson = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  }) : visitId = Value(visitId);
+  static Insertable<EmergencyRecord> custom({
+    Expression<int>? id,
+    Expression<int>? visitId,
+    Expression<String>? patientName,
+    Expression<String>? idNumber,
+    Expression<String>? passportNumber,
+    Expression<String>? gender,
+    Expression<DateTime>? birthDate,
+    Expression<int>? sourceIndex,
+    Expression<int>? purposeIndex,
+    Expression<int>? airlineIndex,
+    Expression<bool>? useOtherAirline,
+    Expression<String>? selectedOtherAirline,
+    Expression<String>? nationality,
+    Expression<DateTime>? incidentDateTime,
+    Expression<int>? placeGroupIdx,
+    Expression<int>? t1Selected,
+    Expression<int>? t2Selected,
+    Expression<int>? remoteSelected,
+    Expression<int>? cargoSelected,
+    Expression<int>? novotelSelected,
+    Expression<int>? cabinSelected,
+    Expression<String>? placeNote,
+    Expression<DateTime>? firstAidStartTime,
+    Expression<DateTime>? intubationStartTime,
+    Expression<DateTime>? onIVLineStartTime,
+    Expression<DateTime>? cardiacMassageStartTime,
+    Expression<DateTime>? cardiacMassageEndTime,
+    Expression<DateTime>? firstAidEndTime,
+    Expression<String>? diagnosis,
+    Expression<String>? situation,
+    Expression<String>? evmE,
+    Expression<String>? evmV,
+    Expression<String>? evmM,
+    Expression<String>? heartRate,
+    Expression<String>? respirationRate,
+    Expression<String>? bloodPressure,
+    Expression<String>? temperature,
+    Expression<String>? leftPupilSize,
+    Expression<String>? rightPupilSize,
+    Expression<String>? leftPupilReaction,
+    Expression<String>? rightPupilReaction,
+    Expression<String>? insertionMethod,
+    Expression<String>? airwayContent,
+    Expression<String>? insertionRecord,
+    Expression<String>? ivNeedleSize,
+    Expression<String>? ivLineRecord,
+    Expression<String>? cardiacMassageRecord,
+    Expression<String>? endRecord,
+    Expression<String>? endResult,
+    Expression<String>? selectedHospital,
+    Expression<String>? otherHospital,
+    Expression<String>? otherEndResult,
+    Expression<DateTime>? deathTime,
+    Expression<String>? selectedDoctor,
+    Expression<String>? selectedNurse,
+    Expression<String>? selectedEMT,
+    Expression<String>? nurseSignature,
+    Expression<String>? emtSignature,
+    Expression<String>? selectedAssistantsJson,
+    Expression<String>? medicationRecordsJson,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (visitId != null) 'visit_id': visitId,
+      if (patientName != null) 'patient_name': patientName,
+      if (idNumber != null) 'id_number': idNumber,
+      if (passportNumber != null) 'passport_number': passportNumber,
+      if (gender != null) 'gender': gender,
+      if (birthDate != null) 'birth_date': birthDate,
+      if (sourceIndex != null) 'source_index': sourceIndex,
+      if (purposeIndex != null) 'purpose_index': purposeIndex,
+      if (airlineIndex != null) 'airline_index': airlineIndex,
+      if (useOtherAirline != null) 'use_other_airline': useOtherAirline,
+      if (selectedOtherAirline != null)
+        'selected_other_airline': selectedOtherAirline,
+      if (nationality != null) 'nationality': nationality,
+      if (incidentDateTime != null) 'incident_date_time': incidentDateTime,
+      if (placeGroupIdx != null) 'place_group_idx': placeGroupIdx,
+      if (t1Selected != null) 't1_selected': t1Selected,
+      if (t2Selected != null) 't2_selected': t2Selected,
+      if (remoteSelected != null) 'remote_selected': remoteSelected,
+      if (cargoSelected != null) 'cargo_selected': cargoSelected,
+      if (novotelSelected != null) 'novotel_selected': novotelSelected,
+      if (cabinSelected != null) 'cabin_selected': cabinSelected,
+      if (placeNote != null) 'place_note': placeNote,
+      if (firstAidStartTime != null) 'first_aid_start_time': firstAidStartTime,
+      if (intubationStartTime != null)
+        'intubation_start_time': intubationStartTime,
+      if (onIVLineStartTime != null)
+        'on_i_v_line_start_time': onIVLineStartTime,
+      if (cardiacMassageStartTime != null)
+        'cardiac_massage_start_time': cardiacMassageStartTime,
+      if (cardiacMassageEndTime != null)
+        'cardiac_massage_end_time': cardiacMassageEndTime,
+      if (firstAidEndTime != null) 'first_aid_end_time': firstAidEndTime,
+      if (diagnosis != null) 'diagnosis': diagnosis,
+      if (situation != null) 'situation': situation,
+      if (evmE != null) 'evm_e': evmE,
+      if (evmV != null) 'evm_v': evmV,
+      if (evmM != null) 'evm_m': evmM,
+      if (heartRate != null) 'heart_rate': heartRate,
+      if (respirationRate != null) 'respiration_rate': respirationRate,
+      if (bloodPressure != null) 'blood_pressure': bloodPressure,
+      if (temperature != null) 'temperature': temperature,
+      if (leftPupilSize != null) 'left_pupil_size': leftPupilSize,
+      if (rightPupilSize != null) 'right_pupil_size': rightPupilSize,
+      if (leftPupilReaction != null) 'left_pupil_reaction': leftPupilReaction,
+      if (rightPupilReaction != null)
+        'right_pupil_reaction': rightPupilReaction,
+      if (insertionMethod != null) 'insertion_method': insertionMethod,
+      if (airwayContent != null) 'airway_content': airwayContent,
+      if (insertionRecord != null) 'insertion_record': insertionRecord,
+      if (ivNeedleSize != null) 'iv_needle_size': ivNeedleSize,
+      if (ivLineRecord != null) 'iv_line_record': ivLineRecord,
+      if (cardiacMassageRecord != null)
+        'cardiac_massage_record': cardiacMassageRecord,
+      if (endRecord != null) 'end_record': endRecord,
+      if (endResult != null) 'end_result': endResult,
+      if (selectedHospital != null) 'selected_hospital': selectedHospital,
+      if (otherHospital != null) 'other_hospital': otherHospital,
+      if (otherEndResult != null) 'other_end_result': otherEndResult,
+      if (deathTime != null) 'death_time': deathTime,
+      if (selectedDoctor != null) 'selected_doctor': selectedDoctor,
+      if (selectedNurse != null) 'selected_nurse': selectedNurse,
+      if (selectedEMT != null) 'selected_e_m_t': selectedEMT,
+      if (nurseSignature != null) 'nurse_signature': nurseSignature,
+      if (emtSignature != null) 'emt_signature': emtSignature,
+      if (selectedAssistantsJson != null)
+        'selected_assistants_json': selectedAssistantsJson,
+      if (medicationRecordsJson != null)
+        'medication_records_json': medicationRecordsJson,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+    });
+  }
+
+  EmergencyRecordsCompanion copyWith({
+    Value<int>? id,
+    Value<int>? visitId,
+    Value<String?>? patientName,
+    Value<String?>? idNumber,
+    Value<String?>? passportNumber,
+    Value<String?>? gender,
+    Value<DateTime?>? birthDate,
+    Value<int?>? sourceIndex,
+    Value<int?>? purposeIndex,
+    Value<int?>? airlineIndex,
+    Value<bool>? useOtherAirline,
+    Value<String?>? selectedOtherAirline,
+    Value<String?>? nationality,
+    Value<DateTime?>? incidentDateTime,
+    Value<int?>? placeGroupIdx,
+    Value<int?>? t1Selected,
+    Value<int?>? t2Selected,
+    Value<int?>? remoteSelected,
+    Value<int?>? cargoSelected,
+    Value<int?>? novotelSelected,
+    Value<int?>? cabinSelected,
+    Value<String?>? placeNote,
+    Value<DateTime?>? firstAidStartTime,
+    Value<DateTime?>? intubationStartTime,
+    Value<DateTime?>? onIVLineStartTime,
+    Value<DateTime?>? cardiacMassageStartTime,
+    Value<DateTime?>? cardiacMassageEndTime,
+    Value<DateTime?>? firstAidEndTime,
+    Value<String?>? diagnosis,
+    Value<String?>? situation,
+    Value<String?>? evmE,
+    Value<String?>? evmV,
+    Value<String?>? evmM,
+    Value<String?>? heartRate,
+    Value<String?>? respirationRate,
+    Value<String?>? bloodPressure,
+    Value<String?>? temperature,
+    Value<String?>? leftPupilSize,
+    Value<String?>? rightPupilSize,
+    Value<String?>? leftPupilReaction,
+    Value<String?>? rightPupilReaction,
+    Value<String?>? insertionMethod,
+    Value<String?>? airwayContent,
+    Value<String?>? insertionRecord,
+    Value<String?>? ivNeedleSize,
+    Value<String?>? ivLineRecord,
+    Value<String?>? cardiacMassageRecord,
+    Value<String?>? endRecord,
+    Value<String?>? endResult,
+    Value<String?>? selectedHospital,
+    Value<String?>? otherHospital,
+    Value<String?>? otherEndResult,
+    Value<DateTime?>? deathTime,
+    Value<String?>? selectedDoctor,
+    Value<String?>? selectedNurse,
+    Value<String?>? selectedEMT,
+    Value<String?>? nurseSignature,
+    Value<String?>? emtSignature,
+    Value<String>? selectedAssistantsJson,
+    Value<String>? medicationRecordsJson,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+  }) {
+    return EmergencyRecordsCompanion(
+      id: id ?? this.id,
+      visitId: visitId ?? this.visitId,
+      patientName: patientName ?? this.patientName,
+      idNumber: idNumber ?? this.idNumber,
+      passportNumber: passportNumber ?? this.passportNumber,
+      gender: gender ?? this.gender,
+      birthDate: birthDate ?? this.birthDate,
+      sourceIndex: sourceIndex ?? this.sourceIndex,
+      purposeIndex: purposeIndex ?? this.purposeIndex,
+      airlineIndex: airlineIndex ?? this.airlineIndex,
+      useOtherAirline: useOtherAirline ?? this.useOtherAirline,
+      selectedOtherAirline: selectedOtherAirline ?? this.selectedOtherAirline,
+      nationality: nationality ?? this.nationality,
+      incidentDateTime: incidentDateTime ?? this.incidentDateTime,
+      placeGroupIdx: placeGroupIdx ?? this.placeGroupIdx,
+      t1Selected: t1Selected ?? this.t1Selected,
+      t2Selected: t2Selected ?? this.t2Selected,
+      remoteSelected: remoteSelected ?? this.remoteSelected,
+      cargoSelected: cargoSelected ?? this.cargoSelected,
+      novotelSelected: novotelSelected ?? this.novotelSelected,
+      cabinSelected: cabinSelected ?? this.cabinSelected,
+      placeNote: placeNote ?? this.placeNote,
+      firstAidStartTime: firstAidStartTime ?? this.firstAidStartTime,
+      intubationStartTime: intubationStartTime ?? this.intubationStartTime,
+      onIVLineStartTime: onIVLineStartTime ?? this.onIVLineStartTime,
+      cardiacMassageStartTime:
+          cardiacMassageStartTime ?? this.cardiacMassageStartTime,
+      cardiacMassageEndTime:
+          cardiacMassageEndTime ?? this.cardiacMassageEndTime,
+      firstAidEndTime: firstAidEndTime ?? this.firstAidEndTime,
+      diagnosis: diagnosis ?? this.diagnosis,
+      situation: situation ?? this.situation,
+      evmE: evmE ?? this.evmE,
+      evmV: evmV ?? this.evmV,
+      evmM: evmM ?? this.evmM,
+      heartRate: heartRate ?? this.heartRate,
+      respirationRate: respirationRate ?? this.respirationRate,
+      bloodPressure: bloodPressure ?? this.bloodPressure,
+      temperature: temperature ?? this.temperature,
+      leftPupilSize: leftPupilSize ?? this.leftPupilSize,
+      rightPupilSize: rightPupilSize ?? this.rightPupilSize,
+      leftPupilReaction: leftPupilReaction ?? this.leftPupilReaction,
+      rightPupilReaction: rightPupilReaction ?? this.rightPupilReaction,
+      insertionMethod: insertionMethod ?? this.insertionMethod,
+      airwayContent: airwayContent ?? this.airwayContent,
+      insertionRecord: insertionRecord ?? this.insertionRecord,
+      ivNeedleSize: ivNeedleSize ?? this.ivNeedleSize,
+      ivLineRecord: ivLineRecord ?? this.ivLineRecord,
+      cardiacMassageRecord: cardiacMassageRecord ?? this.cardiacMassageRecord,
+      endRecord: endRecord ?? this.endRecord,
+      endResult: endResult ?? this.endResult,
+      selectedHospital: selectedHospital ?? this.selectedHospital,
+      otherHospital: otherHospital ?? this.otherHospital,
+      otherEndResult: otherEndResult ?? this.otherEndResult,
+      deathTime: deathTime ?? this.deathTime,
+      selectedDoctor: selectedDoctor ?? this.selectedDoctor,
+      selectedNurse: selectedNurse ?? this.selectedNurse,
+      selectedEMT: selectedEMT ?? this.selectedEMT,
+      nurseSignature: nurseSignature ?? this.nurseSignature,
+      emtSignature: emtSignature ?? this.emtSignature,
+      selectedAssistantsJson:
+          selectedAssistantsJson ?? this.selectedAssistantsJson,
+      medicationRecordsJson:
+          medicationRecordsJson ?? this.medicationRecordsJson,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (visitId.present) {
+      map['visit_id'] = Variable<int>(visitId.value);
+    }
+    if (patientName.present) {
+      map['patient_name'] = Variable<String>(patientName.value);
+    }
+    if (idNumber.present) {
+      map['id_number'] = Variable<String>(idNumber.value);
+    }
+    if (passportNumber.present) {
+      map['passport_number'] = Variable<String>(passportNumber.value);
+    }
+    if (gender.present) {
+      map['gender'] = Variable<String>(gender.value);
+    }
+    if (birthDate.present) {
+      map['birth_date'] = Variable<DateTime>(birthDate.value);
+    }
+    if (sourceIndex.present) {
+      map['source_index'] = Variable<int>(sourceIndex.value);
+    }
+    if (purposeIndex.present) {
+      map['purpose_index'] = Variable<int>(purposeIndex.value);
+    }
+    if (airlineIndex.present) {
+      map['airline_index'] = Variable<int>(airlineIndex.value);
+    }
+    if (useOtherAirline.present) {
+      map['use_other_airline'] = Variable<bool>(useOtherAirline.value);
+    }
+    if (selectedOtherAirline.present) {
+      map['selected_other_airline'] = Variable<String>(
+        selectedOtherAirline.value,
+      );
+    }
+    if (nationality.present) {
+      map['nationality'] = Variable<String>(nationality.value);
+    }
+    if (incidentDateTime.present) {
+      map['incident_date_time'] = Variable<DateTime>(incidentDateTime.value);
+    }
+    if (placeGroupIdx.present) {
+      map['place_group_idx'] = Variable<int>(placeGroupIdx.value);
+    }
+    if (t1Selected.present) {
+      map['t1_selected'] = Variable<int>(t1Selected.value);
+    }
+    if (t2Selected.present) {
+      map['t2_selected'] = Variable<int>(t2Selected.value);
+    }
+    if (remoteSelected.present) {
+      map['remote_selected'] = Variable<int>(remoteSelected.value);
+    }
+    if (cargoSelected.present) {
+      map['cargo_selected'] = Variable<int>(cargoSelected.value);
+    }
+    if (novotelSelected.present) {
+      map['novotel_selected'] = Variable<int>(novotelSelected.value);
+    }
+    if (cabinSelected.present) {
+      map['cabin_selected'] = Variable<int>(cabinSelected.value);
+    }
+    if (placeNote.present) {
+      map['place_note'] = Variable<String>(placeNote.value);
+    }
+    if (firstAidStartTime.present) {
+      map['first_aid_start_time'] = Variable<DateTime>(firstAidStartTime.value);
+    }
+    if (intubationStartTime.present) {
+      map['intubation_start_time'] = Variable<DateTime>(
+        intubationStartTime.value,
+      );
+    }
+    if (onIVLineStartTime.present) {
+      map['on_i_v_line_start_time'] = Variable<DateTime>(
+        onIVLineStartTime.value,
+      );
+    }
+    if (cardiacMassageStartTime.present) {
+      map['cardiac_massage_start_time'] = Variable<DateTime>(
+        cardiacMassageStartTime.value,
+      );
+    }
+    if (cardiacMassageEndTime.present) {
+      map['cardiac_massage_end_time'] = Variable<DateTime>(
+        cardiacMassageEndTime.value,
+      );
+    }
+    if (firstAidEndTime.present) {
+      map['first_aid_end_time'] = Variable<DateTime>(firstAidEndTime.value);
+    }
+    if (diagnosis.present) {
+      map['diagnosis'] = Variable<String>(diagnosis.value);
+    }
+    if (situation.present) {
+      map['situation'] = Variable<String>(situation.value);
+    }
+    if (evmE.present) {
+      map['evm_e'] = Variable<String>(evmE.value);
+    }
+    if (evmV.present) {
+      map['evm_v'] = Variable<String>(evmV.value);
+    }
+    if (evmM.present) {
+      map['evm_m'] = Variable<String>(evmM.value);
+    }
+    if (heartRate.present) {
+      map['heart_rate'] = Variable<String>(heartRate.value);
+    }
+    if (respirationRate.present) {
+      map['respiration_rate'] = Variable<String>(respirationRate.value);
+    }
+    if (bloodPressure.present) {
+      map['blood_pressure'] = Variable<String>(bloodPressure.value);
+    }
+    if (temperature.present) {
+      map['temperature'] = Variable<String>(temperature.value);
+    }
+    if (leftPupilSize.present) {
+      map['left_pupil_size'] = Variable<String>(leftPupilSize.value);
+    }
+    if (rightPupilSize.present) {
+      map['right_pupil_size'] = Variable<String>(rightPupilSize.value);
+    }
+    if (leftPupilReaction.present) {
+      map['left_pupil_reaction'] = Variable<String>(leftPupilReaction.value);
+    }
+    if (rightPupilReaction.present) {
+      map['right_pupil_reaction'] = Variable<String>(rightPupilReaction.value);
+    }
+    if (insertionMethod.present) {
+      map['insertion_method'] = Variable<String>(insertionMethod.value);
+    }
+    if (airwayContent.present) {
+      map['airway_content'] = Variable<String>(airwayContent.value);
+    }
+    if (insertionRecord.present) {
+      map['insertion_record'] = Variable<String>(insertionRecord.value);
+    }
+    if (ivNeedleSize.present) {
+      map['iv_needle_size'] = Variable<String>(ivNeedleSize.value);
+    }
+    if (ivLineRecord.present) {
+      map['iv_line_record'] = Variable<String>(ivLineRecord.value);
+    }
+    if (cardiacMassageRecord.present) {
+      map['cardiac_massage_record'] = Variable<String>(
+        cardiacMassageRecord.value,
+      );
+    }
+    if (endRecord.present) {
+      map['end_record'] = Variable<String>(endRecord.value);
+    }
+    if (endResult.present) {
+      map['end_result'] = Variable<String>(endResult.value);
+    }
+    if (selectedHospital.present) {
+      map['selected_hospital'] = Variable<String>(selectedHospital.value);
+    }
+    if (otherHospital.present) {
+      map['other_hospital'] = Variable<String>(otherHospital.value);
+    }
+    if (otherEndResult.present) {
+      map['other_end_result'] = Variable<String>(otherEndResult.value);
+    }
+    if (deathTime.present) {
+      map['death_time'] = Variable<DateTime>(deathTime.value);
+    }
+    if (selectedDoctor.present) {
+      map['selected_doctor'] = Variable<String>(selectedDoctor.value);
+    }
+    if (selectedNurse.present) {
+      map['selected_nurse'] = Variable<String>(selectedNurse.value);
+    }
+    if (selectedEMT.present) {
+      map['selected_e_m_t'] = Variable<String>(selectedEMT.value);
+    }
+    if (nurseSignature.present) {
+      map['nurse_signature'] = Variable<String>(nurseSignature.value);
+    }
+    if (emtSignature.present) {
+      map['emt_signature'] = Variable<String>(emtSignature.value);
+    }
+    if (selectedAssistantsJson.present) {
+      map['selected_assistants_json'] = Variable<String>(
+        selectedAssistantsJson.value,
+      );
+    }
+    if (medicationRecordsJson.present) {
+      map['medication_records_json'] = Variable<String>(
+        medicationRecordsJson.value,
+      );
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('EmergencyRecordsCompanion(')
+          ..write('id: $id, ')
+          ..write('visitId: $visitId, ')
+          ..write('patientName: $patientName, ')
+          ..write('idNumber: $idNumber, ')
+          ..write('passportNumber: $passportNumber, ')
+          ..write('gender: $gender, ')
+          ..write('birthDate: $birthDate, ')
+          ..write('sourceIndex: $sourceIndex, ')
+          ..write('purposeIndex: $purposeIndex, ')
+          ..write('airlineIndex: $airlineIndex, ')
+          ..write('useOtherAirline: $useOtherAirline, ')
+          ..write('selectedOtherAirline: $selectedOtherAirline, ')
+          ..write('nationality: $nationality, ')
+          ..write('incidentDateTime: $incidentDateTime, ')
+          ..write('placeGroupIdx: $placeGroupIdx, ')
+          ..write('t1Selected: $t1Selected, ')
+          ..write('t2Selected: $t2Selected, ')
+          ..write('remoteSelected: $remoteSelected, ')
+          ..write('cargoSelected: $cargoSelected, ')
+          ..write('novotelSelected: $novotelSelected, ')
+          ..write('cabinSelected: $cabinSelected, ')
+          ..write('placeNote: $placeNote, ')
+          ..write('firstAidStartTime: $firstAidStartTime, ')
+          ..write('intubationStartTime: $intubationStartTime, ')
+          ..write('onIVLineStartTime: $onIVLineStartTime, ')
+          ..write('cardiacMassageStartTime: $cardiacMassageStartTime, ')
+          ..write('cardiacMassageEndTime: $cardiacMassageEndTime, ')
+          ..write('firstAidEndTime: $firstAidEndTime, ')
+          ..write('diagnosis: $diagnosis, ')
+          ..write('situation: $situation, ')
+          ..write('evmE: $evmE, ')
+          ..write('evmV: $evmV, ')
+          ..write('evmM: $evmM, ')
+          ..write('heartRate: $heartRate, ')
+          ..write('respirationRate: $respirationRate, ')
+          ..write('bloodPressure: $bloodPressure, ')
+          ..write('temperature: $temperature, ')
+          ..write('leftPupilSize: $leftPupilSize, ')
+          ..write('rightPupilSize: $rightPupilSize, ')
+          ..write('leftPupilReaction: $leftPupilReaction, ')
+          ..write('rightPupilReaction: $rightPupilReaction, ')
+          ..write('insertionMethod: $insertionMethod, ')
+          ..write('airwayContent: $airwayContent, ')
+          ..write('insertionRecord: $insertionRecord, ')
+          ..write('ivNeedleSize: $ivNeedleSize, ')
+          ..write('ivLineRecord: $ivLineRecord, ')
+          ..write('cardiacMassageRecord: $cardiacMassageRecord, ')
+          ..write('endRecord: $endRecord, ')
+          ..write('endResult: $endResult, ')
+          ..write('selectedHospital: $selectedHospital, ')
+          ..write('otherHospital: $otherHospital, ')
+          ..write('otherEndResult: $otherEndResult, ')
+          ..write('deathTime: $deathTime, ')
+          ..write('selectedDoctor: $selectedDoctor, ')
+          ..write('selectedNurse: $selectedNurse, ')
+          ..write('selectedEMT: $selectedEMT, ')
+          ..write('nurseSignature: $nurseSignature, ')
+          ..write('emtSignature: $emtSignature, ')
+          ..write('selectedAssistantsJson: $selectedAssistantsJson, ')
+          ..write('medicationRecordsJson: $medicationRecordsJson, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -18532,6 +22178,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $VitalSignsRecordsTable vitalSignsRecords =
       $VitalSignsRecordsTable(this);
   late final $ParamedicRecordsTable paramedicRecords = $ParamedicRecordsTable(
+    this,
+  );
+  late final $EmergencyRecordsTable emergencyRecords = $EmergencyRecordsTable(
     this,
   );
   late final VisitsDao visitsDao = VisitsDao(this as AppDatabase);
@@ -18571,6 +22220,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final ParamedicRecordsDao paramedicRecordsDao = ParamedicRecordsDao(
     this as AppDatabase,
   );
+  late final EmergencyRecordsDao emergencyRecordsDao = EmergencyRecordsDao(
+    this as AppDatabase,
+  );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -18591,6 +22243,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     medicationRecords,
     vitalSignsRecords,
     paramedicRecords,
+    emergencyRecords,
   ];
 }
 
@@ -18603,6 +22256,9 @@ typedef $$VisitsTableCreateCompanionBuilder =
       Value<String?> dept,
       Value<String?> note,
       Value<String?> filledBy,
+      Value<bool> hasEmergencyRecord,
+      Value<DateTime?> incidentDateTime,
+      Value<String?> emergencyResult,
       Value<DateTime> uploadedAt,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
@@ -18616,6 +22272,9 @@ typedef $$VisitsTableUpdateCompanionBuilder =
       Value<String?> dept,
       Value<String?> note,
       Value<String?> filledBy,
+      Value<bool> hasEmergencyRecord,
+      Value<DateTime?> incidentDateTime,
+      Value<String?> emergencyResult,
       Value<DateTime> uploadedAt,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
@@ -18744,6 +22403,21 @@ class $$VisitsTableFilterComposer
 
   ColumnFilters<String> get filledBy => $composableBuilder(
     column: $table.filledBy,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get hasEmergencyRecord => $composableBuilder(
+    column: $table.hasEmergencyRecord,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get incidentDateTime => $composableBuilder(
+    column: $table.incidentDateTime,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get emergencyResult => $composableBuilder(
+    column: $table.emergencyResult,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -18882,6 +22556,21 @@ class $$VisitsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<bool> get hasEmergencyRecord => $composableBuilder(
+    column: $table.hasEmergencyRecord,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get incidentDateTime => $composableBuilder(
+    column: $table.incidentDateTime,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get emergencyResult => $composableBuilder(
+    column: $table.emergencyResult,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get uploadedAt => $composableBuilder(
     column: $table.uploadedAt,
     builder: (column) => ColumnOrderings(column),
@@ -18931,6 +22620,21 @@ class $$VisitsTableAnnotationComposer
 
   GeneratedColumn<String> get filledBy =>
       $composableBuilder(column: $table.filledBy, builder: (column) => column);
+
+  GeneratedColumn<bool> get hasEmergencyRecord => $composableBuilder(
+    column: $table.hasEmergencyRecord,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get incidentDateTime => $composableBuilder(
+    column: $table.incidentDateTime,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get emergencyResult => $composableBuilder(
+    column: $table.emergencyResult,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<DateTime> get uploadedAt => $composableBuilder(
     column: $table.uploadedAt,
@@ -19060,6 +22764,9 @@ class $$VisitsTableTableManager
                 Value<String?> dept = const Value.absent(),
                 Value<String?> note = const Value.absent(),
                 Value<String?> filledBy = const Value.absent(),
+                Value<bool> hasEmergencyRecord = const Value.absent(),
+                Value<DateTime?> incidentDateTime = const Value.absent(),
+                Value<String?> emergencyResult = const Value.absent(),
                 Value<DateTime> uploadedAt = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
@@ -19071,6 +22778,9 @@ class $$VisitsTableTableManager
                 dept: dept,
                 note: note,
                 filledBy: filledBy,
+                hasEmergencyRecord: hasEmergencyRecord,
+                incidentDateTime: incidentDateTime,
+                emergencyResult: emergencyResult,
                 uploadedAt: uploadedAt,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
@@ -19084,6 +22794,9 @@ class $$VisitsTableTableManager
                 Value<String?> dept = const Value.absent(),
                 Value<String?> note = const Value.absent(),
                 Value<String?> filledBy = const Value.absent(),
+                Value<bool> hasEmergencyRecord = const Value.absent(),
+                Value<DateTime?> incidentDateTime = const Value.absent(),
+                Value<String?> emergencyResult = const Value.absent(),
                 Value<DateTime> uploadedAt = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
@@ -19095,6 +22808,9 @@ class $$VisitsTableTableManager
                 dept: dept,
                 note: note,
                 filledBy: filledBy,
+                hasEmergencyRecord: hasEmergencyRecord,
+                incidentDateTime: incidentDateTime,
+                emergencyResult: emergencyResult,
                 uploadedAt: uploadedAt,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
@@ -27232,6 +30948,1379 @@ typedef $$ParamedicRecordsTableProcessedTableManager =
       ParamedicRecord,
       PrefetchHooks Function({bool visitId})
     >;
+typedef $$EmergencyRecordsTableCreateCompanionBuilder =
+    EmergencyRecordsCompanion Function({
+      Value<int> id,
+      required int visitId,
+      Value<String?> patientName,
+      Value<String?> idNumber,
+      Value<String?> passportNumber,
+      Value<String?> gender,
+      Value<DateTime?> birthDate,
+      Value<int?> sourceIndex,
+      Value<int?> purposeIndex,
+      Value<int?> airlineIndex,
+      Value<bool> useOtherAirline,
+      Value<String?> selectedOtherAirline,
+      Value<String?> nationality,
+      Value<DateTime?> incidentDateTime,
+      Value<int?> placeGroupIdx,
+      Value<int?> t1Selected,
+      Value<int?> t2Selected,
+      Value<int?> remoteSelected,
+      Value<int?> cargoSelected,
+      Value<int?> novotelSelected,
+      Value<int?> cabinSelected,
+      Value<String?> placeNote,
+      Value<DateTime?> firstAidStartTime,
+      Value<DateTime?> intubationStartTime,
+      Value<DateTime?> onIVLineStartTime,
+      Value<DateTime?> cardiacMassageStartTime,
+      Value<DateTime?> cardiacMassageEndTime,
+      Value<DateTime?> firstAidEndTime,
+      Value<String?> diagnosis,
+      Value<String?> situation,
+      Value<String?> evmE,
+      Value<String?> evmV,
+      Value<String?> evmM,
+      Value<String?> heartRate,
+      Value<String?> respirationRate,
+      Value<String?> bloodPressure,
+      Value<String?> temperature,
+      Value<String?> leftPupilSize,
+      Value<String?> rightPupilSize,
+      Value<String?> leftPupilReaction,
+      Value<String?> rightPupilReaction,
+      Value<String?> insertionMethod,
+      Value<String?> airwayContent,
+      Value<String?> insertionRecord,
+      Value<String?> ivNeedleSize,
+      Value<String?> ivLineRecord,
+      Value<String?> cardiacMassageRecord,
+      Value<String?> endRecord,
+      Value<String?> endResult,
+      Value<String?> selectedHospital,
+      Value<String?> otherHospital,
+      Value<String?> otherEndResult,
+      Value<DateTime?> deathTime,
+      Value<String?> selectedDoctor,
+      Value<String?> selectedNurse,
+      Value<String?> selectedEMT,
+      Value<String?> nurseSignature,
+      Value<String?> emtSignature,
+      Value<String> selectedAssistantsJson,
+      Value<String> medicationRecordsJson,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+    });
+typedef $$EmergencyRecordsTableUpdateCompanionBuilder =
+    EmergencyRecordsCompanion Function({
+      Value<int> id,
+      Value<int> visitId,
+      Value<String?> patientName,
+      Value<String?> idNumber,
+      Value<String?> passportNumber,
+      Value<String?> gender,
+      Value<DateTime?> birthDate,
+      Value<int?> sourceIndex,
+      Value<int?> purposeIndex,
+      Value<int?> airlineIndex,
+      Value<bool> useOtherAirline,
+      Value<String?> selectedOtherAirline,
+      Value<String?> nationality,
+      Value<DateTime?> incidentDateTime,
+      Value<int?> placeGroupIdx,
+      Value<int?> t1Selected,
+      Value<int?> t2Selected,
+      Value<int?> remoteSelected,
+      Value<int?> cargoSelected,
+      Value<int?> novotelSelected,
+      Value<int?> cabinSelected,
+      Value<String?> placeNote,
+      Value<DateTime?> firstAidStartTime,
+      Value<DateTime?> intubationStartTime,
+      Value<DateTime?> onIVLineStartTime,
+      Value<DateTime?> cardiacMassageStartTime,
+      Value<DateTime?> cardiacMassageEndTime,
+      Value<DateTime?> firstAidEndTime,
+      Value<String?> diagnosis,
+      Value<String?> situation,
+      Value<String?> evmE,
+      Value<String?> evmV,
+      Value<String?> evmM,
+      Value<String?> heartRate,
+      Value<String?> respirationRate,
+      Value<String?> bloodPressure,
+      Value<String?> temperature,
+      Value<String?> leftPupilSize,
+      Value<String?> rightPupilSize,
+      Value<String?> leftPupilReaction,
+      Value<String?> rightPupilReaction,
+      Value<String?> insertionMethod,
+      Value<String?> airwayContent,
+      Value<String?> insertionRecord,
+      Value<String?> ivNeedleSize,
+      Value<String?> ivLineRecord,
+      Value<String?> cardiacMassageRecord,
+      Value<String?> endRecord,
+      Value<String?> endResult,
+      Value<String?> selectedHospital,
+      Value<String?> otherHospital,
+      Value<String?> otherEndResult,
+      Value<DateTime?> deathTime,
+      Value<String?> selectedDoctor,
+      Value<String?> selectedNurse,
+      Value<String?> selectedEMT,
+      Value<String?> nurseSignature,
+      Value<String?> emtSignature,
+      Value<String> selectedAssistantsJson,
+      Value<String> medicationRecordsJson,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+    });
+
+class $$EmergencyRecordsTableFilterComposer
+    extends Composer<_$AppDatabase, $EmergencyRecordsTable> {
+  $$EmergencyRecordsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get visitId => $composableBuilder(
+    column: $table.visitId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get patientName => $composableBuilder(
+    column: $table.patientName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get idNumber => $composableBuilder(
+    column: $table.idNumber,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get passportNumber => $composableBuilder(
+    column: $table.passportNumber,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get gender => $composableBuilder(
+    column: $table.gender,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get birthDate => $composableBuilder(
+    column: $table.birthDate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get sourceIndex => $composableBuilder(
+    column: $table.sourceIndex,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get purposeIndex => $composableBuilder(
+    column: $table.purposeIndex,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get airlineIndex => $composableBuilder(
+    column: $table.airlineIndex,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get useOtherAirline => $composableBuilder(
+    column: $table.useOtherAirline,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get selectedOtherAirline => $composableBuilder(
+    column: $table.selectedOtherAirline,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get nationality => $composableBuilder(
+    column: $table.nationality,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get incidentDateTime => $composableBuilder(
+    column: $table.incidentDateTime,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get placeGroupIdx => $composableBuilder(
+    column: $table.placeGroupIdx,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get t1Selected => $composableBuilder(
+    column: $table.t1Selected,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get t2Selected => $composableBuilder(
+    column: $table.t2Selected,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get remoteSelected => $composableBuilder(
+    column: $table.remoteSelected,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get cargoSelected => $composableBuilder(
+    column: $table.cargoSelected,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get novotelSelected => $composableBuilder(
+    column: $table.novotelSelected,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get cabinSelected => $composableBuilder(
+    column: $table.cabinSelected,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get placeNote => $composableBuilder(
+    column: $table.placeNote,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get firstAidStartTime => $composableBuilder(
+    column: $table.firstAidStartTime,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get intubationStartTime => $composableBuilder(
+    column: $table.intubationStartTime,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get onIVLineStartTime => $composableBuilder(
+    column: $table.onIVLineStartTime,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get cardiacMassageStartTime => $composableBuilder(
+    column: $table.cardiacMassageStartTime,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get cardiacMassageEndTime => $composableBuilder(
+    column: $table.cardiacMassageEndTime,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get firstAidEndTime => $composableBuilder(
+    column: $table.firstAidEndTime,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get diagnosis => $composableBuilder(
+    column: $table.diagnosis,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get situation => $composableBuilder(
+    column: $table.situation,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get evmE => $composableBuilder(
+    column: $table.evmE,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get evmV => $composableBuilder(
+    column: $table.evmV,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get evmM => $composableBuilder(
+    column: $table.evmM,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get heartRate => $composableBuilder(
+    column: $table.heartRate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get respirationRate => $composableBuilder(
+    column: $table.respirationRate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get bloodPressure => $composableBuilder(
+    column: $table.bloodPressure,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get temperature => $composableBuilder(
+    column: $table.temperature,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get leftPupilSize => $composableBuilder(
+    column: $table.leftPupilSize,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get rightPupilSize => $composableBuilder(
+    column: $table.rightPupilSize,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get leftPupilReaction => $composableBuilder(
+    column: $table.leftPupilReaction,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get rightPupilReaction => $composableBuilder(
+    column: $table.rightPupilReaction,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get insertionMethod => $composableBuilder(
+    column: $table.insertionMethod,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get airwayContent => $composableBuilder(
+    column: $table.airwayContent,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get insertionRecord => $composableBuilder(
+    column: $table.insertionRecord,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get ivNeedleSize => $composableBuilder(
+    column: $table.ivNeedleSize,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get ivLineRecord => $composableBuilder(
+    column: $table.ivLineRecord,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get cardiacMassageRecord => $composableBuilder(
+    column: $table.cardiacMassageRecord,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get endRecord => $composableBuilder(
+    column: $table.endRecord,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get endResult => $composableBuilder(
+    column: $table.endResult,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get selectedHospital => $composableBuilder(
+    column: $table.selectedHospital,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get otherHospital => $composableBuilder(
+    column: $table.otherHospital,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get otherEndResult => $composableBuilder(
+    column: $table.otherEndResult,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get deathTime => $composableBuilder(
+    column: $table.deathTime,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get selectedDoctor => $composableBuilder(
+    column: $table.selectedDoctor,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get selectedNurse => $composableBuilder(
+    column: $table.selectedNurse,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get selectedEMT => $composableBuilder(
+    column: $table.selectedEMT,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get nurseSignature => $composableBuilder(
+    column: $table.nurseSignature,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get emtSignature => $composableBuilder(
+    column: $table.emtSignature,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get selectedAssistantsJson => $composableBuilder(
+    column: $table.selectedAssistantsJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get medicationRecordsJson => $composableBuilder(
+    column: $table.medicationRecordsJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$EmergencyRecordsTableOrderingComposer
+    extends Composer<_$AppDatabase, $EmergencyRecordsTable> {
+  $$EmergencyRecordsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get visitId => $composableBuilder(
+    column: $table.visitId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get patientName => $composableBuilder(
+    column: $table.patientName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get idNumber => $composableBuilder(
+    column: $table.idNumber,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get passportNumber => $composableBuilder(
+    column: $table.passportNumber,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get gender => $composableBuilder(
+    column: $table.gender,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get birthDate => $composableBuilder(
+    column: $table.birthDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get sourceIndex => $composableBuilder(
+    column: $table.sourceIndex,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get purposeIndex => $composableBuilder(
+    column: $table.purposeIndex,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get airlineIndex => $composableBuilder(
+    column: $table.airlineIndex,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get useOtherAirline => $composableBuilder(
+    column: $table.useOtherAirline,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get selectedOtherAirline => $composableBuilder(
+    column: $table.selectedOtherAirline,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get nationality => $composableBuilder(
+    column: $table.nationality,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get incidentDateTime => $composableBuilder(
+    column: $table.incidentDateTime,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get placeGroupIdx => $composableBuilder(
+    column: $table.placeGroupIdx,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get t1Selected => $composableBuilder(
+    column: $table.t1Selected,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get t2Selected => $composableBuilder(
+    column: $table.t2Selected,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get remoteSelected => $composableBuilder(
+    column: $table.remoteSelected,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get cargoSelected => $composableBuilder(
+    column: $table.cargoSelected,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get novotelSelected => $composableBuilder(
+    column: $table.novotelSelected,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get cabinSelected => $composableBuilder(
+    column: $table.cabinSelected,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get placeNote => $composableBuilder(
+    column: $table.placeNote,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get firstAidStartTime => $composableBuilder(
+    column: $table.firstAidStartTime,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get intubationStartTime => $composableBuilder(
+    column: $table.intubationStartTime,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get onIVLineStartTime => $composableBuilder(
+    column: $table.onIVLineStartTime,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get cardiacMassageStartTime => $composableBuilder(
+    column: $table.cardiacMassageStartTime,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get cardiacMassageEndTime => $composableBuilder(
+    column: $table.cardiacMassageEndTime,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get firstAidEndTime => $composableBuilder(
+    column: $table.firstAidEndTime,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get diagnosis => $composableBuilder(
+    column: $table.diagnosis,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get situation => $composableBuilder(
+    column: $table.situation,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get evmE => $composableBuilder(
+    column: $table.evmE,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get evmV => $composableBuilder(
+    column: $table.evmV,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get evmM => $composableBuilder(
+    column: $table.evmM,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get heartRate => $composableBuilder(
+    column: $table.heartRate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get respirationRate => $composableBuilder(
+    column: $table.respirationRate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get bloodPressure => $composableBuilder(
+    column: $table.bloodPressure,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get temperature => $composableBuilder(
+    column: $table.temperature,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get leftPupilSize => $composableBuilder(
+    column: $table.leftPupilSize,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get rightPupilSize => $composableBuilder(
+    column: $table.rightPupilSize,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get leftPupilReaction => $composableBuilder(
+    column: $table.leftPupilReaction,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get rightPupilReaction => $composableBuilder(
+    column: $table.rightPupilReaction,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get insertionMethod => $composableBuilder(
+    column: $table.insertionMethod,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get airwayContent => $composableBuilder(
+    column: $table.airwayContent,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get insertionRecord => $composableBuilder(
+    column: $table.insertionRecord,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get ivNeedleSize => $composableBuilder(
+    column: $table.ivNeedleSize,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get ivLineRecord => $composableBuilder(
+    column: $table.ivLineRecord,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get cardiacMassageRecord => $composableBuilder(
+    column: $table.cardiacMassageRecord,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get endRecord => $composableBuilder(
+    column: $table.endRecord,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get endResult => $composableBuilder(
+    column: $table.endResult,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get selectedHospital => $composableBuilder(
+    column: $table.selectedHospital,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get otherHospital => $composableBuilder(
+    column: $table.otherHospital,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get otherEndResult => $composableBuilder(
+    column: $table.otherEndResult,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get deathTime => $composableBuilder(
+    column: $table.deathTime,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get selectedDoctor => $composableBuilder(
+    column: $table.selectedDoctor,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get selectedNurse => $composableBuilder(
+    column: $table.selectedNurse,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get selectedEMT => $composableBuilder(
+    column: $table.selectedEMT,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get nurseSignature => $composableBuilder(
+    column: $table.nurseSignature,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get emtSignature => $composableBuilder(
+    column: $table.emtSignature,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get selectedAssistantsJson => $composableBuilder(
+    column: $table.selectedAssistantsJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get medicationRecordsJson => $composableBuilder(
+    column: $table.medicationRecordsJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$EmergencyRecordsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $EmergencyRecordsTable> {
+  $$EmergencyRecordsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get visitId =>
+      $composableBuilder(column: $table.visitId, builder: (column) => column);
+
+  GeneratedColumn<String> get patientName => $composableBuilder(
+    column: $table.patientName,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get idNumber =>
+      $composableBuilder(column: $table.idNumber, builder: (column) => column);
+
+  GeneratedColumn<String> get passportNumber => $composableBuilder(
+    column: $table.passportNumber,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get gender =>
+      $composableBuilder(column: $table.gender, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get birthDate =>
+      $composableBuilder(column: $table.birthDate, builder: (column) => column);
+
+  GeneratedColumn<int> get sourceIndex => $composableBuilder(
+    column: $table.sourceIndex,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get purposeIndex => $composableBuilder(
+    column: $table.purposeIndex,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get airlineIndex => $composableBuilder(
+    column: $table.airlineIndex,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get useOtherAirline => $composableBuilder(
+    column: $table.useOtherAirline,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get selectedOtherAirline => $composableBuilder(
+    column: $table.selectedOtherAirline,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get nationality => $composableBuilder(
+    column: $table.nationality,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get incidentDateTime => $composableBuilder(
+    column: $table.incidentDateTime,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get placeGroupIdx => $composableBuilder(
+    column: $table.placeGroupIdx,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get t1Selected => $composableBuilder(
+    column: $table.t1Selected,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get t2Selected => $composableBuilder(
+    column: $table.t2Selected,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get remoteSelected => $composableBuilder(
+    column: $table.remoteSelected,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get cargoSelected => $composableBuilder(
+    column: $table.cargoSelected,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get novotelSelected => $composableBuilder(
+    column: $table.novotelSelected,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get cabinSelected => $composableBuilder(
+    column: $table.cabinSelected,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get placeNote =>
+      $composableBuilder(column: $table.placeNote, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get firstAidStartTime => $composableBuilder(
+    column: $table.firstAidStartTime,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get intubationStartTime => $composableBuilder(
+    column: $table.intubationStartTime,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get onIVLineStartTime => $composableBuilder(
+    column: $table.onIVLineStartTime,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get cardiacMassageStartTime => $composableBuilder(
+    column: $table.cardiacMassageStartTime,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get cardiacMassageEndTime => $composableBuilder(
+    column: $table.cardiacMassageEndTime,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get firstAidEndTime => $composableBuilder(
+    column: $table.firstAidEndTime,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get diagnosis =>
+      $composableBuilder(column: $table.diagnosis, builder: (column) => column);
+
+  GeneratedColumn<String> get situation =>
+      $composableBuilder(column: $table.situation, builder: (column) => column);
+
+  GeneratedColumn<String> get evmE =>
+      $composableBuilder(column: $table.evmE, builder: (column) => column);
+
+  GeneratedColumn<String> get evmV =>
+      $composableBuilder(column: $table.evmV, builder: (column) => column);
+
+  GeneratedColumn<String> get evmM =>
+      $composableBuilder(column: $table.evmM, builder: (column) => column);
+
+  GeneratedColumn<String> get heartRate =>
+      $composableBuilder(column: $table.heartRate, builder: (column) => column);
+
+  GeneratedColumn<String> get respirationRate => $composableBuilder(
+    column: $table.respirationRate,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get bloodPressure => $composableBuilder(
+    column: $table.bloodPressure,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get temperature => $composableBuilder(
+    column: $table.temperature,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get leftPupilSize => $composableBuilder(
+    column: $table.leftPupilSize,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get rightPupilSize => $composableBuilder(
+    column: $table.rightPupilSize,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get leftPupilReaction => $composableBuilder(
+    column: $table.leftPupilReaction,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get rightPupilReaction => $composableBuilder(
+    column: $table.rightPupilReaction,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get insertionMethod => $composableBuilder(
+    column: $table.insertionMethod,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get airwayContent => $composableBuilder(
+    column: $table.airwayContent,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get insertionRecord => $composableBuilder(
+    column: $table.insertionRecord,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get ivNeedleSize => $composableBuilder(
+    column: $table.ivNeedleSize,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get ivLineRecord => $composableBuilder(
+    column: $table.ivLineRecord,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get cardiacMassageRecord => $composableBuilder(
+    column: $table.cardiacMassageRecord,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get endRecord =>
+      $composableBuilder(column: $table.endRecord, builder: (column) => column);
+
+  GeneratedColumn<String> get endResult =>
+      $composableBuilder(column: $table.endResult, builder: (column) => column);
+
+  GeneratedColumn<String> get selectedHospital => $composableBuilder(
+    column: $table.selectedHospital,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get otherHospital => $composableBuilder(
+    column: $table.otherHospital,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get otherEndResult => $composableBuilder(
+    column: $table.otherEndResult,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get deathTime =>
+      $composableBuilder(column: $table.deathTime, builder: (column) => column);
+
+  GeneratedColumn<String> get selectedDoctor => $composableBuilder(
+    column: $table.selectedDoctor,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get selectedNurse => $composableBuilder(
+    column: $table.selectedNurse,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get selectedEMT => $composableBuilder(
+    column: $table.selectedEMT,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get nurseSignature => $composableBuilder(
+    column: $table.nurseSignature,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get emtSignature => $composableBuilder(
+    column: $table.emtSignature,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get selectedAssistantsJson => $composableBuilder(
+    column: $table.selectedAssistantsJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get medicationRecordsJson => $composableBuilder(
+    column: $table.medicationRecordsJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$EmergencyRecordsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $EmergencyRecordsTable,
+          EmergencyRecord,
+          $$EmergencyRecordsTableFilterComposer,
+          $$EmergencyRecordsTableOrderingComposer,
+          $$EmergencyRecordsTableAnnotationComposer,
+          $$EmergencyRecordsTableCreateCompanionBuilder,
+          $$EmergencyRecordsTableUpdateCompanionBuilder,
+          (
+            EmergencyRecord,
+            BaseReferences<
+              _$AppDatabase,
+              $EmergencyRecordsTable,
+              EmergencyRecord
+            >,
+          ),
+          EmergencyRecord,
+          PrefetchHooks Function()
+        > {
+  $$EmergencyRecordsTableTableManager(
+    _$AppDatabase db,
+    $EmergencyRecordsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$EmergencyRecordsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$EmergencyRecordsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$EmergencyRecordsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> visitId = const Value.absent(),
+                Value<String?> patientName = const Value.absent(),
+                Value<String?> idNumber = const Value.absent(),
+                Value<String?> passportNumber = const Value.absent(),
+                Value<String?> gender = const Value.absent(),
+                Value<DateTime?> birthDate = const Value.absent(),
+                Value<int?> sourceIndex = const Value.absent(),
+                Value<int?> purposeIndex = const Value.absent(),
+                Value<int?> airlineIndex = const Value.absent(),
+                Value<bool> useOtherAirline = const Value.absent(),
+                Value<String?> selectedOtherAirline = const Value.absent(),
+                Value<String?> nationality = const Value.absent(),
+                Value<DateTime?> incidentDateTime = const Value.absent(),
+                Value<int?> placeGroupIdx = const Value.absent(),
+                Value<int?> t1Selected = const Value.absent(),
+                Value<int?> t2Selected = const Value.absent(),
+                Value<int?> remoteSelected = const Value.absent(),
+                Value<int?> cargoSelected = const Value.absent(),
+                Value<int?> novotelSelected = const Value.absent(),
+                Value<int?> cabinSelected = const Value.absent(),
+                Value<String?> placeNote = const Value.absent(),
+                Value<DateTime?> firstAidStartTime = const Value.absent(),
+                Value<DateTime?> intubationStartTime = const Value.absent(),
+                Value<DateTime?> onIVLineStartTime = const Value.absent(),
+                Value<DateTime?> cardiacMassageStartTime = const Value.absent(),
+                Value<DateTime?> cardiacMassageEndTime = const Value.absent(),
+                Value<DateTime?> firstAidEndTime = const Value.absent(),
+                Value<String?> diagnosis = const Value.absent(),
+                Value<String?> situation = const Value.absent(),
+                Value<String?> evmE = const Value.absent(),
+                Value<String?> evmV = const Value.absent(),
+                Value<String?> evmM = const Value.absent(),
+                Value<String?> heartRate = const Value.absent(),
+                Value<String?> respirationRate = const Value.absent(),
+                Value<String?> bloodPressure = const Value.absent(),
+                Value<String?> temperature = const Value.absent(),
+                Value<String?> leftPupilSize = const Value.absent(),
+                Value<String?> rightPupilSize = const Value.absent(),
+                Value<String?> leftPupilReaction = const Value.absent(),
+                Value<String?> rightPupilReaction = const Value.absent(),
+                Value<String?> insertionMethod = const Value.absent(),
+                Value<String?> airwayContent = const Value.absent(),
+                Value<String?> insertionRecord = const Value.absent(),
+                Value<String?> ivNeedleSize = const Value.absent(),
+                Value<String?> ivLineRecord = const Value.absent(),
+                Value<String?> cardiacMassageRecord = const Value.absent(),
+                Value<String?> endRecord = const Value.absent(),
+                Value<String?> endResult = const Value.absent(),
+                Value<String?> selectedHospital = const Value.absent(),
+                Value<String?> otherHospital = const Value.absent(),
+                Value<String?> otherEndResult = const Value.absent(),
+                Value<DateTime?> deathTime = const Value.absent(),
+                Value<String?> selectedDoctor = const Value.absent(),
+                Value<String?> selectedNurse = const Value.absent(),
+                Value<String?> selectedEMT = const Value.absent(),
+                Value<String?> nurseSignature = const Value.absent(),
+                Value<String?> emtSignature = const Value.absent(),
+                Value<String> selectedAssistantsJson = const Value.absent(),
+                Value<String> medicationRecordsJson = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+              }) => EmergencyRecordsCompanion(
+                id: id,
+                visitId: visitId,
+                patientName: patientName,
+                idNumber: idNumber,
+                passportNumber: passportNumber,
+                gender: gender,
+                birthDate: birthDate,
+                sourceIndex: sourceIndex,
+                purposeIndex: purposeIndex,
+                airlineIndex: airlineIndex,
+                useOtherAirline: useOtherAirline,
+                selectedOtherAirline: selectedOtherAirline,
+                nationality: nationality,
+                incidentDateTime: incidentDateTime,
+                placeGroupIdx: placeGroupIdx,
+                t1Selected: t1Selected,
+                t2Selected: t2Selected,
+                remoteSelected: remoteSelected,
+                cargoSelected: cargoSelected,
+                novotelSelected: novotelSelected,
+                cabinSelected: cabinSelected,
+                placeNote: placeNote,
+                firstAidStartTime: firstAidStartTime,
+                intubationStartTime: intubationStartTime,
+                onIVLineStartTime: onIVLineStartTime,
+                cardiacMassageStartTime: cardiacMassageStartTime,
+                cardiacMassageEndTime: cardiacMassageEndTime,
+                firstAidEndTime: firstAidEndTime,
+                diagnosis: diagnosis,
+                situation: situation,
+                evmE: evmE,
+                evmV: evmV,
+                evmM: evmM,
+                heartRate: heartRate,
+                respirationRate: respirationRate,
+                bloodPressure: bloodPressure,
+                temperature: temperature,
+                leftPupilSize: leftPupilSize,
+                rightPupilSize: rightPupilSize,
+                leftPupilReaction: leftPupilReaction,
+                rightPupilReaction: rightPupilReaction,
+                insertionMethod: insertionMethod,
+                airwayContent: airwayContent,
+                insertionRecord: insertionRecord,
+                ivNeedleSize: ivNeedleSize,
+                ivLineRecord: ivLineRecord,
+                cardiacMassageRecord: cardiacMassageRecord,
+                endRecord: endRecord,
+                endResult: endResult,
+                selectedHospital: selectedHospital,
+                otherHospital: otherHospital,
+                otherEndResult: otherEndResult,
+                deathTime: deathTime,
+                selectedDoctor: selectedDoctor,
+                selectedNurse: selectedNurse,
+                selectedEMT: selectedEMT,
+                nurseSignature: nurseSignature,
+                emtSignature: emtSignature,
+                selectedAssistantsJson: selectedAssistantsJson,
+                medicationRecordsJson: medicationRecordsJson,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int visitId,
+                Value<String?> patientName = const Value.absent(),
+                Value<String?> idNumber = const Value.absent(),
+                Value<String?> passportNumber = const Value.absent(),
+                Value<String?> gender = const Value.absent(),
+                Value<DateTime?> birthDate = const Value.absent(),
+                Value<int?> sourceIndex = const Value.absent(),
+                Value<int?> purposeIndex = const Value.absent(),
+                Value<int?> airlineIndex = const Value.absent(),
+                Value<bool> useOtherAirline = const Value.absent(),
+                Value<String?> selectedOtherAirline = const Value.absent(),
+                Value<String?> nationality = const Value.absent(),
+                Value<DateTime?> incidentDateTime = const Value.absent(),
+                Value<int?> placeGroupIdx = const Value.absent(),
+                Value<int?> t1Selected = const Value.absent(),
+                Value<int?> t2Selected = const Value.absent(),
+                Value<int?> remoteSelected = const Value.absent(),
+                Value<int?> cargoSelected = const Value.absent(),
+                Value<int?> novotelSelected = const Value.absent(),
+                Value<int?> cabinSelected = const Value.absent(),
+                Value<String?> placeNote = const Value.absent(),
+                Value<DateTime?> firstAidStartTime = const Value.absent(),
+                Value<DateTime?> intubationStartTime = const Value.absent(),
+                Value<DateTime?> onIVLineStartTime = const Value.absent(),
+                Value<DateTime?> cardiacMassageStartTime = const Value.absent(),
+                Value<DateTime?> cardiacMassageEndTime = const Value.absent(),
+                Value<DateTime?> firstAidEndTime = const Value.absent(),
+                Value<String?> diagnosis = const Value.absent(),
+                Value<String?> situation = const Value.absent(),
+                Value<String?> evmE = const Value.absent(),
+                Value<String?> evmV = const Value.absent(),
+                Value<String?> evmM = const Value.absent(),
+                Value<String?> heartRate = const Value.absent(),
+                Value<String?> respirationRate = const Value.absent(),
+                Value<String?> bloodPressure = const Value.absent(),
+                Value<String?> temperature = const Value.absent(),
+                Value<String?> leftPupilSize = const Value.absent(),
+                Value<String?> rightPupilSize = const Value.absent(),
+                Value<String?> leftPupilReaction = const Value.absent(),
+                Value<String?> rightPupilReaction = const Value.absent(),
+                Value<String?> insertionMethod = const Value.absent(),
+                Value<String?> airwayContent = const Value.absent(),
+                Value<String?> insertionRecord = const Value.absent(),
+                Value<String?> ivNeedleSize = const Value.absent(),
+                Value<String?> ivLineRecord = const Value.absent(),
+                Value<String?> cardiacMassageRecord = const Value.absent(),
+                Value<String?> endRecord = const Value.absent(),
+                Value<String?> endResult = const Value.absent(),
+                Value<String?> selectedHospital = const Value.absent(),
+                Value<String?> otherHospital = const Value.absent(),
+                Value<String?> otherEndResult = const Value.absent(),
+                Value<DateTime?> deathTime = const Value.absent(),
+                Value<String?> selectedDoctor = const Value.absent(),
+                Value<String?> selectedNurse = const Value.absent(),
+                Value<String?> selectedEMT = const Value.absent(),
+                Value<String?> nurseSignature = const Value.absent(),
+                Value<String?> emtSignature = const Value.absent(),
+                Value<String> selectedAssistantsJson = const Value.absent(),
+                Value<String> medicationRecordsJson = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+              }) => EmergencyRecordsCompanion.insert(
+                id: id,
+                visitId: visitId,
+                patientName: patientName,
+                idNumber: idNumber,
+                passportNumber: passportNumber,
+                gender: gender,
+                birthDate: birthDate,
+                sourceIndex: sourceIndex,
+                purposeIndex: purposeIndex,
+                airlineIndex: airlineIndex,
+                useOtherAirline: useOtherAirline,
+                selectedOtherAirline: selectedOtherAirline,
+                nationality: nationality,
+                incidentDateTime: incidentDateTime,
+                placeGroupIdx: placeGroupIdx,
+                t1Selected: t1Selected,
+                t2Selected: t2Selected,
+                remoteSelected: remoteSelected,
+                cargoSelected: cargoSelected,
+                novotelSelected: novotelSelected,
+                cabinSelected: cabinSelected,
+                placeNote: placeNote,
+                firstAidStartTime: firstAidStartTime,
+                intubationStartTime: intubationStartTime,
+                onIVLineStartTime: onIVLineStartTime,
+                cardiacMassageStartTime: cardiacMassageStartTime,
+                cardiacMassageEndTime: cardiacMassageEndTime,
+                firstAidEndTime: firstAidEndTime,
+                diagnosis: diagnosis,
+                situation: situation,
+                evmE: evmE,
+                evmV: evmV,
+                evmM: evmM,
+                heartRate: heartRate,
+                respirationRate: respirationRate,
+                bloodPressure: bloodPressure,
+                temperature: temperature,
+                leftPupilSize: leftPupilSize,
+                rightPupilSize: rightPupilSize,
+                leftPupilReaction: leftPupilReaction,
+                rightPupilReaction: rightPupilReaction,
+                insertionMethod: insertionMethod,
+                airwayContent: airwayContent,
+                insertionRecord: insertionRecord,
+                ivNeedleSize: ivNeedleSize,
+                ivLineRecord: ivLineRecord,
+                cardiacMassageRecord: cardiacMassageRecord,
+                endRecord: endRecord,
+                endResult: endResult,
+                selectedHospital: selectedHospital,
+                otherHospital: otherHospital,
+                otherEndResult: otherEndResult,
+                deathTime: deathTime,
+                selectedDoctor: selectedDoctor,
+                selectedNurse: selectedNurse,
+                selectedEMT: selectedEMT,
+                nurseSignature: nurseSignature,
+                emtSignature: emtSignature,
+                selectedAssistantsJson: selectedAssistantsJson,
+                medicationRecordsJson: medicationRecordsJson,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$EmergencyRecordsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $EmergencyRecordsTable,
+      EmergencyRecord,
+      $$EmergencyRecordsTableFilterComposer,
+      $$EmergencyRecordsTableOrderingComposer,
+      $$EmergencyRecordsTableAnnotationComposer,
+      $$EmergencyRecordsTableCreateCompanionBuilder,
+      $$EmergencyRecordsTableUpdateCompanionBuilder,
+      (
+        EmergencyRecord,
+        BaseReferences<_$AppDatabase, $EmergencyRecordsTable, EmergencyRecord>,
+      ),
+      EmergencyRecord,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -27266,4 +32355,6 @@ class $AppDatabaseManager {
       $$VitalSignsRecordsTableTableManager(_db, _db.vitalSignsRecords);
   $$ParamedicRecordsTableTableManager get paramedicRecords =>
       $$ParamedicRecordsTableTableManager(_db, _db.paramedicRecords);
+  $$EmergencyRecordsTableTableManager get emergencyRecords =>
+      $$EmergencyRecordsTableTableManager(_db, _db.emergencyRecords);
 }

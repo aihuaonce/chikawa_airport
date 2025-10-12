@@ -13,9 +13,17 @@ class VisitsDao extends DatabaseAccessor<AppDatabase> with _$VisitsDaoMixin {
 
   // 建立一筆主檔（回 visitId）
   Future<int> createVisit({String? patientName}) async {
-    final id = await into(
-      visits,
-    ).insert(VisitsCompanion.insert(patientName: Value(patientName)));
+    final id = await into(visits).insert(
+      VisitsCompanion.insert(
+        patientName: Value(patientName),
+        hasEmergencyRecord: const Value(true), // ✅ 預設標記為急救
+      ),
+    );
+
+    // ✅ 自動建立 EmergencyRecord
+    await db.emergencyRecordsDao.createRecordForVisit(id);
+    print('✅ 自動建立急救紀錄 (visitId: $id)');
+
     return id;
   }
 
@@ -57,6 +65,39 @@ class VisitsDao extends DatabaseAccessor<AppDatabase> with _$VisitsDaoMixin {
         dept: dept == null ? const Value.absent() : Value(dept),
         note: note == null ? const Value.absent() : Value(note),
         filledBy: filledBy == null ? const Value.absent() : Value(filledBy),
+        uploadedAt: uploadedAt == null
+            ? const Value.absent()
+            : Value(uploadedAt),
+        updatedAt: Value(DateTime.now()),
+      ),
+    );
+  }
+
+  Future<int> updateVisitForEmergency(
+    int visitId, {
+    String? patientName,
+    String? gender,
+    String? nationality,
+    DateTime? incidentDateTime,
+    String? emergencyResult,
+    DateTime? uploadedAt,
+  }) {
+    return (update(visits)..where((t) => t.visitId.equals(visitId))).write(
+      VisitsCompanion(
+        hasEmergencyRecord: const Value(true), // ✅ 標記為急救記錄
+        patientName: patientName == null
+            ? const Value.absent()
+            : Value(patientName),
+        gender: gender == null ? const Value.absent() : Value(gender),
+        nationality: nationality == null
+            ? const Value.absent()
+            : Value(nationality),
+        incidentDateTime: incidentDateTime == null
+            ? const Value.absent()
+            : Value(incidentDateTime),
+        emergencyResult: emergencyResult == null
+            ? const Value.absent()
+            : Value(emergencyResult),
         uploadedAt: uploadedAt == null
             ? const Value.absent()
             : Value(uploadedAt),
@@ -959,4 +1000,55 @@ class ParamedicRecordsDao extends DatabaseAccessor<AppDatabase>
 
   Future<void> deleteRecord(int id) =>
       (delete(paramedicRecords)..where((tbl) => tbl.id.equals(id))).go();
+}
+
+@DriftAccessor(tables: [EmergencyRecords, Visits])
+class EmergencyRecordsDao extends DatabaseAccessor<AppDatabase>
+    with _$EmergencyRecordsDaoMixin {
+  EmergencyRecordsDao(AppDatabase db) : super(db);
+
+  Future<EmergencyRecord?> getByVisitId(int visitId) {
+    return (select(
+      emergencyRecords,
+    )..where((tbl) => tbl.visitId.equals(visitId))).getSingleOrNull();
+  }
+
+  Future<int> createRecordForVisit(int visitId) {
+    return into(emergencyRecords).insert(
+      EmergencyRecordsCompanion.insert(
+        visitId: visitId,
+        firstAidStartTime: Value(DateTime.now()),
+      ),
+    );
+  }
+
+  Future<bool> recordExistsForVisit(int visitId) async {
+    final existing = await (select(
+      emergencyRecords,
+    )..where((tbl) => tbl.visitId.equals(visitId))).getSingleOrNull();
+    return existing != null;
+  }
+
+  Future<void> updateEmergencyRecord(EmergencyRecordsCompanion entry) {
+    return (update(
+      emergencyRecords,
+    )..where((t) => t.visitId.equals(entry.visitId.value))).write(entry);
+  }
+
+  // 查詢所有急救紀錄（用於首頁列表）
+  Stream<List<EmergencyRecord>> watchAll({String keyword = ''}) {
+    final query = select(emergencyRecords)
+      ..orderBy([(t) => OrderingTerm.desc(t.incidentDateTime)]);
+
+    if (keyword.isNotEmpty) {
+      query.where(
+        (t) =>
+            t.diagnosis.like('%$keyword%') |
+            t.selectedHospital.like('%$keyword%') |
+            t.nationality.like('%$keyword%'),
+      );
+    }
+
+    return query.watch();
+  }
 }
