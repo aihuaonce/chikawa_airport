@@ -24,36 +24,129 @@ class _EmergencyAccidentPageState extends State<EmergencyAccidentPage> {
   ];
 
   final List<String> t1Places = const [
-    '出境查驗台','入境查驗台','貴賓室',
-    '出境大廳(管制區外)','出境層(管制區內)',
-    '入境大廳(管制區外)','入境層(管制區內)',
-    '美食街','航警局','機場捷運','1號停車場','2號停車場',
-    '出境巴士下車處','入境巴士上車處','出境安檢','行李轉盤','海關處',
-    '登機門A1','登機門A2','登機門A3','登機門A4','登機門A5','登機門A6','登機門A7','登機門A8','登機門A9',
-    'A區轉機櫃檯','B區轉機櫃檯','A區轉機安檢','B區轉機安檢',
-    '航廈電車(管制區內)','航廈電車(管制區外)','其他位置',
-    '登機門B1','登機門B2','登機門B3','登機門B4','登機門B5','登機門B6','登機門B7','登機門B8','登機門B9','登機門B1R',
+    '出境查驗台',
+    '入境查驗台',
+    '貴賓室',
+    '出境大廳(管制區外)',
+    '出境層(管制區內)',
+    '入境大廳(管制區外)',
+    '入境層(管制區內)',
+    '美食街',
+    '航警局',
+    '機場捷運',
+    '1號停車場',
+    '2號停車場',
+    '出境巴士下車處',
+    '入境巴士上車處',
+    '出境安檢',
+    '行李轉盤',
+    '海關處',
+    '登機門A1',
+    '登機門A2',
+    '登機門A3',
+    '登機門A4',
+    '登機門A5',
+    '登機門A6',
+    '登機門A7',
+    '登機門A8',
+    '登機門A9',
+    'A區轉機櫃檯',
+    'B區轉機櫃檯',
+    'A區轉機安檢',
+    'B區轉機安檢',
+    '航廈電車(管制區內)',
+    '航廈電車(管制區外)',
+    '其他位置',
+    '登機門B1',
+    '登機門B2',
+    '登機門B3',
+    '登機門B4',
+    '登機門B5',
+    '登機門B6',
+    '登機門B7',
+    '登機門B8',
+    '登機門B9',
+    '登機門B1R',
   ];
 
   final List<String> t2Places = const [
-    '出境查驗台','入境查驗台','貴賓室',
-    '出境大廳(管制區外)','出境層(管制區內)',
-    '入境大廳(管制區外)','入境層(管制區內)',
-    '美食廣場','航警局','機場捷運','3號停車場','4號停車場',
-    '北側觀景台','南側觀景台','北揚5樓','南側5樓',
-    '登機門D1','登機門D2','登機門D3','登機門D4','登機門D5','登機門D6','登機門D7','登機門D8','登機門D9','登機門D10',
-    '登機門C1','登機門C2','登機門C3','登機門C4','登機門C5','登機門C6','登機門C7','登機門C8','登機門C9',
-    'C區轉機櫃檯','C區轉機安檢','航廈電車(管制區內)','航廈電車(管制區外)','其他位置','登機門C5R',
+    '出境查驗台',
+    '入境查驗台',
+    '貴賓室',
+    '出境大廳(管制區外)',
+    '出境層(管制區內)',
+    '入境大廳(管制區外)',
+    '入境層(管制區內)',
+    '美食廣場',
+    '航警局',
+    '機場捷運',
+    '3號停車場',
+    '4號停車場',
+    '北側觀景台',
+    '南側觀景台',
+    '北揚5樓',
+    '南側5樓',
+    '登機門D1',
+    '登機門D2',
+    '登機門D3',
+    '登機門D4',
+    '登機門D5',
+    '登機門D6',
+    '登機門D7',
+    '登機門D8',
+    '登機門D9',
+    '登機門D10',
+    '登機門C1',
+    '登機門C2',
+    '登機門C3',
+    '登機門C4',
+    '登機門C5',
+    '登機門C6',
+    '登機門C7',
+    '登機門C8',
+    '登機門C9',
+    'C區轉機櫃檯',
+    'C區轉機安檢',
+    '航廈電車(管制區內)',
+    '航廈電車(管制區外)',
+    '其他位置',
+    '登機門C5R',
   ];
 
   final List<String> remotePlaces = const [
-    '601','602','603','604','605','606','607','608','609','610','611','612','613','614','615',
+    '601',
+    '602',
+    '603',
+    '604',
+    '605',
+    '606',
+    '607',
+    '608',
+    '609',
+    '610',
+    '611',
+    '612',
+    '613',
+    '614',
+    '615',
   ];
 
   final List<String> cargoPlaces = const [
     '滑行道',
-    '506','507','508','509','510','511','512','513','514','515',
-    '台飛棚廠','維修停機坪','長榮航太','機坪其他位置',
+    '506',
+    '507',
+    '508',
+    '509',
+    '510',
+    '511',
+    '512',
+    '513',
+    '514',
+    '515',
+    '台飛棚廠',
+    '維修停機坪',
+    '長榮航太',
+    '機坪其他位置',
   ];
 
   final List<String> novotelPlaces = const ['諾富特飯店'];
@@ -104,7 +197,8 @@ class _EmergencyAccidentPageState extends State<EmergencyAccidentPage> {
                       label: '事發日期與時間',
                       value: data.incidentDateTime,
                       onPick: (dt) => data.updateAccident(incidentDateTime: dt),
-                      onNow: () => data.updateAccident(incidentDateTime: DateTime.now()),
+                      onNow: () =>
+                          data.updateAccident(incidentDateTime: DateTime.now()),
                     ),
                     const SizedBox(height: 16),
 
@@ -114,7 +208,6 @@ class _EmergencyAccidentPageState extends State<EmergencyAccidentPage> {
                     Container(
                       width: double.infinity,
                       decoration: BoxDecoration(
-                        color: const Color(0xFFFFE7CC),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       padding: const EdgeInsets.fromLTRB(12, 8, 12, 12),
@@ -160,22 +253,30 @@ class _EmergencyAccidentPageState extends State<EmergencyAccidentPage> {
   }
 
   Widget _bigCard({required Widget child}) => Container(
-        margin: const EdgeInsets.fromLTRB(24, 0, 24, 16),
-        padding: const EdgeInsets.fromLTRB(20, 18, 20, 22),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(_radius),
-          boxShadow: const [
-            BoxShadow(color: Color(0x14000000), blurRadius: 8, offset: Offset(0, 4)),
-          ],
+    margin: const EdgeInsets.fromLTRB(24, 0, 24, 16),
+    padding: const EdgeInsets.fromLTRB(20, 18, 20, 22),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(_radius),
+      boxShadow: const [
+        BoxShadow(
+          color: Color(0x14000000),
+          blurRadius: 8,
+          offset: Offset(0, 4),
         ),
-        child: child,
-      );
+      ],
+    ),
+    child: child,
+  );
 
   Widget _bold(String s) => Text(
-        s,
-        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Colors.black87),
-      );
+    s,
+    style: const TextStyle(
+      fontSize: 16,
+      fontWeight: FontWeight.w700,
+      color: Colors.black87,
+    ),
+  );
 
   Widget _dateTimeRow({
     required String label,
@@ -190,7 +291,11 @@ class _EmergencyAccidentPageState extends State<EmergencyAccidentPage> {
           width: 160,
           child: Text(
             label,
-            style: const TextStyle(fontSize: 15.5, color: Colors.black87, fontWeight: FontWeight.w700),
+            style: const TextStyle(
+              fontSize: 15.5,
+              color: Colors.black87,
+              fontWeight: FontWeight.w700,
+            ),
           ),
         ),
         InkWell(
@@ -207,10 +312,15 @@ class _EmergencyAccidentPageState extends State<EmergencyAccidentPage> {
                 initialTime: TimeOfDay.fromDateTime(value ?? DateTime.now()),
               );
               if (newTime != null) {
-                onPick(DateTime(
-                  newDate.year, newDate.month, newDate.day,
-                  newTime.hour, newTime.minute,
-                ));
+                onPick(
+                  DateTime(
+                    newDate.year,
+                    newDate.month,
+                    newDate.day,
+                    newTime.hour,
+                    newTime.minute,
+                  ),
+                );
               }
             }
           },
@@ -249,7 +359,11 @@ class _EmergencyAccidentPageState extends State<EmergencyAccidentPage> {
           width: 100,
           child: Text(
             label,
-            style: const TextStyle(fontSize: 15.5, color: Colors.black87, fontWeight: FontWeight.w700),
+            style: const TextStyle(
+              fontSize: 15.5,
+              color: Colors.black87,
+              fontWeight: FontWeight.w700,
+            ),
           ),
         ),
         Align(
@@ -264,7 +378,10 @@ class _EmergencyAccidentPageState extends State<EmergencyAccidentPage> {
                 decoration: const InputDecoration(
                   isDense: true,
                   border: OutlineInputBorder(),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 10,
+                  ),
                 ).copyWith(hintText: hint),
               ),
             ),
@@ -358,7 +475,9 @@ class _EmergencyAccidentPageState extends State<EmergencyAccidentPage> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Icon(
-                  selected ? Icons.radio_button_checked : Icons.radio_button_off,
+                  selected
+                      ? Icons.radio_button_checked
+                      : Icons.radio_button_off,
                   size: 20,
                   color: selected ? const Color(0xFF274C4A) : Colors.black45,
                 ),
