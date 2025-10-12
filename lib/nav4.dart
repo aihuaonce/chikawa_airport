@@ -34,7 +34,8 @@ class Nav4Page extends StatelessWidget {
             data.loadFromDatabase(dao);
             return data;
           },
-          update: (context, dao, previous) => previous ?? EmergencyData(visitId),
+          update: (context, dao, previous) =>
+              previous ?? EmergencyData(visitId),
         ),
       ],
       child: const EmergencyMainLayout(),
@@ -84,9 +85,7 @@ class EmergencyMainLayout extends StatelessWidget {
                     child: Nav3Section(),
                   ),
                   const SizedBox(height: 8),
-                  Expanded(
-                    child: SingleChildScrollView(child: currentPage),
-                  ),
+                  Expanded(child: SingleChildScrollView(child: currentPage)),
                 ],
               ),
             ),
@@ -108,85 +107,70 @@ class _EmergencyNavBarState extends State<EmergencyNavBar> {
   bool _isSaving = false;
 
   Future<void> _handleSave() async {
-  if (_isSaving) return;
-  
-  setState(() => _isSaving = true);
+    if (_isSaving) return;
 
-  try {
-    final emergencyData = context.read<EmergencyData>();
-    final dao = context.read<EmergencyRecordsDao>();
-    final visitsDao = context.read<VisitsDao>();
-    
-    print('🔵 開始儲存 visitId: ${emergencyData.visitId}');
-    print('📝 病患姓名: ${emergencyData.patientName}');
-    print('📝 事發時間: ${emergencyData.incidentDateTime}');
-    print('📝 急救結果: ${emergencyData.endResult}');
-    
-    // 呼叫 Provider 的儲存方法
-    await emergencyData.saveToDatabase(dao, visitsDao);
+    setState(() => _isSaving = true);
 
-    // ✅ 驗證是否真的儲存成功
-    final savedVisit = await visitsDao.getById(emergencyData.visitId);
-    print('✅ 儲存後的 Visit 資料:');
-    print('   - hasEmergencyRecord: ${savedVisit?.hasEmergencyRecord}');
-    print('   - patientName: ${savedVisit?.patientName}');
-    print('   - incidentDateTime: ${savedVisit?.incidentDateTime}');
-    print('   - emergencyResult: ${savedVisit?.emergencyResult}');
+    try {
+      final emergencyData = context.read<EmergencyData>();
+      final dao = context.read<EmergencyRecordsDao>();
+      final visitsDao = context.read<VisitsDao>();
 
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('急救記錄已儲存成功!'),
-          backgroundColor: Colors.green,
-          duration: Duration(seconds: 2),
-        ),
-      );
-      
-      // 儲存成功後返回上一頁
-      Navigator.of(context).pop();
-    }
-  } catch (e, stackTrace) {
-    print('❌ 儲存失敗: $e');
-    print('堆疊: $stackTrace');
-    
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('儲存失敗: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
-    }
-  } finally {
-    if (mounted) {
-      setState(() => _isSaving = false);
+      print('🔵 開始儲存 visitId: ${emergencyData.visitId}');
+      print('📋 病患姓名: ${emergencyData.patientName}');
+      print('📋 事發時間: ${emergencyData.incidentDateTime}');
+      print('📋 急救結果: ${emergencyData.endResult}');
+
+      // 呼叫 Provider 的儲存方法
+      await emergencyData.saveToDatabase(dao, visitsDao);
+
+      // ✅ 驗證是否真的儲存成功
+      final savedVisit = await visitsDao.getById(emergencyData.visitId);
+      print('✅ 儲存後的 Visit 資料:');
+      print('   - hasEmergencyRecord: ${savedVisit?.hasEmergencyRecord}');
+      print('   - patientName: ${savedVisit?.patientName}');
+      print('   - incidentDateTime: ${savedVisit?.incidentDateTime}');
+      print('   - emergencyResult: ${savedVisit?.emergencyResult}');
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('急救紀錄已儲存成功!'),
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 2),
+          ),
+        );
+
+        // ✅ 儲存成功後返回上一頁
+        Navigator.of(context).pop();
+      }
+    } catch (e, stackTrace) {
+      print('❌ 儲存失敗: $e');
+      print('堆疊: $stackTrace');
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('儲存失敗: $e'), backgroundColor: Colors.red),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isSaving = false);
+      }
     }
   }
-}
 
   @override
   Widget build(BuildContext context) {
     final navProvider = context.watch<EmergencyNavigationProvider>();
-    final List<String> items = ['個人資料', '飛航記錄', '事故紀錄', '處置紀錄'];
+    final List<String> items = ['個人資料', '飛航紀錄', '事故紀錄', '處置紀錄'];
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       decoration: const BoxDecoration(color: Colors.white),
       child: Row(
         children: [
-          // 返回按鈕
-          FilledButton.tonal(
-            style: FilledButton.styleFrom(
-              backgroundColor: const Color(0xFF6ABAD5),
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-            onPressed: () => Navigator.pop(context),
-            child: const Text('返回'),
-          ),
+          // ✅ 移除：返回按鈕
           const SizedBox(width: 12),
 
           // 分頁導航按鈕
@@ -218,32 +202,15 @@ class _EmergencyNavBarState extends State<EmergencyNavBar> {
                     height: 20,
                     child: CircularProgressIndicator(
                       strokeWidth: 2.5,
-                      valueColor: AlwaysStoppedAnimation(Colors.green),
+                      valueColor: AlwaysStoppedAnimation(Color(0xFF27AE60)),
                     ),
                   )
-                : const Icon(Icons.save, color: Colors.green),
+                : const Icon(Icons.save),
             onPressed: _isSaving ? null : _handleSave,
           ),
 
-          // 呼叫救護車按鈕
-          FilledButton(
-            style: FilledButton.styleFrom(
-              backgroundColor: const Color(0xFFE74C3C),
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(14),
-              ),
-            ),
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('呼叫救護車功能')),
-              );
-            },
-            child: const Text('呼叫救護車'),
-          ),
-          const SizedBox(width: 12),
-          const CircleAvatar(radius: 18, backgroundColor: _light),
+          // ✅ 移除：呼叫救護車按鈕
+          // ✅ 移除：右邊的 CircleAvatar
         ],
       ),
     );
@@ -273,12 +240,19 @@ class _PillButton extends StatelessWidget {
           color: bg,
           borderRadius: BorderRadius.circular(20),
           boxShadow: const [
-            BoxShadow(color: Colors.black12, blurRadius: 2, offset: Offset(0, 1)),
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 2,
+              offset: Offset(0, 1),
+            ),
           ],
         ),
         child: Text(
           label,
-          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w600,
+          ),
         ),
       ),
     );
