@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:drift/drift.dart' show Value;
-
-import 'nav5.dart'; // 為了獲取 AmbulanceDataProvider
+import 'data/models/ambulance_data.dart';
 
 class AmbulanceInformationPage extends StatefulWidget {
   final int visitId;
@@ -13,33 +11,15 @@ class AmbulanceInformationPage extends StatefulWidget {
       _AmbulanceInformationPageState();
 }
 
-class _AmbulanceInformationPageState extends State<AmbulanceInformationPage>
-    with AutomaticKeepAliveClientMixin, SavableStateMixin {
+class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
   // ===== 版面外觀 (靜態常量) =====
   static const double _cardRadius = 16;
   static const double _labelWidth = 160;
 
-  // ===== 本地 UI 狀態 =====
-  // 文字輸入控制器
+  // ===== 文字輸入控制器 =====
   final _plateCtrl = TextEditingController();
   final _placeNoteCtrl = TextEditingController();
   final _otherDestCtrl = TextEditingController();
-
-  // 選項和日期狀態變數
-  int? _placeGroupIdx;
-  int? _t1PlaceIdx;
-  int? _t2PlaceIdx;
-  int? _remotePlaceIdx;
-  int? _cargoPlaceIdx;
-  int? _novotelPlaceIdx;
-  int? _cabinPlaceIdx;
-  int? _destinationHospitalIdx;
-  DateTime? _dutyTime;
-  DateTime? _arriveSceneTime;
-  DateTime? _leaveSceneTime;
-  DateTime? _arriveHospitalTime;
-  DateTime? _leaveHospitalTime;
-  DateTime? _backStandbyTime;
 
   // ===== 選項列表 (靜態常量) =====
   static const List<String> placeGroups = [
@@ -50,6 +30,7 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage>
     '諾富特飯店',
     '飛機機艙內',
   ];
+
   static const List<String> t1Places = [
     '出境查驗台',
     '入境查驗台',
@@ -95,6 +76,7 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage>
     '登機門B9',
     '登機門B1R',
   ];
+
   static const List<String> t2Places = [
     '出境查驗台',
     '入境查驗台',
@@ -138,6 +120,7 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage>
     '其他位置',
     '登機門C5R',
   ];
+
   static const List<String> remotePlaces = [
     '601',
     '602',
@@ -155,6 +138,7 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage>
     '614',
     '615',
   ];
+
   static const List<String> cargoPlaces = [
     '滑行道',
     '506',
@@ -172,8 +156,10 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage>
     '長榮航太',
     '機坪其他位置',
   ];
+
   static const List<String> novotelPlaces = ['諾富特飯店'];
   static const List<String> cabinPlaces = ['飛機機艙內'];
+
   static const List<String> hospitals = [
     '聯新國際醫院',
     '林口長庚醫院',
@@ -188,42 +174,21 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage>
   ];
 
   @override
-  bool get wantKeepAlive => true;
-
-  @override
   void initState() {
     super.initState();
-    // 延遲一幀執行，確保 Provider 已經準備好
+    // 延遲一幀執行,確保 Provider 已經準備好
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         _loadInitialData();
-        setState(() {}); // 確保初始資料被渲染
       }
     });
   }
 
   void _loadInitialData() {
-    final dataProvider = context.read<AmbulanceDataProvider>();
-    final recordData = dataProvider.ambulanceRecordData;
-
-    // 從 Provider 初始化所有本地狀態
-    _plateCtrl.text = recordData.plateNumber.value ?? '';
-    _placeNoteCtrl.text = recordData.placeNote.value ?? '';
-    _otherDestCtrl.text = recordData.otherDestinationHospital.value ?? '';
-    _placeGroupIdx = recordData.placeGroupIdx.value;
-    _t1PlaceIdx = recordData.t1PlaceIdx.value;
-    _t2PlaceIdx = recordData.t2PlaceIdx.value;
-    _remotePlaceIdx = recordData.remotePlaceIdx.value;
-    _cargoPlaceIdx = recordData.cargoPlaceIdx.value;
-    _novotelPlaceIdx = recordData.novotelPlaceIdx.value;
-    _cabinPlaceIdx = recordData.cabinPlaceIdx.value;
-    _destinationHospitalIdx = recordData.destinationHospitalIdx.value;
-    _dutyTime = recordData.dutyTime.value;
-    _arriveSceneTime = recordData.arriveSceneTime.value;
-    _leaveSceneTime = recordData.leaveSceneTime.value;
-    _arriveHospitalTime = recordData.arriveHospitalTime.value;
-    _leaveHospitalTime = recordData.leaveHospitalTime.value;
-    _backStandbyTime = recordData.backStandbyTime.value;
+    final data = context.read<AmbulanceData>();
+    _plateCtrl.text = data.plateNumber ?? '';
+    _placeNoteCtrl.text = data.placeNote ?? '';
+    _otherDestCtrl.text = data.otherDestinationHospital ?? '';
   }
 
   @override
@@ -234,47 +199,25 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage>
     super.dispose();
   }
 
-  @override
-  Future<void> saveData() async {
-    try {
-      final dataProvider = context.read<AmbulanceDataProvider>();
-      final recordData = dataProvider.ambulanceRecordData;
+  void _saveToProvider() {
+    final data = context.read<AmbulanceData>();
 
-      String? destinationHospitalName;
-      if (_destinationHospitalIdx != null) {
-        if (_destinationHospitalIdx == hospitals.length - 1) {
-          // 如果是「其他」
-          destinationHospitalName = _otherDestCtrl.text;
-        } else {
-          destinationHospitalName = hospitals[_destinationHospitalIdx!];
-        }
+    String? destinationHospitalName;
+    if (data.destinationHospitalIdx != null) {
+      if (data.destinationHospitalIdx == hospitals.length - 1) {
+        // 如果是「其他」
+        destinationHospitalName = _otherDestCtrl.text;
+      } else {
+        destinationHospitalName = hospitals[data.destinationHospitalIdx!];
       }
-
-      dataProvider.updateAmbulanceRecord(
-        recordData.copyWith(
-          plateNumber: Value(_plateCtrl.text),
-          placeNote: Value(_placeNoteCtrl.text),
-          otherDestinationHospital: Value(_otherDestCtrl.text),
-          placeGroupIdx: Value(_placeGroupIdx),
-          t1PlaceIdx: Value(_t1PlaceIdx),
-          t2PlaceIdx: Value(_t2PlaceIdx),
-          remotePlaceIdx: Value(_remotePlaceIdx),
-          cargoPlaceIdx: Value(_cargoPlaceIdx),
-          novotelPlaceIdx: Value(_novotelPlaceIdx),
-          cabinPlaceIdx: Value(_cabinPlaceIdx),
-          destinationHospitalIdx: Value(_destinationHospitalIdx),
-          destinationHospital: Value(destinationHospitalName),
-          dutyTime: Value(_dutyTime),
-          arriveSceneTime: Value(_arriveSceneTime),
-          leaveSceneTime: Value(_leaveSceneTime),
-          arriveHospitalTime: Value(_arriveHospitalTime),
-          leaveHospitalTime: Value(_leaveHospitalTime),
-          backStandbyTime: Value(_backStandbyTime),
-        ),
-      );
-    } catch (e) {
-      rethrow;
     }
+
+    data.updateInformation(
+      plateNumber: _plateCtrl.text,
+      placeNote: _placeNoteCtrl.text,
+      otherDestinationHospital: _otherDestCtrl.text,
+      destinationHospital: destinationHospitalName,
+    );
   }
 
   // ===== 工具函式 =====
@@ -307,14 +250,8 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage>
 
   @override
   Widget build(BuildContext context) {
-    super.build(context);
-
-    // 我們直接在 Consumer 中使用 provider 資料，不再需要額外的同步邏輯，
-    // 因為本地狀態的初始值已經在 initState 設定好，並且 UI 事件只更新本地狀態。
-    // Consumer 會確保在 Provider 資料變化時重建 UI，屆時本地狀態也會被 build 邏輯重新賦值。
-    return Consumer<AmbulanceDataProvider>(
-      builder: (context, dataProvider, child) {
-        // 在 build 方法中，我們的 UI 元件直接使用本地狀態變數
+    return Consumer<AmbulanceData>(
+      builder: (context, data, child) {
         return SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(24, 12, 24, 24),
           child: Align(
@@ -331,6 +268,7 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage>
                         constraints: const BoxConstraints(maxWidth: 420),
                         child: TextField(
                           controller: _plateCtrl,
+                          onChanged: (_) => _saveToProvider(),
                           decoration: const InputDecoration(
                             hintText: '請填寫車牌號碼',
                             border: OutlineInputBorder(),
@@ -354,21 +292,21 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage>
                         children: [
                           _radioWrap(
                             options: placeGroups,
-                            groupIndex: _placeGroupIdx,
+                            groupIndex: data.placeGroupIdx,
                             onChanged: (i) {
-                              setState(() {
-                                _placeGroupIdx = i;
-                                _t1PlaceIdx = null;
-                                _t2PlaceIdx = null;
-                                _remotePlaceIdx = null;
-                                _cargoPlaceIdx = null;
-                                _novotelPlaceIdx = null;
-                                _cabinPlaceIdx = null;
-                              });
+                              data.updateInformation(
+                                placeGroupIdx: i,
+                                t1PlaceIdx: null,
+                                t2PlaceIdx: null,
+                                remotePlaceIdx: null,
+                                cargoPlaceIdx: null,
+                                novotelPlaceIdx: null,
+                                cabinPlaceIdx: null,
+                              );
                             },
                           ),
                           const SizedBox(height: 8),
-                          _placeSubOptions(),
+                          _placeSubOptions(data),
                         ],
                       ),
                     ),
@@ -378,21 +316,25 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage>
                       label: '地點備註',
                       child: ConstrainedBox(
                         constraints: const BoxConstraints(maxWidth: 700),
-                        child: TextField(controller: _placeNoteCtrl),
+                        child: TextField(
+                          controller: _placeNoteCtrl,
+                          onChanged: (_) => _saveToProvider(),
+                        ),
                       ),
                     ),
                     const SizedBox(height: 16),
 
                     _dateTimeRow(
                       label: '出勤日期與時間',
-                      value: _dutyTime,
-                      onChanged: (dt) => setState(() => _dutyTime = dt),
+                      value: data.dutyTime,
+                      onChanged: (dt) => data.updateInformation(dutyTime: dt),
                     ),
                     const SizedBox(height: 8),
                     _dateTimeRow(
                       label: '到達現場時間',
-                      value: _arriveSceneTime,
-                      onChanged: (dt) => setState(() => _arriveSceneTime = dt),
+                      value: data.arriveSceneTime,
+                      onChanged: (dt) =>
+                          data.updateInformation(arriveSceneTime: dt),
                     ),
                     const SizedBox(height: 16),
 
@@ -405,22 +347,30 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage>
                             padding: const EdgeInsets.symmetric(vertical: 2),
                             child: _radioOption(
                               label: hospitals[i],
-                              isSelected: _destinationHospitalIdx == i,
-                              onTap: () =>
-                                  setState(() => _destinationHospitalIdx = i),
+                              isSelected: data.destinationHospitalIdx == i,
+                              onTap: () {
+                                data.updateInformation(
+                                  destinationHospitalIdx: i,
+                                );
+                                _saveToProvider();
+                              },
                             ),
                           );
                         }),
                       ),
                     ),
 
-                    if (_destinationHospitalIdx == hospitals.length - 1) ...[
+                    if (data.destinationHospitalIdx ==
+                        hospitals.length - 1) ...[
                       const SizedBox(height: 10),
                       _rowTop(
                         label: '其他醫院名稱',
                         child: ConstrainedBox(
                           constraints: const BoxConstraints(maxWidth: 700),
-                          child: TextField(controller: _otherDestCtrl),
+                          child: TextField(
+                            controller: _otherDestCtrl,
+                            onChanged: (_) => _saveToProvider(),
+                          ),
                         ),
                       ),
                     ],
@@ -429,28 +379,30 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage>
 
                     _dateTimeRow(
                       label: '離開現場時間',
-                      value: _leaveSceneTime,
-                      onChanged: (dt) => setState(() => _leaveSceneTime = dt),
+                      value: data.leaveSceneTime,
+                      onChanged: (dt) =>
+                          data.updateInformation(leaveSceneTime: dt),
                     ),
                     const SizedBox(height: 8),
                     _dateTimeRow(
                       label: '到達醫院時間',
-                      value: _arriveHospitalTime,
+                      value: data.arriveHospitalTime,
                       onChanged: (dt) =>
-                          setState(() => _arriveHospitalTime = dt),
+                          data.updateInformation(arriveHospitalTime: dt),
                     ),
                     const SizedBox(height: 8),
                     _dateTimeRow(
                       label: '離開醫院時間',
-                      value: _leaveHospitalTime,
+                      value: data.leaveHospitalTime,
                       onChanged: (dt) =>
-                          setState(() => _leaveHospitalTime = dt),
+                          data.updateInformation(leaveHospitalTime: dt),
                     ),
                     const SizedBox(height: 8),
                     _dateTimeRow(
                       label: '返回待命時間',
-                      value: _backStandbyTime,
-                      onChanged: (dt) => setState(() => _backStandbyTime = dt),
+                      value: data.backStandbyTime,
+                      onChanged: (dt) =>
+                          data.updateInformation(backStandbyTime: dt),
                     ),
                   ],
                 ),
@@ -491,7 +443,7 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage>
   );
 
   Widget _rowTop({required String label, required Widget child}) {
-    // 針對 TextField 做優化，讓 hintText 等能正常顯示
+    // 針對 TextField 做優化,讓 hintText 等能正常顯示
     final Widget effectiveChild = child is TextField
         ? Theme(
             data: Theme.of(context).copyWith(
@@ -612,41 +564,41 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage>
     );
   }
 
-  Widget _placeSubOptions() {
+  Widget _placeSubOptions(AmbulanceData data) {
     final List<String> opts;
     final int? groupIndex;
     final ValueChanged<int> onChanged;
 
-    switch (_placeGroupIdx) {
+    switch (data.placeGroupIdx) {
       case 0:
         opts = t1Places;
-        groupIndex = _t1PlaceIdx;
-        onChanged = (i) => setState(() => _t1PlaceIdx = i);
+        groupIndex = data.t1PlaceIdx;
+        onChanged = (i) => data.updateInformation(t1PlaceIdx: i);
         break;
       case 1:
         opts = t2Places;
-        groupIndex = _t2PlaceIdx;
-        onChanged = (i) => setState(() => _t2PlaceIdx = i);
+        groupIndex = data.t2PlaceIdx;
+        onChanged = (i) => data.updateInformation(t2PlaceIdx: i);
         break;
       case 2:
         opts = remotePlaces;
-        groupIndex = _remotePlaceIdx;
-        onChanged = (i) => setState(() => _remotePlaceIdx = i);
+        groupIndex = data.remotePlaceIdx;
+        onChanged = (i) => data.updateInformation(remotePlaceIdx: i);
         break;
       case 3:
         opts = cargoPlaces;
-        groupIndex = _cargoPlaceIdx;
-        onChanged = (i) => setState(() => _cargoPlaceIdx = i);
+        groupIndex = data.cargoPlaceIdx;
+        onChanged = (i) => data.updateInformation(cargoPlaceIdx: i);
         break;
       case 4:
         opts = novotelPlaces;
-        groupIndex = _novotelPlaceIdx;
-        onChanged = (i) => setState(() => _novotelPlaceIdx = i);
+        groupIndex = data.novotelPlaceIdx;
+        onChanged = (i) => data.updateInformation(novotelPlaceIdx: i);
         break;
       case 5:
         opts = cabinPlaces;
-        groupIndex = _cabinPlaceIdx;
-        onChanged = (i) => setState(() => _cabinPlaceIdx = i);
+        groupIndex = data.cabinPlaceIdx;
+        onChanged = (i) => data.updateInformation(cabinPlaceIdx: i);
         break;
       default:
         return const SizedBox.shrink();
