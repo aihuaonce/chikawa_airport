@@ -6,6 +6,7 @@ import 'nav2.dart';
 import 'data/models/accident_data.dart';
 import 'data/models/flightlog_data.dart';
 import 'data/models/patient_data.dart';
+import 'l10n/app_translations.dart'; // 【新增】引入翻譯
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -18,15 +19,15 @@ class _HomePageState extends State<HomePage> {
   String keyword = "";
   final TextEditingController _searchController = TextEditingController();
 
-  // 定義所有可用的欄位（順序固定）
-  final List<MapEntry<String, String>> availableColumns = [
-    const MapEntry('patientName', '病患'),
-    const MapEntry('gender', '性別'),
-    const MapEntry('nationality', '國籍'),
-    const MapEntry('uploadedAt', '更新時間'),
-    const MapEntry('dept', '科別'),
-    const MapEntry('note', '備註'),
-    const MapEntry('filledBy', '填寫人'),
+  // 【修改】定義所有可用的欄位（順序固定）- 使用 key 來對應翻譯
+  List<String> get availableColumnKeys => [
+    'patientName',
+    'gender',
+    'nationality',
+    'uploadedAt',
+    'dept',
+    'note',
+    'filledBy',
   ];
 
   // 預設顯示的欄位
@@ -56,7 +57,32 @@ class _HomePageState extends State<HomePage> {
     super.dispose();
   }
 
+  // 【新增】根據 key 取得翻譯後的欄位名稱
+  String _getColumnLabel(BuildContext context, String columnKey) {
+    final t = AppTranslations.of(context);
+    switch (columnKey) {
+      case 'patientName':
+        return t.patientName;
+      case 'gender':
+        return t.gender;
+      case 'nationality':
+        return t.nationality;
+      case 'uploadedAt':
+        return t.updateTimeShort;
+      case 'dept':
+        return t.department;
+      case 'note':
+        return t.note;
+      case 'filledBy':
+        return t.filledBy;
+      default:
+        return columnKey;
+    }
+  }
+
   void _showColumnSelector() {
+    final t = AppTranslations.of(context); // 【新增】取得翻譯
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -65,18 +91,18 @@ class _HomePageState extends State<HomePage> {
         return StatefulBuilder(
           builder: (context, setDialogState) {
             return AlertDialog(
-              title: const Text('選擇要顯示的欄位 (最多7個)'),
+              title: Text(t.selectColumns), // 【修改】使用翻譯
               content: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
-                  children: availableColumns.map((entry) {
-                    bool isSelected = tempVisibleColumns.contains(entry.key);
+                  children: availableColumnKeys.map((columnKey) {
+                    bool isSelected = tempVisibleColumns.contains(columnKey);
                     bool canSelect =
                         tempVisibleColumns.length < 7 || isSelected;
 
                     return CheckboxListTile(
                       title: Text(
-                        entry.value,
+                        _getColumnLabel(context, columnKey), // 【修改】使用翻譯
                         style: TextStyle(color: canSelect ? null : Colors.grey),
                       ),
                       value: isSelected,
@@ -84,12 +110,12 @@ class _HomePageState extends State<HomePage> {
                           ? (bool? value) {
                               setDialogState(() {
                                 if (value == true) {
-                                  if (!tempVisibleColumns.contains(entry.key) &&
+                                  if (!tempVisibleColumns.contains(columnKey) &&
                                       tempVisibleColumns.length < 7) {
-                                    tempVisibleColumns.add(entry.key);
+                                    tempVisibleColumns.add(columnKey);
                                   }
                                 } else {
-                                  tempVisibleColumns.remove(entry.key);
+                                  tempVisibleColumns.remove(columnKey);
                                 }
                               });
                             }
@@ -100,7 +126,7 @@ class _HomePageState extends State<HomePage> {
               ),
               actions: [
                 Text(
-                  '已選擇: ${tempVisibleColumns.length}/7',
+                  '${t.selectedCount}: ${tempVisibleColumns.length}/7', // 【修改】使用翻譯
                   style: TextStyle(
                     color: tempVisibleColumns.length == 7
                         ? Colors.orange
@@ -112,13 +138,10 @@ class _HomePageState extends State<HomePage> {
                 TextButton(
                   onPressed: () {
                     setDialogState(() {
-                      tempVisibleColumns = availableColumns
-                          .take(7)
-                          .map((e) => e.key)
-                          .toList();
+                      tempVisibleColumns = availableColumnKeys.take(7).toList();
                     });
                   },
-                  child: const Text('預設7個'),
+                  child: Text(t.defaultSeven), // 【修改】使用翻譯
                 ),
                 TextButton(
                   onPressed: () {
@@ -126,11 +149,11 @@ class _HomePageState extends State<HomePage> {
                       tempVisibleColumns.clear();
                     });
                   },
-                  child: const Text('全部清除'),
+                  child: Text(t.clearAll), // 【修改】使用翻譯
                 ),
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('取消'),
+                  child: Text(t.cancel), // 【修改】使用翻譯
                 ),
                 ElevatedButton(
                   onPressed: () {
@@ -139,7 +162,7 @@ class _HomePageState extends State<HomePage> {
                     });
                     Navigator.of(context).pop();
                   },
-                  child: const Text('確定'),
+                  child: Text(t.confirm), // 【修改】使用翻譯
                 ),
               ],
             );
@@ -175,6 +198,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final visitsDao = context.watch<VisitsDao>();
+    final t = AppTranslations.of(context); // 【新增】取得翻譯
 
     return Scaffold(
       backgroundColor: const Color(0xFFE6F6FB),
@@ -208,7 +232,7 @@ class _HomePageState extends State<HomePage> {
                       ),
                     );
                   },
-                  child: const Text('+新增病患資料'),
+                  child: Text(t.addPatient), // 【修改】使用翻譯
                 ),
                 const Spacer(),
                 ElevatedButton.icon(
@@ -223,7 +247,9 @@ class _HomePageState extends State<HomePage> {
                   ),
                   onPressed: _showColumnSelector,
                   icon: const Icon(Icons.view_column, size: 18),
-                  label: Text('欄位設定 (${visibleColumns.length}/7)'),
+                  label: Text(
+                    '${t.columnSettings} (${visibleColumns.length}/7)',
+                  ), // 【修改】使用翻譯
                 ),
                 const SizedBox(width: 8),
                 SizedBox(
@@ -232,7 +258,7 @@ class _HomePageState extends State<HomePage> {
                     controller: _searchController,
                     decoration: InputDecoration(
                       prefixIcon: const Icon(Icons.search),
-                      hintText: '搜尋姓名/國籍/科別...',
+                      hintText: t.searchPlaceholder, // 【修改】使用翻譯
                       filled: true,
                       fillColor: Colors.white,
                       contentPadding: const EdgeInsets.symmetric(
@@ -258,9 +284,12 @@ class _HomePageState extends State<HomePage> {
             Container(
               color: Colors.transparent,
               child: Row(
-                children: availableColumns
-                    .where((column) => visibleColumns.contains(column.key))
-                    .map((column) => _TableHeader(column.value))
+                children: availableColumnKeys
+                    .where((columnKey) => visibleColumns.contains(columnKey))
+                    .map(
+                      (columnKey) =>
+                          _TableHeader(_getColumnLabel(context, columnKey)),
+                    ) // 【修改】使用翻譯
                     .toList(),
               ),
             ),
@@ -273,7 +302,7 @@ class _HomePageState extends State<HomePage> {
                     return const Center(child: CircularProgressIndicator());
                   }
                   if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return const Center(child: Text('目前沒有任何病患紀錄。'));
+                    return Center(child: Text(t.noPatientRecords)); // 【修改】使用翻譯
                   }
                   final visits = snapshot.data!;
                   return ListView.builder(
@@ -300,17 +329,16 @@ class _HomePageState extends State<HomePage> {
                             ),
                           ),
                           child: Row(
-                            children: availableColumns
+                            children: availableColumnKeys
                                 .where(
-                                  (column) =>
-                                      visibleColumns.contains(column.key),
+                                  (columnKey) =>
+                                      visibleColumns.contains(columnKey),
                                 )
-                                .map((column) {
-                                  final cellValue = _getCellValue(
-                                    v,
-                                    column.key,
+                                .map((columnKey) {
+                                  final cellValue = _getCellValue(v, columnKey);
+                                  return _TableCell(
+                                    cellValue ?? t.valueNotAvailable,
                                   );
-                                  return _TableCell(cellValue ?? '—');
                                 })
                                 .toList(),
                           ),

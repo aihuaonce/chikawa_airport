@@ -1,29 +1,33 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart'; // 【重要】取消註解
+import 'package:provider/provider.dart';
 import 'maintain/maintain_menu_sheet.dart';
-import 'providers/app_navigation_provider.dart'; // 【重要】取消註解
+import 'providers/app_navigation_provider.dart';
+import 'providers/locale_provider.dart'; // 【新增】引入 LocaleProvider
+import 'l10n/app_translations.dart'; // 【新增】引入翻譯
 
 // --- 顏色定義 ---
 const lightColor = Color(0xFF83ACA9);
 const darkColor = Color(0xFF274C4A);
 const navBarBg = Color(0xFFFFFFFF);
 
-// 【修改】Nav1Page 現在可以是 StatelessWidget，因為狀態由 Provider 管理
 class Nav1Page extends StatelessWidget {
   const Nav1Page({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // 【修改】從 Provider 中讀取當前選中的索引
     final appNavProvider = context.watch<AppNavigationProvider>();
     final selectedIndex = appNavProvider.selectedIndex;
 
+    // 【新增】取得翻譯和語言狀態
+    final t = AppTranslations.of(context);
+    final localeProvider = context.watch<LocaleProvider>();
+
     final List<String> items = <String>[
-      '機場出診單', // index 0
-      '急救紀錄單', // index 1
-      '救護車紀錄單', // index 2
-      '查看報表', // index 3
-      '各式列表維護', // index 4
+      t.airportVisit, // '機場出診單' / 'Airport Visit'
+      t.emergencyRecord, // '急救紀錄單' / 'Emergency Record'
+      t.ambulanceRecord, // '救護車紀錄單' / 'Ambulance Record'
+      t.viewReports, // '查看報表' / 'View Reports'
+      t.maintenance, // '各式列表維護' / 'List Maintenance'
     ];
 
     return Container(
@@ -49,7 +53,6 @@ class Nav1Page extends StatelessWidget {
                     padding: const EdgeInsets.only(right: 8),
                     child: _PillButton(
                       label: items[i],
-                      // 【修改】按鈕是否 active，由 Provider 的狀態決定
                       active: i == selectedIndex,
                       onTap: () => _handleNavigation(context, i),
                     ),
@@ -58,24 +61,30 @@ class Nav1Page extends StatelessWidget {
               ),
             ),
           ),
+          // 【新增】語言切換按鈕
+          const SizedBox(width: 8),
+          _LanguageToggleButton(
+            isZh: localeProvider.isZh,
+            onTap: () async {
+              await localeProvider.toggleLocale();
+            },
+          ),
         ],
       ),
     );
   }
 
   void _handleNavigation(BuildContext context, int index) {
-    // 【修改】使用 context.read 來呼叫 Provider 的方法
     final appNavProvider = context.read<AppNavigationProvider>();
 
     switch (index) {
       case 0: // 機場出診單 (對應 HomePage)
       case 1: // 急救紀錄單 (對應 Home2Page)
       case 2: // 救護車紀錄單 (對應 Home3Page)
-      case 3: // 查看報表 (對應 Home4Page, 假設)
-        // 【重要】更新 Provider 中的選中索引，這會觸發 MainPage 重建
+      case 3: // 查看報表 (對應 Home4Page)
         appNavProvider.setSelectedIndex(index);
         break;
-      case 4:
+      case 4: // 各式列表維護
         showModalBottomSheet(
           context: context,
           isScrollControlled: true,
@@ -125,6 +134,51 @@ class _PillButton extends StatelessWidget {
         child: Text(
           label,
           style: const TextStyle(color: fg, fontWeight: FontWeight.w600),
+        ),
+      ),
+    );
+  }
+}
+
+// 【新增】語言切換按鈕元件
+class _LanguageToggleButton extends StatelessWidget {
+  final bool isZh;
+  final VoidCallback onTap;
+
+  const _LanguageToggleButton({required this.isZh, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(15),
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        decoration: BoxDecoration(
+          color: darkColor,
+          borderRadius: BorderRadius.circular(15),
+          boxShadow: const [
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 2,
+              offset: Offset(0, 1),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.language, color: Colors.white, size: 18),
+            const SizedBox(width: 6),
+            Text(
+              isZh ? '中' : 'EN',
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w600,
+                fontSize: 14,
+              ),
+            ),
+          ],
         ),
       ),
     );

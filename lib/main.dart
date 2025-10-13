@@ -1,6 +1,9 @@
 import 'package:chikawa_airport/data/db/daos.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
+import 'providers/locale_provider.dart';
+import 'l10n/app_translations.dart';
 
 // Providers
 import 'providers/app_navigation_provider.dart';
@@ -20,13 +23,17 @@ import 'data/models/referral_data.dart';
 import 'data/db/app_database.dart';
 import 'main_page.dart';
 
-void main() {
+Future<void> main() async {
   final db = AppDatabase();
+
+  final localeProvider = LocaleProvider();
+  await localeProvider.loadLocale();
 
   runApp(
     MultiProvider(
       providers: [
         // --- 狀態管理 Provider (ChangeNotifier) ---
+        ChangeNotifierProvider.value(value: localeProvider),
         ChangeNotifierProvider(create: (_) => AppNavigationProvider()),
         ChangeNotifierProvider(create: (_) => PatientData()),
         ChangeNotifierProvider(create: (_) => FlightLogData()),
@@ -77,8 +84,22 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final localeProvider = context.watch<LocaleProvider>();
     return MaterialApp(
-      title: 'Hospital App',
+      onGenerateTitle: (context) => AppTranslations.of(context).appTitle,
+
+      locale: localeProvider.locale,
+      localizationsDelegates: const [
+        AppTranslations.delegate, // 你的自定義翻譯
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('zh', 'TW'), // 繁體中文
+        Locale('en', 'US'), // 英文
+      ],
+
       theme: ThemeData(primarySwatch: Colors.blue),
       home: const MainPage(),
       debugShowCheckedModeBanner: false, // 建議加入此行以移除右上角的 Debug 標籤

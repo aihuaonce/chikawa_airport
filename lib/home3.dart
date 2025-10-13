@@ -1,9 +1,9 @@
 import 'package:chikawa_airport/data/models/AmbulanceView_Data.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'data/db/daos.dart'; // 假設您的 DAO 都在這個檔案裡
-import 'nav1.dart';
+import 'data/db/daos.dart';
 import 'nav5.dart';
+import 'l10n/app_translations.dart'; // 【新增】引入翻譯
 
 class Home3Page extends StatefulWidget {
   const Home3Page({super.key});
@@ -35,6 +35,7 @@ class _Home3PageState extends State<Home3Page> {
   @override
   Widget build(BuildContext context) {
     final ambulanceRecordsDao = context.watch<AmbulanceRecordsDao>();
+    final t = AppTranslations.of(context); // 【新增】取得翻譯
 
     return Scaffold(
       backgroundColor: const Color(0xFFE6F6FB),
@@ -55,13 +56,15 @@ class _Home3PageState extends State<Home3Page> {
                   ),
                   onPressed: () {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('請在病患的「處置」頁面勾選「建議轉診」以自動建立紀錄。'),
-                        backgroundColor: Color(0xFF274C4A),
+                      SnackBar(
+                        // 【修改】使用翻譯
+                        content: Text(t.ambulanceRecordHint),
+                        backgroundColor: const Color(0xFF274C4A),
                       ),
                     );
                   },
-                  child: const Text('新增紀錄(由病患建立)'),
+                  // 【修改】使用翻譯
+                  child: Text(t.addAmbulanceRecord),
                 ),
                 const Spacer(),
                 SizedBox(
@@ -70,7 +73,8 @@ class _Home3PageState extends State<Home3Page> {
                     controller: _searchController,
                     decoration: InputDecoration(
                       prefixIcon: const Icon(Icons.search),
-                      hintText: '搜尋姓名/主訴/送往地點...',
+                      // 【修改】使用翻譯
+                      hintText: t.searchAmbulance,
                       filled: true,
                       fillColor: Colors.white,
                       contentPadding: const EdgeInsets.symmetric(
@@ -91,6 +95,7 @@ class _Home3PageState extends State<Home3Page> {
                   ),
                 ),
                 const SizedBox(width: 16),
+                // 【備註】此處為開發中功能，暫不修改提示文字
                 IconButton(
                   icon: const Icon(Icons.filter_list),
                   tooltip: '篩選',
@@ -105,15 +110,16 @@ class _Home3PageState extends State<Home3Page> {
             const SizedBox(height: 32),
             Container(
               color: Colors.transparent,
-              child: const Row(
+              // 【修改】使用翻譯
+              child: Row(
                 children: [
-                  _TableHeader('病患姓名'),
-                  _TableHeader('出勤時間'),
-                  _TableHeader('病患主訴'),
-                  _TableHeader('送往地點'),
-                  _TableHeader('總費用'),
-                  _TableHeader('主責醫師'),
-                  _TableHeader('是否拒絕'),
+                  _TableHeader(t.patientName),
+                  _TableHeader(t.dutyTime),
+                  _TableHeader(t.chiefComplaint),
+                  _TableHeader(t.destination),
+                  _TableHeader(t.totalFee),
+                  _TableHeader(t.mainDoctor),
+                  _TableHeader(t.isRejection),
                 ],
               ),
             ),
@@ -128,7 +134,8 @@ class _Home3PageState extends State<Home3Page> {
                     return const Center(child: CircularProgressIndicator());
                   }
                   if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return const Center(child: Text('目前沒有任何救護車出勤紀錄。'));
+                    // 【修改】使用翻譯
+                    return Center(child: Text(t.noAmbulanceRecords));
                   }
 
                   final records = snapshot.data!;
@@ -155,25 +162,36 @@ class _Home3PageState extends State<Home3Page> {
                               bottom: BorderSide(color: Colors.grey.shade300),
                             ),
                           ),
+                          // 【修改】所有表格內容都使用翻譯或替代文字
                           child: Row(
                             children: [
-                              _TableCell(item.visit.patientName ?? '(無姓名)'),
+                              _TableCell(
+                                item.visit.patientName ?? t.valueNotAvailable,
+                              ),
                               _TableCell(
                                 item.record.dutyTime != null
                                     ? _formatDateTime(item.record.dutyTime!)
-                                    : '—',
-                              ),
-                              _TableCell(item.record.chiefComplaint ?? '—'),
-                              _TableCell(
-                                item.record.destinationHospital ?? '—',
+                                    : t.valueNotAvailable,
                               ),
                               _TableCell(
-                                item.record.totalFee?.toString() ?? '—',
+                                item.record.chiefComplaint ??
+                                    t.valueNotAvailable,
                               ),
                               _TableCell(
-                                item.treatment?.selectedMainDoctor ?? '—',
+                                item.record.destinationHospital ??
+                                    t.valueNotAvailable,
                               ),
-                              _TableCell(item.record.isRejection ? '是' : '否'),
+                              _TableCell(
+                                item.record.totalFee?.toString() ??
+                                    t.valueNotAvailable,
+                              ),
+                              _TableCell(
+                                item.treatment?.selectedMainDoctor ??
+                                    t.valueNotAvailable,
+                              ),
+                              _TableCell(
+                                item.record.isRejection ? t.yes : t.no,
+                              ),
                             ],
                           ),
                         ),
@@ -194,6 +212,7 @@ class _Home3PageState extends State<Home3Page> {
       '${dt.year}-${_two(dt.month)}-${_two(dt.day)} ${_two(dt.hour)}:${_two(dt.minute)}';
 }
 
+// 【維持不變】_TableHeader 和 _TableCell 元件不需要修改
 class _TableHeader extends StatelessWidget {
   final String title;
   const _TableHeader(this.title);

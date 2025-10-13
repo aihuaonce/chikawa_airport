@@ -1,8 +1,10 @@
+// lib/pages/AccidentRecord.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../data/db/daos.dart';
 import '../data/models/accident_data.dart';
 import 'nav2.dart'; // SavablePage 介面
+import '../l10n/app_translations.dart'; // 多語支援
 
 class AccidentRecordPage extends StatefulWidget {
   final int visitId;
@@ -18,29 +20,7 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
         AutomaticKeepAliveClientMixin<AccidentRecordPage>,
         SavableStateMixin<AccidentRecordPage> {
   // ===============================================
-  // 實作 SavablePage 的 saveData() 方法
-  // ===============================================
-  @override
-  Future<void> saveData() async {
-    try {
-      // 先同步控制器資料到 AccidentData
-      _syncControllersToData();
-
-      // 執行儲存邏輯
-      await _saveData();
-    } catch (e) {
-      rethrow;
-    }
-  }
-
-  // ===============================================
-  // 保持頁面存活
-  // ===============================================
-  @override
-  bool get wantKeepAlive => true;
-
-  // ===============================================
-  // 原有的變數和選項列表
+  // 狀態與控制器
   // ===============================================
   bool _isLoading = true;
 
@@ -49,7 +29,7 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
   static const double _cardMaxWidth = 1100;
   static const double _radius = 16;
 
-  // 選項列表
+  // 選項列表（保留原有項目）
   final List<String> reportUnits = const [
     'T1-OCC',
     'T2-OCC',
@@ -201,7 +181,7 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
   final List<String> novotelPlaces = const ['諾富特飯店'];
   final List<String> cabinPlaces = const ['飛機機艙內'];
 
-  // 文字欄位控制器
+  // 控制器
   final TextEditingController notifierCtrl = TextEditingController();
   final TextEditingController phoneCtrl = TextEditingController();
   final TextEditingController placeNoteCtrl = TextEditingController();
@@ -226,6 +206,25 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
     super.dispose();
   }
 
+  // ===============================================
+  // SavableStateMixin 實作
+  // ===============================================
+  @override
+  Future<void> saveData() async {
+    try {
+      _syncControllersToData();
+      await _saveData();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  @override
+  bool get wantKeepAlive => true;
+
+  // ===============================================
+  // 資料載入 / 儲存
+  // ===============================================
   Future<void> _loadData() async {
     try {
       final dao = context.read<AccidentRecordsDao>();
@@ -264,6 +263,7 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
         accidentData.reasonOnDuty = record.reasonOnline;
         accidentData.reasonOther = record.reasonOther;
         accidentData.otherReasonText = record.reasonOtherText;
+        accidentData.otherReportUnit = record.otherReportUnit;
         accidentData.update();
       } else {
         // 新記錄的預設值
@@ -279,6 +279,7 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
 
       _syncControllersFromData(accidentData);
     } catch (e) {
+      // 可加入錯誤處理或 log
     } finally {
       if (mounted) {
         setState(() {
@@ -325,11 +326,6 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
       final dao = context.read<AccidentRecordsDao>();
       final accidentData = context.read<AccidentData>();
 
-      print('visitId: ${widget.visitId}');
-      print('incidentDate: ${accidentData.incidentDate}');
-      print('notifier: ${accidentData.notifier}');
-      print('t1Selected: ${accidentData.t1Selected}');
-
       await dao.upsertByVisitId(
         visitId: widget.visitId,
         incidentDate: accidentData.incidentDate,
@@ -361,12 +357,12 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
         reasonOther: accidentData.reasonOther,
         reasonOtherText: accidentData.otherReasonText,
       );
-
     } catch (e) {
       rethrow;
     }
   }
 
+  // 計算醫護到達與通報時間差以顯示分秒與 within10min
   void _calculateTimeDifference(AccidentData accidentData) {
     if (accidentData.notifyTime != null &&
         accidentData.medicArriveTime != null) {
@@ -388,24 +384,26 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
     }
   }
 
-  // 延遲更新方法，避免每次輸入都觸發
+  // 延遲更新，避免每次輸入都立即同步
   void _onTextFieldChanged() {
     Future.delayed(const Duration(milliseconds: 500), () {
-      if (mounted) {
-        _syncControllersToData();
-      }
+      if (mounted) _syncControllersToData();
     });
   }
 
+  // ===============================================
+  // UI 構建
+  // ===============================================
   @override
   Widget build(BuildContext context) {
-    super.build(context); // 啟用 AutomaticKeepAliveClientMixin
+    super.build(context); // for AutomaticKeepAliveClientMixin
+    final t = AppTranslations.of(context);
 
     if (_isLoading) return const Center(child: CircularProgressIndicator());
 
     return Consumer<AccidentData>(
       builder: (context, accidentData, _) {
-        // 同步 AccidentData 到控制器（避免循環更新）
+        // 同步 AccidentData 回控制器，避免循環更新
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (mounted) {
             if (notifierCtrl.text != (accidentData.notifier ?? '')) {
@@ -446,7 +444,7 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _datePicker(
-                        label: '事發日期？',
+                        label: t.incidentDate + '？',
                         value: accidentData.incidentDate,
                         onChanged: (dt) {
                           accidentData.incidentDate = dt;
@@ -455,7 +453,7 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
                       ),
                       const SizedBox(height: 8),
                       _dateTimePicker(
-                        label: '通報時間？',
+                        label: t.notifyTime + '？',
                         value: accidentData.notifyTime,
                         onChanged: (dt) {
                           accidentData.notifyTime = dt;
@@ -465,7 +463,7 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
                       ),
                       const SizedBox(height: 16),
 
-                      _boldLabel('通報單位？'),
+                      _boldLabel(t.reportUnit + '？'),
                       const SizedBox(height: 6),
                       _radioWrap(
                         options: reportUnits,
@@ -479,8 +477,8 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
                           reportUnits.indexOf('其他')) ...[
                         const SizedBox(height: 8),
                         _inputRowBold(
-                          '其他通報單位',
-                          '請輸入其他通報單位',
+                          t.otherReportUnit,
+                          t.enterOtherReportUnit,
                           otherReportUnitCtrl,
                           onChanged: _onTextFieldChanged,
                         ),
@@ -488,22 +486,22 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
                       const SizedBox(height: 16),
 
                       _inputRowBold(
-                        '通報人員？',
-                        '請填寫通報人員姓名',
+                        t.reporterName + '？',
+                        t.enterReporterName,
                         notifierCtrl,
                         onChanged: _onTextFieldChanged,
                       ),
                       const SizedBox(height: 8),
                       _inputRowBold(
-                        '電話？',
-                        '請填寫接獲通報的聯絡電話',
+                        t.phone + '？',
+                        t.enterContactNumber,
                         phoneCtrl,
                         onChanged: _onTextFieldChanged,
                       ),
                       const SizedBox(height: 12),
 
                       _dateTimePicker(
-                        label: '通報營運控制中心時間',
+                        label: t.oocPickUpTime, // 翻譯 key: OOC pick-up time (新增)
                         value: accidentData.pickUpTime,
                         onChanged: (dt) {
                           accidentData.pickUpTime = dt;
@@ -512,7 +510,7 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
                       ),
                       const SizedBox(height: 8),
                       _dateTimePicker(
-                        label: '醫護出發時間',
+                        label: t.medicDepartTime,
                         value: accidentData.medicDepartTime,
                         onChanged: (dt) {
                           accidentData.medicDepartTime = dt;
@@ -521,13 +519,14 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
                       ),
                       const SizedBox(height: 16),
 
-                      _boldLabel('事故地點'),
+                      _boldLabel(t.accidentLocation),
                       const SizedBox(height: 6),
                       _radioWrap(
                         options: placeGroups,
                         groupIndex: accidentData.placeGroupIdx,
                         onChanged: (i) {
                           accidentData.placeGroupIdx = i;
+                          // reset sub selections
                           accidentData.t1Selected = accidentData.t2Selected =
                               accidentData.remoteSelected =
                                   accidentData.cargoSelected =
@@ -540,14 +539,14 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
                       _placeSubOptions(accidentData),
                       const SizedBox(height: 8),
                       _inputRowBold(
-                        '地點備註',
-                        '請填寫地點備註',
+                        t.locationNotes,
+                        t.enterLocationNotes,
                         placeNoteCtrl,
                         onChanged: _onTextFieldChanged,
                       ),
                       const SizedBox(height: 16),
 
-                      _checkboxRowBold('營運控制中心到達現場', accidentData.occArrived, (
+                      _checkboxRowBold(t.occArrived, accidentData.occArrived, (
                         v,
                       ) {
                         accidentData.occArrived = v ?? false;
@@ -559,7 +558,7 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
                       }),
                       const SizedBox(height: 8),
                       _dateTimePicker(
-                        label: '醫護到達時間',
+                        label: t.medicArriveTime,
                         value: accidentData.medicArriveTime,
                         onChanged: (dt) {
                           accidentData.medicArriveTime = dt;
@@ -570,20 +569,21 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
                       const SizedBox(height: 12),
 
                       _inputRowBold(
-                        '花費時間(分秒)',
-                        '例如：10分30秒',
+                        t.elapsedTime,
+                        t.exampleElapsedTimeHint, // 例如：10分30秒 (由 translations 提供)
                         costCtrl,
                         onChanged: _onTextFieldChanged,
                       ),
                       const SizedBox(height: 8),
-                      _boldLabel('10分鐘內到達'),
+                      _boldLabel(t.arrivalWithin10min),
                       const SizedBox(height: 6),
                       _radioWrap(
-                        options: const ['是', '否'],
+                        options: [t.yes, t.no],
                         groupIndex: accidentData.within10min,
                         onChanged: (i) {
                           accidentData.within10min = i;
                           if (i == 0) {
+                            // 若為「是」，清除延遲原因
                             accidentData.reasonPreLanding = false;
                             accidentData.reasonOnDuty = false;
                             accidentData.reasonOther = false;
@@ -596,10 +596,10 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
 
                       if (accidentData.within10min == 1) ...[
                         const SizedBox(height: 10),
-                        _boldLabel('未在10分鐘內到達的原因（可複選）'),
+                        _boldLabel(t.reasonLateTitle),
                         const SizedBox(height: 6),
                         _reasonCheckboxRow(
-                          label: '落地前通知',
+                          label: t.reasonPreLanding,
                           value: accidentData.reasonPreLanding,
                           onChanged: (v) {
                             accidentData.reasonPreLanding = v ?? false;
@@ -611,7 +611,7 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
                           },
                         ),
                         _reasonCheckboxRow(
-                          label: '線上勤務',
+                          label: t.reasonOnDuty,
                           value: accidentData.reasonOnDuty,
                           onChanged: (v) {
                             accidentData.reasonOnDuty = v ?? false;
@@ -619,7 +619,7 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
                           },
                         ),
                         _reasonCheckboxRow(
-                          label: '其他',
+                          label: t.reasonOther,
                           value: accidentData.reasonOther,
                           onChanged: (v) {
                             accidentData.reasonOther = v ?? false;
@@ -629,8 +629,8 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
                         if (accidentData.reasonOther) ...[
                           const SizedBox(height: 6),
                           _inputRowBold(
-                            '其他原因',
-                            '請填寫其他原因',
+                            t.otherReason,
+                            t.enterOtherReason,
                             otherReasonCtrl,
                             onChanged: _onTextFieldChanged,
                           ),
@@ -638,7 +638,7 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
                         if (accidentData.reasonPreLanding) ...[
                           const SizedBox(height: 6),
                           _dateTimePicker(
-                            label: '落地時間',
+                            label: t.landingTime,
                             value: accidentData.landingTime,
                             onChanged: (dt) {
                               accidentData.landingTime = dt;
@@ -650,13 +650,14 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
                       const SizedBox(height: 12),
 
                       _dateTimePicker(
-                        label: '檢查時間',
+                        label: t.checkTime,
                         value: accidentData.checkTime,
                         onChanged: (dt) {
                           accidentData.checkTime = dt;
                           accidentData.update();
                         },
                       ),
+                      const SizedBox(height: 8),
                     ],
                   ),
                 ),
@@ -727,6 +728,7 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
     required DateTime? value,
     required ValueChanged<DateTime?> onChanged,
   }) {
+    final t = AppTranslations.of(context);
     return _labeledRowBold(
       label: label,
       child: Row(
@@ -759,12 +761,12 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
               }
             },
             child: Text(
-              value == null ? '請選擇時間' : _fmtDateTime(value),
+              value == null ? t.selectTime : _fmtDateTime(value),
               style: const TextStyle(fontSize: 15, color: Colors.black87),
             ),
           ),
           const SizedBox(width: 10),
-          _smallButton('更新時間', () => onChanged(DateTime.now())),
+          _smallButton(t.updateTime, () => onChanged(DateTime.now())),
         ],
       ),
     );
@@ -775,6 +777,7 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
     required DateTime? value,
     required ValueChanged<DateTime?> onChanged,
   }) {
+    final t = AppTranslations.of(context);
     return _labeledRowBold(
       label: label,
       child: Row(
@@ -791,12 +794,12 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
               if (newDate != null) onChanged(newDate);
             },
             child: Text(
-              value == null ? '請選擇日期' : _fmtDate(value),
+              value == null ? t.selectDate : _fmtDate(value),
               style: const TextStyle(fontSize: 15, color: Colors.black87),
             ),
           ),
           const SizedBox(width: 10),
-          _smallButton('更新時間', () => onChanged(DateTime.now())),
+          _smallButton(t.updateTime, () => onChanged(DateTime.now())),
         ],
       ),
     );
@@ -824,9 +827,7 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
             ),
           ),
           onChanged: (value) {
-            if (onChanged != null) {
-              onChanged();
-            }
+            if (onChanged != null) onChanged();
           },
         ),
       ),
@@ -903,12 +904,6 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
       ),
     );
   }
-
-  String _two(int n) => n.toString().padLeft(2, '0');
-  String _fmtDate(DateTime dt) =>
-      '${dt.year}年${_two(dt.month)}月${_two(dt.day)}日';
-  String _fmtDateTime(DateTime dt) =>
-      '${dt.year}年${_two(dt.month)}月${_two(dt.day)}日 ${_two(dt.hour)}時${_two(dt.minute)}分${_two(dt.second)}秒';
 
   Widget _placeSubOptions(AccidentData accidentData) {
     if (accidentData.placeGroupIdx == null) return const SizedBox.shrink();
@@ -999,4 +994,10 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
       ),
     );
   }
+
+  String _two(int n) => n.toString().padLeft(2, '0');
+  String _fmtDate(DateTime dt) =>
+      '${dt.year}年${_two(dt.month)}月${_two(dt.day)}日';
+  String _fmtDateTime(DateTime dt) =>
+      '${dt.year}年${_two(dt.month)}月${_two(dt.day)}日 ${_two(dt.hour)}時${_two(dt.minute)}分${_two(dt.second)}秒';
 }

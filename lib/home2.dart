@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'data/db/daos.dart';
 import 'nav4.dart';
+import 'l10n/app_translations.dart'; // 【新增】引入翻譯
 
 class Home2Page extends StatefulWidget {
   const Home2Page({super.key});
@@ -38,6 +39,7 @@ class _Home2PageState extends State<Home2Page> {
   @override
   Widget build(BuildContext context) {
     final visitsDao = context.watch<VisitsDao>();
+    final t = AppTranslations.of(context); // 【新增】取得翻譯
 
     return Scaffold(
       backgroundColor: const Color(0xFFE6F6FB),
@@ -47,7 +49,6 @@ class _Home2PageState extends State<Home2Page> {
           children: [
             Row(
               children: [
-                // ✅ 修改：改為灰色按鈕並顯示提示訊息
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.grey,
@@ -59,13 +60,15 @@ class _Home2PageState extends State<Home2Page> {
                   ),
                   onPressed: () {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('請從首頁新增病患，系統會自動建立急救紀錄。'),
-                        backgroundColor: Color(0xFF274C4A),
+                      SnackBar(
+                        // 【修改】使用翻譯
+                        content: Text(t.emergencyRecordHint),
+                        backgroundColor: const Color(0xFF274C4A),
                       ),
                     );
                   },
-                  child: const Text('新增急救紀錄(由病患建立)'),
+                  // 【修改】使用翻譯
+                  child: Text(t.addEmergencyRecord),
                 ),
                 const Spacer(),
                 SizedBox(
@@ -74,7 +77,8 @@ class _Home2PageState extends State<Home2Page> {
                     controller: _searchController,
                     decoration: InputDecoration(
                       prefixIcon: const Icon(Icons.search),
-                      hintText: '搜尋急救紀錄...',
+                      // 【修改】使用翻譯
+                      hintText: t.searchEmergencyRecord,
                       filled: true,
                       fillColor: Colors.white,
                       contentPadding: const EdgeInsets.symmetric(
@@ -99,12 +103,13 @@ class _Home2PageState extends State<Home2Page> {
             const SizedBox(height: 32),
             Container(
               color: Colors.transparent,
-              child: const Row(
+              // 【修改】使用翻譯
+              child: Row(
                 children: [
-                  _TableHeader('事發日期'),
-                  _TableHeader('姓名'),
-                  _TableHeader('國籍'),
-                  _TableHeader('急救結果'),
+                  _TableHeader(t.incidentDate),
+                  _TableHeader(t.patientName),
+                  _TableHeader(t.nationality),
+                  _TableHeader(t.emergencyResult),
                 ],
               ),
             ),
@@ -118,7 +123,8 @@ class _Home2PageState extends State<Home2Page> {
                   }
 
                   if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return const Center(child: Text('目前沒有任何急救紀錄。'));
+                    // 【修改】使用翻譯
+                    return Center(child: Text(t.noEmergencyRecords));
                   }
 
                   // 過濾出有急救紀錄的 visits
@@ -127,7 +133,8 @@ class _Home2PageState extends State<Home2Page> {
                       .toList();
 
                   if (visits.isEmpty) {
-                    return const Center(child: Text('目前沒有任何急救紀錄。'));
+                    // 【修改】使用翻譯
+                    return Center(child: Text(t.noEmergencyRecords));
                   }
 
                   return ListView.builder(
@@ -156,14 +163,17 @@ class _Home2PageState extends State<Home2Page> {
                           ),
                           child: Row(
                             children: [
+                              // 【修改】使用翻譯顯示空值
                               _TableCell(
                                 v.incidentDateTime != null
                                     ? _fmtDateTime(v.incidentDateTime!)
-                                    : '—',
+                                    : t.valueNotAvailable,
                               ),
-                              _TableCell(v.patientName ?? '—'),
-                              _TableCell(v.nationality ?? '—'),
-                              _TableCell(v.emergencyResult ?? '—'),
+                              _TableCell(v.patientName ?? t.valueNotAvailable),
+                              _TableCell(v.nationality ?? t.valueNotAvailable),
+                              _TableCell(
+                                v.emergencyResult ?? t.valueNotAvailable,
+                              ),
                             ],
                           ),
                         ),
@@ -180,6 +190,7 @@ class _Home2PageState extends State<Home2Page> {
   }
 }
 
+// 【維持不變】_TableHeader 和 _TableCell 元件不需要修改
 class _TableHeader extends StatelessWidget {
   final String title;
   const _TableHeader(this.title);
