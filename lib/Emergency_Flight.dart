@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'data/models/emergency_data.dart';
+import 'l10n/app_translations.dart'; // 【新增】引入翻譯
 
 class EmergencyFlightPage extends StatefulWidget {
   final int visitId;
@@ -11,31 +12,7 @@ class EmergencyFlightPage extends StatefulWidget {
 }
 
 class _EmergencyFlightPageState extends State<EmergencyFlightPage> {
-  final List<String> sourceOptions = const ['出境', '入境', '過境', '其他'];
-  final List<String> purposeOptions = const ['航空公司機組員', '旅客/民眾', '機場內部員工'];
-
-  final List<String> mainAirlines = const [
-    'BR長榮航空',
-    'CI中華航空',
-    'CX國泰航空',
-    'UA聯合航空',
-    'KL荷蘭航空',
-    'CZ中國南方航空',
-    'IT台灣虎航',
-    'EK阿聯酋航空',
-    'CA中國國際航空',
-  ];
-
-  final List<String> otherAirlines = const [
-    'JX星宇航空',
-    'AE華信航空',
-    'B7立榮航空',
-    'MU中國東方航空',
-    'MF廈門航空',
-    'MM樂桃航空',
-    'KE大韓航空',
-    'OZ韓亞航空',
-  ];
+  // 【修改】移除所有靜態選項列表
 
   final TextEditingController nationalityCtrl = TextEditingController();
   final GlobalKey otherAirlineKey = GlobalKey();
@@ -66,6 +43,42 @@ class _EmergencyFlightPageState extends State<EmergencyFlightPage> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppTranslations.of(context); // 【新增】
+
+    // 【新增】動態建立翻譯後的選項列表
+    final List<String> sourceOptions = [
+      t.departure,
+      t.arrival,
+      t.transit,
+      t.other,
+    ];
+    final List<String> purposeOptions = [
+      t.airlineCrew,
+      t.passenger,
+      t.airportStaff,
+    ];
+    final List<String> mainAirlines = [
+      t.evaAir,
+      t.chinaAirlines,
+      t.cathayPacific,
+      t.unitedAirlines,
+      t.klm,
+      t.chinaSouthern,
+      t.tigerairTaiwan,
+      t.emirates,
+      t.airChina,
+    ];
+    final List<String> otherAirlines = [
+      t.starlux,
+      t.mandarinAirlines,
+      t.uniAir,
+      t.chinaEastern,
+      t.xiamenAir,
+      t.peachAviation,
+      t.koreanAir,
+      t.asianaAirlines,
+    ];
+
     return Consumer<EmergencyData>(
       builder: (context, data, child) {
         return Padding(
@@ -74,33 +87,31 @@ class _EmergencyFlightPageState extends State<EmergencyFlightPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // 來源
-                _label('來源'),
+                _label(t.source), // 【修改】
                 const SizedBox(height: 6),
                 _radioWrap(
-                  options: sourceOptions,
+                  options: sourceOptions, // 【修改】
                   groupIndex: data.sourceIndex,
                   onChanged: (i) => data.updateFlight(sourceIndex: i),
                 ),
                 const SizedBox(height: 16),
 
-                // 為何至機場
-                _label('為何至機場'),
+                _label(t.purposeOfVisit), // 【修改】
                 const SizedBox(height: 6),
                 _radioWrap(
-                  options: purposeOptions,
+                  options: purposeOptions, // 【修改】
                   groupIndex: data.purposeIndex,
                   onChanged: (i) => data.updateFlight(purposeIndex: i),
                 ),
                 const SizedBox(height: 16),
 
-                // 航空公司
-                _label('航空公司'),
+                _label(t.airline), // 【修改】
                 const SizedBox(height: 6),
                 ...List.generate(mainAirlines.length, (i) {
-                  final selected = !data.useOtherAirline && data.airlineIndex == i;
+                  final selected =
+                      !data.useOtherAirline && data.airlineIndex == i;
                   return _radioRow(
-                    label: mainAirlines[i],
+                    label: mainAirlines[i], // 【修改】
                     selected: selected,
                     onTap: () {
                       data.updateFlight(
@@ -113,20 +124,21 @@ class _EmergencyFlightPageState extends State<EmergencyFlightPage> {
                 }),
                 _radioRow(
                   key: otherAirlineKey,
-                  label: '其他航空公司',
+                  label: t.otherAirline, // 【修改】
                   selected: data.useOtherAirline,
                   onTap: () async {
                     data.updateFlight(useOtherAirline: true);
                     final picked = await _pickFromMenuAt(
                       anchorKey: otherAirlineKey,
-                      options: otherAirlines,
+                      options: otherAirlines, // 【修改】
                       allowSearch: true,
                     );
                     if (picked != null) {
                       data.updateFlight(selectedOtherAirline: picked);
                     }
                   },
-                  trailing: data.useOtherAirline && data.selectedOtherAirline != null
+                  trailing:
+                      data.useOtherAirline && data.selectedOtherAirline != null
                       ? Padding(
                           padding: const EdgeInsets.only(left: 8),
                           child: Text(
@@ -142,19 +154,21 @@ class _EmergencyFlightPageState extends State<EmergencyFlightPage> {
                 ),
                 const SizedBox(height: 16),
 
-                // 國籍
-                _label('國籍'),
+                _label(t.nationality), // 【修改】
                 const SizedBox(height: 6),
                 ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 420),
                   child: TextField(
                     controller: nationalityCtrl,
                     onChanged: (_) => _saveToProvider(),
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       isDense: true,
-                      hintText: '請輸入國籍',
-                      border: OutlineInputBorder(),
-                      contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                      hintText: t.enterNationalityHint, // 【修改】
+                      border: const OutlineInputBorder(),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 10,
+                      ),
                     ),
                   ),
                 ),
@@ -173,7 +187,11 @@ class _EmergencyFlightPageState extends State<EmergencyFlightPage> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(14),
         boxShadow: const [
-          BoxShadow(color: Color(0x14000000), blurRadius: 8, offset: Offset(0, 4)),
+          BoxShadow(
+            color: Color(0x14000000),
+            blurRadius: 8,
+            offset: Offset(0, 4),
+          ),
         ],
       ),
       child: child,
@@ -181,13 +199,13 @@ class _EmergencyFlightPageState extends State<EmergencyFlightPage> {
   }
 
   Widget _label(String s) => Text(
-        s,
-        style: const TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.w700,
-          color: Colors.black87,
-        ),
-      );
+    s,
+    style: const TextStyle(
+      fontSize: 16,
+      fontWeight: FontWeight.w700,
+      color: Colors.black87,
+    ),
+  );
 
   Widget _radioWrap({
     required List<String> options,
@@ -239,7 +257,9 @@ class _EmergencyFlightPageState extends State<EmergencyFlightPage> {
               color: selected ? const Color(0xFF274C4A) : Colors.black45,
             ),
             const SizedBox(width: 10),
-            Flexible(child: Text(label, style: const TextStyle(fontSize: 16.5))),
+            Flexible(
+              child: Text(label, style: const TextStyle(fontSize: 16.5)),
+            ),
             if (trailing != null) trailing,
           ],
         ),
@@ -252,10 +272,16 @@ class _EmergencyFlightPageState extends State<EmergencyFlightPage> {
     required List<String> options,
     bool allowSearch = true,
   }) async {
+    final t = AppTranslations.of(context); // 【新增】
     final overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
     final box = anchorKey.currentContext!.findRenderObject() as RenderBox;
     final offset = box.localToGlobal(Offset.zero);
-    final rect = Rect.fromLTWH(offset.dx, offset.dy, box.size.width, box.size.height);
+    final rect = Rect.fromLTWH(
+      offset.dx,
+      offset.dy,
+      box.size.width,
+      box.size.height,
+    );
 
     final choice = await showMenu<String>(
       context: context,
@@ -264,9 +290,12 @@ class _EmergencyFlightPageState extends State<EmergencyFlightPage> {
         ...options.map((e) => PopupMenuItem<String>(value: e, child: Text(e))),
         if (allowSearch) const PopupMenuDivider(),
         if (allowSearch)
-          const PopupMenuItem<String>(
+          PopupMenuItem<String>(
             value: '__search_more__',
-            child: Text('搜尋更多…', style: TextStyle(fontWeight: FontWeight.w600)),
+            child: Text(
+              t.searchMore,
+              style: const TextStyle(fontWeight: FontWeight.w600),
+            ), // 【修改】
           ),
       ],
     );
@@ -278,64 +307,76 @@ class _EmergencyFlightPageState extends State<EmergencyFlightPage> {
   }
 
   Future<String?> _searchDialog({required List<String> options}) async {
+    final t = AppTranslations.of(context); // 【新增】
     final ctrl = TextEditingController();
     List<String> showing = List.of(options);
 
     return showDialog<String>(
       context: context,
       builder: (ctx) {
-        return StatefulBuilder(builder: (ctx, setS) {
-          return AlertDialog(
-            title: const Text('搜尋 / 輸入'),
-            content: SizedBox(
-              width: 420,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextField(
-                    controller: ctrl,
-                    decoration: const InputDecoration(hintText: '輸入關鍵字過濾…'),
-                    onChanged: (t) {
-                      setS(() {
-                        showing = options
-                            .where((e) => e.toLowerCase().contains(t.toLowerCase()))
-                            .toList();
-                        if (showing.isEmpty && t.isNotEmpty) {
-                          showing = ['新增：$t'];
-                        }
-                      });
-                    },
-                  ),
-                  const SizedBox(height: 12),
-                  ConstrainedBox(
-                    constraints: const BoxConstraints(maxHeight: 320),
-                    child: ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: showing.length,
-                      itemBuilder: (_, i) {
-                        final val = showing[i];
-                        return ListTile(
-                          dense: true,
-                          title: Text(val),
-                          onTap: () {
-                            final pure = val.startsWith('新增：') ? val.substring(3) : val;
-                            Navigator.of(ctx).pop(pure);
-                          },
-                        );
+        return StatefulBuilder(
+          builder: (ctx, setS) {
+            return AlertDialog(
+              title: Text(t.searchOrInput), // 【修改】
+              content: SizedBox(
+                width: 420,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      controller: ctrl,
+                      decoration: InputDecoration(
+                        hintText: t.filterWithKeywordHint,
+                      ), // 【修改】
+                      onChanged: (text) {
+                        setS(() {
+                          showing = options
+                              .where(
+                                (e) => e.toLowerCase().contains(
+                                  text.toLowerCase(),
+                                ),
+                              )
+                              .toList();
+                          if (showing.isEmpty && text.isNotEmpty) {
+                            showing = ['${t.addNewPrefix}$text']; // 【修改】
+                          }
+                        });
                       },
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 12),
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(maxHeight: 320),
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: showing.length,
+                        itemBuilder: (_, i) {
+                          final val = showing[i];
+                          return ListTile(
+                            dense: true,
+                            title: Text(val),
+                            onTap: () {
+                              final pure =
+                                  val.startsWith(t.addNewPrefix) // 【修改】
+                                  ? val.substring(t.addNewPrefix.length)
+                                  : val;
+                              Navigator.of(ctx).pop(pure);
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(ctx).pop(),
-                child: const Text('取消'),
-              ),
-            ],
-          );
-        });
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(ctx).pop(),
+                  child: Text(t.cancel), // 【修改】
+                ),
+              ],
+            );
+          },
+        );
       },
     );
   }

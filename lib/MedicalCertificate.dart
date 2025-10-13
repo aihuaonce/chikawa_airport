@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'data/db/daos.dart';
 import 'data/models/certificate_data.dart';
+import 'l10n/app_translations.dart'; // 【新增】引入翻譯
 import 'nav2.dart';
 
 class MedicalCertificatePage extends StatefulWidget {
@@ -44,14 +45,16 @@ class _MedicalCertificatePageState extends State<MedicalCertificatePage>
   // ===============================================
   @override
   Future<void> saveData() async {
+    if (!mounted) return;
+    final t = AppTranslations.of(context); // 【新增】
     try {
       _syncControllersToData();
       await _saveData();
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('儲存診斷證明失敗: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('${t.saveCertificateFailed}$e')),
+        ); // 【修改】
       }
       rethrow;
     }
@@ -119,6 +122,7 @@ class _MedicalCertificatePageState extends State<MedicalCertificatePage>
   @override
   Widget build(BuildContext context) {
     super.build(context);
+    final t = AppTranslations.of(context); // 【新增】
 
     if (_isLoading) {
       return const Center(child: CircularProgressIndicator());
@@ -141,20 +145,19 @@ class _MedicalCertificatePageState extends State<MedicalCertificatePage>
                 child: Padding(
                   padding: const EdgeInsets.all(24.0),
                   child: SingleChildScrollView(
-                    // ✨ 新增 SingleChildScrollView 解決溢位問題
                     child: Column(
-                      mainAxisSize: MainAxisSize.min, // 讓卡片自適應內容高度
+                      mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildDiagnosisInput(dataModel),
+                        _buildDiagnosisInput(t, dataModel), // 【修改】
                         const SizedBox(height: 16),
-                        _buildRadioRow(dataModel, "預設囑言片語："),
+                        _buildRadioRow(t, dataModel), // 【修改】
                         const SizedBox(height: 16),
-                        _buildChineseInstructionInput(dataModel),
+                        _buildChineseInstructionInput(t, dataModel), // 【修改】
                         const SizedBox(height: 16),
-                        _buildEnglishInstructionInput(dataModel),
+                        _buildEnglishInstructionInput(t, dataModel), // 【修改】
                         const SizedBox(height: 16),
-                        _buildDateRow(dataModel, "開立日期："),
+                        _buildDateRow(t, dataModel), // 【修改】
                       ],
                     ),
                   ),
@@ -173,7 +176,7 @@ class _MedicalCertificatePageState extends State<MedicalCertificatePage>
 
   Widget _buildLabel(String label) {
     return Padding(
-      padding: const EdgeInsets.only(top: 8.0), // 增加上邊距讓標籤和輸入框頂部對齊
+      padding: const EdgeInsets.only(top: 8.0),
       child: Text(
         label,
         style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
@@ -202,64 +205,81 @@ class _MedicalCertificatePageState extends State<MedicalCertificatePage>
     );
   }
 
-  Widget _buildDiagnosisInput(CertificateData dataModel) {
+  Widget _buildDiagnosisInput(AppTranslations t, CertificateData dataModel) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Expanded(flex: 2, child: _buildLabel("診斷：")),
+        Expanded(flex: 2, child: _buildLabel(t.diagnosisLabel)), // 【修改】
         Expanded(
           flex: 8,
           child: TextField(
             controller: _diagnosisController,
             maxLines: 3,
-            decoration: _getInputDecoration("請輸入診斷"),
+            decoration: _getInputDecoration(t.enterDiagnosisHint), // 【修改】
           ),
         ),
       ],
     );
   }
 
-  Widget _buildChineseInstructionInput(CertificateData dataModel) {
+  Widget _buildChineseInstructionInput(
+    AppTranslations t,
+    CertificateData dataModel,
+  ) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Expanded(flex: 2, child: _buildLabel("中文囑言：")),
+        Expanded(
+          flex: 2,
+          child: _buildLabel(t.chineseInstructionLabel),
+        ), // 【修改】
         Expanded(
           flex: 8,
           child: TextField(
             controller: _chineseController,
             maxLines: 3,
-            decoration: _getInputDecoration("請輸入中文囑言"),
+            decoration: _getInputDecoration(
+              t.enterChineseInstructionHint,
+            ), // 【修改】
           ),
         ),
       ],
     );
   }
 
-  Widget _buildEnglishInstructionInput(CertificateData dataModel) {
+  Widget _buildEnglishInstructionInput(
+    AppTranslations t,
+    CertificateData dataModel,
+  ) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Expanded(flex: 2, child: _buildLabel("英文囑言：")),
+        Expanded(
+          flex: 2,
+          child: _buildLabel(t.englishInstructionLabel),
+        ), // 【修改】
         Expanded(
           flex: 8,
           child: TextField(
             controller: _englishController,
             maxLines: 3,
             decoration: _getInputDecoration(
-              "Please enter English instructions",
-            ),
+              t.enterEnglishInstructionHint,
+            ), // 【修改】
           ),
         ),
       ],
     );
   }
 
-  Widget _buildRadioRow(CertificateData dataModel, String label) {
+  Widget _buildRadioRow(AppTranslations t, CertificateData dataModel) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Expanded(flex: 2, child: _buildLabel(label)),
+        Expanded(
+          flex: 2,
+          child: _buildLabel(t.defaultInstructionPhrase),
+        ), // 【修改】
         Expanded(
           flex: 8,
           child: Row(
@@ -270,18 +290,14 @@ class _MedicalCertificatePageState extends State<MedicalCertificatePage>
                 activeColor: const Color(0xFF83ACA9),
                 onChanged: (value) {
                   dataModel.instructionOption = value;
-                  String chineseText =
-                      "病人於今日因上述False原因，接受本機場醫療中心緊急醫療出診，目前生命徵象穩定適宜飛行。(以下空白)";
-                  String englishText =
-                      "Due to above reasons, the patient received an outreach emergency medical. He/She is fit to fly.(Blank Below)";
-                  dataModel.chineseInstruction = chineseText;
-                  dataModel.englishInstruction = englishText;
-                  _chineseController.text = chineseText; // 直接更新控制器
-                  _englishController.text = englishText; // 直接更新控制器
+                  _chineseController.text =
+                      t.fitToFlyInstructionChinese; // 【修改】
+                  _englishController.text =
+                      t.fitToFlyInstructionEnglish; // 【修改】
                   dataModel.update();
                 },
               ),
-              const Text("適宜飛行"),
+              Text(t.fitToFly), // 【修改】
               const SizedBox(width: 20),
               Radio<int>(
                 value: 2,
@@ -289,18 +305,14 @@ class _MedicalCertificatePageState extends State<MedicalCertificatePage>
                 activeColor: const Color(0xFF83ACA9),
                 onChanged: (value) {
                   dataModel.instructionOption = value;
-                  String chineseText =
-                      "病人於今日因上述False原因，接受本醫療中心緊急醫療出診，建議轉診至醫院進行進一步檢查及治療。(以下空白)";
-                  String englishText =
-                      "Due to above reasons, the patient received an outreach emergency medical. It is suggested to transfer to hospital for further evaluation and management.(Blank Below)";
-                  dataModel.chineseInstruction = chineseText;
-                  dataModel.englishInstruction = englishText;
-                  _chineseController.text = chineseText; // 直接更新控制器
-                  _englishController.text = englishText; // 直接更新控制器
+                  _chineseController.text =
+                      t.referralInstructionChinese; // 【修改】
+                  _englishController.text =
+                      t.referralInstructionEnglish; // 【修改】
                   dataModel.update();
                 },
               ),
-              const Text("轉診後送"),
+              Text(t.referral), // 【修改】
             ],
           ),
         ),
@@ -308,11 +320,11 @@ class _MedicalCertificatePageState extends State<MedicalCertificatePage>
     );
   }
 
-  Widget _buildDateRow(CertificateData dataModel, String label) {
+  Widget _buildDateRow(AppTranslations t, CertificateData dataModel) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Expanded(flex: 2, child: _buildLabel(label)),
+        Expanded(flex: 2, child: _buildLabel(t.issueDateLabel)), // 【修改】
         Expanded(
           flex: 8,
           child: InkWell(
@@ -341,7 +353,7 @@ class _MedicalCertificatePageState extends State<MedicalCertificatePage>
                   Text(
                     dataModel.issueDate != null
                         ? "${dataModel.issueDate!.year}-${dataModel.issueDate!.month.toString().padLeft(2, '0')}-${dataModel.issueDate!.day.toString().padLeft(2, '0')}"
-                        : "選擇日期",
+                        : t.selectDate, // 【修改】
                     style: TextStyle(
                       color: dataModel.issueDate != null
                           ? Colors.black

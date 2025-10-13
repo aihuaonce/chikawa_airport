@@ -8,6 +8,7 @@ import 'data/models/patient_data.dart';
 import 'data/db/daos.dart';
 import 'providers/routes_config.dart';
 import 'widgets/nav_common.dart';
+import 'l10n/app_translations.dart';
 
 mixin SavableStateMixin<T extends StatefulWidget> on State<T> {
   Future<void> saveData();
@@ -112,6 +113,8 @@ class _Nav2PageState extends State<Nav2Page> with WidgetsBindingObserver {
   }
 
   Future<void> _saveAllPages() async {
+    final t = AppTranslations.of(context);
+
     if (_isSaving) return;
 
     setState(() {
@@ -140,7 +143,7 @@ class _Nav2PageState extends State<Nav2Page> with WidgetsBindingObserver {
             successMessages.add(pageName);
           } else {
             hasErrors = true;
-            errorMessages.add('$pageName: 儲存失敗');
+            errorMessages.add('$pageName: ${t.saveFailed}');
           }
         } catch (e) {
           hasErrors = true;
@@ -154,10 +157,10 @@ class _Nav2PageState extends State<Nav2Page> with WidgetsBindingObserver {
       // 儲存公共資料
       try {
         await _saveCommonData();
-        successMessages.add('公共資料');
+        successMessages.add(t.commonData);
       } catch (e) {
         hasErrors = true;
-        errorMessages.add('公共資料: ${e.toString()}');
+        errorMessages.add('${t.commonData}: ${e.toString()}');
       }
 
       // ✅ 關鍵修改：儲存完成後，清除快取並重建所有頁面
@@ -183,9 +186,9 @@ class _Nav2PageState extends State<Nav2Page> with WidgetsBindingObserver {
     if (!mounted) return;
 
     if (hasErrors) {
-      _showErrorDialog(errorMessages, successMessages);
+      _showErrorDialog(t, errorMessages, successMessages);
     } else {
-      _showSuccessMessage();
+      _showSuccessMessage(t);
       // 延遲一下再返回，讓用戶看到成功訊息
       await Future.delayed(const Duration(milliseconds: 1000));
       if (mounted) {
@@ -194,21 +197,26 @@ class _Nav2PageState extends State<Nav2Page> with WidgetsBindingObserver {
     }
   }
 
-  void _showErrorDialog(List<String> errors, List<String> successes) {
+  void _showErrorDialog(
+    AppTranslations t,
+    List<String> errors,
+    List<String> successes,
+  ) {
+    // 【修改】
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('儲存結果'),
+          title: Text(t.saveResult), // 【修改】
           content: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
                 if (successes.isNotEmpty) ...[
-                  const Text(
-                    '成功儲存:',
-                    style: TextStyle(
+                  Text(
+                    t.savedSuccessfully, // 【修改】
+                    style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       color: Colors.green,
                     ),
@@ -217,9 +225,9 @@ class _Nav2PageState extends State<Nav2Page> with WidgetsBindingObserver {
                   const SizedBox(height: 10),
                 ],
                 if (errors.isNotEmpty) ...[
-                  const Text(
-                    '儲存失敗:',
-                    style: TextStyle(
+                  Text(
+                    t.saveFailedLabel, // 【修改】
+                    style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       color: Colors.red,
                     ),
@@ -232,16 +240,15 @@ class _Nav2PageState extends State<Nav2Page> with WidgetsBindingObserver {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text('確定'),
+              child: Text(t.confirm), // 【修改】
             ),
             if (errors.isNotEmpty)
               TextButton(
                 onPressed: () {
                   Navigator.of(context).pop();
-                  // 重試儲存
                   _saveAllPages();
                 },
-                child: const Text('重試'),
+                child: Text(t.retry), // 【修改】
               ),
           ],
         );
@@ -249,12 +256,13 @@ class _Nav2PageState extends State<Nav2Page> with WidgetsBindingObserver {
     );
   }
 
-  void _showSuccessMessage() {
+  void _showSuccessMessage(AppTranslations t) {
+    // 【修改】
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('所有頁面資料已成功儲存'),
+      SnackBar(
+        content: Text(t.saveSuccess), // 【修改】
         backgroundColor: Colors.green,
-        duration: Duration(seconds: 2),
+        duration: const Duration(seconds: 2),
       ),
     );
   }

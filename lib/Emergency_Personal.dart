@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'data/models/emergency_data.dart';
+import 'l10n/app_translations.dart'; // 【新增】引入翻譯
 
 class EmergencyPersonalPage extends StatefulWidget {
   final int visitId;
@@ -17,7 +18,6 @@ class _EmergencyPersonalPageState extends State<EmergencyPersonalPage> {
   @override
   void initState() {
     super.initState();
-    // 延遲載入初始資料
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) _loadData();
     });
@@ -36,7 +36,6 @@ class _EmergencyPersonalPageState extends State<EmergencyPersonalPage> {
     super.dispose();
   }
 
-  // 儲存當前分頁的資料到 Provider
   void _saveToProvider() {
     final data = context.read<EmergencyData>();
     data.updatePersonal(
@@ -47,9 +46,9 @@ class _EmergencyPersonalPageState extends State<EmergencyPersonalPage> {
     );
   }
 
-  String _two(int n) => n.toString().padLeft(2, '0');
-  String _fmtDate(DateTime dt) =>
-      '${dt.year}年${_two(dt.month)}月${_two(dt.day)}日';
+  // 【修改】移除本地的日期格式化方法，將使用 AppTranslations 中的版本
+  // String _two(int n) => n.toString().padLeft(2, '0');
+  // String _fmtDate(DateTime dt) => ...
 
   Future<void> _tapPickBirthDate() async {
     final data = context.read<EmergencyData>();
@@ -66,6 +65,8 @@ class _EmergencyPersonalPageState extends State<EmergencyPersonalPage> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppTranslations.of(context); // 【新增】
+
     return Consumer<EmergencyData>(
       builder: (context, data, child) {
         return Padding(
@@ -74,17 +75,16 @@ class _EmergencyPersonalPageState extends State<EmergencyPersonalPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // 身分證字號
                 _rowTop(
-                  label: '身分證字號',
+                  label: t.idNumber, // 【修改】
                   child: ConstrainedBox(
                     constraints: const BoxConstraints(maxWidth: 420),
                     child: TextField(
                       controller: _idCtrl,
                       onChanged: (_) => _saveToProvider(),
-                      decoration: const InputDecoration(
-                        hintText: '請輸入身分證字號',
-                        border: OutlineInputBorder(),
+                      decoration: InputDecoration(
+                        hintText: t.enterIdNumber, // 【修改】
+                        border: const OutlineInputBorder(),
                         isDense: true,
                       ),
                     ),
@@ -92,22 +92,20 @@ class _EmergencyPersonalPageState extends State<EmergencyPersonalPage> {
                 ),
                 const SizedBox(height: 12),
 
-                // 性別
                 _rowTop(
-                  label: '性別',
+                  label: t.gender, // 【修改】
                   child: Wrap(
                     spacing: 18,
                     children: [
-                      _genderRadio('男', data),
-                      _genderRadio('女', data),
+                      _genderRadio(t.male, data), // 【修改】
+                      _genderRadio(t.female, data), // 【修改】
                     ],
                   ),
                 ),
                 const SizedBox(height: 12),
 
-                // 出生日期
                 _rowTop(
-                  label: '出生日期',
+                  label: t.birthDate, // 【修改】
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -116,13 +114,18 @@ class _EmergencyPersonalPageState extends State<EmergencyPersonalPage> {
                         borderRadius: BorderRadius.circular(4),
                         child: Padding(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 4, vertical: 6),
+                            horizontal: 4,
+                            vertical: 6,
+                          ),
                           child: Text(
                             data.birthDate == null
-                                ? '請選擇日期'
-                                : _fmtDate(data.birthDate!),
+                                ? t
+                                      .selectDate // 【修改】
+                                : t.formatDate(data.birthDate!), // 【修改】
                             style: const TextStyle(
-                                fontSize: 15, color: Colors.black87),
+                              fontSize: 15,
+                              color: Colors.black87,
+                            ),
                           ),
                         ),
                       ),
@@ -135,12 +138,13 @@ class _EmergencyPersonalPageState extends State<EmergencyPersonalPage> {
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF6C63FF),
                             foregroundColor: Colors.white,
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 12),
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
                             elevation: 0,
                           ),
-                          child: const Text('今天',
-                              style: TextStyle(fontSize: 12.5)),
+                          child: Text(
+                            t.today, // 【修改】
+                            style: const TextStyle(fontSize: 12.5),
+                          ),
                         ),
                       ),
                     ],
@@ -148,17 +152,16 @@ class _EmergencyPersonalPageState extends State<EmergencyPersonalPage> {
                 ),
                 const SizedBox(height: 12),
 
-                // 護照號碼
                 _rowTop(
-                  label: '護照號碼',
+                  label: t.passportNumber, // 【修改】
                   child: ConstrainedBox(
                     constraints: const BoxConstraints(maxWidth: 420),
                     child: TextField(
                       controller: _passportCtrl,
                       onChanged: (_) => _saveToProvider(),
-                      decoration: const InputDecoration(
-                        hintText: '請輸入護照號碼',
-                        border: OutlineInputBorder(),
+                      decoration: InputDecoration(
+                        hintText: t.enterPassportNumber, // 【修改】
+                        border: const OutlineInputBorder(),
                         isDense: true,
                       ),
                     ),
@@ -180,7 +183,10 @@ class _EmergencyPersonalPageState extends State<EmergencyPersonalPage> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: const [
           BoxShadow(
-              color: Color(0x14000000), blurRadius: 8, offset: Offset(0, 4)),
+            color: Color(0x14000000),
+            blurRadius: 8,
+            offset: Offset(0, 4),
+          ),
         ],
       ),
       child: child,
@@ -205,7 +211,9 @@ class _EmergencyPersonalPageState extends State<EmergencyPersonalPage> {
             ),
           ),
         ),
-        Expanded(child: Align(alignment: Alignment.topLeft, child: child)),
+        Expanded(
+          child: Align(alignment: Alignment.topLeft, child: child),
+        ),
       ],
     );
   }

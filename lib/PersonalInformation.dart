@@ -1,3 +1,4 @@
+// lib/PersonalInformationPage.dart
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
@@ -5,6 +6,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:provider/provider.dart';
 import '../data/db/daos.dart';
 import '../data/models/patient_data.dart';
+import '../l10n/app_translations.dart'; // 【新增】引入翻譯
 import 'nav2.dart';
 
 class PersonalInformationPage extends StatefulWidget {
@@ -48,11 +50,9 @@ class _PersonalInformationPageState extends State<PersonalInformationPage>
     super.dispose();
   }
 
-  // 實現 saveData 方法 - 這個方法會被 Nav2Page 呼叫
   @override
   Future<void> saveData() async {
     _formKey.currentState?.validate();
-
     try {
       await _save();
     } catch (e) {
@@ -86,11 +86,10 @@ class _PersonalInformationPageState extends State<PersonalInformationPage>
         reasonController.text = patientData.reason ?? '';
       }
     } catch (e) {
+      // Handle error
     } finally {
       if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
+        setState(() => _isLoading = false);
       }
     }
   }
@@ -122,6 +121,8 @@ class _PersonalInformationPageState extends State<PersonalInformationPage>
   }
 
   Future<void> _pickPhoto() async {
+    if (!mounted) return;
+    final t = AppTranslations.of(context); // 【新增】
     try {
       final patientData = context.read<PatientData>();
 
@@ -141,9 +142,9 @@ class _PersonalInformationPageState extends State<PersonalInformationPage>
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('選擇照片失敗: ${e.toString()}')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('${t.photoSelectionFailed}$e')),
+        ); // 【修改】
       }
     }
   }
@@ -153,20 +154,9 @@ class _PersonalInformationPageState extends State<PersonalInformationPage>
       final patientData = context.read<PatientData>();
       final dao = context.read<PatientProfilesDao>();
 
-      // 確保控制器的資料同步到 PatientData
       patientData.idNumber = idController.text.trim();
       patientData.address = addrController.text.trim();
       patientData.phone = phoneController.text.trim();
-
-      print('visitId: ${widget.visitId}');
-      print('gender: ${patientData.gender}');
-      print('nationality: ${patientData.nationality}');
-      print('birthday: ${patientData.birthday}');
-      print('reason: ${patientData.reason}');
-      print('idNumber: ${patientData.idNumber}');
-      print('address: ${patientData.address}');
-      print('phone: ${patientData.phone}');
-      print('hasPhoto: ${patientData.photoBase64 != null}');
 
       await dao.upsertByVisitId(
         visitId: widget.visitId,
@@ -179,16 +169,12 @@ class _PersonalInformationPageState extends State<PersonalInformationPage>
         phone: patientData.phone,
         photoPath: patientData.photoBase64,
       );
-
-      // 注意：這裡不要清空 patientData，讓 Nav2Page 統一處理
     } catch (e) {
       rethrow;
     }
   }
 
-  // 當使用者離開這個頁面時自動儲存
   void _onTextFieldChanged() {
-    // 延遲儲存，避免每次輸入都觸發
     Future.delayed(const Duration(milliseconds: 500), () {
       if (mounted) {
         final patientData = context.read<PatientData>();
@@ -203,6 +189,29 @@ class _PersonalInformationPageState extends State<PersonalInformationPage>
   @override
   Widget build(BuildContext context) {
     if (_isLoading) return const Center(child: CircularProgressIndicator());
+    final t = AppTranslations.of(context); // 【新增】
+
+    // 【新增】動態建立選項列表
+    final purposeOptions = {
+      '航空公司機組員': t.airlineCrew,
+      '旅客/民眾': t.passenger,
+      '機場內部員工': t.airportStaff,
+    };
+
+    final nationalityOptions = {
+      '台灣': t.taiwanNationality,
+      '美國': t.nationalityUSA,
+      '越南': t.nationalityVietnam,
+      '泰國': t.nationalityThailand,
+      '印尼': t.nationalityIndonesia,
+      '菲律賓': t.nationalityPhilippines,
+      '香港': t.nationalityHongKong,
+      '澳門': t.nationalityMacau,
+      '加拿大': t.nationalityCanada,
+      '中國大陸': t.nationalityChina,
+      '日本': t.nationalityJapan,
+      '其他': t.nationalityOther,
+    };
 
     return Consumer<PatientData>(
       builder: (context, patientData, _) {
@@ -224,10 +233,8 @@ class _PersonalInformationPageState extends State<PersonalInformationPage>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // ===== 個人資料 =====
-                    _SectionTitle('個人資料'),
+                    _SectionTitle(t.personalInformation), // 【修改】
                     const SizedBox(height: 16),
-                    // 照片
                     GestureDetector(
                       onTap: _pickPhoto,
                       child: Container(
@@ -254,21 +261,23 @@ class _PersonalInformationPageState extends State<PersonalInformationPage>
                       ),
                     ),
                     const SizedBox(height: 24),
-                    // 出生日期
                     InkWell(
                       onTap: _pickBirthday,
                       child: InputDecorator(
-                        decoration: const InputDecoration(
-                          labelText: '生日',
-                          border: OutlineInputBorder(),
+                        decoration: InputDecoration(
+                          labelText: t.birthday, // 【修改】
+                          border: const OutlineInputBorder(),
                         ),
                         child: Row(
                           children: [
                             Expanded(
                               child: Text(
                                 patientData.birthday == null
-                                    ? '尚未選擇'
-                                    : '${patientData.birthday!.year}-${patientData.birthday!.month.toString().padLeft(2, '0')}-${patientData.birthday!.day.toString().padLeft(2, '0')}',
+                                    ? t
+                                          .notSelected // 【修改】
+                                    : t.formatDate(
+                                        patientData.birthday!,
+                                      ), // 【修改】使用新方法
                               ),
                             ),
                             const Icon(Icons.calendar_today, size: 20),
@@ -277,27 +286,25 @@ class _PersonalInformationPageState extends State<PersonalInformationPage>
                       ),
                     ),
                     const SizedBox(height: 16),
-                    // 年齡
                     InputDecorator(
-                      decoration: const InputDecoration(
-                        labelText: '年齡',
-                        border: OutlineInputBorder(),
+                      decoration: InputDecoration(
+                        labelText: t.age, // 【修改】
+                        border: const OutlineInputBorder(),
                       ),
                       child: Text(
                         patientData.age != null
-                            ? '${patientData.age} 歲'
-                            : '尚未選擇生日',
+                            ? t.ageWithUnit(patientData.age!) // 【修改】使用新方法
+                            : t.birthdayNotSelected, // 【修改】
                       ),
                     ),
                     const SizedBox(height: 16),
-                    // 性別
-                    _SectionTitle('性別'),
+                    _SectionTitle(t.gender), // 【修改】
                     Row(
                       children: [
                         Expanded(
                           child: RadioListTile<String>(
-                            title: const Text('男'),
-                            value: '男',
+                            title: Text(t.male), // 【修改】
+                            value: '男', // DB value
                             groupValue: patientData.gender,
                             activeColor: const Color(0xFF83ACA9),
                             onChanged: (v) {
@@ -308,8 +315,8 @@ class _PersonalInformationPageState extends State<PersonalInformationPage>
                         ),
                         Expanded(
                           child: RadioListTile<String>(
-                            title: const Text('女'),
-                            value: '女',
+                            title: Text(t.female), // 【修改】
+                            value: '女', // DB value
                             groupValue: patientData.gender,
                             activeColor: const Color(0xFF83ACA9),
                             onChanged: (v) {
@@ -321,16 +328,15 @@ class _PersonalInformationPageState extends State<PersonalInformationPage>
                       ],
                     ),
                     const SizedBox(height: 16),
-                    // 證號
                     TextFormField(
                       controller: idController,
-                      decoration: const InputDecoration(
-                        labelText: '護照號或身份證字號',
-                        border: OutlineInputBorder(),
+                      decoration: InputDecoration(
+                        labelText: t.passportOrId, // 【修改】
+                        border: const OutlineInputBorder(),
                       ),
                       validator: (value) {
                         if (value == null || value.trim().isEmpty) {
-                          return '請輸入護照號或身份證字號';
+                          return t.enterPassportOrId; // 【修改】
                         }
                         return null;
                       },
@@ -340,176 +346,43 @@ class _PersonalInformationPageState extends State<PersonalInformationPage>
                       },
                     ),
                     const SizedBox(height: 16),
-                    // 為何至機場？
-                    _SectionTitle('為何至機場？'),
+                    _SectionTitle(t.purposeOfVisit), // 【修改】
                     Column(
-                      children: [
-                        RadioListTile<String>(
-                          title: const Text('航空公司機組員'),
-                          value: '航空公司機組員',
+                      children: purposeOptions.entries.map((entry) {
+                        return RadioListTile<String>(
+                          title: Text(entry.value),
+                          value: entry.key,
                           groupValue: patientData.reason,
                           activeColor: const Color(0xFF83ACA9),
                           onChanged: (v) {
                             patientData.reason = v;
                             patientData.update();
                           },
-                        ),
-                        RadioListTile<String>(
-                          title: const Text('旅客/民眾'),
-                          value: '旅客/民眾',
-                          groupValue: patientData.reason,
-                          activeColor: const Color(0xFF83ACA9),
-                          onChanged: (v) {
-                            patientData.reason = v;
-                            patientData.update();
-                          },
-                        ),
-                        RadioListTile<String>(
-                          title: const Text('機場內部員工'),
-                          value: '機場內部員工',
-                          groupValue: patientData.reason,
-                          activeColor: const Color(0xFF83ACA9),
-                          onChanged: (v) {
-                            patientData.reason = v;
-                            patientData.update();
-                          },
-                        ),
-                      ],
+                        );
+                      }).toList(),
                     ),
                     const SizedBox(height: 16),
-                    // 國籍
-                    _SectionTitle('國籍'),
+                    _SectionTitle(t.nationality), // 【修改】
                     Column(
-                      children: [
-                        RadioListTile<String>(
-                          title: const Text('台灣 (中華民國) TAIWAN'),
-                          value: '台灣',
+                      children: nationalityOptions.entries.map((entry) {
+                        return RadioListTile<String>(
+                          title: Text(entry.value),
+                          value: entry.key,
                           groupValue: patientData.nationality,
                           activeColor: const Color(0xFF83ACA9),
                           onChanged: (v) {
                             patientData.nationality = v;
                             patientData.update();
                           },
-                        ),
-                        RadioListTile<String>(
-                          title: const Text('美國 UNITED STATES'),
-                          value: '美國',
-                          groupValue: patientData.nationality,
-                          activeColor: const Color(0xFF83ACA9),
-                          onChanged: (v) {
-                            patientData.nationality = v;
-                            patientData.update();
-                          },
-                        ),
-                        RadioListTile<String>(
-                          title: const Text('越南 VIETNAM'),
-                          value: '越南',
-                          groupValue: patientData.nationality,
-                          activeColor: const Color(0xFF83ACA9),
-                          onChanged: (v) {
-                            patientData.nationality = v;
-                            patientData.update();
-                          },
-                        ),
-                        RadioListTile<String>(
-                          title: const Text('泰國 THAILAND'),
-                          value: '泰國',
-                          groupValue: patientData.nationality,
-                          activeColor: const Color(0xFF83ACA9),
-                          onChanged: (v) {
-                            patientData.nationality = v;
-                            patientData.update();
-                          },
-                        ),
-                        RadioListTile<String>(
-                          title: const Text('印尼 INDONESIA'),
-                          value: '印尼',
-                          groupValue: patientData.nationality,
-                          activeColor: const Color(0xFF83ACA9),
-                          onChanged: (v) {
-                            patientData.nationality = v;
-                            patientData.update();
-                          },
-                        ),
-                        RadioListTile<String>(
-                          title: const Text('菲律賓 PHILIPPINES'),
-                          value: '菲律賓',
-                          groupValue: patientData.nationality,
-                          activeColor: const Color(0xFF83ACA9),
-                          onChanged: (v) {
-                            patientData.nationality = v;
-                            patientData.update();
-                          },
-                        ),
-                        RadioListTile<String>(
-                          title: const Text('香港 HONG KONG'),
-                          value: '香港',
-                          groupValue: patientData.nationality,
-                          activeColor: const Color(0xFF83ACA9),
-                          onChanged: (v) {
-                            patientData.nationality = v;
-                            patientData.update();
-                          },
-                        ),
-                        RadioListTile<String>(
-                          title: const Text('澳門 MACAU'),
-                          value: '澳門',
-                          groupValue: patientData.nationality,
-                          activeColor: const Color(0xFF83ACA9),
-                          onChanged: (v) {
-                            patientData.nationality = v;
-                            patientData.update();
-                          },
-                        ),
-                        RadioListTile<String>(
-                          title: const Text('加拿大 CANADA'),
-                          value: '加拿大',
-                          groupValue: patientData.nationality,
-                          activeColor: const Color(0xFF83ACA9),
-                          onChanged: (v) {
-                            patientData.nationality = v;
-                            patientData.update();
-                          },
-                        ),
-                        RadioListTile<String>(
-                          title: const Text('中國大陸 CHINA'),
-                          value: '中國大陸',
-                          groupValue: patientData.nationality,
-                          activeColor: const Color(0xFF83ACA9),
-                          onChanged: (v) {
-                            patientData.nationality = v;
-                            patientData.update();
-                          },
-                        ),
-                        RadioListTile<String>(
-                          title: const Text('日本 JAPAN'),
-                          value: '日本',
-                          groupValue: patientData.nationality,
-                          activeColor: const Color(0xFF83ACA9),
-                          onChanged: (v) {
-                            patientData.nationality = v;
-                            patientData.update();
-                          },
-                        ),
-                        RadioListTile<String>(
-                          title: const Text('其他國籍'),
-                          value: '其他',
-                          groupValue: patientData.nationality,
-                          activeColor: const Color(0xFF83ACA9),
-                          onChanged: (v) {
-                            patientData.nationality = v;
-                            patientData.update();
-                          },
-                        ),
-                      ],
+                        );
+                      }).toList(),
                     ),
                     const SizedBox(height: 16),
-                    // 地址
                     TextFormField(
                       controller: addrController,
-                      decoration: const InputDecoration(
-                        labelText: '地址',
-                        border: OutlineInputBorder(),
+                      decoration: InputDecoration(
+                        labelText: t.address, // 【修改】
+                        border: const OutlineInputBorder(),
                       ),
                       maxLines: 2,
                       onChanged: (val) {
@@ -518,17 +391,16 @@ class _PersonalInformationPageState extends State<PersonalInformationPage>
                       },
                     ),
                     const SizedBox(height: 16),
-                    // 聯絡電話
                     TextFormField(
                       controller: phoneController,
-                      decoration: const InputDecoration(
-                        labelText: '聯絡電話',
-                        border: OutlineInputBorder(),
+                      decoration: InputDecoration(
+                        labelText: t.contactNumber, // 【修改】
+                        border: const OutlineInputBorder(),
                       ),
                       keyboardType: TextInputType.phone,
                       validator: (value) {
                         if (value == null || value.trim().isEmpty) {
-                          return '請輸入聯絡電話';
+                          return t.enterContactNumber; // 【修改】
                         }
                         return null;
                       },

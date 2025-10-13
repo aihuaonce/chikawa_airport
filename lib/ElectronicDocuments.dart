@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'data/db/daos.dart';
 import 'data/models/electronic_document_data.dart';
+import 'l10n/app_translations.dart'; // 【新增】引入翻譯
 import 'nav2.dart'; // 為了使用 SavableStateMixin
 
 class ElectronicDocumentsPage extends StatefulWidget {
@@ -39,13 +40,15 @@ class _ElectronicDocumentsPageState extends State<ElectronicDocumentsPage>
   // ===============================================
   @override
   Future<void> saveData() async {
+    if (!mounted) return;
+    final t = AppTranslations.of(context); // 【新增】
     try {
       await _saveData();
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('儲存電傳文件失敗: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('${t.saveElectronicDocFailed}$e')),
+        ); // 【修改】
       }
       rethrow;
     }
@@ -93,6 +96,23 @@ class _ElectronicDocumentsPageState extends State<ElectronicDocumentsPage>
   @override
   Widget build(BuildContext context) {
     super.build(context);
+    final t = AppTranslations.of(context); // 【新增】
+
+    // 【新增】動態建立翻譯後的選項列表
+    // 假設選項的順序和數量是固定的
+    final List<String> toOptions = [
+      t.toOption1,
+      t.toOption2,
+      t.toOption3,
+      t.other, // 從通用翻譯中複用 "其他"
+    ];
+
+    final List<String> fromOptions = [
+      t.fromOption1,
+      t.fromOption2,
+      t.fromOption3,
+      t.other, // 從通用翻譯中複用 "其他"
+    ];
 
     if (_isLoading) {
       return const Center(child: CircularProgressIndicator());
@@ -120,10 +140,10 @@ class _ElectronicDocumentsPageState extends State<ElectronicDocumentsPage>
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const SizedBox(height: 4),
-                        _SectionTitle('TO：桃園國際機場股份有限公司營運控制中心'),
+                        _SectionTitle(t.toOOC), // 【修改】
                         const SizedBox(height: 10),
                         _RadioList(
-                          options: ElectronicDocumentData.toOptions,
+                          options: toOptions, // 【修改】
                           groupValue: dataModel.toSelectedIndex,
                           onChanged: (int v) {
                             dataModel.toSelectedIndex = v;
@@ -131,10 +151,10 @@ class _ElectronicDocumentsPageState extends State<ElectronicDocumentsPage>
                           },
                         ),
                         const SizedBox(height: 28),
-                        _SectionTitle('FROM：聯新國際醫院桃園國際機場醫療中心'),
+                        _SectionTitle(t.fromMedicalCenter), // 【修改】
                         const SizedBox(height: 10),
                         _RadioList(
-                          options: ElectronicDocumentData.fromOptions,
+                          options: fromOptions, // 【修改】
                           groupValue: dataModel.fromSelectedIndex,
                           onChanged: (int v) {
                             dataModel.fromSelectedIndex = v;
@@ -155,7 +175,7 @@ class _ElectronicDocumentsPageState extends State<ElectronicDocumentsPage>
   }
 
   // ===============================================
-  // Helper Widgets (從原始檔複製過來)
+  // Helper Widgets (無須修改)
   // ===============================================
 
   Widget _bigCard({required Widget child}) {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'data/models/ambulance_data.dart';
+import 'l10n/app_translations.dart'; // 【新增】引入翻譯
 
 class AmbulanceInformationPage extends StatefulWidget {
   final int visitId;
@@ -21,106 +22,7 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
   final _placeNoteCtrl = TextEditingController();
   final _otherDestCtrl = TextEditingController();
 
-  // ===== 選項列表 (靜態常量) =====
-  static const List<String> placeGroups = [
-    '第一航廈',
-    '第二航廈',
-    '遠端機坪',
-    '貨運站/機坪其他',
-    '諾富特飯店',
-    '飛機機艙內',
-  ];
-
-  static const List<String> t1Places = [
-    '出境查驗台',
-    '入境查驗台',
-    '貴賓室',
-    '出境大廳(管制區外)',
-    '出境層(管制區內)',
-    '入境大廳(管制區外)',
-    '入境層(管制區內)',
-    '美食街',
-    '航警局',
-    '機場捷運',
-    '1號停車場',
-    '2號停車場',
-    '出境巴士下車處',
-    '入境巴士上車處',
-    '出境安檢',
-    '行李轉盤',
-    '海關處',
-    '登機門A1',
-    '登機門A2',
-    '登機門A3',
-    '登機門A4',
-    '登機門A5',
-    '登機門A6',
-    '登機門A7',
-    '登機門A8',
-    '登機門A9',
-    'A區轉機櫃檯',
-    'B區轉機櫃檯',
-    'A區轉機安檢',
-    'B區轉機安檢',
-    '航廈電車(管制區內)',
-    '航廈電車(管制區外)',
-    '其他位置',
-    '登機門B1',
-    '登機門B2',
-    '登機門B3',
-    '登機門B4',
-    '登機門B5',
-    '登機門B6',
-    '登機門B7',
-    '登機門B8',
-    '登機門B9',
-    '登機門B1R',
-  ];
-
-  static const List<String> t2Places = [
-    '出境查驗台',
-    '入境查驗台',
-    '貴賓室',
-    '出境大廳(管制區外)',
-    '出境層(管制區內)',
-    '入境大廳(管制區外)',
-    '入境層(管制區內)',
-    '美食廣場',
-    '航警局',
-    '機場捷運',
-    '3號停車場',
-    '4號停車場',
-    '北側觀景台',
-    '南側觀景台',
-    '北揚5樓',
-    '南側5樓',
-    '登機門D1',
-    '登機門D2',
-    '登機門D3',
-    '登機門D4',
-    '登機門D5',
-    '登機門D6',
-    '登機門D7',
-    '登機門D8',
-    '登機門D9',
-    '登機門D10',
-    '登機門C1',
-    '登機門C2',
-    '登機門C3',
-    '登機門C4',
-    '登機門C5',
-    '登機門C6',
-    '登機門C7',
-    '登機門C8',
-    '登機門C9',
-    'C區轉機櫃檯',
-    'C區轉機安檢',
-    '航廈電車(管制區內)',
-    '航廈電車(管制區外)',
-    '其他位置',
-    '登機門C5R',
-  ];
-
+  // ===== 選項列表 (靜態常量，無需翻譯) =====
   static const List<String> remotePlaces = [
     '601',
     '602',
@@ -137,40 +39,6 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
     '613',
     '614',
     '615',
-  ];
-
-  static const List<String> cargoPlaces = [
-    '滑行道',
-    '506',
-    '507',
-    '508',
-    '509',
-    '510',
-    '511',
-    '512',
-    '513',
-    '514',
-    '515',
-    '台飛棚廠',
-    '維修停機坪',
-    '長榮航太',
-    '機坪其他位置',
-  ];
-
-  static const List<String> novotelPlaces = ['諾富特飯店'];
-  static const List<String> cabinPlaces = ['飛機機艙內'];
-
-  static const List<String> hospitals = [
-    '聯新國際醫院',
-    '林口長庚醫院',
-    '衛生福利部桃園醫院',
-    '衛生福利部桃園療養院',
-    '桃園經國敏盛醫院',
-    '聖保祿醫院',
-    '中壢天晟醫院',
-    '桃園榮民總醫院',
-    '三峽恩主公醫院',
-    '其他',
   ];
 
   @override
@@ -199,7 +67,8 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
     super.dispose();
   }
 
-  void _saveToProvider() {
+  void _saveToProvider(List<String> hospitals) {
+    // 【修改】傳入醫院列表
     final data = context.read<AmbulanceData>();
 
     String? destinationHospitalName;
@@ -221,11 +90,6 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
   }
 
   // ===== 工具函式 =====
-  String _two(int n) => n.toString().padLeft(2, '0');
-  String _fmtDateTime(DateTime dt) =>
-      '${dt.year}年${_two(dt.month)}月${_two(dt.day)}日 '
-      '${_two(dt.hour)}時${_two(dt.minute)}分${_two(dt.second)}秒';
-
   Future<void> _pickDateTime({
     required DateTime? current,
     required ValueChanged<DateTime?> onChanged,
@@ -250,6 +114,142 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppTranslations.of(context); // 【新增】取得翻譯物件
+
+    // 【修改】將靜態列表改為在 build 方法中動態建立
+    final List<String> placeGroups = [
+      t.terminal1,
+      t.terminal2,
+      t.remoteApron,
+      t.cargoOther,
+      t.novotelHotel,
+      t.insideAircraft,
+    ];
+
+    final List<String> t1Places = [
+      t.departureCounter,
+      t.arrivalCounter,
+      t.vipLounge,
+      t.departureHallPublic,
+      t.departureLevelRestricted,
+      t.arrivalHallPublic,
+      t.arrivalLevelRestricted,
+      t.foodCourt,
+      t.aviationPolice,
+      t.airportMRT,
+      t.carPark1,
+      t.carPark2,
+      t.departureBusDropOff,
+      t.arrivalBusPickUp,
+      t.departureSecurityCheck,
+      t.baggageClaim,
+      t.customs,
+      t.gateLabel('A1'),
+      t.gateLabel('A2'),
+      t.gateLabel('A3'),
+      t.gateLabel('A4'),
+      t.gateLabel('A5'),
+      t.gateLabel('A6'),
+      t.gateLabel('A7'),
+      t.gateLabel('A8'),
+      t.gateLabel('A9'),
+      t.transferCounterA,
+      t.transferCounterB,
+      t.transferSecurityA,
+      t.transferSecurityB,
+      t.skytrainAirside,
+      t.skytrainLandside,
+      t.otherLocation,
+      t.gateLabel('B1'),
+      t.gateLabel('B2'),
+      t.gateLabel('B3'),
+      t.gateLabel('B4'),
+      t.gateLabel('B5'),
+      t.gateLabel('B6'),
+      t.gateLabel('B7'),
+      t.gateLabel('B8'),
+      t.gateLabel('B9'),
+      t.gateLabel('B1R'),
+    ];
+
+    final List<String> t2Places = [
+      t.departureCounter,
+      t.arrivalCounter,
+      t.vipLounge,
+      t.departureHallPublic,
+      t.departureLevelRestricted,
+      t.arrivalHallPublic,
+      t.arrivalLevelRestricted,
+      t.foodCourt,
+      t.aviationPolice,
+      t.airportMRT,
+      t.carPark3,
+      t.carPark4,
+      t.northObservationDeck,
+      t.southObservationDeck,
+      t.northWing5F,
+      t.southWing5F,
+      t.gateLabel('D1'),
+      t.gateLabel('D2'),
+      t.gateLabel('D3'),
+      t.gateLabel('D4'),
+      t.gateLabel('D5'),
+      t.gateLabel('D6'),
+      t.gateLabel('D7'),
+      t.gateLabel('D8'),
+      t.gateLabel('D9'),
+      t.gateLabel('D10'),
+      t.gateLabel('C1'),
+      t.gateLabel('C2'),
+      t.gateLabel('C3'),
+      t.gateLabel('C4'),
+      t.gateLabel('C5'),
+      t.gateLabel('C6'),
+      t.gateLabel('C7'),
+      t.gateLabel('C8'),
+      t.gateLabel('C9'),
+      t.transferCounterC,
+      t.transferSecurityC,
+      t.skytrainAirside,
+      t.skytrainLandside,
+      t.otherLocation,
+      t.gateLabel('C5R'),
+    ];
+
+    final List<String> cargoPlaces = [
+      t.taxiway,
+      '506',
+      '507',
+      '508',
+      '509',
+      '510',
+      '511',
+      '512',
+      '513',
+      '514',
+      '515',
+      t.tacHangar,
+      t.maintenanceApron,
+      t.evergreenAerospace,
+      t.otherApronLocation,
+    ];
+
+    final List<String> novotelPlaces = [t.novotelHotel];
+    final List<String> cabinPlaces = [t.insideAircraft];
+
+    final List<String> hospitals = [
+      t.landseedHospital,
+      t.linkouChangGung,
+      t.taoyuanHospital,
+      t.taoyuanPsychiatricCenter,
+      t.taoyuanMinSheng,
+      t.stPaulsHospital,
+      t.tienShengHospital,
+      t.taoyuanVeteransHospital,
+      t.enChuKungHospital,
+      t.other,
+    ];
+
     return Consumer<AmbulanceData>(
       builder: (context, data, child) {
         return SingleChildScrollView(
@@ -263,15 +263,15 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _rowTop(
-                      label: '車牌號碼',
+                      label: t.plateNumber, // 【修改】
                       child: ConstrainedBox(
                         constraints: const BoxConstraints(maxWidth: 420),
                         child: TextField(
                           controller: _plateCtrl,
-                          onChanged: (_) => _saveToProvider(),
-                          decoration: const InputDecoration(
-                            hintText: '請填寫車牌號碼',
-                            border: OutlineInputBorder(),
+                          onChanged: (_) => _saveToProvider(hospitals), // 【修改】
+                          decoration: InputDecoration(
+                            hintText: t.enterPlateNumberHint, // 【修改】
+                            border: const OutlineInputBorder(),
                             isDense: true,
                           ),
                         ),
@@ -279,7 +279,7 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
                     ),
                     const SizedBox(height: 12),
 
-                    _bold('發生地點'),
+                    _bold(t.incidentLocation), // 【修改】
                     const SizedBox(height: 6),
                     Container(
                       width: double.infinity,
@@ -306,32 +306,39 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
                             },
                           ),
                           const SizedBox(height: 8),
-                          _placeSubOptions(data),
+                          _placeSubOptions(
+                            data,
+                            t1Places,
+                            t2Places,
+                            cargoPlaces,
+                            novotelPlaces,
+                            cabinPlaces,
+                          ), // 【修改】傳入列表
                         ],
                       ),
                     ),
                     const SizedBox(height: 12),
 
                     _rowTop(
-                      label: '地點備註',
+                      label: t.locationNotes, // 【修改】
                       child: ConstrainedBox(
                         constraints: const BoxConstraints(maxWidth: 700),
                         child: TextField(
                           controller: _placeNoteCtrl,
-                          onChanged: (_) => _saveToProvider(),
+                          onChanged: (_) => _saveToProvider(hospitals), // 【修改】
                         ),
                       ),
                     ),
                     const SizedBox(height: 16),
 
                     _dateTimeRow(
-                      label: '出勤日期與時間',
+                      label: t.dutyDateTime, // 【修改】
                       value: data.dutyTime,
                       onChanged: (dt) => data.updateInformation(dutyTime: dt),
                     ),
                     const SizedBox(height: 8),
                     _dateTimeRow(
-                      label: '到達現場時間',
+                      label: t.arriveSceneTime, // 【修改】
                       value: data.arriveSceneTime,
                       onChanged: (dt) =>
                           data.updateInformation(arriveSceneTime: dt),
@@ -339,7 +346,7 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
                     const SizedBox(height: 16),
 
                     _rowTop(
-                      label: '送往醫院或地點',
+                      label: t.destinationHospitalOrPlace, // 【修改】
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: List.generate(hospitals.length, (i) {
@@ -352,7 +359,7 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
                                 data.updateInformation(
                                   destinationHospitalIdx: i,
                                 );
-                                _saveToProvider();
+                                _saveToProvider(hospitals); // 【修改】
                               },
                             ),
                           );
@@ -364,12 +371,13 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
                         hospitals.length - 1) ...[
                       const SizedBox(height: 10),
                       _rowTop(
-                        label: '其他醫院名稱',
+                        label: t.otherHospitalName, // 【修改】
                         child: ConstrainedBox(
                           constraints: const BoxConstraints(maxWidth: 700),
                           child: TextField(
                             controller: _otherDestCtrl,
-                            onChanged: (_) => _saveToProvider(),
+                            onChanged: (_) =>
+                                _saveToProvider(hospitals), // 【修改】
                           ),
                         ),
                       ),
@@ -378,28 +386,28 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
                     const SizedBox(height: 16),
 
                     _dateTimeRow(
-                      label: '離開現場時間',
+                      label: t.leaveSceneTime, // 【修改】
                       value: data.leaveSceneTime,
                       onChanged: (dt) =>
                           data.updateInformation(leaveSceneTime: dt),
                     ),
                     const SizedBox(height: 8),
                     _dateTimeRow(
-                      label: '到達醫院時間',
+                      label: t.arriveHospitalTime, // 【修改】
                       value: data.arriveHospitalTime,
                       onChanged: (dt) =>
                           data.updateInformation(arriveHospitalTime: dt),
                     ),
                     const SizedBox(height: 8),
                     _dateTimeRow(
-                      label: '離開醫院時間',
+                      label: t.leaveHospitalTime, // 【修改】
                       value: data.leaveHospitalTime,
                       onChanged: (dt) =>
                           data.updateInformation(leaveHospitalTime: dt),
                     ),
                     const SizedBox(height: 8),
                     _dateTimeRow(
-                      label: '返回待命時間',
+                      label: t.backToStandbyTime, // 【修改】
                       value: data.backStandbyTime,
                       onChanged: (dt) =>
                           data.updateInformation(backStandbyTime: dt),
@@ -443,7 +451,6 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
   );
 
   Widget _rowTop({required String label, required Widget child}) {
-    // 針對 TextField 做優化,讓 hintText 等能正常顯示
     final Widget effectiveChild = child is TextField
         ? Theme(
             data: Theme.of(context).copyWith(
@@ -486,6 +493,7 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
     required DateTime? value,
     required ValueChanged<DateTime?> onChanged,
   }) {
+    final t = AppTranslations.of(context); // 【新增】
     return _rowTop(
       label: label,
       child: Row(
@@ -497,7 +505,9 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 6),
               child: Text(
-                value == null ? '請選擇時間' : _fmtDateTime(value),
+                value == null
+                    ? t.pleaseSelectTime
+                    : t.formatFullDateTime(value), // 【修改】
                 style: TextStyle(
                   fontSize: 15,
                   color: value == null ? Colors.blue.shade700 : Colors.black87,
@@ -516,7 +526,10 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
                 padding: const EdgeInsets.symmetric(horizontal: 12),
                 elevation: 1,
               ),
-              child: const Text('帶入現在時間', style: TextStyle(fontSize: 12.5)),
+              child: Text(
+                t.useCurrentTime,
+                style: const TextStyle(fontSize: 12.5),
+              ), // 【修改】
             ),
           ),
         ],
@@ -564,7 +577,15 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
     );
   }
 
-  Widget _placeSubOptions(AmbulanceData data) {
+  Widget _placeSubOptions(
+    AmbulanceData data,
+    List<String> t1Places,
+    List<String> t2Places,
+    List<String> cargoPlaces,
+    List<String> novotelPlaces,
+    List<String> cabinPlaces,
+  ) {
+    // 【修改】接收翻譯好的列表
     final List<String> opts;
     final int? groupIndex;
     final ValueChanged<int> onChanged;

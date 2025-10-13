@@ -1,6 +1,9 @@
+// ambulance_expenses_page.dart
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'data/models/ambulance_data.dart';
+import 'l10n/app_translations.dart'; // 【新增】引入翻譯
 
 class AmbulanceExpensesPage extends StatefulWidget {
   final int visitId;
@@ -51,6 +54,7 @@ class _AmbulanceExpensesPageState extends State<AmbulanceExpensesPage> {
   @override
   Widget build(BuildContext context) {
     const double inputWidth = 120;
+    final t = AppTranslations.of(context); // 【新增】取得翻譯物件
 
     return Consumer<AmbulanceData>(
       builder: (context, data, child) {
@@ -69,6 +73,15 @@ class _AmbulanceExpensesPageState extends State<AmbulanceExpensesPage> {
         final totalFee =
             (int.tryParse(_staffFeeController.text) ?? 0) +
             (int.tryParse(_oxygenFeeController.text) ?? 0);
+
+        // 【新增】定義選項，方便管理
+        final chargeStatusOptions = [t.paid, t.collectedByLandseed, t.unpaid];
+        final paidTypeOptions = [t.cash, t.creditCard];
+        final unpaidTypeOptions = [
+          t.accountsReceivable,
+          t.remittance,
+          t.unifiedBilling,
+        ];
 
         return Padding(
           padding: const EdgeInsets.all(16),
@@ -89,9 +102,9 @@ class _AmbulanceExpensesPageState extends State<AmbulanceExpensesPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _buildTitleWithInput(
-                      title: '救護車費用含醫護人員:',
+                      title: t.ambulanceFeeWithStaff, // 【修改】使用翻譯
                       controller: _staffFeeController,
-                      hint: '請填寫整數',
+                      hint: t.enterIntegerHint, // 【修改】使用翻譯
                       inputWidth: inputWidth,
                       onChanged: (value) {
                         setState(() {});
@@ -101,9 +114,9 @@ class _AmbulanceExpensesPageState extends State<AmbulanceExpensesPage> {
                     const SizedBox(height: 12),
 
                     _buildTitleWithInput(
-                      title: '氧氣使用費用:',
+                      title: t.oxygenUsageFee, // 【修改】使用翻譯
                       controller: _oxygenFeeController,
-                      hint: '請填寫整數',
+                      hint: t.enterIntegerHint, // 【修改】使用翻譯
                       inputWidth: inputWidth,
                       onChanged: (value) {
                         setState(() {});
@@ -114,9 +127,9 @@ class _AmbulanceExpensesPageState extends State<AmbulanceExpensesPage> {
 
                     Row(
                       children: [
-                        const Text(
-                          '總費用',
-                          style: TextStyle(
+                        Text(
+                          t.totalFee, // 【修改】使用翻譯
+                          style: const TextStyle(
                             color: Color.fromARGB(255, 61, 61, 61),
                             fontSize: 16,
                           ),
@@ -139,9 +152,9 @@ class _AmbulanceExpensesPageState extends State<AmbulanceExpensesPage> {
                     ),
                     const SizedBox(height: 16),
 
-                    const Text(
-                      '收費情形:',
-                      style: TextStyle(
+                    Text(
+                      t.chargeStatus, // 【修改】使用翻譯
+                      style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
                       ),
@@ -149,7 +162,8 @@ class _AmbulanceExpensesPageState extends State<AmbulanceExpensesPage> {
                     const SizedBox(height: 6),
                     Wrap(
                       spacing: 12,
-                      children: ['已收費', '連新國際醫院代收', '未收費'].map((option) {
+                      children: chargeStatusOptions.map((option) {
+                        // 【修改】使用選項列表
                         return _buildRadioOption(option, data.chargeStatus, (
                           val,
                         ) {
@@ -163,10 +177,11 @@ class _AmbulanceExpensesPageState extends State<AmbulanceExpensesPage> {
                     ),
                     const SizedBox(height: 12),
 
-                    if (data.chargeStatus == '已收費') ...[
-                      const Text(
-                        '已收費:',
-                        style: TextStyle(
+                    if (data.chargeStatus == t.paid) ...[
+                      // 【修改】使用翻譯比較
+                      Text(
+                        t.paidMethod, // 【修改】使用翻譯
+                        style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
                         ),
@@ -174,7 +189,8 @@ class _AmbulanceExpensesPageState extends State<AmbulanceExpensesPage> {
                       const SizedBox(height: 6),
                       Wrap(
                         spacing: 12,
-                        children: ['現金', '刷卡'].map((option) {
+                        children: paidTypeOptions.map((option) {
+                          // 【修改】使用選項列表
                           return _buildRadioOption(
                             option,
                             data.paidType,
@@ -184,10 +200,11 @@ class _AmbulanceExpensesPageState extends State<AmbulanceExpensesPage> {
                       ),
                     ],
 
-                    if (data.chargeStatus == '未收費') ...[
-                      const Text(
-                        '未收費:',
-                        style: TextStyle(
+                    if (data.chargeStatus == t.unpaid) ...[
+                      // 【修改】使用翻譯比較
+                      Text(
+                        t.unpaidReason, // 【修改】使用翻譯
+                        style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
                         ),
@@ -195,7 +212,8 @@ class _AmbulanceExpensesPageState extends State<AmbulanceExpensesPage> {
                       const SizedBox(height: 6),
                       Wrap(
                         spacing: 12,
-                        children: ['欠款', '匯款', '統一請款'].map((option) {
+                        children: unpaidTypeOptions.map((option) {
+                          // 【修改】使用選項列表
                           return _buildRadioOption(
                             option,
                             data.unpaidType,

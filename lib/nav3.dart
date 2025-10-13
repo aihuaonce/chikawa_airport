@@ -1,6 +1,7 @@
 // lib/nav3.dart
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'l10n/app_translations.dart'; // 【新增】引入翻譯
 
 class Nav3Section extends StatefulWidget {
   const Nav3Section({super.key});
@@ -10,7 +11,8 @@ class Nav3Section extends StatefulWidget {
 }
 
 class _Nav3SectionState extends State<Nav3Section> {
-  static const String _placeholder = '請輸入患者姓名（必填）';
+  // 【修改】移除靜態的 placeholder 字串
+  // static const String _placeholder = '請輸入患者姓名（必填）';
 
   final _controller = TextEditingController();
   final _focus = FocusNode();
@@ -18,7 +20,7 @@ class _Nav3SectionState extends State<Nav3Section> {
   @override
   void initState() {
     super.initState();
-    _controller.addListener(() => setState(() {})); // 任何輸入變化都重建 UI
+    _controller.addListener(() => setState(() {}));
   }
 
   @override
@@ -28,7 +30,6 @@ class _Nav3SectionState extends State<Nav3Section> {
     super.dispose();
   }
 
-  // 量測文字寬度，讓底線長度和文字一致
   double _textWidth(String text, TextStyle style) {
     final tp = TextPainter(
       text: TextSpan(text: text, style: style),
@@ -40,29 +41,33 @@ class _Nav3SectionState extends State<Nav3Section> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppTranslations.of(context); // 【新增】取得翻譯物件
+    final String placeholder =
+        t.patientNamePlaceholder; // 【新增】取得翻譯後的 placeholder
+
     // 顯示樣式
-    final redStyle = const TextStyle(
+    const redStyle = TextStyle(
       fontSize: 22,
       height: 1.2,
       fontWeight: FontWeight.w700,
-      color: Color(0xFFDC3545), // 紅
+      color: Color(0xFFDC3545),
     );
-    final blackStyle = const TextStyle(
+    const blackStyle = TextStyle(
       fontSize: 22,
       height: 1.2,
       fontWeight: FontWeight.w700,
-      color: Colors.black87, // 黑
+      color: Colors.black87,
     );
 
     final bool showRed = _controller.text.isEmpty;
 
-    // 目前要顯示哪段文字，用來決定底線長度
-    final String displayText = showRed ? _placeholder : _controller.text;
+    // 【修改】使用翻譯後的 placeholder
+    final String displayText = showRed ? placeholder : _controller.text;
     final TextStyle displayStyle = showRed ? redStyle : blackStyle;
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final w = _textWidth(displayText, displayStyle) + 6; // 多 6px 餘裕
+        final w = _textWidth(displayText, displayStyle) + 6;
         final width = math.min(constraints.maxWidth, w);
 
         return ConstrainedBox(
@@ -70,7 +75,7 @@ class _Nav3SectionState extends State<Nav3Section> {
           child: Stack(
             alignment: Alignment.topLeft,
             children: [
-              // 1) 真正的輸入框（只放使用者的文字）
+              // 1) 真正的輸入框
               TextField(
                 controller: _controller,
                 focusNode: _focus,
@@ -89,15 +94,14 @@ class _Nav3SectionState extends State<Nav3Section> {
                   focusedBorder: UnderlineInputBorder(
                     borderSide: BorderSide(width: 2, color: Colors.black87),
                   ),
-                  // 不用 TextField 自帶 hintText，我們用覆蓋層自己畫紅字
                 ),
               ),
 
-              // 2) 紅字覆蓋層：只有在輸入為空時顯示
+              // 2) 紅字覆蓋層
               if (showRed)
                 IgnorePointer(
                   child: Text(
-                    _placeholder,
+                    placeholder, // 【修改】使用翻譯後的 placeholder
                     style: redStyle,
                     overflow: TextOverflow.visible,
                     softWrap: false,

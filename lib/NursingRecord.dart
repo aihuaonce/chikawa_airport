@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'data/db/daos.dart';
 import 'data/models/nursing_record_data.dart';
+import 'l10n/app_translations.dart'; // 【新增】引入翻譯
 import 'nav2.dart'; // 為了使用 SavableStateMixin
 
 class NursingRecordPage extends StatefulWidget {
@@ -33,13 +34,15 @@ class _NursingRecordPageState extends State<NursingRecordPage>
   // ===============================================
   @override
   Future<void> saveData() async {
+    if (!mounted) return;
+    final t = AppTranslations.of(context); // 【新增】
     try {
       await _saveData();
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('儲存護理記錄失敗: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('${t.saveNursingRecordFailed}$e')),
+        ); // 【修改】
       }
       rethrow;
     }
@@ -78,7 +81,6 @@ class _NursingRecordPageState extends State<NursingRecordPage>
   Future<void> _saveData() async {
     final dao = context.read<NursingRecordsDao>();
     final dataModel = context.read<NursingRecordData>();
-    // 將每筆記錄物件轉換為 Map
     final recordsToSave = dataModel.nursingRecords
         .map((entry) => entry.toMap())
         .toList();
@@ -92,6 +94,7 @@ class _NursingRecordPageState extends State<NursingRecordPage>
   @override
   Widget build(BuildContext context) {
     super.build(context);
+    final t = AppTranslations.of(context); // 【新增】
 
     if (_isLoading) {
       return const Center(child: CircularProgressIndicator());
@@ -117,17 +120,19 @@ class _NursingRecordPageState extends State<NursingRecordPage>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    '護理記錄表',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  Text(
+                    t.nursingRecordForm, // 【修改】
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 16),
-                  _buildHeader(),
-                  // 已新增的資料行
+                  _buildHeader(t), // 【修改】
                   ...dataModel.nursingRecords.map(
-                    (record) => _buildRecordRow(dataModel, record),
+                    (record) => _buildRecordRow(t, dataModel, record), // 【修改】
                   ),
-                  _buildAddRowButton(dataModel),
+                  _buildAddRowButton(t, dataModel), // 【修改】
                 ],
               ),
             ),
@@ -141,58 +146,66 @@ class _NursingRecordPageState extends State<NursingRecordPage>
   // Helper Widgets
   // ===============================================
 
-  Widget _buildHeader() {
+  Widget _buildHeader(AppTranslations t) {
+    // 【修改】
     return Container(
       width: double.infinity,
       color: const Color(0xFFF1F3F6),
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-      child: const Row(
+      child: Row(
         children: [
           Expanded(
             flex: 2,
-            child: Text('紀錄時間', style: TextStyle(fontWeight: FontWeight.bold)),
+            child: Text(
+              t.recordTime,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ), // 【修改】
           ),
           Expanded(
             flex: 3,
-            child: Text('紀錄', style: TextStyle(fontWeight: FontWeight.bold)),
+            child: Text(
+              t.record,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ), // 【修改】
           ),
           Expanded(
             flex: 2,
-            child: Text('護理師姓名', style: TextStyle(fontWeight: FontWeight.bold)),
+            child: Text(
+              t.nurseName,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ), // 【修改】
           ),
           Expanded(
             flex: 2,
-            child: Text('護理師簽名', style: TextStyle(fontWeight: FontWeight.bold)),
+            child: Text(
+              t.nurseSignature,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ), // 【修改】
           ),
-          SizedBox(width: 48), // 刪除按鈕的空間
+          const SizedBox(width: 48),
         ],
       ),
     );
   }
 
   Widget _buildRecordRow(
+    AppTranslations t, // 【修改】
     NursingRecordData dataModel,
     NursingRecordEntry record,
   ) {
-    // 為每一行的 TextField 建立獨立的 Controller
     final timeController = TextEditingController(text: record.time);
     final recordController = TextEditingController(text: record.record);
     final nurseNameController = TextEditingController(text: record.nurseName);
     final nurseSignController = TextEditingController(text: record.nurseSign);
 
-    // 監聽 TextField 的變化，並更新 Model
-    timeController.addListener(() {
-      record.time = timeController.text;
-    });
-    recordController.addListener(() {
-      record.record = recordController.text;
-    });
-    nurseNameController.addListener(() {
-      record.nurseName = nurseNameController.text;
-    });
-    nurseSignController.addListener(() {
-      record.nurseSign = nurseSignController.text;
-    });
+    timeController.addListener(() => record.time = timeController.text);
+    recordController.addListener(() => record.record = recordController.text);
+    nurseNameController.addListener(
+      () => record.nurseName = nurseNameController.text,
+    );
+    nurseSignController.addListener(
+      () => record.nurseSign = nurseSignController.text,
+    );
 
     return Container(
       width: double.infinity,
@@ -201,10 +214,22 @@ class _NursingRecordPageState extends State<NursingRecordPage>
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Expanded(flex: 2, child: _buildTextField(timeController, '時間')),
-          Expanded(flex: 3, child: _buildTextField(recordController, '內容')),
-          Expanded(flex: 2, child: _buildTextField(nurseNameController, '姓名')),
-          Expanded(flex: 2, child: _buildTextField(nurseSignController, '簽名')),
+          Expanded(
+            flex: 2,
+            child: _buildTextField(timeController, t.timeHint),
+          ), // 【修改】
+          Expanded(
+            flex: 3,
+            child: _buildTextField(recordController, t.contentHint),
+          ), // 【修改】
+          Expanded(
+            flex: 2,
+            child: _buildTextField(nurseNameController, t.nameHint),
+          ), // 【修改】
+          Expanded(
+            flex: 2,
+            child: _buildTextField(nurseSignController, t.signatureHint),
+          ), // 【修改】
           IconButton(
             icon: const Icon(Icons.delete, color: Colors.redAccent),
             onPressed: () => dataModel.removeRecord(record.id),
@@ -232,15 +257,19 @@ class _NursingRecordPageState extends State<NursingRecordPage>
     );
   }
 
-  Widget _buildAddRowButton(NursingRecordData dataModel) {
+  Widget _buildAddRowButton(AppTranslations t, NursingRecordData dataModel) {
+    // 【修改】
     return InkWell(
       onTap: () => dataModel.addRecord(),
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
-        child: const Text(
-          '＋ 加入資料行',
-          style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),
+        child: Text(
+          t.addRow, // 【修改】
+          style: const TextStyle(
+            color: Colors.blue,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
     );

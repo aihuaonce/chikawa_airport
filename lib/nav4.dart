@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'nav3.dart';
 import 'data/models/emergency_data.dart';
 import 'data/db/daos.dart';
+import 'l10n/app_translations.dart'; // 【新增】引入翻譯
 import 'providers/emergency_navigation_provider.dart';
 
 import 'Emergency_Personal.dart';
@@ -25,11 +26,9 @@ class Nav4Page extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => EmergencyNavigationProvider()),
-        // ✅ 修改:使用 ProxyProvider 確保能取得 DAO
         ChangeNotifierProxyProvider<EmergencyRecordsDao, EmergencyData>(
           create: (context) {
             final data = EmergencyData(visitId);
-            // ✅ 在創建後立即載入資料
             final dao = context.read<EmergencyRecordsDao>();
             data.loadFromDatabase(dao);
             return data;
@@ -107,7 +106,8 @@ class _EmergencyNavBarState extends State<EmergencyNavBar> {
   bool _isSaving = false;
 
   Future<void> _handleSave() async {
-    if (_isSaving) return;
+    if (_isSaving || !mounted) return;
+    final t = AppTranslations.of(context); // 【新增】
 
     setState(() => _isSaving = true);
 
@@ -116,32 +116,16 @@ class _EmergencyNavBarState extends State<EmergencyNavBar> {
       final dao = context.read<EmergencyRecordsDao>();
       final visitsDao = context.read<VisitsDao>();
 
-      print('🔵 開始儲存 visitId: ${emergencyData.visitId}');
-      print('📋 病患姓名: ${emergencyData.patientName}');
-      print('📋 事發時間: ${emergencyData.incidentDateTime}');
-      print('📋 急救結果: ${emergencyData.endResult}');
-
-      // 呼叫 Provider 的儲存方法
       await emergencyData.saveToDatabase(dao, visitsDao);
-
-      // ✅ 驗證是否真的儲存成功
-      final savedVisit = await visitsDao.getById(emergencyData.visitId);
-      print('✅ 儲存後的 Visit 資料:');
-      print('   - hasEmergencyRecord: ${savedVisit?.hasEmergencyRecord}');
-      print('   - patientName: ${savedVisit?.patientName}');
-      print('   - incidentDateTime: ${savedVisit?.incidentDateTime}');
-      print('   - emergencyResult: ${savedVisit?.emergencyResult}');
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('急救紀錄已儲存成功!'),
+          SnackBar(
+            content: Text(t.emergencySaved), // 【修改】
             backgroundColor: Colors.green,
-            duration: Duration(seconds: 2),
+            duration: const Duration(seconds: 2),
           ),
         );
-
-        // ✅ 儲存成功後返回上一頁
         Navigator.of(context).pop();
       }
     } catch (e, stackTrace) {
@@ -149,8 +133,10 @@ class _EmergencyNavBarState extends State<EmergencyNavBar> {
       print('堆疊: $stackTrace');
 
       if (mounted) {
+        // 【修改】使用已有的翻譯鍵
+        final errorMessage = '${t.saveFailed}: $e';
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('儲存失敗: $e'), backgroundColor: Colors.red),
+          SnackBar(content: Text(errorMessage), backgroundColor: Colors.red),
         );
       }
     } finally {
@@ -163,17 +149,22 @@ class _EmergencyNavBarState extends State<EmergencyNavBar> {
   @override
   Widget build(BuildContext context) {
     final navProvider = context.watch<EmergencyNavigationProvider>();
-    final List<String> items = ['個人資料', '飛航紀錄', '事故紀錄', '處置紀錄'];
+    final t = AppTranslations.of(context); // 【新增】
+
+    // 【修改】動態建立翻譯後的導航項目列表
+    final List<String> items = [
+      t.personalInfo,
+      t.flightRecord,
+      t.accidentRecord,
+      t.treatmentRecord,
+    ];
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       decoration: const BoxDecoration(color: Colors.white),
       child: Row(
         children: [
-          // ✅ 移除：返回按鈕
           const SizedBox(width: 12),
-
-          // 分頁導航按鈕
           Expanded(
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
@@ -182,7 +173,7 @@ class _EmergencyNavBarState extends State<EmergencyNavBar> {
                   return Padding(
                     padding: const EdgeInsets.only(right: 8),
                     child: _PillButton(
-                      label: items[i],
+                      label: items[i], // 【修改】使用翻譯後的列表
                       active: i == navProvider.selectedIndex,
                       onTap: () => navProvider.setSelectedIndex(i),
                     ),
@@ -192,10 +183,8 @@ class _EmergencyNavBarState extends State<EmergencyNavBar> {
             ),
           ),
           const SizedBox(width: 12),
-
-          // 儲存按鈕
           IconButton(
-            tooltip: _isSaving ? '儲存中...' : '儲存所有資料',
+            tooltip: _isSaving ? t.saving : t.saveAllPages, // 【修改】
             icon: _isSaving
                 ? const SizedBox(
                     width: 20,
@@ -208,9 +197,6 @@ class _EmergencyNavBarState extends State<EmergencyNavBar> {
                 : const Icon(Icons.save),
             onPressed: _isSaving ? null : _handleSave,
           ),
-
-          // ✅ 移除：呼叫救護車按鈕
-          // ✅ 移除：右邊的 CircleAvatar
         ],
       ),
     );

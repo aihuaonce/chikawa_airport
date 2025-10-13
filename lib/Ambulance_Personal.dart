@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:signature/signature.dart';
 import 'data/models/ambulance_data.dart';
+import 'l10n/app_translations.dart'; // 【新增】引入翻譯
 
 class AmbulancePersonalPage extends StatefulWidget {
   final int visitId;
@@ -66,6 +67,10 @@ class _AmbulancePersonalPageState extends State<AmbulancePersonalPage> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppTranslations.of(context); // 【新增】取得翻譯物件
+    final genderOptions = [t.male, t.female]; // 【新增】性別選項
+    final handledOptions = [t.notHandled, t.yes]; // 【新增】經手選項
+
     return Consumer<AmbulanceData>(
       builder: (context, data, child) {
         return Padding(
@@ -84,24 +89,24 @@ class _AmbulancePersonalPageState extends State<AmbulancePersonalPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _buildRadioRow(
-                        title: '性別:',
+                        title: t.gender, // 【修改】
                         groupValue: data.gender,
-                        options: const ['男', '女'],
+                        options: genderOptions, // 【修改】
                         onChanged: (val) => data.updatePersonal(gender: val),
                       ),
                       const SizedBox(height: 16),
 
                       _buildTextFieldRow(
-                        title: '身分證字號/護照號碼:',
-                        hint: '請填寫證件號碼',
+                        title: t.idOrPassportNumber, // 【修改】
+                        hint: t.enterIdOrPassportHint, // 【修改】
                         controller: _idCtrl,
                         onChanged: _saveToProvider,
                       ),
                       const SizedBox(height: 16),
 
                       _buildTextFieldRow(
-                        title: '年齡:',
-                        hint: '請填寫整數',
+                        title: t.age, // 【修改】
+                        hint: t.enterIntegerHint, // 【修改】
                         controller: _ageCtrl,
                         keyboardType: TextInputType.number,
                         onChanged: _saveToProvider,
@@ -109,45 +114,45 @@ class _AmbulancePersonalPageState extends State<AmbulancePersonalPage> {
                       const SizedBox(height: 16),
 
                       _buildTextFieldRow(
-                        title: '住址:',
-                        hint: '請填寫住址',
+                        title: t.address, // 【修改】
+                        hint: t.enterAddressHint, // 【修改】
                         controller: _addressCtrl,
                         onChanged: _saveToProvider,
                       ),
                       const SizedBox(height: 16),
 
                       _buildTextFieldRow(
-                        title: '病患財物明細:',
-                        hint: '請填寫病患財物明細',
+                        title: t.patientBelongings, // 【修改】
+                        hint: t.enterBelongingsHint, // 【修改】
                         controller: _belongingsCtrl,
                         onChanged: _saveToProvider,
                       ),
                       const SizedBox(height: 16),
 
                       _buildRadioRow(
-                        title: '是否有經手:',
+                        title: t.belongingsHandled, // 【修改】
                         groupValue: data.belongingsHandled,
-                        options: const ['未經手', '是'],
+                        options: handledOptions, // 【修改】
                         onChanged: (val) =>
                             data.updatePersonal(belongingsHandled: val),
                       ),
                       const SizedBox(height: 16),
 
                       _buildTextFieldRow(
-                        title: '保管人姓名:',
-                        hint: '請填寫保管人姓名',
+                        title: t.custodianName, // 【修改】
+                        hint: t.enterCustodianNameHint, // 【修改】
                         controller: _custodianCtrl,
                         onChanged: _saveToProvider,
                       ),
                       const SizedBox(height: 16),
 
-                      const Text(
-                        '保管人簽名:',
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                      Text(
+                        t.custodianSignature, // 【修改】
+                        style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 8),
                       GestureDetector(
-                        onTap: () => _handleSignatureTap(data),
+                        onTap: () => _handleSignatureTap(data, t), // 【修改】
                         child: Container(
                           height: 120,
                           decoration: BoxDecoration(
@@ -156,9 +161,9 @@ class _AmbulancePersonalPageState extends State<AmbulancePersonalPage> {
                           ),
                           alignment: Alignment.center,
                           child: data.custodianSignature == null
-                              ? const Text(
-                                  '請點擊此處簽名',
-                                  style: TextStyle(color: Colors.grey),
+                              ? Text(
+                                  t.tapToSign, // 【修改】
+                                  style: const TextStyle(color: Colors.grey),
                                 )
                               : Image.memory(data.custodianSignature!),
                         ),
@@ -174,8 +179,12 @@ class _AmbulancePersonalPageState extends State<AmbulancePersonalPage> {
     );
   }
 
-  Future<void> _handleSignatureTap(AmbulanceData data) async {
-    final result = await _openSignatureDialog();
+  Future<void> _handleSignatureTap(
+    AmbulanceData data,
+    AppTranslations t,
+  ) async {
+    // 【修改】
+    final result = await _openSignatureDialog(t); // 【修改】
     if (result != null) {
       data.updatePersonal(custodianSignature: result);
     }
@@ -247,7 +256,8 @@ class _AmbulancePersonalPageState extends State<AmbulancePersonalPage> {
     );
   }
 
-  Future<Uint8List?> _openSignatureDialog() async {
+  Future<Uint8List?> _openSignatureDialog(AppTranslations t) async {
+    // 【修改】
     _signatureController.clear();
 
     return showDialog<Uint8List?>(
@@ -261,9 +271,12 @@ class _AmbulancePersonalPageState extends State<AmbulancePersonalPage> {
             padding: const EdgeInsets.all(16),
             child: Column(
               children: [
-                const Text(
-                  '簽名區',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                Text(
+                  t.signatureArea, // 【修改】
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
                 ),
                 const SizedBox(height: 12),
                 Expanded(
@@ -283,13 +296,13 @@ class _AmbulancePersonalPageState extends State<AmbulancePersonalPage> {
                   children: [
                     TextButton(
                       onPressed: () => _signatureController.clear(),
-                      child: const Text('重寫'),
+                      child: Text(t.redraw), // 【修改】
                     ),
                     TextButton(
                       onPressed: () => Navigator.pop(context, null),
-                      child: const Text(
-                        '清除簽名',
-                        style: TextStyle(color: Colors.red),
+                      child: Text(
+                        t.clearSignature, // 【修改】
+                        style: const TextStyle(color: Colors.red),
                       ),
                     ),
                     const Spacer(),
@@ -299,14 +312,11 @@ class _AmbulancePersonalPageState extends State<AmbulancePersonalPage> {
                           Navigator.pop(context);
                           return;
                         }
-
                         final data = await _signatureController.toPngBytes();
-
                         if (!context.mounted) return;
-
                         Navigator.pop(context, data);
                       },
-                      child: const Text('完成'),
+                      child: Text(t.done), // 【修改】
                     ),
                   ],
                 ),

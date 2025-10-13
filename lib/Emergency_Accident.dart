@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'data/models/emergency_data.dart';
+import 'l10n/app_translations.dart'; // 【新增】引入翻譯
 
 class EmergencyAccidentPage extends StatefulWidget {
   final int visitId;
@@ -14,105 +15,9 @@ class _EmergencyAccidentPageState extends State<EmergencyAccidentPage> {
   static const double _cardMaxWidth = 1100;
   static const double _radius = 16;
 
-  final List<String> placeGroups = const [
-    '第一航廈',
-    '第二航廈',
-    '遠端機坪',
-    '貨運站/機坪其他',
-    '諾富特飯店',
-    '飛機機艙內',
-  ];
+  // 【修改】移除所有靜態地點列表，它們將在 build 方法中動態生成
 
-  final List<String> t1Places = const [
-    '出境查驗台',
-    '入境查驗台',
-    '貴賓室',
-    '出境大廳(管制區外)',
-    '出境層(管制區內)',
-    '入境大廳(管制區外)',
-    '入境層(管制區內)',
-    '美食街',
-    '航警局',
-    '機場捷運',
-    '1號停車場',
-    '2號停車場',
-    '出境巴士下車處',
-    '入境巴士上車處',
-    '出境安檢',
-    '行李轉盤',
-    '海關處',
-    '登機門A1',
-    '登機門A2',
-    '登機門A3',
-    '登機門A4',
-    '登機門A5',
-    '登機門A6',
-    '登機門A7',
-    '登機門A8',
-    '登機門A9',
-    'A區轉機櫃檯',
-    'B區轉機櫃檯',
-    'A區轉機安檢',
-    'B區轉機安檢',
-    '航廈電車(管制區內)',
-    '航廈電車(管制區外)',
-    '其他位置',
-    '登機門B1',
-    '登機門B2',
-    '登機門B3',
-    '登機門B4',
-    '登機門B5',
-    '登機門B6',
-    '登機門B7',
-    '登機門B8',
-    '登機門B9',
-    '登機門B1R',
-  ];
-
-  final List<String> t2Places = const [
-    '出境查驗台',
-    '入境查驗台',
-    '貴賓室',
-    '出境大廳(管制區外)',
-    '出境層(管制區內)',
-    '入境大廳(管制區外)',
-    '入境層(管制區內)',
-    '美食廣場',
-    '航警局',
-    '機場捷運',
-    '3號停車場',
-    '4號停車場',
-    '北側觀景台',
-    '南側觀景台',
-    '北揚5樓',
-    '南側5樓',
-    '登機門D1',
-    '登機門D2',
-    '登機門D3',
-    '登機門D4',
-    '登機門D5',
-    '登機門D6',
-    '登機門D7',
-    '登機門D8',
-    '登機門D9',
-    '登機門D10',
-    '登機門C1',
-    '登機門C2',
-    '登機門C3',
-    '登機門C4',
-    '登機門C5',
-    '登機門C6',
-    '登機門C7',
-    '登機門C8',
-    '登機門C9',
-    'C區轉機櫃檯',
-    'C區轉機安檢',
-    '航廈電車(管制區內)',
-    '航廈電車(管制區外)',
-    '其他位置',
-    '登機門C5R',
-  ];
-
+  // 【修改】只保留不需要翻譯的列表
   final List<String> remotePlaces = const [
     '601',
     '602',
@@ -130,27 +35,6 @@ class _EmergencyAccidentPageState extends State<EmergencyAccidentPage> {
     '614',
     '615',
   ];
-
-  final List<String> cargoPlaces = const [
-    '滑行道',
-    '506',
-    '507',
-    '508',
-    '509',
-    '510',
-    '511',
-    '512',
-    '513',
-    '514',
-    '515',
-    '台飛棚廠',
-    '維修停機坪',
-    '長榮航太',
-    '機坪其他位置',
-  ];
-
-  final List<String> novotelPlaces = const ['諾富特飯店'];
-  final List<String> cabinPlaces = const ['飛機機艙內'];
 
   final TextEditingController placeNoteCtrl = TextEditingController();
 
@@ -180,6 +64,129 @@ class _EmergencyAccidentPageState extends State<EmergencyAccidentPage> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppTranslations.of(context); // 【新增】
+
+    // 【新增】在 build 方法中動態建立翻譯後的選項列表
+    final List<String> placeGroups = [
+      t.terminal1,
+      t.terminal2,
+      t.remoteApron,
+      t.cargoOther,
+      t.novotelHotel,
+      t.insideAircraft,
+    ];
+
+    final List<String> t1Places = [
+      t.departureCounter,
+      t.arrivalCounter,
+      t.vipLounge,
+      t.departureHallPublic,
+      t.departureLevelRestricted,
+      t.arrivalHallPublic,
+      t.arrivalLevelRestricted,
+      t.foodCourt,
+      t.aviationPolice,
+      t.airportMRT,
+      t.carPark1,
+      t.carPark2,
+      t.departureBusDropOff,
+      t.arrivalBusPickUp,
+      t.departureSecurityCheck,
+      t.baggageClaim,
+      t.customs,
+      t.gateLabel('A1'),
+      t.gateLabel('A2'),
+      t.gateLabel('A3'),
+      t.gateLabel('A4'),
+      t.gateLabel('A5'),
+      t.gateLabel('A6'),
+      t.gateLabel('A7'),
+      t.gateLabel('A8'),
+      t.gateLabel('A9'),
+      t.transferCounterA,
+      t.transferCounterB,
+      t.transferSecurityA,
+      t.transferSecurityB,
+      t.skytrainAirside,
+      t.skytrainLandside,
+      t.otherLocation,
+      t.gateLabel('B1'),
+      t.gateLabel('B2'),
+      t.gateLabel('B3'),
+      t.gateLabel('B4'),
+      t.gateLabel('B5'),
+      t.gateLabel('B6'),
+      t.gateLabel('B7'),
+      t.gateLabel('B8'),
+      t.gateLabel('B9'),
+      t.gateLabel('B1R'),
+    ];
+
+    final List<String> t2Places = [
+      t.departureCounter,
+      t.arrivalCounter,
+      t.vipLounge,
+      t.departureHallPublic,
+      t.departureLevelRestricted,
+      t.arrivalHallPublic,
+      t.arrivalLevelRestricted,
+      t.foodCourt,
+      t.aviationPolice,
+      t.airportMRT,
+      t.carPark3,
+      t.carPark4,
+      t.northObservationDeck,
+      t.southObservationDeck,
+      t.northWing5F,
+      t.southWing5F,
+      t.gateLabel('D1'),
+      t.gateLabel('D2'),
+      t.gateLabel('D3'),
+      t.gateLabel('D4'),
+      t.gateLabel('D5'),
+      t.gateLabel('D6'),
+      t.gateLabel('D7'),
+      t.gateLabel('D8'),
+      t.gateLabel('D9'),
+      t.gateLabel('D10'),
+      t.gateLabel('C1'),
+      t.gateLabel('C2'),
+      t.gateLabel('C3'),
+      t.gateLabel('C4'),
+      t.gateLabel('C5'),
+      t.gateLabel('C6'),
+      t.gateLabel('C7'),
+      t.gateLabel('C8'),
+      t.gateLabel('C9'),
+      t.transferCounterC,
+      t.transferSecurityC,
+      t.skytrainAirside,
+      t.skytrainLandside,
+      t.otherLocation,
+      t.gateLabel('C5R'),
+    ];
+
+    final List<String> cargoPlaces = [
+      t.taxiway,
+      '506',
+      '507',
+      '508',
+      '509',
+      '510',
+      '511',
+      '512',
+      '513',
+      '514',
+      '515',
+      t.tacHangar,
+      t.maintenanceApron,
+      t.evergreenAerospace,
+      t.otherApronLocation,
+    ];
+
+    final List<String> novotelPlaces = [t.novotelHotel];
+    final List<String> cabinPlaces = [t.insideAircraft];
+
     return Consumer<EmergencyData>(
       builder: (context, data, child) {
         return Padding(
@@ -192,9 +199,8 @@ class _EmergencyAccidentPageState extends State<EmergencyAccidentPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // 事發日期與時間
                     _dateTimeRow(
-                      label: '事發日期與時間',
+                      label: t.incidentDateTime, // 【修改】
                       value: data.incidentDateTime,
                       onPick: (dt) => data.updateAccident(incidentDateTime: dt),
                       onNow: () =>
@@ -202,8 +208,7 @@ class _EmergencyAccidentPageState extends State<EmergencyAccidentPage> {
                     ),
                     const SizedBox(height: 16),
 
-                    // 發生地點
-                    _bold('發生地點'),
+                    _bold(t.incidentLocation), // 【修改】
                     const SizedBox(height: 6),
                     Container(
                       width: double.infinity,
@@ -215,7 +220,7 @@ class _EmergencyAccidentPageState extends State<EmergencyAccidentPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           _radioWrap(
-                            options: placeGroups,
+                            options: placeGroups, // 【修改】
                             groupIndex: data.placeGroupIdx,
                             onChanged: (i) {
                               data.updateAccident(
@@ -230,16 +235,23 @@ class _EmergencyAccidentPageState extends State<EmergencyAccidentPage> {
                             },
                           ),
                           const SizedBox(height: 8),
-                          _placeSubOptions(data),
+                          // 【修改】傳入動態生成的列表
+                          _placeSubOptions(
+                            data,
+                            t1Places,
+                            t2Places,
+                            cargoPlaces,
+                            novotelPlaces,
+                            cabinPlaces,
+                          ),
                         ],
                       ),
                     ),
                     const SizedBox(height: 16),
 
-                    // 地點備註
                     _inputRowTight(
-                      label: '地點備註',
-                      hint: '請填寫地點備註',
+                      label: t.locationNotes, // 【修改】
+                      hint: t.enterLocationNotes, // 【修改】
                       ctrl: placeNoteCtrl,
                     ),
                   ],
@@ -284,6 +296,7 @@ class _EmergencyAccidentPageState extends State<EmergencyAccidentPage> {
     required ValueChanged<DateTime?> onPick,
     required VoidCallback onNow,
   }) {
+    final t = AppTranslations.of(context); // 【新增】
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
@@ -306,7 +319,7 @@ class _EmergencyAccidentPageState extends State<EmergencyAccidentPage> {
               firstDate: DateTime(2000),
               lastDate: DateTime(2101),
             );
-            if (newDate != null) {
+            if (newDate != null && mounted) {
               final newTime = await showTimePicker(
                 context: context,
                 initialTime: TimeOfDay.fromDateTime(value ?? DateTime.now()),
@@ -325,7 +338,9 @@ class _EmergencyAccidentPageState extends State<EmergencyAccidentPage> {
             }
           },
           child: Text(
-            value == null ? '請選擇時間' : _fmtDateTime(value),
+            value == null
+                ? t.pleaseSelectTime
+                : t.formatFullDateTime(value), // 【修改】
             style: const TextStyle(fontSize: 15, color: Colors.black87),
           ),
         ),
@@ -340,7 +355,10 @@ class _EmergencyAccidentPageState extends State<EmergencyAccidentPage> {
               padding: const EdgeInsets.symmetric(horizontal: 12),
               elevation: 0,
             ),
-            child: const Text('更新時間', style: TextStyle(fontSize: 12.5)),
+            child: Text(
+              t.updateTime,
+              style: const TextStyle(fontSize: 12.5),
+            ), // 【修改】
           ),
         ),
       ],
@@ -366,24 +384,19 @@ class _EmergencyAccidentPageState extends State<EmergencyAccidentPage> {
             ),
           ),
         ),
-        Align(
-          alignment: Alignment.centerLeft,
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 520),
-            child: SizedBox(
-              width: double.infinity,
-              child: TextField(
-                controller: ctrl,
-                onChanged: (_) => _saveToProvider(),
-                decoration: const InputDecoration(
-                  isDense: true,
-                  border: OutlineInputBorder(),
-                  contentPadding: EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 10,
-                  ),
-                ).copyWith(hintText: hint),
+        Expanded(
+          // 【修改】讓輸入框能填滿剩餘空間
+          child: TextField(
+            controller: ctrl,
+            onChanged: (_) => _saveToProvider(),
+            decoration: InputDecoration(
+              isDense: true,
+              border: const OutlineInputBorder(),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 10,
+                vertical: 10,
               ),
+              hintText: hint,
             ),
           ),
         ),
@@ -420,7 +433,15 @@ class _EmergencyAccidentPageState extends State<EmergencyAccidentPage> {
     );
   }
 
-  Widget _placeSubOptions(EmergencyData data) {
+  // 【修改】更新方法簽名以接收動態列表
+  Widget _placeSubOptions(
+    EmergencyData data,
+    List<String> t1Places,
+    List<String> t2Places,
+    List<String> cargoPlaces,
+    List<String> novotelPlaces,
+    List<String> cabinPlaces,
+  ) {
     if (data.placeGroupIdx == null) return const SizedBox.shrink();
 
     List<String> opts;
@@ -490,9 +511,4 @@ class _EmergencyAccidentPageState extends State<EmergencyAccidentPage> {
       ),
     );
   }
-
-  String _two(int n) => n.toString().padLeft(2, '0');
-  String _fmtDateTime(DateTime dt) =>
-      '${dt.year}年${_two(dt.month)}月${_two(dt.day)}日 '
-      '${_two(dt.hour)}時${_two(dt.minute)}分${_two(dt.second)}秒';
 }

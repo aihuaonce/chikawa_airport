@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'data/db/daos.dart';
 import 'data/models/medical_costs_data.dart';
+import 'l10n/app_translations.dart'; // 【新增】引入翻譯
 import 'nav2.dart'; // 為了使用 SavableStateMixin
 
 class MedicalExpensesPage extends StatefulWidget {
@@ -45,14 +46,16 @@ class _MedicalExpensesPageState extends State<MedicalExpensesPage>
   // ===============================================
   @override
   Future<void> saveData() async {
+    if (!mounted) return;
+    final t = AppTranslations.of(context); // 【新增】
     try {
       _syncControllersToData();
       await _saveData();
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('儲存醫療費用失敗: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('${t.saveMedicalFeeFailed}$e')),
+        ); // 【修改】
       }
       rethrow;
     }
@@ -104,20 +107,17 @@ class _MedicalExpensesPageState extends State<MedicalExpensesPage>
     );
   }
 
-  // 將 Model 資料同步到輸入框
   void _syncDataToControllers(MedicalCostsData dataModel) {
     _visitFeeController.text = dataModel.visitFee ?? '';
     _ambulanceFeeController.text = dataModel.ambulanceFee ?? '';
     _noteController.text = dataModel.note ?? '';
   }
 
-  // 將輸入框的資料同步回 Model
   void _syncControllersToData() {
     final dataModel = context.read<MedicalCostsData>();
     dataModel.visitFee = _visitFeeController.text.trim();
     dataModel.ambulanceFee = _ambulanceFeeController.text.trim();
     dataModel.note = _noteController.text.trim();
-    // 當同步資料時，也順便通知 UI 更新總金額
     dataModel.update();
   }
 
@@ -128,6 +128,7 @@ class _MedicalExpensesPageState extends State<MedicalExpensesPage>
   @override
   Widget build(BuildContext context) {
     super.build(context);
+    final t = AppTranslations.of(context); // 【新增】
 
     if (_isLoading) {
       return const Center(child: CircularProgressIndicator());
@@ -156,9 +157,9 @@ class _MedicalExpensesPageState extends State<MedicalExpensesPage>
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
-                        '醫療費用收費表',
-                        style: TextStyle(
+                      Text(
+                        t.medicalFeeForm, // 【修改】
+                        style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
@@ -171,17 +172,19 @@ class _MedicalExpensesPageState extends State<MedicalExpensesPage>
                         onPressed: () => showDialog(
                           context: context,
                           builder: (ctx) => AlertDialog(
-                            title: const Text('收費表'),
-                            content: const Text('這裡可以顯示詳細收費表內容'),
+                            title: Text(t.feeScheduleTitle), // 【修改】
+                            content: Text(
+                              t.feeScheduleContentPlaceholder,
+                            ), // 【修改】
                             actions: [
                               TextButton(
                                 onPressed: () => Navigator.pop(ctx),
-                                child: const Text('關閉'),
+                                child: Text(t.close), // 【修改】
                               ),
                             ],
                           ),
                         ),
-                        child: const Text('查看收費表'),
+                        child: Text(t.viewFeeSchedule), // 【修改】
                       ),
                     ],
                   ),
@@ -191,36 +194,36 @@ class _MedicalExpensesPageState extends State<MedicalExpensesPage>
                     children: [
                       Expanded(
                         flex: 2,
-                        child: _buildChargeMethodSelector(dataModel),
+                        child: _buildChargeMethodSelector(t, dataModel), // 【修改】
                       ),
                       const SizedBox(width: 16),
                       Expanded(flex: 1, child: _buildPhotoTaker(dataModel)),
                     ],
                   ),
                   const SizedBox(height: 16),
-                  _SectionTitle('出診費'),
+                  _SectionTitle(t.consultationFee), // 【修改】
                   TextField(
                     controller: _visitFeeController,
                     keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(
-                      hintText: '輸入金額',
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      hintText: t.enterAmountHint, // 【修改】
+                      border: const OutlineInputBorder(),
                     ),
                     onChanged: (_) => _syncControllersToData(),
                   ),
                   const SizedBox(height: 16),
-                  _SectionTitle('救護車費用'),
+                  _SectionTitle(t.ambulanceFee), // 【修改】
                   TextField(
                     controller: _ambulanceFeeController,
                     keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(
-                      hintText: '輸入金額',
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      hintText: t.enterAmountHint, // 【修改】
+                      border: const OutlineInputBorder(),
                     ),
                     onChanged: (_) => _syncControllersToData(),
                   ),
                   const SizedBox(height: 16),
-                  _SectionTitle('總費用'),
+                  _SectionTitle(t.totalFee), // 【修改】
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(12),
@@ -231,26 +234,26 @@ class _MedicalExpensesPageState extends State<MedicalExpensesPage>
                     ),
                   ),
                   const SizedBox(height: 16),
-                  _SectionTitle('收費備註'),
+                  _SectionTitle(t.billingNotes), // 【修改】
                   TextField(
                     controller: _noteController,
-                    decoration: const InputDecoration(
-                      hintText: '請填寫收費備註',
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      hintText: t.enterBillingNotesHint, // 【修改】
+                      border: const OutlineInputBorder(),
                     ),
                     maxLines: 2,
                   ),
                   const SizedBox(height: 24),
-                  const Text(
-                    '瞭解醫護人員說明明瞭醫療收費之後且同意',
-                    style: TextStyle(color: Colors.black54),
+                  Text(
+                    t.agreementStatementZh, // 【修改】
+                    style: const TextStyle(color: Colors.black54),
                   ),
-                  const Text(
-                    'Understand the medical charge and agree to it.',
-                    style: TextStyle(color: Colors.black45, fontSize: 12),
+                  Text(
+                    t.agreementStatementEn, // 【修改】
+                    style: const TextStyle(color: Colors.black45, fontSize: 12),
                   ),
                   const SizedBox(height: 8),
-                  _buildSignatureButtons(dataModel),
+                  _buildSignatureButtons(t, dataModel), // 【修改】
                 ],
               ),
             ),
@@ -264,18 +267,27 @@ class _MedicalExpensesPageState extends State<MedicalExpensesPage>
   // Helper Widgets
   // ===============================================
 
-  Widget _buildChargeMethodSelector(MedicalCostsData dataModel) {
-    final methods = ['自付', '統一請款', '總院會核代收', '收費異常'];
+  Widget _buildChargeMethodSelector(
+    AppTranslations t,
+    MedicalCostsData dataModel,
+  ) {
+    // 【修改】動態建立翻譯後的選項列表
+    final methods = {
+      '自付': t.selfPay,
+      '統一請款': t.unifiedBilling,
+      '總院會核代收': t.hospitalCollection,
+      '收費異常': t.billingError,
+    };
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _SectionTitle('醫療費用收取方式'),
+        _SectionTitle(t.chargeMethod), // 【修改】
         Column(
-          children: methods
+          children: methods.entries
               .map(
-                (method) => RadioListTile<String>(
-                  title: Text(method),
-                  value: method,
+                (entry) => RadioListTile<String>(
+                  title: Text(entry.value),
+                  value: entry.key, // Use original Chinese as key
                   groupValue: dataModel.chargeMethod,
                   activeColor: const Color(0xFF83ACA9),
                   onChanged: (v) {
@@ -291,10 +303,10 @@ class _MedicalExpensesPageState extends State<MedicalExpensesPage>
   }
 
   Widget _buildPhotoTaker(MedicalCostsData dataModel) {
-    // TODO: 這裡可以根據 dataModel.photoPath 顯示圖片
+    // ... (no changes needed here)
     return GestureDetector(
       onTap: () {
-        // TODO: 串接拍照或上傳，然後更新 dataModel.photoPath
+        // TODO: 串接拍照或上傳
       },
       child: Container(
         height: 160,
@@ -310,7 +322,7 @@ class _MedicalExpensesPageState extends State<MedicalExpensesPage>
     );
   }
 
-  Widget _buildSignatureButtons(MedicalCostsData dataModel) {
+  Widget _buildSignatureButtons(AppTranslations t, MedicalCostsData dataModel) {
     return Row(
       children: [
         Expanded(
@@ -320,9 +332,9 @@ class _MedicalExpensesPageState extends State<MedicalExpensesPage>
               foregroundColor: Colors.white,
             ),
             onPressed: () {
-              // TODO: 串接簽名板，然後更新 dataModel.agreementSignaturePath
+              // TODO: 串接簽名板
             },
-            child: const Text('同意人簽名/身份'),
+            child: Text(t.agreedBySignature), // 【修改】
           ),
         ),
         const SizedBox(width: 12),
@@ -333,9 +345,9 @@ class _MedicalExpensesPageState extends State<MedicalExpensesPage>
               foregroundColor: Colors.white,
             ),
             onPressed: () {
-              // TODO: 串接簽名板，然後更新 dataModel.witnessSignaturePath
+              // TODO: 串接簽名板
             },
-            child: const Text('見證人簽名/身份'),
+            child: Text(t.witnessSignature), // 【修改】
           ),
         ),
       ],

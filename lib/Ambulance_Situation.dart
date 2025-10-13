@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'data/models/ambulance_data.dart';
+import 'l10n/app_translations.dart'; // 【新增】引入翻譯
 
 class AmbulanceSituationPage extends StatefulWidget {
   final int visitId;
@@ -24,67 +25,76 @@ class _AmbulanceSituationPageState extends State<AmbulanceSituationPage> {
     'traumaOther': TextEditingController(),
   };
 
-  // --- 顏色設定與選項 (靜態) ---
+  // --- 顏色設定 ---
   final Color optColor = const Color(0xFF2F5C56);
-  static const _traumaClassOptions = ['非創傷', '創傷'];
-  static const _nonTraumaTypes = ['急症', '一般疾病'];
-  static const _nonTraumaAcuteOptions = [
-    '呼吸問題(喘/呼吸急促)',
-    '呼吸道問題(異物噎塞)',
-    '昏迷(意識不清)',
-    '胸痛/胸悶',
-    '腹痛',
-    '疑似毒藥物中毒',
-    '疑似一氧化碳中毒',
-    '癲癇/抽搐',
-    '路倒',
-    '精神異常',
-    '孕婦急產',
-    '到院前心肺功能停止',
-    '其他',
+
+  // --- 選項 Keys (靜態) ---
+  // 【修改】使用固定的 Key 來管理選項狀態，而非顯示文字
+  static const _traumaClassKeys = ['non_trauma', 'trauma'];
+  static const _nonTraumaTypeKeys = ['acute', 'general'];
+  static const _nonTraumaAcuteKeys = [
+    'breathing',
+    'airway',
+    'coma',
+    'chest_pain',
+    'abdominal_pain',
+    'poisoning',
+    'co_poisoning',
+    'seizure',
+    'collapsed',
+    'psychiatric',
+    'labor',
+    'ohca',
+    'other',
   ];
-  static const _nonTraumaGeneralOptions = [
-    '頭痛/頭暈',
-    '昏倒/昏厥',
-    '發燒',
-    '噁心/嘔吐/腹瀉',
-    '肢體無力',
+  static const _nonTraumaGeneralKeys = [
+    'headache',
+    'fainting',
+    'fever',
+    'nausea',
+    'weakness',
   ];
-  static const _traumaTypeOptions = [
-    '一般外傷',
-    '受傷機轉',
-    '溺水',
-    '摔跌傷',
-    '墜落傷',
-    '穿刺傷',
-    '燒燙傷',
-    '電擊傷',
-    '生物咬螫傷',
-    '到院前心肺功能停止',
-    '其他',
+  static const _traumaTypeKeys = [
+    'general',
+    'mechanism',
+    'drowning',
+    'fall_injury',
+    'fall_height',
+    'puncture',
+    'burns',
+    'electric',
+    'bite',
+    'ohca',
+    'other',
   ];
-  static const _traumaGeneralBodyOptions = [
-    '頭部外傷',
-    '胸部外傷',
-    '腹部外傷',
-    '背部外傷',
-    '肢體外傷',
-    '其他',
+  static const _traumaGeneralBodyKeys = [
+    'head',
+    'chest',
+    'abdomen',
+    'back',
+    'limb',
+    'other',
   ];
-  static const _traumaMechanismOptions = ['因交通事故', '非交通事故'];
-  static const _allergyOptions = ['無', '不詳', '食物', '藥物', '其他'];
-  static const _pmhOptions = [
-    '無',
-    '不詳',
-    '高血壓',
-    '糖尿病',
-    '慢性肺部疾病',
-    '氣喘',
-    '腦血管疾病',
-    '心臟疾病',
-    '腎病/洗腎中',
-    '肝臟疾病',
-    '其他',
+  static const _traumaMechanismKeys = ['traffic', 'non_traffic'];
+  static const _allergyKeys = [
+    'none',
+    'unknown',
+    'food',
+    'medication',
+    'other',
+  ];
+  static const _pmhKeys = [
+    'none',
+    'unknown',
+    'hbp',
+    'dm',
+    'copd',
+    'asthma',
+    'cvd',
+    'heart_disease',
+    'kidney',
+    'liver',
+    'other',
   ];
 
   @override
@@ -129,20 +139,84 @@ class _AmbulanceSituationPageState extends State<AmbulanceSituationPage> {
     );
   }
 
+  // 【新增】將 Key 映射到翻譯文字的輔助方法
+  Map<String, String> _getTranslatedOptions(AppTranslations t) {
+    return {
+      'non_trauma': t.nonTrauma,
+      'trauma': t.trauma,
+      'acute': t.acuteCondition,
+      'general': t.generalSickness,
+      'breathing': t.breathingDifficulty,
+      'airway': t.airwayObstruction,
+      'coma': t.comaUnconscious,
+      'chest_pain': t.chestPainTightness,
+      'abdominal_pain': t.abdominalPain,
+      'poisoning': t.suspectedPoisoning,
+      'co_poisoning': t.suspectedCOPoisoning,
+      'seizure': t.seizureConvulsion,
+      'collapsed': t.foundCollapsed,
+      'psychiatric': t.psychiatricSymptoms,
+      'labor': t.precipitousLabor,
+      'ohca': t.ohca,
+      'other': t.other,
+      'headache': t.headacheDizziness,
+      'fainting': t.faintingSyncope,
+      'fever': t.fever,
+      'nausea': t.nauseaVomitingDiarrhea,
+      'weakness': t.limbWeakness,
+      'mechanism': t.mechanismOfInjury,
+      'drowning': t.drowning,
+      'fall_injury': t.fallInjury,
+      'fall_height': t.fallFromHeight,
+      'puncture': t.punctureWound,
+      'burns': t.burns,
+      'electric': t.electricShock,
+      'bite': t.biteSting,
+      'head': t.headInjury,
+      'chest': t.chestInjury,
+      'abdomen': t.abdominalInjury,
+      'back': t.backInjury,
+      'limb': t.limbInjury,
+      'traffic': t.trafficAccident,
+      'non_traffic': t.nonTrafficAccident,
+      'none': t.none,
+      'unknown': t.unknown,
+      'food': t.food,
+      'medication': t.medication,
+      'hbp': t.hypertension,
+      'dm': t.diabetes,
+      'copd': t.copd,
+      'asthma': t.asthma,
+      'cvd': t.cerebrovascularDisease,
+      'heart_disease': t.heartDisease,
+      'kidney': t.kidneyDiseaseDialysis,
+      'liver': t.liverDisease,
+    };
+  }
+
   @override
   Widget build(BuildContext context) {
+    final t = AppTranslations.of(context); // 【新增】
+    final optionLabels = _getTranslatedOptions(t); // 【新增】
+
     return Consumer<AmbulanceData>(
       builder: (context, data, child) {
-        // --- 根據 Provider data 動態決定 UI 顯示邏輯 ---
-        final bool pickedNonTrauma = data.traumaClass.contains('非創傷');
-        final bool pickedTrauma = data.traumaClass.contains('創傷');
-        final bool pickedAcute = data.nonTraumaType.contains('急症');
-        final bool pickedGeneralDisease = data.nonTraumaType.contains('一般疾病');
-        final bool pickedTraumaGeneral = data.traumaTypePicked.contains('一般外傷');
-        final bool pickedTraumaMech = data.traumaTypePicked.contains('受傷機轉');
-        final bool pickedFall = data.traumaTypePicked.contains('墜落傷');
-        final bool pickedBurn = data.traumaTypePicked.contains('燒燙傷');
-        final bool pickedTraumaOther = data.traumaTypePicked.contains('其他');
+        // 【修改】UI 顯示邏輯改為依賴固定的 key
+        final bool pickedNonTrauma = data.traumaClass.contains('non_trauma');
+        final bool pickedTrauma = data.traumaClass.contains('trauma');
+        final bool pickedAcute = data.nonTraumaType.contains('acute');
+        final bool pickedGeneralDisease = data.nonTraumaType.contains(
+          'general',
+        );
+        final bool pickedTraumaGeneral = data.traumaTypePicked.contains(
+          'general',
+        );
+        final bool pickedTraumaMech = data.traumaTypePicked.contains(
+          'mechanism',
+        );
+        final bool pickedFall = data.traumaTypePicked.contains('fall_height');
+        final bool pickedBurn = data.traumaTypePicked.contains('burns');
+        final bool pickedTraumaOther = data.traumaTypePicked.contains('other');
 
         return Center(
           child: ConstrainedBox(
@@ -163,81 +237,83 @@ class _AmbulanceSituationPageState extends State<AmbulanceSituationPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _title('創傷分類'),
-                      ..._traumaClassOptions.map(
-                        (e) => _checkboxTile(
-                          label: e,
-                          isChecked: data.traumaClass.contains(e),
+                      _title(t.traumaClassification),
+                      ..._traumaClassKeys.map(
+                        (key) => _checkboxTile(
+                          label: optionLabels[key]!,
+                          isChecked: data.traumaClass.contains(key),
                           onChanged: (isChecked) {
                             final newSet = Set<String>.from(data.traumaClass);
                             if (isChecked)
-                              newSet.add(e);
+                              newSet.add(key);
                             else
-                              newSet.remove(e);
+                              newSet.remove(key);
                             data.updateSituation(traumaClass: newSet);
                           },
                         ),
                       ),
                       if (pickedNonTrauma) ...[
-                        _title('非創傷類別'),
-                        ..._nonTraumaTypes.map(
-                          (e) => _checkboxTile(
-                            label: e,
-                            isChecked: data.nonTraumaType.contains(e),
+                        _title(t.nonTraumaCategory),
+                        ..._nonTraumaTypeKeys.map(
+                          (key) => _checkboxTile(
+                            label: optionLabels[key]!,
+                            isChecked: data.nonTraumaType.contains(key),
                             onChanged: (isChecked) {
                               final newSet = Set<String>.from(
                                 data.nonTraumaType,
                               );
                               if (isChecked)
-                                newSet.add(e);
+                                newSet.add(key);
                               else
-                                newSet.remove(e);
+                                newSet.remove(key);
                               data.updateSituation(nonTraumaType: newSet);
                             },
                           ),
                         ),
                         if (pickedAcute) ...[
-                          _title('非創傷急症'),
-                          ..._nonTraumaAcuteOptions.map(
-                            (e) => _checkboxTile(
-                              label: e,
-                              isChecked: data.nonTraumaAcutePicked.contains(e),
+                          _title(t.nonTraumaAcute),
+                          ..._nonTraumaAcuteKeys.map(
+                            (key) => _checkboxTile(
+                              label: optionLabels[key]!,
+                              isChecked: data.nonTraumaAcutePicked.contains(
+                                key,
+                              ),
                               onChanged: (isChecked) {
                                 final newSet = Set<String>.from(
                                   data.nonTraumaAcutePicked,
                                 );
                                 if (isChecked)
-                                  newSet.add(e);
+                                  newSet.add(key);
                                 else
-                                  newSet.remove(e);
+                                  newSet.remove(key);
                                 data.updateSituation(
                                   nonTraumaAcutePicked: newSet,
                                 );
                               },
                             ),
                           ),
-                          if (data.nonTraumaAcutePicked.contains('其他'))
+                          if (data.nonTraumaAcutePicked.contains('other'))
                             _tightField(
-                              label: '非創傷其他急症',
+                              label: t.otherNonTraumaAcute,
                               controller: _controllers['nonTraumaAcuteOther']!,
                             ),
                         ],
                         if (pickedGeneralDisease) ...[
-                          _title('非創傷一般疾病'),
-                          ..._nonTraumaGeneralOptions.map(
-                            (e) => _checkboxTile(
-                              label: e,
+                          _title(t.nonTraumaGeneral),
+                          ..._nonTraumaGeneralKeys.map(
+                            (key) => _checkboxTile(
+                              label: optionLabels[key]!,
                               isChecked: data.nonTraumaGeneralPicked.contains(
-                                e,
+                                key,
                               ),
                               onChanged: (isChecked) {
                                 final newSet = Set<String>.from(
                                   data.nonTraumaGeneralPicked,
                                 );
                                 if (isChecked)
-                                  newSet.add(e);
+                                  newSet.add(key);
                                 else
-                                  newSet.remove(e);
+                                  newSet.remove(key);
                                 data.updateSituation(
                                   nonTraumaGeneralPicked: newSet,
                                 );
@@ -247,70 +323,74 @@ class _AmbulanceSituationPageState extends State<AmbulanceSituationPage> {
                         ],
                       ],
                       if (pickedTrauma) ...[
-                        _title('創傷類別'),
-                        ..._traumaTypeOptions.map(
-                          (e) => _checkboxTile(
-                            label: e,
-                            isChecked: data.traumaTypePicked.contains(e),
+                        _title(t.traumaCategory),
+                        ..._traumaTypeKeys.map(
+                          (key) => _checkboxTile(
+                            label: key == 'general'
+                                ? t.generalTrauma
+                                : optionLabels[key]!, // 特殊處理 'general'
+                            isChecked: data.traumaTypePicked.contains(key),
                             onChanged: (isChecked) {
                               final newSet = Set<String>.from(
                                 data.traumaTypePicked,
                               );
                               if (isChecked)
-                                newSet.add(e);
+                                newSet.add(key);
                               else
-                                newSet.remove(e);
+                                newSet.remove(key);
                               data.updateSituation(traumaTypePicked: newSet);
                             },
                           ),
                         ),
                         if (pickedTraumaOther)
                           _tightField(
-                            label: '其他創傷',
+                            label: t.otherTrauma,
                             controller: _controllers['traumaOther']!,
                           ),
                         if (pickedTraumaGeneral) ...[
-                          _title('創傷—一般外傷'),
-                          ..._traumaGeneralBodyOptions.map(
-                            (e) => _checkboxTile(
-                              label: e,
+                          _title(t.traumaGeneralInjury),
+                          ..._traumaGeneralBodyKeys.map(
+                            (key) => _checkboxTile(
+                              label: optionLabels[key]!,
                               isChecked: data.traumaGeneralBodyPicked.contains(
-                                e,
+                                key,
                               ),
                               onChanged: (isChecked) {
                                 final newSet = Set<String>.from(
                                   data.traumaGeneralBodyPicked,
                                 );
                                 if (isChecked)
-                                  newSet.add(e);
+                                  newSet.add(key);
                                 else
-                                  newSet.remove(e);
+                                  newSet.remove(key);
                                 data.updateSituation(
                                   traumaGeneralBodyPicked: newSet,
                                 );
                               },
                             ),
                           ),
-                          if (data.traumaGeneralBodyPicked.contains('其他'))
+                          if (data.traumaGeneralBodyPicked.contains('other'))
                             _tightField(
-                              label: '其他—一般外傷',
+                              label: t.otherGeneralTrauma,
                               controller: _controllers['traumaGeneralOther']!,
                             ),
                         ],
                         if (pickedTraumaMech) ...[
-                          _title('創傷—受傷機轉'),
-                          ..._traumaMechanismOptions.map(
-                            (e) => _checkboxTile(
-                              label: e,
-                              isChecked: data.traumaMechanismPicked.contains(e),
+                          _title(t.traumaMechanismOfInjury),
+                          ..._traumaMechanismKeys.map(
+                            (key) => _checkboxTile(
+                              label: optionLabels[key]!,
+                              isChecked: data.traumaMechanismPicked.contains(
+                                key,
+                              ),
                               onChanged: (isChecked) {
                                 final newSet = Set<String>.from(
                                   data.traumaMechanismPicked,
                                 );
                                 if (isChecked)
-                                  newSet.add(e);
+                                  newSet.add(key);
                                 else
-                                  newSet.remove(e);
+                                  newSet.remove(key);
                                 data.updateSituation(
                                   traumaMechanismPicked: newSet,
                                 );
@@ -320,72 +400,76 @@ class _AmbulanceSituationPageState extends State<AmbulanceSituationPage> {
                         ],
                         if (pickedFall)
                           _tightField(
-                            label: '高度(公尺)',
+                            label: t.heightMeters,
                             controller: _controllers['fallHeight']!,
                           ),
                         if (pickedBurn) ...[
                           _tightField(
-                            label: '燒燙傷度數',
+                            label: t.burnDegree,
                             controller: _controllers['burnDegree']!,
                           ),
                           _tightField(
-                            label: '燒燙傷面積(%)',
+                            label: t.burnAreaPercentage,
                             controller: _controllers['burnArea']!,
                           ),
                         ],
                       ],
-                      _title('過敏史'),
-                      ..._allergyOptions.map(
-                        (e) => _checkboxTile(
-                          label: e,
-                          isChecked: data.allergy.contains(e),
+                      _title(t.allergyHistory),
+                      ..._allergyKeys.map(
+                        (key) => _checkboxTile(
+                          label: optionLabels[key]!,
+                          isChecked: data.allergy.contains(key),
                           onChanged: (isChecked) {
                             final newSet = Set<String>.from(data.allergy);
                             if (isChecked)
-                              newSet.add(e);
+                              newSet.add(key);
                             else
-                              newSet.remove(e);
+                              newSet.remove(key);
                             data.updateSituation(allergy: newSet);
                           },
                         ),
                       ),
-                      if (data.allergy.contains('其他'))
+                      if (data.allergy.contains('other'))
                         _tightField(
-                          label: '其他過敏史',
+                          label: t.otherAllergyHistory,
                           controller: _controllers['allergyOther']!,
                         ),
-                      _inlineField('病患主訴', _controllers['chiefComplaint']!),
-                      _title('家屬或同事、友人代訴'),
+                      _inlineField(
+                        t.chiefComplaint,
+                        _controllers['chiefComplaint']!,
+                        t.enterChiefComplaintHint,
+                      ),
+                      _title(t.statementByProxy),
                       _radioTile(
-                        '否',
+                        t.no,
                         false,
                         data.isProxyStatement,
                         (val) => data.updateSituation(isProxyStatement: val),
                       ),
                       _radioTile(
-                        '是',
+                        t.yes,
                         true,
                         data.isProxyStatement,
                         (val) => data.updateSituation(isProxyStatement: val),
                       ),
-                      _title('過去病史'),
-                      ..._pmhOptions.map(
-                        (e) => _checkboxTile(
-                          label: e,
-                          isChecked: data.pmh.contains(e),
+                      _title(t.pastMedicalHistory),
+                      ..._pmhKeys.map(
+                        (key) => _checkboxTile(
+                          label: optionLabels[key]!,
+                          isChecked: data.pmh.contains(key),
                           onChanged: (isChecked) {
                             final newSet = Set<String>.from(data.pmh);
                             if (isChecked)
-                              newSet.add(e);
+                              newSet.add(key);
                             else
-                              newSet.remove(e);
+                              newSet.remove(key);
                             data.updateSituation(pmh: newSet);
                           },
                         ),
                       ),
-                      if (data.pmh.contains('其他'))
+                      if (data.pmh.contains('other'))
                         _tightField(
-                          label: '其他過去病史',
+                          label: t.otherPastMedicalHistory,
                           controller: _controllers['pmhOther']!,
                         ),
                     ],
@@ -399,7 +483,7 @@ class _AmbulanceSituationPageState extends State<AmbulanceSituationPage> {
     );
   }
 
-  // --- UI 小積木 ---
+  // --- UI 小積木 (已更新以適應多語系) ---
   Widget _title(String s) => Padding(
     padding: const EdgeInsets.only(top: 12, bottom: 6),
     child: Text(s, style: const TextStyle(fontWeight: FontWeight.w700)),
@@ -460,41 +544,44 @@ class _AmbulanceSituationPageState extends State<AmbulanceSituationPage> {
     ),
   );
 
-  Widget _inlineField(String label, TextEditingController controller) =>
-      Padding(
-        padding: const EdgeInsets.only(top: 4, bottom: 4, left: 4),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            SizedBox(
-              width: 90,
-              child: Padding(
-                padding: const EdgeInsets.only(right: 8),
-                child: Text(
-                  label,
-                  style: const TextStyle(fontWeight: FontWeight.w700),
-                ),
-              ),
+  Widget _inlineField(
+    String label,
+    TextEditingController controller,
+    String hint,
+  ) => Padding(
+    padding: const EdgeInsets.only(top: 4, bottom: 4, left: 4),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        SizedBox(
+          width: 90,
+          child: Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: Text(
+              label,
+              style: const TextStyle(fontWeight: FontWeight.w700),
             ),
-            Expanded(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 500),
-                child: TextFormField(
-                  controller: controller,
-                  onChanged: (_) => _saveToProvider(),
-                  decoration: const InputDecoration(
-                    hintText: '請填寫病患主訴',
-                    isDense: true,
-                    contentPadding: EdgeInsets.symmetric(
-                      vertical: 8,
-                      horizontal: 10,
-                    ),
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-              ),
-            ),
-          ],
+          ),
         ),
-      );
+        Expanded(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 500),
+            child: TextFormField(
+              controller: controller,
+              onChanged: (_) => _saveToProvider(),
+              decoration: InputDecoration(
+                hintText: hint, // 【修改】
+                isDense: true,
+                contentPadding: const EdgeInsets.symmetric(
+                  vertical: 8,
+                  horizontal: 10,
+                ),
+                border: const OutlineInputBorder(),
+              ),
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
 }

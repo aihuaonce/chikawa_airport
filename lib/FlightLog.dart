@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../data/db/daos.dart';
 import '../data/models/flightlog_data.dart';
+import 'l10n/app_translations.dart'; // 【新增】引入翻譯
 import 'nav2.dart'; // SavablePage 介面
 
 class FlightLogPage extends StatefulWidget {
@@ -24,51 +25,11 @@ class _FlightLogPageState extends State<FlightLogPage>
   static const double _cardMaxWidth = 1100;
   static const double _radius = 16;
 
-  // 選項列表
-  final List<String> mainAirlines = const [
-    'BR長榮航空',
-    'CI中華航空',
-    'CX國泰航空',
-    'UA聯合航空',
-    'KL荷蘭航空',
-    'CZ中國南方航空',
-    'IT台灣虎航',
-    'EK阿聯酋航空',
-    'CA中國國際航空',
-  ];
-
-  final List<String> otherAirlines = const [
-    'JX星宇航空',
-    'AE華信航空',
-    'B7立榮航空',
-    'MU中國東方航空',
-    'MF廈門航空',
-    'MM樂桃航空',
-    'KE大韓航空',
-    'OZ韓亞航空',
-  ];
-
-  final List<String> travelOptions = const [
-    '出境',
-    '入境',
-    '過境',
-    '轉機',
-    '迫降',
-    '轉降',
-    '備降',
-    '其他',
-  ];
-
-  final List<String> airportOptions = const [
-    'TPE台北 / 台灣',
-    'HKG香港 / 香港',
-    'LAX洛杉磯 / 美國',
-    'SHA上海 / 中國',
-    'TYO東京 / 日本',
-    'BKK曼谷 / 泰國',
-    'SFO舊金山 / 美國',
-    'MNL馬尼拉 / 菲律賓',
-  ];
+  // 【修改】移除所有靜態選項列表
+  // final List<String> mainAirlines = const [ ... ];
+  // final List<String> otherAirlines = const [ ... ];
+  // final List<String> travelOptions = const [ ... ];
+  // final List<String> airportOptions = const [ ... ];
 
   @override
   void initState() {
@@ -98,7 +59,6 @@ class _FlightLogPageState extends State<FlightLogPage>
       if (!mounted) return;
 
       if (record != null) {
-        // 從資料庫載入到 model
         data.airlineIndex = record.airlineIndex;
         data.useOtherAirline = record.useOtherAirline;
         data.selectedOtherAirline = record.otherAirline;
@@ -157,6 +117,50 @@ class _FlightLogPageState extends State<FlightLogPage>
   @override
   Widget build(BuildContext context) {
     super.build(context);
+    final t = AppTranslations.of(context); // 【新增】
+
+    // 【新增】動態建立翻譯後的選項列表
+    final List<String> mainAirlines = [
+      t.evaAir,
+      t.chinaAirlines,
+      t.cathayPacific,
+      t.unitedAirlines,
+      t.klm,
+      t.chinaSouthern,
+      t.tigerairTaiwan,
+      t.emirates,
+      t.airChina,
+    ];
+    final List<String> otherAirlines = [
+      t.starlux,
+      t.mandarinAirlines,
+      t.uniAir,
+      t.chinaEastern,
+      t.xiamenAir,
+      t.peachAviation,
+      t.koreanAir,
+      t.asianaAirlines,
+    ];
+    final List<String> travelOptions = [
+      t.departure,
+      t.arrival,
+      t.transit,
+      t.transfer,
+      t.emergencyLanding,
+      t.diversionLanding,
+      t.technicalLanding,
+      t.other,
+    ];
+    final List<String> airportOptions = [
+      t.airportTPE,
+      t.airportHKG,
+      t.airportLAX,
+      t.airportSHA,
+      t.airportTYO,
+      t.airportBKK,
+      t.airportSFO,
+      t.airportMNL,
+    ];
 
     if (_isLoading) return const Center(child: CircularProgressIndicator());
 
@@ -177,10 +181,10 @@ class _FlightLogPageState extends State<FlightLogPage>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _boldLabel('航空公司'),
+                      _boldLabel(t.airline), // 【修改】
                       const SizedBox(height: 6),
                       _radioWrap(
-                        options: mainAirlines,
+                        options: mainAirlines, // 【修改】
                         groupIndex: data.useOtherAirline
                             ? null
                             : data.airlineIndex,
@@ -201,21 +205,22 @@ class _FlightLogPageState extends State<FlightLogPage>
                               data.update();
                             },
                           ),
-                          const Text('其他航空公司'),
+                          Text(t.otherAirline), // 【修改】
                           if (data.useOtherAirline)
                             Padding(
                               padding: const EdgeInsets.only(left: 8),
                               child: DropdownButton<String>(
                                 value: data.selectedOtherAirline,
-                                hint: const Text('請選擇'),
-                                items: otherAirlines
-                                    .map(
-                                      (e) => DropdownMenuItem(
-                                        value: e,
-                                        child: Text(e),
-                                      ),
-                                    )
-                                    .toList(),
+                                hint: Text(t.pleaseSelect), // 【修改】
+                                items:
+                                    otherAirlines // 【修改】
+                                        .map(
+                                          (e) => DropdownMenuItem(
+                                            value: e,
+                                            child: Text(e),
+                                          ),
+                                        )
+                                        .toList(),
                                 onChanged: (v) {
                                   data.selectedOtherAirline = v;
                                   data.update();
@@ -226,13 +231,17 @@ class _FlightLogPageState extends State<FlightLogPage>
                       ),
                       const SizedBox(height: 16),
 
-                      _inputRowBold('班機代碼', '請輸入班機號碼', data.flightNoCtrl),
+                      _inputRowBold(
+                        t.flightCode,
+                        t.enterFlightNumberHint,
+                        data.flightNoCtrl,
+                      ), // 【修改】
                       const SizedBox(height: 16),
 
-                      _boldLabel('旅行狀態'),
+                      _boldLabel(t.travelStatus), // 【修改】
                       const SizedBox(height: 6),
                       _radioWrap(
-                        options: travelOptions,
+                        options: travelOptions, // 【修改】
                         groupIndex: data.travelStatusIndex,
                         onChanged: (i) {
                           data.travelStatusIndex = i;
@@ -244,31 +253,36 @@ class _FlightLogPageState extends State<FlightLogPage>
                       ),
                       if (data.travelStatusIndex == travelOptions.length - 1)
                         _inputRowBold(
-                          '其他旅行狀態',
-                          '請輸入旅行狀態',
+                          t.otherTravelStatus, // 【修改】
+                          t.enterTravelStatusHint, // 【修改】
                           data.otherTravelCtrl,
                         ),
                       const SizedBox(height: 16),
 
-                      _boldLabel('啟程地'),
-                      _pickField('點擊選擇啟程地', data.departure, (v) {
+                      _boldLabel(t.departurePlace), // 【修改】
+                      _pickField(t.tapToSelectDeparture, data.departure, (v) {
+                        // 【修改】
                         data.departure = v;
                         data.update();
-                      }),
+                      }, airportOptions), // 【修改】
                       const SizedBox(height: 16),
 
-                      _boldLabel('經過地'),
-                      _pickField('點擊選擇經過地', data.via, (v) {
+                      _boldLabel(t.viaPlace), // 【修改】
+                      _pickField(t.tapToSelectVia, data.via, (v) {
+                        // 【修改】
                         data.via = v;
                         data.update();
-                      }),
+                      }, airportOptions), // 【修改】
                       const SizedBox(height: 16),
 
-                      _boldLabel('目的地'),
-                      _pickField('點擊選擇目的地', data.destination, (v) {
+                      _boldLabel(t.destinationPlace), // 【修改】
+                      _pickField(t.tapToSelectDestination, data.destination, (
+                        v,
+                      ) {
+                        // 【修改】
                         data.destination = v;
                         data.update();
-                      }),
+                      }, airportOptions), // 【修改】
                     ],
                   ),
                 ),
@@ -380,14 +394,16 @@ class _FlightLogPageState extends State<FlightLogPage>
     String placeholder,
     String? value,
     ValueChanged<String?> onPick,
+    List<String> airportOptions, // 【修改】
   ) {
+    final t = AppTranslations.of(context); // 【新增】
     return InkWell(
       onTap: () async {
         final picked = await showDialog<String>(
           context: context,
           builder: (ctx) {
             return SimpleDialog(
-              title: const Text('選擇地點'),
+              title: Text(t.selectLocation), // 【修改】
               children: airportOptions
                   .map(
                     (e) => SimpleDialogOption(

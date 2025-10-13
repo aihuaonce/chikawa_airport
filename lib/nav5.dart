@@ -1,3 +1,4 @@
+// nav5.dart
 import 'package:chikawa_airport/providers/ambulance_routes_config.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -5,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'nav3.dart';
 import 'data/db/daos.dart';
 import 'data/models/ambulance_data.dart';
+import 'l10n/app_translations.dart'; // 【新增】引入翻譯
 
 // ===================================================================
 // 1. 頁面主體 (Nav5Page Widget)
@@ -20,11 +22,9 @@ class Nav5Page extends StatelessWidget {
         ChangeNotifierProvider(
           create: (context) => AmbulanceNavigationProvider(),
         ),
-        // ✅ 使用 ProxyProvider 確保能取得 DAO
         ChangeNotifierProxyProvider<AmbulanceRecordsDao, AmbulanceData>(
           create: (context) {
             final data = AmbulanceData(visitId);
-            // ✅ 在創建後立即載入資料
             final dao = context.read<AmbulanceRecordsDao>();
             data.loadFromDatabase(dao);
             return data;
@@ -62,29 +62,14 @@ class AmbulanceMainLayout extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final navProvider = context.watch<AmbulanceNavigationProvider>();
-    final ambulanceData = context.watch<AmbulanceData>();
+    final t = AppTranslations.of(context); // 【新增】
+    final ambulanceRouteItems = getAmbulanceRouteItems(t); // 【修改】
 
-    // 根據索引決定顯示哪個分頁
-    Widget currentPage;
-    switch (navProvider.selectedIndex) {
-      case 0:
-        currentPage = ambulanceRouteItems[0].builder(visitId, GlobalKey());
-        break;
-      case 1:
-        currentPage = ambulanceRouteItems[1].builder(visitId, GlobalKey());
-        break;
-      case 2:
-        currentPage = ambulanceRouteItems[2].builder(visitId, GlobalKey());
-        break;
-      case 3:
-        currentPage = ambulanceRouteItems[3].builder(visitId, GlobalKey());
-        break;
-      case 4:
-        currentPage = ambulanceRouteItems[4].builder(visitId, GlobalKey());
-        break;
-      default:
-        currentPage = ambulanceRouteItems[0].builder(visitId, GlobalKey());
-    }
+    // 【修改】簡化 Widget 創建邏輯
+    Widget currentPage = ambulanceRouteItems[navProvider.selectedIndex].builder(
+      visitId,
+      GlobalKey(),
+    );
 
     return Scaffold(
       backgroundColor: const Color(0xFFEFF7F7),
@@ -126,7 +111,8 @@ class _AmbulanceNavBarState extends State<AmbulanceNavBar> {
   bool _isSaving = false;
 
   Future<void> _handleSave() async {
-    if (_isSaving) return;
+    if (_isSaving || !mounted) return;
+    final t = AppTranslations.of(context); // 【新增】
 
     setState(() => _isSaving = true);
 
@@ -136,27 +122,16 @@ class _AmbulanceNavBarState extends State<AmbulanceNavBar> {
       final profileDao = context.read<PatientProfilesDao>();
       final visitsDao = context.read<VisitsDao>();
 
-      print('🔵 開始儲存 visitId: ${ambulanceData.visitId}');
-
-      // 呼叫 AmbulanceData 的儲存方法
       await ambulanceData.saveToDatabase(dao, profileDao, visitsDao);
-
-      // ✅ 驗證是否真的儲存成功
-      final savedRecord = await dao.getByVisitId(ambulanceData.visitId);
-      print('✅ 儲存後的 AmbulanceRecord 資料:');
-      print('   - chiefComplaint: ${savedRecord?.chiefComplaint}');
-      print('   - destinationHospital: ${savedRecord?.destinationHospital}');
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('救護車記錄已儲存成功!'),
+          SnackBar(
+            content: Text(t.ambulanceSaved), // 【修改】
             backgroundColor: Colors.green,
-            duration: Duration(seconds: 2),
+            duration: const Duration(seconds: 2),
           ),
         );
-
-        // ✅ 儲存成功後返回上一頁
         Navigator.of(context).pop();
       }
     } catch (e, stackTrace) {
@@ -164,8 +139,10 @@ class _AmbulanceNavBarState extends State<AmbulanceNavBar> {
       print('堆疊: $stackTrace');
 
       if (mounted) {
+        // 【修改】使用已有的翻譯鍵
+        final errorMessage = '${t.saveFailed}: $e';
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('儲存失敗: $e'), backgroundColor: Colors.red),
+          SnackBar(content: Text(errorMessage), backgroundColor: Colors.red),
         );
       }
     } finally {
@@ -178,7 +155,9 @@ class _AmbulanceNavBarState extends State<AmbulanceNavBar> {
   @override
   Widget build(BuildContext context) {
     final navProvider = context.watch<AmbulanceNavigationProvider>();
-    final List<String> items = ambulanceRouteItems.map((e) => e.label).toList();
+    final t = AppTranslations.of(context); // 【新增】
+    // 【修改】動態獲取翻譯後的路由項目
+    final items = getAmbulanceRouteItems(t).map((e) => e.label).toList();
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
@@ -186,8 +165,6 @@ class _AmbulanceNavBarState extends State<AmbulanceNavBar> {
       child: Row(
         children: [
           const SizedBox(width: 12),
-
-          // 分頁導航按鈕
           Expanded(
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
@@ -206,10 +183,8 @@ class _AmbulanceNavBarState extends State<AmbulanceNavBar> {
             ),
           ),
           const SizedBox(width: 12),
-
-          // 儲存按鈕
           IconButton(
-            tooltip: _isSaving ? '儲存中...' : '儲存所有資料',
+            tooltip: _isSaving ? t.saving : t.saveAllPages, // 【修改】
             icon: _isSaving
                 ? const SizedBox(
                     width: 20,
