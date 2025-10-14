@@ -113,6 +113,18 @@ class EmergencyData extends ChangeNotifier {
   String? ivNeedleSize, ivLineRecord;
   String? cardiacMassageRecord;
 
+  String? postResuscitationEvmE;
+  String? postResuscitationEvmV;
+  String? postResuscitationEvmM;
+  String? postResuscitationHeartRate;
+  String? postResuscitationRespirationMethod; // for Radio button
+  String? postResuscitationBloodPressure;
+  String? postResuscitationLeftPupilSize;
+  String? postResuscitationRightPupilSize;
+  String? postResuscitationLeftPupilLightReflex; // for Radio button
+  String? postResuscitationRightPupilLightReflex; // for Radio button
+  String? otherSupplements;
+
   String? endRecord, endResult;
   String? selectedHospital, otherHospital, otherEndResult;
   DateTime? deathTime;
@@ -148,6 +160,17 @@ class EmergencyData extends ChangeNotifier {
     String? ivNeedleSize,
     String? ivLineRecord,
     String? cardiacMassageRecord,
+    String? postResuscitationEvmE,
+    String? postResuscitationEvmV,
+    String? postResuscitationEvmM,
+    String? postResuscitationHeartRate,
+    String? postResuscitationRespirationMethod,
+    String? postResuscitationBloodPressure,
+    String? postResuscitationLeftPupilSize,
+    String? postResuscitationRightPupilSize,
+    String? postResuscitationLeftPupilLightReflex,
+    String? postResuscitationRightPupilLightReflex,
+    String? otherSupplements,
     String? endRecord,
     String? endResult,
     String? selectedHospital,
@@ -192,6 +215,30 @@ class EmergencyData extends ChangeNotifier {
     if (ivLineRecord != null) this.ivLineRecord = ivLineRecord;
     if (cardiacMassageRecord != null)
       this.cardiacMassageRecord = cardiacMassageRecord;
+    if (postResuscitationEvmE != null)
+      this.postResuscitationEvmE = postResuscitationEvmE;
+    if (postResuscitationEvmV != null)
+      this.postResuscitationEvmV = postResuscitationEvmV;
+    if (postResuscitationEvmM != null)
+      this.postResuscitationEvmM = postResuscitationEvmM;
+    if (postResuscitationHeartRate != null)
+      this.postResuscitationHeartRate = postResuscitationHeartRate;
+    if (postResuscitationRespirationMethod != null)
+      this.postResuscitationRespirationMethod =
+          postResuscitationRespirationMethod;
+    if (postResuscitationBloodPressure != null)
+      this.postResuscitationBloodPressure = postResuscitationBloodPressure;
+    if (postResuscitationLeftPupilSize != null)
+      this.postResuscitationLeftPupilSize = postResuscitationLeftPupilSize;
+    if (postResuscitationRightPupilSize != null)
+      this.postResuscitationRightPupilSize = postResuscitationRightPupilSize;
+    if (postResuscitationLeftPupilLightReflex != null)
+      this.postResuscitationLeftPupilLightReflex =
+          postResuscitationLeftPupilLightReflex;
+    if (postResuscitationRightPupilLightReflex != null)
+      this.postResuscitationRightPupilLightReflex =
+          postResuscitationRightPupilLightReflex;
+    if (otherSupplements != null) this.otherSupplements = otherSupplements;
     if (endRecord != null) this.endRecord = endRecord;
     if (endResult != null) this.endResult = endResult;
     if (selectedHospital != null) this.selectedHospital = selectedHospital;
@@ -263,6 +310,17 @@ class EmergencyData extends ChangeNotifier {
     ivNeedleSize = null;
     ivLineRecord = null;
     cardiacMassageRecord = null;
+    postResuscitationEvmE = null;
+    postResuscitationEvmV = null;
+    postResuscitationEvmM = null;
+    postResuscitationHeartRate = null;
+    postResuscitationRespirationMethod = null;
+    postResuscitationBloodPressure = null;
+    postResuscitationLeftPupilSize = null;
+    postResuscitationRightPupilSize = null;
+    postResuscitationLeftPupilLightReflex = null;
+    postResuscitationRightPupilLightReflex = null;
+    otherSupplements = null;
     endRecord = null;
     endResult = null;
     selectedHospital = null;
@@ -434,6 +492,21 @@ class EmergencyData extends ChangeNotifier {
       ivLineRecord = record.ivLineRecord;
       cardiacMassageRecord = record.cardiacMassageRecord;
 
+      postResuscitationEvmE = record.postResuscitationEvmE;
+      postResuscitationEvmV = record.postResuscitationEvmV;
+      postResuscitationEvmM = record.postResuscitationEvmM;
+      postResuscitationHeartRate = record.postResuscitationHeartRate;
+      postResuscitationRespirationMethod =
+          record.postResuscitationRespirationMethod;
+      postResuscitationBloodPressure = record.postResuscitationBloodPressure;
+      postResuscitationLeftPupilSize = record.postResuscitationLeftPupilSize;
+      postResuscitationRightPupilSize = record.postResuscitationRightPupilSize;
+      postResuscitationLeftPupilLightReflex =
+          record.postResuscitationLeftPupilLightReflex;
+      postResuscitationRightPupilLightReflex =
+          record.postResuscitationRightPupilLightReflex;
+      otherSupplements = record.otherSupplements;
+
       endRecord = record.endRecord;
       endResult = record.endResult;
       selectedHospital = record.selectedHospital;
@@ -544,6 +617,25 @@ class EmergencyData extends ChangeNotifier {
           ivNeedleSize: Value(ivNeedleSize),
           ivLineRecord: Value(ivLineRecord),
           cardiacMassageRecord: Value(cardiacMassageRecord),
+          postResuscitationEvmE: Value(postResuscitationEvmE),
+          postResuscitationEvmV: Value(postResuscitationEvmV),
+          postResuscitationEvmM: Value(postResuscitationEvmM),
+          postResuscitationHeartRate: Value(postResuscitationHeartRate),
+          postResuscitationRespirationMethod: Value(
+            postResuscitationRespirationMethod,
+          ),
+          postResuscitationBloodPressure: Value(postResuscitationBloodPressure),
+          postResuscitationLeftPupilSize: Value(postResuscitationLeftPupilSize),
+          postResuscitationRightPupilSize: Value(
+            postResuscitationRightPupilSize,
+          ),
+          postResuscitationLeftPupilLightReflex: Value(
+            postResuscitationLeftPupilLightReflex,
+          ),
+          postResuscitationRightPupilLightReflex: Value(
+            postResuscitationRightPupilLightReflex,
+          ),
+          otherSupplements: Value(otherSupplements),
           endRecord: Value(endRecord),
           endResult: Value(endResult),
           selectedHospital: Value(selectedHospital),
