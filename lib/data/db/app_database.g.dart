@@ -4127,6 +4127,61 @@ class $TreatmentsTable extends Treatments
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _nonTraumaHeadSymptomsJsonMeta =
+      const VerificationMeta('nonTraumaHeadSymptomsJson');
+  @override
+  late final GeneratedColumn<String> nonTraumaHeadSymptomsJson =
+      GeneratedColumn<String>(
+        'non_trauma_head_symptoms_json',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _nonTraumaChestSymptomsJsonMeta =
+      const VerificationMeta('nonTraumaChestSymptomsJson');
+  @override
+  late final GeneratedColumn<String> nonTraumaChestSymptomsJson =
+      GeneratedColumn<String>(
+        'non_trauma_chest_symptoms_json',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _nonTraumaAbdomenSymptomsJsonMeta =
+      const VerificationMeta('nonTraumaAbdomenSymptomsJson');
+  @override
+  late final GeneratedColumn<String> nonTraumaAbdomenSymptomsJson =
+      GeneratedColumn<String>(
+        'non_trauma_abdomen_symptoms_json',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _nonTraumaLimbsSymptomsJsonMeta =
+      const VerificationMeta('nonTraumaLimbsSymptomsJson');
+  @override
+  late final GeneratedColumn<String> nonTraumaLimbsSymptomsJson =
+      GeneratedColumn<String>(
+        'non_trauma_limbs_symptoms_json',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _nonTraumaOtherSymptomsJsonMeta =
+      const VerificationMeta('nonTraumaOtherSymptomsJson');
+  @override
+  late final GeneratedColumn<String> nonTraumaOtherSymptomsJson =
+      GeneratedColumn<String>(
+        'non_trauma_other_symptoms_json',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
   static const VerificationMeta _photoTypesJsonMeta = const VerificationMeta(
     'photoTypesJson',
   );
@@ -4874,6 +4929,11 @@ class $TreatmentsTable extends Treatments
     traumaSymptomsJson,
     nonTraumaSymptomsJson,
     symptomNote,
+    nonTraumaHeadSymptomsJson,
+    nonTraumaChestSymptomsJson,
+    nonTraumaAbdomenSymptomsJson,
+    nonTraumaLimbsSymptomsJson,
+    nonTraumaOtherSymptomsJson,
     photoTypesJson,
     bodyCheckHead,
     bodyCheckChest,
@@ -5031,6 +5091,51 @@ class $TreatmentsTable extends Treatments
         symptomNote.isAcceptableOrUnknown(
           data['symptom_note']!,
           _symptomNoteMeta,
+        ),
+      );
+    }
+    if (data.containsKey('non_trauma_head_symptoms_json')) {
+      context.handle(
+        _nonTraumaHeadSymptomsJsonMeta,
+        nonTraumaHeadSymptomsJson.isAcceptableOrUnknown(
+          data['non_trauma_head_symptoms_json']!,
+          _nonTraumaHeadSymptomsJsonMeta,
+        ),
+      );
+    }
+    if (data.containsKey('non_trauma_chest_symptoms_json')) {
+      context.handle(
+        _nonTraumaChestSymptomsJsonMeta,
+        nonTraumaChestSymptomsJson.isAcceptableOrUnknown(
+          data['non_trauma_chest_symptoms_json']!,
+          _nonTraumaChestSymptomsJsonMeta,
+        ),
+      );
+    }
+    if (data.containsKey('non_trauma_abdomen_symptoms_json')) {
+      context.handle(
+        _nonTraumaAbdomenSymptomsJsonMeta,
+        nonTraumaAbdomenSymptomsJson.isAcceptableOrUnknown(
+          data['non_trauma_abdomen_symptoms_json']!,
+          _nonTraumaAbdomenSymptomsJsonMeta,
+        ),
+      );
+    }
+    if (data.containsKey('non_trauma_limbs_symptoms_json')) {
+      context.handle(
+        _nonTraumaLimbsSymptomsJsonMeta,
+        nonTraumaLimbsSymptomsJson.isAcceptableOrUnknown(
+          data['non_trauma_limbs_symptoms_json']!,
+          _nonTraumaLimbsSymptomsJsonMeta,
+        ),
+      );
+    }
+    if (data.containsKey('non_trauma_other_symptoms_json')) {
+      context.handle(
+        _nonTraumaOtherSymptomsJsonMeta,
+        nonTraumaOtherSymptomsJson.isAcceptableOrUnknown(
+          data['non_trauma_other_symptoms_json']!,
+          _nonTraumaOtherSymptomsJsonMeta,
         ),
       );
     }
@@ -5614,6 +5719,26 @@ class $TreatmentsTable extends Treatments
         DriftSqlType.string,
         data['${effectivePrefix}symptom_note'],
       ),
+      nonTraumaHeadSymptomsJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}non_trauma_head_symptoms_json'],
+      ),
+      nonTraumaChestSymptomsJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}non_trauma_chest_symptoms_json'],
+      ),
+      nonTraumaAbdomenSymptomsJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}non_trauma_abdomen_symptoms_json'],
+      ),
+      nonTraumaLimbsSymptomsJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}non_trauma_limbs_symptoms_json'],
+      ),
+      nonTraumaOtherSymptomsJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}non_trauma_other_symptoms_json'],
+      ),
       photoTypesJson: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}photo_types_json'],
@@ -5890,6 +6015,11 @@ class Treatment extends DataClass implements Insertable<Treatment> {
   final String? traumaSymptomsJson;
   final String? nonTraumaSymptomsJson;
   final String? symptomNote;
+  final String? nonTraumaHeadSymptomsJson;
+  final String? nonTraumaChestSymptomsJson;
+  final String? nonTraumaAbdomenSymptomsJson;
+  final String? nonTraumaLimbsSymptomsJson;
+  final String? nonTraumaOtherSymptomsJson;
   final String? photoTypesJson;
   final String? bodyCheckHead;
   final String? bodyCheckChest;
@@ -5965,6 +6095,11 @@ class Treatment extends DataClass implements Insertable<Treatment> {
     this.traumaSymptomsJson,
     this.nonTraumaSymptomsJson,
     this.symptomNote,
+    this.nonTraumaHeadSymptomsJson,
+    this.nonTraumaChestSymptomsJson,
+    this.nonTraumaAbdomenSymptomsJson,
+    this.nonTraumaLimbsSymptomsJson,
+    this.nonTraumaOtherSymptomsJson,
     this.photoTypesJson,
     this.bodyCheckHead,
     this.bodyCheckChest,
@@ -6056,6 +6191,31 @@ class Treatment extends DataClass implements Insertable<Treatment> {
     }
     if (!nullToAbsent || symptomNote != null) {
       map['symptom_note'] = Variable<String>(symptomNote);
+    }
+    if (!nullToAbsent || nonTraumaHeadSymptomsJson != null) {
+      map['non_trauma_head_symptoms_json'] = Variable<String>(
+        nonTraumaHeadSymptomsJson,
+      );
+    }
+    if (!nullToAbsent || nonTraumaChestSymptomsJson != null) {
+      map['non_trauma_chest_symptoms_json'] = Variable<String>(
+        nonTraumaChestSymptomsJson,
+      );
+    }
+    if (!nullToAbsent || nonTraumaAbdomenSymptomsJson != null) {
+      map['non_trauma_abdomen_symptoms_json'] = Variable<String>(
+        nonTraumaAbdomenSymptomsJson,
+      );
+    }
+    if (!nullToAbsent || nonTraumaLimbsSymptomsJson != null) {
+      map['non_trauma_limbs_symptoms_json'] = Variable<String>(
+        nonTraumaLimbsSymptomsJson,
+      );
+    }
+    if (!nullToAbsent || nonTraumaOtherSymptomsJson != null) {
+      map['non_trauma_other_symptoms_json'] = Variable<String>(
+        nonTraumaOtherSymptomsJson,
+      );
     }
     if (!nullToAbsent || photoTypesJson != null) {
       map['photo_types_json'] = Variable<String>(photoTypesJson);
@@ -6258,6 +6418,26 @@ class Treatment extends DataClass implements Insertable<Treatment> {
       symptomNote: symptomNote == null && nullToAbsent
           ? const Value.absent()
           : Value(symptomNote),
+      nonTraumaHeadSymptomsJson:
+          nonTraumaHeadSymptomsJson == null && nullToAbsent
+          ? const Value.absent()
+          : Value(nonTraumaHeadSymptomsJson),
+      nonTraumaChestSymptomsJson:
+          nonTraumaChestSymptomsJson == null && nullToAbsent
+          ? const Value.absent()
+          : Value(nonTraumaChestSymptomsJson),
+      nonTraumaAbdomenSymptomsJson:
+          nonTraumaAbdomenSymptomsJson == null && nullToAbsent
+          ? const Value.absent()
+          : Value(nonTraumaAbdomenSymptomsJson),
+      nonTraumaLimbsSymptomsJson:
+          nonTraumaLimbsSymptomsJson == null && nullToAbsent
+          ? const Value.absent()
+          : Value(nonTraumaLimbsSymptomsJson),
+      nonTraumaOtherSymptomsJson:
+          nonTraumaOtherSymptomsJson == null && nullToAbsent
+          ? const Value.absent()
+          : Value(nonTraumaOtherSymptomsJson),
       photoTypesJson: photoTypesJson == null && nullToAbsent
           ? const Value.absent()
           : Value(photoTypesJson),
@@ -6446,6 +6626,21 @@ class Treatment extends DataClass implements Insertable<Treatment> {
         json['nonTraumaSymptomsJson'],
       ),
       symptomNote: serializer.fromJson<String?>(json['symptomNote']),
+      nonTraumaHeadSymptomsJson: serializer.fromJson<String?>(
+        json['nonTraumaHeadSymptomsJson'],
+      ),
+      nonTraumaChestSymptomsJson: serializer.fromJson<String?>(
+        json['nonTraumaChestSymptomsJson'],
+      ),
+      nonTraumaAbdomenSymptomsJson: serializer.fromJson<String?>(
+        json['nonTraumaAbdomenSymptomsJson'],
+      ),
+      nonTraumaLimbsSymptomsJson: serializer.fromJson<String?>(
+        json['nonTraumaLimbsSymptomsJson'],
+      ),
+      nonTraumaOtherSymptomsJson: serializer.fromJson<String?>(
+        json['nonTraumaOtherSymptomsJson'],
+      ),
       photoTypesJson: serializer.fromJson<String?>(json['photoTypesJson']),
       bodyCheckHead: serializer.fromJson<String?>(json['bodyCheckHead']),
       bodyCheckChest: serializer.fromJson<String?>(json['bodyCheckChest']),
@@ -6562,6 +6757,21 @@ class Treatment extends DataClass implements Insertable<Treatment> {
         nonTraumaSymptomsJson,
       ),
       'symptomNote': serializer.toJson<String?>(symptomNote),
+      'nonTraumaHeadSymptomsJson': serializer.toJson<String?>(
+        nonTraumaHeadSymptomsJson,
+      ),
+      'nonTraumaChestSymptomsJson': serializer.toJson<String?>(
+        nonTraumaChestSymptomsJson,
+      ),
+      'nonTraumaAbdomenSymptomsJson': serializer.toJson<String?>(
+        nonTraumaAbdomenSymptomsJson,
+      ),
+      'nonTraumaLimbsSymptomsJson': serializer.toJson<String?>(
+        nonTraumaLimbsSymptomsJson,
+      ),
+      'nonTraumaOtherSymptomsJson': serializer.toJson<String?>(
+        nonTraumaOtherSymptomsJson,
+      ),
       'photoTypesJson': serializer.toJson<String?>(photoTypesJson),
       'bodyCheckHead': serializer.toJson<String?>(bodyCheckHead),
       'bodyCheckChest': serializer.toJson<String?>(bodyCheckChest),
@@ -6646,6 +6856,11 @@ class Treatment extends DataClass implements Insertable<Treatment> {
     Value<String?> traumaSymptomsJson = const Value.absent(),
     Value<String?> nonTraumaSymptomsJson = const Value.absent(),
     Value<String?> symptomNote = const Value.absent(),
+    Value<String?> nonTraumaHeadSymptomsJson = const Value.absent(),
+    Value<String?> nonTraumaChestSymptomsJson = const Value.absent(),
+    Value<String?> nonTraumaAbdomenSymptomsJson = const Value.absent(),
+    Value<String?> nonTraumaLimbsSymptomsJson = const Value.absent(),
+    Value<String?> nonTraumaOtherSymptomsJson = const Value.absent(),
     Value<String?> photoTypesJson = const Value.absent(),
     Value<String?> bodyCheckHead = const Value.absent(),
     Value<String?> bodyCheckChest = const Value.absent(),
@@ -6731,6 +6946,21 @@ class Treatment extends DataClass implements Insertable<Treatment> {
         ? nonTraumaSymptomsJson.value
         : this.nonTraumaSymptomsJson,
     symptomNote: symptomNote.present ? symptomNote.value : this.symptomNote,
+    nonTraumaHeadSymptomsJson: nonTraumaHeadSymptomsJson.present
+        ? nonTraumaHeadSymptomsJson.value
+        : this.nonTraumaHeadSymptomsJson,
+    nonTraumaChestSymptomsJson: nonTraumaChestSymptomsJson.present
+        ? nonTraumaChestSymptomsJson.value
+        : this.nonTraumaChestSymptomsJson,
+    nonTraumaAbdomenSymptomsJson: nonTraumaAbdomenSymptomsJson.present
+        ? nonTraumaAbdomenSymptomsJson.value
+        : this.nonTraumaAbdomenSymptomsJson,
+    nonTraumaLimbsSymptomsJson: nonTraumaLimbsSymptomsJson.present
+        ? nonTraumaLimbsSymptomsJson.value
+        : this.nonTraumaLimbsSymptomsJson,
+    nonTraumaOtherSymptomsJson: nonTraumaOtherSymptomsJson.present
+        ? nonTraumaOtherSymptomsJson.value
+        : this.nonTraumaOtherSymptomsJson,
     photoTypesJson: photoTypesJson.present
         ? photoTypesJson.value
         : this.photoTypesJson,
@@ -6893,6 +7123,21 @@ class Treatment extends DataClass implements Insertable<Treatment> {
       symptomNote: data.symptomNote.present
           ? data.symptomNote.value
           : this.symptomNote,
+      nonTraumaHeadSymptomsJson: data.nonTraumaHeadSymptomsJson.present
+          ? data.nonTraumaHeadSymptomsJson.value
+          : this.nonTraumaHeadSymptomsJson,
+      nonTraumaChestSymptomsJson: data.nonTraumaChestSymptomsJson.present
+          ? data.nonTraumaChestSymptomsJson.value
+          : this.nonTraumaChestSymptomsJson,
+      nonTraumaAbdomenSymptomsJson: data.nonTraumaAbdomenSymptomsJson.present
+          ? data.nonTraumaAbdomenSymptomsJson.value
+          : this.nonTraumaAbdomenSymptomsJson,
+      nonTraumaLimbsSymptomsJson: data.nonTraumaLimbsSymptomsJson.present
+          ? data.nonTraumaLimbsSymptomsJson.value
+          : this.nonTraumaLimbsSymptomsJson,
+      nonTraumaOtherSymptomsJson: data.nonTraumaOtherSymptomsJson.present
+          ? data.nonTraumaOtherSymptomsJson.value
+          : this.nonTraumaOtherSymptomsJson,
       photoTypesJson: data.photoTypesJson.present
           ? data.photoTypesJson.value
           : this.photoTypesJson,
@@ -7083,6 +7328,13 @@ class Treatment extends DataClass implements Insertable<Treatment> {
           ..write('traumaSymptomsJson: $traumaSymptomsJson, ')
           ..write('nonTraumaSymptomsJson: $nonTraumaSymptomsJson, ')
           ..write('symptomNote: $symptomNote, ')
+          ..write('nonTraumaHeadSymptomsJson: $nonTraumaHeadSymptomsJson, ')
+          ..write('nonTraumaChestSymptomsJson: $nonTraumaChestSymptomsJson, ')
+          ..write(
+            'nonTraumaAbdomenSymptomsJson: $nonTraumaAbdomenSymptomsJson, ',
+          )
+          ..write('nonTraumaLimbsSymptomsJson: $nonTraumaLimbsSymptomsJson, ')
+          ..write('nonTraumaOtherSymptomsJson: $nonTraumaOtherSymptomsJson, ')
           ..write('photoTypesJson: $photoTypesJson, ')
           ..write('bodyCheckHead: $bodyCheckHead, ')
           ..write('bodyCheckChest: $bodyCheckChest, ')
@@ -7163,6 +7415,11 @@ class Treatment extends DataClass implements Insertable<Treatment> {
     traumaSymptomsJson,
     nonTraumaSymptomsJson,
     symptomNote,
+    nonTraumaHeadSymptomsJson,
+    nonTraumaChestSymptomsJson,
+    nonTraumaAbdomenSymptomsJson,
+    nonTraumaLimbsSymptomsJson,
+    nonTraumaOtherSymptomsJson,
     photoTypesJson,
     bodyCheckHead,
     bodyCheckChest,
@@ -7242,6 +7499,12 @@ class Treatment extends DataClass implements Insertable<Treatment> {
           other.traumaSymptomsJson == this.traumaSymptomsJson &&
           other.nonTraumaSymptomsJson == this.nonTraumaSymptomsJson &&
           other.symptomNote == this.symptomNote &&
+          other.nonTraumaHeadSymptomsJson == this.nonTraumaHeadSymptomsJson &&
+          other.nonTraumaChestSymptomsJson == this.nonTraumaChestSymptomsJson &&
+          other.nonTraumaAbdomenSymptomsJson ==
+              this.nonTraumaAbdomenSymptomsJson &&
+          other.nonTraumaLimbsSymptomsJson == this.nonTraumaLimbsSymptomsJson &&
+          other.nonTraumaOtherSymptomsJson == this.nonTraumaOtherSymptomsJson &&
           other.photoTypesJson == this.photoTypesJson &&
           other.bodyCheckHead == this.bodyCheckHead &&
           other.bodyCheckChest == this.bodyCheckChest &&
@@ -7320,6 +7583,11 @@ class TreatmentsCompanion extends UpdateCompanion<Treatment> {
   final Value<String?> traumaSymptomsJson;
   final Value<String?> nonTraumaSymptomsJson;
   final Value<String?> symptomNote;
+  final Value<String?> nonTraumaHeadSymptomsJson;
+  final Value<String?> nonTraumaChestSymptomsJson;
+  final Value<String?> nonTraumaAbdomenSymptomsJson;
+  final Value<String?> nonTraumaLimbsSymptomsJson;
+  final Value<String?> nonTraumaOtherSymptomsJson;
   final Value<String?> photoTypesJson;
   final Value<String?> bodyCheckHead;
   final Value<String?> bodyCheckChest;
@@ -7395,6 +7663,11 @@ class TreatmentsCompanion extends UpdateCompanion<Treatment> {
     this.traumaSymptomsJson = const Value.absent(),
     this.nonTraumaSymptomsJson = const Value.absent(),
     this.symptomNote = const Value.absent(),
+    this.nonTraumaHeadSymptomsJson = const Value.absent(),
+    this.nonTraumaChestSymptomsJson = const Value.absent(),
+    this.nonTraumaAbdomenSymptomsJson = const Value.absent(),
+    this.nonTraumaLimbsSymptomsJson = const Value.absent(),
+    this.nonTraumaOtherSymptomsJson = const Value.absent(),
     this.photoTypesJson = const Value.absent(),
     this.bodyCheckHead = const Value.absent(),
     this.bodyCheckChest = const Value.absent(),
@@ -7471,6 +7744,11 @@ class TreatmentsCompanion extends UpdateCompanion<Treatment> {
     this.traumaSymptomsJson = const Value.absent(),
     this.nonTraumaSymptomsJson = const Value.absent(),
     this.symptomNote = const Value.absent(),
+    this.nonTraumaHeadSymptomsJson = const Value.absent(),
+    this.nonTraumaChestSymptomsJson = const Value.absent(),
+    this.nonTraumaAbdomenSymptomsJson = const Value.absent(),
+    this.nonTraumaLimbsSymptomsJson = const Value.absent(),
+    this.nonTraumaOtherSymptomsJson = const Value.absent(),
     this.photoTypesJson = const Value.absent(),
     this.bodyCheckHead = const Value.absent(),
     this.bodyCheckChest = const Value.absent(),
@@ -7547,6 +7825,11 @@ class TreatmentsCompanion extends UpdateCompanion<Treatment> {
     Expression<String>? traumaSymptomsJson,
     Expression<String>? nonTraumaSymptomsJson,
     Expression<String>? symptomNote,
+    Expression<String>? nonTraumaHeadSymptomsJson,
+    Expression<String>? nonTraumaChestSymptomsJson,
+    Expression<String>? nonTraumaAbdomenSymptomsJson,
+    Expression<String>? nonTraumaLimbsSymptomsJson,
+    Expression<String>? nonTraumaOtherSymptomsJson,
     Expression<String>? photoTypesJson,
     Expression<String>? bodyCheckHead,
     Expression<String>? bodyCheckChest,
@@ -7627,6 +7910,16 @@ class TreatmentsCompanion extends UpdateCompanion<Treatment> {
       if (nonTraumaSymptomsJson != null)
         'non_trauma_symptoms_json': nonTraumaSymptomsJson,
       if (symptomNote != null) 'symptom_note': symptomNote,
+      if (nonTraumaHeadSymptomsJson != null)
+        'non_trauma_head_symptoms_json': nonTraumaHeadSymptomsJson,
+      if (nonTraumaChestSymptomsJson != null)
+        'non_trauma_chest_symptoms_json': nonTraumaChestSymptomsJson,
+      if (nonTraumaAbdomenSymptomsJson != null)
+        'non_trauma_abdomen_symptoms_json': nonTraumaAbdomenSymptomsJson,
+      if (nonTraumaLimbsSymptomsJson != null)
+        'non_trauma_limbs_symptoms_json': nonTraumaLimbsSymptomsJson,
+      if (nonTraumaOtherSymptomsJson != null)
+        'non_trauma_other_symptoms_json': nonTraumaOtherSymptomsJson,
       if (photoTypesJson != null) 'photo_types_json': photoTypesJson,
       if (bodyCheckHead != null) 'body_check_head': bodyCheckHead,
       if (bodyCheckChest != null) 'body_check_chest': bodyCheckChest,
@@ -7718,6 +8011,11 @@ class TreatmentsCompanion extends UpdateCompanion<Treatment> {
     Value<String?>? traumaSymptomsJson,
     Value<String?>? nonTraumaSymptomsJson,
     Value<String?>? symptomNote,
+    Value<String?>? nonTraumaHeadSymptomsJson,
+    Value<String?>? nonTraumaChestSymptomsJson,
+    Value<String?>? nonTraumaAbdomenSymptomsJson,
+    Value<String?>? nonTraumaLimbsSymptomsJson,
+    Value<String?>? nonTraumaOtherSymptomsJson,
     Value<String?>? photoTypesJson,
     Value<String?>? bodyCheckHead,
     Value<String?>? bodyCheckChest,
@@ -7795,6 +8093,16 @@ class TreatmentsCompanion extends UpdateCompanion<Treatment> {
       nonTraumaSymptomsJson:
           nonTraumaSymptomsJson ?? this.nonTraumaSymptomsJson,
       symptomNote: symptomNote ?? this.symptomNote,
+      nonTraumaHeadSymptomsJson:
+          nonTraumaHeadSymptomsJson ?? this.nonTraumaHeadSymptomsJson,
+      nonTraumaChestSymptomsJson:
+          nonTraumaChestSymptomsJson ?? this.nonTraumaChestSymptomsJson,
+      nonTraumaAbdomenSymptomsJson:
+          nonTraumaAbdomenSymptomsJson ?? this.nonTraumaAbdomenSymptomsJson,
+      nonTraumaLimbsSymptomsJson:
+          nonTraumaLimbsSymptomsJson ?? this.nonTraumaLimbsSymptomsJson,
+      nonTraumaOtherSymptomsJson:
+          nonTraumaOtherSymptomsJson ?? this.nonTraumaOtherSymptomsJson,
       photoTypesJson: photoTypesJson ?? this.photoTypesJson,
       bodyCheckHead: bodyCheckHead ?? this.bodyCheckHead,
       bodyCheckChest: bodyCheckChest ?? this.bodyCheckChest,
@@ -7904,6 +8212,31 @@ class TreatmentsCompanion extends UpdateCompanion<Treatment> {
     }
     if (symptomNote.present) {
       map['symptom_note'] = Variable<String>(symptomNote.value);
+    }
+    if (nonTraumaHeadSymptomsJson.present) {
+      map['non_trauma_head_symptoms_json'] = Variable<String>(
+        nonTraumaHeadSymptomsJson.value,
+      );
+    }
+    if (nonTraumaChestSymptomsJson.present) {
+      map['non_trauma_chest_symptoms_json'] = Variable<String>(
+        nonTraumaChestSymptomsJson.value,
+      );
+    }
+    if (nonTraumaAbdomenSymptomsJson.present) {
+      map['non_trauma_abdomen_symptoms_json'] = Variable<String>(
+        nonTraumaAbdomenSymptomsJson.value,
+      );
+    }
+    if (nonTraumaLimbsSymptomsJson.present) {
+      map['non_trauma_limbs_symptoms_json'] = Variable<String>(
+        nonTraumaLimbsSymptomsJson.value,
+      );
+    }
+    if (nonTraumaOtherSymptomsJson.present) {
+      map['non_trauma_other_symptoms_json'] = Variable<String>(
+        nonTraumaOtherSymptomsJson.value,
+      );
     }
     if (photoTypesJson.present) {
       map['photo_types_json'] = Variable<String>(photoTypesJson.value);
@@ -8131,6 +8464,13 @@ class TreatmentsCompanion extends UpdateCompanion<Treatment> {
           ..write('traumaSymptomsJson: $traumaSymptomsJson, ')
           ..write('nonTraumaSymptomsJson: $nonTraumaSymptomsJson, ')
           ..write('symptomNote: $symptomNote, ')
+          ..write('nonTraumaHeadSymptomsJson: $nonTraumaHeadSymptomsJson, ')
+          ..write('nonTraumaChestSymptomsJson: $nonTraumaChestSymptomsJson, ')
+          ..write(
+            'nonTraumaAbdomenSymptomsJson: $nonTraumaAbdomenSymptomsJson, ',
+          )
+          ..write('nonTraumaLimbsSymptomsJson: $nonTraumaLimbsSymptomsJson, ')
+          ..write('nonTraumaOtherSymptomsJson: $nonTraumaOtherSymptomsJson, ')
           ..write('photoTypesJson: $photoTypesJson, ')
           ..write('bodyCheckHead: $bodyCheckHead, ')
           ..write('bodyCheckChest: $bodyCheckChest, ')
@@ -24364,6 +24704,11 @@ typedef $$TreatmentsTableCreateCompanionBuilder =
       Value<String?> traumaSymptomsJson,
       Value<String?> nonTraumaSymptomsJson,
       Value<String?> symptomNote,
+      Value<String?> nonTraumaHeadSymptomsJson,
+      Value<String?> nonTraumaChestSymptomsJson,
+      Value<String?> nonTraumaAbdomenSymptomsJson,
+      Value<String?> nonTraumaLimbsSymptomsJson,
+      Value<String?> nonTraumaOtherSymptomsJson,
       Value<String?> photoTypesJson,
       Value<String?> bodyCheckHead,
       Value<String?> bodyCheckChest,
@@ -24441,6 +24786,11 @@ typedef $$TreatmentsTableUpdateCompanionBuilder =
       Value<String?> traumaSymptomsJson,
       Value<String?> nonTraumaSymptomsJson,
       Value<String?> symptomNote,
+      Value<String?> nonTraumaHeadSymptomsJson,
+      Value<String?> nonTraumaChestSymptomsJson,
+      Value<String?> nonTraumaAbdomenSymptomsJson,
+      Value<String?> nonTraumaLimbsSymptomsJson,
+      Value<String?> nonTraumaOtherSymptomsJson,
       Value<String?> photoTypesJson,
       Value<String?> bodyCheckHead,
       Value<String?> bodyCheckChest,
@@ -24563,6 +24913,31 @@ class $$TreatmentsTableFilterComposer
 
   ColumnFilters<String> get symptomNote => $composableBuilder(
     column: $table.symptomNote,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get nonTraumaHeadSymptomsJson => $composableBuilder(
+    column: $table.nonTraumaHeadSymptomsJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get nonTraumaChestSymptomsJson => $composableBuilder(
+    column: $table.nonTraumaChestSymptomsJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get nonTraumaAbdomenSymptomsJson => $composableBuilder(
+    column: $table.nonTraumaAbdomenSymptomsJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get nonTraumaLimbsSymptomsJson => $composableBuilder(
+    column: $table.nonTraumaLimbsSymptomsJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get nonTraumaOtherSymptomsJson => $composableBuilder(
+    column: $table.nonTraumaOtherSymptomsJson,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -24946,6 +25321,32 @@ class $$TreatmentsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get nonTraumaHeadSymptomsJson => $composableBuilder(
+    column: $table.nonTraumaHeadSymptomsJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get nonTraumaChestSymptomsJson => $composableBuilder(
+    column: $table.nonTraumaChestSymptomsJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get nonTraumaAbdomenSymptomsJson =>
+      $composableBuilder(
+        column: $table.nonTraumaAbdomenSymptomsJson,
+        builder: (column) => ColumnOrderings(column),
+      );
+
+  ColumnOrderings<String> get nonTraumaLimbsSymptomsJson => $composableBuilder(
+    column: $table.nonTraumaLimbsSymptomsJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get nonTraumaOtherSymptomsJson => $composableBuilder(
+    column: $table.nonTraumaOtherSymptomsJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get photoTypesJson => $composableBuilder(
     column: $table.photoTypesJson,
     builder: (column) => ColumnOrderings(column),
@@ -25322,6 +25723,32 @@ class $$TreatmentsTableAnnotationComposer
     builder: (column) => column,
   );
 
+  GeneratedColumn<String> get nonTraumaHeadSymptomsJson => $composableBuilder(
+    column: $table.nonTraumaHeadSymptomsJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get nonTraumaChestSymptomsJson => $composableBuilder(
+    column: $table.nonTraumaChestSymptomsJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get nonTraumaAbdomenSymptomsJson =>
+      $composableBuilder(
+        column: $table.nonTraumaAbdomenSymptomsJson,
+        builder: (column) => column,
+      );
+
+  GeneratedColumn<String> get nonTraumaLimbsSymptomsJson => $composableBuilder(
+    column: $table.nonTraumaLimbsSymptomsJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get nonTraumaOtherSymptomsJson => $composableBuilder(
+    column: $table.nonTraumaOtherSymptomsJson,
+    builder: (column) => column,
+  );
+
   GeneratedColumn<String> get photoTypesJson => $composableBuilder(
     column: $table.photoTypesJson,
     builder: (column) => column,
@@ -25666,6 +26093,15 @@ class $$TreatmentsTableTableManager
                 Value<String?> traumaSymptomsJson = const Value.absent(),
                 Value<String?> nonTraumaSymptomsJson = const Value.absent(),
                 Value<String?> symptomNote = const Value.absent(),
+                Value<String?> nonTraumaHeadSymptomsJson = const Value.absent(),
+                Value<String?> nonTraumaChestSymptomsJson =
+                    const Value.absent(),
+                Value<String?> nonTraumaAbdomenSymptomsJson =
+                    const Value.absent(),
+                Value<String?> nonTraumaLimbsSymptomsJson =
+                    const Value.absent(),
+                Value<String?> nonTraumaOtherSymptomsJson =
+                    const Value.absent(),
                 Value<String?> photoTypesJson = const Value.absent(),
                 Value<String?> bodyCheckHead = const Value.absent(),
                 Value<String?> bodyCheckChest = const Value.absent(),
@@ -25742,6 +26178,11 @@ class $$TreatmentsTableTableManager
                 traumaSymptomsJson: traumaSymptomsJson,
                 nonTraumaSymptomsJson: nonTraumaSymptomsJson,
                 symptomNote: symptomNote,
+                nonTraumaHeadSymptomsJson: nonTraumaHeadSymptomsJson,
+                nonTraumaChestSymptomsJson: nonTraumaChestSymptomsJson,
+                nonTraumaAbdomenSymptomsJson: nonTraumaAbdomenSymptomsJson,
+                nonTraumaLimbsSymptomsJson: nonTraumaLimbsSymptomsJson,
+                nonTraumaOtherSymptomsJson: nonTraumaOtherSymptomsJson,
                 photoTypesJson: photoTypesJson,
                 bodyCheckHead: bodyCheckHead,
                 bodyCheckChest: bodyCheckChest,
@@ -25819,6 +26260,15 @@ class $$TreatmentsTableTableManager
                 Value<String?> traumaSymptomsJson = const Value.absent(),
                 Value<String?> nonTraumaSymptomsJson = const Value.absent(),
                 Value<String?> symptomNote = const Value.absent(),
+                Value<String?> nonTraumaHeadSymptomsJson = const Value.absent(),
+                Value<String?> nonTraumaChestSymptomsJson =
+                    const Value.absent(),
+                Value<String?> nonTraumaAbdomenSymptomsJson =
+                    const Value.absent(),
+                Value<String?> nonTraumaLimbsSymptomsJson =
+                    const Value.absent(),
+                Value<String?> nonTraumaOtherSymptomsJson =
+                    const Value.absent(),
                 Value<String?> photoTypesJson = const Value.absent(),
                 Value<String?> bodyCheckHead = const Value.absent(),
                 Value<String?> bodyCheckChest = const Value.absent(),
@@ -25895,6 +26345,11 @@ class $$TreatmentsTableTableManager
                 traumaSymptomsJson: traumaSymptomsJson,
                 nonTraumaSymptomsJson: nonTraumaSymptomsJson,
                 symptomNote: symptomNote,
+                nonTraumaHeadSymptomsJson: nonTraumaHeadSymptomsJson,
+                nonTraumaChestSymptomsJson: nonTraumaChestSymptomsJson,
+                nonTraumaAbdomenSymptomsJson: nonTraumaAbdomenSymptomsJson,
+                nonTraumaLimbsSymptomsJson: nonTraumaLimbsSymptomsJson,
+                nonTraumaOtherSymptomsJson: nonTraumaOtherSymptomsJson,
                 photoTypesJson: photoTypesJson,
                 bodyCheckHead: bodyCheckHead,
                 bodyCheckChest: bodyCheckChest,

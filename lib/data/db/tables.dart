@@ -158,6 +158,11 @@ class Treatments extends Table {
   TextColumn get traumaSymptomsJson => text().nullable()();
   TextColumn get nonTraumaSymptomsJson => text().nullable()();
   TextColumn get symptomNote => text().nullable()();
+  TextColumn get nonTraumaHeadSymptomsJson => text().nullable()();
+  TextColumn get nonTraumaChestSymptomsJson => text().nullable()();
+  TextColumn get nonTraumaAbdomenSymptomsJson => text().nullable()();
+  TextColumn get nonTraumaLimbsSymptomsJson => text().nullable()();
+  TextColumn get nonTraumaOtherSymptomsJson => text().nullable()();
 
   // 照片類型
   TextColumn get photoTypesJson => text().nullable()();

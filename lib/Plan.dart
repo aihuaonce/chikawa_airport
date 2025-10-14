@@ -528,6 +528,12 @@ class _PlanPageState extends State<PlanPage>
       mainSymptom: planData.mainSymptom,
       traumaSymptoms: planData.traumaSymptoms,
       nonTraumaSymptoms: planData.nonTraumaSymptoms,
+      nonTraumaHeadSymptoms: planData.nonTraumaHeadSymptoms,
+      nonTraumaChestSymptoms: planData.nonTraumaChestSymptoms,
+      nonTraumaLimbsSymptoms: planData.nonTraumaLimbsSymptoms,
+      nonTraumaOtherSymptoms: planData.nonTraumaOtherSymptoms,
+      nonTraumaAbdomenSymptoms: planData.nonTraumaAbdomenSymptoms,
+
       symptomNote: planData.symptomNote,
       photoTypes: planData.photoTypes,
       bodyCheckHead: planData.bodyCheckHead,
@@ -777,7 +783,158 @@ class _PlanPageState extends State<PlanPage>
                           )
                           .toList(),
                     ),
+                    const SizedBox(height: 16),
+
+                    if (planData.nonTraumaSymptoms['頭頸部'] == true) ...[
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _SectionTitle('頭頸部'),
+                          Wrap(
+                            spacing: 16,
+                            runSpacing: 8,
+                            children: planData.nonTraumaHeadSymptoms.keys
+                                .map(
+                                  (label) => _CheckBoxItem(
+                                    label: label,
+                                    value:
+                                        planData.nonTraumaHeadSymptoms[label] ??
+                                        false,
+                                    onChanged: (v) {
+                                      planData.nonTraumaHeadSymptoms[label] =
+                                          v ?? false;
+                                      planData.update();
+                                    },
+                                  ),
+                                )
+                                .toList(),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                    ],
+
+                    if (planData.nonTraumaSymptoms['胸部'] == true) ...[
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _SectionTitle('胸部'),
+                          Wrap(
+                            spacing: 16,
+                            runSpacing: 8,
+                            children: planData.nonTraumaChestSymptoms.keys
+                                .map(
+                                  (label) => _CheckBoxItem(
+                                    label: label,
+                                    value:
+                                        planData
+                                            .nonTraumaChestSymptoms[label] ??
+                                        false,
+                                    onChanged: (v) {
+                                      planData.nonTraumaChestSymptoms[label] =
+                                          v ?? false;
+                                      planData.update();
+                                    },
+                                  ),
+                                )
+                                .toList(),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                    ],
+
+                    if (planData.nonTraumaSymptoms['腹部'] == true) ...[
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _SectionTitle('腹部'),
+                          Wrap(
+                            spacing: 16,
+                            runSpacing: 8,
+                            children: planData.nonTraumaAbdomenSymptoms.keys
+                                .map(
+                                  (label) => _CheckBoxItem(
+                                    label: label,
+                                    value:
+                                        planData
+                                            .nonTraumaAbdomenSymptoms[label] ??
+                                        false,
+                                    onChanged: (v) {
+                                      planData.nonTraumaAbdomenSymptoms[label] =
+                                          v ?? false;
+                                      planData.update();
+                                    },
+                                  ),
+                                )
+                                .toList(),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                    ],
+
+                    if (planData.nonTraumaSymptoms['四肢'] == true) ...[
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _SectionTitle('四肢'),
+                          Wrap(
+                            spacing: 16,
+                            runSpacing: 8,
+                            children: planData.nonTraumaLimbsSymptoms.keys
+                                .map(
+                                  (label) => _CheckBoxItem(
+                                    label: label,
+                                    value:
+                                        planData
+                                            .nonTraumaLimbsSymptoms[label] ??
+                                        false,
+                                    onChanged: (v) {
+                                      planData.nonTraumaLimbsSymptoms[label] =
+                                          v ?? false;
+                                      planData.update();
+                                    },
+                                  ),
+                                )
+                                .toList(),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                    ],
+
+                    if (planData.nonTraumaSymptoms['其他'] == true) ...[
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _SectionTitle('其他'),
+                          Wrap(
+                            spacing: 16,
+                            runSpacing: 8,
+                            children: planData.nonTraumaOtherSymptoms.keys
+                                .map(
+                                  (label) => _CheckBoxItem(
+                                    label: label,
+                                    value:
+                                        planData
+                                            .nonTraumaOtherSymptoms[label] ??
+                                        false,
+                                    onChanged: (v) {
+                                      planData.nonTraumaOtherSymptoms[label] =
+                                          v ?? false;
+                                      planData.update();
+                                    },
+                                  ),
+                                )
+                                .toList(),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                    ],
                   ],
+
                   const SizedBox(height: 16),
                   _SectionTitle('補充說明'),
                   TextField(
