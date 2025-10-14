@@ -30,6 +30,37 @@ class PlanData extends ChangeNotifier {
     '四肢': false,
     '其他': false,
   };
+
+  Map<String, bool> nonTraumaHeadSymptoms = {
+    '頭痛': false,
+    '頭暈目眩': false,
+    '意識改變': false,
+    '癲癇': false,
+    '喉嚨痛': false,
+    '鼻塞鼻水': false,
+    '五官症狀': false,
+  };
+  Map<String, bool> nonTraumaChestSymptoms = {
+    '咳嗽': false,
+    '呼吸困難': false,
+    '胸悶胸痛': false,
+    '心悸': false,
+  };
+  Map<String, bool> nonTraumaAbdomenSymptoms = {
+    '腹脹腹痛': false,
+    '噁心嘔吐': false,
+    '腹瀉': false,
+  };
+  Map<String, bool> nonTraumaLimbsSymptoms = {'疼痛': false, '麻木無力': false};
+  Map<String, bool> nonTraumaOtherSymptoms = {
+    '發燒': false,
+    '倦怠無力': false,
+    '頻尿、解尿疼痛': false,
+    '暈厥': false,
+    '過敏': false,
+    '精神異常': false,
+    '其他': false,
+  };
   String? symptomNote;
 
   // 照片類型
