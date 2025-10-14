@@ -55,17 +55,12 @@ final List<RouteItem> routeItems = [
         ElectronicDocumentsPage(key: key, visitId: visitId),
   ),
   RouteItem(
-    label: '護理記錄',
-    builder: (visitId, key) => NursingRecordPage(key: key, visitId: visitId),
-  ),
-  RouteItem(
     label: '轉診單',
     builder: (visitId, key) => ReferralFormPage(key: key, visitId: visitId),
   ),
   RouteItem(
-    label: "人形圖",
-    builder: (visitId, key) => BodyMapPage(key: key, visitId: visitId),
+    label: '護理記錄',
+    builder: (visitId, key) => NursingRecordPage(key: key, visitId: visitId),
   ),
-
   // 未來其他頁面...
 ];

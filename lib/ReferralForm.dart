@@ -6,6 +6,8 @@ import 'package:signature/signature.dart';
 import '../data/db/daos.dart';
 import '../data/models/referral_data.dart';
 import 'nav2.dart';
+import '../l10n/app_translations.dart';
+
 
 class ReferralFormPage extends StatefulWidget {
   final int visitId;
@@ -50,10 +52,10 @@ class _ReferralFormPageState extends State<ReferralFormPage>
     "古璿正",
     "江旺財",
     "呂學政",
-    "周志勃",
-    "金霍歌",
+    "周志勇",
+    "金霈歌",
     "徐丕",
-    "康曉妍",
+    "康曉妤",
     "其他",
   ];
 
@@ -342,6 +344,7 @@ class _ReferralFormPageState extends State<ReferralFormPage>
     SignatureController controller,
     Function(Uint8List) onSaved,
   ) {
+    final t = AppTranslations.of(context);
     showDialog(
       context: context,
       builder: (context) => Dialog(
@@ -361,7 +364,7 @@ class _ReferralFormPageState extends State<ReferralFormPage>
                 children: [
                   TextButton(
                     onPressed: controller.clear,
-                    child: const Text("重寫"),
+                    child: Text(t.redraw),
                   ),
                   TextButton(
                     onPressed: () async {
@@ -373,7 +376,7 @@ class _ReferralFormPageState extends State<ReferralFormPage>
                         Navigator.pop(context);
                       }
                     },
-                    child: const Text("儲存"),
+                    child: Text(t.save),
                   ),
                 ],
               ),
@@ -383,10 +386,10 @@ class _ReferralFormPageState extends State<ReferralFormPage>
       ),
     );
   }
-
-  @override
+@override
   Widget build(BuildContext context) {
     super.build(context);
+    final t = AppTranslations.of(context);
 
     if (_isLoading) return const Center(child: CircularProgressIndicator());
 
@@ -411,71 +414,71 @@ class _ReferralFormPageState extends State<ReferralFormPage>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // 第一部分 - 聯絡人資料
-                  const Text(
-                    "聯絡人資料",
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  Text(
+                    t.isZh ? "聯絡人資料" : "Contact Information",
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                   ),
                   const SizedBox(height: 8),
-                  _buildInputRow("姓名：", "請填寫聯絡人姓名", contactNameCtrl),
+                  _buildInputRow(t, "${t.name}：", t.isZh ? "請填寫聯絡人姓名" : "Enter contact name", contactNameCtrl),
                   const SizedBox(height: 8),
-                  _buildInputRow("電話：", "請填寫聯絡人電話", contactPhoneCtrl),
+                  _buildInputRow(t, "${t.phone}：", t.isZh ? "請填寫聯絡人電話" : "Enter contact phone", contactPhoneCtrl),
                   const SizedBox(height: 8),
-                  _buildInputRow("地址：", "請填寫聯絡人地址", contactAddressCtrl),
+                  _buildInputRow(t, "${t.address}：", t.isZh ? "請填寫聯絡人地址" : "Enter contact address", contactAddressCtrl),
 
                   const Divider(thickness: 1, height: 32),
 
                   // 第二部分 - 診斷
-                  const Text(
-                    "診斷ICD-10-CM/PCS病名",
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  Text(
+                    t.isZh ? "診斷ICD-10-CM/PCS病名" : "Diagnosis ICD-10-CM/PCS",
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                   ),
                   const SizedBox(height: 8),
-                  _buildInputRow("主診斷：", "請輸入...", mainDiagnosisCtrl),
+                  _buildInputRow(t, "${t.mainDiagnosis}：", t.isZh ? "請輸入..." : "Please enter...", mainDiagnosisCtrl),
                   const SizedBox(height: 8),
-                  _buildInputRow("副診斷1：", "請輸入...", subDiagnosis1Ctrl),
+                  _buildInputRow(t, "${t.secondaryDiagnosis1}：", t.isZh ? "請輸入..." : "Please enter...", subDiagnosis1Ctrl),
                   const SizedBox(height: 8),
-                  _buildInputRow("副診斷2：", "請輸入...", subDiagnosis2Ctrl),
+                  _buildInputRow(t, "${t.secondaryDiagnosis2}：", t.isZh ? "請輸入..." : "Please enter...", subDiagnosis2Ctrl),
 
                   const SizedBox(height: 16),
                   Row(
                     children: [
-                      Expanded(child: _buildLeftCard(data)),
+                      Expanded(child: _buildLeftCard(t, data)),
                       const SizedBox(width: 16),
-                      Expanded(child: _buildRightCard(data)),
+                      Expanded(child: _buildRightCard(t, data)),
                     ],
                   ),
 
                   const Divider(thickness: 1, height: 32),
 
                   // 第三部分 - 醫師資訊
-                  const Text(
-                    "診治醫生姓名",
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                  Text(
+                    t.isZh ? "診治醫生姓名" : "Attending Physician Name",
+                    style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
-                  _buildDropdown("醫師姓名：", doctorList, data.doctorIdx, (idx) {
+                  _buildDropdown(t, t.isZh ? "醫師姓名：" : "Physician Name:", doctorList, data.doctorIdx, (idx) {
                     data.doctorIdx = idx;
                     data.update();
                   }),
                   if (data.doctorIdx == doctorList.indexOf("其他"))
-                    _buildInputRow("其他：", "請輸入姓名", otherDoctorCtrl),
+                    _buildInputRow(t, "${t.other}：", t.enterName, otherDoctorCtrl),
 
                   const SizedBox(height: 12),
-                  const Text(
-                    "診治醫生科別",
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                  Text(
+                    t.isZh ? "診治醫生科別" : "Physician Department",
+                    style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
-                  _buildDropdown("醫師科別：", deptList, data.deptIdx, (idx) {
+                  _buildDropdown(t, t.isZh ? "醫師科別：" : "Physician Dept:", deptList, data.deptIdx, (idx) {
                     data.deptIdx = idx;
                     data.update();
                   }),
                   if (data.deptIdx == deptList.indexOf("其他"))
-                    _buildInputRow("其他：", "請輸入科別", otherDeptCtrl),
+                    _buildInputRow(t, "${t.other}：", t.isZh ? "請輸入科別" : "Enter department", otherDeptCtrl),
 
                   const SizedBox(height: 12),
-                  const Text(
-                    "診治醫師簽名",
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                  Text(
+                    t.isZh ? "診治醫師簽名" : "Physician Signature",
+                    style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   GestureDetector(
                     onTap: () =>
@@ -491,9 +494,9 @@ class _ReferralFormPageState extends State<ReferralFormPage>
                       ),
                       alignment: Alignment.center,
                       child: data.doctorSignature == null
-                          ? const Text(
-                              "點擊簽名",
-                              style: TextStyle(color: Colors.grey),
+                          ? Text(
+                              t.tapToSign,
+                              style: const TextStyle(color: Colors.grey),
                             )
                           : Image.memory(data.doctorSignature!),
                     ),
@@ -504,23 +507,23 @@ class _ReferralFormPageState extends State<ReferralFormPage>
                   // 第四部分 - 轉診院所
                   Row(
                     children: [
-                      Expanded(child: _buildLeftCard4(data)),
+                      Expanded(child: _buildLeftCard4(t, data)),
                       const SizedBox(width: 16),
-                      Expanded(child: _buildRightCard4(data)),
+                      Expanded(child: _buildRightCard4(t, data)),
                     ],
                   ),
 
                   const Divider(thickness: 1, height: 32),
 
                   // 同意區塊
-                  const Text(
-                    "經醫師解釋病情及轉診目的後同意轉院。",
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                  Text(
+                    t.isZh ? "經醫師解釋病情及轉診目的後同意轉院。" : "After explanation by physician, agree to referral.",
+                    style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 12),
-                  const Text(
-                    "同意人簽名",
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                  Text(
+                    t.isZh ? "同意人簽名" : "Consent Signature",
+                    style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   GestureDetector(
                     onTap: () =>
@@ -536,20 +539,20 @@ class _ReferralFormPageState extends State<ReferralFormPage>
                       ),
                       alignment: Alignment.center,
                       child: data.consentSignature == null
-                          ? const Text(
-                              "點擊簽名",
-                              style: TextStyle(color: Colors.grey),
+                          ? Text(
+                              t.tapToSign,
+                              style: const TextStyle(color: Colors.grey),
                             )
                           : Image.memory(data.consentSignature!),
                     ),
                   ),
                   const SizedBox(height: 12),
-                  _buildInputRow("與病人關係：", "請填寫同意人與病人關係", relationCtrl),
+                  _buildInputRow(t, t.isZh ? "與病人關係：" : "Relation to Patient:", t.isZh ? "請填寫同意人與病人關係" : "Enter relation", relationCtrl),
                   const SizedBox(height: 8),
                   Row(
                     children: [
                       Text(
-                        "簽名日期：${_formatDateTime(data.consentDateTime ?? DateTime.now())}",
+                        "${t.isZh ? '簽名日期：' : 'Signature Date: '}${_formatDateTime(t, data.consentDateTime ?? DateTime.now())}",
                       ),
                       const SizedBox(width: 12),
                       ElevatedButton(
@@ -557,7 +560,7 @@ class _ReferralFormPageState extends State<ReferralFormPage>
                           data.consentDateTime = DateTime.now();
                           data.update();
                         },
-                        child: const Text("更新時間"),
+                        child: Text(t.isZh ? "更新時間" : "Update Time"),
                       ),
                     ],
                   ),
@@ -572,7 +575,7 @@ class _ReferralFormPageState extends State<ReferralFormPage>
 
   // ================= UI 小積木 =================
 
-  Widget _buildInputRow(String label, String hint, TextEditingController ctrl) {
+  Widget _buildInputRow(AppTranslations t, String label, String hint, TextEditingController ctrl) {
     return Row(
       children: [
         Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
@@ -604,6 +607,7 @@ class _ReferralFormPageState extends State<ReferralFormPage>
   }
 
   Widget _buildDropdown(
+    AppTranslations t,
     String label,
     List<String> items,
     int? selectedIdx,
@@ -640,7 +644,7 @@ class _ReferralFormPageState extends State<ReferralFormPage>
     );
   }
 
-  Widget _buildLeftCard(ReferralData data) => Card(
+  Widget _buildLeftCard(AppTranslations t, ReferralData data) => Card(
     color: Colors.white,
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
     child: Padding(
@@ -648,31 +652,31 @@ class _ReferralFormPageState extends State<ReferralFormPage>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text("檢查及治療摘要", style: TextStyle(fontWeight: FontWeight.bold)),
+          Text(t.isZh ? "檢查及治療摘要" : "Exam & Treatment Summary", style: const TextStyle(fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
-          const Text("1. 最近一次檢查結果日期"),
+          Text(t.isZh ? "1. 最近一次檢查結果日期" : "1. Last Exam Date"),
           TextButton(
             onPressed: () => _pickDate(context, (d) {
               data.lastExamDate = d;
               data.update();
             }),
-            child: Text(_formatDate(data.lastExamDate ?? DateTime.now())),
+            child: Text(_formatDate(t, data.lastExamDate ?? DateTime.now())),
           ),
           const SizedBox(height: 8),
-          const Text("2. 最近一次用藥或手術名稱日期"),
+          Text(t.isZh ? "2. 最近一次用藥或手術名稱日期" : "2. Last Medication/Surgery Date"),
           TextButton(
             onPressed: () => _pickDate(context, (d) {
               data.lastMedicationDate = d;
               data.update();
             }),
-            child: Text(_formatDate(data.lastMedicationDate ?? DateTime.now())),
+            child: Text(_formatDate(t, data.lastMedicationDate ?? DateTime.now())),
           ),
         ],
       ),
     ),
   );
 
-  Widget _buildRightCard(ReferralData data) => Card(
+  Widget _buildRightCard(AppTranslations t, ReferralData data) => Card(
     color: Colors.white,
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
     child: Padding(
@@ -680,28 +684,30 @@ class _ReferralFormPageState extends State<ReferralFormPage>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text("轉診目的", style: TextStyle(fontWeight: FontWeight.bold)),
+          Text(t.isZh ? "轉診目的" : "Referral Purpose", style: const TextStyle(fontWeight: FontWeight.bold)),
           ...List.generate(referralPurposes.length, (i) {
             if (i == 3) {
               return _buildRadioWithInput(
+                t,
                 i,
-                "進一步檢查",
-                "檢查項目：",
-                "請填寫檢查項目",
+                referralPurposes[i],
+                t.isZh ? "檢查項目：" : "Exam Items:",
+                t.isZh ? "請填寫檢查項目" : "Enter exam items",
                 furtherExamCtrl,
                 data,
               );
             } else if (i == 5) {
               return _buildRadioWithInput(
+                t,
                 i,
-                "其他",
-                "其他轉診目的：",
-                "請填寫其他轉診目的",
+                referralPurposes[i],
+                t.isZh ? "其他轉診目的：" : "Other Purpose:",
+                t.isZh ? "請填寫其他轉診目的" : "Enter other purpose",
                 otherPurposeCtrl,
                 data,
               );
             } else {
-              return _buildRadio(i, referralPurposes[i], data);
+              return _buildRadio(t, i, referralPurposes[i], data);
             }
           }),
         ],
@@ -709,7 +715,7 @@ class _ReferralFormPageState extends State<ReferralFormPage>
     ),
   );
 
-  Widget _buildLeftCard4(ReferralData data) => Card(
+  Widget _buildLeftCard4(AppTranslations t, ReferralData data) => Card(
     color: Colors.white,
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
     child: Padding(
@@ -717,37 +723,37 @@ class _ReferralFormPageState extends State<ReferralFormPage>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text("開單日期", style: TextStyle(fontWeight: FontWeight.bold)),
+          Text(t.isZh ? "開單日期" : "Issue Date", style: const TextStyle(fontWeight: FontWeight.bold)),
           TextButton(
             onPressed: () => _pickDate(context, (d) {
               data.issueDate = d;
               data.update();
             }),
-            child: Text("日期：${_formatDate(data.issueDate ?? DateTime.now())}"),
+            child: Text("${t.date}：${_formatDate(t, data.issueDate ?? DateTime.now())}"),
           ),
           const SizedBox(height: 8),
-          const Text("安排就醫日期", style: TextStyle(fontWeight: FontWeight.bold)),
+          Text(t.isZh ? "安排就醫日期" : "Appointment Date", style: const TextStyle(fontWeight: FontWeight.bold)),
           TextButton(
             onPressed: () => _pickDate(context, (d) {
               data.appointmentDate = d;
               data.update();
             }),
             child: Text(
-              "日期：${_formatDate(data.appointmentDate ?? DateTime.now())}",
+              "${t.date}：${_formatDate(t, data.appointmentDate ?? DateTime.now())}",
             ),
           ),
           const SizedBox(height: 8),
-          _buildInputRow("安排就醫科別：", "選填就醫科別", appointmentDeptCtrl),
+          _buildInputRow(t, t.isZh ? "安排就醫科別：" : "Appointment Dept:", t.isZh ? "選填就醫科別" : "Optional dept", appointmentDeptCtrl),
           const SizedBox(height: 8),
-          _buildInputRow("安排就醫診間：", "選填就醫診間", appointmentRoomCtrl),
+          _buildInputRow(t, t.isZh ? "安排就醫診間：" : "Appointment Room:", t.isZh ? "選填就醫診間" : "Optional room", appointmentRoomCtrl),
           const SizedBox(height: 8),
-          _buildInputRow("安排就醫號碼：", "選填就醫號碼", appointmentNumberCtrl),
+          _buildInputRow(t, t.isZh ? "安排就醫號碼：" : "Appointment No:", t.isZh ? "選填就醫號碼" : "Optional number", appointmentNumberCtrl),
         ],
       ),
     ),
   );
 
-  Widget _buildRightCard4(ReferralData data) => Card(
+  Widget _buildRightCard4(AppTranslations t, ReferralData data) => Card(
     color: Colors.white,
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
     child: Padding(
@@ -755,26 +761,26 @@ class _ReferralFormPageState extends State<ReferralFormPage>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildInputRow("建議轉診院所名稱：", "聯新國際醫院", referralHospitalCtrl),
+          _buildInputRow(t, t.isZh ? "建議轉診院所名稱：" : "Referral Hospital:", t.isZh ? "諾新國際醫院" : "Landseed Hospital", referralHospitalCtrl),
           const SizedBox(height: 8),
-          _buildDropdown("建議院所科別：", deptList, data.referralDeptIdx, (idx) {
+          _buildDropdown(t, t.isZh ? "建議院所科別：" : "Referral Dept:", deptList, data.referralDeptIdx, (idx) {
             data.referralDeptIdx = idx;
             data.update();
           }),
           if (data.referralDeptIdx == deptList.indexOf("其他"))
-            _buildInputRow("其他：", "請輸入科別", otherReferralDeptCtrl),
+            _buildInputRow(t, "${t.other}：", t.isZh ? "請輸入科別" : "Enter department", otherReferralDeptCtrl),
           const SizedBox(height: 8),
-          _buildInputRow("建議院所醫師姓名：", "視情況填寫轉診院所醫師", referralDoctorCtrl),
+          _buildInputRow(t, t.isZh ? "建議院所醫師姓名：" : "Referral Doctor:", t.isZh ? "視情況填寫轉診院所醫師" : "Optional", referralDoctorCtrl),
           const SizedBox(height: 8),
-          _buildInputRow("建議院所地址：", "請填寫院所地址", referralAddressCtrl),
+          _buildInputRow(t, t.isZh ? "建議院所地址：" : "Hospital Address:", t.isZh ? "請填寫院所地址" : "Enter address", referralAddressCtrl),
           const SizedBox(height: 8),
-          _buildInputRow("建議院所電話：", "請填寫院所電話", referralPhoneCtrl),
+          _buildInputRow(t, t.isZh ? "建議院所電話：" : "Hospital Phone:", t.isZh ? "請填寫院所電話" : "Enter phone", referralPhoneCtrl),
         ],
       ),
     ),
   );
 
-  Widget _buildRadio(int value, String text, ReferralData data) {
+  Widget _buildRadio(AppTranslations t, int value, String text, ReferralData data) {
     return Row(
       children: [
         Radio<int>(
@@ -791,6 +797,7 @@ class _ReferralFormPageState extends State<ReferralFormPage>
   }
 
   Widget _buildRadioWithInput(
+    AppTranslations t,
     int value,
     String text,
     String label,
@@ -817,7 +824,7 @@ class _ReferralFormPageState extends State<ReferralFormPage>
         if (data.referralPurposeIdx == value)
           Padding(
             padding: const EdgeInsets.only(left: 36),
-            child: _buildInputRow(label, hint, ctrl),
+            child: _buildInputRow(t, label, hint, ctrl),
           ),
       ],
     );
@@ -838,11 +845,11 @@ class _ReferralFormPageState extends State<ReferralFormPage>
     }
   }
 
-  String _formatDate(DateTime dt) {
-    return '${dt.year}年${dt.month.toString().padLeft(2, '0')}月${dt.day.toString().padLeft(2, '0')}日';
+  String _formatDate(AppTranslations t, DateTime dt) {
+    return t.formatDate(dt);
   }
 
-  String _formatDateTime(DateTime dt) {
-    return '${dt.year}年${dt.month.toString().padLeft(2, '0')}月${dt.day.toString().padLeft(2, '0')}日';
+  String _formatDateTime(AppTranslations t, DateTime dt) {
+    return t.formatDate(dt);
   }
 }

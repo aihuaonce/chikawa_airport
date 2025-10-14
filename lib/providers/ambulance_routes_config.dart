@@ -10,6 +10,7 @@ import '../Ambulance_Personal.dart';
 import '../Ambulance_Situation.dart';
 import '../Ambulance_Plan.dart';
 import '../Ambulance_Expenses.dart';
+import '../BodyMap.dart';
 
 class AmbulanceRouteItem {
   final String label;
@@ -45,6 +46,10 @@ List<AmbulanceRouteItem> getAmbulanceRouteItems(AppTranslations t) {
       label: t.ambulanceExpenses, // 使用翻譯
       builder: (visitId, key) =>
           AmbulanceExpensesPage(key: key, visitId: visitId),
+    ),
+    AmbulanceRouteItem(
+      label: t.bodyDiagram, // 使用翻譯
+      builder: (visitId, key) => BodyMapPage(key: key, visitId: visitId),
     ),
   ];
 }

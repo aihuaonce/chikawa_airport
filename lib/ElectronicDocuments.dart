@@ -100,19 +100,9 @@ class _ElectronicDocumentsPageState extends State<ElectronicDocumentsPage>
 
     // 【新增】動態建立翻譯後的選項列表
     // 假設選項的順序和數量是固定的
-    final List<String> toOptions = [
-      t.toOption1,
-      t.toOption2,
-      t.toOption3,
-      t.other, // 從通用翻譯中複用 "其他"
-    ];
+    final List<String> toOptions = [t.toOption1, t.toOption2];
 
-    final List<String> fromOptions = [
-      t.fromOption1,
-      t.fromOption2,
-      t.fromOption3,
-      t.other, // 從通用翻譯中複用 "其他"
-    ];
+    final List<String> fromOptions = [t.fromOption1, t.fromOption2];
 
     if (_isLoading) {
       return const Center(child: CircularProgressIndicator());

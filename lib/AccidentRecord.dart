@@ -444,7 +444,7 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _datePicker(
-                        label: t.incidentDate + '？',
+                        label: t.incidentDate,
                         value: accidentData.incidentDate,
                         onChanged: (dt) {
                           accidentData.incidentDate = dt;
@@ -453,7 +453,7 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
                       ),
                       const SizedBox(height: 8),
                       _dateTimePicker(
-                        label: t.notifyTime + '？',
+                        label: t.notifyTime,
                         value: accidentData.notifyTime,
                         onChanged: (dt) {
                           accidentData.notifyTime = dt;
@@ -463,7 +463,7 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
                       ),
                       const SizedBox(height: 16),
 
-                      _boldLabel(t.reportUnit + '？'),
+                      _boldLabel(t.reportUnit),
                       const SizedBox(height: 6),
                       _radioWrap(
                         options: reportUnits,
@@ -486,14 +486,14 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
                       const SizedBox(height: 16),
 
                       _inputRowBold(
-                        t.reporterName + '？',
+                        t.reporterName,
                         t.enterReporterName,
                         notifierCtrl,
                         onChanged: _onTextFieldChanged,
                       ),
                       const SizedBox(height: 8),
                       _inputRowBold(
-                        t.phone + '？',
+                        t.phone,
                         t.enterContactNumber,
                         phoneCtrl,
                         onChanged: _onTextFieldChanged,

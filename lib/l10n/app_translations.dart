@@ -401,7 +401,7 @@ class AppTranslations {
   String get vitalSignsMonitoring => isZh ? '生命徵象監測' : 'Vital Signs Monitoring';
 
   // 人形圖
-  String get bodyDiagram => isZh ? '人形圖:' : 'Body Diagram';
+  String get bodyDiagram => isZh ? '人形圖' : 'Body Diagram';
   String get editBodyDiagram => isZh ? '開啟人形圖編輯功能' : 'Open body diagram editor';
   String get clickToEditDiagram =>
       isZh ? '點擊按鈕開始編輯人形圖' : 'Tap to start editing the body diagram';
@@ -564,7 +564,7 @@ class AppTranslations {
       isZh ? '離開醫院時間' : 'Time of Departure from Hospital';
   String get backToStandbyTime => isZh ? '返回待命時間' : 'Time Back to Standby';
   String get pleaseSelectTime => isZh ? '請選擇時間' : 'Please select time';
-  String get useCurrentTime => isZh ? '帶入現在時間' : 'Use Current Time';
+  String get useCurrentTime => isZh ? '更新時間' : 'Use Current Time';
 
   // 航廈 T1/T2 詳細地點
   String get departureBusDropOff => isZh ? '出境巴士下車處' : 'Departure Bus Drop-off';
@@ -785,19 +785,12 @@ class AppTranslations {
       : 'FROM: Landseed Hospital Taoyuan Airport Medical Center';
 
   // "TO" Options
-  String get toOption1 => isZh ? '醫師機場出診單' : 'Physician Airport Visit Form';
-  String get toOption2 => isZh ? '救護車派遣單' : 'Ambulance Dispatch Form';
-  String get toOption3 =>
-      isZh ? '航機空中醫療支援建議表' : 'In-Flight Medical Support Recommendation Form';
+  String get toOption1 => isZh ? 'T1 03-3063578' : 'T1 03-3063578';
+  String get toOption2 => isZh ? 'T2 03-3063367' : 'T2 03-3063367';
 
   // "FROM" Options
-  String get fromOption1 =>
-      isZh ? '旅客/民眾餐廳用餐後身體不適' : 'Passenger/Visitor unwell after dining';
-  String get fromOption2 => isZh
-      ? '旅客/民眾於機場內意外受傷'
-      : 'Passenger/Visitor injured in an accident at the airport';
-  String get fromOption3 =>
-      isZh ? '旅客/民眾於機場內身體不適' : 'Passenger/Visitor feels unwell at the airport';
+  String get fromOption1 => isZh ? 'T1 03-3834225' : 'T1 03-3834225';
+  String get fromOption2 => isZh ? 'T2 03-3983485' : 'T2 03-3983485';
 
   // ========== Emergency Accident Page (急救事故頁面) ==========
   String get incidentDateTime => isZh ? '事發日期與時間' : 'Incident Date & Time';
@@ -950,20 +943,20 @@ class AppTranslations {
 
   // ========== Medical Certificate Page (診斷證明頁面) ==========
   String get saveCertificateFailed =>
-      isZh ? '儲存診斷證明失敗: ' : 'Failed to save certificate: ';
-  String get diagnosisLabel => isZh ? '診斷：' : 'Diagnosis:';
+      isZh ? '儲存診斷證明失敗' : 'Failed to save certificate ';
+  String get diagnosisLabel => isZh ? '診斷' : 'Diagnosis';
   String get enterDiagnosisHint => isZh ? '請輸入診斷' : 'Please enter diagnosis';
   String get defaultInstructionPhrase =>
-      isZh ? '預設囑言片語：' : 'Default Instruction Phrase:';
+      isZh ? '預設囑言片語' : 'Default Instruction Phrase';
   String get fitToFly => isZh ? '適宜飛行' : 'Fit to Fly';
   String get referral => isZh ? '轉診後送' : 'Referral';
-  String get chineseInstructionLabel => isZh ? '中文囑言：' : 'Chinese Instruction:';
+  String get chineseInstructionLabel => isZh ? '中文囑言' : 'Chinese Instruction';
   String get enterChineseInstructionHint =>
       isZh ? '請輸入中文囑言' : 'Please enter Chinese instruction';
-  String get englishInstructionLabel => isZh ? '英文囑言：' : 'English Instruction:';
+  String get englishInstructionLabel => isZh ? '英文囑言' : 'English Instruction';
   String get enterEnglishInstructionHint =>
       isZh ? '請輸入英文囑言' : 'Please enter English instructions';
-  String get issueDateLabel => isZh ? '開立日期：' : 'Issue Date:';
+  String get issueDateLabel => isZh ? '開立日期' : 'Issue Date';
 
   // Pre-filled instruction texts
   String get fitToFlyInstructionChinese =>
@@ -1039,6 +1032,130 @@ class AppTranslations {
   String get nameHint => isZh ? '姓名' : 'Name';
   String get signatureHint => isZh ? '簽名' : 'Signature';
   String get addRow => isZh ? '＋ 加入資料行' : '+ Add Row';
+
+  // ========== Referral Form Page (轉診表單頁面) ==========
+  String get referralForm => isZh ? '轉診表單' : 'Referral Form';
+  String get contactPersonInfo => isZh ? '聯絡人資料' : 'Contact Person Information';
+  String get contactName => isZh ? '姓名:' : 'Name:';
+  String get enterContactName =>
+      isZh ? '請填寫聯絡人姓名' : 'Please enter contact name';
+  String get contactPhoneNumber => isZh ? '電話:' : 'Phone:';
+  String get enterContactPhone =>
+      isZh ? '請填寫聯絡人電話' : 'Please enter contact phone';
+  String get contactAddressLabel => isZh ? '地址:' : 'Address:';
+  String get enterContactAddress =>
+      isZh ? '請填寫聯絡人地址' : 'Please enter contact address';
+
+  String get diagnosisIcd10 =>
+      isZh ? '診斷ICD-10-CM/PCS病名' : 'Diagnosis ICD-10-CM/PCS';
+  String get primaryDiagnosis => isZh ? '主診斷:' : 'Primary Diagnosis:';
+  String get enterPrimaryDiagnosis => isZh ? '請輸入...' : 'Please enter...';
+  String get secondaryDiagnosis1Label =>
+      isZh ? '副診斷1:' : 'Secondary Diagnosis 1:';
+  String get secondaryDiagnosis2Label =>
+      isZh ? '副診斷2:' : 'Secondary Diagnosis 2:';
+
+  String get examTreatmentSummary =>
+      isZh ? '檢查及治療摘要' : 'Examination & Treatment Summary';
+  String get lastExamResultDate =>
+      isZh ? '最近一次檢查結果日期' : 'Latest Examination Result Date';
+  String get lastMedicationSurgeryDate =>
+      isZh ? '最近一次用藥或手術名稱日期' : 'Latest Medication/Surgery Date';
+
+  String get referralPurpose => isZh ? '轉診目的' : 'Referral Purpose';
+  String get emergencyTreatmentOption => isZh ? '急診治療' : 'Emergency Treatment';
+  String get hospitalization => isZh ? '住院治療' : 'Hospitalization';
+  String get outpatientTreatment => isZh ? '門診治療' : 'Outpatient Treatment';
+  String get furtherExamination => isZh ? '進一步檢查' : 'Further Examination';
+  String get examItem => isZh ? '檢查項目:' : 'Examination Item:';
+  String get enterExamItem =>
+      isZh ? '請填寫檢查項目' : 'Please enter examination item';
+  String get returnToOriginalFacility => isZh
+      ? '轉回轉出或適當之院所繼續追蹤'
+      : 'Return to Original/Appropriate Facility for Follow-up';
+  String get otherPurpose => isZh ? '其他' : 'Other';
+  String get otherReferralPurpose =>
+      isZh ? '其他轉診目的:' : 'Other Referral Purpose:';
+  String get enterOtherPurpose =>
+      isZh ? '請填寫其他轉診目的' : 'Please enter other purpose';
+
+  String get treatingPhysicianName =>
+      isZh ? '診治醫生姓名' : 'Treating Physician Name';
+  String get physicianName => isZh ? '醫師姓名:' : 'Physician Name:';
+  String get otherPhysician => isZh ? '其他:' : 'Other:';
+  String get enterPhysicianName => isZh ? '請輸入姓名' : 'Please enter name';
+
+  String get treatingPhysicianDept =>
+      isZh ? '診治醫生科別' : 'Treating Physician Department';
+  String get physicianDept => isZh ? '醫師科別:' : 'Physician Department:';
+  String get enterDeptName => isZh ? '請輸入科別' : 'Please enter department';
+
+  String get treatingPhysicianSignature =>
+      isZh ? '診治醫師簽名' : 'Treating Physician Signature';
+
+  String get issueDate => isZh ? '開單日期' : 'Issue Date';
+  String get dateLabel => isZh ? '日期:' : 'Date:';
+
+  String get appointmentDate => isZh ? '安排就醫日期' : 'Appointment Date';
+  String get appointmentDepartment =>
+      isZh ? '安排就醫科別:' : 'Appointment Department:';
+  String get enterAppointmentDept => isZh ? '選填就醫科別' : 'Optional department';
+  String get appointmentRoom => isZh ? '安排就醫診間:' : 'Appointment Room:';
+  String get enterAppointmentRoom => isZh ? '選填就醫診間' : 'Optional room';
+  String get appointmentNumberLabel => isZh ? '安排就醫號碼:' : 'Appointment Number:';
+  String get enterAppointmentNumber => isZh ? '選填就醫號碼' : 'Optional number';
+
+  String get recommendedReferralHospital =>
+      isZh ? '建議轉診院所名稱:' : 'Recommended Referral Hospital:';
+  String get landseedInternational =>
+      isZh ? '聯新國際醫院' : 'Landseed International Hospital';
+  String get recommendedHospitalDept =>
+      isZh ? '建議院所科別:' : 'Recommended Hospital Department:';
+  String get recommendedHospitalPhysician =>
+      isZh ? '建議院所醫師姓名:' : 'Recommended Hospital Physician:';
+  String get enterHospitalPhysician =>
+      isZh ? '視情況填寫轉診院所醫師' : 'Optional physician name';
+  String get recommendedHospitalAddress =>
+      isZh ? '建議院所地址:' : 'Recommended Hospital Address:';
+  String get enterHospitalAddress =>
+      isZh ? '請填寫院所地址' : 'Please enter hospital address';
+  String get recommendedHospitalPhone =>
+      isZh ? '建議院所電話:' : 'Recommended Hospital Phone:';
+  String get enterHospitalPhone =>
+      isZh ? '請填寫院所電話' : 'Please enter hospital phone';
+
+  String get consentStatement => isZh
+      ? '經醫師解釋病情及轉診目的後同意轉院。'
+      : 'Consent to transfer after physician explanation of condition and referral purpose.';
+  String get consentPersonSignature =>
+      isZh ? '同意人簽名' : 'Consent Person Signature';
+  String get relationToPatientLabel => isZh ? '與病人關係:' : 'Relation to Patient:';
+  String get enterRelation =>
+      isZh ? '請填寫同意人與病人關係' : 'Please enter relation to patient';
+  String get signatureDateTime => isZh ? '簽名日期:' : 'Signature Date:';
+  String get updateTimeButton => isZh ? '更新時間' : 'Update Time';
+
+  // Doctor names
+  String get doctorFang => isZh ? '方詩旋' : 'Dr. Fang';
+  String get doctorGu => isZh ? '古璿正' : 'Dr. Gu';
+  String get doctorJiang => isZh ? '江旺財' : 'Dr. Jiang';
+  String get doctorLu => isZh ? '呂學政' : 'Dr. Lu';
+  String get doctorZhou => isZh ? '周志勃' : 'Dr. Zhou';
+  String get doctorJin => isZh ? '金霞歌' : 'Dr. Jin';
+  String get doctorXu => isZh ? '徐丕' : 'Dr. Xu';
+  String get doctorKang => isZh ? '康曉妡' : 'Dr. Kang';
+
+  // Department names
+  String get emergencyMedicineDept => isZh ? '急診醫學科' : 'Emergency Medicine';
+  String get generalMedicineDept => isZh ? '不分科' : 'General Medicine';
+  String get familyMedicineDept => isZh ? '家醫科' : 'Family Medicine';
+  String get internalMedicineDept => isZh ? '內科' : 'Internal Medicine';
+  String get surgeryDept => isZh ? '外科' : 'Surgery';
+  String get pediatricsDept => isZh ? '小兒科' : 'Pediatrics';
+  String get obstetricsGynecologyDept =>
+      isZh ? '婦產科' : 'Obstetrics & Gynecology';
+  String get orthopedicsDept => isZh ? '骨科' : 'Orthopedics';
+  String get ophthalmologyDept => isZh ? '眼科' : 'Ophthalmology';
 }
 
 // Delegate for AppTranslations
