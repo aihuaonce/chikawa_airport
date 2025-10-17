@@ -41,6 +41,14 @@ class _EmergencyPlanPageState extends State<EmergencyPlanPage> {
   final emtSignatureController = TextEditingController();
   final otherHospitalController = TextEditingController();
   final otherEndResultController = TextEditingController();
+  final postResuscitationEController = TextEditingController();
+  final postResuscitationVController = TextEditingController();
+  final postResuscitationMController = TextEditingController();
+  final postResuscitationHeartRateController = TextEditingController();
+  final postResuscitationBloodPressureController = TextEditingController();
+  final postResuscitationLeftPupilSizeController = TextEditingController();
+  final postResuscitationRightPupilSizeController = TextEditingController();
+  final otherSupplementsController = TextEditingController();
 
   // 【註】人員名單通常不進行翻譯，因此保留為靜態數據
   final List<String> VisitingStaff = [
@@ -121,6 +129,18 @@ class _EmergencyPlanPageState extends State<EmergencyPlanPage> {
     emtSignatureController.text = data.emtSignature ?? '';
     otherHospitalController.text = data.otherHospital ?? '';
     otherEndResultController.text = data.otherEndResult ?? '';
+    postResuscitationEController.text = data.postResuscitationEvmE ?? '';
+    postResuscitationVController.text = data.postResuscitationEvmV ?? '';
+    postResuscitationMController.text = data.postResuscitationEvmM ?? '';
+    postResuscitationHeartRateController.text =
+        data.postResuscitationHeartRate ?? '';
+    postResuscitationBloodPressureController.text =
+        data.postResuscitationBloodPressure ?? '';
+    postResuscitationLeftPupilSizeController.text =
+        data.postResuscitationLeftPupilSize ?? '';
+    postResuscitationRightPupilSizeController.text =
+        data.postResuscitationRightPupilSize ?? '';
+    otherSupplementsController.text = data.otherSupplements ?? '';
   }
 
   @override
@@ -145,6 +165,15 @@ class _EmergencyPlanPageState extends State<EmergencyPlanPage> {
     emtSignatureController.dispose();
     otherHospitalController.dispose();
     otherEndResultController.dispose();
+    postResuscitationEController.dispose();
+    postResuscitationVController.dispose();
+    postResuscitationMController.dispose();
+    postResuscitationHeartRateController.dispose();
+    postResuscitationBloodPressureController.dispose();
+    postResuscitationLeftPupilSizeController.dispose();
+    postResuscitationRightPupilSizeController.dispose();
+    otherSupplementsController.dispose();
+
     super.dispose();
   }
 
@@ -171,6 +200,17 @@ class _EmergencyPlanPageState extends State<EmergencyPlanPage> {
       emtSignature: emtSignatureController.text,
       otherHospital: otherHospitalController.text,
       otherEndResult: otherEndResultController.text,
+      postResuscitationEvmE: postResuscitationEController.text,
+      postResuscitationEvmV: postResuscitationVController.text,
+      postResuscitationEvmM: postResuscitationMController.text,
+      postResuscitationHeartRate: postResuscitationHeartRateController.text,
+      postResuscitationBloodPressure:
+          postResuscitationBloodPressureController.text,
+      postResuscitationLeftPupilSize:
+          postResuscitationLeftPupilSizeController.text,
+      postResuscitationRightPupilSize:
+          postResuscitationRightPupilSizeController.text,
+      otherSupplements: otherSupplementsController.text,
     );
   }
 
@@ -354,6 +394,166 @@ class _EmergencyPlanPageState extends State<EmergencyPlanPage> {
                         situationController,
                         t.enterSituationDescription,
                       ), // 【修改】
+                    ],
+                  ),
+                ),
+
+                _buildInfoCard(
+                  title: "急救後病況",
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        "意識",
+                        style: TextStyle(fontSize: 14, color: labelColor),
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          _buildLabeledSmallTextField(
+                            'E?',
+                            postResuscitationEController,
+                          ),
+                          const SizedBox(width: 16),
+                          _buildLabeledSmallTextField(
+                            'V?',
+                            postResuscitationVController,
+                          ),
+                          const SizedBox(width: 16),
+                          _buildLabeledSmallTextField(
+                            'M?',
+                            postResuscitationMController,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      _buildTextField(
+                        "心跳(次/分)?",
+                        postResuscitationHeartRateController,
+                        "請輸入",
+                      ),
+                      const SizedBox(height: 16),
+                      const Text(
+                        "呼吸?",
+                        style: TextStyle(fontSize: 14, color: labelColor),
+                      ),
+                      Row(
+                        children: [
+                          _buildTappableRadioOption(
+                            title: "自發性呼吸",
+                            groupValue: data.postResuscitationRespirationMethod,
+                            onChanged: (v) => data.updatePlan(
+                              postResuscitationRespirationMethod: v,
+                            ),
+                          ),
+                          _buildTappableRadioOption(
+                            title: "呼吸器",
+                            groupValue: data.postResuscitationRespirationMethod,
+                            onChanged: (v) => data.updatePlan(
+                              postResuscitationRespirationMethod: v,
+                            ),
+                          ),
+                          _buildTappableRadioOption(
+                            title: "Ambu",
+                            groupValue: data.postResuscitationRespirationMethod,
+                            onChanged: (v) => data.updatePlan(
+                              postResuscitationRespirationMethod: v,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      _buildTextField(
+                        "血壓(mmHg)?",
+                        postResuscitationBloodPressureController,
+                        "請輸入收縮壓/舒張壓",
+                      ),
+                      const SizedBox(height: 16),
+                      const Text(
+                        "瞳孔",
+                        style: TextStyle(fontSize: 14, color: labelColor),
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          _buildLabeledSmallTextField(
+                            "Size(mm) 左?",
+                            postResuscitationLeftPupilSizeController,
+                          ),
+                          const SizedBox(width: 16),
+                          _buildLabeledSmallTextField(
+                            "右?",
+                            postResuscitationRightPupilSizeController,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          const Text("L-R 左?"),
+                          const SizedBox(width: 8),
+                          _buildTappableRadioOption(
+                            title: "+",
+                            groupValue:
+                                data.postResuscitationLeftPupilLightReflex,
+                            onChanged: (v) => data.updatePlan(
+                              postResuscitationLeftPupilLightReflex: v,
+                            ),
+                          ),
+                          _buildTappableRadioOption(
+                            title: "-",
+                            groupValue:
+                                data.postResuscitationLeftPupilLightReflex,
+                            onChanged: (v) => data.updatePlan(
+                              postResuscitationLeftPupilLightReflex: v,
+                            ),
+                          ),
+                          _buildTappableRadioOption(
+                            title: "±",
+                            groupValue:
+                                data.postResuscitationLeftPupilLightReflex,
+                            onChanged: (v) => data.updatePlan(
+                              postResuscitationLeftPupilLightReflex: v,
+                            ),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          const Text("右?"),
+                          const SizedBox(width: 24),
+                          _buildTappableRadioOption(
+                            title: "+",
+                            groupValue:
+                                data.postResuscitationRightPupilLightReflex,
+                            onChanged: (v) => data.updatePlan(
+                              postResuscitationRightPupilLightReflex: v,
+                            ),
+                          ),
+                          _buildTappableRadioOption(
+                            title: "-",
+                            groupValue:
+                                data.postResuscitationRightPupilLightReflex,
+                            onChanged: (v) => data.updatePlan(
+                              postResuscitationRightPupilLightReflex: v,
+                            ),
+                          ),
+                          _buildTappableRadioOption(
+                            title: "±",
+                            groupValue:
+                                data.postResuscitationRightPupilLightReflex,
+                            onChanged: (v) => data.updatePlan(
+                              postResuscitationRightPupilLightReflex: v,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      _buildTextField(
+                        "其他補充?",
+                        otherSupplementsController,
+                        "請輸入補充說明",
+                      ),
                     ],
                   ),
                 ),
