@@ -3,10 +3,10 @@ import 'package:chikawa_airport/providers/ambulance_routes_config.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'nav3.dart';
+// import 'nav3.dart'; // 【移除】
 import 'data/db/daos.dart';
 import 'data/models/ambulance_data.dart';
-import 'l10n/app_translations.dart'; // 【新增】引入翻譯
+import 'l10n/app_translations.dart';
 
 // ===================================================================
 // 1. 頁面主體 (Nav5Page Widget)
@@ -62,10 +62,10 @@ class AmbulanceMainLayout extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final navProvider = context.watch<AmbulanceNavigationProvider>();
-    final t = AppTranslations.of(context); // 【新增】
-    final ambulanceRouteItems = getAmbulanceRouteItems(t); // 【修改】
+    final t = AppTranslations.of(context);
+    final ambulanceRouteItems = getAmbulanceRouteItems(t);
 
-    // 【修改】簡化 Widget 創建邏輯
+    // 簡化 Widget 創建邏輯
     Widget currentPage = ambulanceRouteItems[navProvider.selectedIndex].builder(
       visitId,
       GlobalKey(),
@@ -81,11 +81,12 @@ class AmbulanceMainLayout extends StatelessWidget {
             Expanded(
               child: Column(
                 children: [
-                  const Padding(
-                    padding: EdgeInsets.only(top: 12),
-                    child: Nav3Section(),
-                  ),
-                  const SizedBox(height: 8),
+                  // 【移除】Nav3Section
+                  // const Padding(
+                  //   padding: EdgeInsets.only(top: 12),
+                  //   child: Nav3Section(),
+                  // ),
+                  const SizedBox(height: 20), // 【新增】替代的間距
                   Expanded(child: SingleChildScrollView(child: currentPage)),
                 ],
               ),
@@ -112,7 +113,7 @@ class _AmbulanceNavBarState extends State<AmbulanceNavBar> {
 
   Future<void> _handleSave() async {
     if (_isSaving || !mounted) return;
-    final t = AppTranslations.of(context); // 【新增】
+    final t = AppTranslations.of(context);
 
     setState(() => _isSaving = true);
 
@@ -127,7 +128,7 @@ class _AmbulanceNavBarState extends State<AmbulanceNavBar> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(t.ambulanceSaved), // 【修改】
+            content: Text(t.ambulanceSaved),
             backgroundColor: Colors.green,
             duration: const Duration(seconds: 2),
           ),
@@ -135,11 +136,10 @@ class _AmbulanceNavBarState extends State<AmbulanceNavBar> {
         Navigator.of(context).pop();
       }
     } catch (e, stackTrace) {
-      print('❌ 儲存失敗: $e');
+      print('救護車儲存失敗: $e');
       print('堆疊: $stackTrace');
 
       if (mounted) {
-        // 【修改】使用已有的翻譯鍵
         final errorMessage = '${t.saveFailed}: $e';
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(errorMessage), backgroundColor: Colors.red),
@@ -155,8 +155,8 @@ class _AmbulanceNavBarState extends State<AmbulanceNavBar> {
   @override
   Widget build(BuildContext context) {
     final navProvider = context.watch<AmbulanceNavigationProvider>();
-    final t = AppTranslations.of(context); // 【新增】
-    // 【修改】動態獲取翻譯後的路由項目
+    final t = AppTranslations.of(context);
+    // 動態獲取翻譯後的路由項目
     final items = getAmbulanceRouteItems(t).map((e) => e.label).toList();
 
     return Container(
@@ -184,7 +184,7 @@ class _AmbulanceNavBarState extends State<AmbulanceNavBar> {
           ),
           const SizedBox(width: 12),
           IconButton(
-            tooltip: _isSaving ? t.saving : t.saveAllPages, // 【修改】
+            tooltip: _isSaving ? t.saving : t.saveAllPages,
             icon: _isSaving
                 ? const SizedBox(
                     width: 20,

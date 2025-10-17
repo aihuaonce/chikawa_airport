@@ -6,7 +6,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:provider/provider.dart';
 import '../data/db/daos.dart';
 import '../data/models/patient_data.dart';
-import '../l10n/app_translations.dart'; // 【新增】引入翻譯
+import '../l10n/app_translations.dart';
 import 'nav2.dart';
 
 class PersonalInformationPage extends StatefulWidget {
@@ -21,6 +21,7 @@ class PersonalInformationPage extends StatefulWidget {
 
 class _PersonalInformationPageState extends State<PersonalInformationPage>
     with AutomaticKeepAliveClientMixin, SavableStateMixin {
+  late TextEditingController nameController; // 新增：姓名控制器
   late TextEditingController idController;
   late TextEditingController addrController;
   late TextEditingController phoneController;
@@ -34,6 +35,7 @@ class _PersonalInformationPageState extends State<PersonalInformationPage>
   @override
   void initState() {
     super.initState();
+    nameController = TextEditingController(); // 新增
     idController = TextEditingController();
     addrController = TextEditingController();
     phoneController = TextEditingController();
@@ -43,6 +45,7 @@ class _PersonalInformationPageState extends State<PersonalInformationPage>
 
   @override
   void dispose() {
+    nameController.dispose(); // 新增
     idController.dispose();
     addrController.dispose();
     phoneController.dispose();
@@ -65,6 +68,10 @@ class _PersonalInformationPageState extends State<PersonalInformationPage>
       final dao = context.read<PatientProfilesDao>();
       final profile = await dao.getByVisitId(widget.visitId);
 
+      // 同時載入 Visit 資料以取得姓名
+      final visitDao = context.read<VisitsDao>();
+      final visit = await visitDao.getById(widget.visitId);
+
       if (!mounted) return;
 
       final patientData = context.read<PatientData>();
@@ -84,6 +91,13 @@ class _PersonalInformationPageState extends State<PersonalInformationPage>
         addrController.text = patientData.address ?? '';
         phoneController.text = patientData.phone ?? '';
         reasonController.text = patientData.reason ?? '';
+      }
+
+      // 載入姓名
+      if (visit != null && visit.patientName != null) {
+        nameController.text = visit.patientName!;
+        patientData.patientName = visit.patientName; // 假設 PatientData 有這個欄位
+        patientData.update();
       }
     } catch (e) {
       // Handle error
@@ -122,7 +136,7 @@ class _PersonalInformationPageState extends State<PersonalInformationPage>
 
   Future<void> _pickPhoto() async {
     if (!mounted) return;
-    final t = AppTranslations.of(context); // 【新增】
+    final t = AppTranslations.of(context);
     try {
       final patientData = context.read<PatientData>();
 
@@ -142,9 +156,9 @@ class _PersonalInformationPageState extends State<PersonalInformationPage>
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${t.photoSelectionFailed}$e')),
-        ); // 【修改】
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('${t.photoSelectionFailed}$e')));
       }
     }
   }
@@ -152,23 +166,18 @@ class _PersonalInformationPageState extends State<PersonalInformationPage>
   Future<void> _save() async {
     try {
       final patientData = context.read<PatientData>();
-      final dao = context.read<PatientProfilesDao>();
+      final patientDao = context.read<PatientProfilesDao>();
+      final visitsDao = context.read<VisitsDao>();
 
+      // 步驟 1：在儲存前，確保將 Controller 的最新內容同步到 patientData
+      patientData.patientName = nameController.text.trim();
       patientData.idNumber = idController.text.trim();
       patientData.address = addrController.text.trim();
       patientData.phone = phoneController.text.trim();
+      patientData.reason = reasonController.text.trim();
 
-      await dao.upsertByVisitId(
-        visitId: widget.visitId,
-        birthday: patientData.birthday,
-        gender: patientData.gender,
-        reason: patientData.reason,
-        nationality: patientData.nationality,
-        idNumber: patientData.idNumber,
-        address: patientData.address,
-        phone: patientData.phone,
-        photoPath: patientData.photoBase64,
-      );
+      // 步驟 2：✅ 正確做法：一行程式碼，呼叫您在 PatientData 中完美封裝好的方法
+      await patientData.saveToDatabase(widget.visitId, patientDao, visitsDao);
     } catch (e) {
       rethrow;
     }
@@ -181,6 +190,7 @@ class _PersonalInformationPageState extends State<PersonalInformationPage>
         patientData.idNumber = idController.text.trim();
         patientData.address = addrController.text.trim();
         patientData.phone = phoneController.text.trim();
+        patientData.patientName = nameController.text.trim(); // 新增
         patientData.update();
       }
     });
@@ -189,9 +199,8 @@ class _PersonalInformationPageState extends State<PersonalInformationPage>
   @override
   Widget build(BuildContext context) {
     if (_isLoading) return const Center(child: CircularProgressIndicator());
-    final t = AppTranslations.of(context); // 【新增】
+    final t = AppTranslations.of(context);
 
-    // 【新增】動態建立選項列表
     final purposeOptions = {
       '航空公司機組員': t.airlineCrew,
       '旅客/民眾': t.passenger,
@@ -233,8 +242,38 @@ class _PersonalInformationPageState extends State<PersonalInformationPage>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _SectionTitle(t.personalInformation), // 【修改】
+                    _SectionTitle(t.personalInformation),
                     const SizedBox(height: 16),
+
+                    // 新增：患者姓名輸入欄位
+                    TextFormField(
+                      controller: nameController,
+                      decoration: InputDecoration(
+                        labelText: t.patientNamePlaceholder, // 使用翻譯的姓名標籤
+                        border: const OutlineInputBorder(),
+                        labelStyle: TextStyle(
+                          color: nameController.text.isEmpty
+                              ? const Color(0xFFDC3545) // 紅色
+                              : Colors.black54, // 正常顏色
+                          fontWeight: nameController.text.isEmpty
+                              ? FontWeight.bold
+                              : FontWeight.normal,
+                        ),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return t.patientNamePlaceholder; // 使用翻譯的錯誤訊息
+                        }
+                        return null;
+                      },
+                      onChanged: (val) {
+                        patientData.patientName = val.trim();
+                        _onTextFieldChanged();
+                        setState(() {}); // 觸發重繪以更新標籤顏色
+                      },
+                    ),
+                    const SizedBox(height: 16),
+
                     GestureDetector(
                       onTap: _pickPhoto,
                       child: Container(
@@ -265,7 +304,7 @@ class _PersonalInformationPageState extends State<PersonalInformationPage>
                       onTap: _pickBirthday,
                       child: InputDecorator(
                         decoration: InputDecoration(
-                          labelText: t.birthday, // 【修改】
+                          labelText: t.birthday,
                           border: const OutlineInputBorder(),
                         ),
                         child: Row(
@@ -273,11 +312,8 @@ class _PersonalInformationPageState extends State<PersonalInformationPage>
                             Expanded(
                               child: Text(
                                 patientData.birthday == null
-                                    ? t
-                                          .notSelected // 【修改】
-                                    : t.formatDate(
-                                        patientData.birthday!,
-                                      ), // 【修改】使用新方法
+                                    ? t.notSelected
+                                    : t.formatDate(patientData.birthday!),
                               ),
                             ),
                             const Icon(Icons.calendar_today, size: 20),
@@ -288,22 +324,22 @@ class _PersonalInformationPageState extends State<PersonalInformationPage>
                     const SizedBox(height: 16),
                     InputDecorator(
                       decoration: InputDecoration(
-                        labelText: t.age, // 【修改】
+                        labelText: t.age,
                         border: const OutlineInputBorder(),
                       ),
                       child: Text(
                         patientData.age != null
-                            ? t.ageWithUnit(patientData.age!) // 【修改】使用新方法
-                            : t.birthdayNotSelected, // 【修改】
+                            ? t.ageWithUnit(patientData.age!)
+                            : t.birthdayNotSelected,
                       ),
                     ),
                     const SizedBox(height: 16),
-                    _SectionTitle(t.gender), // 【修改】
+                    _SectionTitle(t.gender),
                     Row(
                       children: [
                         Expanded(
                           child: RadioListTile<String>(
-                            title: Text(t.male), // 【修改】
+                            title: Text(t.male),
                             value: '男', // DB value
                             groupValue: patientData.gender,
                             activeColor: const Color(0xFF83ACA9),
@@ -315,7 +351,7 @@ class _PersonalInformationPageState extends State<PersonalInformationPage>
                         ),
                         Expanded(
                           child: RadioListTile<String>(
-                            title: Text(t.female), // 【修改】
+                            title: Text(t.female),
                             value: '女', // DB value
                             groupValue: patientData.gender,
                             activeColor: const Color(0xFF83ACA9),
@@ -331,12 +367,12 @@ class _PersonalInformationPageState extends State<PersonalInformationPage>
                     TextFormField(
                       controller: idController,
                       decoration: InputDecoration(
-                        labelText: t.passportOrId, // 【修改】
+                        labelText: t.passportOrId,
                         border: const OutlineInputBorder(),
                       ),
                       validator: (value) {
                         if (value == null || value.trim().isEmpty) {
-                          return t.enterPassportOrId; // 【修改】
+                          return t.enterPassportOrId;
                         }
                         return null;
                       },
@@ -346,7 +382,7 @@ class _PersonalInformationPageState extends State<PersonalInformationPage>
                       },
                     ),
                     const SizedBox(height: 16),
-                    _SectionTitle(t.purposeOfVisit), // 【修改】
+                    _SectionTitle(t.purposeOfVisit),
                     Column(
                       children: purposeOptions.entries.map((entry) {
                         return RadioListTile<String>(
@@ -362,7 +398,7 @@ class _PersonalInformationPageState extends State<PersonalInformationPage>
                       }).toList(),
                     ),
                     const SizedBox(height: 16),
-                    _SectionTitle(t.nationality), // 【修改】
+                    _SectionTitle(t.nationality),
                     Column(
                       children: nationalityOptions.entries.map((entry) {
                         return RadioListTile<String>(
@@ -381,7 +417,7 @@ class _PersonalInformationPageState extends State<PersonalInformationPage>
                     TextFormField(
                       controller: addrController,
                       decoration: InputDecoration(
-                        labelText: t.address, // 【修改】
+                        labelText: t.address,
                         border: const OutlineInputBorder(),
                       ),
                       maxLines: 2,
@@ -394,13 +430,13 @@ class _PersonalInformationPageState extends State<PersonalInformationPage>
                     TextFormField(
                       controller: phoneController,
                       decoration: InputDecoration(
-                        labelText: t.contactNumber, // 【修改】
+                        labelText: t.contactNumber,
                         border: const OutlineInputBorder(),
                       ),
                       keyboardType: TextInputType.phone,
                       validator: (value) {
                         if (value == null || value.trim().isEmpty) {
-                          return t.enterContactNumber; // 【修改】
+                          return t.enterContactNumber;
                         }
                         return null;
                       },

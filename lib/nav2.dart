@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:chikawa_airport/nav3.dart';
+// import 'package:chikawa_airport/nav3.dart'; // 【移除】
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'AccidentRecord.dart';
@@ -53,11 +53,6 @@ class _Nav2PageState extends State<Nav2Page> with WidgetsBindingObserver {
 
   void _initializePageKeys() {
     for (int i = 0; i < routeItems.length; i++) {
-      // 雖然這裡 GlobalKey 仍然使用通用型別，但我們會在 _savePageByIndex 中處理型別轉換
-      // 保持 GlobalKey<State> 的彈性是必要的，因為有些頁面可能沒有 Mixin
-      // 但為了讓編譯器更友善，我們可以將其宣告為 GlobalKey<State>
-
-      // 由於您使用了 Mixin，最穩妥的作法是保持 GlobalKey()，並在 _savePageByIndex 中處理。
       _pageKeys[i] = GlobalKey();
     }
   }
@@ -101,7 +96,6 @@ class _Nav2PageState extends State<Nav2Page> with WidgetsBindingObserver {
 
       // 檢查是否有 SavableStateMixin
       if (state is SavableStateMixin) {
-        // ✅ 關鍵修正：必須先轉型，才能呼叫 saveData()
         await (state as SavableStateMixin).saveData();
         return true;
       } else {
@@ -163,8 +157,7 @@ class _Nav2PageState extends State<Nav2Page> with WidgetsBindingObserver {
         errorMessages.add('${t.commonData}: ${e.toString()}');
       }
 
-      // ✅ 關鍵修改：儲存完成後，清除快取並重建所有頁面
-      // 這樣下次切換到頁面時會重新執行 initState，從資料庫載入最新資料
+      // 儲存完成後，清除快取並重建所有頁面
       debugPrint("🔄 清除頁面快取並重建...");
       _cachedPages.clear();
       _pageKeys.clear();
@@ -202,12 +195,11 @@ class _Nav2PageState extends State<Nav2Page> with WidgetsBindingObserver {
     List<String> errors,
     List<String> successes,
   ) {
-    // 【修改】
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(t.saveResult), // 【修改】
+          title: Text(t.saveResult),
           content: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -215,7 +207,7 @@ class _Nav2PageState extends State<Nav2Page> with WidgetsBindingObserver {
               children: [
                 if (successes.isNotEmpty) ...[
                   Text(
-                    t.savedSuccessfully, // 【修改】
+                    t.savedSuccessfully,
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       color: Colors.green,
@@ -226,7 +218,7 @@ class _Nav2PageState extends State<Nav2Page> with WidgetsBindingObserver {
                 ],
                 if (errors.isNotEmpty) ...[
                   Text(
-                    t.saveFailedLabel, // 【修改】
+                    t.saveFailedLabel,
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       color: Colors.red,
@@ -240,7 +232,7 @@ class _Nav2PageState extends State<Nav2Page> with WidgetsBindingObserver {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: Text(t.confirm), // 【修改】
+              child: Text(t.confirm),
             ),
             if (errors.isNotEmpty)
               TextButton(
@@ -248,7 +240,7 @@ class _Nav2PageState extends State<Nav2Page> with WidgetsBindingObserver {
                   Navigator.of(context).pop();
                   _saveAllPages();
                 },
-                child: Text(t.retry), // 【修改】
+                child: Text(t.retry),
               ),
           ],
         );
@@ -257,10 +249,9 @@ class _Nav2PageState extends State<Nav2Page> with WidgetsBindingObserver {
   }
 
   void _showSuccessMessage(AppTranslations t) {
-    // 【修改】
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(t.saveSuccess), // 【修改】
+        content: Text(t.saveSuccess),
         backgroundColor: Colors.green,
         duration: const Duration(seconds: 2),
       ),
@@ -272,29 +263,8 @@ class _Nav2PageState extends State<Nav2Page> with WidgetsBindingObserver {
     final patientDao = context.read<PatientProfilesDao>();
     final visitsDao = context.read<VisitsDao>();
 
-    // 儲存 base64 照片
-    final String? base64Photo = patientData.photoBase64;
-
-    // 寫入 PatientProfiles
-    await patientDao.upsertByVisitId(
-      visitId: widget.visitId,
-      birthday: patientData.birthday,
-      gender: patientData.gender,
-      reason: patientData.reason,
-      nationality: patientData.nationality,
-      idNumber: patientData.idNumber,
-      address: patientData.address,
-      phone: patientData.phone,
-      photoPath: base64Photo,
-    );
-
-    // 同步回 Visits 主檔
-    await visitsDao.updateVisitSummary(
-      widget.visitId,
-      gender: patientData.gender,
-      nationality: patientData.nationality,
-      note: patientData.note,
-    );
+    // ✅ 正確做法：一行程式碼，呼叫您在 PatientData 中完美封裝好的方法
+    await patientData.saveToDatabase(widget.visitId, patientDao, visitsDao);
 
     // 儲存完畢後清空 PatientData
     patientData.clear();
@@ -359,10 +329,12 @@ class _Nav2PageState extends State<Nav2Page> with WidgetsBindingObserver {
                       ),
               ],
             ),
-            const Padding(
-              padding: EdgeInsets.only(top: 12),
-              child: Nav3Section(),
-            ),
+            // 【移除】Nav3Section
+            // const Padding(
+            //   padding: EdgeInsets.only(top: 12),
+            //   child: Nav3Section(),
+            // ),
+            const SizedBox(height: 12), // 【新增】替代的間距
             // 頁面內容
             Expanded(
               child: _cachedPages.isEmpty

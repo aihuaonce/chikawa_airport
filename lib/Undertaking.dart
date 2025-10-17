@@ -104,19 +104,13 @@ class _UndertakingPageState extends State<UndertakingPage>
   }
 
   Future<void> _saveData() async {
-    final dao = context.read<UndertakingsDao>();
+    // 1. 取得所有需要的 DAO 和 Data Model
+    final undertakingDao = context.read<UndertakingsDao>();
+    final visitsDao = context.read<VisitsDao>();
     final dataModel = context.read<UndertakingData>();
-    await dao.upsertByVisitId(
-      visitId: widget.visitId,
-      signerName: dataModel.signerName,
-      signerId: dataModel.signerId,
-      isSelf: dataModel.isSelf,
-      relation: dataModel.relation,
-      address: dataModel.address,
-      phone: dataModel.phone,
-      doctor: dataModel.doctor,
-      signatureBytes: dataModel.signatureBytes,
-    );
+
+    // 2. ✅ 正確做法：一行程式碼，呼叫您在 UndertakingData 中完美封裝好的方法
+    await dataModel.saveToDatabase(widget.visitId, undertakingDao, visitsDao);
   }
 
   void _syncDataToControllers(UndertakingData dataModel) {

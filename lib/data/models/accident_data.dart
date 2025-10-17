@@ -1,8 +1,10 @@
-// data/models/accident_data.dart
+// ==================== 1️⃣ accident_data.dart ====================
 import 'package:flutter/material.dart';
+import 'package:chikawa_airport/data/db/app_database.dart';
+import 'package:drift/drift.dart';
+import '../db/daos.dart';
 
 class AccidentData extends ChangeNotifier {
-  // 時間相關
   DateTime? incidentDate;
   DateTime? notifyTime;
   DateTime? pickUpTime;
@@ -11,7 +13,6 @@ class AccidentData extends ChangeNotifier {
   DateTime? landingTime;
   DateTime? checkTime;
 
-  // 基本資訊
   int? reportUnitIdx;
   String? otherReportUnit;
   String? notifier;
@@ -22,7 +23,6 @@ class AccidentData extends ChangeNotifier {
   String? cost;
   int? within10min;
 
-  // 地點細項選擇
   int? t1Selected;
   int? t2Selected;
   int? remoteSelected;
@@ -30,7 +30,6 @@ class AccidentData extends ChangeNotifier {
   int? novotelSelected;
   int? cabinSelected;
 
-  // 原因選項
   bool reasonPreLanding = false;
   bool reasonOnDuty = false;
   bool reasonOther = false;
@@ -64,5 +63,49 @@ class AccidentData extends ChangeNotifier {
     reasonOther = false;
     otherReasonText = null;
     notifyListeners();
+  }
+
+  // ✅ 新增：轉換為 Companion
+  AccidentRecordsCompanion toCompanion(int visitId) {
+    return AccidentRecordsCompanion(
+      visitId: Value(visitId),
+      incidentDate: Value(incidentDate),
+      notifyTime: Value(notifyTime),
+      pickUpTime: Value(pickUpTime),
+      medicArriveTime: Value(medicArriveTime),
+      ambulanceDepartTime: Value(medicDepartTime),
+      checkTime: Value(checkTime),
+      landingTime: Value(landingTime),
+      reportUnitIdx: Value(reportUnitIdx),
+      otherReportUnit: Value(otherReportUnit),
+      notifier: Value(notifier),
+      phone: Value(phone),
+      placeIdx: Value(placeGroupIdx),
+      placeNote: Value(placeNote),
+      t1PlaceIdx: Value(t1Selected),
+      t2PlaceIdx: Value(t2Selected),
+      remotePlaceIdx: Value(remoteSelected),
+      cargoPlaceIdx: Value(cargoSelected),
+      novotelPlaceIdx: Value(novotelSelected),
+      cabinPlaceIdx: Value(cabinSelected),
+      occArrived: Value(occArrived),
+      cost: Value(cost),
+      within10min: Value(within10min),
+      reasonLanding: Value(reasonPreLanding),
+      reasonOnline: Value(reasonOnDuty),
+      reasonOther: Value(reasonOther),
+      reasonOtherText: Value(otherReasonText),
+    );
+  }
+
+  // ✅ 簡化後的保存方法
+  Future<void> saveToDatabase(int visitId, AccidentRecordsDao dao) async {
+    try {
+      await dao.upsert(toCompanion(visitId));
+      print('✅ 事故記錄已儲存');
+    } catch (e) {
+      print('❌ 儲存失敗: $e');
+      rethrow;
+    }
   }
 }

@@ -99,18 +99,8 @@ class _FlightLogPageState extends State<FlightLogPage>
     final dao = context.read<FlightLogsDao>();
     final data = context.read<FlightLogData>();
 
-    await dao.upsertByVisitId(
-      visitId: widget.visitId,
-      airlineIndex: data.airlineIndex,
-      useOtherAirline: data.useOtherAirline,
-      otherAirline: data.selectedOtherAirline,
-      flightNo: data.flightNo,
-      travelStatusIndex: data.travelStatusIndex,
-      otherTravelStatus: data.otherTravelStatus,
-      departure: data.departure,
-      via: data.via,
-      destination: data.destination,
-    );
+    // ✅ 正確做法：呼叫您在 FlightLogData 中定義好的新方法
+    await data.saveToDatabase(widget.visitId, dao);
   }
 
   // ================= build =================

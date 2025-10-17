@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'nav3.dart';
+// import 'nav3.dart'; // 【移除】
 import 'data/models/emergency_data.dart';
 import 'data/db/daos.dart';
-import 'l10n/app_translations.dart'; // 【新增】引入翻譯
+import 'l10n/app_translations.dart';
 import 'providers/emergency_navigation_provider.dart';
 
 import 'Emergency_Personal.dart';
@@ -79,11 +79,12 @@ class EmergencyMainLayout extends StatelessWidget {
             Expanded(
               child: Column(
                 children: [
-                  const Padding(
-                    padding: EdgeInsets.only(top: 12),
-                    child: Nav3Section(),
-                  ),
-                  const SizedBox(height: 8),
+                  // 【移除】Nav3Section
+                  // const Padding(
+                  //   padding: EdgeInsets.only(top: 12),
+                  //   child: Nav3Section(),
+                  // ),
+                  const SizedBox(height: 20), // 【新增】替代的間距
                   Expanded(child: SingleChildScrollView(child: currentPage)),
                 ],
               ),
@@ -107,7 +108,7 @@ class _EmergencyNavBarState extends State<EmergencyNavBar> {
 
   Future<void> _handleSave() async {
     if (_isSaving || !mounted) return;
-    final t = AppTranslations.of(context); // 【新增】
+    final t = AppTranslations.of(context);
 
     setState(() => _isSaving = true);
 
@@ -121,7 +122,7 @@ class _EmergencyNavBarState extends State<EmergencyNavBar> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(t.emergencySaved), // 【修改】
+            content: Text(t.emergencySaved),
             backgroundColor: Colors.green,
             duration: const Duration(seconds: 2),
           ),
@@ -133,7 +134,6 @@ class _EmergencyNavBarState extends State<EmergencyNavBar> {
       print('堆疊: $stackTrace');
 
       if (mounted) {
-        // 【修改】使用已有的翻譯鍵
         final errorMessage = '${t.saveFailed}: $e';
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(errorMessage), backgroundColor: Colors.red),
@@ -149,9 +149,9 @@ class _EmergencyNavBarState extends State<EmergencyNavBar> {
   @override
   Widget build(BuildContext context) {
     final navProvider = context.watch<EmergencyNavigationProvider>();
-    final t = AppTranslations.of(context); // 【新增】
+    final t = AppTranslations.of(context);
 
-    // 【修改】動態建立翻譯後的導航項目列表
+    // 動態建立翻譯後的導航項目列表
     final List<String> items = [
       t.personalInfo,
       t.flightRecord,
@@ -173,7 +173,7 @@ class _EmergencyNavBarState extends State<EmergencyNavBar> {
                   return Padding(
                     padding: const EdgeInsets.only(right: 8),
                     child: _PillButton(
-                      label: items[i], // 【修改】使用翻譯後的列表
+                      label: items[i],
                       active: i == navProvider.selectedIndex,
                       onTap: () => navProvider.setSelectedIndex(i),
                     ),
@@ -184,7 +184,7 @@ class _EmergencyNavBarState extends State<EmergencyNavBar> {
           ),
           const SizedBox(width: 12),
           IconButton(
-            tooltip: _isSaving ? t.saving : t.saveAllPages, // 【修改】
+            tooltip: _isSaving ? t.saving : t.saveAllPages,
             icon: _isSaving
                 ? const SizedBox(
                     width: 20,
