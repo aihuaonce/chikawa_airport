@@ -81,10 +81,10 @@ class _NursingRecordPageState extends State<NursingRecordPage>
   Future<void> _saveData() async {
     final dao = context.read<NursingRecordsDao>();
     final dataModel = context.read<NursingRecordData>();
-    final recordsToSave = dataModel.nursingRecords
-        .map((entry) => entry.toMap())
-        .toList();
-    await dao.upsertByVisitId(visitId: widget.visitId, records: recordsToSave);
+
+    // ✅ 正確做法：直接呼叫您在 dataModel 中定義好的新方法
+    //    它會自動處理 JSON 轉換和資料庫操作
+    await dataModel.saveToDatabase(widget.visitId, dao);
   }
 
   // ===============================================

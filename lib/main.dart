@@ -24,6 +24,8 @@ import 'data/db/app_database.dart';
 import 'main_page.dart';
 
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
   final db = AppDatabase();
 
   final localeProvider = LocaleProvider();

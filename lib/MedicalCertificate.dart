@@ -92,14 +92,9 @@ class _MedicalCertificatePageState extends State<MedicalCertificatePage>
   Future<void> _saveData() async {
     final dao = context.read<MedicalCertificatesDao>();
     final dataModel = context.read<CertificateData>();
-    await dao.upsertByVisitId(
-      visitId: widget.visitId,
-      diagnosis: dataModel.diagnosis,
-      instructionOption: dataModel.instructionOption,
-      chineseInstruction: dataModel.chineseInstruction,
-      englishInstruction: dataModel.englishInstruction,
-      issueDate: dataModel.issueDate,
-    );
+
+    // ✅ 正確做法：直接呼叫您在 dataModel 中定義好的新方法
+    await dataModel.saveToDatabase(widget.visitId, dao);
   }
 
   void _syncDataToControllers(CertificateData dataModel) {

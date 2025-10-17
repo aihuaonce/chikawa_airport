@@ -322,45 +322,20 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
   }
 
   Future<void> _saveData() async {
-    try {
-      final dao = context.read<AccidentRecordsDao>();
-      final accidentData = context.read<AccidentData>();
+  try {
+    final dao = context.read<AccidentRecordsDao>();
+    final accidentData = context.read<AccidentData>();
 
-      await dao.upsertByVisitId(
-        visitId: widget.visitId,
-        incidentDate: accidentData.incidentDate,
-        notifyTime: accidentData.notifyTime,
-        pickUpTime: accidentData.pickUpTime,
-        medicArriveTime: accidentData.medicArriveTime,
-        ambulanceDepartTime: accidentData.medicDepartTime,
-        checkTime: accidentData.checkTime,
-        landingTime: accidentData.landingTime,
-        reportUnitIdx: accidentData.reportUnitIdx,
-        otherReportUnit: accidentData.otherReportUnit,
-        notifier: accidentData.notifier,
-        phone: accidentData.phone,
-        placeIdx: accidentData.placeGroupIdx,
-        placeNote: accidentData.placeNote,
+    // ✅ 正確做法：呼叫您在 AccidentData 中定義好的新方法
+    //    這個方法會自動處理 toCompanion 的轉換並呼叫 dao.upsert
+    await accidentData.saveToDatabase(widget.visitId, dao);
 
-        t1PlaceIdx: accidentData.t1Selected,
-        t2PlaceIdx: accidentData.t2Selected,
-        remotePlaceIdx: accidentData.remoteSelected,
-        cargoPlaceIdx: accidentData.cargoSelected,
-        novotelPlaceIdx: accidentData.novotelSelected,
-        cabinPlaceIdx: accidentData.cabinSelected,
-
-        occArrived: accidentData.occArrived,
-        cost: accidentData.cost,
-        within10min: accidentData.within10min,
-        reasonLanding: accidentData.reasonPreLanding,
-        reasonOnline: accidentData.reasonOnDuty,
-        reasonOther: accidentData.reasonOther,
-        reasonOtherText: accidentData.otherReasonText,
-      );
-    } catch (e) {
-      rethrow;
-    }
+  } catch (e) {
+    // 建議加上日誌記錄，以便追蹤問題
+    print('❌ 在 AccidentRecordPage 儲存失敗: $e');
+    rethrow;
   }
+}
 
   // 計算醫護到達與通報時間差以顯示分秒與 within10min
   void _calculateTimeDifference(AccidentData accidentData) {

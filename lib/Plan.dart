@@ -516,88 +516,13 @@ class _PlanPageState extends State<PlanPage>
   }
 
   Future<void> _saveData() async {
-    final dao = context.read<TreatmentsDao>();
+    final planDao = context.read<TreatmentsDao>();
+    final visitsDao = context.read<VisitsDao>();
     final planData = context.read<PlanData>();
-    await dao.upsertByVisitId(
-      visitId: widget.visitId,
-      // ... 所有 planData 的欄位維持不變 ...
-      screeningChecked: planData.screeningChecked,
-      screeningMethods: planData.screeningMethods,
-      otherScreeningMethod: planData.otherScreeningMethod,
-      healthData: planData.healthData,
-      mainSymptom: planData.mainSymptom,
-      traumaSymptoms: planData.traumaSymptoms,
-      nonTraumaSymptoms: planData.nonTraumaSymptoms,
-      nonTraumaHeadSymptoms: planData.nonTraumaHeadSymptoms,
-      nonTraumaChestSymptoms: planData.nonTraumaChestSymptoms,
-      nonTraumaLimbsSymptoms: planData.nonTraumaLimbsSymptoms,
-      nonTraumaOtherSymptoms: planData.nonTraumaOtherSymptoms,
-      nonTraumaAbdomenSymptoms: planData.nonTraumaAbdomenSymptoms,
 
-      symptomNote: planData.symptomNote,
-      photoTypes: planData.photoTypes,
-      bodyCheckHead: planData.bodyCheckHead,
-      bodyCheckChest: planData.bodyCheckChest,
-      bodyCheckAbdomen: planData.bodyCheckAbdomen,
-      bodyCheckLimbs: planData.bodyCheckLimbs,
-      bodyCheckOther: planData.bodyCheckOther,
-      temperature: planData.temperature,
-      pulse: planData.pulse,
-      respiration: planData.respiration,
-      bpSystolic: planData.bpSystolic,
-      bpDiastolic: planData.bpDiastolic,
-      spo2: planData.spo2,
-      consciousClear: planData.consciousClear,
-      evmE: planData.evmE,
-      evmV: planData.evmV,
-      evmM: planData.evmM,
-      leftPupilScale: planData.leftPupilScale,
-      leftPupilSize: planData.leftPupilSize,
-      rightPupilScale: planData.rightPupilScale,
-      rightPupilSize: planData.rightPupilSize,
-      history: planData.history,
-      allergy: planData.allergy,
-      initialDiagnosis: planData.initialDiagnosis,
-      diagnosisCategory: planData.diagnosisCategory,
-      selectedICD10Main: planData.selectedICD10Main,
-      selectedICD10Sub1: planData.selectedICD10Sub1,
-      selectedICD10Sub2: planData.selectedICD10Sub2,
-      triageCategory: planData.triageCategory,
-      onSiteTreatments: planData.onSiteTreatments,
-      ekgChecked: planData.ekgChecked,
-      ekgReading: planData.ekgReading,
-      sugarChecked: planData.sugarChecked,
-      sugarReading: planData.sugarReading,
-      suggestReferral: planData.suggestReferral, // 這裡會儲存最新的狀態
-      intubationChecked: planData.intubationChecked,
-      cprChecked: planData.cprChecked,
-      oxygenTherapyChecked: planData.oxygenTherapyChecked,
-      medicalCertificateChecked: planData.medicalCertificateChecked,
-      prescriptionChecked: planData.prescriptionChecked,
-      otherChecked: planData.otherChecked,
-      otherSummary: planData.otherSummary,
-      referralPassageType: planData.referralPassageType,
-      referralAmbulanceType: planData.referralAmbulanceType,
-      referralHospitalIdx: planData.referralHospitalIdx,
-      referralOtherHospital: planData.referralOtherHospital,
-      referralEscort: planData.referralEscort,
-      intubationType: planData.intubationType,
-      oxygenType: planData.oxygenType,
-      oxygenFlow: planData.oxygenFlow,
-      medicalCertificateTypes: planData.medicalCertificateTypes,
-      prescriptionRows: planData.prescriptionRows,
-      followUpResults: planData.followUpResults,
-      otherHospitalIdx: planData.otherHospitalIdx,
-      selectedMainDoctor: planData.selectedMainDoctor,
-      selectedMainNurse: planData.selectedMainNurse,
-      nurseSignature: planData.nurseSignature,
-      selectedEMT: planData.selectedEMT,
-      emtSignature: planData.emtSignature,
-      helperNamesText: planData.helperNamesText,
-      selectedHelpers: planData.selectedHelpers,
-      specialNotes: planData.specialNotes,
-      otherSpecialNote: planData.otherSpecialNote,
-    );
+    // ✅ 正確做法：一行程式碼，呼叫您在 PlanData 中完美封裝好的方法
+    //    這個方法會自動處理所有欄位的轉換，並同步更新 Visits 摘要表
+    await planData.saveToDatabase(widget.visitId, planDao, visitsDao);
   }
 
   // ===============================================

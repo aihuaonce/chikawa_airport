@@ -1,6 +1,9 @@
 // data/models/referral_data.dart
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:chikawa_airport/data/db/app_database.dart';
+import 'package:drift/drift.dart';
+import '../db/daos.dart';
 
 class ReferralData extends ChangeNotifier {
   // 聯絡人資料
@@ -47,9 +50,7 @@ class ReferralData extends ChangeNotifier {
   String? relationToPatient;
   DateTime? consentDateTime;
 
-  void update() {
-    notifyListeners();
-  }
+  void update() => notifyListeners();
 
   void clear() {
     contactName = null;
@@ -83,5 +84,68 @@ class ReferralData extends ChangeNotifier {
     relationToPatient = null;
     consentDateTime = null;
     notifyListeners();
+  }
+
+  // ✅ Companion 轉換
+  ReferralFormsCompanion toCompanion(int visitId) {
+    return ReferralFormsCompanion(
+      visitId: Value(visitId),
+      contactName: Value(contactName),
+      contactPhone: Value(contactPhone),
+      contactAddress: Value(contactAddress),
+      mainDiagnosis: Value(mainDiagnosis),
+      subDiagnosis1: Value(subDiagnosis1),
+      subDiagnosis2: Value(subDiagnosis2),
+      lastExamDate: Value(lastExamDate),
+      lastMedicationDate: Value(lastMedicationDate),
+      referralPurposeIdx: Value(referralPurposeIdx),
+      furtherExamDetail: Value(furtherExamDetail),
+      otherPurposeDetail: Value(otherPurposeDetail),
+      doctorIdx: Value(doctorIdx),
+      otherDoctorName: Value(otherDoctorName),
+      deptIdx: Value(deptIdx),
+      otherDeptName: Value(otherDeptName),
+      doctorSignature: Value(doctorSignature),
+      issueDate: Value(issueDate),
+      appointmentDate: Value(appointmentDate),
+      appointmentDept: Value(appointmentDept),
+      appointmentRoom: Value(appointmentRoom),
+      appointmentNumber: Value(appointmentNumber),
+      referralHospitalName: Value(referralHospitalName),
+      referralDeptIdx: Value(referralDeptIdx),
+      otherReferralDept: Value(otherReferralDept),
+      referralDoctorName: Value(referralDoctorName),
+      referralAddress: Value(referralAddress),
+      referralPhone: Value(referralPhone),
+      consentSignature: Value(consentSignature),
+      relationToPatient: Value(relationToPatient),
+      consentDateTime: Value(consentDateTime),
+    );
+  }
+
+  // ✅ 同步更新 Visits 摘要
+  VisitsCompanion toVisitsCompanion() {
+    return VisitsCompanion(
+      dept: Value(otherDeptName),
+      note: Value(mainDiagnosis),
+      emergencyResult: Value(referralHospitalName),
+      uploadedAt: Value(DateTime.now()),
+    );
+  }
+
+  // ✅ 資料庫保存
+  Future<void> saveToDatabase(
+    int visitId,
+    ReferralFormsDao referralDao,
+    VisitsDao visitsDao,
+  ) async {
+    try {
+      await referralDao.upsert(toCompanion(visitId));
+      await visitsDao.updateVisit(visitId, toVisitsCompanion());
+      print('✅ 轉診資料與 Visits 摘要已更新');
+    } catch (e) {
+      print('❌ 儲存轉診資料失敗: $e');
+      rethrow;
+    }
   }
 }

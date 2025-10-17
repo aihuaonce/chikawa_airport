@@ -8,7 +8,6 @@ import '../data/models/referral_data.dart';
 import 'nav2.dart';
 import '../l10n/app_translations.dart';
 
-
 class ReferralFormPage extends StatefulWidget {
   final int visitId;
 
@@ -296,46 +295,14 @@ class _ReferralFormPageState extends State<ReferralFormPage>
 
   Future<void> _saveData() async {
     try {
-      final dao = context.read<ReferralFormsDao>();
-      final data = context.read<ReferralData>();
+      // 1. 取得所有需要的 DAO 和 Data Model
+      final referralDao = context.read<ReferralFormsDao>();
+      final visitsDao = context.read<VisitsDao>();
+      final referralData = context.read<ReferralData>();
 
-      await dao.upsertByVisitId(
-        visitId: widget.visitId,
-        contactName: data.contactName,
-        contactPhone: data.contactPhone,
-        contactAddress: data.contactAddress,
-        mainDiagnosis: data.mainDiagnosis,
-        subDiagnosis1: data.subDiagnosis1,
-        subDiagnosis2: data.subDiagnosis2,
-        lastExamDate: data.lastExamDate,
-        lastMedicationDate: data.lastMedicationDate,
-        referralPurposeIdx: data.referralPurposeIdx,
-        furtherExamDetail: data.furtherExamDetail,
-        otherPurposeDetail: data.otherPurposeDetail,
-        doctorIdx: data.doctorIdx,
-        otherDoctorName: data.otherDoctorName,
-        deptIdx: data.deptIdx,
-        otherDeptName: data.otherDeptName,
-        doctorSignature: data.doctorSignature,
-        issueDate: data.issueDate,
-        appointmentDate: data.appointmentDate,
-        appointmentDept: data.appointmentDept,
-        appointmentRoom: data.appointmentRoom,
-        appointmentNumber: data.appointmentNumber,
-        referralHospitalName: data.referralHospitalName,
-        referralDeptIdx: data.referralDeptIdx,
-        otherReferralDept: data.otherReferralDept,
-        referralDoctorName: data.referralDoctorName,
-        referralAddress: data.referralAddress,
-        referralPhone: data.referralPhone,
-        consentSignature: data.consentSignature,
-        relationToPatient: data.relationToPatient,
-        consentDateTime: data.consentDateTime,
-      );
-
-      debugPrint('轉診表單儲存成功');
+      // 2. ✅ 正確做法：一行程式碼，呼叫您在 ReferralData 中完美封裝好的方法
+      await referralData.saveToDatabase(widget.visitId, referralDao, visitsDao);
     } catch (e) {
-      debugPrint('儲存轉診表單錯誤: $e');
       rethrow;
     }
   }
@@ -386,7 +353,8 @@ class _ReferralFormPageState extends State<ReferralFormPage>
       ),
     );
   }
-@override
+
+  @override
   Widget build(BuildContext context) {
     super.build(context);
     final t = AppTranslations.of(context);
@@ -416,28 +384,64 @@ class _ReferralFormPageState extends State<ReferralFormPage>
                   // 第一部分 - 聯絡人資料
                   Text(
                     t.isZh ? "聯絡人資料" : "Contact Information",
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
                   ),
                   const SizedBox(height: 8),
-                  _buildInputRow(t, "${t.name}：", t.isZh ? "請填寫聯絡人姓名" : "Enter contact name", contactNameCtrl),
+                  _buildInputRow(
+                    t,
+                    "${t.name}：",
+                    t.isZh ? "請填寫聯絡人姓名" : "Enter contact name",
+                    contactNameCtrl,
+                  ),
                   const SizedBox(height: 8),
-                  _buildInputRow(t, "${t.phone}：", t.isZh ? "請填寫聯絡人電話" : "Enter contact phone", contactPhoneCtrl),
+                  _buildInputRow(
+                    t,
+                    "${t.phone}：",
+                    t.isZh ? "請填寫聯絡人電話" : "Enter contact phone",
+                    contactPhoneCtrl,
+                  ),
                   const SizedBox(height: 8),
-                  _buildInputRow(t, "${t.address}：", t.isZh ? "請填寫聯絡人地址" : "Enter contact address", contactAddressCtrl),
+                  _buildInputRow(
+                    t,
+                    "${t.address}：",
+                    t.isZh ? "請填寫聯絡人地址" : "Enter contact address",
+                    contactAddressCtrl,
+                  ),
 
                   const Divider(thickness: 1, height: 32),
 
                   // 第二部分 - 診斷
                   Text(
                     t.isZh ? "診斷ICD-10-CM/PCS病名" : "Diagnosis ICD-10-CM/PCS",
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
                   ),
                   const SizedBox(height: 8),
-                  _buildInputRow(t, "${t.mainDiagnosis}：", t.isZh ? "請輸入..." : "Please enter...", mainDiagnosisCtrl),
+                  _buildInputRow(
+                    t,
+                    "${t.mainDiagnosis}：",
+                    t.isZh ? "請輸入..." : "Please enter...",
+                    mainDiagnosisCtrl,
+                  ),
                   const SizedBox(height: 8),
-                  _buildInputRow(t, "${t.secondaryDiagnosis1}：", t.isZh ? "請輸入..." : "Please enter...", subDiagnosis1Ctrl),
+                  _buildInputRow(
+                    t,
+                    "${t.secondaryDiagnosis1}：",
+                    t.isZh ? "請輸入..." : "Please enter...",
+                    subDiagnosis1Ctrl,
+                  ),
                   const SizedBox(height: 8),
-                  _buildInputRow(t, "${t.secondaryDiagnosis2}：", t.isZh ? "請輸入..." : "Please enter...", subDiagnosis2Ctrl),
+                  _buildInputRow(
+                    t,
+                    "${t.secondaryDiagnosis2}：",
+                    t.isZh ? "請輸入..." : "Please enter...",
+                    subDiagnosis2Ctrl,
+                  ),
 
                   const SizedBox(height: 16),
                   Row(
@@ -456,24 +460,46 @@ class _ReferralFormPageState extends State<ReferralFormPage>
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
-                  _buildDropdown(t, t.isZh ? "醫師姓名：" : "Physician Name:", doctorList, data.doctorIdx, (idx) {
-                    data.doctorIdx = idx;
-                    data.update();
-                  }),
+                  _buildDropdown(
+                    t,
+                    t.isZh ? "醫師姓名：" : "Physician Name:",
+                    doctorList,
+                    data.doctorIdx,
+                    (idx) {
+                      data.doctorIdx = idx;
+                      data.update();
+                    },
+                  ),
                   if (data.doctorIdx == doctorList.indexOf("其他"))
-                    _buildInputRow(t, "${t.other}：", t.enterName, otherDoctorCtrl),
+                    _buildInputRow(
+                      t,
+                      "${t.other}：",
+                      t.enterName,
+                      otherDoctorCtrl,
+                    ),
 
                   const SizedBox(height: 12),
                   Text(
                     t.isZh ? "診治醫生科別" : "Physician Department",
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
-                  _buildDropdown(t, t.isZh ? "醫師科別：" : "Physician Dept:", deptList, data.deptIdx, (idx) {
-                    data.deptIdx = idx;
-                    data.update();
-                  }),
+                  _buildDropdown(
+                    t,
+                    t.isZh ? "醫師科別：" : "Physician Dept:",
+                    deptList,
+                    data.deptIdx,
+                    (idx) {
+                      data.deptIdx = idx;
+                      data.update();
+                    },
+                  ),
                   if (data.deptIdx == deptList.indexOf("其他"))
-                    _buildInputRow(t, "${t.other}：", t.isZh ? "請輸入科別" : "Enter department", otherDeptCtrl),
+                    _buildInputRow(
+                      t,
+                      "${t.other}：",
+                      t.isZh ? "請輸入科別" : "Enter department",
+                      otherDeptCtrl,
+                    ),
 
                   const SizedBox(height: 12),
                   Text(
@@ -517,7 +543,9 @@ class _ReferralFormPageState extends State<ReferralFormPage>
 
                   // 同意區塊
                   Text(
-                    t.isZh ? "經醫師解釋病情及轉診目的後同意轉院。" : "After explanation by physician, agree to referral.",
+                    t.isZh
+                        ? "經醫師解釋病情及轉診目的後同意轉院。"
+                        : "After explanation by physician, agree to referral.",
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 12),
@@ -547,7 +575,12 @@ class _ReferralFormPageState extends State<ReferralFormPage>
                     ),
                   ),
                   const SizedBox(height: 12),
-                  _buildInputRow(t, t.isZh ? "與病人關係：" : "Relation to Patient:", t.isZh ? "請填寫同意人與病人關係" : "Enter relation", relationCtrl),
+                  _buildInputRow(
+                    t,
+                    t.isZh ? "與病人關係：" : "Relation to Patient:",
+                    t.isZh ? "請填寫同意人與病人關係" : "Enter relation",
+                    relationCtrl,
+                  ),
                   const SizedBox(height: 8),
                   Row(
                     children: [
@@ -575,7 +608,12 @@ class _ReferralFormPageState extends State<ReferralFormPage>
 
   // ================= UI 小積木 =================
 
-  Widget _buildInputRow(AppTranslations t, String label, String hint, TextEditingController ctrl) {
+  Widget _buildInputRow(
+    AppTranslations t,
+    String label,
+    String hint,
+    TextEditingController ctrl,
+  ) {
     return Row(
       children: [
         Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
@@ -652,7 +690,10 @@ class _ReferralFormPageState extends State<ReferralFormPage>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(t.isZh ? "檢查及治療摘要" : "Exam & Treatment Summary", style: const TextStyle(fontWeight: FontWeight.bold)),
+          Text(
+            t.isZh ? "檢查及治療摘要" : "Exam & Treatment Summary",
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
           const SizedBox(height: 8),
           Text(t.isZh ? "1. 最近一次檢查結果日期" : "1. Last Exam Date"),
           TextButton(
@@ -669,7 +710,9 @@ class _ReferralFormPageState extends State<ReferralFormPage>
               data.lastMedicationDate = d;
               data.update();
             }),
-            child: Text(_formatDate(t, data.lastMedicationDate ?? DateTime.now())),
+            child: Text(
+              _formatDate(t, data.lastMedicationDate ?? DateTime.now()),
+            ),
           ),
         ],
       ),
@@ -684,7 +727,10 @@ class _ReferralFormPageState extends State<ReferralFormPage>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(t.isZh ? "轉診目的" : "Referral Purpose", style: const TextStyle(fontWeight: FontWeight.bold)),
+          Text(
+            t.isZh ? "轉診目的" : "Referral Purpose",
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
           ...List.generate(referralPurposes.length, (i) {
             if (i == 3) {
               return _buildRadioWithInput(
@@ -723,16 +769,24 @@ class _ReferralFormPageState extends State<ReferralFormPage>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(t.isZh ? "開單日期" : "Issue Date", style: const TextStyle(fontWeight: FontWeight.bold)),
+          Text(
+            t.isZh ? "開單日期" : "Issue Date",
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
           TextButton(
             onPressed: () => _pickDate(context, (d) {
               data.issueDate = d;
               data.update();
             }),
-            child: Text("${t.date}：${_formatDate(t, data.issueDate ?? DateTime.now())}"),
+            child: Text(
+              "${t.date}：${_formatDate(t, data.issueDate ?? DateTime.now())}",
+            ),
           ),
           const SizedBox(height: 8),
-          Text(t.isZh ? "安排就醫日期" : "Appointment Date", style: const TextStyle(fontWeight: FontWeight.bold)),
+          Text(
+            t.isZh ? "安排就醫日期" : "Appointment Date",
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
           TextButton(
             onPressed: () => _pickDate(context, (d) {
               data.appointmentDate = d;
@@ -743,11 +797,26 @@ class _ReferralFormPageState extends State<ReferralFormPage>
             ),
           ),
           const SizedBox(height: 8),
-          _buildInputRow(t, t.isZh ? "安排就醫科別：" : "Appointment Dept:", t.isZh ? "選填就醫科別" : "Optional dept", appointmentDeptCtrl),
+          _buildInputRow(
+            t,
+            t.isZh ? "安排就醫科別：" : "Appointment Dept:",
+            t.isZh ? "選填就醫科別" : "Optional dept",
+            appointmentDeptCtrl,
+          ),
           const SizedBox(height: 8),
-          _buildInputRow(t, t.isZh ? "安排就醫診間：" : "Appointment Room:", t.isZh ? "選填就醫診間" : "Optional room", appointmentRoomCtrl),
+          _buildInputRow(
+            t,
+            t.isZh ? "安排就醫診間：" : "Appointment Room:",
+            t.isZh ? "選填就醫診間" : "Optional room",
+            appointmentRoomCtrl,
+          ),
           const SizedBox(height: 8),
-          _buildInputRow(t, t.isZh ? "安排就醫號碼：" : "Appointment No:", t.isZh ? "選填就醫號碼" : "Optional number", appointmentNumberCtrl),
+          _buildInputRow(
+            t,
+            t.isZh ? "安排就醫號碼：" : "Appointment No:",
+            t.isZh ? "選填就醫號碼" : "Optional number",
+            appointmentNumberCtrl,
+          ),
         ],
       ),
     ),
@@ -761,26 +830,62 @@ class _ReferralFormPageState extends State<ReferralFormPage>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildInputRow(t, t.isZh ? "建議轉診院所名稱：" : "Referral Hospital:", t.isZh ? "諾新國際醫院" : "Landseed Hospital", referralHospitalCtrl),
+          _buildInputRow(
+            t,
+            t.isZh ? "建議轉診院所名稱：" : "Referral Hospital:",
+            t.isZh ? "諾新國際醫院" : "Landseed Hospital",
+            referralHospitalCtrl,
+          ),
           const SizedBox(height: 8),
-          _buildDropdown(t, t.isZh ? "建議院所科別：" : "Referral Dept:", deptList, data.referralDeptIdx, (idx) {
-            data.referralDeptIdx = idx;
-            data.update();
-          }),
+          _buildDropdown(
+            t,
+            t.isZh ? "建議院所科別：" : "Referral Dept:",
+            deptList,
+            data.referralDeptIdx,
+            (idx) {
+              data.referralDeptIdx = idx;
+              data.update();
+            },
+          ),
           if (data.referralDeptIdx == deptList.indexOf("其他"))
-            _buildInputRow(t, "${t.other}：", t.isZh ? "請輸入科別" : "Enter department", otherReferralDeptCtrl),
+            _buildInputRow(
+              t,
+              "${t.other}：",
+              t.isZh ? "請輸入科別" : "Enter department",
+              otherReferralDeptCtrl,
+            ),
           const SizedBox(height: 8),
-          _buildInputRow(t, t.isZh ? "建議院所醫師姓名：" : "Referral Doctor:", t.isZh ? "視情況填寫轉診院所醫師" : "Optional", referralDoctorCtrl),
+          _buildInputRow(
+            t,
+            t.isZh ? "建議院所醫師姓名：" : "Referral Doctor:",
+            t.isZh ? "視情況填寫轉診院所醫師" : "Optional",
+            referralDoctorCtrl,
+          ),
           const SizedBox(height: 8),
-          _buildInputRow(t, t.isZh ? "建議院所地址：" : "Hospital Address:", t.isZh ? "請填寫院所地址" : "Enter address", referralAddressCtrl),
+          _buildInputRow(
+            t,
+            t.isZh ? "建議院所地址：" : "Hospital Address:",
+            t.isZh ? "請填寫院所地址" : "Enter address",
+            referralAddressCtrl,
+          ),
           const SizedBox(height: 8),
-          _buildInputRow(t, t.isZh ? "建議院所電話：" : "Hospital Phone:", t.isZh ? "請填寫院所電話" : "Enter phone", referralPhoneCtrl),
+          _buildInputRow(
+            t,
+            t.isZh ? "建議院所電話：" : "Hospital Phone:",
+            t.isZh ? "請填寫院所電話" : "Enter phone",
+            referralPhoneCtrl,
+          ),
         ],
       ),
     ),
   );
 
-  Widget _buildRadio(AppTranslations t, int value, String text, ReferralData data) {
+  Widget _buildRadio(
+    AppTranslations t,
+    int value,
+    String text,
+    ReferralData data,
+  ) {
     return Row(
       children: [
         Radio<int>(
