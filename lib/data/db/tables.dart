@@ -158,6 +158,11 @@ class Treatments extends Table {
   TextColumn get traumaSymptomsJson => text().nullable()();
   TextColumn get nonTraumaSymptomsJson => text().nullable()();
   TextColumn get symptomNote => text().nullable()();
+  TextColumn get nonTraumaHeadSymptomsJson => text().nullable()();
+  TextColumn get nonTraumaChestSymptomsJson => text().nullable()();
+  TextColumn get nonTraumaAbdomenSymptomsJson => text().nullable()();
+  TextColumn get nonTraumaLimbsSymptomsJson => text().nullable()();
+  TextColumn get nonTraumaOtherSymptomsJson => text().nullable()();
 
   // 照片類型
   TextColumn get photoTypesJson => text().nullable()();
@@ -622,6 +627,17 @@ class EmergencyRecords extends Table {
   TextColumn get ivNeedleSize => text().nullable()();
   TextColumn get ivLineRecord => text().nullable()();
   TextColumn get cardiacMassageRecord => text().nullable()();
+  TextColumn get postResuscitationEvmE => text().nullable()();
+  TextColumn get postResuscitationEvmV => text().nullable()();
+  TextColumn get postResuscitationEvmM => text().nullable()();
+  TextColumn get postResuscitationHeartRate => text().nullable()();
+  TextColumn get postResuscitationRespirationMethod => text().nullable()();
+  TextColumn get postResuscitationBloodPressure => text().nullable()();
+  TextColumn get postResuscitationLeftPupilSize => text().nullable()();
+  TextColumn get postResuscitationRightPupilSize => text().nullable()();
+  TextColumn get postResuscitationLeftPupilLightReflex => text().nullable()();
+  TextColumn get postResuscitationRightPupilLightReflex => text().nullable()();
+  TextColumn get otherSupplements => text().nullable()();
 
   // 急救結束與結果
   TextColumn get endRecord => text().nullable()();

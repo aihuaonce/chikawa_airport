@@ -528,6 +528,12 @@ class _PlanPageState extends State<PlanPage>
       mainSymptom: planData.mainSymptom,
       traumaSymptoms: planData.traumaSymptoms,
       nonTraumaSymptoms: planData.nonTraumaSymptoms,
+      nonTraumaHeadSymptoms: planData.nonTraumaHeadSymptoms,
+      nonTraumaChestSymptoms: planData.nonTraumaChestSymptoms,
+      nonTraumaLimbsSymptoms: planData.nonTraumaLimbsSymptoms,
+      nonTraumaOtherSymptoms: planData.nonTraumaOtherSymptoms,
+      nonTraumaAbdomenSymptoms: planData.nonTraumaAbdomenSymptoms,
+
       symptomNote: planData.symptomNote,
       photoTypes: planData.photoTypes,
       bodyCheckHead: planData.bodyCheckHead,
@@ -928,6 +934,8 @@ class _PlanPageState extends State<PlanPage>
                       const SizedBox(height: 12),
                     ],
                   ],
+
+                  const SizedBox(height: 16),
                   _SectionTitle('補充說明'),
                   TextField(
                     controller: _controllers['symptomNote'],
