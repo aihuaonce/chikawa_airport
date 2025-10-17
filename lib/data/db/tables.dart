@@ -627,6 +627,17 @@ class EmergencyRecords extends Table {
   TextColumn get ivNeedleSize => text().nullable()();
   TextColumn get ivLineRecord => text().nullable()();
   TextColumn get cardiacMassageRecord => text().nullable()();
+  TextColumn get postResuscitationEvmE => text().nullable()();
+  TextColumn get postResuscitationEvmV => text().nullable()();
+  TextColumn get postResuscitationEvmM => text().nullable()();
+  TextColumn get postResuscitationHeartRate => text().nullable()();
+  TextColumn get postResuscitationRespirationMethod => text().nullable()();
+  TextColumn get postResuscitationBloodPressure => text().nullable()();
+  TextColumn get postResuscitationLeftPupilSize => text().nullable()();
+  TextColumn get postResuscitationRightPupilSize => text().nullable()();
+  TextColumn get postResuscitationLeftPupilLightReflex => text().nullable()();
+  TextColumn get postResuscitationRightPupilLightReflex => text().nullable()();
+  TextColumn get otherSupplements => text().nullable()();
 
   // 急救結束與結果
   TextColumn get endRecord => text().nullable()();

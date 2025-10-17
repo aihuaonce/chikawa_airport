@@ -19540,6 +19540,127 @@ class $EmergencyRecordsTable extends EmergencyRecords
         type: DriftSqlType.string,
         requiredDuringInsert: false,
       );
+  static const VerificationMeta _postResuscitationEvmEMeta =
+      const VerificationMeta('postResuscitationEvmE');
+  @override
+  late final GeneratedColumn<String> postResuscitationEvmE =
+      GeneratedColumn<String>(
+        'post_resuscitation_evm_e',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _postResuscitationEvmVMeta =
+      const VerificationMeta('postResuscitationEvmV');
+  @override
+  late final GeneratedColumn<String> postResuscitationEvmV =
+      GeneratedColumn<String>(
+        'post_resuscitation_evm_v',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _postResuscitationEvmMMeta =
+      const VerificationMeta('postResuscitationEvmM');
+  @override
+  late final GeneratedColumn<String> postResuscitationEvmM =
+      GeneratedColumn<String>(
+        'post_resuscitation_evm_m',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _postResuscitationHeartRateMeta =
+      const VerificationMeta('postResuscitationHeartRate');
+  @override
+  late final GeneratedColumn<String> postResuscitationHeartRate =
+      GeneratedColumn<String>(
+        'post_resuscitation_heart_rate',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _postResuscitationRespirationMethodMeta =
+      const VerificationMeta('postResuscitationRespirationMethod');
+  @override
+  late final GeneratedColumn<String> postResuscitationRespirationMethod =
+      GeneratedColumn<String>(
+        'post_resuscitation_respiration_method',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _postResuscitationBloodPressureMeta =
+      const VerificationMeta('postResuscitationBloodPressure');
+  @override
+  late final GeneratedColumn<String> postResuscitationBloodPressure =
+      GeneratedColumn<String>(
+        'post_resuscitation_blood_pressure',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _postResuscitationLeftPupilSizeMeta =
+      const VerificationMeta('postResuscitationLeftPupilSize');
+  @override
+  late final GeneratedColumn<String> postResuscitationLeftPupilSize =
+      GeneratedColumn<String>(
+        'post_resuscitation_left_pupil_size',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _postResuscitationRightPupilSizeMeta =
+      const VerificationMeta('postResuscitationRightPupilSize');
+  @override
+  late final GeneratedColumn<String> postResuscitationRightPupilSize =
+      GeneratedColumn<String>(
+        'post_resuscitation_right_pupil_size',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _postResuscitationLeftPupilLightReflexMeta =
+      const VerificationMeta('postResuscitationLeftPupilLightReflex');
+  @override
+  late final GeneratedColumn<String> postResuscitationLeftPupilLightReflex =
+      GeneratedColumn<String>(
+        'post_resuscitation_left_pupil_light_reflex',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _postResuscitationRightPupilLightReflexMeta =
+      const VerificationMeta('postResuscitationRightPupilLightReflex');
+  @override
+  late final GeneratedColumn<String> postResuscitationRightPupilLightReflex =
+      GeneratedColumn<String>(
+        'post_resuscitation_right_pupil_light_reflex',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _otherSupplementsMeta = const VerificationMeta(
+    'otherSupplements',
+  );
+  @override
+  late final GeneratedColumn<String> otherSupplements = GeneratedColumn<String>(
+    'other_supplements',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _endRecordMeta = const VerificationMeta(
     'endRecord',
   );
@@ -19758,6 +19879,17 @@ class $EmergencyRecordsTable extends EmergencyRecords
     ivNeedleSize,
     ivLineRecord,
     cardiacMassageRecord,
+    postResuscitationEvmE,
+    postResuscitationEvmV,
+    postResuscitationEvmM,
+    postResuscitationHeartRate,
+    postResuscitationRespirationMethod,
+    postResuscitationBloodPressure,
+    postResuscitationLeftPupilSize,
+    postResuscitationRightPupilSize,
+    postResuscitationLeftPupilLightReflex,
+    postResuscitationRightPupilLightReflex,
+    otherSupplements,
     endRecord,
     endResult,
     selectedHospital,
@@ -20166,6 +20298,105 @@ class $EmergencyRecordsTable extends EmergencyRecords
         ),
       );
     }
+    if (data.containsKey('post_resuscitation_evm_e')) {
+      context.handle(
+        _postResuscitationEvmEMeta,
+        postResuscitationEvmE.isAcceptableOrUnknown(
+          data['post_resuscitation_evm_e']!,
+          _postResuscitationEvmEMeta,
+        ),
+      );
+    }
+    if (data.containsKey('post_resuscitation_evm_v')) {
+      context.handle(
+        _postResuscitationEvmVMeta,
+        postResuscitationEvmV.isAcceptableOrUnknown(
+          data['post_resuscitation_evm_v']!,
+          _postResuscitationEvmVMeta,
+        ),
+      );
+    }
+    if (data.containsKey('post_resuscitation_evm_m')) {
+      context.handle(
+        _postResuscitationEvmMMeta,
+        postResuscitationEvmM.isAcceptableOrUnknown(
+          data['post_resuscitation_evm_m']!,
+          _postResuscitationEvmMMeta,
+        ),
+      );
+    }
+    if (data.containsKey('post_resuscitation_heart_rate')) {
+      context.handle(
+        _postResuscitationHeartRateMeta,
+        postResuscitationHeartRate.isAcceptableOrUnknown(
+          data['post_resuscitation_heart_rate']!,
+          _postResuscitationHeartRateMeta,
+        ),
+      );
+    }
+    if (data.containsKey('post_resuscitation_respiration_method')) {
+      context.handle(
+        _postResuscitationRespirationMethodMeta,
+        postResuscitationRespirationMethod.isAcceptableOrUnknown(
+          data['post_resuscitation_respiration_method']!,
+          _postResuscitationRespirationMethodMeta,
+        ),
+      );
+    }
+    if (data.containsKey('post_resuscitation_blood_pressure')) {
+      context.handle(
+        _postResuscitationBloodPressureMeta,
+        postResuscitationBloodPressure.isAcceptableOrUnknown(
+          data['post_resuscitation_blood_pressure']!,
+          _postResuscitationBloodPressureMeta,
+        ),
+      );
+    }
+    if (data.containsKey('post_resuscitation_left_pupil_size')) {
+      context.handle(
+        _postResuscitationLeftPupilSizeMeta,
+        postResuscitationLeftPupilSize.isAcceptableOrUnknown(
+          data['post_resuscitation_left_pupil_size']!,
+          _postResuscitationLeftPupilSizeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('post_resuscitation_right_pupil_size')) {
+      context.handle(
+        _postResuscitationRightPupilSizeMeta,
+        postResuscitationRightPupilSize.isAcceptableOrUnknown(
+          data['post_resuscitation_right_pupil_size']!,
+          _postResuscitationRightPupilSizeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('post_resuscitation_left_pupil_light_reflex')) {
+      context.handle(
+        _postResuscitationLeftPupilLightReflexMeta,
+        postResuscitationLeftPupilLightReflex.isAcceptableOrUnknown(
+          data['post_resuscitation_left_pupil_light_reflex']!,
+          _postResuscitationLeftPupilLightReflexMeta,
+        ),
+      );
+    }
+    if (data.containsKey('post_resuscitation_right_pupil_light_reflex')) {
+      context.handle(
+        _postResuscitationRightPupilLightReflexMeta,
+        postResuscitationRightPupilLightReflex.isAcceptableOrUnknown(
+          data['post_resuscitation_right_pupil_light_reflex']!,
+          _postResuscitationRightPupilLightReflexMeta,
+        ),
+      );
+    }
+    if (data.containsKey('other_supplements')) {
+      context.handle(
+        _otherSupplementsMeta,
+        otherSupplements.isAcceptableOrUnknown(
+          data['other_supplements']!,
+          _otherSupplementsMeta,
+        ),
+      );
+    }
     if (data.containsKey('end_record')) {
       context.handle(
         _endRecordMeta,
@@ -20483,6 +20714,50 @@ class $EmergencyRecordsTable extends EmergencyRecords
         DriftSqlType.string,
         data['${effectivePrefix}cardiac_massage_record'],
       ),
+      postResuscitationEvmE: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}post_resuscitation_evm_e'],
+      ),
+      postResuscitationEvmV: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}post_resuscitation_evm_v'],
+      ),
+      postResuscitationEvmM: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}post_resuscitation_evm_m'],
+      ),
+      postResuscitationHeartRate: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}post_resuscitation_heart_rate'],
+      ),
+      postResuscitationRespirationMethod: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}post_resuscitation_respiration_method'],
+      ),
+      postResuscitationBloodPressure: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}post_resuscitation_blood_pressure'],
+      ),
+      postResuscitationLeftPupilSize: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}post_resuscitation_left_pupil_size'],
+      ),
+      postResuscitationRightPupilSize: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}post_resuscitation_right_pupil_size'],
+      ),
+      postResuscitationLeftPupilLightReflex: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}post_resuscitation_left_pupil_light_reflex'],
+      ),
+      postResuscitationRightPupilLightReflex: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}post_resuscitation_right_pupil_light_reflex'],
+      ),
+      otherSupplements: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}other_supplements'],
+      ),
       endRecord: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}end_record'],
@@ -20600,6 +20875,17 @@ class EmergencyRecord extends DataClass implements Insertable<EmergencyRecord> {
   final String? ivNeedleSize;
   final String? ivLineRecord;
   final String? cardiacMassageRecord;
+  final String? postResuscitationEvmE;
+  final String? postResuscitationEvmV;
+  final String? postResuscitationEvmM;
+  final String? postResuscitationHeartRate;
+  final String? postResuscitationRespirationMethod;
+  final String? postResuscitationBloodPressure;
+  final String? postResuscitationLeftPupilSize;
+  final String? postResuscitationRightPupilSize;
+  final String? postResuscitationLeftPupilLightReflex;
+  final String? postResuscitationRightPupilLightReflex;
+  final String? otherSupplements;
   final String? endRecord;
   final String? endResult;
   final String? selectedHospital;
@@ -20663,6 +20949,17 @@ class EmergencyRecord extends DataClass implements Insertable<EmergencyRecord> {
     this.ivNeedleSize,
     this.ivLineRecord,
     this.cardiacMassageRecord,
+    this.postResuscitationEvmE,
+    this.postResuscitationEvmV,
+    this.postResuscitationEvmM,
+    this.postResuscitationHeartRate,
+    this.postResuscitationRespirationMethod,
+    this.postResuscitationBloodPressure,
+    this.postResuscitationLeftPupilSize,
+    this.postResuscitationRightPupilSize,
+    this.postResuscitationLeftPupilLightReflex,
+    this.postResuscitationRightPupilLightReflex,
+    this.otherSupplements,
     this.endRecord,
     this.endResult,
     this.selectedHospital,
@@ -20820,6 +21117,53 @@ class EmergencyRecord extends DataClass implements Insertable<EmergencyRecord> {
     }
     if (!nullToAbsent || cardiacMassageRecord != null) {
       map['cardiac_massage_record'] = Variable<String>(cardiacMassageRecord);
+    }
+    if (!nullToAbsent || postResuscitationEvmE != null) {
+      map['post_resuscitation_evm_e'] = Variable<String>(postResuscitationEvmE);
+    }
+    if (!nullToAbsent || postResuscitationEvmV != null) {
+      map['post_resuscitation_evm_v'] = Variable<String>(postResuscitationEvmV);
+    }
+    if (!nullToAbsent || postResuscitationEvmM != null) {
+      map['post_resuscitation_evm_m'] = Variable<String>(postResuscitationEvmM);
+    }
+    if (!nullToAbsent || postResuscitationHeartRate != null) {
+      map['post_resuscitation_heart_rate'] = Variable<String>(
+        postResuscitationHeartRate,
+      );
+    }
+    if (!nullToAbsent || postResuscitationRespirationMethod != null) {
+      map['post_resuscitation_respiration_method'] = Variable<String>(
+        postResuscitationRespirationMethod,
+      );
+    }
+    if (!nullToAbsent || postResuscitationBloodPressure != null) {
+      map['post_resuscitation_blood_pressure'] = Variable<String>(
+        postResuscitationBloodPressure,
+      );
+    }
+    if (!nullToAbsent || postResuscitationLeftPupilSize != null) {
+      map['post_resuscitation_left_pupil_size'] = Variable<String>(
+        postResuscitationLeftPupilSize,
+      );
+    }
+    if (!nullToAbsent || postResuscitationRightPupilSize != null) {
+      map['post_resuscitation_right_pupil_size'] = Variable<String>(
+        postResuscitationRightPupilSize,
+      );
+    }
+    if (!nullToAbsent || postResuscitationLeftPupilLightReflex != null) {
+      map['post_resuscitation_left_pupil_light_reflex'] = Variable<String>(
+        postResuscitationLeftPupilLightReflex,
+      );
+    }
+    if (!nullToAbsent || postResuscitationRightPupilLightReflex != null) {
+      map['post_resuscitation_right_pupil_light_reflex'] = Variable<String>(
+        postResuscitationRightPupilLightReflex,
+      );
+    }
+    if (!nullToAbsent || otherSupplements != null) {
+      map['other_supplements'] = Variable<String>(otherSupplements);
     }
     if (!nullToAbsent || endRecord != null) {
       map['end_record'] = Variable<String>(endRecord);
@@ -20992,6 +21336,46 @@ class EmergencyRecord extends DataClass implements Insertable<EmergencyRecord> {
       cardiacMassageRecord: cardiacMassageRecord == null && nullToAbsent
           ? const Value.absent()
           : Value(cardiacMassageRecord),
+      postResuscitationEvmE: postResuscitationEvmE == null && nullToAbsent
+          ? const Value.absent()
+          : Value(postResuscitationEvmE),
+      postResuscitationEvmV: postResuscitationEvmV == null && nullToAbsent
+          ? const Value.absent()
+          : Value(postResuscitationEvmV),
+      postResuscitationEvmM: postResuscitationEvmM == null && nullToAbsent
+          ? const Value.absent()
+          : Value(postResuscitationEvmM),
+      postResuscitationHeartRate:
+          postResuscitationHeartRate == null && nullToAbsent
+          ? const Value.absent()
+          : Value(postResuscitationHeartRate),
+      postResuscitationRespirationMethod:
+          postResuscitationRespirationMethod == null && nullToAbsent
+          ? const Value.absent()
+          : Value(postResuscitationRespirationMethod),
+      postResuscitationBloodPressure:
+          postResuscitationBloodPressure == null && nullToAbsent
+          ? const Value.absent()
+          : Value(postResuscitationBloodPressure),
+      postResuscitationLeftPupilSize:
+          postResuscitationLeftPupilSize == null && nullToAbsent
+          ? const Value.absent()
+          : Value(postResuscitationLeftPupilSize),
+      postResuscitationRightPupilSize:
+          postResuscitationRightPupilSize == null && nullToAbsent
+          ? const Value.absent()
+          : Value(postResuscitationRightPupilSize),
+      postResuscitationLeftPupilLightReflex:
+          postResuscitationLeftPupilLightReflex == null && nullToAbsent
+          ? const Value.absent()
+          : Value(postResuscitationLeftPupilLightReflex),
+      postResuscitationRightPupilLightReflex:
+          postResuscitationRightPupilLightReflex == null && nullToAbsent
+          ? const Value.absent()
+          : Value(postResuscitationRightPupilLightReflex),
+      otherSupplements: otherSupplements == null && nullToAbsent
+          ? const Value.absent()
+          : Value(otherSupplements),
       endRecord: endRecord == null && nullToAbsent
           ? const Value.absent()
           : Value(endRecord),
@@ -21105,6 +21489,37 @@ class EmergencyRecord extends DataClass implements Insertable<EmergencyRecord> {
       cardiacMassageRecord: serializer.fromJson<String?>(
         json['cardiacMassageRecord'],
       ),
+      postResuscitationEvmE: serializer.fromJson<String?>(
+        json['postResuscitationEvmE'],
+      ),
+      postResuscitationEvmV: serializer.fromJson<String?>(
+        json['postResuscitationEvmV'],
+      ),
+      postResuscitationEvmM: serializer.fromJson<String?>(
+        json['postResuscitationEvmM'],
+      ),
+      postResuscitationHeartRate: serializer.fromJson<String?>(
+        json['postResuscitationHeartRate'],
+      ),
+      postResuscitationRespirationMethod: serializer.fromJson<String?>(
+        json['postResuscitationRespirationMethod'],
+      ),
+      postResuscitationBloodPressure: serializer.fromJson<String?>(
+        json['postResuscitationBloodPressure'],
+      ),
+      postResuscitationLeftPupilSize: serializer.fromJson<String?>(
+        json['postResuscitationLeftPupilSize'],
+      ),
+      postResuscitationRightPupilSize: serializer.fromJson<String?>(
+        json['postResuscitationRightPupilSize'],
+      ),
+      postResuscitationLeftPupilLightReflex: serializer.fromJson<String?>(
+        json['postResuscitationLeftPupilLightReflex'],
+      ),
+      postResuscitationRightPupilLightReflex: serializer.fromJson<String?>(
+        json['postResuscitationRightPupilLightReflex'],
+      ),
+      otherSupplements: serializer.fromJson<String?>(json['otherSupplements']),
       endRecord: serializer.fromJson<String?>(json['endRecord']),
       endResult: serializer.fromJson<String?>(json['endResult']),
       selectedHospital: serializer.fromJson<String?>(json['selectedHospital']),
@@ -21181,6 +21596,37 @@ class EmergencyRecord extends DataClass implements Insertable<EmergencyRecord> {
       'ivNeedleSize': serializer.toJson<String?>(ivNeedleSize),
       'ivLineRecord': serializer.toJson<String?>(ivLineRecord),
       'cardiacMassageRecord': serializer.toJson<String?>(cardiacMassageRecord),
+      'postResuscitationEvmE': serializer.toJson<String?>(
+        postResuscitationEvmE,
+      ),
+      'postResuscitationEvmV': serializer.toJson<String?>(
+        postResuscitationEvmV,
+      ),
+      'postResuscitationEvmM': serializer.toJson<String?>(
+        postResuscitationEvmM,
+      ),
+      'postResuscitationHeartRate': serializer.toJson<String?>(
+        postResuscitationHeartRate,
+      ),
+      'postResuscitationRespirationMethod': serializer.toJson<String?>(
+        postResuscitationRespirationMethod,
+      ),
+      'postResuscitationBloodPressure': serializer.toJson<String?>(
+        postResuscitationBloodPressure,
+      ),
+      'postResuscitationLeftPupilSize': serializer.toJson<String?>(
+        postResuscitationLeftPupilSize,
+      ),
+      'postResuscitationRightPupilSize': serializer.toJson<String?>(
+        postResuscitationRightPupilSize,
+      ),
+      'postResuscitationLeftPupilLightReflex': serializer.toJson<String?>(
+        postResuscitationLeftPupilLightReflex,
+      ),
+      'postResuscitationRightPupilLightReflex': serializer.toJson<String?>(
+        postResuscitationRightPupilLightReflex,
+      ),
+      'otherSupplements': serializer.toJson<String?>(otherSupplements),
       'endRecord': serializer.toJson<String?>(endRecord),
       'endResult': serializer.toJson<String?>(endResult),
       'selectedHospital': serializer.toJson<String?>(selectedHospital),
@@ -21249,6 +21695,18 @@ class EmergencyRecord extends DataClass implements Insertable<EmergencyRecord> {
     Value<String?> ivNeedleSize = const Value.absent(),
     Value<String?> ivLineRecord = const Value.absent(),
     Value<String?> cardiacMassageRecord = const Value.absent(),
+    Value<String?> postResuscitationEvmE = const Value.absent(),
+    Value<String?> postResuscitationEvmV = const Value.absent(),
+    Value<String?> postResuscitationEvmM = const Value.absent(),
+    Value<String?> postResuscitationHeartRate = const Value.absent(),
+    Value<String?> postResuscitationRespirationMethod = const Value.absent(),
+    Value<String?> postResuscitationBloodPressure = const Value.absent(),
+    Value<String?> postResuscitationLeftPupilSize = const Value.absent(),
+    Value<String?> postResuscitationRightPupilSize = const Value.absent(),
+    Value<String?> postResuscitationLeftPupilLightReflex = const Value.absent(),
+    Value<String?> postResuscitationRightPupilLightReflex =
+        const Value.absent(),
+    Value<String?> otherSupplements = const Value.absent(),
     Value<String?> endRecord = const Value.absent(),
     Value<String?> endResult = const Value.absent(),
     Value<String?> selectedHospital = const Value.absent(),
@@ -21360,6 +21818,42 @@ class EmergencyRecord extends DataClass implements Insertable<EmergencyRecord> {
     cardiacMassageRecord: cardiacMassageRecord.present
         ? cardiacMassageRecord.value
         : this.cardiacMassageRecord,
+    postResuscitationEvmE: postResuscitationEvmE.present
+        ? postResuscitationEvmE.value
+        : this.postResuscitationEvmE,
+    postResuscitationEvmV: postResuscitationEvmV.present
+        ? postResuscitationEvmV.value
+        : this.postResuscitationEvmV,
+    postResuscitationEvmM: postResuscitationEvmM.present
+        ? postResuscitationEvmM.value
+        : this.postResuscitationEvmM,
+    postResuscitationHeartRate: postResuscitationHeartRate.present
+        ? postResuscitationHeartRate.value
+        : this.postResuscitationHeartRate,
+    postResuscitationRespirationMethod:
+        postResuscitationRespirationMethod.present
+        ? postResuscitationRespirationMethod.value
+        : this.postResuscitationRespirationMethod,
+    postResuscitationBloodPressure: postResuscitationBloodPressure.present
+        ? postResuscitationBloodPressure.value
+        : this.postResuscitationBloodPressure,
+    postResuscitationLeftPupilSize: postResuscitationLeftPupilSize.present
+        ? postResuscitationLeftPupilSize.value
+        : this.postResuscitationLeftPupilSize,
+    postResuscitationRightPupilSize: postResuscitationRightPupilSize.present
+        ? postResuscitationRightPupilSize.value
+        : this.postResuscitationRightPupilSize,
+    postResuscitationLeftPupilLightReflex:
+        postResuscitationLeftPupilLightReflex.present
+        ? postResuscitationLeftPupilLightReflex.value
+        : this.postResuscitationLeftPupilLightReflex,
+    postResuscitationRightPupilLightReflex:
+        postResuscitationRightPupilLightReflex.present
+        ? postResuscitationRightPupilLightReflex.value
+        : this.postResuscitationRightPupilLightReflex,
+    otherSupplements: otherSupplements.present
+        ? otherSupplements.value
+        : this.otherSupplements,
     endRecord: endRecord.present ? endRecord.value : this.endRecord,
     endResult: endResult.present ? endResult.value : this.endResult,
     selectedHospital: selectedHospital.present
@@ -21508,6 +22002,45 @@ class EmergencyRecord extends DataClass implements Insertable<EmergencyRecord> {
       cardiacMassageRecord: data.cardiacMassageRecord.present
           ? data.cardiacMassageRecord.value
           : this.cardiacMassageRecord,
+      postResuscitationEvmE: data.postResuscitationEvmE.present
+          ? data.postResuscitationEvmE.value
+          : this.postResuscitationEvmE,
+      postResuscitationEvmV: data.postResuscitationEvmV.present
+          ? data.postResuscitationEvmV.value
+          : this.postResuscitationEvmV,
+      postResuscitationEvmM: data.postResuscitationEvmM.present
+          ? data.postResuscitationEvmM.value
+          : this.postResuscitationEvmM,
+      postResuscitationHeartRate: data.postResuscitationHeartRate.present
+          ? data.postResuscitationHeartRate.value
+          : this.postResuscitationHeartRate,
+      postResuscitationRespirationMethod:
+          data.postResuscitationRespirationMethod.present
+          ? data.postResuscitationRespirationMethod.value
+          : this.postResuscitationRespirationMethod,
+      postResuscitationBloodPressure:
+          data.postResuscitationBloodPressure.present
+          ? data.postResuscitationBloodPressure.value
+          : this.postResuscitationBloodPressure,
+      postResuscitationLeftPupilSize:
+          data.postResuscitationLeftPupilSize.present
+          ? data.postResuscitationLeftPupilSize.value
+          : this.postResuscitationLeftPupilSize,
+      postResuscitationRightPupilSize:
+          data.postResuscitationRightPupilSize.present
+          ? data.postResuscitationRightPupilSize.value
+          : this.postResuscitationRightPupilSize,
+      postResuscitationLeftPupilLightReflex:
+          data.postResuscitationLeftPupilLightReflex.present
+          ? data.postResuscitationLeftPupilLightReflex.value
+          : this.postResuscitationLeftPupilLightReflex,
+      postResuscitationRightPupilLightReflex:
+          data.postResuscitationRightPupilLightReflex.present
+          ? data.postResuscitationRightPupilLightReflex.value
+          : this.postResuscitationRightPupilLightReflex,
+      otherSupplements: data.otherSupplements.present
+          ? data.otherSupplements.value
+          : this.otherSupplements,
       endRecord: data.endRecord.present ? data.endRecord.value : this.endRecord,
       endResult: data.endResult.present ? data.endResult.value : this.endResult,
       selectedHospital: data.selectedHospital.present
@@ -21596,6 +22129,29 @@ class EmergencyRecord extends DataClass implements Insertable<EmergencyRecord> {
           ..write('ivNeedleSize: $ivNeedleSize, ')
           ..write('ivLineRecord: $ivLineRecord, ')
           ..write('cardiacMassageRecord: $cardiacMassageRecord, ')
+          ..write('postResuscitationEvmE: $postResuscitationEvmE, ')
+          ..write('postResuscitationEvmV: $postResuscitationEvmV, ')
+          ..write('postResuscitationEvmM: $postResuscitationEvmM, ')
+          ..write('postResuscitationHeartRate: $postResuscitationHeartRate, ')
+          ..write(
+            'postResuscitationRespirationMethod: $postResuscitationRespirationMethod, ',
+          )
+          ..write(
+            'postResuscitationBloodPressure: $postResuscitationBloodPressure, ',
+          )
+          ..write(
+            'postResuscitationLeftPupilSize: $postResuscitationLeftPupilSize, ',
+          )
+          ..write(
+            'postResuscitationRightPupilSize: $postResuscitationRightPupilSize, ',
+          )
+          ..write(
+            'postResuscitationLeftPupilLightReflex: $postResuscitationLeftPupilLightReflex, ',
+          )
+          ..write(
+            'postResuscitationRightPupilLightReflex: $postResuscitationRightPupilLightReflex, ',
+          )
+          ..write('otherSupplements: $otherSupplements, ')
           ..write('endRecord: $endRecord, ')
           ..write('endResult: $endResult, ')
           ..write('selectedHospital: $selectedHospital, ')
@@ -21664,6 +22220,17 @@ class EmergencyRecord extends DataClass implements Insertable<EmergencyRecord> {
     ivNeedleSize,
     ivLineRecord,
     cardiacMassageRecord,
+    postResuscitationEvmE,
+    postResuscitationEvmV,
+    postResuscitationEvmM,
+    postResuscitationHeartRate,
+    postResuscitationRespirationMethod,
+    postResuscitationBloodPressure,
+    postResuscitationLeftPupilSize,
+    postResuscitationRightPupilSize,
+    postResuscitationLeftPupilLightReflex,
+    postResuscitationRightPupilLightReflex,
+    otherSupplements,
     endRecord,
     endResult,
     selectedHospital,
@@ -21731,6 +22298,23 @@ class EmergencyRecord extends DataClass implements Insertable<EmergencyRecord> {
           other.ivNeedleSize == this.ivNeedleSize &&
           other.ivLineRecord == this.ivLineRecord &&
           other.cardiacMassageRecord == this.cardiacMassageRecord &&
+          other.postResuscitationEvmE == this.postResuscitationEvmE &&
+          other.postResuscitationEvmV == this.postResuscitationEvmV &&
+          other.postResuscitationEvmM == this.postResuscitationEvmM &&
+          other.postResuscitationHeartRate == this.postResuscitationHeartRate &&
+          other.postResuscitationRespirationMethod ==
+              this.postResuscitationRespirationMethod &&
+          other.postResuscitationBloodPressure ==
+              this.postResuscitationBloodPressure &&
+          other.postResuscitationLeftPupilSize ==
+              this.postResuscitationLeftPupilSize &&
+          other.postResuscitationRightPupilSize ==
+              this.postResuscitationRightPupilSize &&
+          other.postResuscitationLeftPupilLightReflex ==
+              this.postResuscitationLeftPupilLightReflex &&
+          other.postResuscitationRightPupilLightReflex ==
+              this.postResuscitationRightPupilLightReflex &&
+          other.otherSupplements == this.otherSupplements &&
           other.endRecord == this.endRecord &&
           other.endResult == this.endResult &&
           other.selectedHospital == this.selectedHospital &&
@@ -21796,6 +22380,17 @@ class EmergencyRecordsCompanion extends UpdateCompanion<EmergencyRecord> {
   final Value<String?> ivNeedleSize;
   final Value<String?> ivLineRecord;
   final Value<String?> cardiacMassageRecord;
+  final Value<String?> postResuscitationEvmE;
+  final Value<String?> postResuscitationEvmV;
+  final Value<String?> postResuscitationEvmM;
+  final Value<String?> postResuscitationHeartRate;
+  final Value<String?> postResuscitationRespirationMethod;
+  final Value<String?> postResuscitationBloodPressure;
+  final Value<String?> postResuscitationLeftPupilSize;
+  final Value<String?> postResuscitationRightPupilSize;
+  final Value<String?> postResuscitationLeftPupilLightReflex;
+  final Value<String?> postResuscitationRightPupilLightReflex;
+  final Value<String?> otherSupplements;
   final Value<String?> endRecord;
   final Value<String?> endResult;
   final Value<String?> selectedHospital;
@@ -21859,6 +22454,17 @@ class EmergencyRecordsCompanion extends UpdateCompanion<EmergencyRecord> {
     this.ivNeedleSize = const Value.absent(),
     this.ivLineRecord = const Value.absent(),
     this.cardiacMassageRecord = const Value.absent(),
+    this.postResuscitationEvmE = const Value.absent(),
+    this.postResuscitationEvmV = const Value.absent(),
+    this.postResuscitationEvmM = const Value.absent(),
+    this.postResuscitationHeartRate = const Value.absent(),
+    this.postResuscitationRespirationMethod = const Value.absent(),
+    this.postResuscitationBloodPressure = const Value.absent(),
+    this.postResuscitationLeftPupilSize = const Value.absent(),
+    this.postResuscitationRightPupilSize = const Value.absent(),
+    this.postResuscitationLeftPupilLightReflex = const Value.absent(),
+    this.postResuscitationRightPupilLightReflex = const Value.absent(),
+    this.otherSupplements = const Value.absent(),
     this.endRecord = const Value.absent(),
     this.endResult = const Value.absent(),
     this.selectedHospital = const Value.absent(),
@@ -21923,6 +22529,17 @@ class EmergencyRecordsCompanion extends UpdateCompanion<EmergencyRecord> {
     this.ivNeedleSize = const Value.absent(),
     this.ivLineRecord = const Value.absent(),
     this.cardiacMassageRecord = const Value.absent(),
+    this.postResuscitationEvmE = const Value.absent(),
+    this.postResuscitationEvmV = const Value.absent(),
+    this.postResuscitationEvmM = const Value.absent(),
+    this.postResuscitationHeartRate = const Value.absent(),
+    this.postResuscitationRespirationMethod = const Value.absent(),
+    this.postResuscitationBloodPressure = const Value.absent(),
+    this.postResuscitationLeftPupilSize = const Value.absent(),
+    this.postResuscitationRightPupilSize = const Value.absent(),
+    this.postResuscitationLeftPupilLightReflex = const Value.absent(),
+    this.postResuscitationRightPupilLightReflex = const Value.absent(),
+    this.otherSupplements = const Value.absent(),
     this.endRecord = const Value.absent(),
     this.endResult = const Value.absent(),
     this.selectedHospital = const Value.absent(),
@@ -21987,6 +22604,17 @@ class EmergencyRecordsCompanion extends UpdateCompanion<EmergencyRecord> {
     Expression<String>? ivNeedleSize,
     Expression<String>? ivLineRecord,
     Expression<String>? cardiacMassageRecord,
+    Expression<String>? postResuscitationEvmE,
+    Expression<String>? postResuscitationEvmV,
+    Expression<String>? postResuscitationEvmM,
+    Expression<String>? postResuscitationHeartRate,
+    Expression<String>? postResuscitationRespirationMethod,
+    Expression<String>? postResuscitationBloodPressure,
+    Expression<String>? postResuscitationLeftPupilSize,
+    Expression<String>? postResuscitationRightPupilSize,
+    Expression<String>? postResuscitationLeftPupilLightReflex,
+    Expression<String>? postResuscitationRightPupilLightReflex,
+    Expression<String>? otherSupplements,
     Expression<String>? endRecord,
     Expression<String>? endResult,
     Expression<String>? selectedHospital,
@@ -22058,6 +22686,30 @@ class EmergencyRecordsCompanion extends UpdateCompanion<EmergencyRecord> {
       if (ivLineRecord != null) 'iv_line_record': ivLineRecord,
       if (cardiacMassageRecord != null)
         'cardiac_massage_record': cardiacMassageRecord,
+      if (postResuscitationEvmE != null)
+        'post_resuscitation_evm_e': postResuscitationEvmE,
+      if (postResuscitationEvmV != null)
+        'post_resuscitation_evm_v': postResuscitationEvmV,
+      if (postResuscitationEvmM != null)
+        'post_resuscitation_evm_m': postResuscitationEvmM,
+      if (postResuscitationHeartRate != null)
+        'post_resuscitation_heart_rate': postResuscitationHeartRate,
+      if (postResuscitationRespirationMethod != null)
+        'post_resuscitation_respiration_method':
+            postResuscitationRespirationMethod,
+      if (postResuscitationBloodPressure != null)
+        'post_resuscitation_blood_pressure': postResuscitationBloodPressure,
+      if (postResuscitationLeftPupilSize != null)
+        'post_resuscitation_left_pupil_size': postResuscitationLeftPupilSize,
+      if (postResuscitationRightPupilSize != null)
+        'post_resuscitation_right_pupil_size': postResuscitationRightPupilSize,
+      if (postResuscitationLeftPupilLightReflex != null)
+        'post_resuscitation_left_pupil_light_reflex':
+            postResuscitationLeftPupilLightReflex,
+      if (postResuscitationRightPupilLightReflex != null)
+        'post_resuscitation_right_pupil_light_reflex':
+            postResuscitationRightPupilLightReflex,
+      if (otherSupplements != null) 'other_supplements': otherSupplements,
       if (endRecord != null) 'end_record': endRecord,
       if (endResult != null) 'end_result': endResult,
       if (selectedHospital != null) 'selected_hospital': selectedHospital,
@@ -22126,6 +22778,17 @@ class EmergencyRecordsCompanion extends UpdateCompanion<EmergencyRecord> {
     Value<String?>? ivNeedleSize,
     Value<String?>? ivLineRecord,
     Value<String?>? cardiacMassageRecord,
+    Value<String?>? postResuscitationEvmE,
+    Value<String?>? postResuscitationEvmV,
+    Value<String?>? postResuscitationEvmM,
+    Value<String?>? postResuscitationHeartRate,
+    Value<String?>? postResuscitationRespirationMethod,
+    Value<String?>? postResuscitationBloodPressure,
+    Value<String?>? postResuscitationLeftPupilSize,
+    Value<String?>? postResuscitationRightPupilSize,
+    Value<String?>? postResuscitationLeftPupilLightReflex,
+    Value<String?>? postResuscitationRightPupilLightReflex,
+    Value<String?>? otherSupplements,
     Value<String?>? endRecord,
     Value<String?>? endResult,
     Value<String?>? selectedHospital,
@@ -22192,6 +22855,31 @@ class EmergencyRecordsCompanion extends UpdateCompanion<EmergencyRecord> {
       ivNeedleSize: ivNeedleSize ?? this.ivNeedleSize,
       ivLineRecord: ivLineRecord ?? this.ivLineRecord,
       cardiacMassageRecord: cardiacMassageRecord ?? this.cardiacMassageRecord,
+      postResuscitationEvmE:
+          postResuscitationEvmE ?? this.postResuscitationEvmE,
+      postResuscitationEvmV:
+          postResuscitationEvmV ?? this.postResuscitationEvmV,
+      postResuscitationEvmM:
+          postResuscitationEvmM ?? this.postResuscitationEvmM,
+      postResuscitationHeartRate:
+          postResuscitationHeartRate ?? this.postResuscitationHeartRate,
+      postResuscitationRespirationMethod:
+          postResuscitationRespirationMethod ??
+          this.postResuscitationRespirationMethod,
+      postResuscitationBloodPressure:
+          postResuscitationBloodPressure ?? this.postResuscitationBloodPressure,
+      postResuscitationLeftPupilSize:
+          postResuscitationLeftPupilSize ?? this.postResuscitationLeftPupilSize,
+      postResuscitationRightPupilSize:
+          postResuscitationRightPupilSize ??
+          this.postResuscitationRightPupilSize,
+      postResuscitationLeftPupilLightReflex:
+          postResuscitationLeftPupilLightReflex ??
+          this.postResuscitationLeftPupilLightReflex,
+      postResuscitationRightPupilLightReflex:
+          postResuscitationRightPupilLightReflex ??
+          this.postResuscitationRightPupilLightReflex,
+      otherSupplements: otherSupplements ?? this.otherSupplements,
       endRecord: endRecord ?? this.endRecord,
       endResult: endResult ?? this.endResult,
       selectedHospital: selectedHospital ?? this.selectedHospital,
@@ -22368,6 +23056,59 @@ class EmergencyRecordsCompanion extends UpdateCompanion<EmergencyRecord> {
         cardiacMassageRecord.value,
       );
     }
+    if (postResuscitationEvmE.present) {
+      map['post_resuscitation_evm_e'] = Variable<String>(
+        postResuscitationEvmE.value,
+      );
+    }
+    if (postResuscitationEvmV.present) {
+      map['post_resuscitation_evm_v'] = Variable<String>(
+        postResuscitationEvmV.value,
+      );
+    }
+    if (postResuscitationEvmM.present) {
+      map['post_resuscitation_evm_m'] = Variable<String>(
+        postResuscitationEvmM.value,
+      );
+    }
+    if (postResuscitationHeartRate.present) {
+      map['post_resuscitation_heart_rate'] = Variable<String>(
+        postResuscitationHeartRate.value,
+      );
+    }
+    if (postResuscitationRespirationMethod.present) {
+      map['post_resuscitation_respiration_method'] = Variable<String>(
+        postResuscitationRespirationMethod.value,
+      );
+    }
+    if (postResuscitationBloodPressure.present) {
+      map['post_resuscitation_blood_pressure'] = Variable<String>(
+        postResuscitationBloodPressure.value,
+      );
+    }
+    if (postResuscitationLeftPupilSize.present) {
+      map['post_resuscitation_left_pupil_size'] = Variable<String>(
+        postResuscitationLeftPupilSize.value,
+      );
+    }
+    if (postResuscitationRightPupilSize.present) {
+      map['post_resuscitation_right_pupil_size'] = Variable<String>(
+        postResuscitationRightPupilSize.value,
+      );
+    }
+    if (postResuscitationLeftPupilLightReflex.present) {
+      map['post_resuscitation_left_pupil_light_reflex'] = Variable<String>(
+        postResuscitationLeftPupilLightReflex.value,
+      );
+    }
+    if (postResuscitationRightPupilLightReflex.present) {
+      map['post_resuscitation_right_pupil_light_reflex'] = Variable<String>(
+        postResuscitationRightPupilLightReflex.value,
+      );
+    }
+    if (otherSupplements.present) {
+      map['other_supplements'] = Variable<String>(otherSupplements.value);
+    }
     if (endRecord.present) {
       map['end_record'] = Variable<String>(endRecord.value);
     }
@@ -22470,6 +23211,29 @@ class EmergencyRecordsCompanion extends UpdateCompanion<EmergencyRecord> {
           ..write('ivNeedleSize: $ivNeedleSize, ')
           ..write('ivLineRecord: $ivLineRecord, ')
           ..write('cardiacMassageRecord: $cardiacMassageRecord, ')
+          ..write('postResuscitationEvmE: $postResuscitationEvmE, ')
+          ..write('postResuscitationEvmV: $postResuscitationEvmV, ')
+          ..write('postResuscitationEvmM: $postResuscitationEvmM, ')
+          ..write('postResuscitationHeartRate: $postResuscitationHeartRate, ')
+          ..write(
+            'postResuscitationRespirationMethod: $postResuscitationRespirationMethod, ',
+          )
+          ..write(
+            'postResuscitationBloodPressure: $postResuscitationBloodPressure, ',
+          )
+          ..write(
+            'postResuscitationLeftPupilSize: $postResuscitationLeftPupilSize, ',
+          )
+          ..write(
+            'postResuscitationRightPupilSize: $postResuscitationRightPupilSize, ',
+          )
+          ..write(
+            'postResuscitationLeftPupilLightReflex: $postResuscitationLeftPupilLightReflex, ',
+          )
+          ..write(
+            'postResuscitationRightPupilLightReflex: $postResuscitationRightPupilLightReflex, ',
+          )
+          ..write('otherSupplements: $otherSupplements, ')
           ..write('endRecord: $endRecord, ')
           ..write('endResult: $endResult, ')
           ..write('selectedHospital: $selectedHospital, ')
@@ -31452,6 +32216,17 @@ typedef $$EmergencyRecordsTableCreateCompanionBuilder =
       Value<String?> ivNeedleSize,
       Value<String?> ivLineRecord,
       Value<String?> cardiacMassageRecord,
+      Value<String?> postResuscitationEvmE,
+      Value<String?> postResuscitationEvmV,
+      Value<String?> postResuscitationEvmM,
+      Value<String?> postResuscitationHeartRate,
+      Value<String?> postResuscitationRespirationMethod,
+      Value<String?> postResuscitationBloodPressure,
+      Value<String?> postResuscitationLeftPupilSize,
+      Value<String?> postResuscitationRightPupilSize,
+      Value<String?> postResuscitationLeftPupilLightReflex,
+      Value<String?> postResuscitationRightPupilLightReflex,
+      Value<String?> otherSupplements,
       Value<String?> endRecord,
       Value<String?> endResult,
       Value<String?> selectedHospital,
@@ -31517,6 +32292,17 @@ typedef $$EmergencyRecordsTableUpdateCompanionBuilder =
       Value<String?> ivNeedleSize,
       Value<String?> ivLineRecord,
       Value<String?> cardiacMassageRecord,
+      Value<String?> postResuscitationEvmE,
+      Value<String?> postResuscitationEvmV,
+      Value<String?> postResuscitationEvmM,
+      Value<String?> postResuscitationHeartRate,
+      Value<String?> postResuscitationRespirationMethod,
+      Value<String?> postResuscitationBloodPressure,
+      Value<String?> postResuscitationLeftPupilSize,
+      Value<String?> postResuscitationRightPupilSize,
+      Value<String?> postResuscitationLeftPupilLightReflex,
+      Value<String?> postResuscitationRightPupilLightReflex,
+      Value<String?> otherSupplements,
       Value<String?> endRecord,
       Value<String?> endResult,
       Value<String?> selectedHospital,
@@ -31775,6 +32561,67 @@ class $$EmergencyRecordsTableFilterComposer
 
   ColumnFilters<String> get cardiacMassageRecord => $composableBuilder(
     column: $table.cardiacMassageRecord,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get postResuscitationEvmE => $composableBuilder(
+    column: $table.postResuscitationEvmE,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get postResuscitationEvmV => $composableBuilder(
+    column: $table.postResuscitationEvmV,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get postResuscitationEvmM => $composableBuilder(
+    column: $table.postResuscitationEvmM,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get postResuscitationHeartRate => $composableBuilder(
+    column: $table.postResuscitationHeartRate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get postResuscitationRespirationMethod =>
+      $composableBuilder(
+        column: $table.postResuscitationRespirationMethod,
+        builder: (column) => ColumnFilters(column),
+      );
+
+  ColumnFilters<String> get postResuscitationBloodPressure =>
+      $composableBuilder(
+        column: $table.postResuscitationBloodPressure,
+        builder: (column) => ColumnFilters(column),
+      );
+
+  ColumnFilters<String> get postResuscitationLeftPupilSize =>
+      $composableBuilder(
+        column: $table.postResuscitationLeftPupilSize,
+        builder: (column) => ColumnFilters(column),
+      );
+
+  ColumnFilters<String> get postResuscitationRightPupilSize =>
+      $composableBuilder(
+        column: $table.postResuscitationRightPupilSize,
+        builder: (column) => ColumnFilters(column),
+      );
+
+  ColumnFilters<String> get postResuscitationLeftPupilLightReflex =>
+      $composableBuilder(
+        column: $table.postResuscitationLeftPupilLightReflex,
+        builder: (column) => ColumnFilters(column),
+      );
+
+  ColumnFilters<String> get postResuscitationRightPupilLightReflex =>
+      $composableBuilder(
+        column: $table.postResuscitationRightPupilLightReflex,
+        builder: (column) => ColumnFilters(column),
+      );
+
+  ColumnFilters<String> get otherSupplements => $composableBuilder(
+    column: $table.otherSupplements,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -32098,6 +32945,67 @@ class $$EmergencyRecordsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get postResuscitationEvmE => $composableBuilder(
+    column: $table.postResuscitationEvmE,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get postResuscitationEvmV => $composableBuilder(
+    column: $table.postResuscitationEvmV,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get postResuscitationEvmM => $composableBuilder(
+    column: $table.postResuscitationEvmM,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get postResuscitationHeartRate => $composableBuilder(
+    column: $table.postResuscitationHeartRate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get postResuscitationRespirationMethod =>
+      $composableBuilder(
+        column: $table.postResuscitationRespirationMethod,
+        builder: (column) => ColumnOrderings(column),
+      );
+
+  ColumnOrderings<String> get postResuscitationBloodPressure =>
+      $composableBuilder(
+        column: $table.postResuscitationBloodPressure,
+        builder: (column) => ColumnOrderings(column),
+      );
+
+  ColumnOrderings<String> get postResuscitationLeftPupilSize =>
+      $composableBuilder(
+        column: $table.postResuscitationLeftPupilSize,
+        builder: (column) => ColumnOrderings(column),
+      );
+
+  ColumnOrderings<String> get postResuscitationRightPupilSize =>
+      $composableBuilder(
+        column: $table.postResuscitationRightPupilSize,
+        builder: (column) => ColumnOrderings(column),
+      );
+
+  ColumnOrderings<String> get postResuscitationLeftPupilLightReflex =>
+      $composableBuilder(
+        column: $table.postResuscitationLeftPupilLightReflex,
+        builder: (column) => ColumnOrderings(column),
+      );
+
+  ColumnOrderings<String> get postResuscitationRightPupilLightReflex =>
+      $composableBuilder(
+        column: $table.postResuscitationRightPupilLightReflex,
+        builder: (column) => ColumnOrderings(column),
+      );
+
+  ColumnOrderings<String> get otherSupplements => $composableBuilder(
+    column: $table.otherSupplements,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get endRecord => $composableBuilder(
     column: $table.endRecord,
     builder: (column) => ColumnOrderings(column),
@@ -32394,6 +33302,67 @@ class $$EmergencyRecordsTableAnnotationComposer
     builder: (column) => column,
   );
 
+  GeneratedColumn<String> get postResuscitationEvmE => $composableBuilder(
+    column: $table.postResuscitationEvmE,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get postResuscitationEvmV => $composableBuilder(
+    column: $table.postResuscitationEvmV,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get postResuscitationEvmM => $composableBuilder(
+    column: $table.postResuscitationEvmM,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get postResuscitationHeartRate => $composableBuilder(
+    column: $table.postResuscitationHeartRate,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get postResuscitationRespirationMethod =>
+      $composableBuilder(
+        column: $table.postResuscitationRespirationMethod,
+        builder: (column) => column,
+      );
+
+  GeneratedColumn<String> get postResuscitationBloodPressure =>
+      $composableBuilder(
+        column: $table.postResuscitationBloodPressure,
+        builder: (column) => column,
+      );
+
+  GeneratedColumn<String> get postResuscitationLeftPupilSize =>
+      $composableBuilder(
+        column: $table.postResuscitationLeftPupilSize,
+        builder: (column) => column,
+      );
+
+  GeneratedColumn<String> get postResuscitationRightPupilSize =>
+      $composableBuilder(
+        column: $table.postResuscitationRightPupilSize,
+        builder: (column) => column,
+      );
+
+  GeneratedColumn<String> get postResuscitationLeftPupilLightReflex =>
+      $composableBuilder(
+        column: $table.postResuscitationLeftPupilLightReflex,
+        builder: (column) => column,
+      );
+
+  GeneratedColumn<String> get postResuscitationRightPupilLightReflex =>
+      $composableBuilder(
+        column: $table.postResuscitationRightPupilLightReflex,
+        builder: (column) => column,
+      );
+
+  GeneratedColumn<String> get otherSupplements => $composableBuilder(
+    column: $table.otherSupplements,
+    builder: (column) => column,
+  );
+
   GeneratedColumn<String> get endRecord =>
       $composableBuilder(column: $table.endRecord, builder: (column) => column);
 
@@ -32544,6 +33513,24 @@ class $$EmergencyRecordsTableTableManager
                 Value<String?> ivNeedleSize = const Value.absent(),
                 Value<String?> ivLineRecord = const Value.absent(),
                 Value<String?> cardiacMassageRecord = const Value.absent(),
+                Value<String?> postResuscitationEvmE = const Value.absent(),
+                Value<String?> postResuscitationEvmV = const Value.absent(),
+                Value<String?> postResuscitationEvmM = const Value.absent(),
+                Value<String?> postResuscitationHeartRate =
+                    const Value.absent(),
+                Value<String?> postResuscitationRespirationMethod =
+                    const Value.absent(),
+                Value<String?> postResuscitationBloodPressure =
+                    const Value.absent(),
+                Value<String?> postResuscitationLeftPupilSize =
+                    const Value.absent(),
+                Value<String?> postResuscitationRightPupilSize =
+                    const Value.absent(),
+                Value<String?> postResuscitationLeftPupilLightReflex =
+                    const Value.absent(),
+                Value<String?> postResuscitationRightPupilLightReflex =
+                    const Value.absent(),
+                Value<String?> otherSupplements = const Value.absent(),
                 Value<String?> endRecord = const Value.absent(),
                 Value<String?> endResult = const Value.absent(),
                 Value<String?> selectedHospital = const Value.absent(),
@@ -32607,6 +33594,21 @@ class $$EmergencyRecordsTableTableManager
                 ivNeedleSize: ivNeedleSize,
                 ivLineRecord: ivLineRecord,
                 cardiacMassageRecord: cardiacMassageRecord,
+                postResuscitationEvmE: postResuscitationEvmE,
+                postResuscitationEvmV: postResuscitationEvmV,
+                postResuscitationEvmM: postResuscitationEvmM,
+                postResuscitationHeartRate: postResuscitationHeartRate,
+                postResuscitationRespirationMethod:
+                    postResuscitationRespirationMethod,
+                postResuscitationBloodPressure: postResuscitationBloodPressure,
+                postResuscitationLeftPupilSize: postResuscitationLeftPupilSize,
+                postResuscitationRightPupilSize:
+                    postResuscitationRightPupilSize,
+                postResuscitationLeftPupilLightReflex:
+                    postResuscitationLeftPupilLightReflex,
+                postResuscitationRightPupilLightReflex:
+                    postResuscitationRightPupilLightReflex,
+                otherSupplements: otherSupplements,
                 endRecord: endRecord,
                 endResult: endResult,
                 selectedHospital: selectedHospital,
@@ -32672,6 +33674,24 @@ class $$EmergencyRecordsTableTableManager
                 Value<String?> ivNeedleSize = const Value.absent(),
                 Value<String?> ivLineRecord = const Value.absent(),
                 Value<String?> cardiacMassageRecord = const Value.absent(),
+                Value<String?> postResuscitationEvmE = const Value.absent(),
+                Value<String?> postResuscitationEvmV = const Value.absent(),
+                Value<String?> postResuscitationEvmM = const Value.absent(),
+                Value<String?> postResuscitationHeartRate =
+                    const Value.absent(),
+                Value<String?> postResuscitationRespirationMethod =
+                    const Value.absent(),
+                Value<String?> postResuscitationBloodPressure =
+                    const Value.absent(),
+                Value<String?> postResuscitationLeftPupilSize =
+                    const Value.absent(),
+                Value<String?> postResuscitationRightPupilSize =
+                    const Value.absent(),
+                Value<String?> postResuscitationLeftPupilLightReflex =
+                    const Value.absent(),
+                Value<String?> postResuscitationRightPupilLightReflex =
+                    const Value.absent(),
+                Value<String?> otherSupplements = const Value.absent(),
                 Value<String?> endRecord = const Value.absent(),
                 Value<String?> endResult = const Value.absent(),
                 Value<String?> selectedHospital = const Value.absent(),
@@ -32735,6 +33755,21 @@ class $$EmergencyRecordsTableTableManager
                 ivNeedleSize: ivNeedleSize,
                 ivLineRecord: ivLineRecord,
                 cardiacMassageRecord: cardiacMassageRecord,
+                postResuscitationEvmE: postResuscitationEvmE,
+                postResuscitationEvmV: postResuscitationEvmV,
+                postResuscitationEvmM: postResuscitationEvmM,
+                postResuscitationHeartRate: postResuscitationHeartRate,
+                postResuscitationRespirationMethod:
+                    postResuscitationRespirationMethod,
+                postResuscitationBloodPressure: postResuscitationBloodPressure,
+                postResuscitationLeftPupilSize: postResuscitationLeftPupilSize,
+                postResuscitationRightPupilSize:
+                    postResuscitationRightPupilSize,
+                postResuscitationLeftPupilLightReflex:
+                    postResuscitationLeftPupilLightReflex,
+                postResuscitationRightPupilLightReflex:
+                    postResuscitationRightPupilLightReflex,
+                otherSupplements: otherSupplements,
                 endRecord: endRecord,
                 endResult: endResult,
                 selectedHospital: selectedHospital,
