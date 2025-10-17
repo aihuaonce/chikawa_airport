@@ -1846,7 +1846,7 @@ class _PlanPageState extends State<PlanPage>
           ),
         ),
         const SizedBox(height: 8),
-        _SectionTitle('其他轉送醫院?'),
+        _SectionTitle('其他轉送醫院'),
         TextField(
           controller: _controllers['referralOtherHospital'],
           decoration: const InputDecoration(

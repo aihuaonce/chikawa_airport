@@ -872,6 +872,32 @@ class AppTranslations {
   String get intubationRecord => isZh ? '插管記錄' : 'Intubation Record';
   String get enterIntubationRecord =>
       isZh ? '請輸入插管記錄' : 'Please enter intubation record';
+  String get ivAndCardiacMassage => isZh ? '點滴與心臟按摩' : 'IV and Cardiac Massage';
+  String get onIvLineStartTime =>
+      isZh ? 'On IV Line 開始時間' : 'On IV Line Start Time';
+  String get ivNeedleSize => isZh ? '注射針頭尺寸' : 'IV Needle Size';
+  String get enterIvNeedleSize =>
+      isZh ? '請輸入注射針頭尺寸' : 'Please enter IV needle size';
+  String get onIvLineRecord => isZh ? 'On IV Line 紀錄' : 'On IV Line Record';
+  String get enterOnIvLineRecord =>
+      isZh ? '請輸入 On IV Line 紀錄' : 'Please enter On IV Line record';
+  String get cardiacMassageStartTime =>
+      isZh ? 'Cardiac Massage 開始時間' : 'Cardiac Massage Start Time';
+  String get cardiacMassageEndTime =>
+      isZh ? 'Cardiac Massage 結束時間' : 'Cardiac Massage End Time';
+  String get cardiacMassageRecord =>
+      isZh ? 'Cardiac Massage 紀錄' : 'Cardiac Massage Record';
+  String get enterCardiacMassageRecord =>
+      isZh ? '請輸入 Cardiac Massage 紀錄' : 'Please enter Cardiac Massage record';
+  String get postResuscitationStatus =>
+      isZh ? '急救後病況' : 'Post-Resuscitation Status';
+  String get respiration => isZh ? '呼吸' : 'Respiration';
+  String get spontaneousRespiration =>
+      isZh ? '自發性呼吸' : 'Spontaneous Respiration';
+  String get ventilator => isZh ? '呼吸器' : 'Ventilator';
+  String get otherSupplements => isZh ? '其他補充' : 'Other Supplements';
+  String get enterSupplementaryNotes =>
+      isZh ? '請輸入補充說明' : 'Please enter supplementary notes';
   String get emergencyEndAndResult =>
       isZh ? '急救結束與結果' : 'End of First Aid & Result';
   String get firstAidEndTime => isZh ? '急救結束時間' : 'First Aid End Time';
