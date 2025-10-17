@@ -82,11 +82,9 @@ class _ElectronicDocumentsPageState extends State<ElectronicDocumentsPage>
   Future<void> _saveData() async {
     final dao = context.read<ElectronicDocumentsDao>();
     final dataModel = context.read<ElectronicDocumentData>();
-    await dao.upsertByVisitId(
-      visitId: widget.visitId,
-      toSelectedIndex: dataModel.toSelectedIndex,
-      fromSelectedIndex: dataModel.fromSelectedIndex,
-    );
+
+    // ✅ 正確做法：直接呼叫您在 dataModel 中定義好的新方法
+    await dataModel.saveToDatabase(widget.visitId, dao);
   }
 
   // ===============================================

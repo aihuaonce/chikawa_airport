@@ -1,17 +1,17 @@
+// ==================== 2️⃣ ambulance_data.dart ====================
 import 'dart:convert';
+import 'package:chikawa_airport/data/db/app_database.dart';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'package:drift/drift.dart' show Value, OldDbFieldInDatabaseAccessor;
-
+import 'package:drift/drift.dart';
 import '../db/daos.dart';
-import '../db/app_database.dart';
 
 class AmbulanceData extends ChangeNotifier {
   final int visitId;
 
   AmbulanceData(this.visitId);
 
-  // ==================== Information (基本資訊) ====================
+  // Information
   String? plateNumber;
   int? placeGroupIdx;
   int? t1PlaceIdx;
@@ -31,6 +31,72 @@ class AmbulanceData extends ChangeNotifier {
   String? otherDestinationHospital;
   String? destinationHospital;
 
+  // Personal
+  String? gender;
+  String? idNumber;
+  int? age;
+  String? address;
+  String? patientBelongings;
+  String? belongingsHandled;
+  String? custodianName;
+  Uint8List? custodianSignature;
+
+  // Situation
+  String? chiefComplaint;
+  Set<String> traumaClass = {};
+  Set<String> nonTraumaType = {};
+  Set<String> nonTraumaAcutePicked = {};
+  Set<String> nonTraumaGeneralPicked = {};
+  Set<String> traumaTypePicked = {};
+  Set<String> traumaGeneralBodyPicked = {};
+  Set<String> traumaMechanismPicked = {};
+  Set<String> allergy = {};
+  Set<String> pmh = {};
+  String? allergyOther;
+  String? pmhOther;
+  String? nonTraumaAcuteOther;
+  String? traumaGeneralOther;
+  String? fallHeight;
+  String? burnDegree;
+  String? burnArea;
+  String? traumaOther;
+  bool? isProxyStatement;
+
+  // Plan
+  Map<String, bool> emergencyTreatments = {};
+  Map<String, bool> airwayTreatments = {};
+  Map<String, bool> traumaTreatments = {};
+  Map<String, bool> transportMethods = {};
+  Map<String, bool> cprMethods = {};
+  Map<String, bool> medicationProcedures = {};
+  Map<String, bool> otherEmergencyProcedures = {};
+  String? bodyDiagramNote;
+  String? bodyDiagramPath;
+  String? airwayOther;
+  String? otherEmergencyOther;
+  String? aslType;
+  String? ettSize;
+  String? ettDepth;
+  String? manualDefibCount;
+  String? manualDefibJoules;
+  String? guideNote;
+  String? receivingUnit;
+  DateTime? receivingTime;
+  bool? isRejection;
+  String? rejectionName;
+  String? relationshipType;
+  String? contactName;
+  String? contactPhone;
+
+  // Expenses
+  int? staffFee;
+  int? oxygenFee;
+  int? totalFee;
+  String? chargeStatus;
+  String? paidType;
+  String? unpaidType;
+
+  // Update methods (保持不變)
   void updateInformation({
     String? plateNumber,
     int? placeGroupIdx,
@@ -76,16 +142,6 @@ class AmbulanceData extends ChangeNotifier {
     notifyListeners();
   }
 
-  // ==================== Personal (個人資料) ====================
-  String? gender;
-  String? idNumber;
-  int? age;
-  String? address;
-  String? patientBelongings;
-  String? belongingsHandled;
-  String? custodianName;
-  Uint8List? custodianSignature;
-
   void updatePersonal({
     String? gender,
     String? idNumber,
@@ -107,27 +163,6 @@ class AmbulanceData extends ChangeNotifier {
       this.custodianSignature = custodianSignature;
     notifyListeners();
   }
-
-  // ==================== Situation (情況記錄) ====================
-  String? chiefComplaint;
-  Set<String> traumaClass = {};
-  Set<String> nonTraumaType = {};
-  Set<String> nonTraumaAcutePicked = {};
-  Set<String> nonTraumaGeneralPicked = {};
-  Set<String> traumaTypePicked = {};
-  Set<String> traumaGeneralBodyPicked = {};
-  Set<String> traumaMechanismPicked = {};
-  Set<String> allergy = {};
-  Set<String> pmh = {};
-  String? allergyOther;
-  String? pmhOther;
-  String? nonTraumaAcuteOther;
-  String? traumaGeneralOther;
-  String? fallHeight;
-  String? burnDegree;
-  String? burnArea;
-  String? traumaOther;
-  bool? isProxyStatement;
 
   void updateSituation({
     String? chiefComplaint,
@@ -177,32 +212,6 @@ class AmbulanceData extends ChangeNotifier {
     if (isProxyStatement != null) this.isProxyStatement = isProxyStatement;
     notifyListeners();
   }
-
-  // ==================== Plan (處置記錄) ====================
-  Map<String, bool> emergencyTreatments = {};
-  Map<String, bool> airwayTreatments = {};
-  Map<String, bool> traumaTreatments = {};
-  Map<String, bool> transportMethods = {};
-  Map<String, bool> cprMethods = {};
-  Map<String, bool> medicationProcedures = {};
-  Map<String, bool> otherEmergencyProcedures = {};
-  String? bodyDiagramNote;
-  String? bodyDiagramPath;
-  String? airwayOther;
-  String? otherEmergencyOther;
-  String? aslType;
-  String? ettSize;
-  String? ettDepth;
-  String? manualDefibCount;
-  String? manualDefibJoules;
-  String? guideNote;
-  String? receivingUnit;
-  DateTime? receivingTime;
-  bool? isRejection;
-  String? rejectionName;
-  String? relationshipType;
-  String? contactName;
-  String? contactPhone;
 
   void updatePlan({
     Map<String, bool>? emergencyTreatments,
@@ -261,14 +270,6 @@ class AmbulanceData extends ChangeNotifier {
     notifyListeners();
   }
 
-  // ==================== Expenses (費用) ====================
-  int? staffFee;
-  int? oxygenFee;
-  int? totalFee;
-  String? chargeStatus;
-  String? paidType;
-  String? unpaidType;
-
   void updateExpenses({
     int? staffFee,
     int? oxygenFee,
@@ -286,9 +287,7 @@ class AmbulanceData extends ChangeNotifier {
     notifyListeners();
   }
 
-  // ✅ 清空所有資料
   void clearAll() {
-    // Information
     plateNumber = null;
     placeGroupIdx = null;
     t1PlaceIdx = null;
@@ -308,7 +307,6 @@ class AmbulanceData extends ChangeNotifier {
     otherDestinationHospital = null;
     destinationHospital = null;
 
-    // Personal
     gender = null;
     idNumber = null;
     age = null;
@@ -318,7 +316,6 @@ class AmbulanceData extends ChangeNotifier {
     custodianName = null;
     custodianSignature = null;
 
-    // Situation
     chiefComplaint = null;
     traumaClass = {};
     nonTraumaType = {};
@@ -339,7 +336,6 @@ class AmbulanceData extends ChangeNotifier {
     traumaOther = null;
     isProxyStatement = null;
 
-    // Plan
     emergencyTreatments = {};
     airwayTreatments = {};
     traumaTreatments = {};
@@ -365,7 +361,6 @@ class AmbulanceData extends ChangeNotifier {
     contactName = null;
     contactPhone = null;
 
-    // Expenses
     staffFee = null;
     oxygenFee = null;
     totalFee = null;
@@ -376,12 +371,10 @@ class AmbulanceData extends ChangeNotifier {
     notifyListeners();
   }
 
-  // ✅ 🆕 從其他資料表預填資料
   Future<void> _prefillFromOtherTables(AmbulanceRecordsDao dao) async {
     try {
       print('🔍 開始從其他資料表預填資料...');
 
-      // 1️⃣ 從 PatientProfiles 抓取個人資料
       final profile = await dao.db.patientProfilesDao.getByVisitId(visitId);
       if (profile != null) {
         print('✅ 找到 PatientProfile 資料');
@@ -403,7 +396,6 @@ class AmbulanceData extends ChangeNotifier {
         }
       }
 
-      // 2️⃣ 從 AccidentRecords 抓取事故資料
       final accidentRecord = await dao.db.accidentRecordsDao.getByVisitId(
         visitId,
       );
@@ -433,7 +425,6 @@ class AmbulanceData extends ChangeNotifier {
     }
   }
 
-  // ✅ 從資料庫載入資料(含預填)
   Future<void> loadFromDatabase(AmbulanceRecordsDao dao) async {
     try {
       final record = await dao.getByVisitId(visitId);
@@ -448,7 +439,6 @@ class AmbulanceData extends ChangeNotifier {
 
       print('✅ 找到救護車記錄,載入資料...');
 
-      // Information
       plateNumber = record.plateNumber;
       placeGroupIdx = record.placeGroupIdx;
       t1PlaceIdx = record.t1PlaceIdx;
@@ -468,7 +458,6 @@ class AmbulanceData extends ChangeNotifier {
       otherDestinationHospital = record.otherDestinationHospital;
       destinationHospital = record.destinationHospital;
 
-      // Personal
       if (profile != null) {
         gender = profile.gender;
         idNumber = profile.idNumber;
@@ -480,7 +469,6 @@ class AmbulanceData extends ChangeNotifier {
       custodianName = record.custodianName;
       custodianSignature = record.custodianSignature;
 
-      // Situation
       chiefComplaint = record.chiefComplaint;
       traumaClass = _jsonToSet(record.traumaClassJson);
       nonTraumaType = _jsonToSet(record.nonTraumaTypeJson);
@@ -501,7 +489,6 @@ class AmbulanceData extends ChangeNotifier {
       traumaOther = record.traumaOther;
       isProxyStatement = record.isProxyStatement;
 
-      // Plan
       emergencyTreatments = _jsonToMap(record.emergencyTreatmentsJson);
       airwayTreatments = _jsonToMap(record.airwayTreatmentsJson);
       traumaTreatments = _jsonToMap(record.traumaTreatmentsJson);
@@ -529,7 +516,6 @@ class AmbulanceData extends ChangeNotifier {
       contactName = record.contactName;
       contactPhone = record.contactPhone;
 
-      // Expenses
       staffFee = record.staffFee;
       oxygenFee = record.oxygenFee;
       totalFee = record.totalFee;
@@ -537,7 +523,6 @@ class AmbulanceData extends ChangeNotifier {
       paidType = record.paidType;
       unpaidType = record.unpaidType;
 
-      // 🆕 即使有救護車記錄,還是檢查是否有空白欄位需要預填
       await _prefillFromOtherTables(dao);
 
       notifyListeners();
@@ -548,7 +533,6 @@ class AmbulanceData extends ChangeNotifier {
     }
   }
 
-  // 輔助方法: JSON 轉 Set
   Set<String> _jsonToSet(String? jsonString) {
     if (jsonString == null || jsonString.isEmpty) return {};
     try {
@@ -558,7 +542,6 @@ class AmbulanceData extends ChangeNotifier {
     }
   }
 
-  // 輔助方法: JSON 轉 Map
   Map<String, bool> _jsonToMap(String? jsonString) {
     if (jsonString == null || jsonString.isEmpty) return {};
     try {
@@ -574,121 +557,119 @@ class AmbulanceData extends ChangeNotifier {
     }
   }
 
-  // ==================== ✅ 儲存到資料庫 ====================
+  // ✅ 新增：轉換為 Companion
+  AmbulanceRecordsCompanion toCompanion() {
+    return AmbulanceRecordsCompanion(
+      visitId: Value(visitId),
+      plateNumber: Value(plateNumber),
+      placeGroupIdx: Value(placeGroupIdx),
+      t1PlaceIdx: Value(t1PlaceIdx),
+      t2PlaceIdx: Value(t2PlaceIdx),
+      remotePlaceIdx: Value(remotePlaceIdx),
+      cargoPlaceIdx: Value(cargoPlaceIdx),
+      novotelPlaceIdx: Value(novotelPlaceIdx),
+      cabinPlaceIdx: Value(cabinPlaceIdx),
+      placeNote: Value(placeNote),
+      dutyTime: Value(dutyTime),
+      arriveSceneTime: Value(arriveSceneTime),
+      leaveSceneTime: Value(leaveSceneTime),
+      arriveHospitalTime: Value(arriveHospitalTime),
+      leaveHospitalTime: Value(leaveHospitalTime),
+      backStandbyTime: Value(backStandbyTime),
+      destinationHospitalIdx: Value(destinationHospitalIdx),
+      otherDestinationHospital: Value(otherDestinationHospital),
+      destinationHospital: Value(destinationHospital),
+      patientBelongings: Value(patientBelongings),
+      belongingsHandled: Value(belongingsHandled),
+      custodianName: Value(custodianName),
+      custodianSignature: Value(custodianSignature),
+      chiefComplaint: Value(chiefComplaint),
+      traumaClassJson: Value(jsonEncode(traumaClass.toList())),
+      nonTraumaTypeJson: Value(jsonEncode(nonTraumaType.toList())),
+      nonTraumaAcutePickedJson: Value(
+        jsonEncode(nonTraumaAcutePicked.toList()),
+      ),
+      nonTraumaGeneralPickedJson: Value(
+        jsonEncode(nonTraumaGeneralPicked.toList()),
+      ),
+      traumaTypePickedJson: Value(jsonEncode(traumaTypePicked.toList())),
+      traumaGeneralBodyPickedJson: Value(
+        jsonEncode(traumaGeneralBodyPicked.toList()),
+      ),
+      traumaMechanismPickedJson: Value(
+        jsonEncode(traumaMechanismPicked.toList()),
+      ),
+      allergyJson: Value(jsonEncode(allergy.toList())),
+      pmhJson: Value(jsonEncode(pmh.toList())),
+      allergyOther: Value(allergyOther),
+      pmhOther: Value(pmhOther),
+      nonTraumaAcuteOther: Value(nonTraumaAcuteOther),
+      traumaGeneralOther: Value(traumaGeneralOther),
+      fallHeight: Value(fallHeight),
+      burnDegree: Value(burnDegree),
+      burnArea: Value(burnArea),
+      traumaOther: Value(traumaOther),
+      isProxyStatement: Value(isProxyStatement),
+      emergencyTreatmentsJson: Value(jsonEncode(emergencyTreatments)),
+      airwayTreatmentsJson: Value(jsonEncode(airwayTreatments)),
+      traumaTreatmentsJson: Value(jsonEncode(traumaTreatments)),
+      transportMethodsJson: Value(jsonEncode(transportMethods)),
+      cprMethodsJson: Value(jsonEncode(cprMethods)),
+      medicationProceduresJson: Value(jsonEncode(medicationProcedures)),
+      otherEmergencyProceduresJson: Value(jsonEncode(otherEmergencyProcedures)),
+      bodyDiagramNote: Value(bodyDiagramNote),
+      bodyDiagramPath: Value(bodyDiagramPath),
+      airwayOther: Value(airwayOther),
+      otherEmergencyOther: Value(otherEmergencyOther),
+      aslType: Value(aslType),
+      ettSize: Value(ettSize),
+      ettDepth: Value(ettDepth),
+      manualDefibCount: Value(manualDefibCount),
+      manualDefibJoules: Value(manualDefibJoules),
+      guideNote: Value(guideNote),
+      receivingUnit: Value(receivingUnit),
+      receivingTime: Value(receivingTime),
+      isRejection: Value(isRejection ?? false),
+      rejectionName: Value(rejectionName),
+      relationshipType: Value(relationshipType),
+      contactName: Value(contactName),
+      contactPhone: Value(contactPhone),
+      staffFee: Value(staffFee),
+      oxygenFee: Value(oxygenFee),
+      totalFee: Value(totalFee),
+      chargeStatus: Value(chargeStatus),
+      paidType: Value(paidType),
+      unpaidType: Value(unpaidType),
+    );
+  }
+
+  // ✅ 簡化後的保存方法
   Future<void> saveToDatabase(
     AmbulanceRecordsDao dao,
     PatientProfilesDao profileDao,
     VisitsDao visitsDao,
   ) async {
     try {
-      // 檢查是否已存在記錄
-      final exists = await dao.recordExistsForVisit(visitId);
+      // 直接用 upsert
+      await dao.upsert(toCompanion());
 
-      if (!exists) {
-        await dao.createRecordForVisit(visitId);
-      }
-
-      // 更新救護車記錄
-      await dao.updateAmbulanceRecord(
-        AmbulanceRecordsCompanion(
+      // 更新 PatientProfile
+      await profileDao.upsert(
+        PatientProfilesCompanion(
           visitId: Value(visitId),
-          plateNumber: Value(plateNumber),
-          placeGroupIdx: Value(placeGroupIdx),
-          t1PlaceIdx: Value(t1PlaceIdx),
-          t2PlaceIdx: Value(t2PlaceIdx),
-          remotePlaceIdx: Value(remotePlaceIdx),
-          cargoPlaceIdx: Value(cargoPlaceIdx),
-          novotelPlaceIdx: Value(novotelPlaceIdx),
-          cabinPlaceIdx: Value(cabinPlaceIdx),
-          placeNote: Value(placeNote),
-          dutyTime: Value(dutyTime),
-          arriveSceneTime: Value(arriveSceneTime),
-          leaveSceneTime: Value(leaveSceneTime),
-          arriveHospitalTime: Value(arriveHospitalTime),
-          leaveHospitalTime: Value(leaveHospitalTime),
-          backStandbyTime: Value(backStandbyTime),
-          destinationHospitalIdx: Value(destinationHospitalIdx),
-          otherDestinationHospital: Value(otherDestinationHospital),
-          destinationHospital: Value(destinationHospital),
-          patientBelongings: Value(patientBelongings),
-          belongingsHandled: Value(belongingsHandled),
-          custodianName: Value(custodianName),
-          custodianSignature: Value(custodianSignature),
-          chiefComplaint: Value(chiefComplaint),
-          traumaClassJson: Value(jsonEncode(traumaClass.toList())),
-          nonTraumaTypeJson: Value(jsonEncode(nonTraumaType.toList())),
-          nonTraumaAcutePickedJson: Value(
-            jsonEncode(nonTraumaAcutePicked.toList()),
-          ),
-          nonTraumaGeneralPickedJson: Value(
-            jsonEncode(nonTraumaGeneralPicked.toList()),
-          ),
-          traumaTypePickedJson: Value(jsonEncode(traumaTypePicked.toList())),
-          traumaGeneralBodyPickedJson: Value(
-            jsonEncode(traumaGeneralBodyPicked.toList()),
-          ),
-          traumaMechanismPickedJson: Value(
-            jsonEncode(traumaMechanismPicked.toList()),
-          ),
-          allergyJson: Value(jsonEncode(allergy.toList())),
-          pmhJson: Value(jsonEncode(pmh.toList())),
-          allergyOther: Value(allergyOther),
-          pmhOther: Value(pmhOther),
-          nonTraumaAcuteOther: Value(nonTraumaAcuteOther),
-          traumaGeneralOther: Value(traumaGeneralOther),
-          fallHeight: Value(fallHeight),
-          burnDegree: Value(burnDegree),
-          burnArea: Value(burnArea),
-          traumaOther: Value(traumaOther),
-          isProxyStatement: Value(isProxyStatement),
-          emergencyTreatmentsJson: Value(jsonEncode(emergencyTreatments)),
-          airwayTreatmentsJson: Value(jsonEncode(airwayTreatments)),
-          traumaTreatmentsJson: Value(jsonEncode(traumaTreatments)),
-          transportMethodsJson: Value(jsonEncode(transportMethods)),
-          cprMethodsJson: Value(jsonEncode(cprMethods)),
-          medicationProceduresJson: Value(jsonEncode(medicationProcedures)),
-          otherEmergencyProceduresJson: Value(
-            jsonEncode(otherEmergencyProcedures),
-          ),
-          bodyDiagramNote: Value(bodyDiagramNote),
-          bodyDiagramPath: Value(bodyDiagramPath),
-          airwayOther: Value(airwayOther),
-          otherEmergencyOther: Value(otherEmergencyOther),
-          aslType: Value(aslType),
-          ettSize: Value(ettSize),
-          ettDepth: Value(ettDepth),
-          manualDefibCount: Value(manualDefibCount),
-          manualDefibJoules: Value(manualDefibJoules),
-          guideNote: Value(guideNote),
-          receivingUnit: Value(receivingUnit),
-          receivingTime: Value(receivingTime),
-          isRejection: Value(isRejection ?? false),
-          rejectionName: Value(rejectionName),
-          relationshipType: Value(relationshipType),
-          contactName: Value(contactName),
-          contactPhone: Value(contactPhone),
-          staffFee: Value(staffFee),
-          oxygenFee: Value(oxygenFee),
-          totalFee: Value(totalFee),
-          chargeStatus: Value(chargeStatus),
-          paidType: Value(paidType),
-          unpaidType: Value(unpaidType),
+          gender: Value(gender),
+          idNumber: Value(idNumber),
+          address: Value(address),
         ),
       );
 
-      // 更新 PatientProfile
-      await profileDao.upsertByVisitId(
-        visitId: visitId,
-        gender: gender,
-        idNumber: idNumber,
-        address: address,
-      );
-
-      // 更新 Visits 表
-      await visitsDao.updateVisitSummary(
+      // 更新 Visits
+      await visitsDao.updateVisit(
         visitId,
-        gender: gender,
-        uploadedAt: DateTime.now(),
+        VisitsCompanion(
+          gender: Value(gender),
+          uploadedAt: Value(DateTime.now()),
+        ),
       );
 
       print('✅ 救護車記錄已成功儲存到資料庫 (visitId: $visitId)');

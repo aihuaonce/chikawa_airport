@@ -1,30 +1,27 @@
-// data/models/flightlog_data.dart
+// ==================== 4️⃣ flightlog_data.dart ====================
 import 'package:flutter/material.dart';
+import 'package:chikawa_airport/data/db/app_database.dart';
+import 'package:drift/drift.dart';
+import '../db/daos.dart';
 
 class FlightLogData extends ChangeNotifier {
-  // ----------------- 航空公司 -----------------
-  int? airlineIndex; // 主要航空公司 index
-  bool useOtherAirline = false; // 是否選擇「其他航空公司」
-  String? selectedOtherAirline; // 其他航空公司名稱
-
+  int? airlineIndex;
+  bool useOtherAirline = false;
+  String? selectedOtherAirline;
   String? flightNo;
   String? otherTravelStatus;
 
-  // ----------------- 班機號碼 -----------------
   final TextEditingController flightNoCtrl = TextEditingController();
   final FocusNode flightNoFocus = FocusNode();
 
-  // ----------------- 旅行狀態 -----------------
-  int? travelStatusIndex; // 出境 / 入境 / ... / 其他
+  int? travelStatusIndex;
   final TextEditingController otherTravelCtrl = TextEditingController();
   final FocusNode otherTravelFocus = FocusNode();
 
-  // ----------------- 地點 -----------------
-  String? departure; // 啟程地
-  String? via; // 經過地
-  String? destination; // 目的地
+  String? departure;
+  String? via;
+  String? destination;
 
-  // ----------------- 方法 -----------------
   void update() {
     notifyListeners();
   }
@@ -53,5 +50,32 @@ class FlightLogData extends ChangeNotifier {
     otherTravelCtrl.dispose();
     otherTravelFocus.dispose();
     super.dispose();
+  }
+
+  // ✅ 新增：轉換為 Companion
+  FlightLogsCompanion toCompanion(int visitId) {
+    return FlightLogsCompanion(
+      visitId: Value(visitId),
+      airlineIndex: Value(airlineIndex),
+      useOtherAirline: Value(useOtherAirline),
+      otherAirline: Value(selectedOtherAirline),
+      flightNo: Value(flightNo),
+      travelStatusIndex: Value(travelStatusIndex),
+      otherTravelStatus: Value(otherTravelStatus),
+      departure: Value(departure),
+      via: Value(via),
+      destination: Value(destination),
+    );
+  }
+
+  // ✅ 簡化後的保存方法
+  Future<void> saveToDatabase(int visitId, FlightLogsDao dao) async {
+    try {
+      await dao.upsert(toCompanion(visitId));
+      print('✅ 航班記錄已儲存');
+    } catch (e) {
+      print('❌ 儲存失敗: $e');
+      rethrow;
+    }
   }
 }

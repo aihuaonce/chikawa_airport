@@ -95,16 +95,9 @@ class _MedicalExpensesPageState extends State<MedicalExpensesPage>
   Future<void> _saveData() async {
     final dao = context.read<MedicalCostsDao>();
     final dataModel = context.read<MedicalCostsData>();
-    await dao.upsertByVisitId(
-      visitId: widget.visitId,
-      chargeMethod: dataModel.chargeMethod,
-      visitFee: dataModel.visitFee,
-      ambulanceFee: dataModel.ambulanceFee,
-      note: dataModel.note,
-      photoPath: dataModel.photoPath,
-      agreementSignaturePath: dataModel.agreementSignaturePath,
-      witnessSignaturePath: dataModel.witnessSignaturePath,
-    );
+
+    // ✅ 正確做法：直接呼叫您在 dataModel 中定義好的新方法
+    await dataModel.saveToDatabase(widget.visitId, dao);
   }
 
   void _syncDataToControllers(MedicalCostsData dataModel) {

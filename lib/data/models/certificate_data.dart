@@ -1,26 +1,20 @@
-// lib/data/models/certificate_data.dart
+// ==================== 5️⃣ certificate_data.dart ====================
 import 'package:flutter/material.dart';
+import 'package:chikawa_airport/data/db/app_database.dart';
+import 'package:drift/drift.dart';
+import '../db/daos.dart';
 
 class CertificateData extends ChangeNotifier {
-  // 診斷內容
   String? diagnosis;
-
-  // 預設囑言片語選項 (1: 適宜飛行, 2: 轉診後送)
   int? instructionOption;
-
-  // 中、英文囑言
   String? chineseInstruction;
   String? englishInstruction;
-
-  // 開立日期
   DateTime? issueDate;
 
-  // 通知 UI 更新
   void update() {
     notifyListeners();
   }
 
-  // 清除所有資料
   void clear() {
     diagnosis = null;
     instructionOption = null;
@@ -28,5 +22,28 @@ class CertificateData extends ChangeNotifier {
     englishInstruction = null;
     issueDate = null;
     notifyListeners();
+  }
+
+  // ✅ 新增：轉換為 Companion
+  MedicalCertificatesCompanion toCompanion(int visitId) {
+    return MedicalCertificatesCompanion(
+      visitId: Value(visitId),
+      diagnosis: Value(diagnosis),
+      instructionOption: Value(instructionOption),
+      chineseInstruction: Value(chineseInstruction),
+      englishInstruction: Value(englishInstruction),
+      issueDate: Value(issueDate),
+    );
+  }
+
+  // ✅ 簡化後的保存方法
+  Future<void> saveToDatabase(int visitId, MedicalCertificatesDao dao) async {
+    try {
+      await dao.upsert(toCompanion(visitId));
+      print('✅ 診斷書已儲存');
+    } catch (e) {
+      print('❌ 儲存失敗: $e');
+      rethrow;
+    }
   }
 }

@@ -1,38 +1,23 @@
+// ==================== 3️⃣ emergency_data.dart ====================
 import 'dart:convert';
+import 'package:chikawa_airport/data/db/app_database.dart';
 import 'package:flutter/material.dart';
-import 'package:drift/drift.dart' show Value, OldDbFieldInDatabaseAccessor;
-
+import 'package:drift/drift.dart';
 import '../db/daos.dart';
-import '../db/app_database.dart';
 
 class EmergencyData extends ChangeNotifier {
   final int visitId;
 
   EmergencyData(this.visitId);
 
-  // ==================== Personal (個人資料) ====================
+  // Personal
   String? patientName;
   String? idNumber;
   String? passportNumber;
   String? gender;
   DateTime? birthDate;
 
-  void updatePersonal({
-    String? patientName,
-    String? idNumber,
-    String? passportNumber,
-    String? gender,
-    DateTime? birthDate,
-  }) {
-    if (patientName != null) this.patientName = patientName;
-    if (idNumber != null) this.idNumber = idNumber;
-    if (passportNumber != null) this.passportNumber = passportNumber;
-    if (gender != null) this.gender = gender;
-    if (birthDate != null) this.birthDate = birthDate;
-    notifyListeners();
-  }
-
-  // ==================== Flight (飛航記錄) ====================
+  // Flight
   int? sourceIndex;
   int? purposeIndex;
   int? airlineIndex;
@@ -40,25 +25,7 @@ class EmergencyData extends ChangeNotifier {
   String? selectedOtherAirline;
   String? nationality;
 
-  void updateFlight({
-    int? sourceIndex,
-    int? purposeIndex,
-    int? airlineIndex,
-    bool? useOtherAirline,
-    String? selectedOtherAirline,
-    String? nationality,
-  }) {
-    if (sourceIndex != null) this.sourceIndex = sourceIndex;
-    if (purposeIndex != null) this.purposeIndex = purposeIndex;
-    if (airlineIndex != null) this.airlineIndex = airlineIndex;
-    if (useOtherAirline != null) this.useOtherAirline = useOtherAirline;
-    if (selectedOtherAirline != null)
-      this.selectedOtherAirline = selectedOtherAirline;
-    if (nationality != null) this.nationality = nationality;
-    notifyListeners();
-  }
-
-  // ==================== Accident (事故記錄) ====================
+  // Accident
   DateTime? incidentDateTime;
   int? placeGroupIdx;
   int? t1Selected;
@@ -69,30 +36,7 @@ class EmergencyData extends ChangeNotifier {
   int? cabinSelected;
   String? placeNote;
 
-  void updateAccident({
-    DateTime? incidentDateTime,
-    int? placeGroupIdx,
-    int? t1Selected,
-    int? t2Selected,
-    int? remoteSelected,
-    int? cargoSelected,
-    int? novotelSelected,
-    int? cabinSelected,
-    String? placeNote,
-  }) {
-    if (incidentDateTime != null) this.incidentDateTime = incidentDateTime;
-    if (placeGroupIdx != null) this.placeGroupIdx = placeGroupIdx;
-    if (t1Selected != null) this.t1Selected = t1Selected;
-    if (t2Selected != null) this.t2Selected = t2Selected;
-    if (remoteSelected != null) this.remoteSelected = remoteSelected;
-    if (cargoSelected != null) this.cargoSelected = cargoSelected;
-    if (novotelSelected != null) this.novotelSelected = novotelSelected;
-    if (cabinSelected != null) this.cabinSelected = cabinSelected;
-    if (placeNote != null) this.placeNote = placeNote;
-    notifyListeners();
-  }
-
-  // ==================== Plan (處置記錄) ====================
+  // Plan
   DateTime? firstAidStartTime;
   DateTime? intubationStartTime;
   DateTime? onIVLineStartTime;
@@ -117,12 +61,12 @@ class EmergencyData extends ChangeNotifier {
   String? postResuscitationEvmV;
   String? postResuscitationEvmM;
   String? postResuscitationHeartRate;
-  String? postResuscitationRespirationMethod; // for Radio button
+  String? postResuscitationRespirationMethod;
   String? postResuscitationBloodPressure;
   String? postResuscitationLeftPupilSize;
   String? postResuscitationRightPupilSize;
-  String? postResuscitationLeftPupilLightReflex; // for Radio button
-  String? postResuscitationRightPupilLightReflex; // for Radio button
+  String? postResuscitationLeftPupilLightReflex;
+  String? postResuscitationRightPupilLightReflex;
   String? otherSupplements;
 
   String? endRecord, endResult;
@@ -133,6 +77,63 @@ class EmergencyData extends ChangeNotifier {
   String? nurseSignature, emtSignature;
   List<String> selectedAssistants = [];
   List<Map<String, String>> medicationRecords = [];
+
+  // Update methods (保持不變)
+  void updatePersonal({
+    String? patientName,
+    String? idNumber,
+    String? passportNumber,
+    String? gender,
+    DateTime? birthDate,
+  }) {
+    if (patientName != null) this.patientName = patientName;
+    if (idNumber != null) this.idNumber = idNumber;
+    if (passportNumber != null) this.passportNumber = passportNumber;
+    if (gender != null) this.gender = gender;
+    if (birthDate != null) this.birthDate = birthDate;
+    notifyListeners();
+  }
+
+  void updateFlight({
+    int? sourceIndex,
+    int? purposeIndex,
+    int? airlineIndex,
+    bool? useOtherAirline,
+    String? selectedOtherAirline,
+    String? nationality,
+  }) {
+    if (sourceIndex != null) this.sourceIndex = sourceIndex;
+    if (purposeIndex != null) this.purposeIndex = purposeIndex;
+    if (airlineIndex != null) this.airlineIndex = airlineIndex;
+    if (useOtherAirline != null) this.useOtherAirline = useOtherAirline;
+    if (selectedOtherAirline != null)
+      this.selectedOtherAirline = selectedOtherAirline;
+    if (nationality != null) this.nationality = nationality;
+    notifyListeners();
+  }
+
+  void updateAccident({
+    DateTime? incidentDateTime,
+    int? placeGroupIdx,
+    int? t1Selected,
+    int? t2Selected,
+    int? remoteSelected,
+    int? cargoSelected,
+    int? novotelSelected,
+    int? cabinSelected,
+    String? placeNote,
+  }) {
+    if (incidentDateTime != null) this.incidentDateTime = incidentDateTime;
+    if (placeGroupIdx != null) this.placeGroupIdx = placeGroupIdx;
+    if (t1Selected != null) this.t1Selected = t1Selected;
+    if (t2Selected != null) this.t2Selected = t2Selected;
+    if (remoteSelected != null) this.remoteSelected = remoteSelected;
+    if (cargoSelected != null) this.cargoSelected = cargoSelected;
+    if (novotelSelected != null) this.novotelSelected = novotelSelected;
+    if (cabinSelected != null) this.cabinSelected = cabinSelected;
+    if (placeNote != null) this.placeNote = placeNote;
+    notifyListeners();
+  }
 
   void updatePlan({
     DateTime? firstAidStartTime,
@@ -256,24 +257,18 @@ class EmergencyData extends ChangeNotifier {
     notifyListeners();
   }
 
-  // ✅ 清空所有資料
   void clearAll() {
-    // Personal
     idNumber = null;
     passportNumber = null;
     gender = null;
     birthDate = null;
     patientName = null;
-
-    // Flight
     sourceIndex = null;
     purposeIndex = null;
     airlineIndex = null;
     useOtherAirline = false;
     selectedOtherAirline = null;
     nationality = null;
-
-    // Accident
     incidentDateTime = null;
     placeGroupIdx = null;
     t1Selected = null;
@@ -283,8 +278,6 @@ class EmergencyData extends ChangeNotifier {
     novotelSelected = null;
     cabinSelected = null;
     placeNote = null;
-
-    // Plan
     firstAidStartTime = null;
     intubationStartTime = null;
     onIVLineStartTime = null;
@@ -334,20 +327,16 @@ class EmergencyData extends ChangeNotifier {
     emtSignature = null;
     selectedAssistants = [];
     medicationRecords = [];
-
     notifyListeners();
   }
 
-  // ✅ 🆕 從其他資料表預填資料
   Future<void> _prefillFromOtherTables(EmergencyRecordsDao dao) async {
     try {
       print('🔍 開始從其他資料表預填資料...');
 
-      // 1️⃣ 從 PatientProfiles 抓取個人資料
       final profile = await dao.db.patientProfilesDao.getByVisitId(visitId);
       if (profile != null) {
         print('✅ 找到 PatientProfile 資料');
-        // 如果急救紀錄還沒有這些資料，就用 Profile 的
         if (gender == null && profile.gender != null) {
           gender = profile.gender;
           print('   - 預填性別: $gender');
@@ -366,7 +355,6 @@ class EmergencyData extends ChangeNotifier {
         }
       }
 
-      // 2️⃣ 從 Visits 抓取病患姓名
       final visit = await dao.db.visitsDao.getById(visitId);
       if (visit != null && visit.patientName != null) {
         if (patientName == null) {
@@ -375,7 +363,6 @@ class EmergencyData extends ChangeNotifier {
         }
       }
 
-      // 3️⃣ 從 FlightLogs 抓取航班資料
       final flightLog = await dao.db.flightLogsDao.getByVisitId(visitId);
       if (flightLog != null) {
         print('✅ 找到 FlightLog 資料');
@@ -390,7 +377,6 @@ class EmergencyData extends ChangeNotifier {
         }
       }
 
-      // 4️⃣ 從 AccidentRecords 抓取事故資料
       final accidentRecord = await dao.db.accidentRecordsDao.getByVisitId(
         visitId,
       );
@@ -421,18 +407,15 @@ class EmergencyData extends ChangeNotifier {
       print('✅ 預填資料完成！');
     } catch (e) {
       print('⚠️ 預填資料時發生錯誤: $e');
-      // 即使預填失敗也繼續，不影響主流程
     }
   }
 
-  // ✅ 從資料庫載入資料（含預填）
   Future<void> loadFromDatabase(EmergencyRecordsDao dao) async {
     try {
       final record = await dao.getByVisitId(visitId);
 
       if (record == null) {
         print('ℹ️ visitId $visitId 沒有急救紀錄，開始預填資料');
-        // 🆕 如果沒有急救紀錄，從其他表預填
         await _prefillFromOtherTables(dao);
         notifyListeners();
         return;
@@ -440,7 +423,6 @@ class EmergencyData extends ChangeNotifier {
 
       print('✅ 找到急救紀錄，載入資料...');
 
-      // 載入急救紀錄資料
       idNumber = record.idNumber;
       passportNumber = record.passportNumber;
       gender = record.gender;
@@ -520,7 +502,6 @@ class EmergencyData extends ChangeNotifier {
       nurseSignature = record.nurseSignature;
       emtSignature = record.emtSignature;
 
-      // 解析 JSON
       try {
         if (record.selectedAssistantsJson != null) {
           final decoded = jsonDecode(record.selectedAssistantsJson!);
@@ -543,7 +524,6 @@ class EmergencyData extends ChangeNotifier {
         medicationRecords = [];
       }
 
-      // 🆕 即使有急救紀錄，還是檢查是否有空白欄位需要預填
       await _prefillFromOtherTables(dao);
 
       notifyListeners();
@@ -554,113 +534,109 @@ class EmergencyData extends ChangeNotifier {
     }
   }
 
-  // ==================== ✅ 儲存到資料庫 ====================
+  // ✅ 新增：轉換為 Companion
+  EmergencyRecordsCompanion toCompanion() {
+    return EmergencyRecordsCompanion(
+      visitId: Value(visitId),
+      patientName: Value(patientName),
+      idNumber: Value(idNumber),
+      passportNumber: Value(passportNumber),
+      gender: Value(gender),
+      birthDate: Value(birthDate),
+      sourceIndex: Value(sourceIndex),
+      purposeIndex: Value(purposeIndex),
+      airlineIndex: Value(airlineIndex),
+      useOtherAirline: Value(useOtherAirline),
+      selectedOtherAirline: Value(selectedOtherAirline),
+      nationality: Value(nationality),
+      incidentDateTime: Value(incidentDateTime),
+      placeGroupIdx: Value(placeGroupIdx),
+      t1Selected: Value(t1Selected),
+      t2Selected: Value(t2Selected),
+      remoteSelected: Value(remoteSelected),
+      cargoSelected: Value(cargoSelected),
+      novotelSelected: Value(novotelSelected),
+      cabinSelected: Value(cabinSelected),
+      placeNote: Value(placeNote),
+      firstAidStartTime: Value(firstAidStartTime),
+      intubationStartTime: Value(intubationStartTime),
+      onIVLineStartTime: Value(onIVLineStartTime),
+      cardiacMassageStartTime: Value(cardiacMassageStartTime),
+      cardiacMassageEndTime: Value(cardiacMassageEndTime),
+      firstAidEndTime: Value(firstAidEndTime),
+      diagnosis: Value(diagnosis),
+      situation: Value(situation),
+      evmE: Value(evmE),
+      evmV: Value(evmV),
+      evmM: Value(evmM),
+      heartRate: Value(heartRate),
+      respirationRate: Value(respirationRate),
+      bloodPressure: Value(bloodPressure),
+      temperature: Value(temperature),
+      leftPupilSize: Value(leftPupilSize),
+      rightPupilSize: Value(rightPupilSize),
+      leftPupilReaction: Value(leftPupilReaction),
+      rightPupilReaction: Value(rightPupilReaction),
+      insertionMethod: Value(insertionMethod),
+      airwayContent: Value(airwayContent),
+      insertionRecord: Value(insertionRecord),
+      ivNeedleSize: Value(ivNeedleSize),
+      ivLineRecord: Value(ivLineRecord),
+      cardiacMassageRecord: Value(cardiacMassageRecord),
+      postResuscitationEvmE: Value(postResuscitationEvmE),
+      postResuscitationEvmV: Value(postResuscitationEvmV),
+      postResuscitationEvmM: Value(postResuscitationEvmM),
+      postResuscitationHeartRate: Value(postResuscitationHeartRate),
+      postResuscitationRespirationMethod: Value(
+        postResuscitationRespirationMethod,
+      ),
+      postResuscitationBloodPressure: Value(postResuscitationBloodPressure),
+      postResuscitationLeftPupilSize: Value(postResuscitationLeftPupilSize),
+      postResuscitationRightPupilSize: Value(postResuscitationRightPupilSize),
+      postResuscitationLeftPupilLightReflex: Value(
+        postResuscitationLeftPupilLightReflex,
+      ),
+      postResuscitationRightPupilLightReflex: Value(
+        postResuscitationRightPupilLightReflex,
+      ),
+      otherSupplements: Value(otherSupplements),
+      endRecord: Value(endRecord),
+      endResult: Value(endResult),
+      selectedHospital: Value(selectedHospital),
+      otherHospital: Value(otherHospital),
+      otherEndResult: Value(otherEndResult),
+      deathTime: Value(deathTime),
+      selectedDoctor: Value(selectedDoctor),
+      selectedNurse: Value(selectedNurse),
+      selectedEMT: Value(selectedEMT),
+      nurseSignature: Value(nurseSignature),
+      emtSignature: Value(emtSignature),
+      selectedAssistantsJson: Value(jsonEncode(selectedAssistants)),
+      medicationRecordsJson: Value(jsonEncode(medicationRecords)),
+    );
+  }
+
+  // ✅ 簡化後的保存方法
   Future<void> saveToDatabase(
     EmergencyRecordsDao dao,
     VisitsDao visitsDao,
   ) async {
     try {
-      // 檢查是否已存在記錄
-      final exists = await dao.recordExistsForVisit(visitId);
+      // 直接用 upsert
+      await dao.upsert(toCompanion());
 
-      if (!exists) {
-        // 如果不存在,先建立一筆
-        await dao.createRecordForVisit(visitId);
-      }
-
-      // 更新急救記錄資料
-      await dao.updateEmergencyRecord(
-        EmergencyRecordsCompanion(
-          visitId: Value(visitId),
+      // 更新 Visits 表
+      await visitsDao.updateVisit(
+        visitId,
+        VisitsCompanion(
+          hasEmergencyRecord: const Value(true),
           patientName: Value(patientName),
-          idNumber: Value(idNumber),
-          passportNumber: Value(passportNumber),
           gender: Value(gender),
-          birthDate: Value(birthDate),
-          sourceIndex: Value(sourceIndex),
-          purposeIndex: Value(purposeIndex),
-          airlineIndex: Value(airlineIndex),
-          useOtherAirline: Value(useOtherAirline),
-          selectedOtherAirline: Value(selectedOtherAirline),
           nationality: Value(nationality),
           incidentDateTime: Value(incidentDateTime),
-          placeGroupIdx: Value(placeGroupIdx),
-          t1Selected: Value(t1Selected),
-          t2Selected: Value(t2Selected),
-          remoteSelected: Value(remoteSelected),
-          cargoSelected: Value(cargoSelected),
-          novotelSelected: Value(novotelSelected),
-          cabinSelected: Value(cabinSelected),
-          placeNote: Value(placeNote),
-          firstAidStartTime: Value(firstAidStartTime),
-          intubationStartTime: Value(intubationStartTime),
-          onIVLineStartTime: Value(onIVLineStartTime),
-          cardiacMassageStartTime: Value(cardiacMassageStartTime),
-          cardiacMassageEndTime: Value(cardiacMassageEndTime),
-          firstAidEndTime: Value(firstAidEndTime),
-          diagnosis: Value(diagnosis),
-          situation: Value(situation),
-          evmE: Value(evmE),
-          evmV: Value(evmV),
-          evmM: Value(evmM),
-          heartRate: Value(heartRate),
-          respirationRate: Value(respirationRate),
-          bloodPressure: Value(bloodPressure),
-          temperature: Value(temperature),
-          leftPupilSize: Value(leftPupilSize),
-          rightPupilSize: Value(rightPupilSize),
-          leftPupilReaction: Value(leftPupilReaction),
-          rightPupilReaction: Value(rightPupilReaction),
-          insertionMethod: Value(insertionMethod),
-          airwayContent: Value(airwayContent),
-          insertionRecord: Value(insertionRecord),
-          ivNeedleSize: Value(ivNeedleSize),
-          ivLineRecord: Value(ivLineRecord),
-          cardiacMassageRecord: Value(cardiacMassageRecord),
-          postResuscitationEvmE: Value(postResuscitationEvmE),
-          postResuscitationEvmV: Value(postResuscitationEvmV),
-          postResuscitationEvmM: Value(postResuscitationEvmM),
-          postResuscitationHeartRate: Value(postResuscitationHeartRate),
-          postResuscitationRespirationMethod: Value(
-            postResuscitationRespirationMethod,
-          ),
-          postResuscitationBloodPressure: Value(postResuscitationBloodPressure),
-          postResuscitationLeftPupilSize: Value(postResuscitationLeftPupilSize),
-          postResuscitationRightPupilSize: Value(
-            postResuscitationRightPupilSize,
-          ),
-          postResuscitationLeftPupilLightReflex: Value(
-            postResuscitationLeftPupilLightReflex,
-          ),
-          postResuscitationRightPupilLightReflex: Value(
-            postResuscitationRightPupilLightReflex,
-          ),
-          otherSupplements: Value(otherSupplements),
-          endRecord: Value(endRecord),
-          endResult: Value(endResult),
-          selectedHospital: Value(selectedHospital),
-          otherHospital: Value(otherHospital),
-          otherEndResult: Value(otherEndResult),
-          deathTime: Value(deathTime),
-          selectedDoctor: Value(selectedDoctor),
-          selectedNurse: Value(selectedNurse),
-          selectedEMT: Value(selectedEMT),
-          nurseSignature: Value(nurseSignature),
-          emtSignature: Value(emtSignature),
-          selectedAssistantsJson: Value(jsonEncode(selectedAssistants)),
-          medicationRecordsJson: Value(jsonEncode(medicationRecords)),
+          emergencyResult: Value(endResult),
+          uploadedAt: Value(DateTime.now()),
         ),
-      );
-
-      // ✅ 重要：更新 Visits 表，標記為急救記錄並儲存摘要資訊
-      await visitsDao.updateVisitForEmergency(
-        visitId,
-        patientName: patientName,
-        gender: gender,
-        nationality: nationality,
-        incidentDateTime: incidentDateTime,
-        emergencyResult: endResult,
-        uploadedAt: DateTime.now(),
       );
 
       print('✅ 急救記錄已成功儲存到資料庫 (visitId: $visitId)');

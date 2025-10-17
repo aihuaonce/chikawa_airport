@@ -1,8 +1,11 @@
+// ==================== 8️⃣ nursing_record_data.dart ====================
+import 'dart:convert';
+import 'package:chikawa_airport/data/db/app_database.dart';
 import 'package:flutter/material.dart';
+import 'package:drift/drift.dart';
+import '../db/daos.dart';
 
-// 定義單筆護理記錄的資料結構
 class NursingRecordEntry {
-  // 使用 UUID 或其他唯一 ID 來識別每一筆記錄，方便刪除
   final String id;
   String time;
   String record;
@@ -17,7 +20,6 @@ class NursingRecordEntry {
     this.nurseSign = '',
   });
 
-  // 從 Map 轉換 (用於從資料庫讀取)
   factory NursingRecordEntry.fromMap(Map<String, dynamic> map) {
     return NursingRecordEntry(
       id: map['id'] ?? UniqueKey().toString(),
@@ -28,7 +30,6 @@ class NursingRecordEntry {
     );
   }
 
-  // 轉換為 Map (用於存入資料庫)
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -41,29 +42,45 @@ class NursingRecordEntry {
 }
 
 class NursingRecordData extends ChangeNotifier {
-  // 護理記錄的資料列表
   List<NursingRecordEntry> nursingRecords = [];
 
-  // 新增一筆空的記錄
   void addRecord() {
     nursingRecords.add(NursingRecordEntry(id: UniqueKey().toString()));
     notifyListeners();
   }
 
-  // 根據 ID 刪除一筆記錄
   void removeRecord(String id) {
     nursingRecords.removeWhere((record) => record.id == id);
     notifyListeners();
   }
 
-  // 通知 UI 更新
   void update() {
     notifyListeners();
   }
 
-  // 清除所有資料
   void clear() {
     nursingRecords = [];
     notifyListeners();
+  }
+
+  // ✅ 新增：轉換為 Companion
+  NursingRecordsCompanion toCompanion(int visitId) {
+    return NursingRecordsCompanion(
+      visitId: Value(visitId),
+      recordsJson: Value(
+        jsonEncode(nursingRecords.map((r) => r.toMap()).toList()),
+      ),
+    );
+  }
+
+  // ✅ 簡化後的保存方法
+  Future<void> saveToDatabase(int visitId, NursingRecordsDao dao) async {
+    try {
+      await dao.upsert(toCompanion(visitId));
+      print('✅ 護理記錄已儲存');
+    } catch (e) {
+      print('❌ 儲存失敗: $e');
+      rethrow;
+    }
   }
 }

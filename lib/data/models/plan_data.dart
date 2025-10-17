@@ -1,9 +1,13 @@
-// data/models/plan_data.dart
+// lib/data/models/plan_data.dart
+
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:chikawa_airport/data/db/app_database.dart';
+import 'package:drift/drift.dart';
+import '../db/daos.dart';
 
 class PlanData extends ChangeNotifier {
-  // 疾病管制署篩檢
+  // === 篩檢 ===
   bool screeningChecked = false;
   Map<String, bool> screeningMethods = {
     '喉頭採檢': false,
@@ -13,8 +17,8 @@ class PlanData extends ChangeNotifier {
   String? otherScreeningMethod;
   List<Map<String, String>> healthData = [];
 
-  // 主訴
-  int? mainSymptom; // 0: 外傷, 1: 非外傷
+  // === 主訴 ===
+  int? mainSymptom;
   Map<String, bool> traumaSymptoms = {
     '鈍挫傷': false,
     '扭傷': false,
@@ -30,7 +34,6 @@ class PlanData extends ChangeNotifier {
     '四肢': false,
     '其他': false,
   };
-
   Map<String, bool> nonTraumaHeadSymptoms = {
     '頭痛': false,
     '頭暈目眩': false,
@@ -63,18 +66,17 @@ class PlanData extends ChangeNotifier {
   };
   String? symptomNote;
 
-  // 照片類型
+  // === 照片 ===
   Map<String, bool> photoTypes = {'外傷': false, '心電圖': false, '其他': false};
-  // Note: Photo paths would be handled separately, perhaps stored in a different table or as a list of strings here.
 
-  // 身體檢查
+  // === 身體檢查 ===
   String? bodyCheckHead;
   String? bodyCheckChest;
   String? bodyCheckAbdomen;
   String? bodyCheckLimbs;
   String? bodyCheckOther;
 
-  // 生命徵象
+  // === 生命徵象 ===
   String? temperature;
   String? pulse;
   String? respiration;
@@ -85,16 +87,16 @@ class PlanData extends ChangeNotifier {
   String? evmE;
   String? evmV;
   String? evmM;
-  int? leftPupilScale; // Using int for radio group
+  int? leftPupilScale;
   String? leftPupilSize;
-  int? rightPupilScale; // Using int for radio group
+  int? rightPupilScale;
   String? rightPupilSize;
 
-  // 病史
-  int? history; // 0:無, 1:不詳, 2:有
-  int? allergy; // 0:無, 1:不詳, 2:有
+  // === 病史 ===
+  int? history;
+  int? allergy;
 
-  // 初步診斷
+  // === 診斷 ===
   String? initialDiagnosis;
   int? diagnosisCategory;
   String? selectedICD10Main;
@@ -102,7 +104,7 @@ class PlanData extends ChangeNotifier {
   String? selectedICD10Sub2;
   int? triageCategory;
 
-  // 現場處置
+  // === 處理摘要 ===
   Map<String, bool> onSiteTreatments = {
     '諮詢衛教': false,
     '內科處置': false,
@@ -110,8 +112,6 @@ class PlanData extends ChangeNotifier {
     '拒絕處置': false,
     '疑似傳染病診療': false,
   };
-
-  // 處理摘要
   bool icePack = false;
   bool ekgChecked = false;
   String? ekgReading;
@@ -129,31 +129,25 @@ class PlanData extends ChangeNotifier {
   bool otherChecked = false;
   String? otherSummary;
 
-  // 建議轉診
+  // === 轉診詳情 ===
   int? referralPassageType;
   int? referralAmbulanceType;
   int? referralHospitalIdx;
   String? referralOtherHospital;
   String? referralEscort;
 
-  // 插管
+  // === 處置詳情 ===
   int? intubationType;
-
-  // 氧氣使用
   int? oxygenType;
   String? oxygenFlow;
-
-  // 診斷書
   Map<String, bool> medicalCertificateTypes = {
     '中文診斷書': false,
     '英文診斷書': false,
     '中英文適航證明': false,
   };
-
-  // 藥物使用
   List<Map<String, String>> prescriptionRows = [];
 
-  // 後續結果
+  // === 後續結果 ===
   Map<String, bool> followUpResults = {
     '繼續搭機旅行': false,
     '休息觀察或自行回家': false,
@@ -166,7 +160,7 @@ class PlanData extends ChangeNotifier {
   };
   int? otherHospitalIdx;
 
-  // 人員
+  // === 人員簽名 ===
   String? selectedMainDoctor;
   String? selectedMainNurse;
   String? nurseSignature;
@@ -175,7 +169,7 @@ class PlanData extends ChangeNotifier {
   String? helperNamesText;
   List<String> selectedHelpers = [];
 
-  // 特別註記
+  // === 特別註記 ===
   Map<String, bool> specialNotes = {
     'OHCA醫護團隊到場前有CPR': false,
     'OHCA醫護團隊到場前有使用AED但無電擊': false,
@@ -186,11 +180,10 @@ class PlanData extends ChangeNotifier {
   };
   String? otherSpecialNote;
 
-  void update() {
-    notifyListeners();
-  }
+  void update() => notifyListeners();
 
   void clear() {
+    // 將所有欄位重設為初始值
     screeningChecked = false;
     screeningMethods = {'喉頭採檢': false, '抽血驗證': false, '其他': false};
     otherScreeningMethod = null;
@@ -226,6 +219,7 @@ class PlanData extends ChangeNotifier {
       '胸悶胸痛': false,
       '心悸': false,
     };
+    nonTraumaAbdomenSymptoms = {'腹脹腹痛': false, '噁心嘔吐': false, '腹瀉': false};
     nonTraumaLimbsSymptoms = {'疼痛': false, '麻木無力': false};
     nonTraumaOtherSymptoms = {
       '發燒': false,
@@ -236,7 +230,6 @@ class PlanData extends ChangeNotifier {
       '精神異常': false,
       '其他': false,
     };
-    nonTraumaAbdomenSymptoms = {'腹脹腹痛': false, '噁心嘔吐': false, '腹瀉': false};
     symptomNote = null;
     photoTypes = {'外傷': false, '心電圖': false, '其他': false};
     bodyCheckHead = null;
@@ -330,6 +323,117 @@ class PlanData extends ChangeNotifier {
       '空白': false,
     };
     otherSpecialNote = null;
+
     notifyListeners();
+  }
+
+  // ✅ 轉換為 Companion (完整版)
+  TreatmentsCompanion toCompanion(int visitId) {
+    return TreatmentsCompanion(
+      visitId: Value(visitId),
+      screeningChecked: Value(screeningChecked),
+      screeningMethodsJson: Value(jsonEncode(screeningMethods)),
+      otherScreeningMethod: Value(otherScreeningMethod),
+      healthDataJson: Value(jsonEncode(healthData)),
+      mainSymptom: Value(mainSymptom),
+      traumaSymptomsJson: Value(jsonEncode(traumaSymptoms)),
+      nonTraumaSymptomsJson: Value(jsonEncode(nonTraumaSymptoms)),
+      nonTraumaHeadSymptomsJson: Value(jsonEncode(nonTraumaHeadSymptoms)),
+      nonTraumaChestSymptomsJson: Value(jsonEncode(nonTraumaChestSymptoms)),
+      nonTraumaAbdomenSymptomsJson: Value(jsonEncode(nonTraumaAbdomenSymptoms)),
+      nonTraumaLimbsSymptomsJson: Value(jsonEncode(nonTraumaLimbsSymptoms)),
+      nonTraumaOtherSymptomsJson: Value(jsonEncode(nonTraumaOtherSymptoms)),
+      symptomNote: Value(symptomNote),
+      photoTypesJson: Value(jsonEncode(photoTypes)),
+      bodyCheckHead: Value(bodyCheckHead),
+      bodyCheckChest: Value(bodyCheckChest),
+      bodyCheckAbdomen: Value(bodyCheckAbdomen),
+      bodyCheckLimbs: Value(bodyCheckLimbs),
+      bodyCheckOther: Value(bodyCheckOther),
+      temperature: Value(temperature),
+      pulse: Value(pulse),
+      respiration: Value(respiration),
+      bpSystolic: Value(bpSystolic),
+      bpDiastolic: Value(bpDiastolic),
+      spo2: Value(spo2),
+      consciousClear: Value(consciousClear),
+      evmE: Value(evmE),
+      evmV: Value(evmV),
+      evmM: Value(evmM),
+      leftPupilScale: Value(leftPupilScale),
+      leftPupilSize: Value(leftPupilSize),
+      rightPupilScale: Value(rightPupilScale),
+      rightPupilSize: Value(rightPupilSize),
+      history: Value(history),
+      allergy: Value(allergy),
+      initialDiagnosis: Value(initialDiagnosis),
+      diagnosisCategory: Value(diagnosisCategory),
+      selectedICD10Main: Value(selectedICD10Main),
+      selectedICD10Sub1: Value(selectedICD10Sub1),
+      selectedICD10Sub2: Value(selectedICD10Sub2),
+      triageCategory: Value(triageCategory),
+      onSiteTreatmentsJson: Value(jsonEncode(onSiteTreatments)),
+      ekgChecked: Value(ekgChecked),
+      ekgReading: Value(ekgReading),
+      sugarChecked: Value(sugarChecked),
+      sugarReading: Value(sugarReading),
+      suggestReferral: Value(suggestReferral),
+      intubationChecked: Value(intubationChecked),
+      cprChecked: Value(cprChecked),
+      oxygenTherapyChecked: Value(oxygenTherapyChecked),
+      medicalCertificateChecked: Value(medicalCertificateChecked),
+      prescriptionChecked: Value(prescriptionChecked),
+      otherChecked: Value(otherChecked),
+      otherSummary: Value(otherSummary),
+      referralPassageType: Value(referralPassageType),
+      referralAmbulanceType: Value(referralAmbulanceType),
+      referralHospitalIdx: Value(referralHospitalIdx),
+      referralOtherHospital: Value(referralOtherHospital),
+      referralEscort: Value(referralEscort),
+      intubationType: Value(intubationType),
+      oxygenType: Value(oxygenType),
+      oxygenFlow: Value(oxygenFlow),
+      medicalCertificateTypesJson: Value(jsonEncode(medicalCertificateTypes)),
+      prescriptionRowsJson: Value(jsonEncode(prescriptionRows)),
+      followUpResultsJson: Value(jsonEncode(followUpResults)),
+      otherHospitalIdx: Value(otherHospitalIdx),
+      selectedMainDoctor: Value(selectedMainDoctor),
+      selectedMainNurse: Value(selectedMainNurse),
+      nurseSignature: Value(nurseSignature),
+      selectedEMT: Value(selectedEMT),
+      emtSignature: Value(emtSignature),
+      helperNamesText: Value(helperNamesText),
+      selectedHelpersJson: Value(jsonEncode(selectedHelpers)),
+      specialNotesJson: Value(jsonEncode(specialNotes)),
+      otherSpecialNote: Value(otherSpecialNote),
+    );
+  }
+
+  // ✅ 同步更新 Visits 摘要表
+  VisitsCompanion toVisitsCompanion() {
+    String? result = followUpResults.entries
+        .where((e) => e.value)
+        .map((e) => e.key)
+        .join('、');
+    return VisitsCompanion(
+      emergencyResult: Value(result.isNotEmpty ? result : null),
+      note: Value(initialDiagnosis),
+    );
+  }
+
+  // ✅ 資料庫保存
+  Future<void> saveToDatabase(
+    int visitId,
+    TreatmentsDao planDao,
+    VisitsDao visitsDao,
+  ) async {
+    try {
+      await planDao.upsert(toCompanion(visitId));
+      await visitsDao.updateVisit(visitId, toVisitsCompanion());
+      print('✅ 現場處置與診斷資料已儲存並同步更新 Visits');
+    } catch (e) {
+      print('❌ 儲存現場處置資料失敗: $e');
+      rethrow;
+    }
   }
 }
