@@ -44,8 +44,8 @@ class NursingRecordEntry {
 class NursingRecordData extends ChangeNotifier {
   List<NursingRecordEntry> nursingRecords = [];
 
-  void addRecord() {
-    nursingRecords.add(NursingRecordEntry(id: UniqueKey().toString()));
+  void addRecord(NursingRecordEntry newRecord) {
+    nursingRecords.add(newRecord);
     notifyListeners();
   }
 
