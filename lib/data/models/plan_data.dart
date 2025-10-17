@@ -36,42 +36,32 @@ class PlanData extends ChangeNotifier {
   };
   Map<String, bool> nonTraumaHeadSymptoms = {
     '頭痛': false,
-    '頭暈': false,
-    '眩暈': false,
-    '視力模糊': false,
-    '耳鳴': false,
+    '頭暈目眩': false,
     '意識改變': false,
-    '其他': false,
+    '癲癇': false,
+    '喉嚨痛': false,
+    '鼻塞鼻水': false,
+    '五官症狀': false,
   };
   Map<String, bool> nonTraumaChestSymptoms = {
-    '胸痛': false,
-    '胸悶': false,
-    '呼吸困難': false,
-    '心悸': false,
     '咳嗽': false,
-    '咳血': false,
-    '其他': false,
+    '呼吸困難': false,
+    '胸悶胸痛': false,
+    '心悸': false,
   };
   Map<String, bool> nonTraumaAbdomenSymptoms = {
-    '腹痛': false,
-    '腹脹': false,
-    '噁心': false,
-    '嘔吐': false,
-    '拉肚子': false,
-    '血便': false,
-    '其他': false,
+    '腹脹腹痛': false,
+    '噁心嘔吐': false,
+    '腹瀉': false,
   };
-  Map<String, bool> nonTraumaLimbsSymptoms = {
-    '肢體無力': false,
-    '肢體麻木': false,
-    '肢體疼痛': false,
-    '關節腫痛': false,
-    '其他': false,
-  };
+  Map<String, bool> nonTraumaLimbsSymptoms = {'疼痛': false, '麻木無力': false};
   Map<String, bool> nonTraumaOtherSymptoms = {
     '發燒': false,
-    '皮膚紅疹': false,
-    '皮膚癢': false,
+    '倦怠無力': false,
+    '頻尿、解尿疼痛': false,
+    '暈厥': false,
+    '過敏': false,
+    '精神異常': false,
     '其他': false,
   };
   String? symptomNote;
@@ -151,9 +141,9 @@ class PlanData extends ChangeNotifier {
   int? oxygenType;
   String? oxygenFlow;
   Map<String, bool> medicalCertificateTypes = {
-    '適航證明': false,
-    '診斷證明': false,
-    '就診證明': false,
+    '中文診斷書': false,
+    '英文診斷書': false,
+    '中英文適航證明': false,
   };
   List<Map<String, String>> prescriptionRows = [];
 
@@ -216,42 +206,28 @@ class PlanData extends ChangeNotifier {
     };
     nonTraumaHeadSymptoms = {
       '頭痛': false,
-      '頭暈': false,
-      '眩暈': false,
-      '視力模糊': false,
-      '耳鳴': false,
+      '頭暈目眩': false,
       '意識改變': false,
-      '其他': false,
+      '癲癇': false,
+      '喉嚨痛': false,
+      '鼻塞鼻水': false,
+      '五官症狀': false,
     };
     nonTraumaChestSymptoms = {
-      '胸痛': false,
-      '胸悶': false,
-      '呼吸困難': false,
-      '心悸': false,
       '咳嗽': false,
-      '咳血': false,
-      '其他': false,
+      '呼吸困難': false,
+      '胸悶胸痛': false,
+      '心悸': false,
     };
-    nonTraumaAbdomenSymptoms = {
-      '腹痛': false,
-      '腹脹': false,
-      '噁心': false,
-      '嘔吐': false,
-      '拉肚子': false,
-      '血便': false,
-      '其他': false,
-    };
-    nonTraumaLimbsSymptoms = {
-      '肢體無力': false,
-      '肢體麻木': false,
-      '肢體疼痛': false,
-      '關節腫痛': false,
-      '其他': false,
-    };
+    nonTraumaAbdomenSymptoms = {'腹脹腹痛': false, '噁心嘔吐': false, '腹瀉': false};
+    nonTraumaLimbsSymptoms = {'疼痛': false, '麻木無力': false};
     nonTraumaOtherSymptoms = {
       '發燒': false,
-      '皮膚紅疹': false,
-      '皮膚癢': false,
+      '倦怠無力': false,
+      '頻尿、解尿疼痛': false,
+      '暈厥': false,
+      '過敏': false,
+      '精神異常': false,
       '其他': false,
     };
     symptomNote = null;
@@ -314,7 +290,11 @@ class PlanData extends ChangeNotifier {
     intubationType = null;
     oxygenType = null;
     oxygenFlow = null;
-    medicalCertificateTypes = {'適航證明': false, '診斷證明': false, '就診證明': false};
+    medicalCertificateTypes = {
+      '中文診斷書': false,
+      '英文診斷書': false,
+      '中英文適航證明': false,
+    };
     prescriptionRows = [];
     followUpResults = {
       '繼續搭機旅行': false,
