@@ -38,7 +38,7 @@ class _Home2PageState extends State<Home2Page> {
 
   @override
   Widget build(BuildContext context) {
-    final visitsDao = context.watch<VisitsDao>();
+    final emergencyRecordsDao = context.watch<EmergencyRecordsDao>();
     final t = AppTranslations.of(context); // 【新增】取得翻譯
 
     return Scaffold(
@@ -49,27 +49,6 @@ class _Home2PageState extends State<Home2Page> {
           children: [
             Row(
               children: [
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.grey,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 48,
-                      vertical: 16,
-                    ),
-                  ),
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        // 【修改】使用翻譯
-                        content: Text(t.emergencyRecordHint),
-                        backgroundColor: const Color(0xFF274C4A),
-                      ),
-                    );
-                  },
-                  // 【修改】使用翻譯
-                  child: Text(t.addEmergencyRecord),
-                ),
                 const Spacer(),
                 SizedBox(
                   width: 320,
@@ -115,44 +94,41 @@ class _Home2PageState extends State<Home2Page> {
             ),
             const Divider(thickness: 1, color: Color(0xFFB7E1E6), height: 12),
             Expanded(
-              child: StreamBuilder<List<Visit>>(
-                stream: visitsDao.watchAll(keyword: keyword),
+              child: StreamBuilder<List<EmergencyRecord>>(
+                stream: emergencyRecordsDao.watchAll(keyword: keyword),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());
                   }
 
                   if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    // 【修改】使用翻譯
                     return Center(child: Text(t.noEmergencyRecords));
                   }
 
-                  // 過濾出有急救紀錄的 visits
-                  final visits = snapshot.data!
-                      .where((v) => v.hasEmergencyRecord == true)
-                      .toList();
+                  final records = snapshot.data!;
 
-                  if (visits.isEmpty) {
+                  if (records.isEmpty) {
                     // 【修改】使用翻譯
                     return Center(child: Text(t.noEmergencyRecords));
                   }
 
                   return ListView.builder(
                     padding: EdgeInsets.zero,
-                    itemCount: visits.length,
+                    itemCount: records.length,
                     itemBuilder: (context, index) {
-                      final v = visits[index];
+                      final record = records[index];
 
                       return InkWell(
                         onTap: () async {
+                          // 【維持不變】仍然導航到 Nav4Page，但傳入 EmergencyRecord 的 visitId
                           await Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (context) =>
-                                  Nav4Page(visitId: v.visitId),
+                                  Nav4Page(visitId: record.visitId),
                             ),
                           );
-                          if (mounted) setState(() {});
+                          // StreamBuilder 會自動處理更新，不需要手動 setState
                         },
                         child: Container(
                           padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -163,16 +139,21 @@ class _Home2PageState extends State<Home2Page> {
                           ),
                           child: Row(
                             children: [
-                              // 【修改】使用翻譯顯示空值
+                              // 【修改】從 EmergencyRecord 實例中取得資料
                               _TableCell(
-                                v.incidentDateTime != null
-                                    ? _fmtDateTime(v.incidentDateTime!)
+                                record.incidentDateTime != null
+                                    ? _fmtDateTime(record.incidentDateTime!)
                                     : t.valueNotAvailable,
                               ),
-                              _TableCell(v.patientName ?? t.valueNotAvailable),
-                              _TableCell(v.nationality ?? t.valueNotAvailable),
                               _TableCell(
-                                v.emergencyResult ?? t.valueNotAvailable,
+                                record.patientName ?? t.valueNotAvailable,
+                              ),
+                              _TableCell(
+                                record.nationality ?? t.valueNotAvailable,
+                              ),
+                              _TableCell(
+                                record.endResult ??
+                                    t.valueNotAvailable, // 使用 EmergencyRecord 的 endResult
                               ),
                             ],
                           ),

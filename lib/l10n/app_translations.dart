@@ -65,9 +65,6 @@ class AppTranslations {
   // ========== 首頁2 (急救紀錄) ==========
   String get addEmergencyRecord =>
       isZh ? '新增急救紀錄(由病患建立)' : 'Add Emergency Record (From Patient)';
-  String get emergencyRecordHint => isZh
-      ? '請從首頁新增病患，系統會自動建立急救紀錄。'
-      : 'Please add patient from home page, the system will create emergency record automatically.';
   String get searchEmergencyRecord =>
       isZh ? '搜尋急救紀錄...' : 'Search emergency records...';
   String get noEmergencyRecords =>
@@ -872,6 +869,32 @@ class AppTranslations {
   String get intubationRecord => isZh ? '插管記錄' : 'Intubation Record';
   String get enterIntubationRecord =>
       isZh ? '請輸入插管記錄' : 'Please enter intubation record';
+  String get ivAndCardiacMassage => isZh ? '點滴與心臟按摩' : 'IV and Cardiac Massage';
+  String get onIvLineStartTime =>
+      isZh ? 'On IV Line 開始時間' : 'On IV Line Start Time';
+  String get ivNeedleSize => isZh ? '注射針頭尺寸' : 'IV Needle Size';
+  String get enterIvNeedleSize =>
+      isZh ? '請輸入注射針頭尺寸' : 'Please enter IV needle size';
+  String get onIvLineRecord => isZh ? 'On IV Line 紀錄' : 'On IV Line Record';
+  String get enterOnIvLineRecord =>
+      isZh ? '請輸入 On IV Line 紀錄' : 'Please enter On IV Line record';
+  String get cardiacMassageStartTime =>
+      isZh ? 'Cardiac Massage 開始時間' : 'Cardiac Massage Start Time';
+  String get cardiacMassageEndTime =>
+      isZh ? 'Cardiac Massage 結束時間' : 'Cardiac Massage End Time';
+  String get cardiacMassageRecord =>
+      isZh ? 'Cardiac Massage 紀錄' : 'Cardiac Massage Record';
+  String get enterCardiacMassageRecord =>
+      isZh ? '請輸入 Cardiac Massage 紀錄' : 'Please enter Cardiac Massage record';
+  String get postResuscitationStatus =>
+      isZh ? '急救後病況' : 'Post-Resuscitation Status';
+  String get respiration => isZh ? '呼吸' : 'Respiration';
+  String get spontaneousRespiration =>
+      isZh ? '自發性呼吸' : 'Spontaneous Respiration';
+  String get ventilator => isZh ? '呼吸器' : 'Ventilator';
+  String get otherSupplements => isZh ? '其他補充' : 'Other Supplements';
+  String get enterSupplementaryNotes =>
+      isZh ? '請輸入補充說明' : 'Please enter supplementary notes';
   String get emergencyEndAndResult =>
       isZh ? '急救結束與結果' : 'End of First Aid & Result';
   String get firstAidEndTime => isZh ? '急救結束時間' : 'First Aid End Time';
@@ -1032,6 +1055,35 @@ class AppTranslations {
   String get nameHint => isZh ? '姓名' : 'Name';
   String get signatureHint => isZh ? '簽名' : 'Signature';
   String get addRow => isZh ? '＋ 加入資料行' : '+ Add Row';
+  String get phraseReceptionNotified => isZh ? '接獲通知' : 'Reception Notified';
+  String get phraseNotification1 => isZh ? '通知1' : 'Notification 1';
+  String get phraseNotification2 => isZh ? '通知2' : 'Notification 2';
+  String get phraseNotification3 => isZh ? '通知3' : 'Notification 3';
+  String get phraseArrivedAtScene => isZh ? '抵達現場' : 'Arrived at Scene';
+  String get phraseBloodSugarTest => isZh ? '測血糖' : 'Blood Sugar Test';
+  String get phraseDiagnosisAndMedication =>
+      isZh ? '診斷給藥' : 'Diagnosis & Medication';
+  String get phraseIssueCertificate => isZh ? '開診斷書' : 'Issue Certificate';
+  String get phraseReferral => isZh ? '轉診' : 'Referral';
+  String get phraseReferralHandover => isZh ? '轉診交班' : 'Referral Handover';
+  String get phraseTransferNotification =>
+      isZh ? '轉送通知' : 'Transfer Notification';
+  String get phraseGeneralCustoms => isZh ? '一般通關' : 'General Customs';
+  String get phraseUrgentCustoms => isZh ? '緊急通關' : 'Urgent Customs';
+  String get phraseTransfer1 => isZh ? '轉送1' : 'Transfer 1';
+  String get phraseTransfer2 => isZh ? '轉送2' : 'Transfer 2';
+  String get phraseTransfer3 => isZh ? '轉送3' : 'Transfer 3';
+  String get phraseBilling => isZh ? '收費' : 'Billing';
+  String get phraseEndOfVisit => isZh ? '結束出診' : 'End of Visit';
+  String get phraseReturnToStandby => isZh ? '返回待命' : 'Return to Standby';
+  String get createNursingRecord =>
+      isZh ? '創建 護理紀錄表' : 'Create Nursing Record Form';
+  String get presetPhrase => isZh ? '預設片語' : 'Preset Phrases';
+  String get clickToSelectNurse =>
+      isZh ? '點擊選擇護理師的姓名' : 'Click to select nurse\'s name';
+  String get discard => isZh ? '捨棄' : 'Discard';
+  String get saveAndAddAnother => isZh ? '儲存, 新增另項' : 'Save & Add Another';
+  String get saveAndClose => isZh ? '儲存並關閉' : 'Save & Close';
 
   // ========== Referral Form Page (轉診表單頁面) ==========
   String get referralForm => isZh ? '轉診表單' : 'Referral Form';

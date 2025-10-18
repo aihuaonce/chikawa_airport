@@ -19,9 +19,6 @@ class VisitsDao extends DatabaseAccessor<AppDatabase> with _$VisitsDaoMixin {
       ),
     );
 
-    await db.emergencyRecordsDao.createRecordForVisit(id);
-    print('✅ 自動建立急救紀錄 (visitId: $id)');
-
     return id;
   }
 
@@ -460,15 +457,19 @@ class EmergencyRecordsDao extends DatabaseAccessor<AppDatabase>
 
   // ✅ 簡化：統一的 upsert 方法
   Future<void> upsert(EmergencyRecordsCompanion companion) async {
+    // 檢查紀錄是否存在
     final existing = await getByVisitId(companion.visitId.value);
+    final updated = companion.copyWith(updatedAt: Value(DateTime.now()));
 
     if (existing == null) {
-      await createRecordForVisit(companion.visitId.value);
+      // 如果不存在，執行插入 (Insert)
+      await into(emergencyRecords).insert(updated);
+    } else {
+      // 如果存在，執行更新 (Update)
+      await (update(emergencyRecords)
+            ..where((t) => t.visitId.equals(companion.visitId.value)))
+          .write(updated);
     }
-
-    await (update(emergencyRecords)
-          ..where((t) => t.visitId.equals(companion.visitId.value)))
-        .write(companion);
   }
 
   Stream<List<EmergencyRecord>> watchAll({String keyword = ''}) {
@@ -478,6 +479,7 @@ class EmergencyRecordsDao extends DatabaseAccessor<AppDatabase>
     if (keyword.isNotEmpty) {
       query.where(
         (t) =>
+            t.patientName.like('%$keyword%') |
             t.diagnosis.like('%$keyword%') |
             t.selectedHospital.like('%$keyword%') |
             t.nationality.like('%$keyword%'),

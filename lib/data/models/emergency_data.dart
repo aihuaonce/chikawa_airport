@@ -412,125 +412,135 @@ class EmergencyData extends ChangeNotifier {
 
   Future<void> loadFromDatabase(EmergencyRecordsDao dao) async {
     try {
+      // 步驟 1: 先清除舊資料，確保是一個乾淨的狀態
+      clearAll();
+
+      // 步驟 2: 嘗試從資料庫讀取現有的急救紀錄
       final record = await dao.getByVisitId(visitId);
 
-      if (record == null) {
-        print('ℹ️ visitId $visitId 沒有急救紀錄，開始預填資料');
-        await _prefillFromOtherTables(dao);
-        notifyListeners();
-        return;
-      }
+      // 步驟 3: 如果紀錄確實存在於資料庫，才載入資料
+      if (record != null) {
+        print('✅ 找到急救紀錄，載入資料...');
 
-      print('✅ 找到急救紀錄，載入資料...');
+        // 【核心修改】我們不再呼叫預填寫方法，已將其移除
+        // await _prefillFromOtherTables(dao); // <--- 此行已被移除
 
-      idNumber = record.idNumber;
-      passportNumber = record.passportNumber;
-      gender = record.gender;
-      birthDate = record.birthDate;
-      patientName = record.patientName;
+        // --- 從資料庫紀錄載入所有欄位 ---
+        idNumber = record.idNumber;
+        passportNumber = record.passportNumber;
+        gender = record.gender;
+        birthDate = record.birthDate;
+        patientName = record.patientName;
 
-      sourceIndex = record.sourceIndex;
-      purposeIndex = record.purposeIndex;
-      airlineIndex = record.airlineIndex;
-      useOtherAirline = record.useOtherAirline;
-      selectedOtherAirline = record.selectedOtherAirline;
-      nationality = record.nationality;
+        sourceIndex = record.sourceIndex;
+        purposeIndex = record.purposeIndex;
+        airlineIndex = record.airlineIndex;
+        useOtherAirline = record.useOtherAirline;
+        selectedOtherAirline = record.selectedOtherAirline;
+        nationality = record.nationality;
 
-      incidentDateTime = record.incidentDateTime;
-      placeGroupIdx = record.placeGroupIdx;
-      t1Selected = record.t1Selected;
-      t2Selected = record.t2Selected;
-      remoteSelected = record.remoteSelected;
-      cargoSelected = record.cargoSelected;
-      novotelSelected = record.novotelSelected;
-      cabinSelected = record.cabinSelected;
-      placeNote = record.placeNote;
+        incidentDateTime = record.incidentDateTime;
+        placeGroupIdx = record.placeGroupIdx;
+        t1Selected = record.t1Selected;
+        t2Selected = record.t2Selected;
+        remoteSelected = record.remoteSelected;
+        cargoSelected = record.cargoSelected;
+        novotelSelected = record.novotelSelected;
+        cabinSelected = record.cabinSelected;
+        placeNote = record.placeNote;
 
-      firstAidStartTime = record.firstAidStartTime;
-      intubationStartTime = record.intubationStartTime;
-      onIVLineStartTime = record.onIVLineStartTime;
-      cardiacMassageStartTime = record.cardiacMassageStartTime;
-      cardiacMassageEndTime = record.cardiacMassageEndTime;
-      firstAidEndTime = record.firstAidEndTime;
+        firstAidStartTime = record.firstAidStartTime;
+        intubationStartTime = record.intubationStartTime;
+        onIVLineStartTime = record.onIVLineStartTime;
+        cardiacMassageStartTime = record.cardiacMassageStartTime;
+        cardiacMassageEndTime = record.cardiacMassageEndTime;
+        firstAidEndTime = record.firstAidEndTime;
 
-      diagnosis = record.diagnosis;
-      situation = record.situation;
-      evmE = record.evmE;
-      evmV = record.evmV;
-      evmM = record.evmM;
-      heartRate = record.heartRate;
-      respirationRate = record.respirationRate;
-      bloodPressure = record.bloodPressure;
-      temperature = record.temperature;
-      leftPupilSize = record.leftPupilSize;
-      rightPupilSize = record.rightPupilSize;
-      leftPupilReaction = record.leftPupilReaction;
-      rightPupilReaction = record.rightPupilReaction;
+        diagnosis = record.diagnosis;
+        situation = record.situation;
+        evmE = record.evmE;
+        evmV = record.evmV;
+        evmM = record.evmM;
+        heartRate = record.heartRate;
+        respirationRate = record.respirationRate;
+        bloodPressure = record.bloodPressure;
+        temperature = record.temperature;
+        leftPupilSize = record.leftPupilSize;
+        rightPupilSize = record.rightPupilSize;
+        leftPupilReaction = record.leftPupilReaction;
+        rightPupilReaction = record.rightPupilReaction;
 
-      insertionMethod = record.insertionMethod;
-      airwayContent = record.airwayContent;
-      insertionRecord = record.insertionRecord;
-      ivNeedleSize = record.ivNeedleSize;
-      ivLineRecord = record.ivLineRecord;
-      cardiacMassageRecord = record.cardiacMassageRecord;
+        insertionMethod = record.insertionMethod;
+        airwayContent = record.airwayContent;
+        insertionRecord = record.insertionRecord;
+        ivNeedleSize = record.ivNeedleSize;
+        ivLineRecord = record.ivLineRecord;
+        cardiacMassageRecord = record.cardiacMassageRecord;
 
-      postResuscitationEvmE = record.postResuscitationEvmE;
-      postResuscitationEvmV = record.postResuscitationEvmV;
-      postResuscitationEvmM = record.postResuscitationEvmM;
-      postResuscitationHeartRate = record.postResuscitationHeartRate;
-      postResuscitationRespirationMethod =
-          record.postResuscitationRespirationMethod;
-      postResuscitationBloodPressure = record.postResuscitationBloodPressure;
-      postResuscitationLeftPupilSize = record.postResuscitationLeftPupilSize;
-      postResuscitationRightPupilSize = record.postResuscitationRightPupilSize;
-      postResuscitationLeftPupilLightReflex =
-          record.postResuscitationLeftPupilLightReflex;
-      postResuscitationRightPupilLightReflex =
-          record.postResuscitationRightPupilLightReflex;
-      otherSupplements = record.otherSupplements;
+        postResuscitationEvmE = record.postResuscitationEvmE;
+        postResuscitationEvmV = record.postResuscitationEvmV;
+        postResuscitationEvmM = record.postResuscitationEvmM;
+        postResuscitationHeartRate = record.postResuscitationHeartRate;
+        postResuscitationRespirationMethod =
+            record.postResuscitationRespirationMethod;
+        postResuscitationBloodPressure = record.postResuscitationBloodPressure;
+        postResuscitationLeftPupilSize = record.postResuscitationLeftPupilSize;
+        postResuscitationRightPupilSize =
+            record.postResuscitationRightPupilSize;
+        postResuscitationLeftPupilLightReflex =
+            record.postResuscitationLeftPupilLightReflex;
+        postResuscitationRightPupilLightReflex =
+            record.postResuscitationRightPupilLightReflex;
+        otherSupplements = record.otherSupplements;
 
-      endRecord = record.endRecord;
-      endResult = record.endResult;
-      selectedHospital = record.selectedHospital;
-      otherHospital = record.otherHospital;
-      otherEndResult = record.otherEndResult;
-      deathTime = record.deathTime;
+        endRecord = record.endRecord;
+        endResult = record.endResult;
+        selectedHospital = record.selectedHospital;
+        otherHospital = record.otherHospital;
+        otherEndResult = record.otherEndResult;
+        deathTime = record.deathTime;
 
-      selectedDoctor = record.selectedDoctor;
-      selectedNurse = record.selectedNurse;
-      selectedEMT = record.selectedEMT;
-      nurseSignature = record.nurseSignature;
-      emtSignature = record.emtSignature;
+        selectedDoctor = record.selectedDoctor;
+        selectedNurse = record.selectedNurse;
+        selectedEMT = record.selectedEMT;
+        nurseSignature = record.nurseSignature;
+        emtSignature = record.emtSignature;
 
-      try {
-        if (record.selectedAssistantsJson != null) {
-          final decoded = jsonDecode(record.selectedAssistantsJson!);
-          selectedAssistants = List<String>.from(decoded);
+        try {
+          if (record.selectedAssistantsJson != null) {
+            final decoded = jsonDecode(record.selectedAssistantsJson!);
+            selectedAssistants = List<String>.from(decoded);
+          }
+        } catch (e) {
+          print('⚠️ 解析 selectedAssistantsJson 失敗: $e');
+          selectedAssistants = [];
         }
-      } catch (e) {
-        print('⚠️ 解析 selectedAssistantsJson 失敗: $e');
-        selectedAssistants = [];
-      }
 
-      try {
-        if (record.medicationRecordsJson != null) {
-          final decoded = jsonDecode(record.medicationRecordsJson!);
-          medicationRecords = List<Map<String, String>>.from(
-            decoded.map((item) => Map<String, String>.from(item)),
-          );
+        try {
+          if (record.medicationRecordsJson != null) {
+            final decoded = jsonDecode(record.medicationRecordsJson!);
+            medicationRecords = List<Map<String, String>>.from(
+              decoded.map((item) => Map<String, String>.from(item)),
+            );
+          }
+        } catch (e) {
+          print('⚠️ 解析 medicationRecordsJson 失敗: $e');
+          medicationRecords = [];
         }
-      } catch (e) {
-        print('⚠️ 解析 medicationRecordsJson 失敗: $e');
-        medicationRecords = [];
+
+        print('✅ 成功載入 visitId $visitId 的急救紀錄');
+      } else {
+        // 步驟 4: 如果紀錄不存在，只印出提示訊息，UI 將顯示空白表單
+        print('ℹ️ visitId $visitId 尚無急救紀錄，將顯示空白表單。');
       }
 
-      await _prefillFromOtherTables(dao);
-
+      // 步驟 5: 最後，通知所有監聽者(UI)更新畫面
       notifyListeners();
-      print('✅ 成功載入 visitId $visitId 的急救紀錄');
     } catch (e) {
-      print('❌ 載入急救紀錄失敗: $e');
-      clearAll();
+      // 步驟 6: 處理任何可能發生的錯誤
+      print('❌ 載入急救紀錄時失敗: $e');
+      clearAll(); // 發生錯誤時清空所有資料
+      notifyListeners();
     }
   }
 

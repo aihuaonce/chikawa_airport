@@ -215,12 +215,11 @@ class _EmergencyPlanPageState extends State<EmergencyPlanPage> {
   }
 
   Future<void> _showDoctorDialog(AppTranslations t) async {
-    // 【修改】
     final result = await showDialog<String>(
       context: context,
       builder: (context) {
         return SimpleDialog(
-          title: Text(t.selectDoctorDialogTitle), // 【修改】
+          title: Text(t.selectDoctorDialogTitle),
           children: [
             SizedBox(
               width: 400,
@@ -244,12 +243,11 @@ class _EmergencyPlanPageState extends State<EmergencyPlanPage> {
   }
 
   Future<void> _showNurseDialog(AppTranslations t) async {
-    // 【修改】
     final result = await showDialog<String>(
       context: context,
       builder: (context) {
         return SimpleDialog(
-          title: Text(t.selectNurseDialogTitle), // 【修改】
+          title: Text(t.selectNurseDialogTitle),
           children: [
             SizedBox(
               width: 400,
@@ -273,12 +271,11 @@ class _EmergencyPlanPageState extends State<EmergencyPlanPage> {
   }
 
   Future<void> _showEMTDialog(AppTranslations t) async {
-    // 【修改】
     final result = await showDialog<String>(
       context: context,
       builder: (context) {
         return SimpleDialog(
-          title: Text(t.selectEMTDialogTitle), // 【修改】
+          title: Text(t.selectEMTDialogTitle),
           children: [
             SizedBox(
               width: 400,
@@ -302,7 +299,6 @@ class _EmergencyPlanPageState extends State<EmergencyPlanPage> {
   }
 
   Future<void> _showHelperSelectionDialog(AppTranslations t) async {
-    // 【修改】
     final data = context.read<EmergencyData>();
     List<String> tempSelected = List.from(data.selectedAssistants);
 
@@ -312,7 +308,7 @@ class _EmergencyPlanPageState extends State<EmergencyPlanPage> {
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
-              title: Text(t.selectAssistantsDialogTitle), // 【修改】
+              title: Text(t.selectAssistantsDialogTitle),
               content: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -334,7 +330,7 @@ class _EmergencyPlanPageState extends State<EmergencyPlanPage> {
               ),
               actions: <Widget>[
                 TextButton(
-                  child: Text(t.cancel), // 【修改】
+                  child: Text(t.cancel),
                   onPressed: () => Navigator.of(context).pop(),
                 ),
                 ElevatedButton(
@@ -342,7 +338,7 @@ class _EmergencyPlanPageState extends State<EmergencyPlanPage> {
                     backgroundColor: primaryDark,
                     foregroundColor: white,
                   ),
-                  child: Text(t.confirm), // 【修改】
+                  child: Text(t.confirm),
                   onPressed: () => Navigator.of(context).pop(tempSelected),
                 ),
               ],
@@ -359,7 +355,7 @@ class _EmergencyPlanPageState extends State<EmergencyPlanPage> {
 
   @override
   Widget build(BuildContext context) {
-    final t = AppTranslations.of(context); // 【新增】
+    final t = AppTranslations.of(context);
     return Consumer<EmergencyData>(
       builder: (context, data, child) {
         return Container(
@@ -373,11 +369,11 @@ class _EmergencyPlanPageState extends State<EmergencyPlanPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _buildInfoCard(
-                  title: t.emergencyBasicInfo, // 【修改】
+                  title: t.emergencyBasicInfo,
                   child: Column(
                     children: [
                       _buildTimeSection(
-                        title: t.firstAidStartTime, // 【修改】
+                        title: t.firstAidStartTime,
                         timeValue: data.firstAidStartTime ?? DateTime.now(),
                         onUpdateTime: () =>
                             data.updatePlan(firstAidStartTime: DateTime.now()),
@@ -387,186 +383,26 @@ class _EmergencyPlanPageState extends State<EmergencyPlanPage> {
                         t.diagnosis,
                         diagnosisController,
                         t.enterDiagnosis,
-                      ), // 【修改】
+                      ),
                       const SizedBox(height: 16),
                       _buildTextField(
                         t.situationDescription,
                         situationController,
                         t.enterSituationDescription,
-                      ), // 【修改】
-                    ],
-                  ),
-                ),
-
-                _buildInfoCard(
-                  title: "急救後病況",
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        "意識",
-                        style: TextStyle(fontSize: 14, color: labelColor),
-                      ),
-                      const SizedBox(height: 8),
-                      Row(
-                        children: [
-                          _buildLabeledSmallTextField(
-                            'E?',
-                            postResuscitationEController,
-                          ),
-                          const SizedBox(width: 16),
-                          _buildLabeledSmallTextField(
-                            'V?',
-                            postResuscitationVController,
-                          ),
-                          const SizedBox(width: 16),
-                          _buildLabeledSmallTextField(
-                            'M?',
-                            postResuscitationMController,
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      _buildTextField(
-                        "心跳(次/分)?",
-                        postResuscitationHeartRateController,
-                        "請輸入",
-                      ),
-                      const SizedBox(height: 16),
-                      const Text(
-                        "呼吸?",
-                        style: TextStyle(fontSize: 14, color: labelColor),
-                      ),
-                      Row(
-                        children: [
-                          _buildTappableRadioOption(
-                            title: "自發性呼吸",
-                            groupValue: data.postResuscitationRespirationMethod,
-                            onChanged: (v) => data.updatePlan(
-                              postResuscitationRespirationMethod: v,
-                            ),
-                          ),
-                          _buildTappableRadioOption(
-                            title: "呼吸器",
-                            groupValue: data.postResuscitationRespirationMethod,
-                            onChanged: (v) => data.updatePlan(
-                              postResuscitationRespirationMethod: v,
-                            ),
-                          ),
-                          _buildTappableRadioOption(
-                            title: "Ambu",
-                            groupValue: data.postResuscitationRespirationMethod,
-                            onChanged: (v) => data.updatePlan(
-                              postResuscitationRespirationMethod: v,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      _buildTextField(
-                        "血壓(mmHg)?",
-                        postResuscitationBloodPressureController,
-                        "請輸入收縮壓/舒張壓",
-                      ),
-                      const SizedBox(height: 16),
-                      const Text(
-                        "瞳孔",
-                        style: TextStyle(fontSize: 14, color: labelColor),
-                      ),
-                      const SizedBox(height: 8),
-                      Row(
-                        children: [
-                          _buildLabeledSmallTextField(
-                            "Size(mm) 左?",
-                            postResuscitationLeftPupilSizeController,
-                          ),
-                          const SizedBox(width: 16),
-                          _buildLabeledSmallTextField(
-                            "右?",
-                            postResuscitationRightPupilSizeController,
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      Row(
-                        children: [
-                          const Text("L-R 左?"),
-                          const SizedBox(width: 8),
-                          _buildTappableRadioOption(
-                            title: "+",
-                            groupValue:
-                                data.postResuscitationLeftPupilLightReflex,
-                            onChanged: (v) => data.updatePlan(
-                              postResuscitationLeftPupilLightReflex: v,
-                            ),
-                          ),
-                          _buildTappableRadioOption(
-                            title: "-",
-                            groupValue:
-                                data.postResuscitationLeftPupilLightReflex,
-                            onChanged: (v) => data.updatePlan(
-                              postResuscitationLeftPupilLightReflex: v,
-                            ),
-                          ),
-                          _buildTappableRadioOption(
-                            title: "±",
-                            groupValue:
-                                data.postResuscitationLeftPupilLightReflex,
-                            onChanged: (v) => data.updatePlan(
-                              postResuscitationLeftPupilLightReflex: v,
-                            ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          const Text("右?"),
-                          const SizedBox(width: 24),
-                          _buildTappableRadioOption(
-                            title: "+",
-                            groupValue:
-                                data.postResuscitationRightPupilLightReflex,
-                            onChanged: (v) => data.updatePlan(
-                              postResuscitationRightPupilLightReflex: v,
-                            ),
-                          ),
-                          _buildTappableRadioOption(
-                            title: "-",
-                            groupValue:
-                                data.postResuscitationRightPupilLightReflex,
-                            onChanged: (v) => data.updatePlan(
-                              postResuscitationRightPupilLightReflex: v,
-                            ),
-                          ),
-                          _buildTappableRadioOption(
-                            title: "±",
-                            groupValue:
-                                data.postResuscitationRightPupilLightReflex,
-                            onChanged: (v) => data.updatePlan(
-                              postResuscitationRightPupilLightReflex: v,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      _buildTextField(
-                        "其他補充?",
-                        otherSupplementsController,
-                        "請輸入補充說明",
                       ),
                     ],
                   ),
                 ),
 
                 _buildInfoCard(
-                  title: t.patientCondition, // 【修改】
+                  title: t.patientCondition,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         t.consciousness,
                         style: const TextStyle(fontSize: 14, color: labelColor),
-                      ), // 【修改】
+                      ),
                       const SizedBox(height: 8),
                       Row(
                         children: [
@@ -578,79 +414,87 @@ class _EmergencyPlanPageState extends State<EmergencyPlanPage> {
                         ],
                       ),
                       const SizedBox(height: 16),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _buildTextField(
-                              t.heartRate,
-                              heartRateController,
-                              t.enterValue,
-                            ), // 【修改】
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: _buildTextField(
-                              t.respirationRate,
-                              respirationRateController,
-                              t.enterValue,
-                            ), // 【修改】
-                          ),
-                        ],
+
+                      _buildTextField(
+                        t.heartRate,
+                        heartRateController,
+                        t.enterValue,
                       ),
                       const SizedBox(height: 16),
+                      _buildTextField(
+                        t.respirationRate,
+                        respirationRateController,
+                        t.enterValue,
+                      ),
+                      const SizedBox(height: 16),
+
                       _buildTextField(
                         t.bloodPressure,
                         bloodPressureController,
                         t.enterSystolicDiastolic,
-                      ), // 【修改】
+                      ),
                       const SizedBox(height: 16),
+
                       Text(
                         t.bodyTemperature,
                         style: const TextStyle(fontSize: 14, color: labelColor),
-                      ), // 【修改】
+                      ),
                       Row(
                         children: [
                           _buildTappableRadioOption(
-                            title: t.tempCold, // 【修改】
+                            title: t.tempCold,
                             groupValue: data.temperature,
                             onChanged: (v) => data.updatePlan(temperature: v),
                           ),
                           _buildTappableRadioOption(
-                            title: t.tempWarm, // 【修改】
+                            title: t.tempWarm,
                             groupValue: data.temperature,
                             onChanged: (v) => data.updatePlan(temperature: v),
                           ),
                         ],
                       ),
                       const SizedBox(height: 16),
+
                       Text(
                         t.pupils,
                         style: const TextStyle(fontSize: 14, color: labelColor),
-                      ), // 【修改】
+                      ),
                       const SizedBox(height: 8),
                       Row(
                         children: [
                           _buildLabeledSmallTextField(
                             t.leftPupilSize,
                             leftPupilSizeController,
-                          ), // 【修改】
+                          ),
                           const SizedBox(width: 16),
                           _buildLabeledSmallTextField(
                             t.rightPupilSize,
                             rightPupilSizeController,
-                          ), // 【修改】
+                          ),
                         ],
+                      ),
+                      const SizedBox(height: 8),
+                      _buildPupilLightReflexRow(
+                        label: t.leftPupilReaction,
+                        groupValue: data.leftPupilReaction,
+                        onChanged: (v) => data.updatePlan(leftPupilReaction: v),
+                      ),
+                      _buildPupilLightReflexRow(
+                        label: t.rightPupilReaction,
+                        groupValue: data.rightPupilReaction,
+                        onChanged: (v) =>
+                            data.updatePlan(rightPupilReaction: v),
                       ),
                     ],
                   ),
                 ),
 
                 _buildInfoCard(
-                  title: t.emergencyProcedures, // 【修改】
+                  title: t.emergencyProcedures,
                   child: Column(
                     children: [
                       _buildTimeSection(
-                        title: t.intubationStartTime, // 【修改】
+                        title: t.intubationStartTime,
                         timeValue: data.intubationStartTime ?? DateTime.now(),
                         onUpdateTime: () => data.updatePlan(
                           intubationStartTime: DateTime.now(),
@@ -662,7 +506,7 @@ class _EmergencyPlanPageState extends State<EmergencyPlanPage> {
                           Text(
                             t.intubationMethod,
                             style: const TextStyle(color: labelColor),
-                          ), // 【修改】
+                          ),
                           _buildTappableRadioOption(
                             title: 'ET',
                             groupValue: data.insertionMethod,
@@ -688,23 +532,71 @@ class _EmergencyPlanPageState extends State<EmergencyPlanPage> {
                         t.airwayContentCode,
                         airwayContentController,
                         t.enterAirwayContentCode,
-                      ), // 【修改】
+                      ),
                       const SizedBox(height: 16),
                       _buildTextField(
                         t.intubationRecord,
                         insertionRecordController,
                         t.enterIntubationRecord,
-                      ), // 【修改】
+                      ),
+
+                      const Divider(height: 32, thickness: 0.5),
+                      _buildTimeSection(
+                        title: t.onIvLineStartTime,
+                        timeValue: data.onIVLineStartTime ?? DateTime.now(),
+                        onUpdateTime: () =>
+                            data.updatePlan(onIVLineStartTime: DateTime.now()),
+                      ),
+                      const SizedBox(height: 16),
+                      _buildTextField(
+                        t.ivNeedleSize,
+                        ivNeedleSizeController,
+                        t.enterIvNeedleSize,
+                      ),
+                      const SizedBox(height: 16),
+                      _buildTextField(
+                        t.onIvLineRecord,
+                        ivLineRecordController,
+                        t.enterOnIvLineRecord,
+                      ),
+                      const Divider(height: 32, thickness: 0.5),
+                      _buildTimeSection(
+                        title: t.cardiacMassageStartTime,
+                        timeValue:
+                            data.cardiacMassageStartTime ?? DateTime.now(),
+                        onUpdateTime: () => data.updatePlan(
+                          cardiacMassageStartTime: DateTime.now(),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      _buildTimeSection(
+                        title: t.cardiacMassageEndTime,
+                        timeValue: data.cardiacMassageEndTime ?? DateTime.now(),
+                        onUpdateTime: () => data.updatePlan(
+                          cardiacMassageEndTime: DateTime.now(),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      _buildTextField(
+                        t.cardiacMassageRecord,
+                        cardiacMassageRecordController,
+                        t.enterCardiacMassageRecord,
+                      ),
                     ],
                   ),
                 ),
 
                 _buildInfoCard(
-                  title: t.emergencyEndAndResult, // 【修改】
+                  title: t.postResuscitationStatus,
+                  child: _buildPostResuscitationStatusSection(data, t),
+                ),
+
+                _buildInfoCard(
+                  title: t.emergencyEndAndResult,
                   child: Column(
                     children: [
                       _buildTimeSection(
-                        title: t.firstAidEndTime, // 【修改】
+                        title: t.firstAidEndTime,
                         timeValue: data.firstAidEndTime ?? DateTime.now(),
                         onUpdateTime: () =>
                             data.updatePlan(firstAidEndTime: DateTime.now()),
@@ -714,26 +606,26 @@ class _EmergencyPlanPageState extends State<EmergencyPlanPage> {
                         t.firstAidEndRecord,
                         endRecordController,
                         t.enterValue,
-                      ), // 【修改】
+                      ),
                       const SizedBox(height: 16),
                       Row(
                         children: [
                           Text(
                             t.emergencyResult,
                             style: const TextStyle(color: labelColor),
-                          ), // 【修改】
+                          ),
                           _buildTappableRadioOption(
-                            title: t.resultReferral, // 【修改】
+                            title: t.resultReferral,
                             groupValue: data.endResult,
                             onChanged: (v) => data.updatePlan(endResult: v),
                           ),
                           _buildTappableRadioOption(
-                            title: t.resultDeath, // 【修改】
+                            title: t.resultDeath,
                             groupValue: data.endResult,
                             onChanged: (v) => data.updatePlan(endResult: v),
                           ),
                           _buildTappableRadioOption(
-                            title: t.other, // 【修改】
+                            title: t.other,
                             groupValue: data.endResult,
                             onChanged: (v) => data.updatePlan(endResult: v),
                           ),
@@ -744,20 +636,20 @@ class _EmergencyPlanPageState extends State<EmergencyPlanPage> {
                 ),
 
                 _buildInfoCard(
-                  title: t.participatingPersonnel, // 【修改】
+                  title: t.participatingPersonnel,
                   child: Column(
                     children: [
                       _buildSelectorField(
-                        t.emergencyDoctor, // 【修改】
+                        t.emergencyDoctor,
                         data.selectedDoctor ?? '',
-                        () => _showDoctorDialog(t), // 【修改】
+                        () => _showDoctorDialog(t),
                         isRequired: true,
                       ),
                       const SizedBox(height: 16),
                       _buildSelectorField(
-                        t.emergencyNurse, // 【修改】
+                        t.emergencyNurse,
                         data.selectedNurse ?? '',
-                        () => _showNurseDialog(t), // 【修改】
+                        () => _showNurseDialog(t),
                         isRequired: true,
                       ),
                       const SizedBox(height: 16),
@@ -766,26 +658,26 @@ class _EmergencyPlanPageState extends State<EmergencyPlanPage> {
                         nurseSignatureController,
                         t.signatureStamp,
                         maxLines: 2,
-                      ), // 【修改】
+                      ),
                       const SizedBox(height: 16),
                       _buildSelectorField(
                         t.emergencyEMT,
                         data.selectedEMT ?? '',
                         () => _showEMTDialog(t),
-                      ), // 【修改】
+                      ),
                       const SizedBox(height: 16),
                       _buildTextField(
                         t.emtSignature,
                         emtSignatureController,
                         t.signatureStamp,
                         maxLines: 2,
-                      ), // 【修改】
+                      ),
                     ],
                   ),
                 ),
 
                 _buildInfoCard(
-                  title: t.assistantPersonnelList, // 【修改】
+                  title: t.assistantPersonnelList,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -809,15 +701,15 @@ class _EmergencyPlanPageState extends State<EmergencyPlanPage> {
                             : Text(
                                 t.noAssistantsSelected,
                                 style: const TextStyle(color: Colors.grey),
-                              ), // 【修改】
+                              ),
                       ),
                       const SizedBox(height: 12),
                       InkWell(
-                        onTap: () => _showHelperSelectionDialog(t), // 【修改】
+                        onTap: () => _showHelperSelectionDialog(t),
                         child: Text(
                           t.addEditAssistants,
                           style: const TextStyle(color: Colors.blue),
-                        ), // 【修改】
+                        ),
                       ),
                     ],
                   ),
@@ -931,15 +823,148 @@ class _EmergencyPlanPageState extends State<EmergencyPlanPage> {
     );
   }
 
+  Widget _buildPostResuscitationStatusSection(
+    EmergencyData data,
+    AppTranslations t,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // 意識 (GCS)
+        Text(
+          t.consciousness,
+          style: const TextStyle(fontSize: 14, color: labelColor),
+        ),
+        const SizedBox(height: 8),
+        Row(
+          children: [
+            _buildLabeledSmallTextField('E', postResuscitationEController),
+            const SizedBox(width: 16),
+            _buildLabeledSmallTextField('V', postResuscitationVController),
+            const SizedBox(width: 16),
+            _buildLabeledSmallTextField('M', postResuscitationMController),
+          ],
+        ),
+        const SizedBox(height: 16),
+
+        _buildTextField(
+          t.heartRate,
+          postResuscitationHeartRateController,
+          t.enterValue,
+        ),
+        const SizedBox(height: 16),
+
+        Text(
+          t.respiration,
+          style: const TextStyle(fontSize: 14, color: labelColor),
+        ),
+        Row(
+          children: [
+            _buildTappableRadioOption(
+              title: t.spontaneousRespiration,
+              groupValue: data.postResuscitationRespirationMethod,
+              onChanged: (v) =>
+                  data.updatePlan(postResuscitationRespirationMethod: v),
+            ),
+            _buildTappableRadioOption(
+              title: t.ventilator,
+              groupValue: data.postResuscitationRespirationMethod,
+              onChanged: (v) =>
+                  data.updatePlan(postResuscitationRespirationMethod: v),
+            ),
+            _buildTappableRadioOption(
+              title: "Ambu",
+              groupValue: data.postResuscitationRespirationMethod,
+              onChanged: (v) =>
+                  data.updatePlan(postResuscitationRespirationMethod: v),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+
+        _buildTextField(
+          t.bloodPressure,
+          postResuscitationBloodPressureController,
+          t.enterSystolicDiastolic,
+        ),
+        const SizedBox(height: 16),
+
+        Row(
+          children: [
+            _buildLabeledSmallTextField(
+              t.leftPupilSizeLabel,
+              postResuscitationLeftPupilSizeController,
+            ),
+            const SizedBox(width: 16),
+            _buildLabeledSmallTextField(
+              t.rightPupilSizeLabel,
+              postResuscitationRightPupilSizeController,
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+
+        _buildPupilLightReflexRow(
+          label: t.leftPupilReaction,
+          groupValue: data.postResuscitationLeftPupilLightReflex,
+          onChanged: (v) =>
+              data.updatePlan(postResuscitationLeftPupilLightReflex: v),
+        ),
+        _buildPupilLightReflexRow(
+          label: t.rightPupilReaction,
+          groupValue: data.postResuscitationRightPupilLightReflex,
+          onChanged: (v) =>
+              data.updatePlan(postResuscitationRightPupilLightReflex: v),
+        ),
+        const SizedBox(height: 16),
+
+        _buildTextField(
+          t.otherSupplements,
+          otherSupplementsController,
+          t.enterSupplementaryNotes,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPupilLightReflexRow({
+    required String label,
+    required String? groupValue,
+    required ValueChanged<String?> onChanged,
+  }) {
+    double labelWidth = 60;
+    return Row(
+      children: [
+        SizedBox(width: labelWidth, child: Text(label)),
+        const SizedBox(width: 8),
+        _buildTappableRadioOption(
+          title: "+",
+          groupValue: groupValue,
+          onChanged: onChanged,
+        ),
+        _buildTappableRadioOption(
+          title: "-",
+          groupValue: groupValue,
+          onChanged: onChanged,
+        ),
+        _buildTappableRadioOption(
+          title: "±",
+          groupValue: groupValue,
+          onChanged: onChanged,
+        ),
+      ],
+    );
+  }
+
   Widget _buildTimeSection({
     required String title,
     required DateTime timeValue,
     required VoidCallback onUpdateTime,
   }) {
-    final t = AppTranslations.of(context); // 【新增】
+    final t = AppTranslations.of(context);
     final formattedTime = DateFormat(
       t.fullDateTimeSecondsFormat,
-    ).format(timeValue); // 【修改】
+    ).format(timeValue);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -978,7 +1003,7 @@ class _EmergencyPlanPageState extends State<EmergencyPlanPage> {
                   vertical: 12,
                 ),
               ),
-              child: Text(t.updateTime), // 【修改】
+              child: Text(t.updateTime),
             ),
           ],
         ),
@@ -992,7 +1017,7 @@ class _EmergencyPlanPageState extends State<EmergencyPlanPage> {
     VoidCallback onTap, {
     bool isRequired = false,
   }) {
-    final t = AppTranslations.of(context); // 【新增】
+    final t = AppTranslations.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -1024,7 +1049,7 @@ class _EmergencyPlanPageState extends State<EmergencyPlanPage> {
             child: Text(
               value.isEmpty
                   ? (isRequired ? t.tapToSelectRequired : t.tapToSelect)
-                  : value, // 【修改】
+                  : value,
               style: TextStyle(
                 fontSize: 16,
                 color: value.isEmpty ? Colors.grey.shade500 : Colors.black87,

@@ -56,110 +56,6 @@ class _PlanPageState extends State<PlanPage>
     'otherSpecialNote': TextEditingController(),
   };
 
-  // Lists for dialogs and options
-  final List<String> icd10List = [
-    'A00 Cholera - 霍亂',
-    'A00.0 Cholera due to Vibrio cholerae 01, biovar cholerae - 血清型01霍亂弧菌霍亂',
-    'A00.1 Cholera due to Vibrio cholerae 01, biovar eltor - 血清型01霍亂弧菌El Tor霍亂',
-    'A00.9 Cholera, unspecified - 霍亂',
-    'A01 Typhoid and paratyphoid fevers - 傷寒及副傷寒',
-    'A01.0 Typhoid fever - 傷寒',
-    'A01.01 Typhoid fever, unspecified - 傷寒',
-    'A01.01 Typhoid meningitis - 傷寒腦膜炎',
-  ];
-  final List<String> referralHospitals = [
-    '聯新國際醫院',
-    '林口長庚醫院',
-    '衛生福利部桃園醫院',
-    '衛生福利部桃園療養院',
-    '桃園國際敏盛醫院',
-    '聖保祿醫院',
-    '中壢天晟醫院',
-    '桃園榮民總醫院',
-    '三峽恩主公醫院',
-    '其他',
-  ];
-  final List<String> otherHospitals = [
-    '桃園經國敏盛醫院',
-    '聖保祿醫院',
-    '衛生福利部桃園醫院',
-    '衛生福利部桃園療養院',
-    '桃園榮民總醫院',
-    '三峽恩主公醫院',
-    '其他',
-  ];
-  final List<String> VisitingStaff = [
-    '方詩旋',
-    '古璿正',
-    '江汪財',
-    '呂學政',
-    '周志勃',
-    '金霍歌',
-    '徐丕',
-    '康曉妍',
-  ];
-  final List<String> RegisteredNurses = [
-    '陳思穎',
-    '邱靜鈴',
-    '莊杼媛',
-    '洪萱',
-    '范育婕',
-    '陳珮妤',
-    '蔡可葳',
-    '粘瑞華',
-  ];
-  final List<String> EMTs = ['王文義', '游進昌', '胡勝捷', '黃逸斌', '吳承軒', '張致綸', '劉呈軒'];
-  final List<String> _helperNames = [
-    '方詩婷',
-    '古增正',
-    '江旺財',
-    '呂學政',
-    '海欣茹',
-    '洪雲敏',
-    '徐杰',
-    '康曉朗',
-    '黎裕昌',
-    '戴逸旻',
-    '廖詠怡',
-    '許婷涵',
-    '陳小山',
-    '王悅朗',
-    '劉金宇',
-    '彭士書',
-    '熊得志',
-    '顧小',
-    '蔡心文',
-    '程皓',
-    '楊敏度',
-    '羅尹彤',
-    '廖名用',
-    '陳國平',
-    '蘇敬婷',
-    '黃梨梅',
-    '朱森學',
-    '陳思穎',
-    '邵詩婷',
-    '莊抒捷',
-    '洪萱',
-    '林育緯',
-    '唐詠婷',
-    '蔡可葳',
-    '粘瑞敏',
-    '黃馨儀',
-    '陳冠羽',
-    '陳怡玲',
-    '吳雅柔',
-    '何文豪',
-    '王文義',
-    '游恩晶',
-    '胡雅捷',
-    '黃逸誠',
-    '吳季軒',
-    '劉曉華',
-    '張峻維',
-    '劉昱軒',
-  ];
-
   @override
   void initState() {
     super.initState();
@@ -254,6 +150,46 @@ class _PlanPageState extends State<PlanPage>
   // ===============================================
   // Data Handling Logic
   // ===============================================
+  Future<void> _generateEmergencyRecord() async {
+    try {
+      final emergencyRecordsDao = context.read<EmergencyRecordsDao>();
+
+      // 檢查是否已存在急救紀錄
+      bool recordExists = await emergencyRecordsDao.recordExistsForVisit(
+        widget.visitId,
+      );
+
+      if (recordExists) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('此患者已有急救紀錄單！'),
+              backgroundColor: Colors.orange,
+            ),
+          );
+        }
+        return;
+      }
+
+      // 建立急救紀錄
+      await emergencyRecordsDao.createRecordForVisit(widget.visitId);
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('✅ 已成功產生急救紀錄單！'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('產生急救紀錄單失敗: $e'), backgroundColor: Colors.red),
+        );
+      }
+    }
+  }
 
   Future<void> _loadData() async {
     if (!mounted) return;
@@ -1407,7 +1343,7 @@ class _PlanPageState extends State<PlanPage>
               backgroundColor: const Color(0xFF83ACA9),
               foregroundColor: Colors.white,
             ),
-            onPressed: () {},
+            onPressed: _generateEmergencyRecord, // 改為手動觸發
             child: const Text('產生急救記錄單'),
           ),
           const SizedBox(height: 16),
@@ -1480,9 +1416,9 @@ class _PlanPageState extends State<PlanPage>
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: List.generate(
-              otherHospitals.length,
+              PlanData.otherHospitals.length,
               (i) => _RadioItem(
-                otherHospitals[i],
+                PlanData.otherHospitals[i],
                 value: i,
                 groupValue: planData.otherHospitalIdx,
                 onChanged: (v) {
@@ -1758,9 +1694,9 @@ class _PlanPageState extends State<PlanPage>
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: List.generate(
-            referralHospitals.length,
+            PlanData.referralHospitals.length,
             (i) => _RadioItem(
-              referralHospitals[i],
+              PlanData.referralHospitals[i],
               value: i,
               groupValue: planData.referralHospitalIdx,
               onChanged: (v) {
@@ -1771,7 +1707,7 @@ class _PlanPageState extends State<PlanPage>
           ),
         ),
         const SizedBox(height: 8),
-        _SectionTitle('其他轉送醫院?'),
+        _SectionTitle('其他轉送醫院'),
         TextField(
           controller: _controllers['referralOtherHospital'],
           decoration: const InputDecoration(
@@ -1926,7 +1862,7 @@ class _PlanPageState extends State<PlanPage>
             width: 400,
             height: 300,
             child: ListView(
-              children: icd10List
+              children: PlanData.icd10List
                   .map(
                     (item) => ListTile(
                       title: Text(item),
@@ -1944,9 +1880,9 @@ class _PlanPageState extends State<PlanPage>
 
   Future<void> _showStaffDialog(PlanData planData, String role) async {
     final List<String> staffList = switch (role) {
-      '醫師' => VisitingStaff,
-      '護理師' => RegisteredNurses,
-      'EMT' => EMTs,
+      '醫師' => PlanData.visitingStaff,
+      '護理師' => PlanData.registeredNurses,
+      'EMT' => PlanData.emts,
       _ => [],
     };
     final result = await showDialog<String>(
@@ -1999,7 +1935,7 @@ class _PlanPageState extends State<PlanPage>
               content: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
-                  children: _helperNames.map((name) {
+                  children: PlanData.helperNames.map((name) {
                     return CheckboxListTile(
                       title: Text(name),
                       value: tempSelected.contains(name),
@@ -2051,27 +1987,6 @@ class _PlanPageState extends State<PlanPage>
             selectedDays,
             selectedDoseUnit;
         String note = '';
-        final drugCategories = {
-          '口服藥': [
-            'Augmentin syrup',
-            'Peace 藥錠',
-            'Wempyn 潰瘍寧',
-            'Ciprofloxacin',
-            'Ibuprofen 佈洛芬',
-          ],
-          '注射劑': [
-            'Ventolin 吸入劑',
-            'Wycillin 筋注劑',
-            'N/S 250ml',
-            'D5W 250ml',
-            'KCL 添加液',
-          ],
-          '點滴注射': ['D5S 500ml', 'Lactated Ringer\'s 乳酸林格氏液'],
-        };
-        final usageOptions = ['口服', '靜脈注射', '肌肉注射', '皮下注射'];
-        final freqOptions = ['QD', 'BID', 'TID', 'QID', 'PRN'];
-        final daysOptions = ['1 天', '3 天', '5 天', '7 天'];
-        final doseUnitOptions = ['mg', 'g', 'tab', 'amp', 'vial'];
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
@@ -2081,7 +1996,7 @@ class _PlanPageState extends State<PlanPage>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text('藥品名稱'),
-                    ...drugCategories.entries
+                    ...PlanData.drugCategories.entries
                         .map(
                           (categoryEntry) => Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -2118,7 +2033,7 @@ class _PlanPageState extends State<PlanPage>
                     const SizedBox(height: 16),
                     DropdownButtonFormField<String>(
                       decoration: const InputDecoration(labelText: '使用方式'),
-                      items: usageOptions
+                      items: PlanData.usageOptions
                           .map(
                             (e) => DropdownMenuItem(value: e, child: Text(e)),
                           )
@@ -2127,7 +2042,7 @@ class _PlanPageState extends State<PlanPage>
                     ),
                     DropdownButtonFormField<String>(
                       decoration: const InputDecoration(labelText: '服用頻率'),
-                      items: freqOptions
+                      items: PlanData.freqOptions
                           .map(
                             (e) => DropdownMenuItem(value: e, child: Text(e)),
                           )
@@ -2136,7 +2051,7 @@ class _PlanPageState extends State<PlanPage>
                     ),
                     DropdownButtonFormField<String>(
                       decoration: const InputDecoration(labelText: '服用天數'),
-                      items: daysOptions
+                      items: PlanData.daysOptions
                           .map(
                             (e) => DropdownMenuItem(value: e, child: Text(e)),
                           )
@@ -2145,7 +2060,7 @@ class _PlanPageState extends State<PlanPage>
                     ),
                     DropdownButtonFormField<String>(
                       decoration: const InputDecoration(labelText: '劑量單位'),
-                      items: doseUnitOptions
+                      items: PlanData.doseUnitOptions
                           .map(
                             (e) => DropdownMenuItem(value: e, child: Text(e)),
                           )

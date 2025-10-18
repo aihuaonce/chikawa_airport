@@ -1,11 +1,12 @@
 // lib/NursingRecordPage.dart
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'data/db/daos.dart';
 import 'data/models/nursing_record_data.dart';
-import 'l10n/app_translations.dart'; // 【新增】引入翻譯
-import 'nav2.dart'; // 為了使用 SavableStateMixin
+import 'l10n/app_translations.dart';
+import 'nav2.dart';
 
 class NursingRecordPage extends StatefulWidget {
   final int visitId;
@@ -22,6 +23,17 @@ class _NursingRecordPageState extends State<NursingRecordPage>
   @override
   bool get wantKeepAlive => true;
   bool _isLoading = true;
+
+  final List<String> _nurses = [
+    '陳思穎',
+    '邱靜鈴',
+    '莊漾媛',
+    '洪豔',
+    '范育婕',
+    '陳簡妤',
+    '蔡可萱',
+    '粘瑞詩',
+  ];
 
   @override
   void initState() {
@@ -258,20 +270,302 @@ class _NursingRecordPageState extends State<NursingRecordPage>
   }
 
   Widget _buildAddRowButton(AppTranslations t, NursingRecordData dataModel) {
-    // 【修改】
     return InkWell(
-      onTap: () => dataModel.addRecord(),
+      onTap: () => _showAddRecordDialog(context, dataModel),
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
-        child: Text(
-          t.addRow, // 【修改】
-          style: const TextStyle(
-            color: Colors.blue,
-            fontWeight: FontWeight.bold,
-          ),
+        child: Row(
+          children: [
+            const SizedBox(width: 8),
+            Text(
+              t.addRow,
+              style: const TextStyle(
+                color: Colors.blue,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
         ),
       ),
+    );
+  }
+
+  Future<void> _showAddRecordDialog(
+    BuildContext context,
+    NursingRecordData dataModel,
+  ) async {
+    final t = AppTranslations.of(context);
+    // Dialog 內部的狀態變數
+    final recordController = TextEditingController();
+    final signatureController = TextEditingController();
+    String? selectedNurse;
+    String? selectedPhrase;
+    final recordTime = DateTime.now();
+
+    // 預設片語清單
+    final List<String> presetPhrases = [
+      t.phraseReceptionNotified,
+      t.phraseNotification1,
+      t.phraseNotification2,
+      t.phraseNotification3,
+      t.phraseArrivedAtScene,
+      t.phraseBloodSugarTest,
+      t.phraseDiagnosisAndMedication,
+      t.phraseIssueCertificate,
+      t.phraseReferral,
+      t.phraseReferralHandover,
+      t.phraseTransferNotification,
+      t.phraseGeneralCustoms,
+      t.phraseUrgentCustoms,
+      t.phraseTransfer1,
+      t.phraseTransfer2,
+      t.phraseTransfer3,
+      t.phraseBilling,
+      t.phraseEndOfVisit,
+      t.phraseReturnToStandby,
+    ];
+
+    // 根據片語產生紀錄文字的輔助函式
+    String getPresetText(String phrase) {
+      if (phrase == t.phraseReceptionNotified) {
+        return '接獲[通報單位][通報人員]通報位於[事故地點]有旅客[主訴]身體不適，需要醫護出診協助。';
+      }
+      // 您可以在這裡為其他片語新增範本
+      return phrase;
+    }
+
+    await showDialog(
+      context: context,
+      barrierDismissible: false, // 避免點擊外部關閉
+      builder: (dialogContext) {
+        // 使用 StatefulBuilder 來管理 Dialog 自己的 State
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              title: Text(t.createNursingRecord),
+              content: SizedBox(
+                width: MediaQuery.of(context).size.width * 0.6, // 寬一點
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // --- 紀錄時間 ---
+                      _buildDialogStaticField(
+                        t.recordTime,
+                        DateFormat('yyyy年MM月dd日 HH時mm分ss秒').format(recordTime),
+                      ),
+                      const SizedBox(height: 16),
+
+                      // --- 預設片語 ---
+                      Text(
+                        t.presetPhrase,
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      Wrap(
+                        spacing: 4.0,
+                        runSpacing: 0.0,
+                        children: presetPhrases.map((phrase) {
+                          return Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Radio<String>(
+                                value: phrase,
+                                groupValue: selectedPhrase,
+                                onChanged: (value) {
+                                  setDialogState(() {
+                                    selectedPhrase = value;
+                                    recordController.text = getPresetText(
+                                      value!,
+                                    );
+                                  });
+                                },
+                              ),
+                              Text(phrase),
+                            ],
+                          );
+                        }).toList(),
+                      ),
+                      const SizedBox(height: 16),
+
+                      // --- 紀錄 ---
+                      _buildDialogTextField(t.record, recordController, 5),
+                      const SizedBox(height: 16),
+
+                      // --- 護理師姓名 ---
+                      _buildDialogSelector(
+                        label: t.nurseName,
+                        value: selectedNurse ?? t.clickToSelectNurse,
+                        onTap: () async {
+                          final result = await _showNurseSelectionDialog(
+                            context,
+                            t,
+                          );
+                          if (result != null) {
+                            setDialogState(() => selectedNurse = result);
+                          }
+                        },
+                        selectedNurse: selectedNurse,
+                      ),
+                      const SizedBox(height: 16),
+
+                      // --- 護理師簽名 ---
+                      _buildDialogTextField(
+                        t.nurseSignature,
+                        signatureController,
+                        3,
+                        hint: t.signatureStamp,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              actions: [
+                TextButton(
+                  child: Text(t.discard),
+                  onPressed: () => Navigator.of(context).pop(),
+                ),
+                ElevatedButton(
+                  child: Text(t.saveAndAddAnother),
+                  onPressed: () {
+                    if (selectedNurse != null) {
+                      final newRecord = NursingRecordEntry(
+                        id: UniqueKey().toString(),
+                        time: DateFormat('yyyy/MM/dd HH:mm').format(recordTime),
+                        record: recordController.text,
+                        nurseName: selectedNurse!,
+                        nurseSign: signatureController.text,
+                      );
+                      dataModel.addRecord(newRecord);
+
+                      // 重設 Dialog 以便新增下一筆
+                      setDialogState(() {
+                        recordController.clear();
+                        signatureController.clear();
+                        selectedPhrase = null;
+                        selectedNurse = null;
+                      });
+                    }
+                  },
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Theme.of(context).primaryColor,
+                    foregroundColor: Colors.white,
+                  ),
+                  child: Text(t.saveAndClose),
+                  onPressed: () {
+                    if (selectedNurse != null) {
+                      final newRecord = NursingRecordEntry(
+                        id: UniqueKey().toString(),
+                        time: DateFormat('yyyy/MM/dd HH:mm').format(recordTime),
+                        record: recordController.text,
+                        nurseName: selectedNurse!,
+                        nurseSign: signatureController.text,
+                      );
+                      dataModel.addRecord(newRecord);
+                      Navigator.of(context).pop();
+                    }
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  // --- Dialog 內部使用的小組件 ---
+
+  Widget _buildDialogStaticField(String label, String value) {
+    return Row(
+      children: [
+        Text('$label：', style: const TextStyle(fontWeight: FontWeight.bold)),
+        Text(value),
+      ],
+    );
+  }
+
+  Widget _buildDialogTextField(
+    String label,
+    TextEditingController controller,
+    int maxLines, {
+    String? hint,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
+        const SizedBox(height: 8),
+        TextField(
+          controller: controller,
+          maxLines: maxLines,
+          decoration: InputDecoration(
+            hintText: hint,
+            border: const OutlineInputBorder(),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: 8,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDialogSelector({
+    required String label,
+    required String value,
+    required VoidCallback onTap,
+    required String? selectedNurse,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
+        const SizedBox(height: 8),
+        InkWell(
+          onTap: onTap,
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey),
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: Text(
+              value,
+              style: TextStyle(
+                color: selectedNurse == null
+                    ? Colors.grey.shade600
+                    : Colors.black,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Future<String?> _showNurseSelectionDialog(
+    BuildContext context,
+    AppTranslations t,
+  ) async {
+    return await showDialog<String>(
+      context: context,
+      builder: (context) {
+        return SimpleDialog(
+          title: Text(t.selectNurseDialogTitle),
+          children: _nurses.map((nurse) {
+            return SimpleDialogOption(
+              onPressed: () => Navigator.pop(context, nurse),
+              child: Text(nurse),
+            );
+          }).toList(),
+        );
+      },
     );
   }
 }
