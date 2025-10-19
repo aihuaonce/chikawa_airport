@@ -250,6 +250,15 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
       t.other,
     ];
 
+    int? hospitalIdx;
+
+    // ===== 運送原因（★ Added）=====
+    final List<String> transportReasons = [
+      t.patientConditionRequired,
+      t.patientOrFamilyRequest,
+    ]; // ★ Added
+    int? transportReasonIdx; // ★ Added
+
     return Consumer<AmbulanceData>(
       builder: (context, data, child) {
         return SingleChildScrollView(
@@ -382,9 +391,18 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
                         ),
                       ),
                     ],
-
+                    const SizedBox(height: 12),
+                    _rowTop(
+                      label: '運送原因', // ★ Added
+                      child: _radioWrap(
+                        // ★ Added
+                        options: transportReasons,
+                        groupIndex: transportReasonIdx,
+                        onChanged: (i) =>
+                            setState(() => transportReasonIdx = i),
+                      ),
+                    ),
                     const SizedBox(height: 16),
-
                     _dateTimeRow(
                       label: t.leaveSceneTime, // 【修改】
                       value: data.leaveSceneTime,

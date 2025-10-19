@@ -730,6 +730,9 @@ class AppTranslations {
   String get liverDisease => isZh ? '肝臟疾病' : 'Liver Disease';
   String get otherPastMedicalHistory =>
       isZh ? '其他過去病史' : 'Other Past Medical History';
+  String get patientConditionRequired => isZh ? '病情需要' : 'Medical necessity';
+  String get patientOrFamilyRequest =>
+      isZh ? '病人或家屬要求' : 'Patient or family request';
 
   // ========== Body Map Page (人形圖頁面) ==========
   String get bodyMapSaveSuccess =>

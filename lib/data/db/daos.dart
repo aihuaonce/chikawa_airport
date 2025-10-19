@@ -462,6 +462,7 @@ class EmergencyRecordsDao extends DatabaseAccessor<AppDatabase>
     final updated = companion.copyWith(updatedAt: Value(DateTime.now()));
 
     if (existing == null) {
+      print('⚙️ upsert 被呼叫，visitId: ${companion.visitId.value}');
       // 如果不存在，執行插入 (Insert)
       await into(emergencyRecords).insert(updated);
     } else {

@@ -139,7 +139,6 @@ class _Home2PageState extends State<Home2Page> {
                           ),
                           child: Row(
                             children: [
-                              // 【修改】從 EmergencyRecord 實例中取得資料
                               _TableCell(
                                 record.incidentDateTime != null
                                     ? _fmtDateTime(record.incidentDateTime!)

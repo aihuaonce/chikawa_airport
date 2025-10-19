@@ -7,6 +7,7 @@ import '../db/daos.dart';
 
 class EmergencyData extends ChangeNotifier {
   final int visitId;
+  bool isLoaded = false;
 
   EmergencyData(this.visitId);
 
@@ -530,15 +531,16 @@ class EmergencyData extends ChangeNotifier {
 
         print('✅ 成功載入 visitId $visitId 的急救紀錄');
       } else {
-        // 步驟 4: 如果紀錄不存在，只印出提示訊息，UI 將顯示空白表單
         print('ℹ️ visitId $visitId 尚無急救紀錄，將顯示空白表單。');
       }
 
       // 步驟 5: 最後，通知所有監聽者(UI)更新畫面
+      isLoaded = true;
       notifyListeners();
     } catch (e) {
       // 步驟 6: 處理任何可能發生的錯誤
       print('❌ 載入急救紀錄時失敗: $e');
+      isLoaded = true;
       clearAll(); // 發生錯誤時清空所有資料
       notifyListeners();
     }
