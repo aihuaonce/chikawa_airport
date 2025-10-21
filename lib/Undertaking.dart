@@ -35,6 +35,8 @@ class _UndertakingPageState extends State<UndertakingPage>
     exportBackgroundColor: Colors.white,
   );
 
+  DateTime _selectedDate = DateTime.now();
+
   @override
   void initState() {
     super.initState();
@@ -139,7 +141,7 @@ class _UndertakingPageState extends State<UndertakingPage>
     super.build(context);
     if (_isLoading) return const Center(child: CircularProgressIndicator());
 
-    final today = _todayTw();
+    final today = _formatDate(_selectedDate);
 
     return Consumer<UndertakingData>(
       builder: (context, dataModel, child) {
@@ -209,7 +211,21 @@ class _UndertakingPageState extends State<UndertakingPage>
                 const SizedBox(height: 8),
                 _buildSignatureArea(dataModel),
                 const SizedBox(height: 12),
-                Text("Date: $today"),
+                Row(
+                  children: [
+                    const Text("Date: "),
+                    TextButton(
+                      onPressed: () => _selectDate(context),
+                      child: Text(
+                        today,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
@@ -399,9 +415,23 @@ class _UndertakingPageState extends State<UndertakingPage>
     );
   }
 
-  String _todayTw() {
-    final d = DateTime.now();
+  String _formatDate(DateTime date) {
     String two(int n) => n.toString().padLeft(2, '0');
-    return '${d.year}年${two(d.month)}月${two(d.day)}日';
+    return '${date.year}年${two(date.month)}月${two(date.day)}日';
+  }
+
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate,
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2030),
+      locale: const Locale('zh', 'TW'),
+    );
+    if (picked != null && picked != _selectedDate) {
+      setState(() {
+        _selectedDate = picked;
+      });
+    }
   }
 }
