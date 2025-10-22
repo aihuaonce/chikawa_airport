@@ -147,18 +147,21 @@ class _UndertakingPageState extends State<UndertakingPage>
           color: const Color(0xFFE6F6FB),
           padding: const EdgeInsets.all(16.0),
           // ** 錯誤修正 **：將 Row 替換為 LayoutBuilder，以便在不同寬度下有不同佈局
+          child: Center(
           child: LayoutBuilder(
             builder: (context, constraints) {
               // 如果寬度足夠，使用左右佈局
               if (constraints.maxWidth > 800) {
-                return Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                return IntrinsicHeight( // <- 新增：讓 Row 內左右卡片高度一致
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch, // <- 修改：左右卡片拉伸對齊高度
                   children: [
                     _buildEnglishSide(dataModel, today),
                     const SizedBox(width: 16),
                     _buildChineseSide(dataModel, today),
                   ],
-                );
+                ),
+              );
               }
               // 如果寬度不足，使用上下佈局並允許滾動
               else {
@@ -174,6 +177,7 @@ class _UndertakingPageState extends State<UndertakingPage>
               }
             },
           ),
+        ),
         );
       },
     );
@@ -186,8 +190,10 @@ class _UndertakingPageState extends State<UndertakingPage>
   Widget _buildEnglishSide(UndertakingData dataModel, String today) {
     return Expanded(
       child: Card(
-        color: const Color(0xFFF9F9F9),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        color: Colors.white,
+        elevation: 8, // 陰影
+        shadowColor: Colors.black26, // 陰影顏色
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           // ** 錯誤修正 **：將 Column 替換為 SingleChildScrollView，使其內容可滾動
@@ -305,8 +311,10 @@ class _UndertakingPageState extends State<UndertakingPage>
 
     return Expanded(
       child: Card(
-        color: const Color(0xFFF9F9F9),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        color: Colors.white,
+        elevation: 8, // 陰影
+        shadowColor: Colors.black26, // 陰影顏色
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: SingleChildScrollView(
@@ -317,19 +325,22 @@ class _UndertakingPageState extends State<UndertakingPage>
                 const SizedBox(height: 8),
                 Text("身分證字號： ${dataModel.signerId ?? ""}"),
                 Text("$today 於桃園國際機場接受聯新國際醫院桃園國際機場醫療中心醫師"),
-                DropdownButton<String>(
-                  value: dataModel.doctor,
-                  isExpanded: true,
-                  items: dataModel.doctorList
-                      .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                      .toList(),
-                  onChanged: (val) {
+                SizedBox(
+                width: 100, // 設定下拉選單的寬度
+                child: DropdownButton<String>(
+                    value: dataModel.doctor,
+                    isExpanded: true, // 保持文字完整顯示
+                    items: dataModel.doctorList
+                        .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                        .toList(),
+                    onChanged: (val) {
                     if (val != null) {
-                      dataModel.doctor = val;
-                      dataModel.update();
+                    dataModel.doctor = val;
+                    dataModel.update();
                     }
                   },
-                ),
+               ),
+            ),
                 const SizedBox(height: 12),
                 const Text(
                   "診視，醫師建議轉診至醫院繼續治療，但本人因個人因素拒絕醫師「繼續治療」之建議，致生一切後果願自行負責，與聯新國際醫院桃園國際機場醫療中心無涉。",
