@@ -12,6 +12,16 @@ class MedicalCostsData extends ChangeNotifier {
   String? photoPath;
   String? agreementSignaturePath;
   String? witnessSignaturePath;
+  String? paymentMethod;
+  String? paymentStatus;
+  String? selectedCurrency;
+  String? foreignCurrencyAmount;
+  String? convertedTwdAmount;
+  String? applicantName;
+  String? applicantUnit;
+  String? contactPhone;
+  bool? receiptIssuedAndTransferred;
+  String? billingErrorReason;
 
   double get totalFee {
     final double visit = double.tryParse(visitFee ?? '0') ?? 0;
@@ -31,6 +41,17 @@ class MedicalCostsData extends ChangeNotifier {
     photoPath = null;
     agreementSignaturePath = null;
     witnessSignaturePath = null;
+    paymentMethod = null;
+    paymentStatus = null;
+    selectedCurrency = null;
+    foreignCurrencyAmount = null;
+    convertedTwdAmount = null;
+    applicantName = null;
+    applicantUnit = null;
+    contactPhone = null;
+    receiptIssuedAndTransferred = null;
+    billingErrorReason = null;
+
     notifyListeners();
   }
 

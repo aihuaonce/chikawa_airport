@@ -1,4 +1,4 @@
-// lib/NursingRecordPage.dart
+// lib/NursingRecordPage.dart (已根據您的美編規範進行修改)
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -118,34 +118,49 @@ class _NursingRecordPageState extends State<NursingRecordPage>
           color: const Color(0xFFE6F6FB),
           alignment: Alignment.topCenter,
           child: SingleChildScrollView(
-            child: Container(
-              width: 900,
-              margin: const EdgeInsets.symmetric(vertical: 32),
-              padding: const EdgeInsets.all(32),
-              decoration: BoxDecoration(
-                color: const Color(0xFFF9FAFB),
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: const [
-                  BoxShadow(color: Colors.black12, blurRadius: 8),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    t.nursingRecordForm, // 【修改】
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+            child: ConstrainedBox(
+              // Use ConstrainedBox to enforce maxWidth
+              constraints: const BoxConstraints(maxWidth: 1000),
+              child: Container(
+                margin: const EdgeInsets.symmetric(
+                  vertical: 32,
+                  horizontal: 16,
+                ),
+                padding: const EdgeInsets.all(32),
+                decoration: BoxDecoration(
+                  color: Colors.white, // As requested: 白色卡片
+                  borderRadius: BorderRadius.circular(16), // As requested: 圓角16
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Color.fromRGBO(
+                        0,
+                        0,
+                        0,
+                        0.08,
+                      ), // As requested: 陰影柔和
+                      blurRadius: 12,
+                      offset: Offset(0, 4),
                     ),
-                  ),
-                  const SizedBox(height: 16),
-                  _buildHeader(t), // 【修改】
-                  ...dataModel.nursingRecords.map(
-                    (record) => _buildRecordRow(t, dataModel, record), // 【修改】
-                  ),
-                  _buildAddRowButton(t, dataModel), // 【修改】
-                ],
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      t.nursingRecordForm, // 【修改】
+                      style: const TextStyle(
+                        fontSize: 20, // Slightly larger title
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    _buildHeader(t), // 【修改】
+                    ...dataModel.nursingRecords.map(
+                      (record) => _buildRecordRow(t, dataModel, record), // 【修改】
+                    ),
+                    _buildAddRowButton(t, dataModel), // 【修改】
+                  ],
+                ),
               ),
             ),
           ),
@@ -335,6 +350,14 @@ class _NursingRecordPageState extends State<NursingRecordPage>
       return phrase;
     }
 
+    // Define the button style once to be reused, as per your spec
+    final ButtonStyle actionButtonStyle = ElevatedButton.styleFrom(
+      backgroundColor: const Color(0xFF83ACA9), // As requested: 按鈕背景色
+      foregroundColor: Colors.white, // As requested: 文字白色
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+    );
+
     await showDialog(
       context: context,
       barrierDismissible: false, // 避免點擊外部關閉
@@ -373,6 +396,9 @@ class _NursingRecordPageState extends State<NursingRecordPage>
                               Radio<String>(
                                 value: phrase,
                                 groupValue: selectedPhrase,
+                                activeColor: const Color(
+                                  0xFF274C4A,
+                                ), // As requested: 選中顏色
                                 onChanged: (value) {
                                   setDialogState(() {
                                     selectedPhrase = value;
@@ -427,6 +453,7 @@ class _NursingRecordPageState extends State<NursingRecordPage>
                   onPressed: () => Navigator.of(context).pop(),
                 ),
                 ElevatedButton(
+                  style: actionButtonStyle,
                   child: Text(t.saveAndAddAnother),
                   onPressed: () {
                     if (selectedNurse != null) {
@@ -450,10 +477,7 @@ class _NursingRecordPageState extends State<NursingRecordPage>
                   },
                 ),
                 ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).primaryColor,
-                    foregroundColor: Colors.white,
-                  ),
+                  style: actionButtonStyle,
                   child: Text(t.saveAndClose),
                   onPressed: () {
                     if (selectedNurse != null) {

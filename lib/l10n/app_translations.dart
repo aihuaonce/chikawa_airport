@@ -1006,8 +1006,31 @@ class AppTranslations {
   String get chargeMethod =>
       isZh ? '醫療費用收取方式' : 'Medical Fee Collection Method';
   String get selfPay => isZh ? '自付' : 'Self-Pay';
+  String get paymentMethod => isZh ? '自付方式' : 'Payment Method';
+  String get applicantName => isZh ? '申請人' : 'Applicant Name';
+  String get enterApplicantNameHint =>
+      isZh ? '請填寫申請人的姓名' : 'Please enter applicant\'s name';
+  String get applicantUnit => isZh ? '申請單位' : 'Applicant Unit';
+  String get enterApplicantUnitHint =>
+      isZh ? '請填寫申請單位' : 'Please enter applicant unit';
   String get hospitalCollection => isZh ? '總院會核代收' : 'Hospital Collection';
   String get billingError => isZh ? '收費異常' : 'Billing Error';
+  String get billingErrorReason => isZh ? '收費異常原因' : 'Billing Error Reason';
+  String get enterBillingErrorReasonHint =>
+      isZh ? '請填寫收費異常的原因' : 'Please enter the reason for the billing error';
+  String get paymentStatus => isZh ? '收款狀態' : 'Payment Status';
+  String get paymentPending => isZh ? '尚未收款' : 'Payment Pending';
+  String get paymentReceived => isZh ? '已收款' : 'Payment Received';
+  String get notNeeded => isZh ? '不需要' : 'Not Needed';
+  String get selectCurrency => isZh ? '選擇貨幣' : 'Select Currency';
+  String get twd => isZh ? '台幣' : 'TWD';
+  String get usd => isZh ? '美金' : 'USD';
+  String get cny => isZh ? '人民幣' : 'CNY';
+  String get jpy => isZh ? '日幣' : 'JPY';
+  String get cad => isZh ? '加幣' : 'CAD';
+  String get foreignCurrency => isZh ? '外幣' : 'Foreign Currency';
+  String get enterNumericValueHint => isZh ? '輸入數字' : 'Enter numeric value';
+  String get convertedTwdAmount => isZh ? '兌換後的台幣' : 'Amount in TWD';
   String get consultationFee => isZh ? '出診費' : 'Consultation Fee';
   String get ambulanceFee => isZh ? '救護車費用' : 'Ambulance Fee';
   // totalFee is already defined in the common section
@@ -1015,6 +1038,9 @@ class AppTranslations {
   String get enterAmountHint => isZh ? '輸入金額' : 'Enter amount';
   String get enterBillingNotesHint =>
       isZh ? '請填寫收費備註' : 'Please enter billing notes';
+  String get receiptIssuedAndTransferred =>
+      isZh ? '已開立收據並轉交' : 'Receipt Issued and Transferred';
+  String get erCounterSignature => isZh ? '急診櫃台簽收名' : 'ER Counter Signature';
   String get agreementStatementZh => isZh
       ? '瞭解醫護人員說明明瞭醫療收費之後且同意'
       : 'I understand the explanation of the medical charges and agree to them.';
