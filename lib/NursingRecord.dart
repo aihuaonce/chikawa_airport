@@ -47,14 +47,14 @@ class _NursingRecordPageState extends State<NursingRecordPage>
   @override
   Future<void> saveData() async {
     if (!mounted) return;
-    final t = AppTranslations.of(context); // 【新增】
+    final t = AppTranslations.of(context);
     try {
       await _saveData();
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('${t.saveNursingRecordFailed}$e')),
-        ); // 【修改】
+        );
       }
       rethrow;
     }
@@ -93,9 +93,6 @@ class _NursingRecordPageState extends State<NursingRecordPage>
   Future<void> _saveData() async {
     final dao = context.read<NursingRecordsDao>();
     final dataModel = context.read<NursingRecordData>();
-
-    // ✅ 正確做法：直接呼叫您在 dataModel 中定義好的新方法
-    //    它會自動處理 JSON 轉換和資料庫操作
     await dataModel.saveToDatabase(widget.visitId, dao);
   }
 
@@ -106,7 +103,7 @@ class _NursingRecordPageState extends State<NursingRecordPage>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    final t = AppTranslations.of(context); // 【新增】
+    final t = AppTranslations.of(context);
 
     if (_isLoading) {
       return const Center(child: CircularProgressIndicator());
@@ -119,7 +116,6 @@ class _NursingRecordPageState extends State<NursingRecordPage>
           alignment: Alignment.topCenter,
           child: SingleChildScrollView(
             child: ConstrainedBox(
-              // Use ConstrainedBox to enforce maxWidth
               constraints: const BoxConstraints(maxWidth: 1000),
               child: Container(
                 margin: const EdgeInsets.symmetric(
@@ -128,16 +124,11 @@ class _NursingRecordPageState extends State<NursingRecordPage>
                 ),
                 padding: const EdgeInsets.all(32),
                 decoration: BoxDecoration(
-                  color: Colors.white, // As requested: 白色卡片
-                  borderRadius: BorderRadius.circular(16), // As requested: 圓角16
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
                   boxShadow: const [
                     BoxShadow(
-                      color: Color.fromRGBO(
-                        0,
-                        0,
-                        0,
-                        0.08,
-                      ), // As requested: 陰影柔和
+                      color: Color.fromRGBO(0, 0, 0, 0.08),
                       blurRadius: 12,
                       offset: Offset(0, 4),
                     ),
@@ -147,18 +138,18 @@ class _NursingRecordPageState extends State<NursingRecordPage>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      t.nursingRecordForm, // 【修改】
+                      t.nursingRecordForm,
                       style: const TextStyle(
-                        fontSize: 20, // Slightly larger title
+                        fontSize: 20,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     const SizedBox(height: 24),
-                    _buildHeader(t), // 【修改】
+                    _buildHeader(t),
                     ...dataModel.nursingRecords.map(
-                      (record) => _buildRecordRow(t, dataModel, record), // 【修改】
+                      (record) => _buildRecordRow(t, dataModel, record),
                     ),
-                    _buildAddRowButton(t, dataModel), // 【修改】
+                    _buildAddRowButton(t, dataModel),
                   ],
                 ),
               ),
@@ -174,7 +165,6 @@ class _NursingRecordPageState extends State<NursingRecordPage>
   // ===============================================
 
   Widget _buildHeader(AppTranslations t) {
-    // 【修改】
     return Container(
       width: double.infinity,
       color: const Color(0xFFF1F3F6),
@@ -186,28 +176,28 @@ class _NursingRecordPageState extends State<NursingRecordPage>
             child: Text(
               t.recordTime,
               style: const TextStyle(fontWeight: FontWeight.bold),
-            ), // 【修改】
+            ),
           ),
           Expanded(
             flex: 3,
             child: Text(
               t.record,
               style: const TextStyle(fontWeight: FontWeight.bold),
-            ), // 【修改】
+            ),
           ),
           Expanded(
             flex: 2,
             child: Text(
               t.nurseName,
               style: const TextStyle(fontWeight: FontWeight.bold),
-            ), // 【修改】
+            ),
           ),
           Expanded(
             flex: 2,
             child: Text(
               t.nurseSignature,
               style: const TextStyle(fontWeight: FontWeight.bold),
-            ), // 【修改】
+            ),
           ),
           const SizedBox(width: 48),
         ],
@@ -216,7 +206,7 @@ class _NursingRecordPageState extends State<NursingRecordPage>
   }
 
   Widget _buildRecordRow(
-    AppTranslations t, // 【修改】
+    AppTranslations t,
     NursingRecordData dataModel,
     NursingRecordEntry record,
   ) {
@@ -241,22 +231,19 @@ class _NursingRecordPageState extends State<NursingRecordPage>
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Expanded(
-            flex: 2,
-            child: _buildTextField(timeController, t.timeHint),
-          ), // 【修改】
+          Expanded(flex: 2, child: _buildTextField(timeController, t.timeHint)),
           Expanded(
             flex: 3,
             child: _buildTextField(recordController, t.contentHint),
-          ), // 【修改】
+          ),
           Expanded(
             flex: 2,
             child: _buildTextField(nurseNameController, t.nameHint),
-          ), // 【修改】
+          ),
           Expanded(
             flex: 2,
             child: _buildTextField(nurseSignController, t.signatureHint),
-          ), // 【修改】
+          ),
           IconButton(
             icon: const Icon(Icons.delete, color: Colors.redAccent),
             onPressed: () => dataModel.removeRecord(record.id),
@@ -346,20 +333,19 @@ class _NursingRecordPageState extends State<NursingRecordPage>
       if (phrase == t.phraseReceptionNotified) {
         return '接獲[通報單位][通報人員]通報位於[事故地點]有旅客[主訴]身體不適，需要醫護出診協助。';
       }
-      // 您可以在這裡為其他片語新增範本
       return phrase;
     }
 
     final ButtonStyle actionButtonStyle = ElevatedButton.styleFrom(
-      backgroundColor: const Color(0xFF83ACA9), // As requested: 按鈕背景色
-      foregroundColor: Colors.white, // As requested: 文字白色
+      backgroundColor: const Color(0xFF83ACA9),
+      foregroundColor: Colors.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
     );
 
     await showDialog(
       context: context,
-      barrierDismissible: false, // 避免點擊外部關閉
+      barrierDismissible: false,
       builder: (dialogContext) {
         // 使用 StatefulBuilder 來管理 Dialog 自己的 State
         return StatefulBuilder(
@@ -367,7 +353,7 @@ class _NursingRecordPageState extends State<NursingRecordPage>
             return AlertDialog(
               title: Text(t.createNursingRecord),
               content: SizedBox(
-                width: MediaQuery.of(context).size.width * 0.6, // 寬一點
+                width: MediaQuery.of(context).size.width * 0.6,
                 child: SingleChildScrollView(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -462,6 +448,7 @@ class _NursingRecordPageState extends State<NursingRecordPage>
                         nurseSign: signatureController.text,
                       );
                       dataModel.addRecord(newRecord);
+                      _saveData(); // ✅ 修改：新增後立即儲存
 
                       // 重設 Dialog 以便新增下一筆
                       setDialogState(() {
@@ -486,6 +473,7 @@ class _NursingRecordPageState extends State<NursingRecordPage>
                         nurseSign: signatureController.text,
                       );
                       dataModel.addRecord(newRecord);
+                      _saveData(); // ✅ 修改：新增後立即儲存
                       Navigator.of(context).pop();
                     }
                   },
