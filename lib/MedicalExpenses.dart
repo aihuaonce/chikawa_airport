@@ -244,7 +244,13 @@ class _MedicalExpensesPageState extends State<MedicalExpensesPage>
                         hintText: t.enterAmountHint,
                         border: const OutlineInputBorder(),
                       ),
-                      onChanged: (_) => _syncControllersToData(),
+                      onChanged: (_) {
+                        final dataModel = context.read<MedicalCostsData>();
+                        dataModel.visitFee = _visitFeeController.text.trim();
+                        dataModel.ambulanceFee = _ambulanceFeeController.text
+                            .trim();
+                        // ❌ 不立即 notify，改在儲存前呼叫 dataModel.update()
+                      },
                     ),
                     const SizedBox(height: 16),
                     _SectionTitle(t.ambulanceFee),
@@ -255,7 +261,13 @@ class _MedicalExpensesPageState extends State<MedicalExpensesPage>
                         hintText: t.enterAmountHint,
                         border: const OutlineInputBorder(),
                       ),
-                      onChanged: (_) => _syncControllersToData(),
+                      onChanged: (_) {
+                        final dataModel = context.read<MedicalCostsData>();
+                        dataModel.visitFee = _visitFeeController.text.trim();
+                        dataModel.ambulanceFee = _ambulanceFeeController.text
+                            .trim();
+                        // ❌ 不立即 notify，改在儲存前呼叫 dataModel.update()
+                      },
                     ),
                     const SizedBox(height: 16),
                     _SectionTitle(t.totalFee),
@@ -277,7 +289,13 @@ class _MedicalExpensesPageState extends State<MedicalExpensesPage>
                         border: const OutlineInputBorder(),
                       ),
                       maxLines: 2,
-                      onChanged: (_) => _syncControllersToData(),
+                      onChanged: (_) {
+                        final dataModel = context.read<MedicalCostsData>();
+                        dataModel.visitFee = _visitFeeController.text.trim();
+                        dataModel.ambulanceFee = _ambulanceFeeController.text
+                            .trim();
+                        // ❌ 不立即 notify，改在儲存前呼叫 dataModel.update()
+                      },
                     ),
                     const SizedBox(height: 24),
                     Text(
@@ -417,7 +435,12 @@ class _MedicalExpensesPageState extends State<MedicalExpensesPage>
             hintText: t.enterApplicantNameHint,
             border: const OutlineInputBorder(),
           ),
-          onChanged: (_) => _syncControllersToData(),
+          onChanged: (_) {
+            final dataModel = context.read<MedicalCostsData>();
+            dataModel.visitFee = _visitFeeController.text.trim();
+            dataModel.ambulanceFee = _ambulanceFeeController.text.trim();
+            // ❌ 不立即 notify，改在儲存前呼叫 dataModel.update()
+          },
         ),
         const SizedBox(height: 16),
         _SectionTitle(t.applicantUnit),
@@ -427,7 +450,12 @@ class _MedicalExpensesPageState extends State<MedicalExpensesPage>
             hintText: t.enterApplicantUnitHint,
             border: const OutlineInputBorder(),
           ),
-          onChanged: (_) => _syncControllersToData(),
+          onChanged: (_) {
+            final dataModel = context.read<MedicalCostsData>();
+            dataModel.visitFee = _visitFeeController.text.trim();
+            dataModel.ambulanceFee = _ambulanceFeeController.text.trim();
+            // ❌ 不立即 notify，改在儲存前呼叫 dataModel.update()
+          },
         ),
         const SizedBox(height: 16),
         _SectionTitle(t.contactNumber),
@@ -438,7 +466,12 @@ class _MedicalExpensesPageState extends State<MedicalExpensesPage>
             hintText: t.enterContactNumber,
             border: const OutlineInputBorder(),
           ),
-          onChanged: (_) => _syncControllersToData(),
+          onChanged: (_) {
+            final dataModel = context.read<MedicalCostsData>();
+            dataModel.visitFee = _visitFeeController.text.trim();
+            dataModel.ambulanceFee = _ambulanceFeeController.text.trim();
+            // ❌ 不立即 notify，改在儲存前呼叫 dataModel.update()
+          },
         ),
       ],
     );
@@ -500,7 +533,12 @@ class _MedicalExpensesPageState extends State<MedicalExpensesPage>
             hintText: t.enterBillingErrorReasonHint,
             border: const OutlineInputBorder(),
           ),
-          onChanged: (_) => _syncControllersToData(),
+          onChanged: (_) {
+            final dataModel = context.read<MedicalCostsData>();
+            dataModel.visitFee = _visitFeeController.text.trim();
+            dataModel.ambulanceFee = _ambulanceFeeController.text.trim();
+            // ❌ 不立即 notify，改在儲存前呼叫 dataModel.update()
+          },
         ),
       ],
     );
@@ -589,7 +627,12 @@ class _MedicalExpensesPageState extends State<MedicalExpensesPage>
               hintText: t.enterNumericValueHint,
               border: const OutlineInputBorder(),
             ),
-            onChanged: (_) => _syncControllersToData(),
+            onChanged: (_) {
+              final dataModel = context.read<MedicalCostsData>();
+              dataModel.visitFee = _visitFeeController.text.trim();
+              dataModel.ambulanceFee = _ambulanceFeeController.text.trim();
+              // ❌ 不立即 notify，改在儲存前呼叫 dataModel.update()
+            },
           ),
           const SizedBox(height: 16),
           _SectionTitle(t.convertedTwdAmount),
@@ -600,7 +643,12 @@ class _MedicalExpensesPageState extends State<MedicalExpensesPage>
               hintText: t.enterIntegerHint,
               border: const OutlineInputBorder(),
             ),
-            onChanged: (_) => _syncControllersToData(),
+            onChanged: (_) {
+              final dataModel = context.read<MedicalCostsData>();
+              dataModel.visitFee = _visitFeeController.text.trim();
+              dataModel.ambulanceFee = _ambulanceFeeController.text.trim();
+              // ❌ 不立即 notify，改在儲存前呼叫 dataModel.update()
+            },
           ),
         ],
       ],

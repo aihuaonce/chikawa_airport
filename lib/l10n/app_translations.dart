@@ -1061,8 +1061,12 @@ class AppTranslations {
   String get saveFailedLabel => isZh ? '儲存失敗:' : 'Save Failed:';
 
   String get medicalCertificate => isZh ? '診斷證明' : 'Medical Certificate';
+  String get medicalCertificateNav => isZh ? '診斷書' : 'Medical Certificate';
+  String get refusedReferralNav => isZh ? '拒絕轉診切結書' : 'Refused Referral';
+  String get referralFormNav => isZh ? '轉診單' : 'Referral Form';
   String get medicalExpenses => isZh ? '醫療費用' : 'Medical Expenses';
   String get electronicDocuments => isZh ? '電傳文件' : 'Electronic Documents';
+  String get nursingRecordFormNav => isZh ? '護理記錄' : 'Nursing Record Form';
   String get bodyMap => isZh ? '人形圖' : 'Body Map';
 
   // ========== Nav5 (救護車導航標籤) ==========
