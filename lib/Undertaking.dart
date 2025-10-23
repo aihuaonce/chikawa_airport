@@ -35,6 +35,8 @@ class _UndertakingPageState extends State<UndertakingPage>
     exportBackgroundColor: Colors.white,
   );
 
+  DateTime _selectedDate = DateTime.now();
+
   @override
   void initState() {
     super.initState();
@@ -139,7 +141,7 @@ class _UndertakingPageState extends State<UndertakingPage>
     super.build(context);
     if (_isLoading) return const Center(child: CircularProgressIndicator());
 
-    final today = _todayTw();
+    final today = _formatDate(_selectedDate);
 
     return Consumer<UndertakingData>(
       builder: (context, dataModel, child) {
@@ -148,36 +150,38 @@ class _UndertakingPageState extends State<UndertakingPage>
           padding: const EdgeInsets.all(16.0),
           // ** 錯誤修正 **：將 Row 替換為 LayoutBuilder，以便在不同寬度下有不同佈局
           child: Center(
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              // 如果寬度足夠，使用左右佈局
-              if (constraints.maxWidth > 800) {
-                return IntrinsicHeight( // <- 新增：讓 Row 內左右卡片高度一致
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.stretch, // <- 修改：左右卡片拉伸對齊高度
-                  children: [
-                    _buildEnglishSide(dataModel, today),
-                    const SizedBox(width: 16),
-                    _buildChineseSide(dataModel, today),
-                  ],
-                ),
-              );
-              }
-              // 如果寬度不足，使用上下佈局並允許滾動
-              else {
-                return SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      _buildEnglishSide(dataModel, today),
-                      const SizedBox(height: 16),
-                      _buildChineseSide(dataModel, today),
-                    ],
-                  ),
-                );
-              }
-            },
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                // 如果寬度足夠，使用左右佈局
+                if (constraints.maxWidth > 800) {
+                  return IntrinsicHeight(
+                    // <- 新增：讓 Row 內左右卡片高度一致
+                    child: Row(
+                      crossAxisAlignment:
+                          CrossAxisAlignment.stretch, // <- 修改：左右卡片拉伸對齊高度
+                      children: [
+                        _buildEnglishSide(dataModel, today),
+                        const SizedBox(width: 16),
+                        _buildChineseSide(dataModel, today),
+                      ],
+                    ),
+                  );
+                }
+                // 如果寬度不足，使用上下佈局並允許滾動
+                else {
+                  return SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        _buildEnglishSide(dataModel, today),
+                        const SizedBox(height: 16),
+                        _buildChineseSide(dataModel, today),
+                      ],
+                    ),
+                  );
+                }
+              },
+            ),
           ),
-        ),
         );
       },
     );
@@ -215,7 +219,21 @@ class _UndertakingPageState extends State<UndertakingPage>
                 const SizedBox(height: 8),
                 _buildSignatureArea(dataModel),
                 const SizedBox(height: 12),
-                Text("Date: $today"),
+                Row(
+                  children: [
+                    const Text("Date: "),
+                    TextButton(
+                      onPressed: () => _selectDate(context),
+                      child: Text(
+                        today,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
@@ -326,21 +344,21 @@ class _UndertakingPageState extends State<UndertakingPage>
                 Text("身分證字號： ${dataModel.signerId ?? ""}"),
                 Text("$today 於桃園國際機場接受聯新國際醫院桃園國際機場醫療中心醫師"),
                 SizedBox(
-                width: 100, // 設定下拉選單的寬度
-                child: DropdownButton<String>(
+                  width: 100, // 設定下拉選單的寬度
+                  child: DropdownButton<String>(
                     value: dataModel.doctor,
                     isExpanded: true, // 保持文字完整顯示
                     items: dataModel.doctorList
                         .map((e) => DropdownMenuItem(value: e, child: Text(e)))
                         .toList(),
                     onChanged: (val) {
-                    if (val != null) {
-                    dataModel.doctor = val;
-                    dataModel.update();
-                    }
-                  },
-               ),
-            ),
+                      if (val != null) {
+                        dataModel.doctor = val;
+                        dataModel.update();
+                      }
+                    },
+                  ),
+                ),
                 const SizedBox(height: 12),
                 const Text(
                   "診視，醫師建議轉診至醫院繼續治療，但本人因個人因素拒絕醫師「繼續治療」之建議，致生一切後果願自行負責，與聯新國際醫院桃園國際機場醫療中心無涉。",
@@ -410,9 +428,23 @@ class _UndertakingPageState extends State<UndertakingPage>
     );
   }
 
-  String _todayTw() {
-    final d = DateTime.now();
+  String _formatDate(DateTime date) {
     String two(int n) => n.toString().padLeft(2, '0');
-    return '${d.year}年${two(d.month)}月${two(d.day)}日';
+    return '${date.year}年${two(date.month)}月${two(date.day)}日';
+  }
+
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate,
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2030),
+      locale: const Locale('zh', 'TW'),
+    );
+    if (picked != null && picked != _selectedDate) {
+      setState(() {
+        _selectedDate = picked;
+      });
+    }
   }
 }

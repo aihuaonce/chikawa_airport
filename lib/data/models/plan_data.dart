@@ -7,6 +7,169 @@ import 'package:drift/drift.dart';
 import '../db/daos.dart';
 
 class PlanData extends ChangeNotifier {
+  // === 常數列表 (從 plan.dart 移過來) ===
+  static final List<String> icd10List = [
+    'A00 Cholera - 霍亂',
+    'A00.0 Cholera due to Vibrio cholerae 01, biovar cholerae - 血清型01霍亂弧菌霍亂',
+    'A00.1 Cholera due to Vibrio cholerae 01, biovar eltor - 血清型01霍亂弧菌El Tor霍亂',
+    'A00.9 Cholera, unspecified - 霍亂',
+    'A01 Typhoid and paratyphoid fevers - 傷寒及副傷寒',
+    'A01.0 Typhoid fever - 傷寒',
+    'A01.01 Typhoid fever, unspecified - 傷寒',
+    'A01.01 Typhoid meningitis - 傷寒腦膜炎',
+  ];
+
+  static final List<String> referralHospitals = [
+    '諾新國際醫院',
+    '林口長庚醫院',
+    '衛生福利部桃園醫院',
+    '衛生福利部桃園療養院',
+    '桃園國際敏盛醫院',
+    '聖保祿醫院',
+    '中壢天晟醫院',
+    '桃園榮民總醫院',
+    '三峽恩主公醫院',
+    '其他',
+  ];
+
+  static final List<String> otherHospitals = [
+    '桃園經國敏盛醫院',
+    '聖保祿醫院',
+    '衛生福利部桃園醫院',
+    '衛生福利部桃園療養院',
+    '桃園榮民總醫院',
+    '三峽恩主公醫院',
+    '其他',
+  ];
+
+  static final List<String> visitingStaff = [
+    '方詩旋',
+    '夏瑿正',
+    '江汪財',
+    '呂學政',
+    '周志勃',
+    '金霏歌',
+    '徐丕',
+    '康曉妤',
+  ];
+
+  static final List<String> registeredNurses = [
+    '陳怡穎',
+    '邱霏鈴',
+    '莊漫媛',
+    '洪豔',
+    '范育婕',
+    '陳筱妤',
+    '蔡可蓉',
+    '粘瑞敏',
+  ];
+
+  static final List<String> emts = [
+    '王文義',
+    '游進昌',
+    '胡勝淵',
+    '黃逸斌',
+    '峯承軒',
+    '張致綸',
+    '劉呈軒',
+  ];
+
+  static final List<String> helperNames = [
+    '方詩婷',
+    '夏增正',
+    '江旺財',
+    '呂學政',
+    '海欣茹',
+    '洪雲敏',
+    '徐氏',
+    '康曉朗',
+    '黎裕昌',
+    '戴逸旻',
+    '廖詩怡',
+    '許婷涵',
+    '陳小山',
+    '王悅朗',
+    '劉金宇',
+    '彭士書',
+    '熊得志',
+    '顧小',
+    '蔡心文',
+    '程皓',
+    '楊敏度',
+    '羅尹彤',
+    '廖占用',
+    '陳國平',
+    '蘇敬婷',
+    '黃梨梅',
+    '朱森學',
+    '陳怡穎',
+    '邵詩婷',
+    '莊抒淵',
+    '洪豔',
+    '林育緯',
+    '唐詩婷',
+    '蔡可蓉',
+    '粘瑞敏',
+    '黃馨儀',
+    '陳冠羽',
+    '陳怡玲',
+    '峯雅柔',
+    '何文豪',
+    '王文義',
+    '游橙晶',
+    '胡雅淵',
+    '黃逸誠',
+    '峯季軒',
+    '劉曉敏',
+    '張峻維',
+    '劉昱軒',
+  ];
+
+  static final List<String> diagnosisCategories = [
+    'Mild Neurologic(headache、dizziness、vertigo)',
+    'Severe Neurologic(syncope、seizure、CVA)',
+    'GI non-OP (AGE Epigas mild bleeding)',
+    'GI surgical (app cholecystitis PPU)',
+    'Mild Trauma(含head injury、non-surgical intervention)',
+    'Severe Trauma (surgical intervention)',
+    'Mild CV (Palpitation Chest pain H/T hypo)',
+    'Severe CV (AMI Arrythmia Shock Others)',
+    'RESP(Asthma、COPD)',
+    'Fever (cause undetermined)',
+    'Musculoskeletal',
+    'DM (hypoglycemia or hyperglycemia)',
+    'GU (APN Stone or others)',
+    'OHCA',
+    'Derma',
+    'GYN',
+    'OPH/ENT',
+    'Psychiatric (nervous、anxious、Alcohols/drug)',
+    'Others',
+  ];
+
+  static final Map<String, List<String>> drugCategories = {
+    '口服藥': [
+      'Augmentin syrup',
+      'Peace 藥錠',
+      'Wempyn 潰瘍寧',
+      'Ciprofloxacin',
+      'Ibuprofen 伊洛芬',
+    ],
+    '注射劑': [
+      'Ventolin 吸入劑',
+      'Wycillin 筋注劑',
+      'N/S 250ml',
+      'D5W 250ml',
+      'KCL 添加液',
+    ],
+    '點滴注射': ['D5S 500ml', 'Lactated Ringer\'s 乳酸林格氏液'],
+  };
+
+  static final List<String> usageOptions = ['口服', '靜脈注射', '肌肉注射', '皮下注射'];
+  static final List<String> freqOptions = ['QD', 'BID', 'TID', 'QID', 'PRN'];
+  static final List<String> daysOptions = ['1 天', '3 天', '5 天', '7 天'];
+  static final List<String> doseUnitOptions = ['mg', 'g', 'tab', 'amp', 'vial'];
+
   // === 篩檢 ===
   bool screeningChecked = false;
   Map<String, bool> screeningMethods = {
@@ -151,7 +314,7 @@ class PlanData extends ChangeNotifier {
   Map<String, bool> followUpResults = {
     '繼續搭機旅行': false,
     '休息觀察或自行回家': false,
-    '轉聯新國際醫院': false,
+    '轉諾新國際醫院': false,
     '轉林口長庚醫院': false,
     '轉其他醫院': false,
     '建議轉診門診追蹤': false,
@@ -299,7 +462,7 @@ class PlanData extends ChangeNotifier {
     followUpResults = {
       '繼續搭機旅行': false,
       '休息觀察或自行回家': false,
-      '轉聯新國際醫院': false,
+      '轉諾新國際醫院': false,
       '轉林口長庚醫院': false,
       '轉其他醫院': false,
       '建議轉診門診追蹤': false,

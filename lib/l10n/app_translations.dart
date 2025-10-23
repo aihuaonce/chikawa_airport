@@ -65,9 +65,6 @@ class AppTranslations {
   // ========== 首頁2 (急救紀錄) ==========
   String get addEmergencyRecord =>
       isZh ? '新增急救紀錄(由病患建立)' : 'Add Emergency Record (From Patient)';
-  String get emergencyRecordHint => isZh
-      ? '請從首頁新增病患，系統會自動建立急救紀錄。'
-      : 'Please add patient from home page, the system will create emergency record automatically.';
   String get searchEmergencyRecord =>
       isZh ? '搜尋急救紀錄...' : 'Search emergency records...';
   String get noEmergencyRecords =>
@@ -733,6 +730,9 @@ class AppTranslations {
   String get liverDisease => isZh ? '肝臟疾病' : 'Liver Disease';
   String get otherPastMedicalHistory =>
       isZh ? '其他過去病史' : 'Other Past Medical History';
+  String get patientConditionRequired => isZh ? '病情需要' : 'Medical necessity';
+  String get patientOrFamilyRequest =>
+      isZh ? '病人或家屬要求' : 'Patient or family request';
 
   // ========== Body Map Page (人形圖頁面) ==========
   String get bodyMapSaveSuccess =>

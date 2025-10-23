@@ -1,4 +1,4 @@
-// lib/NursingRecordPage.dart (已根據您的美編規範進行修改)
+// lib/NursingRecordPage.dart
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -350,7 +350,6 @@ class _NursingRecordPageState extends State<NursingRecordPage>
       return phrase;
     }
 
-    // Define the button style once to be reused, as per your spec
     final ButtonStyle actionButtonStyle = ElevatedButton.styleFrom(
       backgroundColor: const Color(0xFF83ACA9), // As requested: 按鈕背景色
       foregroundColor: Colors.white, // As requested: 文字白色
@@ -396,9 +395,7 @@ class _NursingRecordPageState extends State<NursingRecordPage>
                               Radio<String>(
                                 value: phrase,
                                 groupValue: selectedPhrase,
-                                activeColor: const Color(
-                                  0xFF274C4A,
-                                ), // As requested: 選中顏色
+                                activeColor: const Color(0xFF274C4A),
                                 onChanged: (value) {
                                   setDialogState(() {
                                     selectedPhrase = value;

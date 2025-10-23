@@ -5,6 +5,7 @@ import 'package:drift/drift.dart';
 import '../db/daos.dart';
 
 class MedicalCostsData extends ChangeNotifier {
+  // ========== 原有欄位 ==========
   String? chargeMethod;
   String? visitFee;
   String? ambulanceFee;
@@ -12,28 +13,42 @@ class MedicalCostsData extends ChangeNotifier {
   String? photoPath;
   String? agreementSignaturePath;
   String? witnessSignaturePath;
-  String? paymentMethod;
-  String? paymentStatus;
-  String? selectedCurrency;
-  String? foreignCurrencyAmount;
-  String? convertedTwdAmount;
-  String? applicantName;
-  String? applicantUnit;
-  String? contactPhone;
-  bool? receiptIssuedAndTransferred;
-  String? billingErrorReason;
 
+  // ========== 【新增】自付相關欄位 ==========
+  String? paymentMethod; // '現金' or '刷卡'
+
+  // ========== 【新增】共用欄位 ==========
+  String? paymentStatus; // '尚未收款', '已收款', '不需要'
+  String? selectedCurrency; // '台幣', '美金', '人民幣', '日幣', '加幣'
+  String? foreignCurrencyAmount; // 外幣金額
+  String? convertedTwdAmount; // 兌換後的台幣金額
+
+  // ========== 【新增】統一請款專用欄位 ==========
+  String? applicantName; // 申請人
+  String? applicantUnit; // 申請單位
+  String? contactPhone; // 聯絡電話
+
+  // ========== 【新增】總院會核代收專用欄位 ==========
+  bool? receiptIssuedAndTransferred; // 已開立收據並轉交
+
+  // ========== 【新增】收費異常專用欄位 ==========
+  String? billingErrorReason; // 收費異常原因
+
+  // ========== 計算總費用 ==========
   double get totalFee {
     final double visit = double.tryParse(visitFee ?? '0') ?? 0;
     final double ambulance = double.tryParse(ambulanceFee ?? '0') ?? 0;
     return visit + ambulance;
   }
 
+  // ========== 通知更新 ==========
   void update() {
     notifyListeners();
   }
 
+  // ========== 清空所有資料 ==========
   void clear() {
+    // 原有欄位
     chargeMethod = null;
     visitFee = null;
     ambulanceFee = null;
@@ -41,6 +56,8 @@ class MedicalCostsData extends ChangeNotifier {
     photoPath = null;
     agreementSignaturePath = null;
     witnessSignaturePath = null;
+
+    // 【新增】清空新欄位
     paymentMethod = null;
     paymentStatus = null;
     selectedCurrency = null;
@@ -55,10 +72,11 @@ class MedicalCostsData extends ChangeNotifier {
     notifyListeners();
   }
 
-  // ✅ 新增：轉換為 Companion
+  // ========== 轉換為 Companion（包含所有欄位）==========
   MedicalCostsCompanion toCompanion(int visitId) {
     return MedicalCostsCompanion(
       visitId: Value(visitId),
+      // 原有欄位
       chargeMethod: Value(chargeMethod),
       visitFee: Value(visitFee),
       ambulanceFee: Value(ambulanceFee),
@@ -66,10 +84,21 @@ class MedicalCostsData extends ChangeNotifier {
       photoPath: Value(photoPath),
       agreementSignaturePath: Value(agreementSignaturePath),
       witnessSignaturePath: Value(witnessSignaturePath),
+      // 【新增】新欄位
+      paymentMethod: Value(paymentMethod),
+      paymentStatus: Value(paymentStatus),
+      selectedCurrency: Value(selectedCurrency),
+      foreignCurrencyAmount: Value(foreignCurrencyAmount),
+      convertedTwdAmount: Value(convertedTwdAmount),
+      applicantName: Value(applicantName),
+      applicantUnit: Value(applicantUnit),
+      contactPhone: Value(contactPhone),
+      receiptIssuedAndTransferred: Value(receiptIssuedAndTransferred),
+      billingErrorReason: Value(billingErrorReason),
     );
   }
 
-  // ✅ 簡化後的保存方法
+  // ========== 儲存到資料庫 ==========
   Future<void> saveToDatabase(int visitId, MedicalCostsDao dao) async {
     try {
       await dao.upsert(toCompanion(visitId));

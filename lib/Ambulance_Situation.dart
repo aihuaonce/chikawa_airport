@@ -83,6 +83,7 @@ class _AmbulanceSituationPageState extends State<AmbulanceSituationPage> {
     'medication',
     'other',
   ];
+
   static const _pmhKeys = [
     'none',
     'unknown',

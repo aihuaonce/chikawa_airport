@@ -8646,6 +8646,119 @@ class $MedicalCostsTable extends MedicalCosts
         type: DriftSqlType.string,
         requiredDuringInsert: false,
       );
+  static const VerificationMeta _paymentMethodMeta = const VerificationMeta(
+    'paymentMethod',
+  );
+  @override
+  late final GeneratedColumn<String> paymentMethod = GeneratedColumn<String>(
+    'payment_method',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _paymentStatusMeta = const VerificationMeta(
+    'paymentStatus',
+  );
+  @override
+  late final GeneratedColumn<String> paymentStatus = GeneratedColumn<String>(
+    'payment_status',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _selectedCurrencyMeta = const VerificationMeta(
+    'selectedCurrency',
+  );
+  @override
+  late final GeneratedColumn<String> selectedCurrency = GeneratedColumn<String>(
+    'selected_currency',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _foreignCurrencyAmountMeta =
+      const VerificationMeta('foreignCurrencyAmount');
+  @override
+  late final GeneratedColumn<String> foreignCurrencyAmount =
+      GeneratedColumn<String>(
+        'foreign_currency_amount',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _convertedTwdAmountMeta =
+      const VerificationMeta('convertedTwdAmount');
+  @override
+  late final GeneratedColumn<String> convertedTwdAmount =
+      GeneratedColumn<String>(
+        'converted_twd_amount',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _applicantNameMeta = const VerificationMeta(
+    'applicantName',
+  );
+  @override
+  late final GeneratedColumn<String> applicantName = GeneratedColumn<String>(
+    'applicant_name',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _applicantUnitMeta = const VerificationMeta(
+    'applicantUnit',
+  );
+  @override
+  late final GeneratedColumn<String> applicantUnit = GeneratedColumn<String>(
+    'applicant_unit',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _contactPhoneMeta = const VerificationMeta(
+    'contactPhone',
+  );
+  @override
+  late final GeneratedColumn<String> contactPhone = GeneratedColumn<String>(
+    'contact_phone',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _receiptIssuedAndTransferredMeta =
+      const VerificationMeta('receiptIssuedAndTransferred');
+  @override
+  late final GeneratedColumn<bool> receiptIssuedAndTransferred =
+      GeneratedColumn<bool>(
+        'receipt_issued_and_transferred',
+        aliasedName,
+        true,
+        type: DriftSqlType.bool,
+        requiredDuringInsert: false,
+        defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'CHECK ("receipt_issued_and_transferred" IN (0, 1))',
+        ),
+      );
+  static const VerificationMeta _billingErrorReasonMeta =
+      const VerificationMeta('billingErrorReason');
+  @override
+  late final GeneratedColumn<String> billingErrorReason =
+      GeneratedColumn<String>(
+        'billing_error_reason',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
   static const VerificationMeta _createdAtMeta = const VerificationMeta(
     'createdAt',
   );
@@ -8681,6 +8794,16 @@ class $MedicalCostsTable extends MedicalCosts
     photoPath,
     agreementSignaturePath,
     witnessSignaturePath,
+    paymentMethod,
+    paymentStatus,
+    selectedCurrency,
+    foreignCurrencyAmount,
+    convertedTwdAmount,
+    applicantName,
+    applicantUnit,
+    contactPhone,
+    receiptIssuedAndTransferred,
+    billingErrorReason,
     createdAt,
     updatedAt,
   ];
@@ -8761,6 +8884,96 @@ class $MedicalCostsTable extends MedicalCosts
         ),
       );
     }
+    if (data.containsKey('payment_method')) {
+      context.handle(
+        _paymentMethodMeta,
+        paymentMethod.isAcceptableOrUnknown(
+          data['payment_method']!,
+          _paymentMethodMeta,
+        ),
+      );
+    }
+    if (data.containsKey('payment_status')) {
+      context.handle(
+        _paymentStatusMeta,
+        paymentStatus.isAcceptableOrUnknown(
+          data['payment_status']!,
+          _paymentStatusMeta,
+        ),
+      );
+    }
+    if (data.containsKey('selected_currency')) {
+      context.handle(
+        _selectedCurrencyMeta,
+        selectedCurrency.isAcceptableOrUnknown(
+          data['selected_currency']!,
+          _selectedCurrencyMeta,
+        ),
+      );
+    }
+    if (data.containsKey('foreign_currency_amount')) {
+      context.handle(
+        _foreignCurrencyAmountMeta,
+        foreignCurrencyAmount.isAcceptableOrUnknown(
+          data['foreign_currency_amount']!,
+          _foreignCurrencyAmountMeta,
+        ),
+      );
+    }
+    if (data.containsKey('converted_twd_amount')) {
+      context.handle(
+        _convertedTwdAmountMeta,
+        convertedTwdAmount.isAcceptableOrUnknown(
+          data['converted_twd_amount']!,
+          _convertedTwdAmountMeta,
+        ),
+      );
+    }
+    if (data.containsKey('applicant_name')) {
+      context.handle(
+        _applicantNameMeta,
+        applicantName.isAcceptableOrUnknown(
+          data['applicant_name']!,
+          _applicantNameMeta,
+        ),
+      );
+    }
+    if (data.containsKey('applicant_unit')) {
+      context.handle(
+        _applicantUnitMeta,
+        applicantUnit.isAcceptableOrUnknown(
+          data['applicant_unit']!,
+          _applicantUnitMeta,
+        ),
+      );
+    }
+    if (data.containsKey('contact_phone')) {
+      context.handle(
+        _contactPhoneMeta,
+        contactPhone.isAcceptableOrUnknown(
+          data['contact_phone']!,
+          _contactPhoneMeta,
+        ),
+      );
+    }
+    if (data.containsKey('receipt_issued_and_transferred')) {
+      context.handle(
+        _receiptIssuedAndTransferredMeta,
+        receiptIssuedAndTransferred.isAcceptableOrUnknown(
+          data['receipt_issued_and_transferred']!,
+          _receiptIssuedAndTransferredMeta,
+        ),
+      );
+    }
+    if (data.containsKey('billing_error_reason')) {
+      context.handle(
+        _billingErrorReasonMeta,
+        billingErrorReason.isAcceptableOrUnknown(
+          data['billing_error_reason']!,
+          _billingErrorReasonMeta,
+        ),
+      );
+    }
     if (data.containsKey('created_at')) {
       context.handle(
         _createdAtMeta,
@@ -8818,6 +9031,46 @@ class $MedicalCostsTable extends MedicalCosts
         DriftSqlType.string,
         data['${effectivePrefix}witness_signature_path'],
       ),
+      paymentMethod: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}payment_method'],
+      ),
+      paymentStatus: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}payment_status'],
+      ),
+      selectedCurrency: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}selected_currency'],
+      ),
+      foreignCurrencyAmount: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}foreign_currency_amount'],
+      ),
+      convertedTwdAmount: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}converted_twd_amount'],
+      ),
+      applicantName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}applicant_name'],
+      ),
+      applicantUnit: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}applicant_unit'],
+      ),
+      contactPhone: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}contact_phone'],
+      ),
+      receiptIssuedAndTransferred: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}receipt_issued_and_transferred'],
+      ),
+      billingErrorReason: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}billing_error_reason'],
+      ),
       createdAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}created_at'],
@@ -8845,6 +9098,16 @@ class MedicalCost extends DataClass implements Insertable<MedicalCost> {
   final String? photoPath;
   final String? agreementSignaturePath;
   final String? witnessSignaturePath;
+  final String? paymentMethod;
+  final String? paymentStatus;
+  final String? selectedCurrency;
+  final String? foreignCurrencyAmount;
+  final String? convertedTwdAmount;
+  final String? applicantName;
+  final String? applicantUnit;
+  final String? contactPhone;
+  final bool? receiptIssuedAndTransferred;
+  final String? billingErrorReason;
   final DateTime createdAt;
   final DateTime updatedAt;
   const MedicalCost({
@@ -8857,6 +9120,16 @@ class MedicalCost extends DataClass implements Insertable<MedicalCost> {
     this.photoPath,
     this.agreementSignaturePath,
     this.witnessSignaturePath,
+    this.paymentMethod,
+    this.paymentStatus,
+    this.selectedCurrency,
+    this.foreignCurrencyAmount,
+    this.convertedTwdAmount,
+    this.applicantName,
+    this.applicantUnit,
+    this.contactPhone,
+    this.receiptIssuedAndTransferred,
+    this.billingErrorReason,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -8888,6 +9161,38 @@ class MedicalCost extends DataClass implements Insertable<MedicalCost> {
     if (!nullToAbsent || witnessSignaturePath != null) {
       map['witness_signature_path'] = Variable<String>(witnessSignaturePath);
     }
+    if (!nullToAbsent || paymentMethod != null) {
+      map['payment_method'] = Variable<String>(paymentMethod);
+    }
+    if (!nullToAbsent || paymentStatus != null) {
+      map['payment_status'] = Variable<String>(paymentStatus);
+    }
+    if (!nullToAbsent || selectedCurrency != null) {
+      map['selected_currency'] = Variable<String>(selectedCurrency);
+    }
+    if (!nullToAbsent || foreignCurrencyAmount != null) {
+      map['foreign_currency_amount'] = Variable<String>(foreignCurrencyAmount);
+    }
+    if (!nullToAbsent || convertedTwdAmount != null) {
+      map['converted_twd_amount'] = Variable<String>(convertedTwdAmount);
+    }
+    if (!nullToAbsent || applicantName != null) {
+      map['applicant_name'] = Variable<String>(applicantName);
+    }
+    if (!nullToAbsent || applicantUnit != null) {
+      map['applicant_unit'] = Variable<String>(applicantUnit);
+    }
+    if (!nullToAbsent || contactPhone != null) {
+      map['contact_phone'] = Variable<String>(contactPhone);
+    }
+    if (!nullToAbsent || receiptIssuedAndTransferred != null) {
+      map['receipt_issued_and_transferred'] = Variable<bool>(
+        receiptIssuedAndTransferred,
+      );
+    }
+    if (!nullToAbsent || billingErrorReason != null) {
+      map['billing_error_reason'] = Variable<String>(billingErrorReason);
+    }
     map['created_at'] = Variable<DateTime>(createdAt);
     map['updated_at'] = Variable<DateTime>(updatedAt);
     return map;
@@ -8916,6 +9221,37 @@ class MedicalCost extends DataClass implements Insertable<MedicalCost> {
       witnessSignaturePath: witnessSignaturePath == null && nullToAbsent
           ? const Value.absent()
           : Value(witnessSignaturePath),
+      paymentMethod: paymentMethod == null && nullToAbsent
+          ? const Value.absent()
+          : Value(paymentMethod),
+      paymentStatus: paymentStatus == null && nullToAbsent
+          ? const Value.absent()
+          : Value(paymentStatus),
+      selectedCurrency: selectedCurrency == null && nullToAbsent
+          ? const Value.absent()
+          : Value(selectedCurrency),
+      foreignCurrencyAmount: foreignCurrencyAmount == null && nullToAbsent
+          ? const Value.absent()
+          : Value(foreignCurrencyAmount),
+      convertedTwdAmount: convertedTwdAmount == null && nullToAbsent
+          ? const Value.absent()
+          : Value(convertedTwdAmount),
+      applicantName: applicantName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(applicantName),
+      applicantUnit: applicantUnit == null && nullToAbsent
+          ? const Value.absent()
+          : Value(applicantUnit),
+      contactPhone: contactPhone == null && nullToAbsent
+          ? const Value.absent()
+          : Value(contactPhone),
+      receiptIssuedAndTransferred:
+          receiptIssuedAndTransferred == null && nullToAbsent
+          ? const Value.absent()
+          : Value(receiptIssuedAndTransferred),
+      billingErrorReason: billingErrorReason == null && nullToAbsent
+          ? const Value.absent()
+          : Value(billingErrorReason),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
     );
@@ -8940,6 +9276,24 @@ class MedicalCost extends DataClass implements Insertable<MedicalCost> {
       witnessSignaturePath: serializer.fromJson<String?>(
         json['witnessSignaturePath'],
       ),
+      paymentMethod: serializer.fromJson<String?>(json['paymentMethod']),
+      paymentStatus: serializer.fromJson<String?>(json['paymentStatus']),
+      selectedCurrency: serializer.fromJson<String?>(json['selectedCurrency']),
+      foreignCurrencyAmount: serializer.fromJson<String?>(
+        json['foreignCurrencyAmount'],
+      ),
+      convertedTwdAmount: serializer.fromJson<String?>(
+        json['convertedTwdAmount'],
+      ),
+      applicantName: serializer.fromJson<String?>(json['applicantName']),
+      applicantUnit: serializer.fromJson<String?>(json['applicantUnit']),
+      contactPhone: serializer.fromJson<String?>(json['contactPhone']),
+      receiptIssuedAndTransferred: serializer.fromJson<bool?>(
+        json['receiptIssuedAndTransferred'],
+      ),
+      billingErrorReason: serializer.fromJson<String?>(
+        json['billingErrorReason'],
+      ),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
     );
@@ -8959,6 +9313,20 @@ class MedicalCost extends DataClass implements Insertable<MedicalCost> {
         agreementSignaturePath,
       ),
       'witnessSignaturePath': serializer.toJson<String?>(witnessSignaturePath),
+      'paymentMethod': serializer.toJson<String?>(paymentMethod),
+      'paymentStatus': serializer.toJson<String?>(paymentStatus),
+      'selectedCurrency': serializer.toJson<String?>(selectedCurrency),
+      'foreignCurrencyAmount': serializer.toJson<String?>(
+        foreignCurrencyAmount,
+      ),
+      'convertedTwdAmount': serializer.toJson<String?>(convertedTwdAmount),
+      'applicantName': serializer.toJson<String?>(applicantName),
+      'applicantUnit': serializer.toJson<String?>(applicantUnit),
+      'contactPhone': serializer.toJson<String?>(contactPhone),
+      'receiptIssuedAndTransferred': serializer.toJson<bool?>(
+        receiptIssuedAndTransferred,
+      ),
+      'billingErrorReason': serializer.toJson<String?>(billingErrorReason),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
     };
@@ -8974,6 +9342,16 @@ class MedicalCost extends DataClass implements Insertable<MedicalCost> {
     Value<String?> photoPath = const Value.absent(),
     Value<String?> agreementSignaturePath = const Value.absent(),
     Value<String?> witnessSignaturePath = const Value.absent(),
+    Value<String?> paymentMethod = const Value.absent(),
+    Value<String?> paymentStatus = const Value.absent(),
+    Value<String?> selectedCurrency = const Value.absent(),
+    Value<String?> foreignCurrencyAmount = const Value.absent(),
+    Value<String?> convertedTwdAmount = const Value.absent(),
+    Value<String?> applicantName = const Value.absent(),
+    Value<String?> applicantUnit = const Value.absent(),
+    Value<String?> contactPhone = const Value.absent(),
+    Value<bool?> receiptIssuedAndTransferred = const Value.absent(),
+    Value<String?> billingErrorReason = const Value.absent(),
     DateTime? createdAt,
     DateTime? updatedAt,
   }) => MedicalCost(
@@ -8990,6 +9368,34 @@ class MedicalCost extends DataClass implements Insertable<MedicalCost> {
     witnessSignaturePath: witnessSignaturePath.present
         ? witnessSignaturePath.value
         : this.witnessSignaturePath,
+    paymentMethod: paymentMethod.present
+        ? paymentMethod.value
+        : this.paymentMethod,
+    paymentStatus: paymentStatus.present
+        ? paymentStatus.value
+        : this.paymentStatus,
+    selectedCurrency: selectedCurrency.present
+        ? selectedCurrency.value
+        : this.selectedCurrency,
+    foreignCurrencyAmount: foreignCurrencyAmount.present
+        ? foreignCurrencyAmount.value
+        : this.foreignCurrencyAmount,
+    convertedTwdAmount: convertedTwdAmount.present
+        ? convertedTwdAmount.value
+        : this.convertedTwdAmount,
+    applicantName: applicantName.present
+        ? applicantName.value
+        : this.applicantName,
+    applicantUnit: applicantUnit.present
+        ? applicantUnit.value
+        : this.applicantUnit,
+    contactPhone: contactPhone.present ? contactPhone.value : this.contactPhone,
+    receiptIssuedAndTransferred: receiptIssuedAndTransferred.present
+        ? receiptIssuedAndTransferred.value
+        : this.receiptIssuedAndTransferred,
+    billingErrorReason: billingErrorReason.present
+        ? billingErrorReason.value
+        : this.billingErrorReason,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
   );
@@ -9012,6 +9418,36 @@ class MedicalCost extends DataClass implements Insertable<MedicalCost> {
       witnessSignaturePath: data.witnessSignaturePath.present
           ? data.witnessSignaturePath.value
           : this.witnessSignaturePath,
+      paymentMethod: data.paymentMethod.present
+          ? data.paymentMethod.value
+          : this.paymentMethod,
+      paymentStatus: data.paymentStatus.present
+          ? data.paymentStatus.value
+          : this.paymentStatus,
+      selectedCurrency: data.selectedCurrency.present
+          ? data.selectedCurrency.value
+          : this.selectedCurrency,
+      foreignCurrencyAmount: data.foreignCurrencyAmount.present
+          ? data.foreignCurrencyAmount.value
+          : this.foreignCurrencyAmount,
+      convertedTwdAmount: data.convertedTwdAmount.present
+          ? data.convertedTwdAmount.value
+          : this.convertedTwdAmount,
+      applicantName: data.applicantName.present
+          ? data.applicantName.value
+          : this.applicantName,
+      applicantUnit: data.applicantUnit.present
+          ? data.applicantUnit.value
+          : this.applicantUnit,
+      contactPhone: data.contactPhone.present
+          ? data.contactPhone.value
+          : this.contactPhone,
+      receiptIssuedAndTransferred: data.receiptIssuedAndTransferred.present
+          ? data.receiptIssuedAndTransferred.value
+          : this.receiptIssuedAndTransferred,
+      billingErrorReason: data.billingErrorReason.present
+          ? data.billingErrorReason.value
+          : this.billingErrorReason,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
@@ -9029,6 +9465,16 @@ class MedicalCost extends DataClass implements Insertable<MedicalCost> {
           ..write('photoPath: $photoPath, ')
           ..write('agreementSignaturePath: $agreementSignaturePath, ')
           ..write('witnessSignaturePath: $witnessSignaturePath, ')
+          ..write('paymentMethod: $paymentMethod, ')
+          ..write('paymentStatus: $paymentStatus, ')
+          ..write('selectedCurrency: $selectedCurrency, ')
+          ..write('foreignCurrencyAmount: $foreignCurrencyAmount, ')
+          ..write('convertedTwdAmount: $convertedTwdAmount, ')
+          ..write('applicantName: $applicantName, ')
+          ..write('applicantUnit: $applicantUnit, ')
+          ..write('contactPhone: $contactPhone, ')
+          ..write('receiptIssuedAndTransferred: $receiptIssuedAndTransferred, ')
+          ..write('billingErrorReason: $billingErrorReason, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
           ..write(')'))
@@ -9036,7 +9482,7 @@ class MedicalCost extends DataClass implements Insertable<MedicalCost> {
   }
 
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
     id,
     visitId,
     chargeMethod,
@@ -9046,9 +9492,19 @@ class MedicalCost extends DataClass implements Insertable<MedicalCost> {
     photoPath,
     agreementSignaturePath,
     witnessSignaturePath,
+    paymentMethod,
+    paymentStatus,
+    selectedCurrency,
+    foreignCurrencyAmount,
+    convertedTwdAmount,
+    applicantName,
+    applicantUnit,
+    contactPhone,
+    receiptIssuedAndTransferred,
+    billingErrorReason,
     createdAt,
     updatedAt,
-  );
+  ]);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -9062,6 +9518,17 @@ class MedicalCost extends DataClass implements Insertable<MedicalCost> {
           other.photoPath == this.photoPath &&
           other.agreementSignaturePath == this.agreementSignaturePath &&
           other.witnessSignaturePath == this.witnessSignaturePath &&
+          other.paymentMethod == this.paymentMethod &&
+          other.paymentStatus == this.paymentStatus &&
+          other.selectedCurrency == this.selectedCurrency &&
+          other.foreignCurrencyAmount == this.foreignCurrencyAmount &&
+          other.convertedTwdAmount == this.convertedTwdAmount &&
+          other.applicantName == this.applicantName &&
+          other.applicantUnit == this.applicantUnit &&
+          other.contactPhone == this.contactPhone &&
+          other.receiptIssuedAndTransferred ==
+              this.receiptIssuedAndTransferred &&
+          other.billingErrorReason == this.billingErrorReason &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt);
 }
@@ -9076,6 +9543,16 @@ class MedicalCostsCompanion extends UpdateCompanion<MedicalCost> {
   final Value<String?> photoPath;
   final Value<String?> agreementSignaturePath;
   final Value<String?> witnessSignaturePath;
+  final Value<String?> paymentMethod;
+  final Value<String?> paymentStatus;
+  final Value<String?> selectedCurrency;
+  final Value<String?> foreignCurrencyAmount;
+  final Value<String?> convertedTwdAmount;
+  final Value<String?> applicantName;
+  final Value<String?> applicantUnit;
+  final Value<String?> contactPhone;
+  final Value<bool?> receiptIssuedAndTransferred;
+  final Value<String?> billingErrorReason;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
   const MedicalCostsCompanion({
@@ -9088,6 +9565,16 @@ class MedicalCostsCompanion extends UpdateCompanion<MedicalCost> {
     this.photoPath = const Value.absent(),
     this.agreementSignaturePath = const Value.absent(),
     this.witnessSignaturePath = const Value.absent(),
+    this.paymentMethod = const Value.absent(),
+    this.paymentStatus = const Value.absent(),
+    this.selectedCurrency = const Value.absent(),
+    this.foreignCurrencyAmount = const Value.absent(),
+    this.convertedTwdAmount = const Value.absent(),
+    this.applicantName = const Value.absent(),
+    this.applicantUnit = const Value.absent(),
+    this.contactPhone = const Value.absent(),
+    this.receiptIssuedAndTransferred = const Value.absent(),
+    this.billingErrorReason = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
   });
@@ -9101,6 +9588,16 @@ class MedicalCostsCompanion extends UpdateCompanion<MedicalCost> {
     this.photoPath = const Value.absent(),
     this.agreementSignaturePath = const Value.absent(),
     this.witnessSignaturePath = const Value.absent(),
+    this.paymentMethod = const Value.absent(),
+    this.paymentStatus = const Value.absent(),
+    this.selectedCurrency = const Value.absent(),
+    this.foreignCurrencyAmount = const Value.absent(),
+    this.convertedTwdAmount = const Value.absent(),
+    this.applicantName = const Value.absent(),
+    this.applicantUnit = const Value.absent(),
+    this.contactPhone = const Value.absent(),
+    this.receiptIssuedAndTransferred = const Value.absent(),
+    this.billingErrorReason = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
   }) : visitId = Value(visitId);
@@ -9114,6 +9611,16 @@ class MedicalCostsCompanion extends UpdateCompanion<MedicalCost> {
     Expression<String>? photoPath,
     Expression<String>? agreementSignaturePath,
     Expression<String>? witnessSignaturePath,
+    Expression<String>? paymentMethod,
+    Expression<String>? paymentStatus,
+    Expression<String>? selectedCurrency,
+    Expression<String>? foreignCurrencyAmount,
+    Expression<String>? convertedTwdAmount,
+    Expression<String>? applicantName,
+    Expression<String>? applicantUnit,
+    Expression<String>? contactPhone,
+    Expression<bool>? receiptIssuedAndTransferred,
+    Expression<String>? billingErrorReason,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
   }) {
@@ -9129,6 +9636,20 @@ class MedicalCostsCompanion extends UpdateCompanion<MedicalCost> {
         'agreement_signature_path': agreementSignaturePath,
       if (witnessSignaturePath != null)
         'witness_signature_path': witnessSignaturePath,
+      if (paymentMethod != null) 'payment_method': paymentMethod,
+      if (paymentStatus != null) 'payment_status': paymentStatus,
+      if (selectedCurrency != null) 'selected_currency': selectedCurrency,
+      if (foreignCurrencyAmount != null)
+        'foreign_currency_amount': foreignCurrencyAmount,
+      if (convertedTwdAmount != null)
+        'converted_twd_amount': convertedTwdAmount,
+      if (applicantName != null) 'applicant_name': applicantName,
+      if (applicantUnit != null) 'applicant_unit': applicantUnit,
+      if (contactPhone != null) 'contact_phone': contactPhone,
+      if (receiptIssuedAndTransferred != null)
+        'receipt_issued_and_transferred': receiptIssuedAndTransferred,
+      if (billingErrorReason != null)
+        'billing_error_reason': billingErrorReason,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
     });
@@ -9144,6 +9665,16 @@ class MedicalCostsCompanion extends UpdateCompanion<MedicalCost> {
     Value<String?>? photoPath,
     Value<String?>? agreementSignaturePath,
     Value<String?>? witnessSignaturePath,
+    Value<String?>? paymentMethod,
+    Value<String?>? paymentStatus,
+    Value<String?>? selectedCurrency,
+    Value<String?>? foreignCurrencyAmount,
+    Value<String?>? convertedTwdAmount,
+    Value<String?>? applicantName,
+    Value<String?>? applicantUnit,
+    Value<String?>? contactPhone,
+    Value<bool?>? receiptIssuedAndTransferred,
+    Value<String?>? billingErrorReason,
     Value<DateTime>? createdAt,
     Value<DateTime>? updatedAt,
   }) {
@@ -9158,6 +9689,18 @@ class MedicalCostsCompanion extends UpdateCompanion<MedicalCost> {
       agreementSignaturePath:
           agreementSignaturePath ?? this.agreementSignaturePath,
       witnessSignaturePath: witnessSignaturePath ?? this.witnessSignaturePath,
+      paymentMethod: paymentMethod ?? this.paymentMethod,
+      paymentStatus: paymentStatus ?? this.paymentStatus,
+      selectedCurrency: selectedCurrency ?? this.selectedCurrency,
+      foreignCurrencyAmount:
+          foreignCurrencyAmount ?? this.foreignCurrencyAmount,
+      convertedTwdAmount: convertedTwdAmount ?? this.convertedTwdAmount,
+      applicantName: applicantName ?? this.applicantName,
+      applicantUnit: applicantUnit ?? this.applicantUnit,
+      contactPhone: contactPhone ?? this.contactPhone,
+      receiptIssuedAndTransferred:
+          receiptIssuedAndTransferred ?? this.receiptIssuedAndTransferred,
+      billingErrorReason: billingErrorReason ?? this.billingErrorReason,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
@@ -9197,6 +9740,40 @@ class MedicalCostsCompanion extends UpdateCompanion<MedicalCost> {
         witnessSignaturePath.value,
       );
     }
+    if (paymentMethod.present) {
+      map['payment_method'] = Variable<String>(paymentMethod.value);
+    }
+    if (paymentStatus.present) {
+      map['payment_status'] = Variable<String>(paymentStatus.value);
+    }
+    if (selectedCurrency.present) {
+      map['selected_currency'] = Variable<String>(selectedCurrency.value);
+    }
+    if (foreignCurrencyAmount.present) {
+      map['foreign_currency_amount'] = Variable<String>(
+        foreignCurrencyAmount.value,
+      );
+    }
+    if (convertedTwdAmount.present) {
+      map['converted_twd_amount'] = Variable<String>(convertedTwdAmount.value);
+    }
+    if (applicantName.present) {
+      map['applicant_name'] = Variable<String>(applicantName.value);
+    }
+    if (applicantUnit.present) {
+      map['applicant_unit'] = Variable<String>(applicantUnit.value);
+    }
+    if (contactPhone.present) {
+      map['contact_phone'] = Variable<String>(contactPhone.value);
+    }
+    if (receiptIssuedAndTransferred.present) {
+      map['receipt_issued_and_transferred'] = Variable<bool>(
+        receiptIssuedAndTransferred.value,
+      );
+    }
+    if (billingErrorReason.present) {
+      map['billing_error_reason'] = Variable<String>(billingErrorReason.value);
+    }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
@@ -9218,6 +9795,16 @@ class MedicalCostsCompanion extends UpdateCompanion<MedicalCost> {
           ..write('photoPath: $photoPath, ')
           ..write('agreementSignaturePath: $agreementSignaturePath, ')
           ..write('witnessSignaturePath: $witnessSignaturePath, ')
+          ..write('paymentMethod: $paymentMethod, ')
+          ..write('paymentStatus: $paymentStatus, ')
+          ..write('selectedCurrency: $selectedCurrency, ')
+          ..write('foreignCurrencyAmount: $foreignCurrencyAmount, ')
+          ..write('convertedTwdAmount: $convertedTwdAmount, ')
+          ..write('applicantName: $applicantName, ')
+          ..write('applicantUnit: $applicantUnit, ')
+          ..write('contactPhone: $contactPhone, ')
+          ..write('receiptIssuedAndTransferred: $receiptIssuedAndTransferred, ')
+          ..write('billingErrorReason: $billingErrorReason, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
           ..write(')'))
@@ -27212,6 +27799,16 @@ typedef $$MedicalCostsTableCreateCompanionBuilder =
       Value<String?> photoPath,
       Value<String?> agreementSignaturePath,
       Value<String?> witnessSignaturePath,
+      Value<String?> paymentMethod,
+      Value<String?> paymentStatus,
+      Value<String?> selectedCurrency,
+      Value<String?> foreignCurrencyAmount,
+      Value<String?> convertedTwdAmount,
+      Value<String?> applicantName,
+      Value<String?> applicantUnit,
+      Value<String?> contactPhone,
+      Value<bool?> receiptIssuedAndTransferred,
+      Value<String?> billingErrorReason,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
     });
@@ -27226,6 +27823,16 @@ typedef $$MedicalCostsTableUpdateCompanionBuilder =
       Value<String?> photoPath,
       Value<String?> agreementSignaturePath,
       Value<String?> witnessSignaturePath,
+      Value<String?> paymentMethod,
+      Value<String?> paymentStatus,
+      Value<String?> selectedCurrency,
+      Value<String?> foreignCurrencyAmount,
+      Value<String?> convertedTwdAmount,
+      Value<String?> applicantName,
+      Value<String?> applicantUnit,
+      Value<String?> contactPhone,
+      Value<bool?> receiptIssuedAndTransferred,
+      Value<String?> billingErrorReason,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
     });
@@ -27281,6 +27888,56 @@ class $$MedicalCostsTableFilterComposer
 
   ColumnFilters<String> get witnessSignaturePath => $composableBuilder(
     column: $table.witnessSignaturePath,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get paymentMethod => $composableBuilder(
+    column: $table.paymentMethod,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get paymentStatus => $composableBuilder(
+    column: $table.paymentStatus,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get selectedCurrency => $composableBuilder(
+    column: $table.selectedCurrency,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get foreignCurrencyAmount => $composableBuilder(
+    column: $table.foreignCurrencyAmount,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get convertedTwdAmount => $composableBuilder(
+    column: $table.convertedTwdAmount,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get applicantName => $composableBuilder(
+    column: $table.applicantName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get applicantUnit => $composableBuilder(
+    column: $table.applicantUnit,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get contactPhone => $composableBuilder(
+    column: $table.contactPhone,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get receiptIssuedAndTransferred => $composableBuilder(
+    column: $table.receiptIssuedAndTransferred,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get billingErrorReason => $composableBuilder(
+    column: $table.billingErrorReason,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -27349,6 +28006,56 @@ class $$MedicalCostsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get paymentMethod => $composableBuilder(
+    column: $table.paymentMethod,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get paymentStatus => $composableBuilder(
+    column: $table.paymentStatus,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get selectedCurrency => $composableBuilder(
+    column: $table.selectedCurrency,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get foreignCurrencyAmount => $composableBuilder(
+    column: $table.foreignCurrencyAmount,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get convertedTwdAmount => $composableBuilder(
+    column: $table.convertedTwdAmount,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get applicantName => $composableBuilder(
+    column: $table.applicantName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get applicantUnit => $composableBuilder(
+    column: $table.applicantUnit,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get contactPhone => $composableBuilder(
+    column: $table.contactPhone,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get receiptIssuedAndTransferred => $composableBuilder(
+    column: $table.receiptIssuedAndTransferred,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get billingErrorReason => $composableBuilder(
+    column: $table.billingErrorReason,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
     column: $table.createdAt,
     builder: (column) => ColumnOrderings(column),
@@ -27404,6 +28111,56 @@ class $$MedicalCostsTableAnnotationComposer
     builder: (column) => column,
   );
 
+  GeneratedColumn<String> get paymentMethod => $composableBuilder(
+    column: $table.paymentMethod,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get paymentStatus => $composableBuilder(
+    column: $table.paymentStatus,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get selectedCurrency => $composableBuilder(
+    column: $table.selectedCurrency,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get foreignCurrencyAmount => $composableBuilder(
+    column: $table.foreignCurrencyAmount,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get convertedTwdAmount => $composableBuilder(
+    column: $table.convertedTwdAmount,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get applicantName => $composableBuilder(
+    column: $table.applicantName,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get applicantUnit => $composableBuilder(
+    column: $table.applicantUnit,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get contactPhone => $composableBuilder(
+    column: $table.contactPhone,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get receiptIssuedAndTransferred => $composableBuilder(
+    column: $table.receiptIssuedAndTransferred,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get billingErrorReason => $composableBuilder(
+    column: $table.billingErrorReason,
+    builder: (column) => column,
+  );
+
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
 
@@ -27451,6 +28208,16 @@ class $$MedicalCostsTableTableManager
                 Value<String?> photoPath = const Value.absent(),
                 Value<String?> agreementSignaturePath = const Value.absent(),
                 Value<String?> witnessSignaturePath = const Value.absent(),
+                Value<String?> paymentMethod = const Value.absent(),
+                Value<String?> paymentStatus = const Value.absent(),
+                Value<String?> selectedCurrency = const Value.absent(),
+                Value<String?> foreignCurrencyAmount = const Value.absent(),
+                Value<String?> convertedTwdAmount = const Value.absent(),
+                Value<String?> applicantName = const Value.absent(),
+                Value<String?> applicantUnit = const Value.absent(),
+                Value<String?> contactPhone = const Value.absent(),
+                Value<bool?> receiptIssuedAndTransferred = const Value.absent(),
+                Value<String?> billingErrorReason = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
               }) => MedicalCostsCompanion(
@@ -27463,6 +28230,16 @@ class $$MedicalCostsTableTableManager
                 photoPath: photoPath,
                 agreementSignaturePath: agreementSignaturePath,
                 witnessSignaturePath: witnessSignaturePath,
+                paymentMethod: paymentMethod,
+                paymentStatus: paymentStatus,
+                selectedCurrency: selectedCurrency,
+                foreignCurrencyAmount: foreignCurrencyAmount,
+                convertedTwdAmount: convertedTwdAmount,
+                applicantName: applicantName,
+                applicantUnit: applicantUnit,
+                contactPhone: contactPhone,
+                receiptIssuedAndTransferred: receiptIssuedAndTransferred,
+                billingErrorReason: billingErrorReason,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
               ),
@@ -27477,6 +28254,16 @@ class $$MedicalCostsTableTableManager
                 Value<String?> photoPath = const Value.absent(),
                 Value<String?> agreementSignaturePath = const Value.absent(),
                 Value<String?> witnessSignaturePath = const Value.absent(),
+                Value<String?> paymentMethod = const Value.absent(),
+                Value<String?> paymentStatus = const Value.absent(),
+                Value<String?> selectedCurrency = const Value.absent(),
+                Value<String?> foreignCurrencyAmount = const Value.absent(),
+                Value<String?> convertedTwdAmount = const Value.absent(),
+                Value<String?> applicantName = const Value.absent(),
+                Value<String?> applicantUnit = const Value.absent(),
+                Value<String?> contactPhone = const Value.absent(),
+                Value<bool?> receiptIssuedAndTransferred = const Value.absent(),
+                Value<String?> billingErrorReason = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
               }) => MedicalCostsCompanion.insert(
@@ -27489,6 +28276,16 @@ class $$MedicalCostsTableTableManager
                 photoPath: photoPath,
                 agreementSignaturePath: agreementSignaturePath,
                 witnessSignaturePath: witnessSignaturePath,
+                paymentMethod: paymentMethod,
+                paymentStatus: paymentStatus,
+                selectedCurrency: selectedCurrency,
+                foreignCurrencyAmount: foreignCurrencyAmount,
+                convertedTwdAmount: convertedTwdAmount,
+                applicantName: applicantName,
+                applicantUnit: applicantUnit,
+                contactPhone: contactPhone,
+                receiptIssuedAndTransferred: receiptIssuedAndTransferred,
+                billingErrorReason: billingErrorReason,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
               ),

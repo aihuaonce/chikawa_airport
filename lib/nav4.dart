@@ -1,7 +1,6 @@
+// nav4.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
-// import 'nav3.dart'; // 【移除】
 import 'data/models/emergency_data.dart';
 import 'data/db/daos.dart';
 import 'l10n/app_translations.dart';
@@ -27,14 +26,13 @@ class Nav4Page extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => EmergencyNavigationProvider()),
         ChangeNotifierProxyProvider<EmergencyRecordsDao, EmergencyData>(
-          create: (context) {
-            final data = EmergencyData(visitId);
-            final dao = context.read<EmergencyRecordsDao>();
-            data.loadFromDatabase(dao);
-            return data;
+          create: (context) => EmergencyData(visitId),
+          update: (context, dao, previous) {
+            if (previous != null && !previous.isLoaded) {
+              previous.loadFromDatabase(dao);
+            }
+            return previous ?? EmergencyData(visitId);
           },
-          update: (context, dao, previous) =>
-              previous ?? EmergencyData(visitId),
         ),
       ],
       child: const EmergencyMainLayout(),
@@ -50,7 +48,6 @@ class EmergencyMainLayout extends StatelessWidget {
     final navProvider = context.watch<EmergencyNavigationProvider>();
     final emergencyData = context.watch<EmergencyData>();
 
-    // 根據索引決定顯示哪個分頁
     Widget currentPage;
     switch (navProvider.selectedIndex) {
       case 0:
@@ -79,12 +76,7 @@ class EmergencyMainLayout extends StatelessWidget {
             Expanded(
               child: Column(
                 children: [
-                  // 【移除】Nav3Section
-                  // const Padding(
-                  //   padding: EdgeInsets.only(top: 12),
-                  //   child: Nav3Section(),
-                  // ),
-                  const SizedBox(height: 20), // 【新增】替代的間距
+                  const SizedBox(height: 20),
                   Expanded(child: SingleChildScrollView(child: currentPage)),
                 ],
               ),
@@ -151,7 +143,6 @@ class _EmergencyNavBarState extends State<EmergencyNavBar> {
     final navProvider = context.watch<EmergencyNavigationProvider>();
     final t = AppTranslations.of(context);
 
-    // 動態建立翻譯後的導航項目列表
     final List<String> items = [
       t.personalInfo,
       t.flightRecord,
