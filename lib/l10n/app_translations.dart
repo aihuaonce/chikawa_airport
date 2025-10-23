@@ -1038,6 +1038,9 @@ class AppTranslations {
   String get enterAmountHint => isZh ? '輸入金額' : 'Enter amount';
   String get enterBillingNotesHint =>
       isZh ? '請填寫收費備註' : 'Please enter billing notes';
+  String get receiptIssuedAndTransferred =>
+      isZh ? '已開立收據並轉交' : 'Receipt Issued and Transferred';
+  String get erCounterSignature => isZh ? '急診櫃台簽收名' : 'ER Counter Signature';
   String get agreementStatementZh => isZh
       ? '瞭解醫護人員說明明瞭醫療收費之後且同意'
       : 'I understand the explanation of the medical charges and agree to them.';
@@ -1058,8 +1061,12 @@ class AppTranslations {
   String get saveFailedLabel => isZh ? '儲存失敗:' : 'Save Failed:';
 
   String get medicalCertificate => isZh ? '診斷證明' : 'Medical Certificate';
+  String get medicalCertificateNav => isZh ? '診斷書' : 'Medical Certificate';
+  String get refusedReferralNav => isZh ? '拒絕轉診切結書' : 'Refused Referral';
+  String get referralFormNav => isZh ? '轉診單' : 'Referral Form';
   String get medicalExpenses => isZh ? '醫療費用' : 'Medical Expenses';
   String get electronicDocuments => isZh ? '電傳文件' : 'Electronic Documents';
+  String get nursingRecordFormNav => isZh ? '護理記錄' : 'Nursing Record Form';
   String get bodyMap => isZh ? '人形圖' : 'Body Map';
 
   // ========== Nav5 (救護車導航標籤) ==========

@@ -42,13 +42,10 @@ class MedicalCostsData extends ChangeNotifier {
   }
 
   // ========== 通知更新 ==========
-  void update() {
-    notifyListeners();
-  }
+  void update() => notifyListeners();
 
   // ========== 清空所有資料 ==========
   void clear() {
-    // 原有欄位
     chargeMethod = null;
     visitFee = null;
     ambulanceFee = null;
@@ -57,7 +54,6 @@ class MedicalCostsData extends ChangeNotifier {
     agreementSignaturePath = null;
     witnessSignaturePath = null;
 
-    // 【新增】清空新欄位
     paymentMethod = null;
     paymentStatus = null;
     selectedCurrency = null;
@@ -72,40 +68,45 @@ class MedicalCostsData extends ChangeNotifier {
     notifyListeners();
   }
 
-  // ========== 轉換為 Companion（包含所有欄位）==========
+  // ========== Helper：安全包裝 Value ==========
+  Value<T> _safeValue<T>(T? value) =>
+      value != null ? Value(value) : const Value.absent();
+
+  // ========== 轉換為 Companion（含所有欄位）=========
   MedicalCostsCompanion toCompanion(int visitId) {
     return MedicalCostsCompanion(
       visitId: Value(visitId),
       // 原有欄位
-      chargeMethod: Value(chargeMethod),
-      visitFee: Value(visitFee),
-      ambulanceFee: Value(ambulanceFee),
-      note: Value(note),
-      photoPath: Value(photoPath),
-      agreementSignaturePath: Value(agreementSignaturePath),
-      witnessSignaturePath: Value(witnessSignaturePath),
-      // 【新增】新欄位
-      paymentMethod: Value(paymentMethod),
-      paymentStatus: Value(paymentStatus),
-      selectedCurrency: Value(selectedCurrency),
-      foreignCurrencyAmount: Value(foreignCurrencyAmount),
-      convertedTwdAmount: Value(convertedTwdAmount),
-      applicantName: Value(applicantName),
-      applicantUnit: Value(applicantUnit),
-      contactPhone: Value(contactPhone),
-      receiptIssuedAndTransferred: Value(receiptIssuedAndTransferred),
-      billingErrorReason: Value(billingErrorReason),
+      chargeMethod: _safeValue(chargeMethod),
+      visitFee: _safeValue(visitFee),
+      ambulanceFee: _safeValue(ambulanceFee),
+      note: _safeValue(note),
+      photoPath: _safeValue(photoPath),
+      agreementSignaturePath: _safeValue(agreementSignaturePath),
+      witnessSignaturePath: _safeValue(witnessSignaturePath),
+      // 新增欄位
+      paymentMethod: _safeValue(paymentMethod),
+      paymentStatus: _safeValue(paymentStatus),
+      selectedCurrency: _safeValue(selectedCurrency),
+      foreignCurrencyAmount: _safeValue(foreignCurrencyAmount),
+      convertedTwdAmount: _safeValue(convertedTwdAmount),
+      applicantName: _safeValue(applicantName),
+      applicantUnit: _safeValue(applicantUnit),
+      contactPhone: _safeValue(contactPhone),
+      receiptIssuedAndTransferred: _safeValue(receiptIssuedAndTransferred),
+      billingErrorReason: _safeValue(billingErrorReason),
     );
   }
 
   // ========== 儲存到資料庫 ==========
-  Future<void> saveToDatabase(int visitId, MedicalCostsDao dao) async {
+  Future<bool> saveToDatabase(int visitId, MedicalCostsDao dao) async {
     try {
       await dao.upsert(toCompanion(visitId));
-      print('✅ 費用記錄已儲存');
-    } catch (e) {
-      print('❌ 儲存失敗: $e');
-      rethrow;
+      debugPrint('✅ [MedicalCostsData] 費用記錄已成功儲存 (visitId=$visitId)');
+      return true;
+    } catch (e, stack) {
+      debugPrint('❌ [MedicalCostsData] 儲存失敗: $e\n$stack');
+      return false;
     }
   }
 }

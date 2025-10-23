@@ -1,9 +1,6 @@
 import 'dart:convert';
-// import 'package:chikawa_airport/nav3.dart'; // 【移除】
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'AccidentRecord.dart';
-import 'PersonalInformation.dart';
 import 'data/models/patient_data.dart';
 import 'data/db/daos.dart';
 import 'providers/routes_config.dart';
@@ -29,20 +26,32 @@ class _Nav2PageState extends State<Nav2Page> with WidgetsBindingObserver {
   final Map<int, GlobalKey> _pageKeys = {};
   final Map<int, Widget> _cachedPages = {};
   bool _isSaving = false;
+  late List<RouteItem> _routeItems; // 儲存當前的路由項目
 
   @override
   void initState() {
     super.initState();
     currentIndex = widget.initialIndex;
     WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    // 在這裡獲取翻譯和路由項目
+    final t = AppTranslations.of(context);
+    _routeItems = getRouteItems(t);
 
     // 初始化所有頁面的 GlobalKey
-    _initializePageKeys();
+    if (_pageKeys.isEmpty) {
+      _initializePageKeys();
 
-    // 延遲建立頁面，確保 context 準備好
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _buildAllPages();
-    });
+      // 延遲建立頁面，確保 context 準備好
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _buildAllPages();
+      });
+    }
   }
 
   @override
@@ -52,7 +61,7 @@ class _Nav2PageState extends State<Nav2Page> with WidgetsBindingObserver {
   }
 
   void _initializePageKeys() {
-    for (int i = 0; i < routeItems.length; i++) {
+    for (int i = 0; i < _routeItems.length; i++) {
       _pageKeys[i] = GlobalKey();
     }
   }
@@ -61,13 +70,15 @@ class _Nav2PageState extends State<Nav2Page> with WidgetsBindingObserver {
     if (!mounted) return;
 
     setState(() {
-      for (int i = 0; i < routeItems.length; i++) {
+      for (int i = 0; i < _routeItems.length; i++) {
         try {
-          _cachedPages[i] = routeItems[i].builder(
+          _cachedPages[i] = _routeItems[i].builder(
             widget.visitId,
             _pageKeys[i]!,
           );
-        } catch (e) {}
+        } catch (e) {
+          debugPrint('建立頁面 $i 失敗: $e');
+        }
       }
     });
   }
@@ -80,12 +91,14 @@ class _Nav2PageState extends State<Nav2Page> with WidgetsBindingObserver {
 
     try {
       await _savePageByIndex(currentIndex);
-    } catch (e) {}
+    } catch (e) {
+      debugPrint('儲存當前頁面失敗: $e');
+    }
   }
 
   Future<bool> _savePageByIndex(int index) async {
     final key = _pageKeys[index];
-    final pageName = routeItems[index].label;
+    final pageName = _routeItems[index].label;
 
     if (key?.currentState == null) {
       return false;
@@ -102,6 +115,7 @@ class _Nav2PageState extends State<Nav2Page> with WidgetsBindingObserver {
         return true;
       }
     } catch (e) {
+      debugPrint('儲存頁面 $pageName 失敗: $e');
       return false;
     }
   }
@@ -121,15 +135,15 @@ class _Nav2PageState extends State<Nav2Page> with WidgetsBindingObserver {
 
     try {
       // 首先確保所有頁面都已建立
-      if (_cachedPages.length != routeItems.length) {
+      if (_cachedPages.length != _routeItems.length) {
         _buildAllPages();
         // 等待頁面建立完成
         await Future.delayed(const Duration(milliseconds: 500));
       }
 
       // 遍歷所有頁面並儲存
-      for (int i = 0; i < routeItems.length; i++) {
-        final pageName = routeItems[i].label;
+      for (int i = 0; i < _routeItems.length; i++) {
+        final pageName = _routeItems[i].label;
 
         try {
           bool success = await _savePageByIndex(i);
@@ -168,7 +182,7 @@ class _Nav2PageState extends State<Nav2Page> with WidgetsBindingObserver {
       _buildAllPages();
     } catch (e) {
       hasErrors = true;
-      errorMessages.add('系統錯誤: ${e.toString()}');
+      errorMessages.add('${t.systemError}: ${e.toString()}');
     }
 
     setState(() {
@@ -285,6 +299,8 @@ class _Nav2PageState extends State<Nav2Page> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppTranslations.of(context);
+
     return Scaffold(
       backgroundColor: const Color(0xFFE6F6FB),
       body: Padding(
@@ -299,7 +315,7 @@ class _Nav2PageState extends State<Nav2Page> with WidgetsBindingObserver {
                   child: SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: Row(
-                      children: routeItems.asMap().entries.map((entry) {
+                      children: _routeItems.asMap().entries.map((entry) {
                         final index = entry.key;
                         final item = entry.value;
                         return Padding(
@@ -324,17 +340,12 @@ class _Nav2PageState extends State<Nav2Page> with WidgetsBindingObserver {
                       )
                     : IconButton(
                         icon: const Icon(Icons.save),
-                        tooltip: '儲存所有頁面',
+                        tooltip: t.saveAllPages,
                         onPressed: _saveAllPages,
                       ),
               ],
             ),
-            // 【移除】Nav3Section
-            // const Padding(
-            //   padding: EdgeInsets.only(top: 12),
-            //   child: Nav3Section(),
-            // ),
-            const SizedBox(height: 12), // 【新增】替代的間距
+            const SizedBox(height: 12),
             // 頁面內容
             Expanded(
               child: _cachedPages.isEmpty
@@ -342,7 +353,7 @@ class _Nav2PageState extends State<Nav2Page> with WidgetsBindingObserver {
                   : IndexedStack(
                       index: currentIndex,
                       children: List.generate(
-                        routeItems.length,
+                        _routeItems.length,
                         (index) => _cachedPages[index] ?? Container(),
                       ),
                     ),

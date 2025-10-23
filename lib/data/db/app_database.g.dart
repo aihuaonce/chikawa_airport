@@ -806,6 +806,7 @@ class $PatientProfilesTable extends PatientProfiles
     false,
     type: DriftSqlType.int,
     requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'),
   );
   static const VerificationMeta _birthdayMeta = const VerificationMeta(
     'birthday',
@@ -1056,10 +1057,6 @@ class $PatientProfilesTable extends PatientProfiles
 
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
-  @override
-  List<Set<GeneratedColumn>> get uniqueKeys => [
-    {visitId},
-  ];
   @override
   PatientProfile map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
@@ -3299,6 +3296,7 @@ class $FlightLogsTable extends FlightLogs
     false,
     type: DriftSqlType.int,
     requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'),
   );
   static const VerificationMeta _airlineIndexMeta = const VerificationMeta(
     'airlineIndex',
@@ -18147,7 +18145,7 @@ class $MedicationRecordsTable extends MedicationRecords
     type: DriftSqlType.int,
     requiredDuringInsert: true,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES visits (visit_id)',
+      'UNIQUE REFERENCES visits (visit_id)',
     ),
   );
   static const VerificationMeta _recordTimeMeta = const VerificationMeta(
@@ -18595,7 +18593,7 @@ class $VitalSignsRecordsTable extends VitalSignsRecords
     type: DriftSqlType.int,
     requiredDuringInsert: true,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES visits (visit_id)',
+      'UNIQUE REFERENCES visits (visit_id)',
     ),
   );
   static const VerificationMeta _recordTimeMeta = const VerificationMeta(
@@ -19328,7 +19326,7 @@ class $ParamedicRecordsTable extends ParamedicRecords
     type: DriftSqlType.int,
     requiredDuringInsert: true,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES visits (visit_id)',
+      'UNIQUE REFERENCES visits (visit_id)',
     ),
   );
   static const VerificationMeta _nameMeta = const VerificationMeta('name');

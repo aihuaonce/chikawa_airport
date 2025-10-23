@@ -40,7 +40,7 @@ class PatientProfiles extends Table {
   IntColumn get id => integer().autoIncrement()();
 
   // 關聯到主檔（必填，不 nullable）
-  IntColumn get visitId => integer()();
+  IntColumn get visitId => integer().unique()();
 
   // 個人資料欄位
   DateTimeColumn get birthday => dateTime().nullable()();
@@ -57,11 +57,6 @@ class PatientProfiles extends Table {
 
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
   DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
-
-  @override
-  List<Set<Column>> get uniqueKeys => [
-    {visitId},
-  ];
 
   @override
   List<Set<Column>> get indexes => [
@@ -121,7 +116,7 @@ class AccidentRecords extends Table {
 
 class FlightLogs extends Table {
   IntColumn get id => integer().autoIncrement()();
-  IntColumn get visitId => integer()(); // 關聯到 Visits
+  IntColumn get visitId => integer().unique()(); // 關聯到 Visits
 
   IntColumn get airlineIndex => integer().nullable()();
   BoolColumn get useOtherAirline =>
@@ -272,12 +267,13 @@ class MedicalCosts extends Table {
   TextColumn get agreementSignaturePath => text().nullable()();
   TextColumn get witnessSignaturePath => text().nullable()();
 
-   // 【新增】自付相關欄位
+  // 【新增】自付相關欄位
   TextColumn get paymentMethod => text().nullable()(); // '現金' or '刷卡'
 
   // 【新增】統一請款、總院會核代收、收費異常共用欄位
   TextColumn get paymentStatus => text().nullable()(); // '尚未收款', '已收款', '不需要'
-  TextColumn get selectedCurrency => text().nullable()(); // '台幣', '美金', '人民幣', '日幣', '加幣'
+  TextColumn get selectedCurrency =>
+      text().nullable()(); // '台幣', '美金', '人民幣', '日幣', '加幣'
   TextColumn get foreignCurrencyAmount => text().nullable()(); // 外幣金額
   TextColumn get convertedTwdAmount => text().nullable()(); // 兌換後的台幣金額
 
@@ -287,7 +283,8 @@ class MedicalCosts extends Table {
   TextColumn get contactPhone => text().nullable()(); // 聯絡電話
 
   // 【新增】總院會核代收專用欄位
-  BoolColumn get receiptIssuedAndTransferred => boolean().nullable()(); // 已開立收據並轉交
+  BoolColumn get receiptIssuedAndTransferred =>
+      boolean().nullable()(); // 已開立收據並轉交
 
   // 【新增】收費異常專用欄位
   TextColumn get billingErrorReason => text().nullable()(); // 收費異常原因
@@ -550,7 +547,7 @@ class AmbulanceRecords extends Table {
 class MedicationRecords extends Table {
   IntColumn get id => integer().autoIncrement()();
   IntColumn get visitId =>
-      integer().references(Visits, #visitId)(); // 關聯到 Visit
+      integer().unique().references(Visits, #visitId)(); // 關聯到 Visit
 
   DateTimeColumn get recordTime => dateTime().nullable()();
   TextColumn get name => text().nullable()(); // 藥名
@@ -562,7 +559,7 @@ class MedicationRecords extends Table {
 // 生命徵象紀錄表
 class VitalSignsRecords extends Table {
   IntColumn get id => integer().autoIncrement()();
-  IntColumn get visitId => integer().references(Visits, #visitId)();
+  IntColumn get visitId => integer().unique().references(Visits, #visitId)();
 
   DateTimeColumn get recordTime => dateTime().nullable()();
   BoolColumn get atHospital => boolean().withDefault(const Constant(false))();
@@ -579,7 +576,7 @@ class VitalSignsRecords extends Table {
 // 隨車救護人員紀錄表
 class ParamedicRecords extends Table {
   IntColumn get id => integer().autoIncrement()();
-  IntColumn get visitId => integer().references(Visits, #visitId)();
+  IntColumn get visitId => integer().unique().references(Visits, #visitId)();
 
   TextColumn get name => text().nullable()();
   BlobColumn get signature => blob().nullable()(); // 簽名
