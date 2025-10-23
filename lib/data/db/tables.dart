@@ -272,6 +272,26 @@ class MedicalCosts extends Table {
   TextColumn get agreementSignaturePath => text().nullable()();
   TextColumn get witnessSignaturePath => text().nullable()();
 
+   // 【新增】自付相關欄位
+  TextColumn get paymentMethod => text().nullable()(); // '現金' or '刷卡'
+
+  // 【新增】統一請款、總院會核代收、收費異常共用欄位
+  TextColumn get paymentStatus => text().nullable()(); // '尚未收款', '已收款', '不需要'
+  TextColumn get selectedCurrency => text().nullable()(); // '台幣', '美金', '人民幣', '日幣', '加幣'
+  TextColumn get foreignCurrencyAmount => text().nullable()(); // 外幣金額
+  TextColumn get convertedTwdAmount => text().nullable()(); // 兌換後的台幣金額
+
+  // 【新增】統一請款專用欄位
+  TextColumn get applicantName => text().nullable()(); // 申請人
+  TextColumn get applicantUnit => text().nullable()(); // 申請單位
+  TextColumn get contactPhone => text().nullable()(); // 聯絡電話
+
+  // 【新增】總院會核代收專用欄位
+  BoolColumn get receiptIssuedAndTransferred => boolean().nullable()(); // 已開立收據並轉交
+
+  // 【新增】收費異常專用欄位
+  TextColumn get billingErrorReason => text().nullable()(); // 收費異常原因
+
   // 紀錄時間
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
   DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();

@@ -1,4 +1,4 @@
-// lib/PersonalInformationPage.dart
+// lib/PersonalInformationPage.dart (已根據您的美編規範進行修改)
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
@@ -230,222 +230,249 @@ class _PersonalInformationPageState extends State<PersonalInformationPage>
             color: const Color(0xFFE6F6FB),
             alignment: Alignment.topCenter,
             child: SingleChildScrollView(
-              child: Container(
-                width: 900,
-                margin: const EdgeInsets.symmetric(vertical: 32),
-                padding: const EdgeInsets.all(32),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF9FAFB),
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 8)],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _SectionTitle(t.personalInformation),
-                    const SizedBox(height: 16),
-
-                    // 新增：患者姓名輸入欄位
-                    TextFormField(
-                      controller: nameController,
-                      decoration: InputDecoration(
-                        labelText: t.patientNamePlaceholder, // 使用翻譯的姓名標籤
-                        border: const OutlineInputBorder(),
-                        labelStyle: TextStyle(
-                          color: nameController.text.isEmpty
-                              ? const Color(0xFFDC3545) // 紅色
-                              : Colors.black54, // 正常顏色
-                          fontWeight: nameController.text.isEmpty
-                              ? FontWeight.bold
-                              : FontWeight.normal,
-                        ),
+              child: ConstrainedBox(
+                // Use ConstrainedBox to enforce maxWidth
+                constraints: const BoxConstraints(maxWidth: 1000),
+                child: Container(
+                  margin: const EdgeInsets.symmetric(
+                    vertical: 32,
+                    horizontal: 16,
+                  ),
+                  padding: const EdgeInsets.all(32),
+                  decoration: BoxDecoration(
+                    color: Colors.white, // As requested: 白色卡片
+                    borderRadius: BorderRadius.circular(
+                      16,
+                    ), // As requested: 圓角16
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Color.fromRGBO(
+                          0,
+                          0,
+                          0,
+                          0.08,
+                        ), // As requested: 陰影柔和
+                        blurRadius: 12,
+                        offset: Offset(0, 4),
                       ),
-                      validator: (value) {
-                        if (value == null || value.trim().isEmpty) {
-                          return t.patientNamePlaceholder; // 使用翻譯的錯誤訊息
-                        }
-                        return null;
-                      },
-                      onChanged: (val) {
-                        patientData.patientName = val.trim();
-                        _onTextFieldChanged();
-                        setState(() {}); // 觸發重繪以更新標籤顏色
-                      },
-                    ),
-                    const SizedBox(height: 16),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _SectionTitle(t.personalInformation),
+                      const SizedBox(height: 16),
 
-                    GestureDetector(
-                      onTap: _pickPhoto,
-                      child: Container(
-                        height: 150,
-                        width: 150,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey.shade400),
-                          borderRadius: BorderRadius.circular(8),
-                          color: Colors.grey.shade200,
-                        ),
-                        child: patientData.photoBase64 != null
-                            ? ClipRRect(
-                                borderRadius: BorderRadius.circular(8),
-                                child: Image.memory(
-                                  base64Decode(patientData.photoBase64!),
-                                  fit: BoxFit.cover,
-                                ),
-                              )
-                            : const Icon(
-                                Icons.add_a_photo,
-                                size: 50,
-                                color: Colors.grey,
-                              ),
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    InkWell(
-                      onTap: _pickBirthday,
-                      child: InputDecorator(
+                      // 新增：患者姓名輸入欄位
+                      TextFormField(
+                        controller: nameController,
                         decoration: InputDecoration(
-                          labelText: t.birthday,
+                          labelText: t.patientNamePlaceholder, // 使用翻譯的姓名標籤
+                          border: const OutlineInputBorder(),
+                          labelStyle: TextStyle(
+                            color: nameController.text.isEmpty
+                                ? const Color(0xFFDC3545) // 紅色
+                                : Colors.black54, // 正常顏色
+                            fontWeight: nameController.text.isEmpty
+                                ? FontWeight.bold
+                                : FontWeight.normal,
+                          ),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return t.patientNamePlaceholder; // 使用翻譯的錯誤訊息
+                          }
+                          return null;
+                        },
+                        onChanged: (val) {
+                          patientData.patientName = val.trim();
+                          _onTextFieldChanged();
+                          setState(() {}); // 觸發重繪以更新標籤顏色
+                        },
+                      ),
+                      const SizedBox(height: 16),
+
+                      GestureDetector(
+                        onTap: _pickPhoto,
+                        child: Container(
+                          height: 150,
+                          width: 150,
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.grey.shade400),
+                            borderRadius: BorderRadius.circular(8),
+                            color: Colors.grey.shade200,
+                          ),
+                          child: patientData.photoBase64 != null
+                              ? ClipRRect(
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: Image.memory(
+                                    base64Decode(patientData.photoBase64!),
+                                    fit: BoxFit.cover,
+                                  ),
+                                )
+                              : const Icon(
+                                  Icons.add_a_photo,
+                                  size: 50,
+                                  color: Colors.grey,
+                                ),
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      InkWell(
+                        onTap: _pickBirthday,
+                        child: InputDecorator(
+                          decoration: InputDecoration(
+                            labelText: t.birthday,
+                            border: const OutlineInputBorder(),
+                          ),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  patientData.birthday == null
+                                      ? t.notSelected
+                                      : t.formatDate(patientData.birthday!),
+                                ),
+                              ),
+                              const Icon(Icons.calendar_today, size: 20),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      InputDecorator(
+                        decoration: InputDecoration(
+                          labelText: t.age,
                           border: const OutlineInputBorder(),
                         ),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                patientData.birthday == null
-                                    ? t.notSelected
-                                    : t.formatDate(patientData.birthday!),
-                              ),
+                        child: Text(
+                          patientData.age != null
+                              ? t.ageWithUnit(patientData.age!)
+                              : t.birthdayNotSelected,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      _SectionTitle(t.gender),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: RadioListTile<String>(
+                              title: Text(t.male),
+                              value: '男', // DB value
+                              groupValue: patientData.gender,
+                              activeColor: const Color(
+                                0xFF274C4A,
+                              ), // As requested: 選中顏色
+                              onChanged: (v) {
+                                patientData.gender = v;
+                                patientData.update();
+                              },
                             ),
-                            const Icon(Icons.calendar_today, size: 20),
-                          ],
+                          ),
+                          Expanded(
+                            child: RadioListTile<String>(
+                              title: Text(t.female),
+                              value: '女', // DB value
+                              groupValue: patientData.gender,
+                              activeColor: const Color(
+                                0xFF274C4A,
+                              ), // As requested: 選中顏色
+                              onChanged: (v) {
+                                patientData.gender = v;
+                                patientData.update();
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      TextFormField(
+                        controller: idController,
+                        decoration: InputDecoration(
+                          labelText: t.passportOrId,
+                          border: const OutlineInputBorder(),
                         ),
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return t.enterPassportOrId;
+                          }
+                          return null;
+                        },
+                        onChanged: (val) {
+                          patientData.idNumber = val.trim();
+                          _onTextFieldChanged();
+                        },
                       ),
-                    ),
-                    const SizedBox(height: 16),
-                    InputDecorator(
-                      decoration: InputDecoration(
-                        labelText: t.age,
-                        border: const OutlineInputBorder(),
-                      ),
-                      child: Text(
-                        patientData.age != null
-                            ? t.ageWithUnit(patientData.age!)
-                            : t.birthdayNotSelected,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    _SectionTitle(t.gender),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: RadioListTile<String>(
-                            title: Text(t.male),
-                            value: '男', // DB value
-                            groupValue: patientData.gender,
-                            activeColor: const Color(0xFF83ACA9),
+                      const SizedBox(height: 16),
+                      _SectionTitle(t.purposeOfVisit),
+                      Column(
+                        children: purposeOptions.entries.map((entry) {
+                          return RadioListTile<String>(
+                            title: Text(entry.value),
+                            value: entry.key,
+                            groupValue: patientData.reason,
+                            activeColor: const Color(
+                              0xFF274C4A,
+                            ), // As requested: 選中顏色
                             onChanged: (v) {
-                              patientData.gender = v;
+                              patientData.reason = v;
                               patientData.update();
                             },
-                          ),
-                        ),
-                        Expanded(
-                          child: RadioListTile<String>(
-                            title: Text(t.female),
-                            value: '女', // DB value
-                            groupValue: patientData.gender,
-                            activeColor: const Color(0xFF83ACA9),
+                          );
+                        }).toList(),
+                      ),
+                      const SizedBox(height: 16),
+                      _SectionTitle(t.nationality),
+                      Column(
+                        children: nationalityOptions.entries.map((entry) {
+                          return RadioListTile<String>(
+                            title: Text(entry.value),
+                            value: entry.key,
+                            groupValue: patientData.nationality,
+                            activeColor: const Color(
+                              0xFF274C4A,
+                            ), // As requested: 選中顏色
                             onChanged: (v) {
-                              patientData.gender = v;
+                              patientData.nationality = v;
                               patientData.update();
                             },
-                          ),
+                          );
+                        }).toList(),
+                      ),
+                      const SizedBox(height: 16),
+                      TextFormField(
+                        controller: addrController,
+                        decoration: InputDecoration(
+                          labelText: t.address,
+                          border: const OutlineInputBorder(),
                         ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    TextFormField(
-                      controller: idController,
-                      decoration: InputDecoration(
-                        labelText: t.passportOrId,
-                        border: const OutlineInputBorder(),
+                        maxLines: 2,
+                        onChanged: (val) {
+                          patientData.address = val.trim();
+                          _onTextFieldChanged();
+                        },
                       ),
-                      validator: (value) {
-                        if (value == null || value.trim().isEmpty) {
-                          return t.enterPassportOrId;
-                        }
-                        return null;
-                      },
-                      onChanged: (val) {
-                        patientData.idNumber = val.trim();
-                        _onTextFieldChanged();
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                    _SectionTitle(t.purposeOfVisit),
-                    Column(
-                      children: purposeOptions.entries.map((entry) {
-                        return RadioListTile<String>(
-                          title: Text(entry.value),
-                          value: entry.key,
-                          groupValue: patientData.reason,
-                          activeColor: const Color(0xFF83ACA9),
-                          onChanged: (v) {
-                            patientData.reason = v;
-                            patientData.update();
-                          },
-                        );
-                      }).toList(),
-                    ),
-                    const SizedBox(height: 16),
-                    _SectionTitle(t.nationality),
-                    Column(
-                      children: nationalityOptions.entries.map((entry) {
-                        return RadioListTile<String>(
-                          title: Text(entry.value),
-                          value: entry.key,
-                          groupValue: patientData.nationality,
-                          activeColor: const Color(0xFF83ACA9),
-                          onChanged: (v) {
-                            patientData.nationality = v;
-                            patientData.update();
-                          },
-                        );
-                      }).toList(),
-                    ),
-                    const SizedBox(height: 16),
-                    TextFormField(
-                      controller: addrController,
-                      decoration: InputDecoration(
-                        labelText: t.address,
-                        border: const OutlineInputBorder(),
+                      const SizedBox(height: 16),
+                      TextFormField(
+                        controller: phoneController,
+                        decoration: InputDecoration(
+                          labelText: t.contactNumber,
+                          border: const OutlineInputBorder(),
+                        ),
+                        keyboardType: TextInputType.phone,
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return t.enterContactNumber;
+                          }
+                          return null;
+                        },
+                        onChanged: (val) {
+                          patientData.phone = val.trim();
+                          _onTextFieldChanged();
+                        },
                       ),
-                      maxLines: 2,
-                      onChanged: (val) {
-                        patientData.address = val.trim();
-                        _onTextFieldChanged();
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                    TextFormField(
-                      controller: phoneController,
-                      decoration: InputDecoration(
-                        labelText: t.contactNumber,
-                        border: const OutlineInputBorder(),
-                      ),
-                      keyboardType: TextInputType.phone,
-                      validator: (value) {
-                        if (value == null || value.trim().isEmpty) {
-                          return t.enterContactNumber;
-                        }
-                        return null;
-                      },
-                      onChanged: (val) {
-                        patientData.phone = val.trim();
-                        _onTextFieldChanged();
-                      },
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -462,9 +489,13 @@ class _SectionTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-      title,
-      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+    return Padding(
+      // Add some vertical padding for better spacing
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Text(
+        title,
+        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+      ),
     );
   }
 }

@@ -478,18 +478,33 @@ class _PlanPageState extends State<PlanPage>
           color: const Color(0xFFE6F6FB),
           alignment: Alignment.topCenter,
           child: SingleChildScrollView(
-            child: Container(
-              width: 900,
-              margin: const EdgeInsets.symmetric(vertical: 32),
-              padding: const EdgeInsets.all(32),
-              decoration: BoxDecoration(
-                color: const Color(0xFFF9FAFB),
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: const [
-                  BoxShadow(color: Colors.black12, blurRadius: 8),
-                ],
+            // Use ConstrainedBox to enforce maxWidth
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 1000),
+              child: Container(
+                margin: const EdgeInsets.symmetric(
+                  vertical: 32,
+                  horizontal: 16,
+                ),
+                padding: const EdgeInsets.all(32),
+                decoration: BoxDecoration(
+                  color: Colors.white, // As requested: 白色卡片
+                  borderRadius: BorderRadius.circular(16), // As requested: 圓角16
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Color.fromRGBO(
+                        0,
+                        0,
+                        0,
+                        0.08,
+                      ), // As requested: 陰影柔和
+                      blurRadius: 12,
+                      offset: Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: _buildFullUI(planData),
               ),
-              child: _buildFullUI(planData),
             ),
           ),
         );
@@ -501,6 +516,13 @@ class _PlanPageState extends State<PlanPage>
   // Main UI Structure (Extracted for Readability)
   // ===============================================
   Widget _buildFullUI(PlanData planData) {
+    final ButtonStyle actionButtonStyle = ElevatedButton.styleFrom(
+      backgroundColor: const Color(0xFF83ACA9), // As requested: 按鈕背景色
+      foregroundColor: Colors.white, // As requested: 文字白色
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+    );
+
     final Map<String, bool> onSiteTreatments = {
       '諮詢衛教': false,
       '內科處置': false,
@@ -579,7 +601,8 @@ class _PlanPageState extends State<PlanPage>
                     _SectionTitle('健康評估'),
                     _HealthDataTable(
                       healthData: planData.healthData,
-                      onAdd: () => _addHealthDataDialog(planData),
+                      onAdd: () =>
+                          _addHealthDataDialog(planData, actionButtonStyle),
                     ),
                     const SizedBox(height: 24),
                   ],
@@ -937,6 +960,7 @@ class _PlanPageState extends State<PlanPage>
                       _SectionTitle('意識清晰'),
                       Checkbox(
                         value: planData.consciousClear,
+                        activeColor: const Color(0xFF274C4A),
                         onChanged: (v) {
                           planData.consciousClear = v ?? true;
                           planData.update();
@@ -1200,19 +1224,19 @@ class _PlanPageState extends State<PlanPage>
         _buildICD10Selector("主診斷", planData.selectedICD10Main, (v) {
           planData.selectedICD10Main = v;
           planData.update();
-        }),
+        }, actionButtonStyle),
         const SizedBox(height: 24),
         _SectionTitle('副診斷1的ICD-10'),
         _buildICD10Selector("副診斷1", planData.selectedICD10Sub1, (v) {
           planData.selectedICD10Sub1 = v;
           planData.update();
-        }),
+        }, actionButtonStyle),
         const SizedBox(height: 24),
         _SectionTitle('副診斷2的ICD-10'),
         _buildICD10Selector("副診斷2", planData.selectedICD10Sub2, (v) {
           planData.selectedICD10Sub2 = v;
           planData.update();
-        }),
+        }, actionButtonStyle),
         const SizedBox(height: 32),
         _SectionTitle('檢傷分類'),
         Wrap(
@@ -1310,7 +1334,8 @@ class _PlanPageState extends State<PlanPage>
           ),
           const SizedBox(height: 16),
         ],
-        if (planData.suggestReferral) _buildReferralSection(planData),
+        if (planData.suggestReferral)
+          _buildReferralSection(planData, actionButtonStyle),
         if (planData.intubationChecked) ...[
           _SectionTitle('插管方式'),
           Row(
@@ -1339,10 +1364,7 @@ class _PlanPageState extends State<PlanPage>
         ],
         if (planData.cprChecked) ...[
           ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF83ACA9),
-              foregroundColor: Colors.white,
-            ),
+            style: actionButtonStyle,
             onPressed: _generateEmergencyRecord, // 改為手動觸發
             child: const Text('產生急救記錄單'),
           ),
@@ -1373,7 +1395,7 @@ class _PlanPageState extends State<PlanPage>
           _SectionTitle('藥物記錄表'),
           _PrescriptionTable(
             prescriptionRows: planData.prescriptionRows,
-            onAdd: () => _showPrescriptionDialog(planData),
+            onAdd: () => _showPrescriptionDialog(planData, actionButtonStyle),
           ),
           const SizedBox(height: 16),
         ],
@@ -1514,7 +1536,7 @@ class _PlanPageState extends State<PlanPage>
         const SizedBox(height: 12),
         _HelperTable(
           selectedHelpers: planData.selectedHelpers,
-          onAdd: () => _showHelperSelectionDialog(planData),
+          onAdd: () => _showHelperSelectionDialog(planData, actionButtonStyle),
         ),
         const SizedBox(height: 24),
         _SectionTitle('特別註記'),
@@ -1629,7 +1651,7 @@ class _PlanPageState extends State<PlanPage>
     );
   }
 
-  Widget _buildReferralSection(PlanData planData) {
+  Widget _buildReferralSection(PlanData planData, ButtonStyle buttonStyle) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -1728,10 +1750,7 @@ class _PlanPageState extends State<PlanPage>
         Align(
           alignment: Alignment.centerLeft,
           child: ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF274C4A),
-              foregroundColor: Colors.white,
-            ),
+            style: buttonStyle,
             onPressed: () {},
             child: const Text('產生救護車紀錄單'),
           ),
@@ -1800,7 +1819,7 @@ class _PlanPageState extends State<PlanPage>
     );
   }
 
-  void _addHealthDataDialog(PlanData planData) {
+  void _addHealthDataDialog(PlanData planData, ButtonStyle buttonStyle) {
     final nameController = TextEditingController();
     final relationController = TextEditingController();
     final tempController = TextEditingController();
@@ -1832,10 +1851,7 @@ class _PlanPageState extends State<PlanPage>
             child: const Text("取消"),
           ),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF83ACA9),
-              foregroundColor: Colors.white,
-            ),
+            style: buttonStyle,
             onPressed: () {
               planData.healthData.add({
                 "name": nameController.text,
@@ -1923,7 +1939,10 @@ class _PlanPageState extends State<PlanPage>
     }
   }
 
-  Future<void> _showHelperSelectionDialog(PlanData planData) async {
+  Future<void> _showHelperSelectionDialog(
+    PlanData planData,
+    ButtonStyle buttonStyle,
+  ) async {
     List<String> tempSelected = List.from(planData.selectedHelpers);
     List<String>? result = await showDialog<List<String>>(
       context: context,
@@ -1939,6 +1958,7 @@ class _PlanPageState extends State<PlanPage>
                     return CheckboxListTile(
                       title: Text(name),
                       value: tempSelected.contains(name),
+                      activeColor: const Color(0xFF274C4A),
                       onChanged: (bool? checked) {
                         setState(() {
                           if (checked == true) {
@@ -1960,6 +1980,7 @@ class _PlanPageState extends State<PlanPage>
                   },
                 ),
                 ElevatedButton(
+                  style: buttonStyle,
                   child: const Text('確定'),
                   onPressed: () {
                     Navigator.of(context).pop(tempSelected);
@@ -1977,7 +1998,10 @@ class _PlanPageState extends State<PlanPage>
     }
   }
 
-  Future<void> _showPrescriptionDialog(PlanData planData) async {
+  Future<void> _showPrescriptionDialog(
+    PlanData planData,
+    ButtonStyle buttonStyle,
+  ) async {
     Map<String, String>? result = await showDialog<Map<String, String>>(
       context: context,
       builder: (context) {
@@ -2020,6 +2044,14 @@ class _PlanPageState extends State<PlanPage>
                                       (drug) => ChoiceChip(
                                         label: Text(drug),
                                         selected: selectedDrug == drug,
+                                        selectedColor: const Color(
+                                          0xFF274C4A,
+                                        ), // As requested
+                                        labelStyle: TextStyle(
+                                          color: selectedDrug == drug
+                                              ? Colors.white
+                                              : Colors.black,
+                                        ),
                                         onSelected: (_) =>
                                             setState(() => selectedDrug = drug),
                                       ),
@@ -2081,6 +2113,7 @@ class _PlanPageState extends State<PlanPage>
                   child: const Text('取消'),
                 ),
                 ElevatedButton(
+                  style: buttonStyle,
                   onPressed: () => Navigator.pop(context, {
                     '藥品名稱': selectedDrug ?? '',
                     '使用方式': selectedUsage ?? '',
@@ -2107,6 +2140,7 @@ class _PlanPageState extends State<PlanPage>
     String title,
     String? value,
     ValueChanged<String?> onSelected,
+    ButtonStyle buttonStyle,
   ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -2114,19 +2148,13 @@ class _PlanPageState extends State<PlanPage>
         Row(
           children: [
             ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF83ACA9),
-                foregroundColor: Colors.white,
-              ),
+              style: buttonStyle,
               onPressed: () => _showICD10Dialog(onSelected),
               child: const Text('ICD10CM搜尋'),
             ),
             const SizedBox(width: 12),
             ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF83ACA9),
-                foregroundColor: Colors.white,
-              ),
+              style: buttonStyle,
               onPressed: () {},
               child: const Text('GOOGLE搜尋'),
             ),
@@ -2221,19 +2249,24 @@ class _RadioItem<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) => InkWell(
     onTap: () => onChanged(value),
-    child: Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Radio<T>(
-          value: value,
-          groupValue: groupValue,
-          activeColor: const Color(0xFF83ACA9),
-          onChanged: onChanged,
-        ),
-        Flexible(
-          child: Text(label, style: const TextStyle(color: Colors.black)),
-        ),
-      ],
+    borderRadius: BorderRadius.circular(8), // Add for better touch feedback
+    child: Padding(
+      // Add padding for better spacing
+      padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 2.0),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Radio<T>(
+            value: value,
+            groupValue: groupValue,
+            activeColor: const Color(0xFF274C4A), // As requested: 選中顏色
+            onChanged: onChanged,
+          ),
+          Flexible(
+            child: Text(label, style: const TextStyle(color: Colors.black)),
+          ),
+        ],
+      ),
     ),
   );
 }
@@ -2250,16 +2283,21 @@ class _CheckBoxItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) => InkWell(
     onTap: () => onChanged(!value),
-    child: Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Checkbox(
-          value: value,
-          activeColor: const Color(0xFF83ACA9),
-          onChanged: onChanged,
-        ),
-        Text(label, style: const TextStyle(color: Colors.black)),
-      ],
+    borderRadius: BorderRadius.circular(8), // Add for better touch feedback
+    child: Padding(
+      // Add padding for better spacing
+      padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 2.0),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Checkbox(
+            value: value,
+            activeColor: const Color(0xFF274C4A), // As requested: 選中顏色
+            onChanged: onChanged,
+          ),
+          Text(label, style: const TextStyle(color: Colors.black)),
+        ],
+      ),
     ),
   );
 }
