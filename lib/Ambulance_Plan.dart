@@ -3,9 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:signature/signature.dart';
-
 import 'data/models/ambulance_data.dart';
-import 'l10n/app_translations.dart'; // 【新增】引入翻譯
+import 'l10n/app_translations.dart';
 
 class AmbulancePlanPage extends StatefulWidget {
   final int visitId;
@@ -16,7 +15,6 @@ class AmbulancePlanPage extends StatefulWidget {
 }
 
 class _AmbulancePlanPageState extends State<AmbulancePlanPage> {
-  // 【修改】使用固定的 Key 來管理狀態，而非顯示文字
   static const List<String> emergencyTreatmentKeys = [
     'airway',
     'trauma',
@@ -134,7 +132,6 @@ class _AmbulancePlanPageState extends State<AmbulancePlanPage> {
     );
   }
 
-  // 【新增】將 Key 映射到翻譯文字的輔助方法
   Map<String, String> _getTranslatedOptions(AppTranslations t) {
     return {
       // Emergency
@@ -178,11 +175,18 @@ class _AmbulancePlanPageState extends State<AmbulancePlanPage> {
 
   @override
   Widget build(BuildContext context) {
-    final t = AppTranslations.of(context); // 【新增】
-    final optionLabels = _getTranslatedOptions(t); // 【新增】
+    final t = AppTranslations.of(context);
+    final optionLabels = _getTranslatedOptions(t);
 
     return Consumer<AmbulanceData>(
       builder: (context, data, child) {
+        final aslTypes = (data.aslType ?? '')
+            .split(',')
+            .where((s) => s.isNotEmpty)
+            .toSet();
+        final isEttSelected = aslTypes.contains('ett');
+        final isDefibSelected = aslTypes.contains('defib');
+
         return Padding(
           padding: const EdgeInsets.all(16),
           child: Center(
@@ -307,17 +311,52 @@ class _AmbulancePlanPageState extends State<AmbulancePlanPage> {
                         children: [
                           _buildCheckboxOption(
                             t.endotrachealTube,
-                            data.aslType == 'ett',
-                            (v) => data.updatePlan(aslType: v ? 'ett' : null),
+                            isEttSelected,
+                            (v) {
+                              final newTypes = Set<String>.from(aslTypes);
+                              if (v) {
+                                newTypes.add('ett');
+                              } else {
+                                newTypes.remove('ett');
+                                _controllers['ettSizeController']!.clear();
+                                _controllers['ettDepthController']!.clear();
+                                data.updatePlan(ettSize: null, ettDepth: null);
+                              }
+                              data.updatePlan(
+                                aslType: newTypes.isEmpty
+                                    ? null
+                                    : newTypes.join(','),
+                              );
+                            },
                           ),
                           _buildCheckboxOption(
                             t.aslManualDefib,
-                            data.aslType == 'defib',
-                            (v) => data.updatePlan(aslType: v ? 'defib' : null),
+                            isDefibSelected,
+                            (v) {
+                              final newTypes = Set<String>.from(aslTypes);
+                              if (v) {
+                                newTypes.add('defib');
+                              } else {
+                                newTypes.remove('defib');
+                                _controllers['manualDefibCountController']!
+                                    .clear();
+                                _controllers['manualDefibJoulesController']!
+                                    .clear();
+                                data.updatePlan(
+                                  manualDefibCount: null,
+                                  manualDefibJoules: null,
+                                );
+                              }
+                              data.updatePlan(
+                                aslType: newTypes.isEmpty
+                                    ? null
+                                    : newTypes.join(','),
+                              );
+                            },
                           ),
                         ],
                       ),
-                      if (data.aslType == 'ett') ...[
+                      if (isEttSelected) ...[
                         const SizedBox(height: 8),
                         _buildTitleWithInput(
                           t.ettNumber,
@@ -331,7 +370,7 @@ class _AmbulancePlanPageState extends State<AmbulancePlanPage> {
                           t.enterEttDepth,
                         ),
                       ],
-                      if (data.aslType == 'defib') ...[
+                      if (isDefibSelected) ...[
                         const SizedBox(height: 8),
                         _buildTitleWithInput(
                           t.manualDefibCount,
@@ -512,7 +551,6 @@ class _AmbulancePlanPageState extends State<AmbulancePlanPage> {
     );
   }
 
-  // Helper Widgets (已更新以適應多語系)
   Widget _buildSectionTitle(String title) {
     return Text(
       title,

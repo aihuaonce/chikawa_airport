@@ -1,8 +1,9 @@
+// MedicalCertificatePage.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'data/db/daos.dart';
 import 'data/models/certificate_data.dart';
-import 'l10n/app_translations.dart'; // 【新增】引入翻譯
+import 'l10n/app_translations.dart';
 import 'nav2.dart';
 
 class MedicalCertificatePage extends StatefulWidget {
@@ -40,29 +41,22 @@ class _MedicalCertificatePageState extends State<MedicalCertificatePage>
     super.dispose();
   }
 
-  // ===============================================
-  // SavableStateMixin 介面實作
-  // ===============================================
   @override
   Future<void> saveData() async {
     if (!mounted) return;
-    final t = AppTranslations.of(context); // 【新增】
+    final t = AppTranslations.of(context);
     try {
       _syncControllersToData();
       await _saveData();
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${t.saveCertificateFailed}$e')),
-        ); // 【修改】
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('${t.saveCertificateFailed}$e')));
       }
       rethrow;
     }
   }
-
-  // ===============================================
-  // 資料處理邏輯
-  // ===============================================
 
   Future<void> _loadData() async {
     if (!mounted) return;
@@ -92,8 +86,6 @@ class _MedicalCertificatePageState extends State<MedicalCertificatePage>
   Future<void> _saveData() async {
     final dao = context.read<MedicalCertificatesDao>();
     final dataModel = context.read<CertificateData>();
-
-    // ✅ 正確做法：直接呼叫您在 dataModel 中定義好的新方法
     await dataModel.saveToDatabase(widget.visitId, dao);
   }
 
@@ -110,14 +102,10 @@ class _MedicalCertificatePageState extends State<MedicalCertificatePage>
     dataModel.englishInstruction = _englishController.text.trim();
   }
 
-  // ===============================================
-  // UI Build Method
-  // ===============================================
-
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    final t = AppTranslations.of(context); // 【新增】
+    final t = AppTranslations.of(context);
 
     if (_isLoading) {
       return const Center(child: CircularProgressIndicator());
@@ -144,15 +132,15 @@ class _MedicalCertificatePageState extends State<MedicalCertificatePage>
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildDiagnosisInput(t, dataModel), // 【修改】
+                        _buildDiagnosisInput(t, dataModel),
                         const SizedBox(height: 16),
-                        _buildRadioRow(t, dataModel), // 【修改】
+                        _buildRadioRow(t, dataModel),
                         const SizedBox(height: 16),
-                        _buildChineseInstructionInput(t, dataModel), // 【修改】
+                        _buildChineseInstructionInput(t, dataModel),
                         const SizedBox(height: 16),
-                        _buildEnglishInstructionInput(t, dataModel), // 【修改】
+                        _buildEnglishInstructionInput(t, dataModel),
                         const SizedBox(height: 16),
-                        _buildDateRow(t, dataModel), // 【修改】
+                        _buildDateRow(t, dataModel),
                       ],
                     ),
                   ),
@@ -164,10 +152,6 @@ class _MedicalCertificatePageState extends State<MedicalCertificatePage>
       },
     );
   }
-
-  // ===============================================
-  // Helper Widgets
-  // ===============================================
 
   Widget _buildLabel(String label) {
     return Padding(
@@ -204,13 +188,13 @@ class _MedicalCertificatePageState extends State<MedicalCertificatePage>
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Expanded(flex: 2, child: _buildLabel(t.diagnosisLabel)), // 【修改】
+        Expanded(flex: 2, child: _buildLabel(t.diagnosisLabel)),
         Expanded(
           flex: 8,
           child: TextField(
             controller: _diagnosisController,
             maxLines: 3,
-            decoration: _getInputDecoration(t.enterDiagnosisHint), // 【修改】
+            decoration: _getInputDecoration(t.enterDiagnosisHint),
           ),
         ),
       ],
@@ -224,18 +208,13 @@ class _MedicalCertificatePageState extends State<MedicalCertificatePage>
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Expanded(
-          flex: 2,
-          child: _buildLabel(t.chineseInstructionLabel),
-        ), // 【修改】
+        Expanded(flex: 2, child: _buildLabel(t.chineseInstructionLabel)),
         Expanded(
           flex: 8,
           child: TextField(
             controller: _chineseController,
             maxLines: 3,
-            decoration: _getInputDecoration(
-              t.enterChineseInstructionHint,
-            ), // 【修改】
+            decoration: _getInputDecoration(t.enterChineseInstructionHint),
           ),
         ),
       ],
@@ -249,18 +228,13 @@ class _MedicalCertificatePageState extends State<MedicalCertificatePage>
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Expanded(
-          flex: 2,
-          child: _buildLabel(t.englishInstructionLabel),
-        ), // 【修改】
+        Expanded(flex: 2, child: _buildLabel(t.englishInstructionLabel)),
         Expanded(
           flex: 8,
           child: TextField(
             controller: _englishController,
             maxLines: 3,
-            decoration: _getInputDecoration(
-              t.enterEnglishInstructionHint,
-            ), // 【修改】
+            decoration: _getInputDecoration(t.enterEnglishInstructionHint),
           ),
         ),
       ],
@@ -268,13 +242,42 @@ class _MedicalCertificatePageState extends State<MedicalCertificatePage>
   }
 
   Widget _buildRadioRow(AppTranslations t, CertificateData dataModel) {
+    // ✅ 輔助函式，用來更新文字和狀態
+    void updateInstructions({
+      required int option,
+      required String chineseTemplate,
+      required String englishTemplate,
+    }) {
+      dataModel.instructionOption = option;
+
+      // 1. 從 Controller 獲取診斷文字，如果為空，則使用預留位置
+      String diagnosis = _diagnosisController.text.trim();
+      if (diagnosis.isEmpty) {
+        diagnosis = t.diagnosisPlaceholder; // e.g., "[請填寫診斷]"
+      }
+
+      // 2. 使用 replaceAll 將模板中的 {diagnosis} 替換掉
+      final newChineseText = chineseTemplate.replaceAll(
+        '{diagnosis}',
+        diagnosis,
+      );
+      final newEnglishText = englishTemplate.replaceAll(
+        '{diagnosis}',
+        diagnosis,
+      );
+
+      // 3. 更新對應的文字輸入框
+      _chineseController.text = newChineseText;
+      _englishController.text = newEnglishText;
+
+      // 4. 通知 Provider 資料已更新
+      dataModel.update();
+    }
+
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Expanded(
-          flex: 2,
-          child: _buildLabel(t.defaultInstructionPhrase),
-        ), // 【修改】
+        Expanded(flex: 2, child: _buildLabel(t.defaultInstructionPhrase)),
         Expanded(
           flex: 8,
           child: Row(
@@ -284,30 +287,30 @@ class _MedicalCertificatePageState extends State<MedicalCertificatePage>
                 groupValue: dataModel.instructionOption,
                 activeColor: const Color(0xFF83ACA9),
                 onChanged: (value) {
-                  dataModel.instructionOption = value;
-                  _chineseController.text =
-                      t.fitToFlyInstructionChinese; // 【修改】
-                  _englishController.text =
-                      t.fitToFlyInstructionEnglish; // 【修改】
-                  dataModel.update();
+                  // ✅ 調用我們的新輔助函式
+                  updateInstructions(
+                    option: value!,
+                    chineseTemplate: t.fitToFlyInstructionChinese,
+                    englishTemplate: t.fitToFlyInstructionEnglish,
+                  );
                 },
               ),
-              Text(t.fitToFly), // 【修改】
+              Text(t.fitToFly),
               const SizedBox(width: 20),
               Radio<int>(
                 value: 2,
                 groupValue: dataModel.instructionOption,
                 activeColor: const Color(0xFF83ACA9),
                 onChanged: (value) {
-                  dataModel.instructionOption = value;
-                  _chineseController.text =
-                      t.referralInstructionChinese; // 【修改】
-                  _englishController.text =
-                      t.referralInstructionEnglish; // 【修改】
-                  dataModel.update();
+                  // ✅ 調用我們的新輔-助函式
+                  updateInstructions(
+                    option: value!,
+                    chineseTemplate: t.referralInstructionChinese,
+                    englishTemplate: t.referralInstructionEnglish,
+                  );
                 },
               ),
-              Text(t.referral), // 【修改】
+              Text(t.referral),
             ],
           ),
         ),
@@ -319,7 +322,7 @@ class _MedicalCertificatePageState extends State<MedicalCertificatePage>
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Expanded(flex: 2, child: _buildLabel(t.issueDateLabel)), // 【修改】
+        Expanded(flex: 2, child: _buildLabel(t.issueDateLabel)),
         Expanded(
           flex: 8,
           child: InkWell(
@@ -348,7 +351,7 @@ class _MedicalCertificatePageState extends State<MedicalCertificatePage>
                   Text(
                     dataModel.issueDate != null
                         ? "${dataModel.issueDate!.year}-${dataModel.issueDate!.month.toString().padLeft(2, '0')}-${dataModel.issueDate!.day.toString().padLeft(2, '0')}"
-                        : t.selectDate, // 【修改】
+                        : t.selectDate,
                     style: TextStyle(
                       color: dataModel.issueDate != null
                           ? Colors.black

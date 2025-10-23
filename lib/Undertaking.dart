@@ -1,11 +1,12 @@
 // lib/UndertakingPage.dart
+
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:signature/signature.dart';
 import 'data/db/daos.dart';
 import 'data/models/undertaking_data.dart';
-import 'nav2.dart'; // 為了使用 SavableStateMixin
+import 'nav2.dart';
 
 class UndertakingPage extends StatefulWidget {
   final int visitId;
@@ -23,12 +24,12 @@ class _UndertakingPageState extends State<UndertakingPage>
   bool get wantKeepAlive => true;
   bool _isLoading = true;
 
-  // 文字及簽名控制器
+  // Controllers 仍然存在於 Page 中，因為它們是 UI 元件的狀態
+  final _signerController = TextEditingController();
+  final _signerIdController = TextEditingController();
   final _relationController = TextEditingController();
   final _addressController = TextEditingController();
   final _phoneController = TextEditingController();
-  final _signerController = TextEditingController();
-  final _signerIdController = TextEditingController();
   final _signatureController = SignatureController(
     penStrokeWidth: 2,
     penColor: Colors.black,
@@ -40,16 +41,26 @@ class _UndertakingPageState extends State<UndertakingPage>
   @override
   void initState() {
     super.initState();
+    // ✅ 簡化：在 initState 中註冊 controllers 並觸發載入
+    // 使用 context.read 是因為在 initState 中我們只需要獲取一次 Provider 實例，不需要監聽
+    final dataModel = context.read<UndertakingData>();
+    dataModel.initControllers(
+      signerController: _signerController,
+      signerIdController: _signerIdController,
+      relationController: _relationController,
+      addressController: _addressController,
+      phoneController: _phoneController,
+    );
     _loadData();
   }
 
   @override
   void dispose() {
+    _signerController.dispose();
+    _signerIdController.dispose();
     _relationController.dispose();
     _addressController.dispose();
     _phoneController.dispose();
-    _signerController.dispose();
-    _signerIdController.dispose();
     _signatureController.dispose();
     super.dispose();
   }
@@ -60,8 +71,12 @@ class _UndertakingPageState extends State<UndertakingPage>
   @override
   Future<void> saveData() async {
     try {
-      _syncControllersToData();
-      await _saveData();
+      // ✅ 簡化：直接呼叫 Data Model 的儲存方法
+      await context.read<UndertakingData>().saveToDatabase(
+        widget.visitId,
+        context.read<UndertakingsDao>(),
+        context.read<VisitsDao>(),
+      );
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(
@@ -78,26 +93,16 @@ class _UndertakingPageState extends State<UndertakingPage>
 
   Future<void> _loadData() async {
     if (!mounted) return;
+    // UI 層只關心 loading 狀態
+    setState(() => _isLoading = true);
     try {
-      final dao = context.read<UndertakingsDao>();
-      final dataModel = context.read<UndertakingData>();
-      final record = await dao.getByVisitId(widget.visitId);
-
-      dataModel.clear();
-
-      if (record != null) {
-        dataModel.signerName = record.signerName;
-        dataModel.signerId = record.signerId;
-        dataModel.isSelf = record.isSelf;
-        dataModel.relation = record.relation;
-        dataModel.address = record.address;
-        dataModel.phone = record.phone;
-        dataModel.doctor = record.doctor ?? dataModel.doctor;
-        dataModel.signatureBytes = record.signatureBytes;
-      }
-
-      _syncDataToControllers(dataModel);
-      dataModel.update();
+      // ✅ 簡化：所有複雜的載入邏輯都已移至 Data Model
+      await context.read<UndertakingData>().loadDataForVisit(
+        widget.visitId,
+        undertakingDao: context.read<UndertakingsDao>(),
+        visitsDao: context.read<VisitsDao>(),
+        profileDao: context.read<PatientProfilesDao>(),
+      );
     } catch (e) {
       // Handle error
     } finally {
@@ -105,37 +110,9 @@ class _UndertakingPageState extends State<UndertakingPage>
     }
   }
 
-  Future<void> _saveData() async {
-    // 1. 取得所有需要的 DAO 和 Data Model
-    final undertakingDao = context.read<UndertakingsDao>();
-    final visitsDao = context.read<VisitsDao>();
-    final dataModel = context.read<UndertakingData>();
-
-    // 2. ✅ 正確做法：一行程式碼，呼叫您在 UndertakingData 中完美封裝好的方法
-    await dataModel.saveToDatabase(widget.visitId, undertakingDao, visitsDao);
-  }
-
-  void _syncDataToControllers(UndertakingData dataModel) {
-    _signerController.text = dataModel.signerName ?? '';
-    _signerIdController.text = dataModel.signerId ?? '';
-    _relationController.text = dataModel.relation ?? '';
-    _addressController.text = dataModel.address ?? '';
-    _phoneController.text = dataModel.phone ?? '';
-  }
-
-  void _syncControllersToData() {
-    final dataModel = context.read<UndertakingData>();
-    dataModel.signerName = _signerController.text.trim();
-    dataModel.signerId = _signerIdController.text.trim();
-    dataModel.relation = _relationController.text.trim();
-    dataModel.address = _addressController.text.trim();
-    dataModel.phone = _phoneController.text.trim();
-  }
-
   // ===============================================
-  // UI Build Method
+  // UI Build Method (幾乎不變，但邏輯更清晰)
   // ===============================================
-
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -148,17 +125,13 @@ class _UndertakingPageState extends State<UndertakingPage>
         return Container(
           color: const Color(0xFFE6F6FB),
           padding: const EdgeInsets.all(16.0),
-          // ** 錯誤修正 **：將 Row 替換為 LayoutBuilder，以便在不同寬度下有不同佈局
           child: Center(
             child: LayoutBuilder(
               builder: (context, constraints) {
-                // 如果寬度足夠，使用左右佈局
                 if (constraints.maxWidth > 800) {
                   return IntrinsicHeight(
-                    // <- 新增：讓 Row 內左右卡片高度一致
                     child: Row(
-                      crossAxisAlignment:
-                          CrossAxisAlignment.stretch, // <- 修改：左右卡片拉伸對齊高度
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         _buildEnglishSide(dataModel, today),
                         const SizedBox(width: 16),
@@ -166,9 +139,7 @@ class _UndertakingPageState extends State<UndertakingPage>
                       ],
                     ),
                   );
-                }
-                // 如果寬度不足，使用上下佈局並允許滾動
-                else {
+                } else {
                   return SingleChildScrollView(
                     child: Column(
                       children: [
@@ -187,10 +158,74 @@ class _UndertakingPageState extends State<UndertakingPage>
     );
   }
 
-  // ===============================================
-  // Helper Widgets
-  // ===============================================
+  Widget _buildChineseSide(UndertakingData dataModel, String today) {
+    return Expanded(
+      child: Card(
+        color: Colors.white,
+        elevation: 8,
+        shadowColor: Colors.black26,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // 這些預覽文字現在會因為 Controller 的 listener 而即時更新
+                Text("本人： ${dataModel.signerName ?? ""}"),
+                const SizedBox(height: 8),
+                Text("身分證字號： ${dataModel.signerId ?? ""}"),
+                Text("$today 於桃園國際機場接受聯新國際醫院桃園國際機場醫療中心醫師"),
+                SizedBox(
+                  width: 100,
+                  child: DropdownButton<String>(
+                    value: dataModel.doctor,
+                    isExpanded: true,
+                    items: dataModel.doctorList
+                        .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                        .toList(),
+                    onChanged: (val) {
+                      if (val != null) {
+                        dataModel.doctor = val;
+                        dataModel.update();
+                      }
+                    },
+                  ),
+                ),
+                const SizedBox(height: 12),
+                const Text(
+                  "診視，醫師建議轉診至醫院繼續治療，但本人因個人因素拒絕醫師「繼續治療」之建議，致生一切後果願自行負責，與聯新國際醫院桃園國際機場醫療中心無涉。",
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    const Text("是否為本人？"),
+                    Checkbox(
+                      value: dataModel.isSelf,
+                      // ✅ 簡化：直接呼叫 Data Model 的方法
+                      onChanged: (val) => dataModel.toggleIsSelf(val ?? false),
+                    ),
+                  ],
+                ),
+                _buildInfoRow("立切結書人姓名：", _signerController, "請輸入姓名"),
+                _buildInfoRow("立切結書人身分證字號：", _signerIdController, "請輸入身分證字號"),
+                _buildInfoRow(
+                  "立切結書人與病患關係：",
+                  _relationController,
+                  "例如：本人、父母、配偶",
+                ),
+                _buildInfoRow("立切結書人地址：", _addressController, "請輸入地址"),
+                _buildInfoRow("立切結書人電話：", _phoneController, "請輸入聯絡電話"),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 
+  // ... 其他 UI Helper Widgets (_buildEnglishSide, _buildSignatureArea, etc.) 保持不變 ...
+  // (此處省略未變動的 UI 程式碼以節省篇幅)
   Widget _buildEnglishSide(UndertakingData dataModel, String today) {
     return Expanded(
       child: Card(
@@ -224,13 +259,7 @@ class _UndertakingPageState extends State<UndertakingPage>
                     const Text("Date: "),
                     TextButton(
                       onPressed: () => _selectDate(context),
-                      child: Text(
-                        today,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          decoration: TextDecoration.underline,
-                        ),
-                      ),
+                      child: Text(today, style: const TextStyle(fontSize: 14)),
                     ),
                   ],
                 ),
@@ -245,6 +274,7 @@ class _UndertakingPageState extends State<UndertakingPage>
   Widget _buildSignatureArea(UndertakingData dataModel) {
     if (dataModel.signatureBytes != null &&
         dataModel.signatureBytes!.isNotEmpty) {
+      // 為了避免每次重建都重設簽名板，這裡直接使用已儲存的圖片
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -312,88 +342,6 @@ class _UndertakingPageState extends State<UndertakingPage>
         ],
       );
     }
-  }
-
-  Widget _buildChineseSide(UndertakingData dataModel, String today) {
-    _signerController.removeListener(() {});
-    _signerController.addListener(() {
-      dataModel.signerName = _signerController.text;
-      dataModel.update();
-    });
-
-    _signerIdController.removeListener(() {});
-    _signerIdController.addListener(() {
-      dataModel.signerId = _signerIdController.text;
-      dataModel.update();
-    });
-
-    return Expanded(
-      child: Card(
-        color: Colors.white,
-        elevation: 8, // 陰影
-        shadowColor: Colors.black26, // 陰影顏色
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text("本人： ${dataModel.signerName ?? ""}"),
-                const SizedBox(height: 8),
-                Text("身分證字號： ${dataModel.signerId ?? ""}"),
-                Text("$today 於桃園國際機場接受聯新國際醫院桃園國際機場醫療中心醫師"),
-                SizedBox(
-                  width: 100, // 設定下拉選單的寬度
-                  child: DropdownButton<String>(
-                    value: dataModel.doctor,
-                    isExpanded: true, // 保持文字完整顯示
-                    items: dataModel.doctorList
-                        .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                        .toList(),
-                    onChanged: (val) {
-                      if (val != null) {
-                        dataModel.doctor = val;
-                        dataModel.update();
-                      }
-                    },
-                  ),
-                ),
-                const SizedBox(height: 12),
-                const Text(
-                  "診視，醫師建議轉診至醫院繼續治療，但本人因個人因素拒絕醫師「繼續治療」之建議，致生一切後果願自行負責，與聯新國際醫院桃園國際機場醫療中心無涉。",
-                ),
-                const SizedBox(height: 16),
-                Row(
-                  children: [
-                    const Text("是否為本人？"),
-                    Checkbox(
-                      value: dataModel.isSelf,
-                      onChanged: (val) {
-                        dataModel.isSelf = val ?? false;
-                        if (dataModel.isSelf) {
-                          _relationController.text = "本人";
-                        }
-                        dataModel.update();
-                      },
-                    ),
-                  ],
-                ),
-                _buildInfoRow("立切結書人姓名：", _signerController, "請輸入姓名"),
-                _buildInfoRow("立切結書人身分證字號：", _signerIdController, "請輸入身分證字號"),
-                _buildInfoRow(
-                  "立切結書人與病患關係：",
-                  _relationController,
-                  "例如：本人、父母、配偶",
-                ),
-                _buildInfoRow("立切結書人地址：", _addressController, "請輸入地址"),
-                _buildInfoRow("立切結書人電話：", _phoneController, "請輸入聯絡電話"),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
   }
 
   Widget _buildInfoRow(

@@ -101,6 +101,8 @@ class _ReferralFormPageState extends State<ReferralFormPage>
   final TextEditingController subDiagnosis2Ctrl = TextEditingController();
   final TextEditingController furtherExamCtrl = TextEditingController();
   final TextEditingController otherPurposeCtrl = TextEditingController();
+  final TextEditingController handoverNotesCtrl =
+      TextEditingController(); // ✅ 新增
   final TextEditingController otherDoctorCtrl = TextEditingController();
   final TextEditingController otherDeptCtrl = TextEditingController();
   final TextEditingController appointmentDeptCtrl = TextEditingController();
@@ -129,6 +131,7 @@ class _ReferralFormPageState extends State<ReferralFormPage>
     subDiagnosis2Ctrl.dispose();
     furtherExamCtrl.dispose();
     otherPurposeCtrl.dispose();
+    handoverNotesCtrl.dispose(); // ✅ 新增
     otherDoctorCtrl.dispose();
     otherDeptCtrl.dispose();
     appointmentDeptCtrl.dispose();
@@ -166,6 +169,7 @@ class _ReferralFormPageState extends State<ReferralFormPage>
         referralData.referralPurposeIdx = record.referralPurposeIdx;
         referralData.furtherExamDetail = record.furtherExamDetail;
         referralData.otherPurposeDetail = record.otherPurposeDetail;
+        referralData.handoverNotes = record.handoverNotes; // ✅ 新增
         referralData.doctorIdx = record.doctorIdx;
         referralData.otherDoctorName = record.otherDoctorName;
         referralData.deptIdx = record.deptIdx;
@@ -218,6 +222,7 @@ class _ReferralFormPageState extends State<ReferralFormPage>
     subDiagnosis2Ctrl.text = data.subDiagnosis2 ?? '';
     furtherExamCtrl.text = data.furtherExamDetail ?? '';
     otherPurposeCtrl.text = data.otherPurposeDetail ?? '';
+    handoverNotesCtrl.text = data.handoverNotes ?? ''; // ✅ 新增
     otherDoctorCtrl.text = data.otherDoctorName ?? '';
     otherDeptCtrl.text = data.otherDeptName ?? '';
     appointmentDeptCtrl.text = data.appointmentDept ?? '';
@@ -258,6 +263,9 @@ class _ReferralFormPageState extends State<ReferralFormPage>
     data.otherPurposeDetail = otherPurposeCtrl.text.trim().isEmpty
         ? null
         : otherPurposeCtrl.text.trim();
+    data.handoverNotes = handoverNotesCtrl.text.trim().isEmpty
+        ? null
+        : handoverNotesCtrl.text.trim(); // ✅ 新增
     data.otherDoctorName = otherDoctorCtrl.text.trim().isEmpty
         ? null
         : otherDoctorCtrl.text.trim();
@@ -300,7 +308,6 @@ class _ReferralFormPageState extends State<ReferralFormPage>
       final visitsDao = context.read<VisitsDao>();
       final referralData = context.read<ReferralData>();
 
-      // 2. ✅ 正確做法：一行程式碼，呼叫您在 ReferralData 中完美封裝好的方法
       await referralData.saveToDatabase(widget.visitId, referralDao, visitsDao);
     } catch (e) {
       rethrow;
@@ -451,6 +458,10 @@ class _ReferralFormPageState extends State<ReferralFormPage>
                       Expanded(child: _buildRightCard(t, data)),
                     ],
                   ),
+
+                  // ✅ 新增：醫師交班注意事項（獨立卡片）
+                  const SizedBox(height: 16),
+                  _buildHandoverNotesCard(t, data),
 
                   const Divider(thickness: 1, height: 32),
 
@@ -760,6 +771,44 @@ class _ReferralFormPageState extends State<ReferralFormPage>
       ),
     ),
   );
+
+  Widget _buildHandoverNotesCard(AppTranslations t, ReferralData data) {
+    return Card(
+      color: Colors.white,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              t.isZh
+                  ? "醫師交班注意事項\n(生命徵象會自動帶入轉診單)"
+                  : "Physician Handover Notes\n(Vital signs are automatically pre-filled in the referral form.)",
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: handoverNotesCtrl,
+              maxLines: 5, // 允許多行輸入
+              decoration: InputDecoration(
+                hintText: t.isZh
+                    ? "請填寫交班注意事項..."
+                    : "Please enter handover notes...",
+                border: const OutlineInputBorder(),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 10,
+                ),
+              ),
+              onChanged: (_) =>
+                  _syncControllersToData(), // 當文字改變時，同步資料到 ReferralData
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   Widget _buildLeftCard4(AppTranslations t, ReferralData data) => Card(
     color: Colors.white,

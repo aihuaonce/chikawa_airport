@@ -25,6 +25,8 @@ class ReferralData extends ChangeNotifier {
   String? furtherExamDetail;
   String? otherPurposeDetail;
 
+  String? handoverNotes;
+
   // 診治醫生資訊
   int? doctorIdx;
   String? otherDoctorName;
@@ -64,6 +66,7 @@ class ReferralData extends ChangeNotifier {
     referralPurposeIdx = null;
     furtherExamDetail = null;
     otherPurposeDetail = null;
+    handoverNotes = null;
     doctorIdx = null;
     otherDoctorName = null;
     deptIdx = null;
@@ -101,6 +104,7 @@ class ReferralData extends ChangeNotifier {
       referralPurposeIdx: Value(referralPurposeIdx),
       furtherExamDetail: Value(furtherExamDetail),
       otherPurposeDetail: Value(otherPurposeDetail),
+      handoverNotes: Value(handoverNotes),
       doctorIdx: Value(doctorIdx),
       otherDoctorName: Value(otherDoctorName),
       deptIdx: Value(deptIdx),
