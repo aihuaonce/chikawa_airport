@@ -259,13 +259,7 @@ class _UndertakingPageState extends State<UndertakingPage>
                     const Text("Date: "),
                     TextButton(
                       onPressed: () => _selectDate(context),
-                      child: Text(
-                        today,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          decoration: TextDecoration.underline,
-                        ),
-                      ),
+                      child: Text(today, style: const TextStyle(fontSize: 14)),
                     ),
                   ],
                 ),
