@@ -12022,6 +12022,17 @@ class $ReferralFormsTable extends ReferralForms
         type: DriftSqlType.string,
         requiredDuringInsert: false,
       );
+  static const VerificationMeta _handoverNotesMeta = const VerificationMeta(
+    'handoverNotes',
+  );
+  @override
+  late final GeneratedColumn<String> handoverNotes = GeneratedColumn<String>(
+    'handover_notes',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _doctorIdxMeta = const VerificationMeta(
     'doctorIdx',
   );
@@ -12277,6 +12288,7 @@ class $ReferralFormsTable extends ReferralForms
     referralPurposeIdx,
     furtherExamDetail,
     otherPurposeDetail,
+    handoverNotes,
     doctorIdx,
     otherDoctorName,
     deptIdx,
@@ -12418,6 +12430,15 @@ class $ReferralFormsTable extends ReferralForms
         otherPurposeDetail.isAcceptableOrUnknown(
           data['other_purpose_detail']!,
           _otherPurposeDetailMeta,
+        ),
+      );
+    }
+    if (data.containsKey('handover_notes')) {
+      context.handle(
+        _handoverNotesMeta,
+        handoverNotes.isAcceptableOrUnknown(
+          data['handover_notes']!,
+          _handoverNotesMeta,
         ),
       );
     }
@@ -12656,6 +12677,10 @@ class $ReferralFormsTable extends ReferralForms
         DriftSqlType.string,
         data['${effectivePrefix}other_purpose_detail'],
       ),
+      handoverNotes: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}handover_notes'],
+      ),
       doctorIdx: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}doctor_idx'],
@@ -12763,6 +12788,7 @@ class ReferralForm extends DataClass implements Insertable<ReferralForm> {
   final int? referralPurposeIdx;
   final String? furtherExamDetail;
   final String? otherPurposeDetail;
+  final String? handoverNotes;
   final int? doctorIdx;
   final String? otherDoctorName;
   final int? deptIdx;
@@ -12798,6 +12824,7 @@ class ReferralForm extends DataClass implements Insertable<ReferralForm> {
     this.referralPurposeIdx,
     this.furtherExamDetail,
     this.otherPurposeDetail,
+    this.handoverNotes,
     this.doctorIdx,
     this.otherDoctorName,
     this.deptIdx,
@@ -12857,6 +12884,9 @@ class ReferralForm extends DataClass implements Insertable<ReferralForm> {
     }
     if (!nullToAbsent || otherPurposeDetail != null) {
       map['other_purpose_detail'] = Variable<String>(otherPurposeDetail);
+    }
+    if (!nullToAbsent || handoverNotes != null) {
+      map['handover_notes'] = Variable<String>(handoverNotes);
     }
     if (!nullToAbsent || doctorIdx != null) {
       map['doctor_idx'] = Variable<int>(doctorIdx);
@@ -12957,6 +12987,9 @@ class ReferralForm extends DataClass implements Insertable<ReferralForm> {
       otherPurposeDetail: otherPurposeDetail == null && nullToAbsent
           ? const Value.absent()
           : Value(otherPurposeDetail),
+      handoverNotes: handoverNotes == null && nullToAbsent
+          ? const Value.absent()
+          : Value(handoverNotes),
       doctorIdx: doctorIdx == null && nullToAbsent
           ? const Value.absent()
           : Value(doctorIdx),
@@ -13044,6 +13077,7 @@ class ReferralForm extends DataClass implements Insertable<ReferralForm> {
       otherPurposeDetail: serializer.fromJson<String?>(
         json['otherPurposeDetail'],
       ),
+      handoverNotes: serializer.fromJson<String?>(json['handoverNotes']),
       doctorIdx: serializer.fromJson<int?>(json['doctorIdx']),
       otherDoctorName: serializer.fromJson<String?>(json['otherDoctorName']),
       deptIdx: serializer.fromJson<int?>(json['deptIdx']),
@@ -13096,6 +13130,7 @@ class ReferralForm extends DataClass implements Insertable<ReferralForm> {
       'referralPurposeIdx': serializer.toJson<int?>(referralPurposeIdx),
       'furtherExamDetail': serializer.toJson<String?>(furtherExamDetail),
       'otherPurposeDetail': serializer.toJson<String?>(otherPurposeDetail),
+      'handoverNotes': serializer.toJson<String?>(handoverNotes),
       'doctorIdx': serializer.toJson<int?>(doctorIdx),
       'otherDoctorName': serializer.toJson<String?>(otherDoctorName),
       'deptIdx': serializer.toJson<int?>(deptIdx),
@@ -13134,6 +13169,7 @@ class ReferralForm extends DataClass implements Insertable<ReferralForm> {
     Value<int?> referralPurposeIdx = const Value.absent(),
     Value<String?> furtherExamDetail = const Value.absent(),
     Value<String?> otherPurposeDetail = const Value.absent(),
+    Value<String?> handoverNotes = const Value.absent(),
     Value<int?> doctorIdx = const Value.absent(),
     Value<String?> otherDoctorName = const Value.absent(),
     Value<int?> deptIdx = const Value.absent(),
@@ -13185,6 +13221,9 @@ class ReferralForm extends DataClass implements Insertable<ReferralForm> {
     otherPurposeDetail: otherPurposeDetail.present
         ? otherPurposeDetail.value
         : this.otherPurposeDetail,
+    handoverNotes: handoverNotes.present
+        ? handoverNotes.value
+        : this.handoverNotes,
     doctorIdx: doctorIdx.present ? doctorIdx.value : this.doctorIdx,
     otherDoctorName: otherDoctorName.present
         ? otherDoctorName.value
@@ -13276,6 +13315,9 @@ class ReferralForm extends DataClass implements Insertable<ReferralForm> {
       otherPurposeDetail: data.otherPurposeDetail.present
           ? data.otherPurposeDetail.value
           : this.otherPurposeDetail,
+      handoverNotes: data.handoverNotes.present
+          ? data.handoverNotes.value
+          : this.handoverNotes,
       doctorIdx: data.doctorIdx.present ? data.doctorIdx.value : this.doctorIdx,
       otherDoctorName: data.otherDoctorName.present
           ? data.otherDoctorName.value
@@ -13348,6 +13390,7 @@ class ReferralForm extends DataClass implements Insertable<ReferralForm> {
           ..write('referralPurposeIdx: $referralPurposeIdx, ')
           ..write('furtherExamDetail: $furtherExamDetail, ')
           ..write('otherPurposeDetail: $otherPurposeDetail, ')
+          ..write('handoverNotes: $handoverNotes, ')
           ..write('doctorIdx: $doctorIdx, ')
           ..write('otherDoctorName: $otherDoctorName, ')
           ..write('deptIdx: $deptIdx, ')
@@ -13388,6 +13431,7 @@ class ReferralForm extends DataClass implements Insertable<ReferralForm> {
     referralPurposeIdx,
     furtherExamDetail,
     otherPurposeDetail,
+    handoverNotes,
     doctorIdx,
     otherDoctorName,
     deptIdx,
@@ -13427,6 +13471,7 @@ class ReferralForm extends DataClass implements Insertable<ReferralForm> {
           other.referralPurposeIdx == this.referralPurposeIdx &&
           other.furtherExamDetail == this.furtherExamDetail &&
           other.otherPurposeDetail == this.otherPurposeDetail &&
+          other.handoverNotes == this.handoverNotes &&
           other.doctorIdx == this.doctorIdx &&
           other.otherDoctorName == this.otherDoctorName &&
           other.deptIdx == this.deptIdx &&
@@ -13470,6 +13515,7 @@ class ReferralFormsCompanion extends UpdateCompanion<ReferralForm> {
   final Value<int?> referralPurposeIdx;
   final Value<String?> furtherExamDetail;
   final Value<String?> otherPurposeDetail;
+  final Value<String?> handoverNotes;
   final Value<int?> doctorIdx;
   final Value<String?> otherDoctorName;
   final Value<int?> deptIdx;
@@ -13505,6 +13551,7 @@ class ReferralFormsCompanion extends UpdateCompanion<ReferralForm> {
     this.referralPurposeIdx = const Value.absent(),
     this.furtherExamDetail = const Value.absent(),
     this.otherPurposeDetail = const Value.absent(),
+    this.handoverNotes = const Value.absent(),
     this.doctorIdx = const Value.absent(),
     this.otherDoctorName = const Value.absent(),
     this.deptIdx = const Value.absent(),
@@ -13541,6 +13588,7 @@ class ReferralFormsCompanion extends UpdateCompanion<ReferralForm> {
     this.referralPurposeIdx = const Value.absent(),
     this.furtherExamDetail = const Value.absent(),
     this.otherPurposeDetail = const Value.absent(),
+    this.handoverNotes = const Value.absent(),
     this.doctorIdx = const Value.absent(),
     this.otherDoctorName = const Value.absent(),
     this.deptIdx = const Value.absent(),
@@ -13577,6 +13625,7 @@ class ReferralFormsCompanion extends UpdateCompanion<ReferralForm> {
     Expression<int>? referralPurposeIdx,
     Expression<String>? furtherExamDetail,
     Expression<String>? otherPurposeDetail,
+    Expression<String>? handoverNotes,
     Expression<int>? doctorIdx,
     Expression<String>? otherDoctorName,
     Expression<int>? deptIdx,
@@ -13616,6 +13665,7 @@ class ReferralFormsCompanion extends UpdateCompanion<ReferralForm> {
       if (furtherExamDetail != null) 'further_exam_detail': furtherExamDetail,
       if (otherPurposeDetail != null)
         'other_purpose_detail': otherPurposeDetail,
+      if (handoverNotes != null) 'handover_notes': handoverNotes,
       if (doctorIdx != null) 'doctor_idx': doctorIdx,
       if (otherDoctorName != null) 'other_doctor_name': otherDoctorName,
       if (deptIdx != null) 'dept_idx': deptIdx,
@@ -13656,6 +13706,7 @@ class ReferralFormsCompanion extends UpdateCompanion<ReferralForm> {
     Value<int?>? referralPurposeIdx,
     Value<String?>? furtherExamDetail,
     Value<String?>? otherPurposeDetail,
+    Value<String?>? handoverNotes,
     Value<int?>? doctorIdx,
     Value<String?>? otherDoctorName,
     Value<int?>? deptIdx,
@@ -13692,6 +13743,7 @@ class ReferralFormsCompanion extends UpdateCompanion<ReferralForm> {
       referralPurposeIdx: referralPurposeIdx ?? this.referralPurposeIdx,
       furtherExamDetail: furtherExamDetail ?? this.furtherExamDetail,
       otherPurposeDetail: otherPurposeDetail ?? this.otherPurposeDetail,
+      handoverNotes: handoverNotes ?? this.handoverNotes,
       doctorIdx: doctorIdx ?? this.doctorIdx,
       otherDoctorName: otherDoctorName ?? this.otherDoctorName,
       deptIdx: deptIdx ?? this.deptIdx,
@@ -13759,6 +13811,9 @@ class ReferralFormsCompanion extends UpdateCompanion<ReferralForm> {
     }
     if (otherPurposeDetail.present) {
       map['other_purpose_detail'] = Variable<String>(otherPurposeDetail.value);
+    }
+    if (handoverNotes.present) {
+      map['handover_notes'] = Variable<String>(handoverNotes.value);
     }
     if (doctorIdx.present) {
       map['doctor_idx'] = Variable<int>(doctorIdx.value);
@@ -13844,6 +13899,7 @@ class ReferralFormsCompanion extends UpdateCompanion<ReferralForm> {
           ..write('referralPurposeIdx: $referralPurposeIdx, ')
           ..write('furtherExamDetail: $furtherExamDetail, ')
           ..write('otherPurposeDetail: $otherPurposeDetail, ')
+          ..write('handoverNotes: $handoverNotes, ')
           ..write('doctorIdx: $doctorIdx, ')
           ..write('otherDoctorName: $otherDoctorName, ')
           ..write('deptIdx: $deptIdx, ')
@@ -29381,6 +29437,7 @@ typedef $$ReferralFormsTableCreateCompanionBuilder =
       Value<int?> referralPurposeIdx,
       Value<String?> furtherExamDetail,
       Value<String?> otherPurposeDetail,
+      Value<String?> handoverNotes,
       Value<int?> doctorIdx,
       Value<String?> otherDoctorName,
       Value<int?> deptIdx,
@@ -29418,6 +29475,7 @@ typedef $$ReferralFormsTableUpdateCompanionBuilder =
       Value<int?> referralPurposeIdx,
       Value<String?> furtherExamDetail,
       Value<String?> otherPurposeDetail,
+      Value<String?> handoverNotes,
       Value<int?> doctorIdx,
       Value<String?> otherDoctorName,
       Value<int?> deptIdx,
@@ -29512,6 +29570,11 @@ class $$ReferralFormsTableFilterComposer
 
   ColumnFilters<String> get otherPurposeDetail => $composableBuilder(
     column: $table.otherPurposeDetail,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get handoverNotes => $composableBuilder(
+    column: $table.handoverNotes,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -29695,6 +29758,11 @@ class $$ReferralFormsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get handoverNotes => $composableBuilder(
+    column: $table.handoverNotes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<int> get doctorIdx => $composableBuilder(
     column: $table.doctorIdx,
     builder: (column) => ColumnOrderings(column),
@@ -29871,6 +29939,11 @@ class $$ReferralFormsTableAnnotationComposer
     builder: (column) => column,
   );
 
+  GeneratedColumn<String> get handoverNotes => $composableBuilder(
+    column: $table.handoverNotes,
+    builder: (column) => column,
+  );
+
   GeneratedColumn<int> get doctorIdx =>
       $composableBuilder(column: $table.doctorIdx, builder: (column) => column);
 
@@ -30011,6 +30084,7 @@ class $$ReferralFormsTableTableManager
                 Value<int?> referralPurposeIdx = const Value.absent(),
                 Value<String?> furtherExamDetail = const Value.absent(),
                 Value<String?> otherPurposeDetail = const Value.absent(),
+                Value<String?> handoverNotes = const Value.absent(),
                 Value<int?> doctorIdx = const Value.absent(),
                 Value<String?> otherDoctorName = const Value.absent(),
                 Value<int?> deptIdx = const Value.absent(),
@@ -30046,6 +30120,7 @@ class $$ReferralFormsTableTableManager
                 referralPurposeIdx: referralPurposeIdx,
                 furtherExamDetail: furtherExamDetail,
                 otherPurposeDetail: otherPurposeDetail,
+                handoverNotes: handoverNotes,
                 doctorIdx: doctorIdx,
                 otherDoctorName: otherDoctorName,
                 deptIdx: deptIdx,
@@ -30083,6 +30158,7 @@ class $$ReferralFormsTableTableManager
                 Value<int?> referralPurposeIdx = const Value.absent(),
                 Value<String?> furtherExamDetail = const Value.absent(),
                 Value<String?> otherPurposeDetail = const Value.absent(),
+                Value<String?> handoverNotes = const Value.absent(),
                 Value<int?> doctorIdx = const Value.absent(),
                 Value<String?> otherDoctorName = const Value.absent(),
                 Value<int?> deptIdx = const Value.absent(),
@@ -30118,6 +30194,7 @@ class $$ReferralFormsTableTableManager
                 referralPurposeIdx: referralPurposeIdx,
                 furtherExamDetail: furtherExamDetail,
                 otherPurposeDetail: otherPurposeDetail,
+                handoverNotes: handoverNotes,
                 doctorIdx: doctorIdx,
                 otherDoctorName: otherDoctorName,
                 deptIdx: deptIdx,

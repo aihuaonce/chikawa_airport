@@ -387,6 +387,8 @@ class ReferralForms extends Table {
   TextColumn get furtherExamDetail => text().nullable()();
   TextColumn get otherPurposeDetail => text().nullable()();
 
+  TextColumn get handoverNotes => text().nullable()();
+
   // 診治醫生資訊
   IntColumn get doctorIdx => integer().nullable()();
   TextColumn get otherDoctorName => text().nullable()();

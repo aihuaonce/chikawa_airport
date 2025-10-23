@@ -254,7 +254,8 @@ class AmbulanceData extends ChangeNotifier {
     if (airwayOther != null) this.airwayOther = airwayOther;
     if (otherEmergencyOther != null)
       this.otherEmergencyOther = otherEmergencyOther;
-    if (aslType != null) this.aslType = aslType;
+    // 允許設定為 null 或空字串
+    this.aslType = (aslType == null || aslType.isEmpty) ? null : aslType;
     if (ettSize != null) this.ettSize = ettSize;
     if (ettDepth != null) this.ettDepth = ettDepth;
     if (manualDefibCount != null) this.manualDefibCount = manualDefibCount;
