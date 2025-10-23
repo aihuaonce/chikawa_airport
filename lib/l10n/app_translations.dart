@@ -984,15 +984,18 @@ class AppTranslations {
       isZh ? '請輸入英文囑言' : 'Please enter English instructions';
   String get issueDateLabel => isZh ? '開立日期' : 'Issue Date';
 
-  // Pre-filled instruction texts
+  // Pre-filled instruction texts with a placeholder
   String get fitToFlyInstructionChinese =>
-      "病人於今日因上述False原因，接受本機場醫療中心緊急醫療出診，目前生命徵象穩定適宜飛行。(以下空白)";
+      "病人於今日因上述{diagnosis}原因，接受本機場醫療中心緊急醫療出診，目前生命徵象穩定適宜飛行。(以下空白)";
   String get fitToFlyInstructionEnglish =>
-      "Due to above reasons, the patient received an outreach emergency medical. He/She is fit to fly.(Blank Below)";
+      "Due to above {diagnosis} reasons, the patient received an outreach emergency medical. He/She is fit to fly.(Blank Below)";
   String get referralInstructionChinese =>
-      "病人於今日因上述False原因，接受本醫療中心緊急醫療出診，建議轉診至醫院進行進一步檢查及治療。(以下空白)";
+      "病人於今日因上述{diagnosis}原因，接受本醫療中心緊急醫療出診，建議轉診至醫院進行進一步檢查及治療。(以下空白)";
   String get referralInstructionEnglish =>
-      "Due to above reasons, the patient received an outreach emergency medical. It is suggested to transfer to hospital for further evaluation and management.(Blank Below)";
+      "Due to above {diagnosis} reasons, the patient received an outreach emergency medical. It is suggested to transfer to hospital for further evaluation and management.(Blank Below)";
+
+  // 【新增】一個當診斷為空時的預留位置文字
+  String get diagnosisPlaceholder => "[請填寫診斷]";
 
   // ========== Medical Expenses Page (醫療費用頁面) ==========
   String get saveMedicalFeeFailed =>
