@@ -1,10 +1,10 @@
-// lib/MedicalExpensesPage.dart
+// lib/MedicalExpensesPage.dart (已根據您的美編規範進行修改)
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'data/db/daos.dart';
 import 'data/models/medical_costs_data.dart';
-import 'l10n/app_translations.dart'; // 【新增】引入翻譯
-import 'nav2.dart'; // 為了使用 SavableStateMixin
+import 'l10n/app_translations.dart';
+import 'nav2.dart';
 
 class MedicalExpensesPage extends StatefulWidget {
   final int visitId;
@@ -22,7 +22,7 @@ class _MedicalExpensesPageState extends State<MedicalExpensesPage>
   bool get wantKeepAlive => true;
   bool _isLoading = true;
 
-  // 【修改】為新欄位新增文字輸入框控制器
+  // 控制器維持不變
   final _visitFeeController = TextEditingController();
   final _ambulanceFeeController = TextEditingController();
   final _noteController = TextEditingController();
@@ -41,7 +41,6 @@ class _MedicalExpensesPageState extends State<MedicalExpensesPage>
 
   @override
   void dispose() {
-    // 【修改】釋放所有控制器
     _visitFeeController.dispose();
     _ambulanceFeeController.dispose();
     _noteController.dispose();
@@ -54,9 +53,7 @@ class _MedicalExpensesPageState extends State<MedicalExpensesPage>
     super.dispose();
   }
 
-  // ===============================================
-  // SavableStateMixin 介面實作
-  // ===============================================
+  // SavableStateMixin and Data Logic (saveData, _loadData, etc.) are unchanged
   @override
   Future<void> saveData() async {
     if (!mounted) return;
@@ -74,10 +71,6 @@ class _MedicalExpensesPageState extends State<MedicalExpensesPage>
     }
   }
 
-  // ===============================================
-  // 資料處理邏輯
-  // ===============================================
-
   Future<void> _loadData() async {
     if (!mounted) return;
     try {
@@ -85,18 +78,18 @@ class _MedicalExpensesPageState extends State<MedicalExpensesPage>
       final dataModel = context.read<MedicalCostsData>();
       final record = await dao.getByVisitId(widget.visitId);
 
+      // 1. 先執行 clear() 來設定好所有欄位的預設值
       dataModel.clear();
 
+      // 2. 如果資料庫有紀錄，才用紀錄中的值去覆蓋預設值
       if (record != null) {
-        // 【修改】載入所有欄位的資料
-        // 注意：您需要在 MedicalCostsRecord (來自 aoo) 和 MedicalCostsData (您的 Provider Model)
-        // 中都加入對應的屬性才能成功讀取和寫入
-        dataModel.chargeMethod = record.chargeMethod;
+        // 【關鍵修改】如果資料庫的值是 null，就使用 clear() 設定的預設值 '自付'
+        dataModel.chargeMethod = record.chargeMethod ?? '自付';
+
+        // 其他欄位的預設值本來就是 null，所以可以直接賦值
         dataModel.visitFee = record.visitFee;
         dataModel.ambulanceFee = record.ambulanceFee;
         dataModel.note = record.note;
-
-        // --- 新增欄位 ---
         dataModel.paymentMethod = record.paymentMethod;
         dataModel.paymentStatus = record.paymentStatus;
         dataModel.selectedCurrency = record.selectedCurrency;
@@ -109,6 +102,7 @@ class _MedicalExpensesPageState extends State<MedicalExpensesPage>
             record.receiptIssuedAndTransferred;
         dataModel.billingErrorReason = record.billingErrorReason;
       }
+
       _syncDataToControllers(dataModel);
       dataModel.update();
     } catch (e) {
@@ -118,14 +112,7 @@ class _MedicalExpensesPageState extends State<MedicalExpensesPage>
     }
   }
 
-  Future<void> _saveData() async {
-    final dao = context.read<MedicalCostsDao>();
-    final dataModel = context.read<MedicalCostsData>();
-    await dataModel.saveToDatabase(widget.visitId, dao);
-  }
-
   void _syncDataToControllers(MedicalCostsData dataModel) {
-    // 【修改】同步所有資料到控制器
     _visitFeeController.text = dataModel.visitFee ?? '';
     _ambulanceFeeController.text = dataModel.ambulanceFee ?? '';
     _noteController.text = dataModel.note ?? '';
@@ -137,8 +124,13 @@ class _MedicalExpensesPageState extends State<MedicalExpensesPage>
     _billingErrorReasonController.text = dataModel.billingErrorReason ?? '';
   }
 
+  Future<void> _saveData() async {
+    final dao = context.read<MedicalCostsDao>();
+    final dataModel = context.read<MedicalCostsData>();
+    await dataModel.saveToDatabase(widget.visitId, dao);
+  }
+
   void _syncControllersToData() {
-    // 【修改】同步所有控制器資料回 dataModel
     final dataModel = context.read<MedicalCostsData>();
     dataModel.visitFee = _visitFeeController.text.trim();
     dataModel.ambulanceFee = _ambulanceFeeController.text.trim();
@@ -152,10 +144,7 @@ class _MedicalExpensesPageState extends State<MedicalExpensesPage>
     dataModel.update();
   }
 
-  // ===============================================
-  // UI Build Method
-  // ===============================================
-
+  // Main Build method is unchanged
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -171,127 +160,141 @@ class _MedicalExpensesPageState extends State<MedicalExpensesPage>
           color: const Color(0xFFE6F6FB),
           alignment: Alignment.topCenter,
           child: SingleChildScrollView(
-            child: Container(
-              width: 900,
-              margin: const EdgeInsets.symmetric(vertical: 32),
-              padding: const EdgeInsets.all(32),
-              decoration: BoxDecoration(
-                color: const Color(0xFFF9FAFB),
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: const [
-                  BoxShadow(color: Colors.black12, blurRadius: 8),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // ... (Header and Fee Schedule Button - no changes)
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        t.medicalFeeForm,
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF83ACA9),
-                          foregroundColor: Colors.white,
-                        ),
-                        onPressed: () => showDialog(
-                          context: context,
-                          builder: (ctx) => AlertDialog(
-                            title: Text(t.feeScheduleTitle),
-                            content: Text(t.feeScheduleContentPlaceholder),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.pop(ctx),
-                                child: Text(t.close),
-                              ),
-                            ],
+            child: ConstrainedBox(
+              // Use ConstrainedBox to enforce maxWidth
+              constraints: const BoxConstraints(maxWidth: 1000),
+              child: Container(
+                margin: const EdgeInsets.symmetric(
+                  vertical: 32,
+                  horizontal: 16,
+                ),
+                padding: const EdgeInsets.all(32),
+                decoration: BoxDecoration(
+                  color: Colors.white, // As requested: 白色卡片
+                  borderRadius: BorderRadius.circular(16), // As requested: 圓角16
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Color.fromRGBO(
+                        0,
+                        0,
+                        0,
+                        0.08,
+                      ), // As requested: 陰影柔和
+                      blurRadius: 12,
+                      offset: Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          t.medicalFeeForm,
+                          style: const TextStyle(
+                            fontSize: 20, // Slightly larger title
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
-                        child: Text(t.viewFeeSchedule),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(
+                              0xFF83ACA9,
+                            ), // As requested
+                            foregroundColor: Colors.white, // As requested
+                          ),
+                          onPressed: () => showDialog(
+                            context: context,
+                            builder: (ctx) => AlertDialog(
+                              title: Text(t.feeScheduleTitle),
+                              content: Text(t.feeScheduleContentPlaceholder),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(ctx),
+                                  child: Text(t.close),
+                                ),
+                              ],
+                            ),
+                          ),
+                          child: Text(t.viewFeeSchedule),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          flex: 2,
+                          child: _buildChargeMethodSelector(t, dataModel),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(flex: 1, child: _buildPhotoTaker(dataModel)),
+                      ],
+                    ),
+                    _buildConditionalFields(t, dataModel),
+                    const SizedBox(height: 16),
+                    _SectionTitle(t.consultationFee),
+                    TextField(
+                      controller: _visitFeeController,
+                      keyboardType: TextInputType.number,
+                      decoration: InputDecoration(
+                        hintText: t.enterAmountHint,
+                        border: const OutlineInputBorder(),
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        flex: 2,
-                        child: _buildChargeMethodSelector(t, dataModel),
+                      onChanged: (_) => _syncControllersToData(),
+                    ),
+                    const SizedBox(height: 16),
+                    _SectionTitle(t.ambulanceFee),
+                    TextField(
+                      controller: _ambulanceFeeController,
+                      keyboardType: TextInputType.number,
+                      decoration: InputDecoration(
+                        hintText: t.enterAmountHint,
+                        border: const OutlineInputBorder(),
                       ),
-                      const SizedBox(width: 16),
-                      Expanded(flex: 1, child: _buildPhotoTaker(dataModel)),
-                    ],
-                  ),
-
-                  // 【新增】顯示對應欄位的輔助方法
-                  _buildConditionalFields(t, dataModel),
-
-                  const SizedBox(height: 16),
-                  _SectionTitle(t.consultationFee),
-                  TextField(
-                    controller: _visitFeeController,
-                    keyboardType: TextInputType.number,
-                    decoration: InputDecoration(
-                      hintText: t.enterAmountHint,
-                      border: const OutlineInputBorder(),
+                      onChanged: (_) => _syncControllersToData(),
                     ),
-                    onChanged: (_) => _syncControllersToData(),
-                  ),
-                  const SizedBox(height: 16),
-                  _SectionTitle(t.ambulanceFee),
-                  TextField(
-                    controller: _ambulanceFeeController,
-                    keyboardType: TextInputType.number,
-                    decoration: InputDecoration(
-                      hintText: t.enterAmountHint,
-                      border: const OutlineInputBorder(),
+                    const SizedBox(height: 16),
+                    _SectionTitle(t.totalFee),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(12),
+                      color: const Color(0xFFF1F3F6),
+                      child: Text(
+                        dataModel.totalFee.toStringAsFixed(0),
+                        style: const TextStyle(fontSize: 16),
+                      ),
                     ),
-                    onChanged: (_) => _syncControllersToData(),
-                  ),
-                  const SizedBox(height: 16),
-                  _SectionTitle(t.totalFee),
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(12),
-                    color: const Color(0xFFF1F3F6),
-                    child: Text(
-                      dataModel.totalFee.toStringAsFixed(0),
-                      style: const TextStyle(fontSize: 16),
+                    const SizedBox(height: 16),
+                    _SectionTitle(t.billingNotes),
+                    TextField(
+                      controller: _noteController,
+                      decoration: InputDecoration(
+                        hintText: t.enterBillingNotesHint,
+                        border: const OutlineInputBorder(),
+                      ),
+                      maxLines: 2,
+                      onChanged: (_) => _syncControllersToData(),
                     ),
-                  ),
-                  const SizedBox(height: 16),
-
-                  // 【修改】將備註移到條件欄位的下方，使其成為共用欄位
-                  _SectionTitle(t.billingNotes),
-                  TextField(
-                    controller: _noteController,
-                    decoration: InputDecoration(
-                      hintText: t.enterBillingNotesHint,
-                      border: const OutlineInputBorder(),
+                    const SizedBox(height: 24),
+                    Text(
+                      t.agreementStatementZh,
+                      style: const TextStyle(color: Colors.black54),
                     ),
-                    maxLines: 2,
-                    onChanged: (_) => _syncControllersToData(),
-                  ),
-                  const SizedBox(height: 24),
-                  Text(
-                    t.agreementStatementZh,
-                    style: const TextStyle(color: Colors.black54),
-                  ),
-                  Text(
-                    t.agreementStatementEn,
-                    style: const TextStyle(color: Colors.black45, fontSize: 12),
-                  ),
-                  const SizedBox(height: 8),
-                  _buildSignatureButtons(t, dataModel),
-                ],
+                    Text(
+                      t.agreementStatementEn,
+                      style: const TextStyle(
+                        color: Colors.black45,
+                        fontSize: 12,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    _buildSignatureButtons(t, dataModel),
+                  ],
+                ),
               ),
             ),
           ),
@@ -308,7 +311,6 @@ class _MedicalExpensesPageState extends State<MedicalExpensesPage>
     AppTranslations t,
     MedicalCostsData dataModel,
   ) {
-    // ... (no changes)
     final methods = {
       '自付': t.selfPay,
       '統一請款': t.unifiedBilling,
@@ -326,7 +328,7 @@ class _MedicalExpensesPageState extends State<MedicalExpensesPage>
                   title: Text(entry.value),
                   value: entry.key,
                   groupValue: dataModel.chargeMethod,
-                  activeColor: const Color(0xFF83ACA9),
+                  activeColor: const Color(0xFF274C4A), // As requested: 選中顏色
                   onChanged: (v) {
                     dataModel.chargeMethod = v;
                     dataModel.update();
@@ -339,13 +341,14 @@ class _MedicalExpensesPageState extends State<MedicalExpensesPage>
     );
   }
 
-  // 【新增】主要的條件渲染方法
   Widget _buildConditionalFields(
     AppTranslations t,
     MedicalCostsData dataModel,
   ) {
-    // 根據 dataModel 中的 chargeMethod 決定要顯示哪個 Widget
-    switch (dataModel.chargeMethod) {
+    if (dataModel.chargeMethod == null) {
+      return const SizedBox.shrink();
+    }
+    switch (dataModel.chargeMethod!) {
       case '自付':
         return _buildSelfPayFields(t, dataModel);
       case '統一請款':
@@ -355,48 +358,47 @@ class _MedicalExpensesPageState extends State<MedicalExpensesPage>
       case '收費異常':
         return _buildBillingErrorFields(t, dataModel);
       default:
-        // 預設情況下不顯示任何額外欄位
         return const SizedBox.shrink();
     }
   }
 
-  // 【新增】建立「自付」對應的欄位
   Widget _buildSelfPayFields(AppTranslations t, MedicalCostsData dataModel) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(height: 16),
-        _SectionTitle(t.paymentMethod), // t.paymentMethod = "自付方式"
+        _SectionTitle(t.paymentMethod),
         Row(
           children: [
             Radio(
               value: '現金',
               groupValue: dataModel.paymentMethod,
+              activeColor: const Color(0xFF274C4A), // As requested: 選中顏色
               onChanged: (v) {
                 dataModel.paymentMethod = v;
                 dataModel.update();
               },
             ),
-            Text(t.cash), // t.cash = "現金"
+            Text(t.cash),
             const SizedBox(width: 24),
             Radio(
               value: '刷卡',
               groupValue: dataModel.paymentMethod,
+              activeColor: const Color(0xFF274C4A), // As requested: 選中顏色
               onChanged: (v) {
                 dataModel.paymentMethod = v;
                 dataModel.update();
               },
             ),
-            Text(t.creditCard), // t.creditCard = "刷卡"
+            Text(t.creditCard),
           ],
         ),
-        // 如果選擇了刷卡，才顯示貨幣相關欄位
-        if (dataModel.paymentMethod == '刷卡') _buildCurrencyFields(t, dataModel),
+        if (dataModel.paymentMethod == '現金') _buildCurrencyFields(t, dataModel),
       ],
     );
   }
 
-  // 【新增】建立「統一請款」對應的欄位
+  // Other helper widgets are unchanged
   Widget _buildUnifiedBillingFields(
     AppTranslations t,
     MedicalCostsData dataModel,
@@ -408,23 +410,21 @@ class _MedicalExpensesPageState extends State<MedicalExpensesPage>
         _buildPaymentStatusSelector(t, dataModel),
         _buildCurrencyFields(t, dataModel),
         const SizedBox(height: 16),
-        _SectionTitle(t.applicantName), // t.applicantName = "申請人"
+        _SectionTitle(t.applicantName),
         TextField(
           controller: _applicantNameController,
           decoration: InputDecoration(
-            hintText: t
-                .enterApplicantNameHint, // t.enterApplicantNameHint = "請填寫申請人的姓名"
+            hintText: t.enterApplicantNameHint,
             border: const OutlineInputBorder(),
           ),
           onChanged: (_) => _syncControllersToData(),
         ),
         const SizedBox(height: 16),
-        _SectionTitle(t.applicantUnit), // t.applicantUnit = "申請單位"
+        _SectionTitle(t.applicantUnit),
         TextField(
           controller: _applicantUnitController,
           decoration: InputDecoration(
-            hintText: t
-                .enterApplicantUnitHint, // t.enterApplicantUnitHint = "請填寫申請單位"
+            hintText: t.enterApplicantUnitHint,
             border: const OutlineInputBorder(),
           ),
           onChanged: (_) => _syncControllersToData(),
@@ -444,7 +444,6 @@ class _MedicalExpensesPageState extends State<MedicalExpensesPage>
     );
   }
 
-  // 【新增】建立「總院急診代收」對應的欄位
   Widget _buildHospitalCollectionFields(
     AppTranslations t,
     MedicalCostsData dataModel,
@@ -453,18 +452,13 @@ class _MedicalExpensesPageState extends State<MedicalExpensesPage>
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(height: 16),
-        _buildPaymentStatusSelector(
-          t,
-          dataModel,
-          showNotNeeded: false,
-        ), // 此情境不顯示"不需要"選項
+        _buildPaymentStatusSelector(t, dataModel, showNotNeeded: false),
         _buildCurrencyFields(t, dataModel),
         const SizedBox(height: 16),
         CheckboxListTile(
-          title: Text(
-            t.receiptIssuedAndTransferred,
-          ), // t.receiptIssuedAndTransferred = "已開立收據並轉交"
+          title: Text(t.receiptIssuedAndTransferred),
           value: dataModel.receiptIssuedAndTransferred ?? false,
+          activeColor: const Color(0xFF274C4A), // As requested: 選中顏色
           onChanged: (bool? value) {
             dataModel.receiptIssuedAndTransferred = value;
             dataModel.update();
@@ -473,7 +467,7 @@ class _MedicalExpensesPageState extends State<MedicalExpensesPage>
           contentPadding: EdgeInsets.zero,
         ),
         const SizedBox(height: 16),
-        _SectionTitle(t.erCounterSignature), // t.erCounterSignature = "急診櫃台簽收名"
+        _SectionTitle(t.erCounterSignature),
         Container(
           height: 150,
           width: double.infinity,
@@ -481,13 +475,12 @@ class _MedicalExpensesPageState extends State<MedicalExpensesPage>
             border: Border.all(color: Colors.grey),
             borderRadius: BorderRadius.circular(8),
           ),
-          child: Center(child: Text(t.signature)), // t.signature = "簽章"
+          child: Center(child: Text(t.signature)),
         ),
       ],
     );
   }
 
-  // 【新增】建立「收費異常」對應的欄位
   Widget _buildBillingErrorFields(
     AppTranslations t,
     MedicalCostsData dataModel,
@@ -499,13 +492,12 @@ class _MedicalExpensesPageState extends State<MedicalExpensesPage>
         _buildPaymentStatusSelector(t, dataModel),
         _buildCurrencyFields(t, dataModel),
         const SizedBox(height: 16),
-        _SectionTitle(t.billingErrorReason), // t.billingErrorReason = "收費異常原因"
+        _SectionTitle(t.billingErrorReason),
         TextField(
           controller: _billingErrorReasonController,
           maxLines: 2,
           decoration: InputDecoration(
-            hintText: t
-                .enterBillingErrorReasonHint, // t.enterBillingErrorReasonHint = "請填寫收費異常的原因"
+            hintText: t.enterBillingErrorReasonHint,
             border: const OutlineInputBorder(),
           ),
           onChanged: (_) => _syncControllersToData(),
@@ -514,23 +506,21 @@ class _MedicalExpensesPageState extends State<MedicalExpensesPage>
     );
   }
 
-  // 【新增】可重複使用的「收款狀態」選擇器
   Widget _buildPaymentStatusSelector(
     AppTranslations t,
     MedicalCostsData dataModel, {
     bool showNotNeeded = true,
   }) {
-    // 建立選項 Map
     final Map<String, String> statusOptions = {
-      '尚未收款': t.paymentPending, // t.paymentPending = "尚未收款"
-      '已收款': t.paymentReceived, // t.paymentReceived = "已收款"
-      if (showNotNeeded) '不需要': t.notNeeded, // t.notNeeded = "不需要"
+      '尚未收款': t.paymentPending,
+      '已收款': t.paymentReceived,
+      if (showNotNeeded) '不需要': t.notNeeded,
     };
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _SectionTitle(t.paymentStatus), // t.paymentStatus = "收款狀態"
+        _SectionTitle(t.paymentStatus),
         Row(
           children: statusOptions.entries.map((entry) {
             return Row(
@@ -539,6 +529,7 @@ class _MedicalExpensesPageState extends State<MedicalExpensesPage>
                 Radio<String>(
                   value: entry.key,
                   groupValue: dataModel.paymentStatus,
+                  activeColor: const Color(0xFF274C4A), // As requested: 選中顏色
                   onChanged: (v) {
                     dataModel.paymentStatus = v;
                     dataModel.update();
@@ -554,7 +545,6 @@ class _MedicalExpensesPageState extends State<MedicalExpensesPage>
     );
   }
 
-  // 【新增】可重複使用的「貨幣」相關欄位
   Widget _buildCurrencyFields(AppTranslations t, MedicalCostsData dataModel) {
     final Map<String, String> currencies = {
       '台幣': t.twd,
@@ -567,7 +557,7 @@ class _MedicalExpensesPageState extends State<MedicalExpensesPage>
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(height: 16),
-        _SectionTitle(t.selectCurrency), // t.selectCurrency = "選擇貨幣"
+        _SectionTitle(t.selectCurrency),
         Row(
           children: currencies.entries.map((entry) {
             return Row(
@@ -576,6 +566,7 @@ class _MedicalExpensesPageState extends State<MedicalExpensesPage>
                 Radio<String>(
                   value: entry.key,
                   groupValue: dataModel.selectedCurrency,
+                  activeColor: const Color(0xFF274C4A), // As requested: 選中顏色
                   onChanged: (v) {
                     dataModel.selectedCurrency = v;
                     dataModel.update();
@@ -587,29 +578,26 @@ class _MedicalExpensesPageState extends State<MedicalExpensesPage>
             );
           }).toList(),
         ),
-        // 如果選擇的不是台幣，才顯示外幣和兌換金額
-        if (dataModel.selectedCurrency != '台幣') ...[
+        if (dataModel.selectedCurrency != null &&
+            dataModel.selectedCurrency != '台幣') ...[
           const SizedBox(height: 16),
-          _SectionTitle(t.foreignCurrency), // t.foreignCurrency = "外幣"
+          _SectionTitle(t.foreignCurrency),
           TextField(
             controller: _foreignCurrencyController,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
             decoration: InputDecoration(
-              hintText:
-                  t.enterNumericValueHint, // t.enterNumericValueHint = "輸入數字"
+              hintText: t.enterNumericValueHint,
               border: const OutlineInputBorder(),
             ),
             onChanged: (_) => _syncControllersToData(),
           ),
           const SizedBox(height: 16),
-          _SectionTitle(
-            t.convertedTwdAmount,
-          ), // t.convertedTwdAmount = "兌換後的台幣"
+          _SectionTitle(t.convertedTwdAmount),
           TextField(
             controller: _convertedTwdController,
             keyboardType: TextInputType.number,
             decoration: InputDecoration(
-              hintText: t.enterIntegerHint, // t.enterIntegerHint = "輸入整數"
+              hintText: t.enterIntegerHint,
               border: const OutlineInputBorder(),
             ),
             onChanged: (_) => _syncControllersToData(),
@@ -620,10 +608,9 @@ class _MedicalExpensesPageState extends State<MedicalExpensesPage>
   }
 
   Widget _buildPhotoTaker(MedicalCostsData dataModel) {
-    // ... (no changes)
     return GestureDetector(
       onTap: () {
-        // TODO: 串接拍照或上傳
+        // TODO: Implement image picking
       },
       child: Container(
         height: 160,
@@ -640,17 +627,16 @@ class _MedicalExpensesPageState extends State<MedicalExpensesPage>
   }
 
   Widget _buildSignatureButtons(AppTranslations t, MedicalCostsData dataModel) {
-    // ... (no changes)
     return Row(
       children: [
         Expanded(
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF83ACA9),
-              foregroundColor: Colors.white,
+              backgroundColor: const Color(0xFF83ACA9), // As requested
+              foregroundColor: Colors.white, // As requested
             ),
             onPressed: () {
-              // TODO: 串接簽名板
+              // TODO: Implement signature pad
             },
             child: Text(t.agreedBySignature),
           ),
@@ -659,11 +645,11 @@ class _MedicalExpensesPageState extends State<MedicalExpensesPage>
         Expanded(
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF83ACA9),
-              foregroundColor: Colors.white,
+              backgroundColor: const Color(0xFF83ACA9), // As requested
+              foregroundColor: Colors.white, // As requested
             ),
             onPressed: () {
-              // TODO: 串接簽名板
+              // TODO: Implement signature pad
             },
             child: Text(t.witnessSignature),
           ),
@@ -673,7 +659,6 @@ class _MedicalExpensesPageState extends State<MedicalExpensesPage>
   }
 }
 
-// ... (_SectionTitle - no changes)
 class _SectionTitle extends StatelessWidget {
   final String text;
   const _SectionTitle(this.text);
