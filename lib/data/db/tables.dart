@@ -501,6 +501,11 @@ class AmbulanceRecords extends Table {
   TextColumn get contactName => text().nullable()();
   TextColumn get contactPhone => text().nullable()();
 
+  TextColumn get medicationRecordsJson =>
+      text().withDefault(const Constant('[]'))();
+  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+  DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
+
   // --- 對應 Ambulance_Expenses.dart ---
   IntColumn get staffFee => integer().nullable()();
   IntColumn get oxygenFee => integer().nullable()();
@@ -539,10 +544,6 @@ class AmbulanceRecords extends Table {
 
   // Radio Button
   BoolColumn get isProxyStatement => boolean().nullable()(); // 是否代訴
-
-  // --- 紀錄時間 ---
-  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
-  DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
 }
 
 // 給藥紀錄表

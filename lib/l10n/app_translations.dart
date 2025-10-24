@@ -339,7 +339,7 @@ class AppTranslations {
       isZh ? '請輸入護照號碼' : 'Please enter the passport number';
 
   // ========== Ambulance Plan ==========
-  String get emergencyTreatment => isZh ? '急救處置:' : 'Emergency Treatments';
+  String get emergencyTreatment => isZh ? '急救處置' : 'Emergency Treatments';
   String get airwayTreatment => isZh ? '呼吸道處置' : 'Airway Management';
   String get traumaTreatment => isZh ? '創傷處置' : 'Trauma Care';
   String get transport => isZh ? '搬運' : 'Transport';
@@ -426,31 +426,31 @@ class AppTranslations {
       isZh ? '請填寫指導說明' : 'Please enter the instruction notes';
 
   // 接收單位
-  String get receivingUnit => isZh ? '接收單位:' : 'Receiving Unit:';
+  String get receivingUnit => isZh ? '接收單位' : 'Receiving Unit:';
   String get enterReceivingUnit =>
       isZh ? '請填寫接收單位' : 'Please enter the receiving unit';
-  String get receivingTime => isZh ? '接收時間:' : 'Receiving Time:';
+  String get receivingTime => isZh ? '接收時間' : 'Receiving Time:';
 
   // 拒絕送醫
   String get refuseTransport =>
-      isZh ? '是否拒絕送醫:' : 'Refuse Transport to Hospital:';
+      isZh ? '是否拒絕送醫' : 'Refuse Transport to Hospital:';
   String get refusalStatement =>
-      isZh ? '拒絕醫療聲明：' : 'Refusal of Medical Care Statement:';
+      isZh ? '拒絕醫療聲明' : 'Refusal of Medical Care Statement:';
   String get refusalText => isZh
       ? '本人聲明，救護人員以解釋病情與送醫之需要，但我拒絕救護與送醫。'
       : 'I hereby declare that EMS personnel have explained my condition and the need for transport to hospital, but I refuse emergency care and transport.';
   String get enterName => isZh ? '請填寫姓名' : 'Please enter the name';
 
   // 關係人
-  String get relationship => isZh ? '關係人身分:' : 'Relationship to Patient:';
+  String get relationship => isZh ? '關係人身分' : 'Relationship to Patient:';
   String get patient => isZh ? '病患' : 'Patient';
   String get familyMember => isZh ? '家屬' : 'Family Member';
   String get representative => isZh ? '關係人' : 'Representative';
-  String get representativeName => isZh ? '關係人姓名:' : 'Representative\'s Name:';
+  String get representativeName => isZh ? '關係人姓名' : 'Representative\'s Name:';
   String get enterRepresentativeName =>
       isZh ? '請填寫關係人的姓名' : 'Please enter the representative\'s name';
   String get representativePhone =>
-      isZh ? '關係人連絡電話:' : 'Representative\'s Contact Phone Number:';
+      isZh ? '關係人連絡電話' : 'Representative\'s Contact Phone Number:';
   String get enterRepresentativePhone => isZh
       ? '請填寫關係人的連絡電話'
       : 'Please enter the representative\'s contact phone number';

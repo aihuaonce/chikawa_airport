@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:signature/signature.dart';
 import 'data/models/ambulance_data.dart';
+import 'data/models/medication_record_model.dart';
 import 'l10n/app_translations.dart';
 
 class AmbulancePlanPage extends StatefulWidget {
@@ -15,6 +16,7 @@ class AmbulancePlanPage extends StatefulWidget {
 }
 
 class _AmbulancePlanPageState extends State<AmbulancePlanPage> {
+  // Option Keys (no changes here)
   static const List<String> emergencyTreatmentKeys = [
     'airway',
     'trauma',
@@ -65,13 +67,14 @@ class _AmbulancePlanPageState extends State<AmbulancePlanPage> {
   ];
   static const List<String> relationshipKeys = ['patient', 'family', 'rep'];
 
+  // 【修改】新增 traumaOtherController，並移除 bodyDiagramNoteController
   final Map<String, TextEditingController> _controllers = {
     'guideController': TextEditingController(),
     'receivingUnitController': TextEditingController(),
     'contactNameController': TextEditingController(),
     'contactPhoneController': TextEditingController(),
-    'bodyDiagramNoteController': TextEditingController(),
     'airwayOtherController': TextEditingController(),
+    'traumaOtherController': TextEditingController(), // 【新增】
     'otherEmergencyOtherController': TextEditingController(),
     'ettSizeController': TextEditingController(),
     'ettDepthController': TextEditingController(),
@@ -94,9 +97,9 @@ class _AmbulancePlanPageState extends State<AmbulancePlanPage> {
     _controllers['receivingUnitController']!.text = data.receivingUnit ?? '';
     _controllers['contactNameController']!.text = data.contactName ?? '';
     _controllers['contactPhoneController']!.text = data.contactPhone ?? '';
-    _controllers['bodyDiagramNoteController']!.text =
-        data.bodyDiagramNote ?? '';
     _controllers['airwayOtherController']!.text = data.airwayOther ?? '';
+    // 【修改】將 traumaOtherController 對應到 bodyDiagramNote
+    _controllers['traumaOtherController']!.text = data.bodyDiagramNote ?? '';
     _controllers['otherEmergencyOtherController']!.text =
         data.otherEmergencyOther ?? '';
     _controllers['ettSizeController']!.text = data.ettSize ?? '';
@@ -121,8 +124,9 @@ class _AmbulancePlanPageState extends State<AmbulancePlanPage> {
       receivingUnit: _controllers['receivingUnitController']!.text,
       contactName: _controllers['contactNameController']!.text,
       contactPhone: _controllers['contactPhoneController']!.text,
-      bodyDiagramNote: _controllers['bodyDiagramNoteController']!.text,
       airwayOther: _controllers['airwayOtherController']!.text,
+      // 【修改】將 traumaOtherController 的值存回 bodyDiagramNote
+      bodyDiagramNote: _controllers['traumaOtherController']!.text,
       otherEmergencyOther: _controllers['otherEmergencyOtherController']!.text,
       ettSize: _controllers['ettSizeController']!.text,
       ettDepth: _controllers['ettDepthController']!.text,
@@ -134,41 +138,45 @@ class _AmbulancePlanPageState extends State<AmbulancePlanPage> {
 
   Map<String, String> _getTranslatedOptions(AppTranslations t) {
     return {
-      // Emergency
+      // ... (no changes here) ...
       'airway': t.airwayTreatment,
       'trauma': t.traumaTreatment,
       'transport': t.transport,
       'cpr': t.cpr,
       'medication': t.medicationProcedure,
       'other': t.otherProcedure,
-      // Airway
-      'oral': t.oralAirway, 'nasal': t.nasalAirway, 'suction': t.suction,
-      'heimlich': t.heimlichManeuver, 'cannula': t.nasalCannula, 'mask': t.mask,
-      'nrm': t.nonRebreatherMask, 'bvm': t.bvm, 'lma': t.lma, 'igel': t.igel,
+      'oral': t.oralAirway,
+      'nasal': t.nasalAirway,
+      'suction': t.suction,
+      'heimlich': t.heimlichManeuver,
+      'cannula': t.nasalCannula,
+      'mask': t.mask,
+      'nrm': t.nonRebreatherMask,
+      'bvm': t.bvm,
+      'lma': t.lma,
+      'igel': t.igel,
       'ett': t.endotrachealTube,
-      // Trauma
       'collar': t.cervicalCollar,
       'cleaning': t.woundCleaning,
       'hemostasis': t.hemostasisBandaging,
       'fixation': t.fractureFixation,
       'backboard': t.longBackboard,
       'scoop': t.scoopStretcher,
-      // Transport
       'self': t.walkToVehicle, 'appropriate': t.appropriateTransport,
-      // CPR
       'auto': t.autoCpr,
       'manual': t.manualCpr,
       'aed': t.aed,
       'defib': t.manualDefibrillator,
-      // Medication
-      'iv': t.ivFluid, 'glucose': t.oralGlucose, 'aspirin': t.assistAspirin,
-      'ntg': t.assistNtg, 'bronchodilator': t.assistBronchodilator,
-      // Other Emergency
+      'iv': t.ivFluid,
+      'glucose': t.oralGlucose,
+      'aspirin': t.assistAspirin,
+      'ntg': t.assistNtg,
+      'bronchodilator': t.assistBronchodilator,
       'warmth': t.warmth,
       'support': t.psychologicalSupport,
       'restraints': t.restraints,
-      'refuseOxygen': t.refuseOxygen, 'monitoring': t.vitalSignsMonitoring,
-      // Relationship
+      'refuseOxygen': t.refuseOxygen,
+      'monitoring': t.vitalSignsMonitoring,
       'patient': t.patient, 'family': t.familyMember, 'rep': t.representative,
     };
   }
@@ -236,12 +244,13 @@ class _AmbulancePlanPageState extends State<AmbulancePlanPage> {
                           (newMap) => data.updatePlan(airwayTreatments: newMap),
                         ),
                       if (data.emergencyTreatments['trauma'] == true)
+                        // 【修改】傳入 traumaOtherController 的 key
                         _buildSubOptions(
                           t.traumaTreatment,
                           traumaTreatmentKeys,
                           optionLabels,
                           data.traumaTreatments,
-                          null,
+                          'traumaOtherController',
                           (newMap) => data.updatePlan(traumaTreatments: newMap),
                         ),
                       if (data.emergencyTreatments['transport'] == true)
@@ -283,27 +292,10 @@ class _AmbulancePlanPageState extends State<AmbulancePlanPage> {
                               data.updatePlan(otherEmergencyProcedures: newMap),
                         ),
 
-                      _buildSectionTitle(t.bodyDiagram),
-                      const SizedBox(height: 6),
-                      Center(/* ... 人形圖 UI ... */),
-                      const SizedBox(height: 8),
-                      Center(
-                        child: ElevatedButton(
-                          onPressed: () =>
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text(t.editBodyDiagram)),
-                              ),
-                          child: Text(t.clickToEditDiagram),
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      _buildTitleWithInput(
-                        t.bodyDiagramNote,
-                        _controllers['bodyDiagramNoteController']!,
-                        t.enterNote,
-                      ),
+                      _buildMedicationSection(t, data),
                       const SizedBox(height: 12),
 
+                      // ... (Rest of the build method is unchanged)
                       _buildSectionTitle(t.aslTreatment),
                       const SizedBox(height: 6),
                       Wrap(
@@ -551,6 +543,109 @@ class _AmbulancePlanPageState extends State<AmbulancePlanPage> {
     );
   }
 
+  Widget _buildMedicationSection(AppTranslations t, AmbulanceData data) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildSectionTitle(t.medicationRecord),
+        const SizedBox(height: 8),
+        Container(
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.grey.shade300),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Column(
+            children: [
+              _buildMedicationTableHeader(t),
+              if (data.medicationRecords.isNotEmpty)
+                ...data.medicationRecords.asMap().entries.map((entry) {
+                  final index = entry.key;
+                  final record = entry.value;
+                  return _buildMedicationTableRow(
+                    context,
+                    t,
+                    record,
+                    index,
+                    data,
+                  );
+                }),
+              _buildAddMedicationRowButton(context, t, data),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMedicationTableHeader(AppTranslations t) {
+    const headerStyle = TextStyle(
+      fontWeight: FontWeight.bold,
+      color: Colors.black54,
+    );
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade100,
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(8),
+          topRight: Radius.circular(8),
+        ),
+      ),
+      child: Row(
+        children: [
+          Expanded(flex: 3, child: Text(t.time, style: headerStyle)),
+          Expanded(flex: 2, child: Text(t.medicationName, style: headerStyle)),
+          Expanded(flex: 2, child: Text(t.usage, style: headerStyle)),
+          Expanded(flex: 2, child: Text(t.doseUnit, style: headerStyle)),
+          Expanded(flex: 2, child: Text(t.emtName, style: headerStyle)), // 執行者
+          const SizedBox(width: 48), // For actions
+        ],
+      ),
+    );
+  }
+
+  // 【修改】移除重複的 _buildAddMedicationRowButton 函式
+  Widget _buildAddMedicationRowButton(
+    BuildContext context,
+    AppTranslations t,
+    AmbulanceData data,
+  ) {
+    return InkWell(
+      onTap: () async {
+        final result = await showDialog<MedicationRecordModel>(
+          context: context,
+          builder: (ctx) => _MedicationRecordDialog(t: t),
+        );
+        if (result != null) {
+          final updatedList = List<MedicationRecordModel>.from(
+            data.medicationRecords,
+          )..add(result);
+          data.updatePlan(medicationRecords: updatedList);
+        }
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        decoration: BoxDecoration(
+          border: Border(top: BorderSide(color: Colors.grey.shade200)),
+          borderRadius: const BorderRadius.only(
+            bottomLeft: Radius.circular(8),
+            bottomRight: Radius.circular(8),
+          ),
+        ),
+        child: Center(
+          child: Text(
+            t.addMedicationRecord, // "+ 新增藥物記錄"
+            style: TextStyle(
+              color: Theme.of(context).primaryColor,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ... (Helper widgets _buildSectionTitle, _buildTitleWithInput, etc. are unchanged)
   Widget _buildSectionTitle(String title) {
     return Text(
       title,
@@ -671,4 +766,176 @@ class _AmbulancePlanPageState extends State<AmbulancePlanPage> {
       ],
     );
   }
+}
+
+// Dialog class remains unchanged
+class _MedicationRecordDialog extends StatefulWidget {
+  final AppTranslations t;
+  const _MedicationRecordDialog({required this.t});
+
+  @override
+  State<_MedicationRecordDialog> createState() =>
+      _MedicationRecordDialogState();
+}
+
+class _MedicationRecordDialogState extends State<_MedicationRecordDialog> {
+  late DateTime _recordTime;
+  final _nameController = TextEditingController();
+  final _routeController = TextEditingController();
+  final _doseController = TextEditingController();
+  final _executorController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _recordTime = DateTime.now();
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _routeController.dispose();
+    _doseController.dispose();
+    _executorController.dispose();
+    super.dispose();
+  }
+
+  void _onSave() {
+    final newRecord = MedicationRecordModel(
+      recordTime: _recordTime,
+      name: _nameController.text.trim(),
+      route: _routeController.text.trim(),
+      dose: _doseController.text.trim(),
+      executor: _executorController.text.trim(),
+    );
+    Navigator.of(context).pop(newRecord);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final timeFormat = DateFormat('yyyy年MM月dd日 HH時mm分ss秒');
+    return AlertDialog(
+      title: Text("創建 藥物紀錄"),
+      content: SingleChildScrollView(
+        child: SizedBox(
+          width: 400,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Text("紀錄時間", style: TextStyle(fontWeight: FontWeight.bold)),
+                  const Spacer(),
+                  Text(timeFormat.format(_recordTime)),
+                  const SizedBox(width: 8),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.purple,
+                      foregroundColor: Colors.white,
+                    ),
+                    onPressed: () =>
+                        setState(() => _recordTime = DateTime.now()),
+                    child: Text(widget.t.updateTime),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              _buildInputDialogField(
+                widget.t.medicationName,
+                _nameController,
+                "請輸入藥名",
+              ),
+              const SizedBox(height: 12),
+              _buildInputDialogField(widget.t.usage, _routeController, "請輸入途徑"),
+              const SizedBox(height: 12),
+              _buildInputDialogField(
+                widget.t.doseUnit,
+                _doseController,
+                "請輸入劑量",
+              ),
+              const SizedBox(height: 12),
+              _buildInputDialogField(
+                widget.t.emtName,
+                _executorController,
+                "請輸入執行者",
+              ),
+            ],
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text(widget.t.discard),
+        ),
+        ElevatedButton(onPressed: _onSave, child: Text(widget.t.saveAndClose)),
+      ],
+    );
+  }
+
+  Widget _buildInputDialogField(
+    String label,
+    TextEditingController controller,
+    String hint,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
+        const SizedBox(height: 4),
+        TextField(
+          controller: controller,
+          decoration: InputDecoration(
+            hintText: hint,
+            border: OutlineInputBorder(),
+            isDense: true,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// Assume _buildMedicationTableRow is defined elsewhere or not shown in the original snippet,
+// so it's omitted here for brevity. You should keep it if it exists in your full code.
+Widget _buildMedicationTableRow(
+  BuildContext context,
+  AppTranslations t,
+  MedicationRecordModel record,
+  int index,
+  AmbulanceData data,
+) {
+  // This is a placeholder implementation.
+  // Please use your actual implementation for this widget.
+  return Container(
+    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+    decoration: BoxDecoration(
+      border: Border(top: BorderSide(color: Colors.grey.shade200)),
+    ),
+    child: Row(
+      children: [
+        Expanded(
+          flex: 3,
+          child: Text(DateFormat('HH:mm:ss').format(record.recordTime)),
+        ),
+        Expanded(flex: 2, child: Text(record.name)),
+        Expanded(flex: 2, child: Text(record.route)),
+        Expanded(flex: 2, child: Text(record.dose)),
+        Expanded(flex: 2, child: Text(record.executor)),
+        SizedBox(
+          width: 48,
+          child: IconButton(
+            icon: Icon(Icons.delete_outline, color: Colors.red.shade700),
+            onPressed: () {
+              final updatedList = List<MedicationRecordModel>.from(
+                data.medicationRecords,
+              )..removeAt(index);
+              data.updatePlan(medicationRecords: updatedList);
+            },
+          ),
+        ),
+      ],
+    ),
+  );
 }

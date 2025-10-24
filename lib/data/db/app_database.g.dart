@@ -14492,6 +14492,42 @@ class $AmbulanceRecordsTable extends AmbulanceRecords
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _medicationRecordsJsonMeta =
+      const VerificationMeta('medicationRecordsJson');
+  @override
+  late final GeneratedColumn<String> medicationRecordsJson =
+      GeneratedColumn<String>(
+        'medication_records_json',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: const Constant('[]'),
+      );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
   static const VerificationMeta _staffFeeMeta = const VerificationMeta(
     'staffFee',
   );
@@ -14769,30 +14805,6 @@ class $AmbulanceRecordsTable extends AmbulanceRecords
       'CHECK ("is_proxy_statement" IN (0, 1))',
     ),
   );
-  static const VerificationMeta _createdAtMeta = const VerificationMeta(
-    'createdAt',
-  );
-  @override
-  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
-    'created_at',
-    aliasedName,
-    false,
-    type: DriftSqlType.dateTime,
-    requiredDuringInsert: false,
-    defaultValue: currentDateAndTime,
-  );
-  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
-    'updatedAt',
-  );
-  @override
-  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
-    'updated_at',
-    aliasedName,
-    false,
-    type: DriftSqlType.dateTime,
-    requiredDuringInsert: false,
-    defaultValue: currentDateAndTime,
-  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -14844,6 +14856,9 @@ class $AmbulanceRecordsTable extends AmbulanceRecords
     relationshipType,
     contactName,
     contactPhone,
+    medicationRecordsJson,
+    createdAt,
+    updatedAt,
     staffFee,
     oxygenFee,
     totalFee,
@@ -14868,8 +14883,6 @@ class $AmbulanceRecordsTable extends AmbulanceRecords
     burnArea,
     traumaOther,
     isProxyStatement,
-    createdAt,
-    updatedAt,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -15299,6 +15312,27 @@ class $AmbulanceRecordsTable extends AmbulanceRecords
         ),
       );
     }
+    if (data.containsKey('medication_records_json')) {
+      context.handle(
+        _medicationRecordsJsonMeta,
+        medicationRecordsJson.isAcceptableOrUnknown(
+          data['medication_records_json']!,
+          _medicationRecordsJsonMeta,
+        ),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
     if (data.containsKey('staff_fee')) {
       context.handle(
         _staffFeeMeta,
@@ -15483,18 +15517,6 @@ class $AmbulanceRecordsTable extends AmbulanceRecords
           data['is_proxy_statement']!,
           _isProxyStatementMeta,
         ),
-      );
-    }
-    if (data.containsKey('created_at')) {
-      context.handle(
-        _createdAtMeta,
-        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
-      );
-    }
-    if (data.containsKey('updated_at')) {
-      context.handle(
-        _updatedAtMeta,
-        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
       );
     }
     return context;
@@ -15702,6 +15724,18 @@ class $AmbulanceRecordsTable extends AmbulanceRecords
         DriftSqlType.string,
         data['${effectivePrefix}contact_phone'],
       ),
+      medicationRecordsJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}medication_records_json'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
       staffFee: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}staff_fee'],
@@ -15798,14 +15832,6 @@ class $AmbulanceRecordsTable extends AmbulanceRecords
         DriftSqlType.bool,
         data['${effectivePrefix}is_proxy_statement'],
       ),
-      createdAt: attachedDatabase.typeMapping.read(
-        DriftSqlType.dateTime,
-        data['${effectivePrefix}created_at'],
-      )!,
-      updatedAt: attachedDatabase.typeMapping.read(
-        DriftSqlType.dateTime,
-        data['${effectivePrefix}updated_at'],
-      )!,
     );
   }
 
@@ -15865,6 +15891,9 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
   final String? relationshipType;
   final String? contactName;
   final String? contactPhone;
+  final String medicationRecordsJson;
+  final DateTime createdAt;
+  final DateTime updatedAt;
   final int? staffFee;
   final int? oxygenFee;
   final int? totalFee;
@@ -15889,8 +15918,6 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
   final String? burnArea;
   final String? traumaOther;
   final bool? isProxyStatement;
-  final DateTime createdAt;
-  final DateTime updatedAt;
   const AmbulanceRecord({
     required this.id,
     required this.visitId,
@@ -15941,6 +15968,9 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
     this.relationshipType,
     this.contactName,
     this.contactPhone,
+    required this.medicationRecordsJson,
+    required this.createdAt,
+    required this.updatedAt,
     this.staffFee,
     this.oxygenFee,
     this.totalFee,
@@ -15965,8 +15995,6 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
     this.burnArea,
     this.traumaOther,
     this.isProxyStatement,
-    required this.createdAt,
-    required this.updatedAt,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -16106,6 +16134,9 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
     if (!nullToAbsent || contactPhone != null) {
       map['contact_phone'] = Variable<String>(contactPhone);
     }
+    map['medication_records_json'] = Variable<String>(medicationRecordsJson);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
     if (!nullToAbsent || staffFee != null) {
       map['staff_fee'] = Variable<int>(staffFee);
     }
@@ -16168,8 +16199,6 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
     if (!nullToAbsent || isProxyStatement != null) {
       map['is_proxy_statement'] = Variable<bool>(isProxyStatement);
     }
-    map['created_at'] = Variable<DateTime>(createdAt);
-    map['updated_at'] = Variable<DateTime>(updatedAt);
     return map;
   }
 
@@ -16302,6 +16331,9 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
       contactPhone: contactPhone == null && nullToAbsent
           ? const Value.absent()
           : Value(contactPhone),
+      medicationRecordsJson: Value(medicationRecordsJson),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
       staffFee: staffFee == null && nullToAbsent
           ? const Value.absent()
           : Value(staffFee),
@@ -16356,8 +16388,6 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
       isProxyStatement: isProxyStatement == null && nullToAbsent
           ? const Value.absent()
           : Value(isProxyStatement),
-      createdAt: Value(createdAt),
-      updatedAt: Value(updatedAt),
     );
   }
 
@@ -16448,6 +16478,11 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
       relationshipType: serializer.fromJson<String?>(json['relationshipType']),
       contactName: serializer.fromJson<String?>(json['contactName']),
       contactPhone: serializer.fromJson<String?>(json['contactPhone']),
+      medicationRecordsJson: serializer.fromJson<String>(
+        json['medicationRecordsJson'],
+      ),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
       staffFee: serializer.fromJson<int?>(json['staffFee']),
       oxygenFee: serializer.fromJson<int?>(json['oxygenFee']),
       totalFee: serializer.fromJson<int?>(json['totalFee']),
@@ -16486,8 +16521,6 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
       burnArea: serializer.fromJson<String?>(json['burnArea']),
       traumaOther: serializer.fromJson<String?>(json['traumaOther']),
       isProxyStatement: serializer.fromJson<bool?>(json['isProxyStatement']),
-      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
-      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
     );
   }
   @override
@@ -16551,6 +16584,9 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
       'relationshipType': serializer.toJson<String?>(relationshipType),
       'contactName': serializer.toJson<String?>(contactName),
       'contactPhone': serializer.toJson<String?>(contactPhone),
+      'medicationRecordsJson': serializer.toJson<String>(medicationRecordsJson),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
       'staffFee': serializer.toJson<int?>(staffFee),
       'oxygenFee': serializer.toJson<int?>(oxygenFee),
       'totalFee': serializer.toJson<int?>(totalFee),
@@ -16583,8 +16619,6 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
       'burnArea': serializer.toJson<String?>(burnArea),
       'traumaOther': serializer.toJson<String?>(traumaOther),
       'isProxyStatement': serializer.toJson<bool?>(isProxyStatement),
-      'createdAt': serializer.toJson<DateTime>(createdAt),
-      'updatedAt': serializer.toJson<DateTime>(updatedAt),
     };
   }
 
@@ -16638,6 +16672,9 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
     Value<String?> relationshipType = const Value.absent(),
     Value<String?> contactName = const Value.absent(),
     Value<String?> contactPhone = const Value.absent(),
+    String? medicationRecordsJson,
+    DateTime? createdAt,
+    DateTime? updatedAt,
     Value<int?> staffFee = const Value.absent(),
     Value<int?> oxygenFee = const Value.absent(),
     Value<int?> totalFee = const Value.absent(),
@@ -16662,8 +16699,6 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
     Value<String?> burnArea = const Value.absent(),
     Value<String?> traumaOther = const Value.absent(),
     Value<bool?> isProxyStatement = const Value.absent(),
-    DateTime? createdAt,
-    DateTime? updatedAt,
   }) => AmbulanceRecord(
     id: id ?? this.id,
     visitId: visitId ?? this.visitId,
@@ -16771,6 +16806,9 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
         : this.relationshipType,
     contactName: contactName.present ? contactName.value : this.contactName,
     contactPhone: contactPhone.present ? contactPhone.value : this.contactPhone,
+    medicationRecordsJson: medicationRecordsJson ?? this.medicationRecordsJson,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
     staffFee: staffFee.present ? staffFee.value : this.staffFee,
     oxygenFee: oxygenFee.present ? oxygenFee.value : this.oxygenFee,
     totalFee: totalFee.present ? totalFee.value : this.totalFee,
@@ -16805,8 +16843,6 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
     isProxyStatement: isProxyStatement.present
         ? isProxyStatement.value
         : this.isProxyStatement,
-    createdAt: createdAt ?? this.createdAt,
-    updatedAt: updatedAt ?? this.updatedAt,
   );
   AmbulanceRecord copyWithCompanion(AmbulanceRecordsCompanion data) {
     return AmbulanceRecord(
@@ -16941,6 +16977,11 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
       contactPhone: data.contactPhone.present
           ? data.contactPhone.value
           : this.contactPhone,
+      medicationRecordsJson: data.medicationRecordsJson.present
+          ? data.medicationRecordsJson.value
+          : this.medicationRecordsJson,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
       staffFee: data.staffFee.present ? data.staffFee.value : this.staffFee,
       oxygenFee: data.oxygenFee.present ? data.oxygenFee.value : this.oxygenFee,
       totalFee: data.totalFee.present ? data.totalFee.value : this.totalFee,
@@ -16999,8 +17040,6 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
       isProxyStatement: data.isProxyStatement.present
           ? data.isProxyStatement.value
           : this.isProxyStatement,
-      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
-      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
   }
 
@@ -17058,6 +17097,9 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
           ..write('relationshipType: $relationshipType, ')
           ..write('contactName: $contactName, ')
           ..write('contactPhone: $contactPhone, ')
+          ..write('medicationRecordsJson: $medicationRecordsJson, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
           ..write('staffFee: $staffFee, ')
           ..write('oxygenFee: $oxygenFee, ')
           ..write('totalFee: $totalFee, ')
@@ -17081,9 +17123,7 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
           ..write('burnDegree: $burnDegree, ')
           ..write('burnArea: $burnArea, ')
           ..write('traumaOther: $traumaOther, ')
-          ..write('isProxyStatement: $isProxyStatement, ')
-          ..write('createdAt: $createdAt, ')
-          ..write('updatedAt: $updatedAt')
+          ..write('isProxyStatement: $isProxyStatement')
           ..write(')'))
         .toString();
   }
@@ -17139,6 +17179,9 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
     relationshipType,
     contactName,
     contactPhone,
+    medicationRecordsJson,
+    createdAt,
+    updatedAt,
     staffFee,
     oxygenFee,
     totalFee,
@@ -17163,8 +17206,6 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
     burnArea,
     traumaOther,
     isProxyStatement,
-    createdAt,
-    updatedAt,
   ]);
   @override
   bool operator ==(Object other) =>
@@ -17223,6 +17264,9 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
           other.relationshipType == this.relationshipType &&
           other.contactName == this.contactName &&
           other.contactPhone == this.contactPhone &&
+          other.medicationRecordsJson == this.medicationRecordsJson &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
           other.staffFee == this.staffFee &&
           other.oxygenFee == this.oxygenFee &&
           other.totalFee == this.totalFee &&
@@ -17247,9 +17291,7 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
           other.burnDegree == this.burnDegree &&
           other.burnArea == this.burnArea &&
           other.traumaOther == this.traumaOther &&
-          other.isProxyStatement == this.isProxyStatement &&
-          other.createdAt == this.createdAt &&
-          other.updatedAt == this.updatedAt);
+          other.isProxyStatement == this.isProxyStatement);
 }
 
 class AmbulanceRecordsCompanion extends UpdateCompanion<AmbulanceRecord> {
@@ -17302,6 +17344,9 @@ class AmbulanceRecordsCompanion extends UpdateCompanion<AmbulanceRecord> {
   final Value<String?> relationshipType;
   final Value<String?> contactName;
   final Value<String?> contactPhone;
+  final Value<String> medicationRecordsJson;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
   final Value<int?> staffFee;
   final Value<int?> oxygenFee;
   final Value<int?> totalFee;
@@ -17326,8 +17371,6 @@ class AmbulanceRecordsCompanion extends UpdateCompanion<AmbulanceRecord> {
   final Value<String?> burnArea;
   final Value<String?> traumaOther;
   final Value<bool?> isProxyStatement;
-  final Value<DateTime> createdAt;
-  final Value<DateTime> updatedAt;
   const AmbulanceRecordsCompanion({
     this.id = const Value.absent(),
     this.visitId = const Value.absent(),
@@ -17378,6 +17421,9 @@ class AmbulanceRecordsCompanion extends UpdateCompanion<AmbulanceRecord> {
     this.relationshipType = const Value.absent(),
     this.contactName = const Value.absent(),
     this.contactPhone = const Value.absent(),
+    this.medicationRecordsJson = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
     this.staffFee = const Value.absent(),
     this.oxygenFee = const Value.absent(),
     this.totalFee = const Value.absent(),
@@ -17402,8 +17448,6 @@ class AmbulanceRecordsCompanion extends UpdateCompanion<AmbulanceRecord> {
     this.burnArea = const Value.absent(),
     this.traumaOther = const Value.absent(),
     this.isProxyStatement = const Value.absent(),
-    this.createdAt = const Value.absent(),
-    this.updatedAt = const Value.absent(),
   });
   AmbulanceRecordsCompanion.insert({
     this.id = const Value.absent(),
@@ -17455,6 +17499,9 @@ class AmbulanceRecordsCompanion extends UpdateCompanion<AmbulanceRecord> {
     this.relationshipType = const Value.absent(),
     this.contactName = const Value.absent(),
     this.contactPhone = const Value.absent(),
+    this.medicationRecordsJson = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
     this.staffFee = const Value.absent(),
     this.oxygenFee = const Value.absent(),
     this.totalFee = const Value.absent(),
@@ -17479,8 +17526,6 @@ class AmbulanceRecordsCompanion extends UpdateCompanion<AmbulanceRecord> {
     this.burnArea = const Value.absent(),
     this.traumaOther = const Value.absent(),
     this.isProxyStatement = const Value.absent(),
-    this.createdAt = const Value.absent(),
-    this.updatedAt = const Value.absent(),
   }) : visitId = Value(visitId);
   static Insertable<AmbulanceRecord> custom({
     Expression<int>? id,
@@ -17532,6 +17577,9 @@ class AmbulanceRecordsCompanion extends UpdateCompanion<AmbulanceRecord> {
     Expression<String>? relationshipType,
     Expression<String>? contactName,
     Expression<String>? contactPhone,
+    Expression<String>? medicationRecordsJson,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
     Expression<int>? staffFee,
     Expression<int>? oxygenFee,
     Expression<int>? totalFee,
@@ -17556,8 +17604,6 @@ class AmbulanceRecordsCompanion extends UpdateCompanion<AmbulanceRecord> {
     Expression<String>? burnArea,
     Expression<String>? traumaOther,
     Expression<bool>? isProxyStatement,
-    Expression<DateTime>? createdAt,
-    Expression<DateTime>? updatedAt,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -17620,6 +17666,10 @@ class AmbulanceRecordsCompanion extends UpdateCompanion<AmbulanceRecord> {
       if (relationshipType != null) 'relationship_type': relationshipType,
       if (contactName != null) 'contact_name': contactName,
       if (contactPhone != null) 'contact_phone': contactPhone,
+      if (medicationRecordsJson != null)
+        'medication_records_json': medicationRecordsJson,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
       if (staffFee != null) 'staff_fee': staffFee,
       if (oxygenFee != null) 'oxygen_fee': oxygenFee,
       if (totalFee != null) 'total_fee': totalFee,
@@ -17651,8 +17701,6 @@ class AmbulanceRecordsCompanion extends UpdateCompanion<AmbulanceRecord> {
       if (burnArea != null) 'burn_area': burnArea,
       if (traumaOther != null) 'trauma_other': traumaOther,
       if (isProxyStatement != null) 'is_proxy_statement': isProxyStatement,
-      if (createdAt != null) 'created_at': createdAt,
-      if (updatedAt != null) 'updated_at': updatedAt,
     });
   }
 
@@ -17706,6 +17754,9 @@ class AmbulanceRecordsCompanion extends UpdateCompanion<AmbulanceRecord> {
     Value<String?>? relationshipType,
     Value<String?>? contactName,
     Value<String?>? contactPhone,
+    Value<String>? medicationRecordsJson,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
     Value<int?>? staffFee,
     Value<int?>? oxygenFee,
     Value<int?>? totalFee,
@@ -17730,8 +17781,6 @@ class AmbulanceRecordsCompanion extends UpdateCompanion<AmbulanceRecord> {
     Value<String?>? burnArea,
     Value<String?>? traumaOther,
     Value<bool?>? isProxyStatement,
-    Value<DateTime>? createdAt,
-    Value<DateTime>? updatedAt,
   }) {
     return AmbulanceRecordsCompanion(
       id: id ?? this.id,
@@ -17788,6 +17837,10 @@ class AmbulanceRecordsCompanion extends UpdateCompanion<AmbulanceRecord> {
       relationshipType: relationshipType ?? this.relationshipType,
       contactName: contactName ?? this.contactName,
       contactPhone: contactPhone ?? this.contactPhone,
+      medicationRecordsJson:
+          medicationRecordsJson ?? this.medicationRecordsJson,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
       staffFee: staffFee ?? this.staffFee,
       oxygenFee: oxygenFee ?? this.oxygenFee,
       totalFee: totalFee ?? this.totalFee,
@@ -17816,8 +17869,6 @@ class AmbulanceRecordsCompanion extends UpdateCompanion<AmbulanceRecord> {
       burnArea: burnArea ?? this.burnArea,
       traumaOther: traumaOther ?? this.traumaOther,
       isProxyStatement: isProxyStatement ?? this.isProxyStatement,
-      createdAt: createdAt ?? this.createdAt,
-      updatedAt: updatedAt ?? this.updatedAt,
     );
   }
 
@@ -17993,6 +18044,17 @@ class AmbulanceRecordsCompanion extends UpdateCompanion<AmbulanceRecord> {
     if (contactPhone.present) {
       map['contact_phone'] = Variable<String>(contactPhone.value);
     }
+    if (medicationRecordsJson.present) {
+      map['medication_records_json'] = Variable<String>(
+        medicationRecordsJson.value,
+      );
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
     if (staffFee.present) {
       map['staff_fee'] = Variable<int>(staffFee.value);
     }
@@ -18077,12 +18139,6 @@ class AmbulanceRecordsCompanion extends UpdateCompanion<AmbulanceRecord> {
     if (isProxyStatement.present) {
       map['is_proxy_statement'] = Variable<bool>(isProxyStatement.value);
     }
-    if (createdAt.present) {
-      map['created_at'] = Variable<DateTime>(createdAt.value);
-    }
-    if (updatedAt.present) {
-      map['updated_at'] = Variable<DateTime>(updatedAt.value);
-    }
     return map;
   }
 
@@ -18140,6 +18196,9 @@ class AmbulanceRecordsCompanion extends UpdateCompanion<AmbulanceRecord> {
           ..write('relationshipType: $relationshipType, ')
           ..write('contactName: $contactName, ')
           ..write('contactPhone: $contactPhone, ')
+          ..write('medicationRecordsJson: $medicationRecordsJson, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
           ..write('staffFee: $staffFee, ')
           ..write('oxygenFee: $oxygenFee, ')
           ..write('totalFee: $totalFee, ')
@@ -18163,9 +18222,7 @@ class AmbulanceRecordsCompanion extends UpdateCompanion<AmbulanceRecord> {
           ..write('burnDegree: $burnDegree, ')
           ..write('burnArea: $burnArea, ')
           ..write('traumaOther: $traumaOther, ')
-          ..write('isProxyStatement: $isProxyStatement, ')
-          ..write('createdAt: $createdAt, ')
-          ..write('updatedAt: $updatedAt')
+          ..write('isProxyStatement: $isProxyStatement')
           ..write(')'))
         .toString();
   }
@@ -30293,6 +30350,9 @@ typedef $$AmbulanceRecordsTableCreateCompanionBuilder =
       Value<String?> relationshipType,
       Value<String?> contactName,
       Value<String?> contactPhone,
+      Value<String> medicationRecordsJson,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
       Value<int?> staffFee,
       Value<int?> oxygenFee,
       Value<int?> totalFee,
@@ -30317,8 +30377,6 @@ typedef $$AmbulanceRecordsTableCreateCompanionBuilder =
       Value<String?> burnArea,
       Value<String?> traumaOther,
       Value<bool?> isProxyStatement,
-      Value<DateTime> createdAt,
-      Value<DateTime> updatedAt,
     });
 typedef $$AmbulanceRecordsTableUpdateCompanionBuilder =
     AmbulanceRecordsCompanion Function({
@@ -30371,6 +30429,9 @@ typedef $$AmbulanceRecordsTableUpdateCompanionBuilder =
       Value<String?> relationshipType,
       Value<String?> contactName,
       Value<String?> contactPhone,
+      Value<String> medicationRecordsJson,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
       Value<int?> staffFee,
       Value<int?> oxygenFee,
       Value<int?> totalFee,
@@ -30395,8 +30456,6 @@ typedef $$AmbulanceRecordsTableUpdateCompanionBuilder =
       Value<String?> burnArea,
       Value<String?> traumaOther,
       Value<bool?> isProxyStatement,
-      Value<DateTime> createdAt,
-      Value<DateTime> updatedAt,
     });
 
 class $$AmbulanceRecordsTableFilterComposer
@@ -30653,6 +30712,21 @@ class $$AmbulanceRecordsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<String> get medicationRecordsJson => $composableBuilder(
+    column: $table.medicationRecordsJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
   ColumnFilters<int> get staffFee => $composableBuilder(
     column: $table.staffFee,
     builder: (column) => ColumnFilters(column),
@@ -30770,16 +30844,6 @@ class $$AmbulanceRecordsTableFilterComposer
 
   ColumnFilters<bool> get isProxyStatement => $composableBuilder(
     column: $table.isProxyStatement,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<DateTime> get createdAt => $composableBuilder(
-    column: $table.createdAt,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
-    column: $table.updatedAt,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -31039,6 +31103,21 @@ class $$AmbulanceRecordsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get medicationRecordsJson => $composableBuilder(
+    column: $table.medicationRecordsJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<int> get staffFee => $composableBuilder(
     column: $table.staffFee,
     builder: (column) => ColumnOrderings(column),
@@ -31156,16 +31235,6 @@ class $$AmbulanceRecordsTableOrderingComposer
 
   ColumnOrderings<bool> get isProxyStatement => $composableBuilder(
     column: $table.isProxyStatement,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
-    column: $table.createdAt,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
-    column: $table.updatedAt,
     builder: (column) => ColumnOrderings(column),
   );
 }
@@ -31409,6 +31478,17 @@ class $$AmbulanceRecordsTableAnnotationComposer
     builder: (column) => column,
   );
 
+  GeneratedColumn<String> get medicationRecordsJson => $composableBuilder(
+    column: $table.medicationRecordsJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
   GeneratedColumn<int> get staffFee =>
       $composableBuilder(column: $table.staffFee, builder: (column) => column);
 
@@ -31514,12 +31594,6 @@ class $$AmbulanceRecordsTableAnnotationComposer
     column: $table.isProxyStatement,
     builder: (column) => column,
   );
-
-  GeneratedColumn<DateTime> get createdAt =>
-      $composableBuilder(column: $table.createdAt, builder: (column) => column);
-
-  GeneratedColumn<DateTime> get updatedAt =>
-      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
 }
 
 class $$AmbulanceRecordsTableTableManager
@@ -31609,6 +31683,9 @@ class $$AmbulanceRecordsTableTableManager
                 Value<String?> relationshipType = const Value.absent(),
                 Value<String?> contactName = const Value.absent(),
                 Value<String?> contactPhone = const Value.absent(),
+                Value<String> medicationRecordsJson = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
                 Value<int?> staffFee = const Value.absent(),
                 Value<int?> oxygenFee = const Value.absent(),
                 Value<int?> totalFee = const Value.absent(),
@@ -31634,8 +31711,6 @@ class $$AmbulanceRecordsTableTableManager
                 Value<String?> burnArea = const Value.absent(),
                 Value<String?> traumaOther = const Value.absent(),
                 Value<bool?> isProxyStatement = const Value.absent(),
-                Value<DateTime> createdAt = const Value.absent(),
-                Value<DateTime> updatedAt = const Value.absent(),
               }) => AmbulanceRecordsCompanion(
                 id: id,
                 visitId: visitId,
@@ -31686,6 +31761,9 @@ class $$AmbulanceRecordsTableTableManager
                 relationshipType: relationshipType,
                 contactName: contactName,
                 contactPhone: contactPhone,
+                medicationRecordsJson: medicationRecordsJson,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
                 staffFee: staffFee,
                 oxygenFee: oxygenFee,
                 totalFee: totalFee,
@@ -31710,8 +31788,6 @@ class $$AmbulanceRecordsTableTableManager
                 burnArea: burnArea,
                 traumaOther: traumaOther,
                 isProxyStatement: isProxyStatement,
-                createdAt: createdAt,
-                updatedAt: updatedAt,
               ),
           createCompanionCallback:
               ({
@@ -31765,6 +31841,9 @@ class $$AmbulanceRecordsTableTableManager
                 Value<String?> relationshipType = const Value.absent(),
                 Value<String?> contactName = const Value.absent(),
                 Value<String?> contactPhone = const Value.absent(),
+                Value<String> medicationRecordsJson = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
                 Value<int?> staffFee = const Value.absent(),
                 Value<int?> oxygenFee = const Value.absent(),
                 Value<int?> totalFee = const Value.absent(),
@@ -31790,8 +31869,6 @@ class $$AmbulanceRecordsTableTableManager
                 Value<String?> burnArea = const Value.absent(),
                 Value<String?> traumaOther = const Value.absent(),
                 Value<bool?> isProxyStatement = const Value.absent(),
-                Value<DateTime> createdAt = const Value.absent(),
-                Value<DateTime> updatedAt = const Value.absent(),
               }) => AmbulanceRecordsCompanion.insert(
                 id: id,
                 visitId: visitId,
@@ -31842,6 +31919,9 @@ class $$AmbulanceRecordsTableTableManager
                 relationshipType: relationshipType,
                 contactName: contactName,
                 contactPhone: contactPhone,
+                medicationRecordsJson: medicationRecordsJson,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
                 staffFee: staffFee,
                 oxygenFee: oxygenFee,
                 totalFee: totalFee,
@@ -31866,8 +31946,6 @@ class $$AmbulanceRecordsTableTableManager
                 burnArea: burnArea,
                 traumaOther: traumaOther,
                 isProxyStatement: isProxyStatement,
-                createdAt: createdAt,
-                updatedAt: updatedAt,
               ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
