@@ -20,7 +20,7 @@ class PlanData extends ChangeNotifier {
   ];
 
   static final List<String> referralHospitals = [
-    '諾新國際醫院',
+    '聯新國際醫院',
     '林口長庚醫院',
     '衛生福利部桃園醫院',
     '衛生福利部桃園療養院',
@@ -314,7 +314,7 @@ class PlanData extends ChangeNotifier {
   Map<String, bool> followUpResults = {
     '繼續搭機旅行': false,
     '休息觀察或自行回家': false,
-    '轉諾新國際醫院': false,
+    '轉聯新國際醫院': false,
     '轉林口長庚醫院': false,
     '轉其他醫院': false,
     '建議轉診門診追蹤': false,
@@ -462,7 +462,7 @@ class PlanData extends ChangeNotifier {
     followUpResults = {
       '繼續搭機旅行': false,
       '休息觀察或自行回家': false,
-      '轉諾新國際醫院': false,
+      '轉聯新國際醫院': false,
       '轉林口長庚醫院': false,
       '轉其他醫院': false,
       '建議轉診門診追蹤': false,

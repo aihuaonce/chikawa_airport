@@ -882,7 +882,7 @@ class _ReferralFormPageState extends State<ReferralFormPage>
           _buildInputRow(
             t,
             t.isZh ? "建議轉診院所名稱：" : "Referral Hospital:",
-            t.isZh ? "諾新國際醫院" : "Landseed Hospital",
+            t.isZh ? "聯新國際醫院" : "Landseed Hospital",
             referralHospitalCtrl,
           ),
           const SizedBox(height: 8),
