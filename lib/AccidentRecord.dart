@@ -24,10 +24,15 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
   // ===============================================
   bool _isLoading = true;
 
-  // 外觀參數
+  // ===== 外觀參數（只動樣式）=====
   static const double _outerHpad = 48;
-  static const double _cardMaxWidth = 1100;
+  static const double _cardMaxWidth = 1000; // ★ 白卡 maxWidth 規格：800
   static const double _radius = 16;
+
+  // ★ 主題色（不動邏輯）
+  static const Color _deepGreen = Color(0xFF274C4A); // 單/複選選中
+  static const Color _lightGreen = Color(0xFF83ACA9); // 更新時間按鈕
+  static const Color _border = Color(0xFFCBD5E1);
 
   // 選項列表（保留原有項目）
   final List<String> reportUnits = const [
@@ -434,7 +439,7 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
                           accidentData.notifyTime = dt;
                           accidentData.update();
                           _calculateTimeDifference(accidentData);
-                        },
+                        }, 
                       ),
                       const SizedBox(height: 16),
 
@@ -476,12 +481,13 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
                       const SizedBox(height: 12),
 
                       _dateTimePicker(
-                        label: t.oocPickUpTime, // 翻譯 key: OOC pick-up time (新增)
+                        label: t.oocPickUpTime, // OOC pick-up time
                         value: accidentData.pickUpTime,
                         onChanged: (dt) {
                           accidentData.pickUpTime = dt;
                           accidentData.update();
                         },
+                        labelWidth: 160,  // ← 只針對這一行放大，避免被省略
                       ),
                       const SizedBox(height: 8),
                       _dateTimePicker(
@@ -545,7 +551,7 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
 
                       _inputRowBold(
                         t.elapsedTime,
-                        t.exampleElapsedTimeHint, // 例如：10分30秒 (由 translations 提供)
+                        t.exampleElapsedTimeHint,
                         costCtrl,
                         onChanged: _onTextFieldChanged,
                       ),
@@ -654,58 +660,72 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
         borderRadius: BorderRadius.circular(_radius),
         boxShadow: const [
           BoxShadow(
-            color: Color(0x14000000),
-            blurRadius: 8,
-            offset: Offset(0, 4),
+            color: Color(0x1A000000), // 柔和陰影（~10% 黑）
+            blurRadius: 14,
+            offset: Offset(0, 6),
           ),
         ],
+        border: const Border(
+          top: BorderSide(color: _border),
+          right: BorderSide(color: _border),
+          bottom: BorderSide(color: _border),
+          left: BorderSide(color: _border),
+        ),
       ),
       child: child,
     );
   }
 
   Widget _boldLabel(String s) => Text(
-    s,
-    style: const TextStyle(
-      fontSize: 16,
-      fontWeight: FontWeight.w700,
-      color: Colors.black87,
-    ),
-  );
+        s,
+        style: const TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w700,
+          color: Colors.black87,
+          height: 1.25,
+        ),
+      );
 
-  Widget _labeledRowBold({required String label, required Widget child}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          SizedBox(
-            width: 160,
-            child: Text(
-              label,
-              style: const TextStyle(
-                fontSize: 15.5,
-                color: Colors.black87,
-                fontWeight: FontWeight.w700,
-              ),
+  // ★ 共用：標籤在左、內容在右（縮小標籤寬，讓間距變小）
+  Widget _labeledRowBold({required String label, required Widget child,double labelWidth = 108,}) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(vertical: 6),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        ConstrainedBox(
+  constraints: BoxConstraints(
+    minWidth: labelWidth,
+    maxWidth: labelWidth,
+  ),
+          child: Text(
+            label,
+            softWrap: false,
+            overflow: TextOverflow.fade, // 避免斷行撐寬
+            style: const TextStyle(
+              fontSize: 15.5,
+              color: Colors.black87,
+              fontWeight: FontWeight.w700,
+              height: 1.2,
             ),
           ),
-          Expanded(
-            child: Align(alignment: Alignment.centerLeft, child: child),
-          ),
-        ],
-      ),
-    );
-  }
-
+        ),
+        const SizedBox(width: 6), // ← 固定小縫隙，視覺靠更近
+        Expanded(child: Align(alignment: Alignment.centerLeft, child: child)),
+      ],
+    ),
+  );
+}
   Widget _dateTimePicker({
     required String label,
     required DateTime? value,
     required ValueChanged<DateTime?> onChanged,
+    double labelWidth = 95,   
   }) {
     final t = AppTranslations.of(context);
     return _labeledRowBold(
       label: label,
+      labelWidth: labelWidth, // 傳下去 
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -751,6 +771,7 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
     required String label,
     required DateTime? value,
     required ValueChanged<DateTime?> onChanged,
+    double labelWidth = 95,   // 新增
   }) {
     final t = AppTranslations.of(context);
     return _labeledRowBold(
@@ -788,8 +809,9 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
   }) {
     return _labeledRowBold(
       label: label,
+      
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 420),
+        constraints: const BoxConstraints(maxWidth: 300),
         child: TextField(
           controller: ctrl,
           decoration: InputDecoration(
@@ -798,7 +820,7 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
             border: const OutlineInputBorder(),
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 10,
-              vertical: 10,
+              vertical: 8, // ★ 原 10 -> 8 視覺更緊
             ),
           ),
           onChanged: (value) {
@@ -816,7 +838,16 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
   ) {
     return _labeledRowBold(
       label: label,
-      child: Checkbox(value: value, onChanged: onChanged),
+      labelWidth: 160,
+      child: Checkbox(
+        value: value,
+        onChanged: onChanged,
+        activeColor: _deepGreen, // ★ 勾選深綠
+        checkColor: Colors.white,
+        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        visualDensity: const VisualDensity(horizontal: -1, vertical: -1),
+        side: const BorderSide(color: _border, width: 1.2),
+      ),
     );
   }
 
@@ -827,7 +858,7 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
   }) {
     return Wrap(
       spacing: 14,
-      runSpacing: 4,
+      runSpacing: 10, // ★ 原 4 -> 10：兩排行距更舒服
       children: List.generate(options.length, (i) {
         final selected = groupIndex == i;
         return InkWell(
@@ -838,7 +869,7 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
               Icon(
                 selected ? Icons.radio_button_checked : Icons.radio_button_off,
                 size: 20,
-                color: selected ? const Color(0xFF274C4A) : Colors.black45,
+                color: selected ? _deepGreen : Colors.black45,
               ),
               const SizedBox(width: 6),
               Text(options[i], style: const TextStyle(fontSize: 15.5)),
@@ -856,7 +887,15 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
   }) {
     return Row(
       children: [
-        Checkbox(value: value, onChanged: onChanged),
+        Checkbox(
+          value: value,
+          onChanged: onChanged,
+          activeColor: _deepGreen, // ★ 深綠
+          checkColor: Colors.white,
+          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          visualDensity: const VisualDensity(horizontal: -1, vertical: -1),
+          side: const BorderSide(color: _border, width: 1.2),
+        ),
         const SizedBox(width: 6),
         Text(label, style: const TextStyle(fontSize: 15.5)),
       ],
@@ -869,13 +908,13 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
           padding: const EdgeInsets.symmetric(horizontal: 12),
-          backgroundColor: const Color(0xFF6C63FF),
-          foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+          backgroundColor: _lightGreen, // ★ #83ACA9
+          foregroundColor: Colors.white, // ★ 白字
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           elevation: 0,
         ),
         onPressed: onTap,
-        child: Text(text, style: const TextStyle(fontSize: 12.5)),
+        child: Text(text, style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600)),
       ),
     );
   }
@@ -945,7 +984,7 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
       padding: const EdgeInsets.only(top: 6.0),
       child: Wrap(
         spacing: 18,
-        runSpacing: 6,
+        runSpacing: 8, // 微增垂直行距
         children: List.generate(opts.length, (i) {
           final selected = groupIndex == i;
           return InkWell(
@@ -958,7 +997,7 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
                       ? Icons.radio_button_checked
                       : Icons.radio_button_off,
                   size: 20,
-                  color: selected ? const Color(0xFF274C4A) : Colors.black45,
+                  color: selected ? _deepGreen : Colors.black45,
                 ),
                 const SizedBox(width: 6),
                 Text(opts[i], style: const TextStyle(fontSize: 15.5)),

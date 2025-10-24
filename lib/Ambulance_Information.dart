@@ -13,9 +13,10 @@ class AmbulanceInformationPage extends StatefulWidget {
 }
 
 class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
-  // ===== 版面外觀 (靜態常量) =====
+  // ===== 版面外觀 (只動樣式) =====
   static const double _cardRadius = 16;
-  static const double _labelWidth = 160;
+  static const double _labelWidth = 120; // ★ 縮短標題欄寬，減少標題與輸入框的空隙
+  static const double _cardMaxWidth = 1000; // ★ 卡片最大寬度統一為1000
 
   // ===== 文字輸入控制器 =====
   final _plateCtrl = TextEditingController();
@@ -24,31 +25,14 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
 
   // ===== 選項列表 (靜態常量，無需翻譯) =====
   static const List<String> remotePlaces = [
-    '601',
-    '602',
-    '603',
-    '604',
-    '605',
-    '606',
-    '607',
-    '608',
-    '609',
-    '610',
-    '611',
-    '612',
-    '613',
-    '614',
-    '615',
+    '601','602','603','604','605','606','607','608','609','610','611','612','613','614','615',
   ];
 
   @override
   void initState() {
     super.initState();
-    // 延遲一幀執行,確保 Provider 已經準備好
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        _loadInitialData();
-      }
+      if (mounted) _loadInitialData();
     });
   }
 
@@ -68,13 +52,11 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
   }
 
   void _saveToProvider(List<String> hospitals) {
-    // 【修改】傳入醫院列表
     final data = context.read<AmbulanceData>();
 
     String? destinationHospitalName;
     if (data.destinationHospitalIdx != null) {
       if (data.destinationHospitalIdx == hospitals.length - 1) {
-        // 如果是「其他」
         destinationHospitalName = _otherDestCtrl.text;
       } else {
         destinationHospitalName = hospitals[data.destinationHospitalIdx!];
@@ -107,157 +89,60 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
       initialTime: TimeOfDay.fromDateTime(base),
     );
     if (time == null) return;
-    onChanged(
-      DateTime(date.year, date.month, date.day, time.hour, time.minute),
-    );
+    onChanged(DateTime(date.year, date.month, date.day, time.hour, time.minute));
   }
 
   @override
   Widget build(BuildContext context) {
-    final t = AppTranslations.of(context); // 【新增】取得翻譯物件
+    final t = AppTranslations.of(context);
 
-    // 【修改】將靜態列表改為在 build 方法中動態建立
+    // 動態翻譯列表（不動邏輯/選項，只是用現有 t.*）
     final List<String> placeGroups = [
-      t.terminal1,
-      t.terminal2,
-      t.remoteApron,
-      t.cargoOther,
-      t.novotelHotel,
-      t.insideAircraft,
+      t.terminal1, t.terminal2, t.remoteApron, t.cargoOther, t.novotelHotel, t.insideAircraft,
     ];
-
     final List<String> t1Places = [
-      t.departureCounter,
-      t.arrivalCounter,
-      t.vipLounge,
-      t.departureHallPublic,
-      t.departureLevelRestricted,
-      t.arrivalHallPublic,
-      t.arrivalLevelRestricted,
-      t.foodCourt,
-      t.aviationPolice,
-      t.airportMRT,
-      t.carPark1,
-      t.carPark2,
-      t.departureBusDropOff,
-      t.arrivalBusPickUp,
-      t.departureSecurityCheck,
-      t.baggageClaim,
-      t.customs,
-      t.gateLabel('A1'),
-      t.gateLabel('A2'),
-      t.gateLabel('A3'),
-      t.gateLabel('A4'),
-      t.gateLabel('A5'),
-      t.gateLabel('A6'),
-      t.gateLabel('A7'),
-      t.gateLabel('A8'),
-      t.gateLabel('A9'),
-      t.transferCounterA,
-      t.transferCounterB,
-      t.transferSecurityA,
-      t.transferSecurityB,
-      t.skytrainAirside,
-      t.skytrainLandside,
-      t.otherLocation,
-      t.gateLabel('B1'),
-      t.gateLabel('B2'),
-      t.gateLabel('B3'),
-      t.gateLabel('B4'),
-      t.gateLabel('B5'),
-      t.gateLabel('B6'),
-      t.gateLabel('B7'),
-      t.gateLabel('B8'),
-      t.gateLabel('B9'),
-      t.gateLabel('B1R'),
+      t.departureCounter, t.arrivalCounter, t.vipLounge, t.departureHallPublic,
+      t.departureLevelRestricted, t.arrivalHallPublic, t.arrivalLevelRestricted,
+      t.foodCourt, t.aviationPolice, t.airportMRT, t.carPark1, t.carPark2,
+      t.departureBusDropOff, t.arrivalBusPickUp, t.departureSecurityCheck,
+      t.baggageClaim, t.customs,
+      t.gateLabel('A1'), t.gateLabel('A2'), t.gateLabel('A3'), t.gateLabel('A4'), t.gateLabel('A5'),
+      t.gateLabel('A6'), t.gateLabel('A7'), t.gateLabel('A8'), t.gateLabel('A9'),
+      t.transferCounterA, t.transferCounterB, t.transferSecurityA, t.transferSecurityB,
+      t.skytrainAirside, t.skytrainLandside, t.otherLocation,
+      t.gateLabel('B1'), t.gateLabel('B2'), t.gateLabel('B3'), t.gateLabel('B4'), t.gateLabel('B5'),
+      t.gateLabel('B6'), t.gateLabel('B7'), t.gateLabel('B8'), t.gateLabel('B9'), t.gateLabel('B1R'),
     ];
-
     final List<String> t2Places = [
-      t.departureCounter,
-      t.arrivalCounter,
-      t.vipLounge,
-      t.departureHallPublic,
-      t.departureLevelRestricted,
-      t.arrivalHallPublic,
-      t.arrivalLevelRestricted,
-      t.foodCourt,
-      t.aviationPolice,
-      t.airportMRT,
-      t.carPark3,
-      t.carPark4,
-      t.northObservationDeck,
-      t.southObservationDeck,
-      t.northWing5F,
-      t.southWing5F,
-      t.gateLabel('D1'),
-      t.gateLabel('D2'),
-      t.gateLabel('D3'),
-      t.gateLabel('D4'),
-      t.gateLabel('D5'),
-      t.gateLabel('D6'),
-      t.gateLabel('D7'),
-      t.gateLabel('D8'),
-      t.gateLabel('D9'),
-      t.gateLabel('D10'),
-      t.gateLabel('C1'),
-      t.gateLabel('C2'),
-      t.gateLabel('C3'),
-      t.gateLabel('C4'),
-      t.gateLabel('C5'),
-      t.gateLabel('C6'),
-      t.gateLabel('C7'),
-      t.gateLabel('C8'),
-      t.gateLabel('C9'),
-      t.transferCounterC,
-      t.transferSecurityC,
-      t.skytrainAirside,
-      t.skytrainLandside,
-      t.otherLocation,
-      t.gateLabel('C5R'),
+      t.departureCounter, t.arrivalCounter, t.vipLounge, t.departureHallPublic,
+      t.departureLevelRestricted, t.arrivalHallPublic, t.arrivalLevelRestricted,
+      t.foodCourt, t.aviationPolice, t.airportMRT, t.carPark3, t.carPark4,
+      t.northObservationDeck, t.southObservationDeck, t.northWing5F, t.southWing5F,
+      t.gateLabel('D1'), t.gateLabel('D2'), t.gateLabel('D3'), t.gateLabel('D4'), t.gateLabel('D5'),
+      t.gateLabel('D6'), t.gateLabel('D7'), t.gateLabel('D8'), t.gateLabel('D9'), t.gateLabel('D10'),
+      t.gateLabel('C1'), t.gateLabel('C2'), t.gateLabel('C3'), t.gateLabel('C4'), t.gateLabel('C5'),
+      t.gateLabel('C6'), t.gateLabel('C7'), t.gateLabel('C8'), t.gateLabel('C9'),
+      t.transferCounterC, t.transferSecurityC, t.skytrainAirside, t.skytrainLandside,
+      t.otherLocation, t.gateLabel('C5R'),
     ];
-
     final List<String> cargoPlaces = [
-      t.taxiway,
-      '506',
-      '507',
-      '508',
-      '509',
-      '510',
-      '511',
-      '512',
-      '513',
-      '514',
-      '515',
-      t.tacHangar,
-      t.maintenanceApron,
-      t.evergreenAerospace,
-      t.otherApronLocation,
+      t.taxiway, '506','507','508','509','510','511','512','513','514','515',
+      t.tacHangar, t.maintenanceApron, t.evergreenAerospace, t.otherApronLocation,
     ];
-
     final List<String> novotelPlaces = [t.novotelHotel];
     final List<String> cabinPlaces = [t.insideAircraft];
 
     final List<String> hospitals = [
-      t.landseedHospital,
-      t.linkouChangGung,
-      t.taoyuanHospital,
-      t.taoyuanPsychiatricCenter,
-      t.taoyuanMinSheng,
-      t.stPaulsHospital,
-      t.tienShengHospital,
-      t.taoyuanVeteransHospital,
-      t.enChuKungHospital,
-      t.other,
+      t.landseedHospital, t.linkouChangGung, t.taoyuanHospital, t.taoyuanPsychiatricCenter,
+      t.taoyuanMinSheng, t.stPaulsHospital, t.tienShengHospital,
+      t.taoyuanVeteransHospital, t.enChuKungHospital, t.other,
     ];
 
-    int? hospitalIdx;
-
-    // ===== 運送原因（★ Added）=====
+    // 運送原因（保留你原本的新增欄位，文字用既有 t.*）
     final List<String> transportReasons = [
-      t.patientConditionRequired,
-      t.patientOrFamilyRequest,
-    ]; // ★ Added
-    int? transportReasonIdx; // ★ Added
+      t.patientConditionRequired, t.patientOrFamilyRequest,
+    ];
+    int? transportReasonIdx;
 
     return Consumer<AmbulanceData>(
       builder: (context, data, child) {
@@ -266,36 +151,34 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
           child: Align(
             alignment: Alignment.topCenter,
             child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 1100),
+              constraints: const BoxConstraints(maxWidth: _cardMaxWidth), // ★ 800
               child: _card(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _rowTop(
-                      label: t.plateNumber, // 【修改】
+                      label: t.plateNumber,
+                      labelWidth: 84,
                       child: ConstrainedBox(
-                        constraints: const BoxConstraints(maxWidth: 420),
+                        constraints: const BoxConstraints(maxWidth: 250), // ★ 輸入框略短
                         child: TextField(
                           controller: _plateCtrl,
-                          onChanged: (_) => _saveToProvider(hospitals), // 【修改】
+                          onChanged: (_) => _saveToProvider(hospitals),
                           decoration: InputDecoration(
-                            hintText: t.enterPlateNumberHint, // 【修改】
+                            hintText: t.enterPlateNumberHint,
                             border: const OutlineInputBorder(),
                             isDense: true,
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                           ),
                         ),
                       ),
                     ),
                     const SizedBox(height: 12),
 
-                    _bold(t.incidentLocation), // 【修改】
+                    _bold(t.incidentLocation),
                     const SizedBox(height: 6),
-                    Container(
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      padding: const EdgeInsets.fromLTRB(12, 8, 12, 12),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(0, 0, 0, 4),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -316,46 +199,47 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
                           ),
                           const SizedBox(height: 8),
                           _placeSubOptions(
-                            data,
-                            t1Places,
-                            t2Places,
-                            cargoPlaces,
-                            novotelPlaces,
-                            cabinPlaces,
-                          ), // 【修改】傳入列表
+                            data, t1Places, t2Places, cargoPlaces, novotelPlaces, cabinPlaces,
+                          ),
                         ],
                       ),
                     ),
                     const SizedBox(height: 12),
 
                     _rowTop(
-                      label: t.locationNotes, // 【修改】
+                      label: t.locationNotes,
+                      labelWidth: 84,
                       child: ConstrainedBox(
-                        constraints: const BoxConstraints(maxWidth: 700),
+                        constraints: const BoxConstraints(maxWidth: 300), // ★ 略縮短
                         child: TextField(
                           controller: _placeNoteCtrl,
-                          onChanged: (_) => _saveToProvider(hospitals), // 【修改】
+                          onChanged: (_) => _saveToProvider(hospitals),
+                          decoration: InputDecoration(
+                            hintText: t.enterLocationNotes, // 若沒有此 key 也不會影響既有內容
+                            border: const OutlineInputBorder(),
+                            isDense: true,
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                          ),
                         ),
                       ),
                     ),
                     const SizedBox(height: 16),
 
                     _dateTimeRow(
-                      label: t.dutyDateTime, // 【修改】
+                      label: t.dutyDateTime,
                       value: data.dutyTime,
                       onChanged: (dt) => data.updateInformation(dutyTime: dt),
                     ),
                     const SizedBox(height: 8),
                     _dateTimeRow(
-                      label: t.arriveSceneTime, // 【修改】
+                      label: t.arriveSceneTime,
                       value: data.arriveSceneTime,
-                      onChanged: (dt) =>
-                          data.updateInformation(arriveSceneTime: dt),
+                      onChanged: (dt) => data.updateInformation(arriveSceneTime: dt),
                     ),
                     const SizedBox(height: 16),
 
                     _rowTop(
-                      label: t.destinationHospitalOrPlace, // 【修改】
+                      label: t.destinationHospitalOrPlace,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: List.generate(hospitals.length, (i) {
@@ -365,10 +249,8 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
                               label: hospitals[i],
                               isSelected: data.destinationHospitalIdx == i,
                               onTap: () {
-                                data.updateInformation(
-                                  destinationHospitalIdx: i,
-                                );
-                                _saveToProvider(hospitals); // 【修改】
+                                data.updateInformation(destinationHospitalIdx: i);
+                                _saveToProvider(hospitals);
                               },
                             ),
                           );
@@ -376,59 +258,59 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
                       ),
                     ),
 
-                    if (data.destinationHospitalIdx ==
-                        hospitals.length - 1) ...[
+                    if (data.destinationHospitalIdx == hospitals.length - 1) ...[
                       const SizedBox(height: 10),
                       _rowTop(
-                        label: t.otherHospitalName, // 【修改】
+                        label: t.otherHospitalName,
                         child: ConstrainedBox(
-                          constraints: const BoxConstraints(maxWidth: 700),
+                          constraints: const BoxConstraints(maxWidth: 300),
                           child: TextField(
                             controller: _otherDestCtrl,
-                            onChanged: (_) =>
-                                _saveToProvider(hospitals), // 【修改】
+                            onChanged: (_) => _saveToProvider(hospitals),
+                            decoration: const InputDecoration(
+                              border: OutlineInputBorder(),
+                              isDense: true,
+                              contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                            ),
                           ),
                         ),
                       ),
                     ],
+
                     const SizedBox(height: 12),
                     _rowTop(
-                      label: '運送原因', // ★ Added
+                      label: '運送原因', 
+                      labelWidth: 84,
                       child: _radioWrap(
-                        // ★ Added
                         options: transportReasons,
                         groupIndex: transportReasonIdx,
-                        onChanged: (i) =>
-                            setState(() => transportReasonIdx = i),
+                        onChanged: (i) => setState(() => transportReasonIdx = i),
                       ),
                     ),
+
                     const SizedBox(height: 16),
                     _dateTimeRow(
-                      label: t.leaveSceneTime, // 【修改】
+                      label: t.leaveSceneTime,
                       value: data.leaveSceneTime,
-                      onChanged: (dt) =>
-                          data.updateInformation(leaveSceneTime: dt),
+                      onChanged: (dt) => data.updateInformation(leaveSceneTime: dt),
                     ),
                     const SizedBox(height: 8),
                     _dateTimeRow(
-                      label: t.arriveHospitalTime, // 【修改】
+                      label: t.arriveHospitalTime,
                       value: data.arriveHospitalTime,
-                      onChanged: (dt) =>
-                          data.updateInformation(arriveHospitalTime: dt),
+                      onChanged: (dt) => data.updateInformation(arriveHospitalTime: dt),
                     ),
                     const SizedBox(height: 8),
                     _dateTimeRow(
-                      label: t.leaveHospitalTime, // 【修改】
+                      label: t.leaveHospitalTime,
                       value: data.leaveHospitalTime,
-                      onChanged: (dt) =>
-                          data.updateInformation(leaveHospitalTime: dt),
+                      onChanged: (dt) => data.updateInformation(leaveHospitalTime: dt),
                     ),
                     const SizedBox(height: 8),
                     _dateTimeRow(
-                      label: t.backToStandbyTime, // 【修改】
+                      label: t.backToStandbyTime,
                       value: data.backStandbyTime,
-                      onChanged: (dt) =>
-                          data.updateInformation(backStandbyTime: dt),
+                      onChanged: (dt) => data.updateInformation(backStandbyTime: dt),
                     ),
                   ],
                 ),
@@ -440,16 +322,16 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
     );
   }
 
-  // ====== 小積木 (Helper Widgets) ======
+  // ====== 小積木 (樣式微調版) ======
   Widget _card({required Widget child}) {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 18, 20, 22),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(_cardRadius),
+        borderRadius: BorderRadius.circular(_cardRadius), // 圓角 16
         boxShadow: const [
           BoxShadow(
-            color: Color(0x14000000),
+            color: Color(0x14000000), // 柔和陰影
             blurRadius: 8,
             offset: Offset(0, 4),
           ),
@@ -460,15 +342,16 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
   }
 
   Widget _bold(String s) => Text(
-    s,
-    style: const TextStyle(
-      fontSize: 16,
-      fontWeight: FontWeight.w700,
-      color: Colors.black87,
-    ),
-  );
+        s,
+        style: const TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w700,
+          color: Colors.black87,
+          height: 1.25,
+        ),
+      );
 
-  Widget _rowTop({required String label, required Widget child}) {
+  Widget _rowTop({required String label, required Widget child,double? labelWidth,}) {
     final Widget effectiveChild = child is TextField
         ? Theme(
             data: Theme.of(context).copyWith(
@@ -486,7 +369,7 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SizedBox(
-          width: _labelWidth,
+          width: labelWidth ?? _labelWidth, // ★ 縮短後，右側空白變小
           child: Padding(
             padding: const EdgeInsets.only(top: 8),
             child: Text(
@@ -495,13 +378,12 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
                 fontSize: 15.5,
                 color: Colors.black87,
                 fontWeight: FontWeight.w700,
+                height: 1.25,
               ),
             ),
           ),
         ),
-        Expanded(
-          child: Align(alignment: Alignment.topLeft, child: effectiveChild),
-        ),
+        Expanded(child: Align(alignment: Alignment.topLeft, child: effectiveChild)),
       ],
     );
   }
@@ -511,7 +393,7 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
     required DateTime? value,
     required ValueChanged<DateTime?> onChanged,
   }) {
-    final t = AppTranslations.of(context); // 【新增】
+    final t = AppTranslations.of(context);
     return _rowTop(
       label: label,
       child: Row(
@@ -523,9 +405,7 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 6),
               child: Text(
-                value == null
-                    ? t.pleaseSelectTime
-                    : t.formatFullDateTime(value), // 【修改】
+                value == null ? t.pleaseSelectTime : t.formatFullDateTime(value),
                 style: TextStyle(
                   fontSize: 15,
                   color: value == null ? Colors.blue.shade700 : Colors.black87,
@@ -539,15 +419,12 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
             child: ElevatedButton(
               onPressed: () => onChanged(DateTime.now()),
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF83ACA9),
+                backgroundColor: const Color(0xFF83ACA9), // ★ 規格色
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(horizontal: 12),
                 elevation: 1,
               ),
-              child: Text(
-                t.useCurrentTime,
-                style: const TextStyle(fontSize: 12.5),
-              ), // 【修改】
+              child: Text(t.useCurrentTime, style: const TextStyle(fontSize: 12.5)),
             ),
           ),
         ],
@@ -568,7 +445,7 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
           Icon(
             isSelected ? Icons.radio_button_checked : Icons.radio_button_off,
             size: 20,
-            color: isSelected ? const Color(0xFF274C4A) : Colors.black45,
+            color: isSelected ? const Color(0xFF274C4A) : Colors.black45, // ★ 深綠
           ),
           const SizedBox(width: 8),
           Text(label, style: const TextStyle(fontSize: 15.5)),
@@ -584,7 +461,7 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
   }) {
     return Wrap(
       spacing: 14,
-      runSpacing: 4,
+      runSpacing: 6, // ★ 行距拉開一點
       children: List.generate(options.length, (i) {
         return _radioOption(
           label: options[i],
@@ -603,7 +480,6 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
     List<String> novotelPlaces,
     List<String> cabinPlaces,
   ) {
-    // 【修改】接收翻譯好的列表
     final List<String> opts;
     final int? groupIndex;
     final ValueChanged<int> onChanged;
