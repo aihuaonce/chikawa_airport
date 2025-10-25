@@ -20,7 +20,7 @@ class PlanData extends ChangeNotifier {
   ];
 
   static final List<String> referralHospitals = [
-    '諾新國際醫院',
+    '聯新國際醫院',
     '林口長庚醫院',
     '衛生福利部桃園醫院',
     '衛生福利部桃園療養院',
@@ -40,6 +40,57 @@ class PlanData extends ChangeNotifier {
     '桃園榮民總醫院',
     '三峽恩主公醫院',
     '其他',
+  ];
+
+  static final List<String> escortOptions = [
+    '方詩婷',
+    '夏增正',
+    '江旺財',
+    '呂學政',
+    '海欣茹',
+    '洪雲敏',
+    '徐氏',
+    '康曉朗',
+    '黎裕昌',
+    '戴逸旻',
+    '廖詩怡',
+    '許婷涵',
+    '陳小山',
+    '王悅朗',
+    '劉金宇',
+    '彭士書',
+    '熊得志',
+    '顧小',
+    '蔡心文',
+    '程皓',
+    '楊敏度',
+    '羅尹彤',
+    '廖占用',
+    '陳國平',
+    '蘇敬婷',
+    '黃梨梅',
+    '朱森學',
+    '陳怡穎',
+    '邵詩婷',
+    '莊抒淵',
+    '洪豔',
+    '林育緯',
+    '唐詩婷',
+    '蔡可蓉',
+    '粘瑞敏',
+    '黃馨儀',
+    '陳冠羽',
+    '陳怡玲',
+    '峯雅柔',
+    '何文豪',
+    '王文義',
+    '游橙晶',
+    '胡雅淵',
+    '黃逸誠',
+    '峯季軒',
+    '劉曉敏',
+    '張峻維',
+    '劉昱軒',
   ];
 
   static final List<String> visitingStaff = [
@@ -297,7 +348,8 @@ class PlanData extends ChangeNotifier {
   int? referralAmbulanceType;
   int? referralHospitalIdx;
   String? referralOtherHospital;
-  String? referralEscort;
+  String? referralEscortText;
+  List<String> selectedEscorts = [];
 
   // === 處置詳情 ===
   int? intubationType;
@@ -449,7 +501,8 @@ class PlanData extends ChangeNotifier {
     referralAmbulanceType = null;
     referralHospitalIdx = null;
     referralOtherHospital = null;
-    referralEscort = null;
+    referralEscortText = null;
+    selectedEscorts = [];
     intubationType = null;
     oxygenType = null;
     oxygenFlow = null;
@@ -552,7 +605,8 @@ class PlanData extends ChangeNotifier {
       referralAmbulanceType: Value(referralAmbulanceType),
       referralHospitalIdx: Value(referralHospitalIdx),
       referralOtherHospital: Value(referralOtherHospital),
-      referralEscort: Value(referralEscort),
+      referralEscortText: Value(referralEscortText),
+      selectedEscortsJson: Value(jsonEncode(selectedEscorts)),
       intubationType: Value(intubationType),
       oxygenType: Value(oxygenType),
       oxygenFlow: Value(oxygenFlow),

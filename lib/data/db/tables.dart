@@ -221,7 +221,8 @@ class Treatments extends Table {
   IntColumn get referralAmbulanceType => integer().nullable()();
   IntColumn get referralHospitalIdx => integer().nullable()();
   TextColumn get referralOtherHospital => text().nullable()();
-  TextColumn get referralEscort => text().nullable()();
+  TextColumn get referralEscortText => text().nullable()();
+  TextColumn get selectedEscortsJson => text().nullable()();
   IntColumn get intubationType => integer().nullable()();
   IntColumn get oxygenType => integer().nullable()();
   TextColumn get oxygenFlow => text().nullable()();

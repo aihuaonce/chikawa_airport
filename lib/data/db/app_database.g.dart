@@ -4703,17 +4703,28 @@ class $TreatmentsTable extends Treatments
         type: DriftSqlType.string,
         requiredDuringInsert: false,
       );
-  static const VerificationMeta _referralEscortMeta = const VerificationMeta(
-    'referralEscort',
-  );
+  static const VerificationMeta _referralEscortTextMeta =
+      const VerificationMeta('referralEscortText');
   @override
-  late final GeneratedColumn<String> referralEscort = GeneratedColumn<String>(
-    'referral_escort',
-    aliasedName,
-    true,
-    type: DriftSqlType.string,
-    requiredDuringInsert: false,
-  );
+  late final GeneratedColumn<String> referralEscortText =
+      GeneratedColumn<String>(
+        'referral_escort_text',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _selectedEscortsJsonMeta =
+      const VerificationMeta('selectedEscortsJson');
+  @override
+  late final GeneratedColumn<String> selectedEscortsJson =
+      GeneratedColumn<String>(
+        'selected_escorts_json',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
   static const VerificationMeta _intubationTypeMeta = const VerificationMeta(
     'intubationType',
   );
@@ -4977,7 +4988,8 @@ class $TreatmentsTable extends Treatments
     referralAmbulanceType,
     referralHospitalIdx,
     referralOtherHospital,
-    referralEscort,
+    referralEscortText,
+    selectedEscortsJson,
     intubationType,
     oxygenType,
     oxygenFlow,
@@ -5509,12 +5521,21 @@ class $TreatmentsTable extends Treatments
         ),
       );
     }
-    if (data.containsKey('referral_escort')) {
+    if (data.containsKey('referral_escort_text')) {
       context.handle(
-        _referralEscortMeta,
-        referralEscort.isAcceptableOrUnknown(
-          data['referral_escort']!,
-          _referralEscortMeta,
+        _referralEscortTextMeta,
+        referralEscortText.isAcceptableOrUnknown(
+          data['referral_escort_text']!,
+          _referralEscortTextMeta,
+        ),
+      );
+    }
+    if (data.containsKey('selected_escorts_json')) {
+      context.handle(
+        _selectedEscortsJsonMeta,
+        selectedEscortsJson.isAcceptableOrUnknown(
+          data['selected_escorts_json']!,
+          _selectedEscortsJsonMeta,
         ),
       );
     }
@@ -5917,9 +5938,13 @@ class $TreatmentsTable extends Treatments
         DriftSqlType.string,
         data['${effectivePrefix}referral_other_hospital'],
       ),
-      referralEscort: attachedDatabase.typeMapping.read(
+      referralEscortText: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
-        data['${effectivePrefix}referral_escort'],
+        data['${effectivePrefix}referral_escort_text'],
+      ),
+      selectedEscortsJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}selected_escorts_json'],
       ),
       intubationType: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
@@ -6063,7 +6088,8 @@ class Treatment extends DataClass implements Insertable<Treatment> {
   final int? referralAmbulanceType;
   final int? referralHospitalIdx;
   final String? referralOtherHospital;
-  final String? referralEscort;
+  final String? referralEscortText;
+  final String? selectedEscortsJson;
   final int? intubationType;
   final int? oxygenType;
   final String? oxygenFlow;
@@ -6143,7 +6169,8 @@ class Treatment extends DataClass implements Insertable<Treatment> {
     this.referralAmbulanceType,
     this.referralHospitalIdx,
     this.referralOtherHospital,
-    this.referralEscort,
+    this.referralEscortText,
+    this.selectedEscortsJson,
     this.intubationType,
     this.oxygenType,
     this.oxygenFlow,
@@ -6332,8 +6359,11 @@ class Treatment extends DataClass implements Insertable<Treatment> {
     if (!nullToAbsent || referralOtherHospital != null) {
       map['referral_other_hospital'] = Variable<String>(referralOtherHospital);
     }
-    if (!nullToAbsent || referralEscort != null) {
-      map['referral_escort'] = Variable<String>(referralEscort);
+    if (!nullToAbsent || referralEscortText != null) {
+      map['referral_escort_text'] = Variable<String>(referralEscortText);
+    }
+    if (!nullToAbsent || selectedEscortsJson != null) {
+      map['selected_escorts_json'] = Variable<String>(selectedEscortsJson);
     }
     if (!nullToAbsent || intubationType != null) {
       map['intubation_type'] = Variable<int>(intubationType);
@@ -6543,9 +6573,12 @@ class Treatment extends DataClass implements Insertable<Treatment> {
       referralOtherHospital: referralOtherHospital == null && nullToAbsent
           ? const Value.absent()
           : Value(referralOtherHospital),
-      referralEscort: referralEscort == null && nullToAbsent
+      referralEscortText: referralEscortText == null && nullToAbsent
           ? const Value.absent()
-          : Value(referralEscort),
+          : Value(referralEscortText),
+      selectedEscortsJson: selectedEscortsJson == null && nullToAbsent
+          ? const Value.absent()
+          : Value(selectedEscortsJson),
       intubationType: intubationType == null && nullToAbsent
           ? const Value.absent()
           : Value(intubationType),
@@ -6706,7 +6739,12 @@ class Treatment extends DataClass implements Insertable<Treatment> {
       referralOtherHospital: serializer.fromJson<String?>(
         json['referralOtherHospital'],
       ),
-      referralEscort: serializer.fromJson<String?>(json['referralEscort']),
+      referralEscortText: serializer.fromJson<String?>(
+        json['referralEscortText'],
+      ),
+      selectedEscortsJson: serializer.fromJson<String?>(
+        json['selectedEscortsJson'],
+      ),
       intubationType: serializer.fromJson<int?>(json['intubationType']),
       oxygenType: serializer.fromJson<int?>(json['oxygenType']),
       oxygenFlow: serializer.fromJson<String?>(json['oxygenFlow']),
@@ -6819,7 +6857,8 @@ class Treatment extends DataClass implements Insertable<Treatment> {
       'referralOtherHospital': serializer.toJson<String?>(
         referralOtherHospital,
       ),
-      'referralEscort': serializer.toJson<String?>(referralEscort),
+      'referralEscortText': serializer.toJson<String?>(referralEscortText),
+      'selectedEscortsJson': serializer.toJson<String?>(selectedEscortsJson),
       'intubationType': serializer.toJson<int?>(intubationType),
       'oxygenType': serializer.toJson<int?>(oxygenType),
       'oxygenFlow': serializer.toJson<String?>(oxygenFlow),
@@ -6904,7 +6943,8 @@ class Treatment extends DataClass implements Insertable<Treatment> {
     Value<int?> referralAmbulanceType = const Value.absent(),
     Value<int?> referralHospitalIdx = const Value.absent(),
     Value<String?> referralOtherHospital = const Value.absent(),
-    Value<String?> referralEscort = const Value.absent(),
+    Value<String?> referralEscortText = const Value.absent(),
+    Value<String?> selectedEscortsJson = const Value.absent(),
     Value<int?> intubationType = const Value.absent(),
     Value<int?> oxygenType = const Value.absent(),
     Value<String?> oxygenFlow = const Value.absent(),
@@ -7047,9 +7087,12 @@ class Treatment extends DataClass implements Insertable<Treatment> {
     referralOtherHospital: referralOtherHospital.present
         ? referralOtherHospital.value
         : this.referralOtherHospital,
-    referralEscort: referralEscort.present
-        ? referralEscort.value
-        : this.referralEscort,
+    referralEscortText: referralEscortText.present
+        ? referralEscortText.value
+        : this.referralEscortText,
+    selectedEscortsJson: selectedEscortsJson.present
+        ? selectedEscortsJson.value
+        : this.selectedEscortsJson,
     intubationType: intubationType.present
         ? intubationType.value
         : this.intubationType,
@@ -7257,9 +7300,12 @@ class Treatment extends DataClass implements Insertable<Treatment> {
       referralOtherHospital: data.referralOtherHospital.present
           ? data.referralOtherHospital.value
           : this.referralOtherHospital,
-      referralEscort: data.referralEscort.present
-          ? data.referralEscort.value
-          : this.referralEscort,
+      referralEscortText: data.referralEscortText.present
+          ? data.referralEscortText.value
+          : this.referralEscortText,
+      selectedEscortsJson: data.selectedEscortsJson.present
+          ? data.selectedEscortsJson.value
+          : this.selectedEscortsJson,
       intubationType: data.intubationType.present
           ? data.intubationType.value
           : this.intubationType,
@@ -7378,7 +7424,8 @@ class Treatment extends DataClass implements Insertable<Treatment> {
           ..write('referralAmbulanceType: $referralAmbulanceType, ')
           ..write('referralHospitalIdx: $referralHospitalIdx, ')
           ..write('referralOtherHospital: $referralOtherHospital, ')
-          ..write('referralEscort: $referralEscort, ')
+          ..write('referralEscortText: $referralEscortText, ')
+          ..write('selectedEscortsJson: $selectedEscortsJson, ')
           ..write('intubationType: $intubationType, ')
           ..write('oxygenType: $oxygenType, ')
           ..write('oxygenFlow: $oxygenFlow, ')
@@ -7463,7 +7510,8 @@ class Treatment extends DataClass implements Insertable<Treatment> {
     referralAmbulanceType,
     referralHospitalIdx,
     referralOtherHospital,
-    referralEscort,
+    referralEscortText,
+    selectedEscortsJson,
     intubationType,
     oxygenType,
     oxygenFlow,
@@ -7548,7 +7596,8 @@ class Treatment extends DataClass implements Insertable<Treatment> {
           other.referralAmbulanceType == this.referralAmbulanceType &&
           other.referralHospitalIdx == this.referralHospitalIdx &&
           other.referralOtherHospital == this.referralOtherHospital &&
-          other.referralEscort == this.referralEscort &&
+          other.referralEscortText == this.referralEscortText &&
+          other.selectedEscortsJson == this.selectedEscortsJson &&
           other.intubationType == this.intubationType &&
           other.oxygenType == this.oxygenType &&
           other.oxygenFlow == this.oxygenFlow &&
@@ -7631,7 +7680,8 @@ class TreatmentsCompanion extends UpdateCompanion<Treatment> {
   final Value<int?> referralAmbulanceType;
   final Value<int?> referralHospitalIdx;
   final Value<String?> referralOtherHospital;
-  final Value<String?> referralEscort;
+  final Value<String?> referralEscortText;
+  final Value<String?> selectedEscortsJson;
   final Value<int?> intubationType;
   final Value<int?> oxygenType;
   final Value<String?> oxygenFlow;
@@ -7711,7 +7761,8 @@ class TreatmentsCompanion extends UpdateCompanion<Treatment> {
     this.referralAmbulanceType = const Value.absent(),
     this.referralHospitalIdx = const Value.absent(),
     this.referralOtherHospital = const Value.absent(),
-    this.referralEscort = const Value.absent(),
+    this.referralEscortText = const Value.absent(),
+    this.selectedEscortsJson = const Value.absent(),
     this.intubationType = const Value.absent(),
     this.oxygenType = const Value.absent(),
     this.oxygenFlow = const Value.absent(),
@@ -7792,7 +7843,8 @@ class TreatmentsCompanion extends UpdateCompanion<Treatment> {
     this.referralAmbulanceType = const Value.absent(),
     this.referralHospitalIdx = const Value.absent(),
     this.referralOtherHospital = const Value.absent(),
-    this.referralEscort = const Value.absent(),
+    this.referralEscortText = const Value.absent(),
+    this.selectedEscortsJson = const Value.absent(),
     this.intubationType = const Value.absent(),
     this.oxygenType = const Value.absent(),
     this.oxygenFlow = const Value.absent(),
@@ -7873,7 +7925,8 @@ class TreatmentsCompanion extends UpdateCompanion<Treatment> {
     Expression<int>? referralAmbulanceType,
     Expression<int>? referralHospitalIdx,
     Expression<String>? referralOtherHospital,
-    Expression<String>? referralEscort,
+    Expression<String>? referralEscortText,
+    Expression<String>? selectedEscortsJson,
     Expression<int>? intubationType,
     Expression<int>? oxygenType,
     Expression<String>? oxygenFlow,
@@ -7971,7 +8024,10 @@ class TreatmentsCompanion extends UpdateCompanion<Treatment> {
         'referral_hospital_idx': referralHospitalIdx,
       if (referralOtherHospital != null)
         'referral_other_hospital': referralOtherHospital,
-      if (referralEscort != null) 'referral_escort': referralEscort,
+      if (referralEscortText != null)
+        'referral_escort_text': referralEscortText,
+      if (selectedEscortsJson != null)
+        'selected_escorts_json': selectedEscortsJson,
       if (intubationType != null) 'intubation_type': intubationType,
       if (oxygenType != null) 'oxygen_type': oxygenType,
       if (oxygenFlow != null) 'oxygen_flow': oxygenFlow,
@@ -8059,7 +8115,8 @@ class TreatmentsCompanion extends UpdateCompanion<Treatment> {
     Value<int?>? referralAmbulanceType,
     Value<int?>? referralHospitalIdx,
     Value<String?>? referralOtherHospital,
-    Value<String?>? referralEscort,
+    Value<String?>? referralEscortText,
+    Value<String?>? selectedEscortsJson,
     Value<int?>? intubationType,
     Value<int?>? oxygenType,
     Value<String?>? oxygenFlow,
@@ -8149,7 +8206,8 @@ class TreatmentsCompanion extends UpdateCompanion<Treatment> {
       referralHospitalIdx: referralHospitalIdx ?? this.referralHospitalIdx,
       referralOtherHospital:
           referralOtherHospital ?? this.referralOtherHospital,
-      referralEscort: referralEscort ?? this.referralEscort,
+      referralEscortText: referralEscortText ?? this.referralEscortText,
+      selectedEscortsJson: selectedEscortsJson ?? this.selectedEscortsJson,
       intubationType: intubationType ?? this.intubationType,
       oxygenType: oxygenType ?? this.oxygenType,
       oxygenFlow: oxygenFlow ?? this.oxygenFlow,
@@ -8381,8 +8439,13 @@ class TreatmentsCompanion extends UpdateCompanion<Treatment> {
         referralOtherHospital.value,
       );
     }
-    if (referralEscort.present) {
-      map['referral_escort'] = Variable<String>(referralEscort.value);
+    if (referralEscortText.present) {
+      map['referral_escort_text'] = Variable<String>(referralEscortText.value);
+    }
+    if (selectedEscortsJson.present) {
+      map['selected_escorts_json'] = Variable<String>(
+        selectedEscortsJson.value,
+      );
     }
     if (intubationType.present) {
       map['intubation_type'] = Variable<int>(intubationType.value);
@@ -8514,7 +8577,8 @@ class TreatmentsCompanion extends UpdateCompanion<Treatment> {
           ..write('referralAmbulanceType: $referralAmbulanceType, ')
           ..write('referralHospitalIdx: $referralHospitalIdx, ')
           ..write('referralOtherHospital: $referralOtherHospital, ')
-          ..write('referralEscort: $referralEscort, ')
+          ..write('referralEscortText: $referralEscortText, ')
+          ..write('selectedEscortsJson: $selectedEscortsJson, ')
           ..write('intubationType: $intubationType, ')
           ..write('oxygenType: $oxygenType, ')
           ..write('oxygenFlow: $oxygenFlow, ')
@@ -26216,7 +26280,8 @@ typedef $$TreatmentsTableCreateCompanionBuilder =
       Value<int?> referralAmbulanceType,
       Value<int?> referralHospitalIdx,
       Value<String?> referralOtherHospital,
-      Value<String?> referralEscort,
+      Value<String?> referralEscortText,
+      Value<String?> selectedEscortsJson,
       Value<int?> intubationType,
       Value<int?> oxygenType,
       Value<String?> oxygenFlow,
@@ -26298,7 +26363,8 @@ typedef $$TreatmentsTableUpdateCompanionBuilder =
       Value<int?> referralAmbulanceType,
       Value<int?> referralHospitalIdx,
       Value<String?> referralOtherHospital,
-      Value<String?> referralEscort,
+      Value<String?> referralEscortText,
+      Value<String?> selectedEscortsJson,
       Value<int?> intubationType,
       Value<int?> oxygenType,
       Value<String?> oxygenFlow,
@@ -26628,8 +26694,13 @@ class $$TreatmentsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get referralEscort => $composableBuilder(
-    column: $table.referralEscort,
+  ColumnFilters<String> get referralEscortText => $composableBuilder(
+    column: $table.referralEscortText,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get selectedEscortsJson => $composableBuilder(
+    column: $table.selectedEscortsJson,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -27034,8 +27105,13 @@ class $$TreatmentsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get referralEscort => $composableBuilder(
-    column: $table.referralEscort,
+  ColumnOrderings<String> get referralEscortText => $composableBuilder(
+    column: $table.referralEscortText,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get selectedEscortsJson => $composableBuilder(
+    column: $table.selectedEscortsJson,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -27422,8 +27498,13 @@ class $$TreatmentsTableAnnotationComposer
     builder: (column) => column,
   );
 
-  GeneratedColumn<String> get referralEscort => $composableBuilder(
-    column: $table.referralEscort,
+  GeneratedColumn<String> get referralEscortText => $composableBuilder(
+    column: $table.referralEscortText,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get selectedEscortsJson => $composableBuilder(
+    column: $table.selectedEscortsJson,
     builder: (column) => column,
   );
 
@@ -27609,7 +27690,8 @@ class $$TreatmentsTableTableManager
                 Value<int?> referralAmbulanceType = const Value.absent(),
                 Value<int?> referralHospitalIdx = const Value.absent(),
                 Value<String?> referralOtherHospital = const Value.absent(),
-                Value<String?> referralEscort = const Value.absent(),
+                Value<String?> referralEscortText = const Value.absent(),
+                Value<String?> selectedEscortsJson = const Value.absent(),
                 Value<int?> intubationType = const Value.absent(),
                 Value<int?> oxygenType = const Value.absent(),
                 Value<String?> oxygenFlow = const Value.absent(),
@@ -27690,7 +27772,8 @@ class $$TreatmentsTableTableManager
                 referralAmbulanceType: referralAmbulanceType,
                 referralHospitalIdx: referralHospitalIdx,
                 referralOtherHospital: referralOtherHospital,
-                referralEscort: referralEscort,
+                referralEscortText: referralEscortText,
+                selectedEscortsJson: selectedEscortsJson,
                 intubationType: intubationType,
                 oxygenType: oxygenType,
                 oxygenFlow: oxygenFlow,
@@ -27776,7 +27859,8 @@ class $$TreatmentsTableTableManager
                 Value<int?> referralAmbulanceType = const Value.absent(),
                 Value<int?> referralHospitalIdx = const Value.absent(),
                 Value<String?> referralOtherHospital = const Value.absent(),
-                Value<String?> referralEscort = const Value.absent(),
+                Value<String?> referralEscortText = const Value.absent(),
+                Value<String?> selectedEscortsJson = const Value.absent(),
                 Value<int?> intubationType = const Value.absent(),
                 Value<int?> oxygenType = const Value.absent(),
                 Value<String?> oxygenFlow = const Value.absent(),
@@ -27857,7 +27941,8 @@ class $$TreatmentsTableTableManager
                 referralAmbulanceType: referralAmbulanceType,
                 referralHospitalIdx: referralHospitalIdx,
                 referralOtherHospital: referralOtherHospital,
-                referralEscort: referralEscort,
+                referralEscortText: referralEscortText,
+                selectedEscortsJson: selectedEscortsJson,
                 intubationType: intubationType,
                 oxygenType: oxygenType,
                 oxygenFlow: oxygenFlow,

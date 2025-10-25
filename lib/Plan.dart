@@ -48,7 +48,7 @@ class _PlanPageState extends State<PlanPage>
     'sugarReading': TextEditingController(),
     'otherSummary': TextEditingController(),
     'referralOtherHospital': TextEditingController(),
-    'referralEscort': TextEditingController(),
+    'referralEscortText': TextEditingController(),
     'oxygenFlow': TextEditingController(),
     'nurseSignature': TextEditingController(),
     'emtSignature': TextEditingController(),
@@ -275,7 +275,10 @@ class _PlanPageState extends State<PlanPage>
         planData.referralAmbulanceType = record.referralAmbulanceType;
         planData.referralHospitalIdx = record.referralHospitalIdx;
         planData.referralOtherHospital = record.referralOtherHospital;
-        planData.referralEscort = record.referralEscort;
+        planData.referralEscortText = record.referralEscortText;
+        planData.selectedEscorts = List<String>.from(
+          decodeJson(record.selectedEscortsJson, []),
+        );
         planData.intubationType = record.intubationType;
         planData.oxygenType = record.oxygenType;
         planData.oxygenFlow = record.oxygenFlow;
@@ -343,7 +346,7 @@ class _PlanPageState extends State<PlanPage>
         'sugarReading' => planData.sugarReading,
         'otherSummary' => planData.otherSummary,
         'referralOtherHospital' => planData.referralOtherHospital,
-        'referralEscort' => planData.referralEscort,
+        'referralEscortText' => planData.referralEscortText,
         'oxygenFlow' => planData.oxygenFlow,
         'nurseSignature' => planData.nurseSignature,
         'emtSignature' => planData.emtSignature,
@@ -429,8 +432,8 @@ class _PlanPageState extends State<PlanPage>
         case 'referralOtherHospital':
           planData.referralOtherHospital = text;
           break;
-        case 'referralEscort':
-          planData.referralEscort = text;
+        case 'referralEscortText':
+          planData.referralEscortText = text;
           break;
         case 'oxygenFlow':
           planData.oxygenFlow = text;
@@ -1740,11 +1743,18 @@ class _PlanPageState extends State<PlanPage>
         const SizedBox(height: 8),
         _SectionTitle('隨車人員'),
         TextField(
-          controller: _controllers['referralEscort'],
+          controller: _controllers['referralEscortText'], // 使用新的 controller
           decoration: const InputDecoration(
-            hintText: '請填寫隨車人員的姓名',
+            hintText: '請填寫其他隨車人員的姓名', // 更新提示文字
             border: OutlineInputBorder(),
           ),
+        ),
+        const SizedBox(height: 12),
+        _EscortTable(
+          // 使用新的列表 Widget
+          selectedEscorts: planData.selectedEscorts,
+          onAdd: () =>
+              _showEscortSelectionDialog(planData, buttonStyle), // 呼叫新的彈窗
         ),
         const SizedBox(height: 8),
         Align(
@@ -2211,6 +2221,66 @@ class _PlanPageState extends State<PlanPage>
       ),
     );
   }
+
+  Future<void> _showEscortSelectionDialog(
+    PlanData planData,
+    ButtonStyle buttonStyle,
+  ) async {
+    List<String> tempSelected = List.from(planData.selectedEscorts);
+    List<String>? result = await showDialog<List<String>>(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text('選擇隨車人員姓名'),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: PlanData.escortOptions.map((name) {
+                    // 使用隨車人員名單
+                    return CheckboxListTile(
+                      title: Text(name),
+                      value: tempSelected.contains(name),
+                      activeColor: const Color(0xFF274C4A),
+                      onChanged: (bool? checked) {
+                        setState(() {
+                          if (checked == true) {
+                            tempSelected.add(name);
+                          } else {
+                            tempSelected.remove(name);
+                          }
+                        });
+                      },
+                    );
+                  }).toList(),
+                ),
+              ),
+              actions: <Widget>[
+                TextButton(
+                  child: const Text('取消'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+                ElevatedButton(
+                  style: buttonStyle,
+                  child: const Text('確定'),
+                  onPressed: () {
+                    Navigator.of(context).pop(tempSelected);
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+    if (result != null) {
+      planData.selectedEscorts = result; // 更新 planData
+      planData.update();
+    }
+  }
 }
 
 // ===============================================
@@ -2569,6 +2639,44 @@ class _HelperTable extends StatelessWidget {
           child: const Text('加入協助人員', style: TextStyle(color: Colors.blue)),
         ),
         const SizedBox(height: 24),
+      ],
+    ),
+  );
+}
+
+// 【新增】隨車人員列表 Widget
+class _EscortTable extends StatelessWidget {
+  final List<String> selectedEscorts;
+  final VoidCallback onAdd;
+  const _EscortTable({required this.selectedEscorts, required this.onAdd});
+  @override
+  Widget build(BuildContext context) => Container(
+    width: double.infinity,
+    color: const Color(0xFFF1F3F6),
+    padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (selectedEscorts.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: selectedEscorts
+                  .map(
+                    (escort) =>
+                        Text(escort, style: const TextStyle(fontSize: 16)),
+                  )
+                  .toList(),
+            ),
+          )
+        else
+          const Text('尚未選擇隨車人員', style: TextStyle(color: Colors.grey)),
+        const SizedBox(height: 12),
+        InkWell(
+          onTap: onAdd,
+          child: const Text('加入隨車人員', style: TextStyle(color: Colors.blue)),
+        ),
       ],
     ),
   );
