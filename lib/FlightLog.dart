@@ -22,14 +22,12 @@ class _FlightLogPageState extends State<FlightLogPage>
 
   // 外觀參數
   static const double _outerHpad = 48;
-  static const double _cardMaxWidth = 1100;
+  static const double _cardMaxWidth = 1000; // ★ 白卡 maxWidth 規格：800
   static const double _radius = 16;
 
-  // 【修改】移除所有靜態選項列表
-  // final List<String> mainAirlines = const [ ... ];
-  // final List<String> otherAirlines = const [ ... ];
-  // final List<String> travelOptions = const [ ... ];
-  // final List<String> airportOptions = const [ ... ];
+  // ★ 主題色（不動邏輯）
+  static const Color _deepGreen = Color(0xFF274C4A); // 單/複選選中
+  static const Color _border = Color(0xFFCBD5E1);
 
   @override
   void initState() {
@@ -171,10 +169,12 @@ class _FlightLogPageState extends State<FlightLogPage>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _boldLabel(t.airline), // 【修改】
+                      _boldLabel(t.airline),
                       const SizedBox(height: 6),
+
+                      // ===== 航空公司：主清單（單選）=====
                       _radioWrap(
-                        options: mainAirlines, // 【修改】
+                        options: mainAirlines,
                         groupIndex: data.useOtherAirline
                             ? null
                             : data.airlineIndex,
@@ -185,53 +185,81 @@ class _FlightLogPageState extends State<FlightLogPage>
                           data.update();
                         },
                       ),
-                      const SizedBox(height: 6),
-                      Row(
-                        children: [
-                          Checkbox(
-                            value: data.useOtherAirline,
-                            onChanged: (v) {
-                              data.useOtherAirline = v ?? false;
-                              data.update();
-                            },
-                          ),
-                          Text(t.otherAirline), // 【修改】
-                          if (data.useOtherAirline)
-                            Padding(
-                              padding: const EdgeInsets.only(left: 8),
-                              child: DropdownButton<String>(
+                      const SizedBox(height: 8),
+
+                      // ===== 其他航空公司（與上方單選左緣對齊、勾選色深綠）=====
+                      Padding(
+                        // 保持與上方單選同一條左緣
+                        padding: const EdgeInsets.only(left: 0),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            // 微調 Checkbox 視覺左緣（-2px）
+                            Transform.translate(
+                              offset: const Offset(-2, 0),
+                              child: SizedBox(
+                                height: 24,
+                                width: 24,
+                                child: Checkbox(
+                                  value: data.useOtherAirline,
+                                  onChanged: (v) {
+                                    data.useOtherAirline = v ?? false;
+                                    data.update();
+                                  },
+                                  activeColor: const Color(0xFF274C4A), // 深綠
+                                  checkColor: Colors.white,
+                                  materialTapTargetSize:
+                                      MaterialTapTargetSize.shrinkWrap,
+                                  visualDensity: const VisualDensity(
+                                    horizontal: -2,
+                                    vertical: -2,
+                                  ),
+                                  side: const BorderSide(
+                                    color: Color(0xFFCBD5E1),
+                                    width: 1.2,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Text(t.otherAirline),
+                            if (data.useOtherAirline) ...[
+                              const SizedBox(width: 8),
+                              DropdownButton<String>(
                                 value: data.selectedOtherAirline,
-                                hint: Text(t.pleaseSelect), // 【修改】
-                                items:
-                                    otherAirlines // 【修改】
-                                        .map(
-                                          (e) => DropdownMenuItem(
-                                            value: e,
-                                            child: Text(e),
-                                          ),
-                                        )
-                                        .toList(),
+                                hint: Text(t.pleaseSelect),
+                                items: otherAirlines
+                                    .map(
+                                      (e) => DropdownMenuItem(
+                                        value: e,
+                                        child: Text(e),
+                                      ),
+                                    )
+                                    .toList(),
                                 onChanged: (v) {
                                   data.selectedOtherAirline = v;
                                   data.update();
                                 },
                               ),
-                            ),
-                        ],
+                            ],
+                          ],
+                        ),
                       ),
+
                       const SizedBox(height: 16),
 
+                      // ===== 班機代碼（輸入框縮短、緊貼左側標籤）=====
                       _inputRowBold(
                         t.flightCode,
                         t.enterFlightNumberHint,
                         data.flightNoCtrl,
-                      ), // 【修改】
+                      ),
                       const SizedBox(height: 16),
 
-                      _boldLabel(t.travelStatus), // 【修改】
+                      _boldLabel(t.travelStatus),
                       const SizedBox(height: 6),
                       _radioWrap(
-                        options: travelOptions, // 【修改】
+                        options: travelOptions,
                         groupIndex: data.travelStatusIndex,
                         onChanged: (i) {
                           data.travelStatusIndex = i;
@@ -243,36 +271,33 @@ class _FlightLogPageState extends State<FlightLogPage>
                       ),
                       if (data.travelStatusIndex == travelOptions.length - 1)
                         _inputRowBold(
-                          t.otherTravelStatus, // 【修改】
-                          t.enterTravelStatusHint, // 【修改】
+                          t.otherTravelStatus,
+                          t.enterTravelStatusHint,
                           data.otherTravelCtrl,
                         ),
                       const SizedBox(height: 16),
 
-                      _boldLabel(t.departurePlace), // 【修改】
+                      _boldLabel(t.departurePlace),
                       _pickField(t.tapToSelectDeparture, data.departure, (v) {
-                        // 【修改】
                         data.departure = v;
                         data.update();
-                      }, airportOptions), // 【修改】
+                      }, airportOptions),
                       const SizedBox(height: 16),
 
-                      _boldLabel(t.viaPlace), // 【修改】
+                      _boldLabel(t.viaPlace),
                       _pickField(t.tapToSelectVia, data.via, (v) {
-                        // 【修改】
                         data.via = v;
                         data.update();
-                      }, airportOptions), // 【修改】
+                      }, airportOptions),
                       const SizedBox(height: 16),
 
-                      _boldLabel(t.destinationPlace), // 【修改】
+                      _boldLabel(t.destinationPlace),
                       _pickField(t.tapToSelectDestination, data.destination, (
                         v,
                       ) {
-                        // 【修改】
                         data.destination = v;
                         data.update();
-                      }, airportOptions), // 【修改】
+                      }, airportOptions),
                     ],
                   ),
                 ),
@@ -294,11 +319,17 @@ class _FlightLogPageState extends State<FlightLogPage>
         borderRadius: BorderRadius.circular(_radius),
         boxShadow: const [
           BoxShadow(
-            color: Color(0x14000000),
-            blurRadius: 8,
-            offset: Offset(0, 4),
+            color: Color(0x1A000000), // 柔和陰影（~10% 黑）
+            blurRadius: 14,
+            offset: Offset(0, 6),
           ),
         ],
+        border: const Border(
+          top: BorderSide(color: _border),
+          right: BorderSide(color: _border),
+          bottom: BorderSide(color: _border),
+          left: BorderSide(color: _border),
+        ),
       ),
       child: child,
     );
@@ -310,9 +341,11 @@ class _FlightLogPageState extends State<FlightLogPage>
       fontSize: 16,
       fontWeight: FontWeight.w700,
       color: Colors.black87,
+      height: 1.25,
     ),
   );
 
+  // ★ 輸入列：縮短輸入框 + 緊貼左側標籤
   Widget _inputRowBold(
     String label,
     String hint,
@@ -322,30 +355,41 @@ class _FlightLogPageState extends State<FlightLogPage>
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           SizedBox(
-            width: 160,
+            width: 88,
             child: Text(
               label,
               style: const TextStyle(
                 fontSize: 15.5,
                 fontWeight: FontWeight.w700,
+                height: 1.3,
               ),
             ),
           ),
-          Expanded(
+          // 原本是 Expanded，改為固定寬度讓輸入框縮短並與左側標籤齊頭
+          SizedBox(
+            width: 168, // ★ 可依需要微調
             child: TextField(
               controller: ctrl,
-              decoration: InputDecoration(
-                hintText: hint,
-                border: const OutlineInputBorder(),
+              decoration: const InputDecoration(
+                hintText: '',
                 isDense: true,
+                border: OutlineInputBorder(),
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 6,
+                ),
               ),
               onChanged: (_) {
                 if (onChanged != null) onChanged();
               },
             ),
           ),
+          const SizedBox(width: 8),
+          // 如果要顯示 hint（但不佔 TextField 寬度），可加上這行：
+          // Expanded(child: Text(hint, style: TextStyle(color: Colors.black54, fontSize: 13))),
         ],
       ),
     );
@@ -358,7 +402,7 @@ class _FlightLogPageState extends State<FlightLogPage>
   }) {
     return Wrap(
       spacing: 14,
-      runSpacing: 4,
+      runSpacing: 10,
       children: List.generate(options.length, (i) {
         final selected = groupIndex == i;
         return InkWell(
@@ -369,7 +413,7 @@ class _FlightLogPageState extends State<FlightLogPage>
               Icon(
                 selected ? Icons.radio_button_checked : Icons.radio_button_off,
                 size: 20,
-                color: selected ? const Color(0xFF274C4A) : Colors.black45,
+                color: selected ? _deepGreen : Colors.black45, // ★ 深綠色
               ),
               const SizedBox(width: 6),
               Text(options[i]),
@@ -384,16 +428,16 @@ class _FlightLogPageState extends State<FlightLogPage>
     String placeholder,
     String? value,
     ValueChanged<String?> onPick,
-    List<String> airportOptions, // 【修改】
+    List<String> airportOptions,
   ) {
-    final t = AppTranslations.of(context); // 【新增】
+    final t = AppTranslations.of(context);
     return InkWell(
       onTap: () async {
         final picked = await showDialog<String>(
           context: context,
           builder: (ctx) {
             return SimpleDialog(
-              title: Text(t.selectLocation), // 【修改】
+              title: Text(t.selectLocation),
               children: airportOptions
                   .map(
                     (e) => SimpleDialogOption(

@@ -1,9 +1,8 @@
 // ambulance_expenses_page.dart
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'data/models/ambulance_data.dart';
-import 'l10n/app_translations.dart'; // 【新增】引入翻譯
+import 'l10n/app_translations.dart';
 
 class AmbulanceExpensesPage extends StatefulWidget {
   final int visitId;
@@ -51,23 +50,122 @@ class _AmbulanceExpensesPageState extends State<AmbulanceExpensesPage> {
     );
   }
 
+  // 標題 + 方框輸入
+  Widget _labeledInputRow({
+    required String label,
+    required TextEditingController controller,
+    required String hint,
+    double labelWidth = 130,
+    double fieldWidth = 150,
+    TextInputType keyboardType = TextInputType.number,
+    ValueChanged<String>? onChanged,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          SizedBox(
+            width: labelWidth,
+            child: Text(
+              label,
+              style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
+            ),
+          ),
+          SizedBox(
+            width: fieldWidth,
+            child: TextField(
+              controller: controller,
+              keyboardType: keyboardType,
+              textAlign: TextAlign.left,
+              decoration: const InputDecoration(
+                isDense: true,
+                border: OutlineInputBorder(),
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 8,
+                ),
+              ).copyWith(hintText: hint),
+              onChanged: onChanged,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // 標題 + 唯讀方框
+  Widget _labeledReadOnlyBox({
+    required String label,
+    required String valueText,
+    double labelWidth = 140,
+    double fieldWidth = 160,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          SizedBox(
+            width: labelWidth,
+            child: Text(
+              label,
+              style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
+            ),
+          ),
+          SizedBox(
+            width: fieldWidth,
+            child: TextField(
+              readOnly: true,
+              controller: TextEditingController(text: valueText),
+              textAlign: TextAlign.left,
+              decoration: const InputDecoration(
+                isDense: true,
+                border: OutlineInputBorder(),
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 8,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRadioOption(
+    String text,
+    String? groupValue,
+    Function(String?) onChanged,
+  ) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Radio<String>(
+          value: text,
+          groupValue: groupValue,
+          onChanged: onChanged,
+          activeColor: const Color(0xFF274C4A),
+          visualDensity: VisualDensity.compact,
+          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        ),
+        Text(text, style: const TextStyle(fontSize: 14)),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    const double inputWidth = 120;
-    final t = AppTranslations.of(context); // 【新增】取得翻譯物件
+    final t = AppTranslations.of(context);
 
     return Consumer<AmbulanceData>(
       builder: (context, data, child) {
-        // 確保 Controller 的文字與 Provider 的資料一致
-        final providerStaffFee = data.staffFee?.toString() ?? '';
-        if (_staffFeeController.text != providerStaffFee) {
-          _staffFeeController.text = providerStaffFee;
-        }
-
-        final providerOxygenFee = data.oxygenFee?.toString() ?? '';
-        if (_oxygenFeeController.text != providerOxygenFee) {
-          _oxygenFeeController.text = providerOxygenFee;
-        }
+        // keep controllers in sync
+        final s = data.staffFee?.toString() ?? '';
+        if (_staffFeeController.text != s) _staffFeeController.text = s;
+        final o = data.oxygenFee?.toString() ?? '';
+        if (_oxygenFeeController.text != o) _oxygenFeeController.text = o;
 
         // 總費用從 Controller 即時計算
         final totalFee =
@@ -84,210 +182,131 @@ class _AmbulanceExpensesPageState extends State<AmbulanceExpensesPage> {
         ];
 
         return Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.fromLTRB(24, 12, 24, 24),
           child: Center(
             child: Card(
               color: Colors.white,
-              elevation: 3,
+              elevation: 2,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(12),
               ),
-              child: Container(
-                width: 800,
-                padding: const EdgeInsets.symmetric(
-                  vertical: 20,
-                  horizontal: 24,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildTitleWithInput(
-                      title: t.ambulanceFeeWithStaff, // 【修改】使用翻譯
-                      controller: _staffFeeController,
-                      hint: t.enterIntegerHint, // 【修改】使用翻譯
-                      inputWidth: inputWidth,
-                      onChanged: (value) {
-                        setState(() {});
-                        _saveToProvider();
-                      },
-                    ),
-                    const SizedBox(height: 12),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 1000),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 18, 20, 22),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _labeledInputRow(
+                        label: t.ambulanceFeeWithStaff,
+                        controller: _staffFeeController,
+                        hint: t.enterIntegerHint,
+                        labelWidth: 180,
+                        onChanged: (_) {
+                          setState(() {});
+                          _saveToProvider();
+                        },
+                      ),
+                      _labeledInputRow(
+                        label: t.oxygenUsageFee,
+                        controller: _oxygenFeeController,
+                        hint: t.enterIntegerHint,
+                        labelWidth: 120,
+                        onChanged: (_) {
+                          setState(() {});
+                          _saveToProvider();
+                        },
+                      ),
+                      _labeledReadOnlyBox(
+                        label: t.totalFee,
+                        valueText: '$totalFee',
+                        labelWidth: 70,
+                        fieldWidth: 120,
+                      ),
+                      const SizedBox(height: 8),
 
-                    _buildTitleWithInput(
-                      title: t.oxygenUsageFee, // 【修改】使用翻譯
-                      controller: _oxygenFeeController,
-                      hint: t.enterIntegerHint, // 【修改】使用翻譯
-                      inputWidth: inputWidth,
-                      onChanged: (value) {
-                        setState(() {});
-                        _saveToProvider();
-                      },
-                    ),
-                    const SizedBox(height: 12),
+                      Text(
+                        t.chargeStatus,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Wrap(
+                        spacing: 12,
+                        children: chargeStatusOptions
+                            .map(
+                              (opt) => _buildRadioOption(
+                                opt,
+                                data.chargeStatus,
+                                (val) {
+                                  data.updateExpenses(
+                                    chargeStatus: val,
+                                    paidType: null,
+                                    unpaidType: null,
+                                  );
+                                },
+                              ),
+                            )
+                            .toList(),
+                      ),
+                      const SizedBox(height: 12),
 
-                    Row(
-                      children: [
+                      if (data.chargeStatus == t.paid) ...[
                         Text(
-                          t.totalFee, // 【修改】使用翻譯
+                          t.paidMethod,
                           style: const TextStyle(
-                            color: Color.fromARGB(255, 61, 61, 61),
+                            fontWeight: FontWeight.bold,
                             fontSize: 16,
                           ),
                         ),
-                        const Spacer(),
-                        SizedBox(
-                          width: inputWidth,
-                          child: Align(
-                            alignment: Alignment.centerRight,
-                            child: Text(
-                              '$totalFee',
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
+                        const SizedBox(height: 6),
+                        Wrap(
+                          spacing: 12,
+                          children: paidTypeOptions
+                              .map(
+                                (opt) => _buildRadioOption(
+                                  opt,
+                                  data.paidType,
+                                  (val) => data.updateExpenses(paidType: val),
+                                ),
+                              )
+                              .toList(),
+                        ),
+                        const SizedBox(height: 8),
+                      ],
+
+                      if (data.chargeStatus == t.unpaid) ...[
+                        Text(
+                          t.unpaidReason,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
                           ),
                         ),
+                        const SizedBox(height: 6),
+                        Wrap(
+                          spacing: 12,
+                          children: unpaidTypeOptions
+                              .map(
+                                (opt) => _buildRadioOption(
+                                  opt,
+                                  data.unpaidType,
+                                  (val) => data.updateExpenses(unpaidType: val),
+                                ),
+                              )
+                              .toList(),
+                        ),
                       ],
-                    ),
-                    const SizedBox(height: 16),
-
-                    Text(
-                      t.chargeStatus, // 【修改】使用翻譯
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Wrap(
-                      spacing: 12,
-                      children: chargeStatusOptions.map((option) {
-                        // 【修改】使用選項列表
-                        return _buildRadioOption(option, data.chargeStatus, (
-                          val,
-                        ) {
-                          data.updateExpenses(
-                            chargeStatus: val,
-                            paidType: null,
-                            unpaidType: null,
-                          );
-                        });
-                      }).toList(),
-                    ),
-                    const SizedBox(height: 12),
-
-                    if (data.chargeStatus == t.paid) ...[
-                      // 【修改】使用翻譯比較
-                      Text(
-                        t.paidMethod, // 【修改】使用翻譯
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      Wrap(
-                        spacing: 12,
-                        children: paidTypeOptions.map((option) {
-                          // 【修改】使用選項列表
-                          return _buildRadioOption(
-                            option,
-                            data.paidType,
-                            (val) => data.updateExpenses(paidType: val),
-                          );
-                        }).toList(),
-                      ),
                     ],
-
-                    if (data.chargeStatus == t.unpaid) ...[
-                      // 【修改】使用翻譯比較
-                      Text(
-                        t.unpaidReason, // 【修改】使用翻譯
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      Wrap(
-                        spacing: 12,
-                        children: unpaidTypeOptions.map((option) {
-                          // 【修改】使用選項列表
-                          return _buildRadioOption(
-                            option,
-                            data.unpaidType,
-                            (val) => data.updateExpenses(unpaidType: val),
-                          );
-                        }).toList(),
-                      ),
-                    ],
-                  ],
+                  ),
                 ),
               ),
             ),
           ),
         );
       },
-    );
-  }
-
-  Widget _buildTitleWithInput({
-    required String title,
-    required TextEditingController controller,
-    required String hint,
-    required double inputWidth,
-    required ValueChanged<String> onChanged,
-  }) {
-    return Row(
-      children: [
-        Text(
-          title,
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-        ),
-        const Spacer(),
-        SizedBox(
-          width: inputWidth,
-          child: TextField(
-            controller: controller,
-            keyboardType: TextInputType.number,
-            textAlign: TextAlign.right,
-            decoration: InputDecoration(
-              hintText: hint,
-              hintStyle: const TextStyle(color: Colors.grey, fontSize: 13),
-              isDense: true,
-              contentPadding: const EdgeInsets.symmetric(vertical: 4),
-              enabledBorder: const UnderlineInputBorder(
-                borderSide: BorderSide(color: Colors.grey, width: 1),
-              ),
-              focusedBorder: const UnderlineInputBorder(
-                borderSide: BorderSide(color: Colors.blue, width: 2),
-              ),
-            ),
-            onChanged: onChanged,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildRadioOption(
-    String text,
-    String? groupValue,
-    Function(String?) onChanged,
-  ) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Radio<String>(
-          value: text,
-          groupValue: groupValue,
-          onChanged: onChanged,
-          visualDensity: VisualDensity.compact,
-          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        ),
-        Text(text, style: const TextStyle(fontSize: 14)),
-      ],
     );
   }
 }

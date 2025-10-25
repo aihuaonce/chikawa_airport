@@ -1746,15 +1746,6 @@ class _PlanPageState extends State<PlanPage>
             border: OutlineInputBorder(),
           ),
         ),
-        const SizedBox(height: 8),
-        Align(
-          alignment: Alignment.centerLeft,
-          child: ElevatedButton(
-            style: buttonStyle,
-            onPressed: () {},
-            child: const Text('產生救護車紀錄單'),
-          ),
-        ),
         const SizedBox(height: 16),
       ],
     );

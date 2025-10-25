@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'data/models/emergency_data.dart';
-import 'l10n/app_translations.dart'; // 【新增】引入翻譯
+import 'l10n/app_translations.dart';
 
 class EmergencyPersonalPage extends StatefulWidget {
   final int visitId;
@@ -14,6 +14,14 @@ class EmergencyPersonalPage extends StatefulWidget {
 class _EmergencyPersonalPageState extends State<EmergencyPersonalPage> {
   final _idCtrl = TextEditingController();
   final _passportCtrl = TextEditingController();
+
+  static const Color _deepGreen = Color(0xFF274C4A);
+  static const Color _lightGreen = Color(0xFF83ACA9);
+  static const Color _border = Color(0xFFCBD5E1);
+
+  static const double _labelMinW = 84;
+  static const double _labelMaxW = 108;
+  static const double _labelGap = 8;
 
   @override
   void initState() {
@@ -65,109 +73,138 @@ class _EmergencyPersonalPageState extends State<EmergencyPersonalPage> {
 
   @override
   Widget build(BuildContext context) {
-    final t = AppTranslations.of(context); // 【新增】
+    final t = AppTranslations.of(context);
 
     return Consumer<EmergencyData>(
       builder: (context, data, child) {
-        return Padding(
-          padding: const EdgeInsets.fromLTRB(24, 12, 24, 24),
-          child: _card(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _rowTop(
-                  label: t.idNumber, // 【修改】
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 420),
-                    child: TextField(
-                      controller: _idCtrl,
-                      onChanged: (_) => _saveToProvider(),
-                      decoration: InputDecoration(
-                        hintText: t.enterIdNumber, // 【修改】
-                        border: const OutlineInputBorder(),
-                        isDense: true,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 12),
-
-                _rowTop(
-                  label: t.gender, // 【修改】
-                  child: Wrap(
-                    spacing: 18,
+        return Container(
+          color: const Color(0xFFE6F6FB),
+          padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 16),
+          child: SingleChildScrollView(
+            child: Align(
+              alignment: Alignment.topCenter,
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(
+                  maxWidth: 1000,
+                ), // ✅ 卡片寬度固定 800
+                child: _card(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _genderRadio(t.male, data), // 【修改】
-                      _genderRadio(t.female, data), // 【修改】
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 12),
-
-                _rowTop(
-                  label: t.birthDate, // 【修改】
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      InkWell(
-                        onTap: _tapPickBirthDate,
-                        borderRadius: BorderRadius.circular(4),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 4,
-                            vertical: 6,
-                          ),
-                          child: Text(
-                            data.birthDate == null
-                                ? t
-                                      .selectDate // 【修改】
-                                : t.formatDate(data.birthDate!), // 【修改】
-                            style: const TextStyle(
-                              fontSize: 15,
-                              color: Colors.black87,
+                      _rowTop(
+                        label: t.idNumber,
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(
+                            maxWidth: 300,
+                          ), // ✅ 輸入框變短
+                          child: TextField(
+                            controller: _idCtrl,
+                            onChanged: (_) => _saveToProvider(),
+                            decoration: InputDecoration(
+                              hintText: t.enterIdNumber,
+                              isDense: true,
+                              border: const OutlineInputBorder(),
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 8,
+                              ),
                             ),
                           ),
                         ),
                       ),
-                      const SizedBox(width: 10),
-                      SizedBox(
-                        height: 32,
-                        child: ElevatedButton(
-                          onPressed: () =>
-                              data.updatePersonal(birthDate: DateTime.now()),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF6C63FF),
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(horizontal: 12),
-                            elevation: 0,
-                          ),
-                          child: Text(
-                            t.today, // 【修改】
-                            style: const TextStyle(fontSize: 12.5),
+                      const SizedBox(height: 12),
+
+                      _rowTop(
+                        label: t.gender,
+                        child: Wrap(
+                          spacing: 18,
+                          children: [
+                            _genderRadio(t.male, data),
+                            _genderRadio(t.female, data),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+
+                      _rowTop(
+                        label: t.birthDate,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            InkWell(
+                              onTap: _tapPickBirthDate,
+                              borderRadius: BorderRadius.circular(4),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 4,
+                                  vertical: 6,
+                                ),
+                                child: Text(
+                                  data.birthDate == null
+                                      ? t.selectDate
+                                      : t.formatDate(data.birthDate!),
+                                  style: const TextStyle(
+                                    fontSize: 15,
+                                    color: Colors.black87,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            SizedBox(
+                              height: 32,
+                              child: ElevatedButton(
+                                onPressed: () => data.updatePersonal(
+                                  birthDate: DateTime.now(),
+                                ),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: _lightGreen, // ✅ 淺綠色
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                  ),
+                                  elevation: 0,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                                child: Text(
+                                  t.today,
+                                  style: const TextStyle(
+                                    fontSize: 12.5,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+
+                      _rowTop(
+                        label: t.passportNumber,
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(maxWidth: 300),
+                          child: TextField(
+                            controller: _passportCtrl,
+                            onChanged: (_) => _saveToProvider(),
+                            decoration: InputDecoration(
+                              hintText: t.enterPassportNumber,
+                              isDense: true,
+                              border: const OutlineInputBorder(),
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 8,
+                              ),
+                            ),
                           ),
                         ),
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(height: 12),
-
-                _rowTop(
-                  label: t.passportNumber, // 【修改】
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 420),
-                    child: TextField(
-                      controller: _passportCtrl,
-                      onChanged: (_) => _saveToProvider(),
-                      decoration: InputDecoration(
-                        hintText: t.enterPassportNumber, // 【修改】
-                        border: const OutlineInputBorder(),
-                        isDense: true,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
         );
@@ -177,6 +214,7 @@ class _EmergencyPersonalPageState extends State<EmergencyPersonalPage> {
 
   Widget _card({required Widget child}) {
     return Container(
+      margin: const EdgeInsets.fromLTRB(24, 0, 24, 16),
       padding: const EdgeInsets.fromLTRB(20, 18, 20, 22),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -197,20 +235,27 @@ class _EmergencyPersonalPageState extends State<EmergencyPersonalPage> {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SizedBox(
-          width: 160,
+        ConstrainedBox(
+          constraints: const BoxConstraints(
+            minWidth: _labelMinW,
+            maxWidth: _labelMaxW,
+          ),
           child: Padding(
             padding: const EdgeInsets.only(top: 8),
             child: Text(
               label,
+              softWrap: false,
+              overflow: TextOverflow.fade,
               style: const TextStyle(
                 fontSize: 15.5,
                 color: Colors.black87,
                 fontWeight: FontWeight.w700,
+                height: 1.2,
               ),
             ),
           ),
         ),
+        const SizedBox(width: _labelGap),
         Expanded(
           child: Align(alignment: Alignment.topLeft, child: child),
         ),
@@ -228,7 +273,7 @@ class _EmergencyPersonalPageState extends State<EmergencyPersonalPage> {
           Icon(
             selected ? Icons.radio_button_checked : Icons.radio_button_off,
             size: 20,
-            color: selected ? const Color(0xFF274C4A) : Colors.black45,
+            color: selected ? _deepGreen : Colors.black45,
           ),
           const SizedBox(width: 6),
           Text(value, style: const TextStyle(fontSize: 15.5)),

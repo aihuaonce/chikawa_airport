@@ -12,12 +12,14 @@ class EmergencyAccidentPage extends StatefulWidget {
 }
 
 class _EmergencyAccidentPageState extends State<EmergencyAccidentPage> {
-  static const double _cardMaxWidth = 1100;
+  // 統一外觀
+  static const double _cardMaxWidth = 1000; // ★ 固定 1000
   static const double _radius = 16;
+  static const Color _deepGreen = Color(0xFF274C4A); // 單/複選選中顏色
+  static const Color _lightGreen = Color(0xFF83ACA9); // 更新時間按鈕
+  static const Color _bg = Color(0xFFE6F6FB);
 
-  // 【修改】移除所有靜態地點列表，它們將在 build 方法中動態生成
-
-  // 【修改】只保留不需要翻譯的列表
+  // 只保留不需翻譯的列表
   final List<String> remotePlaces = const [
     '601',
     '602',
@@ -64,9 +66,9 @@ class _EmergencyAccidentPageState extends State<EmergencyAccidentPage> {
 
   @override
   Widget build(BuildContext context) {
-    final t = AppTranslations.of(context); // 【新增】
+    final t = AppTranslations.of(context);
 
-    // 【新增】在 build 方法中動態建立翻譯後的選項列表
+    // 動態建立翻譯後的選項列表
     final List<String> placeGroups = [
       t.terminal1,
       t.terminal2,
@@ -189,72 +191,75 @@ class _EmergencyAccidentPageState extends State<EmergencyAccidentPage> {
 
     return Consumer<EmergencyData>(
       builder: (context, data, child) {
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-          child: Align(
-            alignment: Alignment.topCenter,
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: _cardMaxWidth),
-              child: _bigCard(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _dateTimeRow(
-                      label: t.incidentDateTime, // 【修改】
-                      value: data.incidentDateTime,
-                      onPick: (dt) => data.updateAccident(incidentDateTime: dt),
-                      onNow: () =>
-                          data.updateAccident(incidentDateTime: DateTime.now()),
-                    ),
-                    const SizedBox(height: 16),
-
-                    _bold(t.incidentLocation), // 【修改】
-                    const SizedBox(height: 6),
-                    Container(
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8),
+        return Container(
+          color: _bg,
+          padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 16),
+          child: SingleChildScrollView(
+            child: Align(
+              alignment: Alignment.topCenter,
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: _cardMaxWidth),
+                child: _bigCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _dateTimeRow(
+                        label: t.incidentDateTime, // 【修改】
+                        value: data.incidentDateTime,
+                        onPick: (dt) =>
+                            data.updateAccident(incidentDateTime: dt),
+                        onNow: () => data.updateAccident(
+                          incidentDateTime: DateTime.now(),
+                        ),
                       ),
-                      padding: const EdgeInsets.fromLTRB(12, 8, 12, 12),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _radioWrap(
-                            options: placeGroups, // 【修改】
-                            groupIndex: data.placeGroupIdx,
-                            onChanged: (i) {
-                              data.updateAccident(
-                                placeGroupIdx: i,
-                                t1Selected: null,
-                                t2Selected: null,
-                                remoteSelected: null,
-                                cargoSelected: null,
-                                novotelSelected: null,
-                                cabinSelected: null,
-                              );
-                            },
-                          ),
-                          const SizedBox(height: 8),
-                          // 【修改】傳入動態生成的列表
-                          _placeSubOptions(
-                            data,
-                            t1Places,
-                            t2Places,
-                            cargoPlaces,
-                            novotelPlaces,
-                            cabinPlaces,
-                          ),
-                        ],
+                      const SizedBox(height: 16),
+                      _bold(t.incidentLocation),
+                      const SizedBox(height: 6),
+                      Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        padding: const EdgeInsets.fromLTRB(0, 8, 12, 12),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _radioWrap(
+                              options: placeGroups,
+                              groupIndex: data.placeGroupIdx,
+                              onChanged: (i) {
+                                data.updateAccident(
+                                  placeGroupIdx: i,
+                                  t1Selected: null,
+                                  t2Selected: null,
+                                  remoteSelected: null,
+                                  cargoSelected: null,
+                                  novotelSelected: null,
+                                  cabinSelected: null,
+                                );
+                              },
+                            ),
+                            const SizedBox(height: 8),
+                            _placeSubOptions(
+                              data,
+                              t1Places,
+                              t2Places,
+                              cargoPlaces,
+                              novotelPlaces,
+                              cabinPlaces,
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 16),
+                      const SizedBox(height: 16),
 
-                    _inputRowTight(
-                      label: t.locationNotes, // 【修改】
-                      hint: t.enterLocationNotes, // 【修改】
-                      ctrl: placeNoteCtrl,
-                    ),
-                  ],
+                      _inputRowTight(
+                        label: t.locationNotes,
+                        hint: t.enterLocationNotes,
+                        ctrl: placeNoteCtrl,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -264,6 +269,8 @@ class _EmergencyAccidentPageState extends State<EmergencyAccidentPage> {
     );
   }
 
+  // ====== 視覺小積木 ======
+
   Widget _bigCard({required Widget child}) => Container(
     margin: const EdgeInsets.fromLTRB(24, 0, 24, 16),
     padding: const EdgeInsets.fromLTRB(20, 18, 20, 22),
@@ -272,9 +279,9 @@ class _EmergencyAccidentPageState extends State<EmergencyAccidentPage> {
       borderRadius: BorderRadius.circular(_radius),
       boxShadow: const [
         BoxShadow(
-          color: Color(0x14000000),
-          blurRadius: 8,
-          offset: Offset(0, 4),
+          color: Color(0x1A000000), // 柔和陰影
+          blurRadius: 14,
+          offset: Offset(0, 6),
         ),
       ],
     ),
@@ -287,21 +294,23 @@ class _EmergencyAccidentPageState extends State<EmergencyAccidentPage> {
       fontSize: 16,
       fontWeight: FontWeight.w700,
       color: Colors.black87,
+      height: 1.25,
     ),
   );
 
+  // 標題縮短 + 按鈕換淺綠
   Widget _dateTimeRow({
     required String label,
     required DateTime? value,
     required ValueChanged<DateTime?> onPick,
     required VoidCallback onNow,
   }) {
-    final t = AppTranslations.of(context); // 【新增】
+    final t = AppTranslations.of(context);
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         SizedBox(
-          width: 160,
+          width: 120, // ★ 原 160 -> 120，減少標題後空白
           child: Text(
             label,
             style: const TextStyle(
@@ -350,10 +359,13 @@ class _EmergencyAccidentPageState extends State<EmergencyAccidentPage> {
           child: ElevatedButton(
             onPressed: onNow,
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF6C63FF),
+              backgroundColor: _lightGreen, // ★ 淺綠
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(horizontal: 12),
               elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
             ),
             child: Text(
               t.updateTime,
@@ -365,42 +377,46 @@ class _EmergencyAccidentPageState extends State<EmergencyAccidentPage> {
     );
   }
 
+  // 輸入框縮短（保留 hint 與內容）
   Widget _inputRowTight({
     required String label,
     required String hint,
     required TextEditingController ctrl,
   }) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        SizedBox(
-          width: 100,
-          child: Text(
-            label,
-            style: const TextStyle(
-              fontSize: 15.5,
-              color: Colors.black87,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        ),
-        Expanded(
-          // 【修改】讓輸入框能填滿剩餘空間
-          child: TextField(
-            controller: ctrl,
-            onChanged: (_) => _saveToProvider(),
-            decoration: InputDecoration(
-              isDense: true,
-              border: const OutlineInputBorder(),
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 10,
-                vertical: 10,
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          SizedBox(
+            width: 84, // ★ 標題縮短
+            child: Text(
+              label,
+              style: const TextStyle(
+                fontSize: 15.5,
+                color: Colors.black87,
+                fontWeight: FontWeight.w700,
               ),
-              hintText: hint,
             ),
           ),
-        ),
-      ],
+          SizedBox(
+            width: 200, // ★ 固定輸入框寬度 300
+            child: TextField(
+              controller: ctrl,
+              onChanged: (_) => _saveToProvider(),
+              decoration: InputDecoration(
+                isDense: true,
+                border: const OutlineInputBorder(),
+                hintText: hint,
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 8,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -410,6 +426,7 @@ class _EmergencyAccidentPageState extends State<EmergencyAccidentPage> {
     required ValueChanged<int> onChanged,
   }) {
     return Wrap(
+      alignment: WrapAlignment.start,
       spacing: 18,
       runSpacing: 6,
       children: List.generate(options.length, (i) {
@@ -422,7 +439,7 @@ class _EmergencyAccidentPageState extends State<EmergencyAccidentPage> {
               Icon(
                 selected ? Icons.radio_button_checked : Icons.radio_button_off,
                 size: 20,
-                color: selected ? const Color(0xFF274C4A) : Colors.black45,
+                color: selected ? _deepGreen : Colors.black45,
               ),
               const SizedBox(width: 6),
               Text(options[i], style: const TextStyle(fontSize: 15.5)),
@@ -500,7 +517,7 @@ class _EmergencyAccidentPageState extends State<EmergencyAccidentPage> {
                       ? Icons.radio_button_checked
                       : Icons.radio_button_off,
                   size: 20,
-                  color: selected ? const Color(0xFF274C4A) : Colors.black45,
+                  color: selected ? _deepGreen : Colors.black45,
                 ),
                 const SizedBox(width: 6),
                 Text(opts[i], style: const TextStyle(fontSize: 15.5)),

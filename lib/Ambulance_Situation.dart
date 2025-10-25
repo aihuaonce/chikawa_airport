@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'data/models/ambulance_data.dart';
-import 'l10n/app_translations.dart'; // 【新增】引入翻譯
+import 'l10n/app_translations.dart';
 
 class AmbulanceSituationPage extends StatefulWidget {
   final int visitId;
@@ -25,8 +25,13 @@ class _AmbulanceSituationPageState extends State<AmbulanceSituationPage> {
     'traumaOther': TextEditingController(),
   };
 
-  // --- 顏色設定 ---
-  final Color optColor = const Color(0xFF2F5C56);
+  // ---------- 版面樣式常數（只動樣式） ----------
+  static const double _outerHpad = 48; // 外側水平留白
+  static const double _cardMaxWidth = 1000; // 白卡最大寬
+  static const double _cardRadius = 16; // 卡片圓角
+  static const double _inlineLabelWidth = 84; // 行內欄位標題寬（病患主訴）
+  static const double _inlineFieldMaxWidth = 300; // 行內欄位輸入框最大寬
+  final Color optColor = const Color(0xFF2F5C56); // 勾選主色（不動）
 
   // --- 選項 Keys (靜態) ---
   // 【修改】使用固定的 Key 來管理選項狀態，而非顯示文字
@@ -202,7 +207,6 @@ class _AmbulanceSituationPageState extends State<AmbulanceSituationPage> {
 
     return Consumer<AmbulanceData>(
       builder: (context, data, child) {
-        // 【修改】UI 顯示邏輯改為依賴固定的 key
         final bool pickedNonTrauma = data.traumaClass.contains('non_trauma');
         final bool pickedTrauma = data.traumaClass.contains('trauma');
         final bool pickedAcute = data.nonTraumaType.contains('acute');
@@ -219,22 +223,18 @@ class _AmbulanceSituationPageState extends State<AmbulanceSituationPage> {
         final bool pickedBurn = data.traumaTypePicked.contains('burns');
         final bool pickedTraumaOther = data.traumaTypePicked.contains('other');
 
-        return Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 880),
-            child: Card(
-              color: Colors.white,
-              elevation: 1.5,
-              margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
-                ),
-                child: SingleChildScrollView(
+        return Container(
+          color: const Color(0xFFE6F6FB), // 淺藍背景
+          padding: const EdgeInsets.symmetric(
+            horizontal: _outerHpad,
+            vertical: 16,
+          ),
+          child: SingleChildScrollView(
+            child: Align(
+              alignment: Alignment.topCenter,
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: _cardMaxWidth),
+                child: _bigCard(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -254,6 +254,7 @@ class _AmbulanceSituationPageState extends State<AmbulanceSituationPage> {
                         ),
                       ),
                       if (pickedNonTrauma) ...[
+                        const SizedBox(height: 8),
                         _title(t.nonTraumaCategory),
                         ..._nonTraumaTypeKeys.map(
                           (key) => _checkboxTile(
@@ -272,6 +273,7 @@ class _AmbulanceSituationPageState extends State<AmbulanceSituationPage> {
                           ),
                         ),
                         if (pickedAcute) ...[
+                          const SizedBox(height: 8),
                           _title(t.nonTraumaAcute),
                           ..._nonTraumaAcuteKeys.map(
                             (key) => _checkboxTile(
@@ -300,6 +302,7 @@ class _AmbulanceSituationPageState extends State<AmbulanceSituationPage> {
                             ),
                         ],
                         if (pickedGeneralDisease) ...[
+                          const SizedBox(height: 8),
                           _title(t.nonTraumaGeneral),
                           ..._nonTraumaGeneralKeys.map(
                             (key) => _checkboxTile(
@@ -324,6 +327,7 @@ class _AmbulanceSituationPageState extends State<AmbulanceSituationPage> {
                         ],
                       ],
                       if (pickedTrauma) ...[
+                        const SizedBox(height: 8),
                         _title(t.traumaCategory),
                         ..._traumaTypeKeys.map(
                           (key) => _checkboxTile(
@@ -349,6 +353,7 @@ class _AmbulanceSituationPageState extends State<AmbulanceSituationPage> {
                             controller: _controllers['traumaOther']!,
                           ),
                         if (pickedTraumaGeneral) ...[
+                          const SizedBox(height: 8),
                           _title(t.traumaGeneralInjury),
                           ..._traumaGeneralBodyKeys.map(
                             (key) => _checkboxTile(
@@ -377,6 +382,7 @@ class _AmbulanceSituationPageState extends State<AmbulanceSituationPage> {
                             ),
                         ],
                         if (pickedTraumaMech) ...[
+                          const SizedBox(height: 8),
                           _title(t.traumaMechanismOfInjury),
                           ..._traumaMechanismKeys.map(
                             (key) => _checkboxTile(
@@ -435,11 +441,18 @@ class _AmbulanceSituationPageState extends State<AmbulanceSituationPage> {
                           label: t.otherAllergyHistory,
                           controller: _controllers['allergyOther']!,
                         ),
+
+                      // 行內欄位：病患主訴（標題寬 84 / 欄位上限 520）
+                      const SizedBox(height: 8),
                       _inlineField(
                         t.chiefComplaint,
                         _controllers['chiefComplaint']!,
                         t.enterChiefComplaintHint,
+                        labelWidth: 84,
+                        fieldMaxWidth: 350,
                       ),
+
+                      const SizedBox(height: 8),
                       _title(t.statementByProxy),
                       _radioTile(
                         t.no,
@@ -453,6 +466,7 @@ class _AmbulanceSituationPageState extends State<AmbulanceSituationPage> {
                         data.isProxyStatement,
                         (val) => data.updateSituation(isProxyStatement: val),
                       ),
+                      const SizedBox(height: 8),
                       _title(t.pastMedicalHistory),
                       ..._pmhKeys.map(
                         (key) => _checkboxTile(
@@ -484,10 +498,34 @@ class _AmbulanceSituationPageState extends State<AmbulanceSituationPage> {
     );
   }
 
-  // --- UI 小積木 (已更新以適應多語系) ---
+  // ---------- Helper（只動樣式，不動邏輯） ----------
+  Widget _bigCard({required Widget child}) => Container(
+    margin: const EdgeInsets.fromLTRB(24, 0, 24, 16),
+    padding: const EdgeInsets.fromLTRB(20, 18, 20, 22),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(_cardRadius),
+      boxShadow: const [
+        BoxShadow(
+          color: Color(0x14000000),
+          blurRadius: 8,
+          offset: Offset(0, 4),
+        ),
+      ],
+    ),
+    child: child,
+  );
+
   Widget _title(String s) => Padding(
-    padding: const EdgeInsets.only(top: 12, bottom: 6),
-    child: Text(s, style: const TextStyle(fontWeight: FontWeight.w700)),
+    padding: const EdgeInsets.only(top: 6, bottom: 4),
+    child: Text(
+      s,
+      style: const TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.w700,
+        color: Colors.black87,
+      ),
+    ),
   );
 
   Widget _checkboxTile({
@@ -495,12 +533,12 @@ class _AmbulanceSituationPageState extends State<AmbulanceSituationPage> {
     required bool isChecked,
     required ValueChanged<bool> onChanged,
   }) => CheckboxListTile(
-    visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
     dense: true,
+    visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
     contentPadding: EdgeInsets.zero,
     controlAffinity: ListTileControlAffinity.leading,
-    checkColor: Colors.white,
     activeColor: optColor,
+    checkColor: Colors.white,
     side: BorderSide(color: optColor, width: 2),
     title: Text(label),
     value: isChecked,
@@ -512,14 +550,26 @@ class _AmbulanceSituationPageState extends State<AmbulanceSituationPage> {
     bool value,
     bool? groupValue,
     ValueChanged<bool?> onChanged,
-  ) => RadioListTile<bool>(
-    visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
-    dense: true,
-    contentPadding: EdgeInsets.zero,
-    title: Text(label),
-    value: value,
-    groupValue: groupValue,
-    onChanged: onChanged,
+  ) => Theme(
+    data: Theme.of(context).copyWith(
+      radioTheme: RadioThemeData(
+        fillColor: MaterialStateProperty.resolveWith<Color>((states) {
+          if (states.contains(MaterialState.selected)) {
+            return const Color(0xFF274C4A); // 深綠（選中）
+          }
+          return Colors.black54; // 未選中灰
+        }),
+      ),
+    ),
+    child: RadioListTile<bool>(
+      visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
+      dense: true,
+      contentPadding: EdgeInsets.zero,
+      title: Text(label),
+      value: value,
+      groupValue: groupValue,
+      onChanged: onChanged,
+    ),
   );
 
   Widget _tightField({
@@ -528,7 +578,7 @@ class _AmbulanceSituationPageState extends State<AmbulanceSituationPage> {
   }) => Padding(
     padding: const EdgeInsets.only(left: 40, top: 2, bottom: 4),
     child: ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: 440),
+      constraints: const BoxConstraints(maxWidth: 250),
       child: TextFormField(
         controller: controller,
         onChanged: (_) => _saveToProvider(),
@@ -548,14 +598,17 @@ class _AmbulanceSituationPageState extends State<AmbulanceSituationPage> {
   Widget _inlineField(
     String label,
     TextEditingController controller,
-    String hint,
-  ) => Padding(
+    String hint, {
+    double labelWidth = 90, // ← 讓你可以傳入 84
+    double fieldMaxWidth = 500, // ← 讓你可以傳入 350
+  }) => Padding(
     padding: const EdgeInsets.only(top: 4, bottom: 4, left: 4),
     child: Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
+        // 標題寬度可調
         SizedBox(
-          width: 90,
+          width: labelWidth,
           child: Padding(
             padding: const EdgeInsets.only(right: 8),
             child: Text(
@@ -564,22 +617,18 @@ class _AmbulanceSituationPageState extends State<AmbulanceSituationPage> {
             ),
           ),
         ),
-        Expanded(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 500),
-            child: TextFormField(
-              controller: controller,
-              onChanged: (_) => _saveToProvider(),
-              decoration: InputDecoration(
-                hintText: hint, // 【修改】
-                isDense: true,
-                contentPadding: const EdgeInsets.symmetric(
-                  vertical: 8,
-                  horizontal: 10,
-                ),
-                border: const OutlineInputBorder(),
-              ),
-            ),
+
+        // 輸入框寬度可調（不要用 Expanded，否則會被撐滿）
+        SizedBox(
+          width: fieldMaxWidth,
+          child: TextFormField(
+            controller: controller,
+            onChanged: (_) => _saveToProvider(),
+            decoration: const InputDecoration(
+              isDense: true,
+              contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+              border: OutlineInputBorder(),
+            ).copyWith(hintText: hint),
           ),
         ),
       ],

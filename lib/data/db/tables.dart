@@ -501,6 +501,9 @@ class AmbulanceRecords extends Table {
   TextColumn get contactName => text().nullable()();
   TextColumn get contactPhone => text().nullable()();
 
+  TextColumn get medicationRecordsJson =>
+      text().withDefault(const Constant('[]'))();
+
   // --- 對應 Ambulance_Expenses.dart ---
   IntColumn get staffFee => integer().nullable()();
   IntColumn get oxygenFee => integer().nullable()();

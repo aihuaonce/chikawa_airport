@@ -14492,6 +14492,18 @@ class $AmbulanceRecordsTable extends AmbulanceRecords
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _medicationRecordsJsonMeta =
+      const VerificationMeta('medicationRecordsJson');
+  @override
+  late final GeneratedColumn<String> medicationRecordsJson =
+      GeneratedColumn<String>(
+        'medication_records_json',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: const Constant('[]'),
+      );
   static const VerificationMeta _staffFeeMeta = const VerificationMeta(
     'staffFee',
   );
@@ -14844,6 +14856,7 @@ class $AmbulanceRecordsTable extends AmbulanceRecords
     relationshipType,
     contactName,
     contactPhone,
+    medicationRecordsJson,
     staffFee,
     oxygenFee,
     totalFee,
@@ -15299,6 +15312,15 @@ class $AmbulanceRecordsTable extends AmbulanceRecords
         ),
       );
     }
+    if (data.containsKey('medication_records_json')) {
+      context.handle(
+        _medicationRecordsJsonMeta,
+        medicationRecordsJson.isAcceptableOrUnknown(
+          data['medication_records_json']!,
+          _medicationRecordsJsonMeta,
+        ),
+      );
+    }
     if (data.containsKey('staff_fee')) {
       context.handle(
         _staffFeeMeta,
@@ -15702,6 +15724,10 @@ class $AmbulanceRecordsTable extends AmbulanceRecords
         DriftSqlType.string,
         data['${effectivePrefix}contact_phone'],
       ),
+      medicationRecordsJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}medication_records_json'],
+      )!,
       staffFee: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}staff_fee'],
@@ -15865,6 +15891,7 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
   final String? relationshipType;
   final String? contactName;
   final String? contactPhone;
+  final String medicationRecordsJson;
   final int? staffFee;
   final int? oxygenFee;
   final int? totalFee;
@@ -15941,6 +15968,7 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
     this.relationshipType,
     this.contactName,
     this.contactPhone,
+    required this.medicationRecordsJson,
     this.staffFee,
     this.oxygenFee,
     this.totalFee,
@@ -16106,6 +16134,7 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
     if (!nullToAbsent || contactPhone != null) {
       map['contact_phone'] = Variable<String>(contactPhone);
     }
+    map['medication_records_json'] = Variable<String>(medicationRecordsJson);
     if (!nullToAbsent || staffFee != null) {
       map['staff_fee'] = Variable<int>(staffFee);
     }
@@ -16302,6 +16331,7 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
       contactPhone: contactPhone == null && nullToAbsent
           ? const Value.absent()
           : Value(contactPhone),
+      medicationRecordsJson: Value(medicationRecordsJson),
       staffFee: staffFee == null && nullToAbsent
           ? const Value.absent()
           : Value(staffFee),
@@ -16448,6 +16478,9 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
       relationshipType: serializer.fromJson<String?>(json['relationshipType']),
       contactName: serializer.fromJson<String?>(json['contactName']),
       contactPhone: serializer.fromJson<String?>(json['contactPhone']),
+      medicationRecordsJson: serializer.fromJson<String>(
+        json['medicationRecordsJson'],
+      ),
       staffFee: serializer.fromJson<int?>(json['staffFee']),
       oxygenFee: serializer.fromJson<int?>(json['oxygenFee']),
       totalFee: serializer.fromJson<int?>(json['totalFee']),
@@ -16551,6 +16584,7 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
       'relationshipType': serializer.toJson<String?>(relationshipType),
       'contactName': serializer.toJson<String?>(contactName),
       'contactPhone': serializer.toJson<String?>(contactPhone),
+      'medicationRecordsJson': serializer.toJson<String>(medicationRecordsJson),
       'staffFee': serializer.toJson<int?>(staffFee),
       'oxygenFee': serializer.toJson<int?>(oxygenFee),
       'totalFee': serializer.toJson<int?>(totalFee),
@@ -16638,6 +16672,7 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
     Value<String?> relationshipType = const Value.absent(),
     Value<String?> contactName = const Value.absent(),
     Value<String?> contactPhone = const Value.absent(),
+    String? medicationRecordsJson,
     Value<int?> staffFee = const Value.absent(),
     Value<int?> oxygenFee = const Value.absent(),
     Value<int?> totalFee = const Value.absent(),
@@ -16771,6 +16806,7 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
         : this.relationshipType,
     contactName: contactName.present ? contactName.value : this.contactName,
     contactPhone: contactPhone.present ? contactPhone.value : this.contactPhone,
+    medicationRecordsJson: medicationRecordsJson ?? this.medicationRecordsJson,
     staffFee: staffFee.present ? staffFee.value : this.staffFee,
     oxygenFee: oxygenFee.present ? oxygenFee.value : this.oxygenFee,
     totalFee: totalFee.present ? totalFee.value : this.totalFee,
@@ -16941,6 +16977,9 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
       contactPhone: data.contactPhone.present
           ? data.contactPhone.value
           : this.contactPhone,
+      medicationRecordsJson: data.medicationRecordsJson.present
+          ? data.medicationRecordsJson.value
+          : this.medicationRecordsJson,
       staffFee: data.staffFee.present ? data.staffFee.value : this.staffFee,
       oxygenFee: data.oxygenFee.present ? data.oxygenFee.value : this.oxygenFee,
       totalFee: data.totalFee.present ? data.totalFee.value : this.totalFee,
@@ -17058,6 +17097,7 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
           ..write('relationshipType: $relationshipType, ')
           ..write('contactName: $contactName, ')
           ..write('contactPhone: $contactPhone, ')
+          ..write('medicationRecordsJson: $medicationRecordsJson, ')
           ..write('staffFee: $staffFee, ')
           ..write('oxygenFee: $oxygenFee, ')
           ..write('totalFee: $totalFee, ')
@@ -17139,6 +17179,7 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
     relationshipType,
     contactName,
     contactPhone,
+    medicationRecordsJson,
     staffFee,
     oxygenFee,
     totalFee,
@@ -17223,6 +17264,7 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
           other.relationshipType == this.relationshipType &&
           other.contactName == this.contactName &&
           other.contactPhone == this.contactPhone &&
+          other.medicationRecordsJson == this.medicationRecordsJson &&
           other.staffFee == this.staffFee &&
           other.oxygenFee == this.oxygenFee &&
           other.totalFee == this.totalFee &&
@@ -17302,6 +17344,7 @@ class AmbulanceRecordsCompanion extends UpdateCompanion<AmbulanceRecord> {
   final Value<String?> relationshipType;
   final Value<String?> contactName;
   final Value<String?> contactPhone;
+  final Value<String> medicationRecordsJson;
   final Value<int?> staffFee;
   final Value<int?> oxygenFee;
   final Value<int?> totalFee;
@@ -17378,6 +17421,7 @@ class AmbulanceRecordsCompanion extends UpdateCompanion<AmbulanceRecord> {
     this.relationshipType = const Value.absent(),
     this.contactName = const Value.absent(),
     this.contactPhone = const Value.absent(),
+    this.medicationRecordsJson = const Value.absent(),
     this.staffFee = const Value.absent(),
     this.oxygenFee = const Value.absent(),
     this.totalFee = const Value.absent(),
@@ -17455,6 +17499,7 @@ class AmbulanceRecordsCompanion extends UpdateCompanion<AmbulanceRecord> {
     this.relationshipType = const Value.absent(),
     this.contactName = const Value.absent(),
     this.contactPhone = const Value.absent(),
+    this.medicationRecordsJson = const Value.absent(),
     this.staffFee = const Value.absent(),
     this.oxygenFee = const Value.absent(),
     this.totalFee = const Value.absent(),
@@ -17532,6 +17577,7 @@ class AmbulanceRecordsCompanion extends UpdateCompanion<AmbulanceRecord> {
     Expression<String>? relationshipType,
     Expression<String>? contactName,
     Expression<String>? contactPhone,
+    Expression<String>? medicationRecordsJson,
     Expression<int>? staffFee,
     Expression<int>? oxygenFee,
     Expression<int>? totalFee,
@@ -17620,6 +17666,8 @@ class AmbulanceRecordsCompanion extends UpdateCompanion<AmbulanceRecord> {
       if (relationshipType != null) 'relationship_type': relationshipType,
       if (contactName != null) 'contact_name': contactName,
       if (contactPhone != null) 'contact_phone': contactPhone,
+      if (medicationRecordsJson != null)
+        'medication_records_json': medicationRecordsJson,
       if (staffFee != null) 'staff_fee': staffFee,
       if (oxygenFee != null) 'oxygen_fee': oxygenFee,
       if (totalFee != null) 'total_fee': totalFee,
@@ -17706,6 +17754,7 @@ class AmbulanceRecordsCompanion extends UpdateCompanion<AmbulanceRecord> {
     Value<String?>? relationshipType,
     Value<String?>? contactName,
     Value<String?>? contactPhone,
+    Value<String>? medicationRecordsJson,
     Value<int?>? staffFee,
     Value<int?>? oxygenFee,
     Value<int?>? totalFee,
@@ -17788,6 +17837,8 @@ class AmbulanceRecordsCompanion extends UpdateCompanion<AmbulanceRecord> {
       relationshipType: relationshipType ?? this.relationshipType,
       contactName: contactName ?? this.contactName,
       contactPhone: contactPhone ?? this.contactPhone,
+      medicationRecordsJson:
+          medicationRecordsJson ?? this.medicationRecordsJson,
       staffFee: staffFee ?? this.staffFee,
       oxygenFee: oxygenFee ?? this.oxygenFee,
       totalFee: totalFee ?? this.totalFee,
@@ -17993,6 +18044,11 @@ class AmbulanceRecordsCompanion extends UpdateCompanion<AmbulanceRecord> {
     if (contactPhone.present) {
       map['contact_phone'] = Variable<String>(contactPhone.value);
     }
+    if (medicationRecordsJson.present) {
+      map['medication_records_json'] = Variable<String>(
+        medicationRecordsJson.value,
+      );
+    }
     if (staffFee.present) {
       map['staff_fee'] = Variable<int>(staffFee.value);
     }
@@ -18140,6 +18196,7 @@ class AmbulanceRecordsCompanion extends UpdateCompanion<AmbulanceRecord> {
           ..write('relationshipType: $relationshipType, ')
           ..write('contactName: $contactName, ')
           ..write('contactPhone: $contactPhone, ')
+          ..write('medicationRecordsJson: $medicationRecordsJson, ')
           ..write('staffFee: $staffFee, ')
           ..write('oxygenFee: $oxygenFee, ')
           ..write('totalFee: $totalFee, ')
@@ -30293,6 +30350,7 @@ typedef $$AmbulanceRecordsTableCreateCompanionBuilder =
       Value<String?> relationshipType,
       Value<String?> contactName,
       Value<String?> contactPhone,
+      Value<String> medicationRecordsJson,
       Value<int?> staffFee,
       Value<int?> oxygenFee,
       Value<int?> totalFee,
@@ -30371,6 +30429,7 @@ typedef $$AmbulanceRecordsTableUpdateCompanionBuilder =
       Value<String?> relationshipType,
       Value<String?> contactName,
       Value<String?> contactPhone,
+      Value<String> medicationRecordsJson,
       Value<int?> staffFee,
       Value<int?> oxygenFee,
       Value<int?> totalFee,
@@ -30650,6 +30709,11 @@ class $$AmbulanceRecordsTableFilterComposer
 
   ColumnFilters<String> get contactPhone => $composableBuilder(
     column: $table.contactPhone,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get medicationRecordsJson => $composableBuilder(
+    column: $table.medicationRecordsJson,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -31039,6 +31103,11 @@ class $$AmbulanceRecordsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get medicationRecordsJson => $composableBuilder(
+    column: $table.medicationRecordsJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<int> get staffFee => $composableBuilder(
     column: $table.staffFee,
     builder: (column) => ColumnOrderings(column),
@@ -31409,6 +31478,11 @@ class $$AmbulanceRecordsTableAnnotationComposer
     builder: (column) => column,
   );
 
+  GeneratedColumn<String> get medicationRecordsJson => $composableBuilder(
+    column: $table.medicationRecordsJson,
+    builder: (column) => column,
+  );
+
   GeneratedColumn<int> get staffFee =>
       $composableBuilder(column: $table.staffFee, builder: (column) => column);
 
@@ -31609,6 +31683,7 @@ class $$AmbulanceRecordsTableTableManager
                 Value<String?> relationshipType = const Value.absent(),
                 Value<String?> contactName = const Value.absent(),
                 Value<String?> contactPhone = const Value.absent(),
+                Value<String> medicationRecordsJson = const Value.absent(),
                 Value<int?> staffFee = const Value.absent(),
                 Value<int?> oxygenFee = const Value.absent(),
                 Value<int?> totalFee = const Value.absent(),
@@ -31686,6 +31761,7 @@ class $$AmbulanceRecordsTableTableManager
                 relationshipType: relationshipType,
                 contactName: contactName,
                 contactPhone: contactPhone,
+                medicationRecordsJson: medicationRecordsJson,
                 staffFee: staffFee,
                 oxygenFee: oxygenFee,
                 totalFee: totalFee,
@@ -31765,6 +31841,7 @@ class $$AmbulanceRecordsTableTableManager
                 Value<String?> relationshipType = const Value.absent(),
                 Value<String?> contactName = const Value.absent(),
                 Value<String?> contactPhone = const Value.absent(),
+                Value<String> medicationRecordsJson = const Value.absent(),
                 Value<int?> staffFee = const Value.absent(),
                 Value<int?> oxygenFee = const Value.absent(),
                 Value<int?> totalFee = const Value.absent(),
@@ -31842,6 +31919,7 @@ class $$AmbulanceRecordsTableTableManager
                 relationshipType: relationshipType,
                 contactName: contactName,
                 contactPhone: contactPhone,
+                medicationRecordsJson: medicationRecordsJson,
                 staffFee: staffFee,
                 oxygenFee: oxygenFee,
                 totalFee: totalFee,

@@ -15,7 +15,8 @@ class AmbulanceInformationPage extends StatefulWidget {
 class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
   // ===== 版面外觀 (靜態常量) =====
   static const double _cardRadius = 16;
-  static const double _labelWidth = 160;
+  static const double _labelWidth = 120; // ★ 縮短標題欄寬，減少標題與輸入框的空隙
+  static const double _cardMaxWidth = 1000; // ★ 卡片最大寬度統一為1000
 
   // ===== 文字輸入控制器 =====
   final _plateCtrl = TextEditingController();
@@ -46,9 +47,7 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
     super.initState();
     // 延遲一幀執行,確保 Provider 已經準備好
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        _loadInitialData();
-      }
+      if (mounted) _loadInitialData();
     });
   }
 
@@ -114,7 +113,7 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
 
   @override
   Widget build(BuildContext context) {
-    final t = AppTranslations.of(context); // 【新增】取得翻譯物件
+    final t = AppTranslations.of(context);
 
     // 【修改】將靜態列表改為在 build 方法中動態建立
     final List<String> placeGroups = [
@@ -125,7 +124,6 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
       t.novotelHotel,
       t.insideAircraft,
     ];
-
     final List<String> t1Places = [
       t.departureCounter,
       t.arrivalCounter,
@@ -171,7 +169,6 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
       t.gateLabel('B9'),
       t.gateLabel('B1R'),
     ];
-
     final List<String> t2Places = [
       t.departureCounter,
       t.arrivalCounter,
@@ -215,7 +212,6 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
       t.otherLocation,
       t.gateLabel('C5R'),
     ];
-
     final List<String> cargoPlaces = [
       t.taxiway,
       '506',
@@ -233,7 +229,6 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
       t.evergreenAerospace,
       t.otherApronLocation,
     ];
-
     final List<String> novotelPlaces = [t.novotelHotel];
     final List<String> cabinPlaces = [t.insideAircraft];
 
@@ -266,36 +261,41 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
           child: Align(
             alignment: Alignment.topCenter,
             child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 1100),
+              constraints: const BoxConstraints(
+                maxWidth: _cardMaxWidth,
+              ), // ★ 800
               child: _card(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _rowTop(
-                      label: t.plateNumber, // 【修改】
+                      label: t.plateNumber,
+                      labelWidth: 84,
                       child: ConstrainedBox(
-                        constraints: const BoxConstraints(maxWidth: 420),
+                        constraints: const BoxConstraints(
+                          maxWidth: 250,
+                        ), // ★ 輸入框略短
                         child: TextField(
                           controller: _plateCtrl,
-                          onChanged: (_) => _saveToProvider(hospitals), // 【修改】
+                          onChanged: (_) => _saveToProvider(hospitals),
                           decoration: InputDecoration(
-                            hintText: t.enterPlateNumberHint, // 【修改】
+                            hintText: t.enterPlateNumberHint,
                             border: const OutlineInputBorder(),
                             isDense: true,
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 10,
+                            ),
                           ),
                         ),
                       ),
                     ),
                     const SizedBox(height: 12),
 
-                    _bold(t.incidentLocation), // 【修改】
+                    _bold(t.incidentLocation),
                     const SizedBox(height: 6),
-                    Container(
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      padding: const EdgeInsets.fromLTRB(12, 8, 12, 12),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(0, 0, 0, 4),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -322,32 +322,45 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
                             cargoPlaces,
                             novotelPlaces,
                             cabinPlaces,
-                          ), // 【修改】傳入列表
+                          ),
                         ],
                       ),
                     ),
                     const SizedBox(height: 12),
 
                     _rowTop(
-                      label: t.locationNotes, // 【修改】
+                      label: t.locationNotes,
+                      labelWidth: 84,
                       child: ConstrainedBox(
-                        constraints: const BoxConstraints(maxWidth: 700),
+                        constraints: const BoxConstraints(
+                          maxWidth: 300,
+                        ), // ★ 略縮短
                         child: TextField(
                           controller: _placeNoteCtrl,
-                          onChanged: (_) => _saveToProvider(hospitals), // 【修改】
+                          onChanged: (_) => _saveToProvider(hospitals),
+                          decoration: InputDecoration(
+                            hintText:
+                                t.enterLocationNotes, // 若沒有此 key 也不會影響既有內容
+                            border: const OutlineInputBorder(),
+                            isDense: true,
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 10,
+                            ),
+                          ),
                         ),
                       ),
                     ),
                     const SizedBox(height: 16),
 
                     _dateTimeRow(
-                      label: t.dutyDateTime, // 【修改】
+                      label: t.dutyDateTime,
                       value: data.dutyTime,
                       onChanged: (dt) => data.updateInformation(dutyTime: dt),
                     ),
                     const SizedBox(height: 8),
                     _dateTimeRow(
-                      label: t.arriveSceneTime, // 【修改】
+                      label: t.arriveSceneTime,
                       value: data.arriveSceneTime,
                       onChanged: (dt) =>
                           data.updateInformation(arriveSceneTime: dt),
@@ -355,7 +368,7 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
                     const SizedBox(height: 16),
 
                     _rowTop(
-                      label: t.destinationHospitalOrPlace, // 【修改】
+                      label: t.destinationHospitalOrPlace,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: List.generate(hospitals.length, (i) {
@@ -368,7 +381,7 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
                                 data.updateInformation(
                                   destinationHospitalIdx: i,
                                 );
-                                _saveToProvider(hospitals); // 【修改】
+                                _saveToProvider(hospitals);
                               },
                             ),
                           );
@@ -380,52 +393,61 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
                         hospitals.length - 1) ...[
                       const SizedBox(height: 10),
                       _rowTop(
-                        label: t.otherHospitalName, // 【修改】
+                        label: t.otherHospitalName,
                         child: ConstrainedBox(
-                          constraints: const BoxConstraints(maxWidth: 700),
+                          constraints: const BoxConstraints(maxWidth: 300),
                           child: TextField(
                             controller: _otherDestCtrl,
-                            onChanged: (_) =>
-                                _saveToProvider(hospitals), // 【修改】
+                            onChanged: (_) => _saveToProvider(hospitals),
+                            decoration: const InputDecoration(
+                              border: OutlineInputBorder(),
+                              isDense: true,
+                              contentPadding: EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 10,
+                              ),
+                            ),
                           ),
                         ),
                       ),
                     ],
+
                     const SizedBox(height: 12),
                     _rowTop(
-                      label: '運送原因', // ★ Added
+                      label: '運送原因',
+                      labelWidth: 84,
                       child: _radioWrap(
-                        // ★ Added
                         options: transportReasons,
                         groupIndex: transportReasonIdx,
                         onChanged: (i) =>
                             setState(() => transportReasonIdx = i),
                       ),
                     ),
+
                     const SizedBox(height: 16),
                     _dateTimeRow(
-                      label: t.leaveSceneTime, // 【修改】
+                      label: t.leaveSceneTime,
                       value: data.leaveSceneTime,
                       onChanged: (dt) =>
                           data.updateInformation(leaveSceneTime: dt),
                     ),
                     const SizedBox(height: 8),
                     _dateTimeRow(
-                      label: t.arriveHospitalTime, // 【修改】
+                      label: t.arriveHospitalTime,
                       value: data.arriveHospitalTime,
                       onChanged: (dt) =>
                           data.updateInformation(arriveHospitalTime: dt),
                     ),
                     const SizedBox(height: 8),
                     _dateTimeRow(
-                      label: t.leaveHospitalTime, // 【修改】
+                      label: t.leaveHospitalTime,
                       value: data.leaveHospitalTime,
                       onChanged: (dt) =>
                           data.updateInformation(leaveHospitalTime: dt),
                     ),
                     const SizedBox(height: 8),
                     _dateTimeRow(
-                      label: t.backToStandbyTime, // 【修改】
+                      label: t.backToStandbyTime,
                       value: data.backStandbyTime,
                       onChanged: (dt) =>
                           data.updateInformation(backStandbyTime: dt),
@@ -465,10 +487,15 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
       fontSize: 16,
       fontWeight: FontWeight.w700,
       color: Colors.black87,
+      height: 1.25,
     ),
   );
 
-  Widget _rowTop({required String label, required Widget child}) {
+  Widget _rowTop({
+    required String label,
+    required Widget child,
+    double? labelWidth,
+  }) {
     final Widget effectiveChild = child is TextField
         ? Theme(
             data: Theme.of(context).copyWith(
@@ -486,7 +513,7 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SizedBox(
-          width: _labelWidth,
+          width: labelWidth ?? _labelWidth, // ★ 縮短後，右側空白變小
           child: Padding(
             padding: const EdgeInsets.only(top: 8),
             child: Text(
@@ -495,6 +522,7 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
                 fontSize: 15.5,
                 color: Colors.black87,
                 fontWeight: FontWeight.w700,
+                height: 1.25,
               ),
             ),
           ),
@@ -511,7 +539,7 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
     required DateTime? value,
     required ValueChanged<DateTime?> onChanged,
   }) {
-    final t = AppTranslations.of(context); // 【新增】
+    final t = AppTranslations.of(context);
     return _rowTop(
       label: label,
       child: Row(
@@ -525,7 +553,7 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
               child: Text(
                 value == null
                     ? t.pleaseSelectTime
-                    : t.formatFullDateTime(value), // 【修改】
+                    : t.formatFullDateTime(value),
                 style: TextStyle(
                   fontSize: 15,
                   color: value == null ? Colors.blue.shade700 : Colors.black87,
@@ -539,7 +567,7 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
             child: ElevatedButton(
               onPressed: () => onChanged(DateTime.now()),
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF83ACA9),
+                backgroundColor: const Color(0xFF83ACA9), // ★ 規格色
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(horizontal: 12),
                 elevation: 1,
@@ -547,7 +575,7 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
               child: Text(
                 t.useCurrentTime,
                 style: const TextStyle(fontSize: 12.5),
-              ), // 【修改】
+              ),
             ),
           ),
         ],
@@ -568,7 +596,9 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
           Icon(
             isSelected ? Icons.radio_button_checked : Icons.radio_button_off,
             size: 20,
-            color: isSelected ? const Color(0xFF274C4A) : Colors.black45,
+            color: isSelected
+                ? const Color(0xFF274C4A)
+                : Colors.black45, // ★ 深綠
           ),
           const SizedBox(width: 8),
           Text(label, style: const TextStyle(fontSize: 15.5)),
@@ -584,7 +614,7 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
   }) {
     return Wrap(
       spacing: 14,
-      runSpacing: 4,
+      runSpacing: 6, // ★ 行距拉開一點
       children: List.generate(options.length, (i) {
         return _radioOption(
           label: options[i],

@@ -1,10 +1,11 @@
-// ==================== 2️⃣ ambulance_data.dart ====================
+// lib/data/models/ambulance_data.dart
+import 'package:drift/drift.dart';
 import 'dart:convert';
 import 'package:chikawa_airport/data/db/app_database.dart';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'package:drift/drift.dart';
 import '../db/daos.dart';
+import 'medication_record_model.dart';
 
 class AmbulanceData extends ChangeNotifier {
   final int visitId;
@@ -87,6 +88,7 @@ class AmbulanceData extends ChangeNotifier {
   String? relationshipType;
   String? contactName;
   String? contactPhone;
+  List<MedicationRecordModel> medicationRecords = [];
 
   // Expenses
   int? staffFee;
@@ -238,6 +240,7 @@ class AmbulanceData extends ChangeNotifier {
     String? relationshipType,
     String? contactName,
     String? contactPhone,
+    List<MedicationRecordModel>? medicationRecords,
   }) {
     if (emergencyTreatments != null)
       this.emergencyTreatments = emergencyTreatments;
@@ -254,7 +257,6 @@ class AmbulanceData extends ChangeNotifier {
     if (airwayOther != null) this.airwayOther = airwayOther;
     if (otherEmergencyOther != null)
       this.otherEmergencyOther = otherEmergencyOther;
-    // 允許設定為 null 或空字串
     this.aslType = (aslType == null || aslType.isEmpty) ? null : aslType;
     if (ettSize != null) this.ettSize = ettSize;
     if (ettDepth != null) this.ettDepth = ettDepth;
@@ -268,6 +270,7 @@ class AmbulanceData extends ChangeNotifier {
     if (relationshipType != null) this.relationshipType = relationshipType;
     if (contactName != null) this.contactName = contactName;
     if (contactPhone != null) this.contactPhone = contactPhone;
+    if (medicationRecords != null) this.medicationRecords = medicationRecords;
     notifyListeners();
   }
 
@@ -361,6 +364,7 @@ class AmbulanceData extends ChangeNotifier {
     relationshipType = null;
     contactName = null;
     contactPhone = null;
+    medicationRecords = [];
 
     staffFee = null;
     oxygenFee = null;
@@ -375,51 +379,30 @@ class AmbulanceData extends ChangeNotifier {
   Future<void> _prefillFromOtherTables(AmbulanceRecordsDao dao) async {
     try {
       print('🔍 開始從其他資料表預填資料...');
-
       final profile = await dao.db.patientProfilesDao.getByVisitId(visitId);
       if (profile != null) {
         print('✅ 找到 PatientProfile 資料');
-        if (gender == null && profile.gender != null) {
-          gender = profile.gender;
-          print('   - 預填性別: $gender');
-        }
-        if (age == null && profile.age != null) {
-          age = profile.age;
-          print('   - 預填年齡: $age');
-        }
-        if (idNumber == null && profile.idNumber != null) {
+        if (gender == null && profile.gender != null) gender = profile.gender;
+        if (age == null && profile.age != null) age = profile.age;
+        if (idNumber == null && profile.idNumber != null)
           idNumber = profile.idNumber;
-          print('   - 預填身分證: $idNumber');
-        }
-        if (address == null && profile.address != null) {
+        if (address == null && profile.address != null)
           address = profile.address;
-          print('   - 預填住址: $address');
-        }
       }
-
       final accidentRecord = await dao.db.accidentRecordsDao.getByVisitId(
         visitId,
       );
       if (accidentRecord != null) {
         print('✅ 找到 AccidentRecord 資料');
-        if (placeGroupIdx == null && accidentRecord.placeIdx != null) {
+        if (placeGroupIdx == null && accidentRecord.placeIdx != null)
           placeGroupIdx = accidentRecord.placeIdx;
-          print('   - 預填地點群組: $placeGroupIdx');
-        }
-        if (t1PlaceIdx == null && accidentRecord.t1PlaceIdx != null) {
+        if (t1PlaceIdx == null && accidentRecord.t1PlaceIdx != null)
           t1PlaceIdx = accidentRecord.t1PlaceIdx;
-          print('   - 預填T1地點: $t1PlaceIdx');
-        }
-        if (t2PlaceIdx == null && accidentRecord.t2PlaceIdx != null) {
+        if (t2PlaceIdx == null && accidentRecord.t2PlaceIdx != null)
           t2PlaceIdx = accidentRecord.t2PlaceIdx;
-          print('   - 預填T2地點: $t2PlaceIdx');
-        }
-        if (placeNote == null && accidentRecord.placeNote != null) {
+        if (placeNote == null && accidentRecord.placeNote != null)
           placeNote = accidentRecord.placeNote;
-          print('   - 預填地點備註: $placeNote');
-        }
       }
-
       print('✅ 預填資料完成!');
     } catch (e) {
       print('⚠️ 預填資料時發生錯誤: $e');
@@ -489,6 +472,7 @@ class AmbulanceData extends ChangeNotifier {
       burnArea = record.burnArea;
       traumaOther = record.traumaOther;
       isProxyStatement = record.isProxyStatement;
+      traumaOther = record.traumaOther;
 
       emergencyTreatments = _jsonToMap(record.emergencyTreatmentsJson);
       airwayTreatments = _jsonToMap(record.airwayTreatmentsJson);
@@ -516,6 +500,14 @@ class AmbulanceData extends ChangeNotifier {
       relationshipType = record.relationshipType;
       contactName = record.contactName;
       contactPhone = record.contactPhone;
+      try {
+        medicationRecords = (jsonDecode(record.medicationRecordsJson) as List)
+            .map((item) => MedicationRecordModel.fromJson(item))
+            .toList();
+      } catch (e) {
+        print('⚠️ 解碼 medicationRecordsJson 失敗: $e');
+        medicationRecords = [];
+      }
 
       staffFee = record.staffFee;
       oxygenFee = record.oxygenFee;
@@ -531,6 +523,7 @@ class AmbulanceData extends ChangeNotifier {
     } catch (e) {
       print('❌ 載入救護車記錄失敗: $e');
       clearAll();
+      notifyListeners(); // 發生錯誤時也通知 UI 更新為空白狀態
     }
   }
 
@@ -635,6 +628,9 @@ class AmbulanceData extends ChangeNotifier {
       relationshipType: Value(relationshipType),
       contactName: Value(contactName),
       contactPhone: Value(contactPhone),
+      medicationRecordsJson: Value(
+        jsonEncode(medicationRecords.map((r) => r.toJson()).toList()),
+      ),
       staffFee: Value(staffFee),
       oxygenFee: Value(oxygenFee),
       totalFee: Value(totalFee),
