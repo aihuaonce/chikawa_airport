@@ -14568,6 +14568,30 @@ class $AmbulanceRecordsTable extends AmbulanceRecords
         requiredDuringInsert: false,
         defaultValue: const Constant('[]'),
       );
+  static const VerificationMeta _paramedicRecordsJsonMeta =
+      const VerificationMeta('paramedicRecordsJson');
+  @override
+  late final GeneratedColumn<String> paramedicRecordsJson =
+      GeneratedColumn<String>(
+        'paramedic_records_json',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: const Constant('[]'),
+      );
+  static const VerificationMeta _vitalSignsRecordsJsonMeta =
+      const VerificationMeta('vitalSignsRecordsJson');
+  @override
+  late final GeneratedColumn<String> vitalSignsRecordsJson =
+      GeneratedColumn<String>(
+        'vital_signs_records_json',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: const Constant('[]'),
+      );
   static const VerificationMeta _createdAtMeta = const VerificationMeta(
     'createdAt',
   );
@@ -14921,6 +14945,8 @@ class $AmbulanceRecordsTable extends AmbulanceRecords
     contactName,
     contactPhone,
     medicationRecordsJson,
+    paramedicRecordsJson,
+    vitalSignsRecordsJson,
     createdAt,
     updatedAt,
     staffFee,
@@ -15385,6 +15411,24 @@ class $AmbulanceRecordsTable extends AmbulanceRecords
         ),
       );
     }
+    if (data.containsKey('paramedic_records_json')) {
+      context.handle(
+        _paramedicRecordsJsonMeta,
+        paramedicRecordsJson.isAcceptableOrUnknown(
+          data['paramedic_records_json']!,
+          _paramedicRecordsJsonMeta,
+        ),
+      );
+    }
+    if (data.containsKey('vital_signs_records_json')) {
+      context.handle(
+        _vitalSignsRecordsJsonMeta,
+        vitalSignsRecordsJson.isAcceptableOrUnknown(
+          data['vital_signs_records_json']!,
+          _vitalSignsRecordsJsonMeta,
+        ),
+      );
+    }
     if (data.containsKey('created_at')) {
       context.handle(
         _createdAtMeta,
@@ -15792,6 +15836,14 @@ class $AmbulanceRecordsTable extends AmbulanceRecords
         DriftSqlType.string,
         data['${effectivePrefix}medication_records_json'],
       )!,
+      paramedicRecordsJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}paramedic_records_json'],
+      )!,
+      vitalSignsRecordsJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}vital_signs_records_json'],
+      )!,
       createdAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}created_at'],
@@ -15956,6 +16008,8 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
   final String? contactName;
   final String? contactPhone;
   final String medicationRecordsJson;
+  final String paramedicRecordsJson;
+  final String vitalSignsRecordsJson;
   final DateTime createdAt;
   final DateTime updatedAt;
   final int? staffFee;
@@ -16033,6 +16087,8 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
     this.contactName,
     this.contactPhone,
     required this.medicationRecordsJson,
+    required this.paramedicRecordsJson,
+    required this.vitalSignsRecordsJson,
     required this.createdAt,
     required this.updatedAt,
     this.staffFee,
@@ -16199,6 +16255,8 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
       map['contact_phone'] = Variable<String>(contactPhone);
     }
     map['medication_records_json'] = Variable<String>(medicationRecordsJson);
+    map['paramedic_records_json'] = Variable<String>(paramedicRecordsJson);
+    map['vital_signs_records_json'] = Variable<String>(vitalSignsRecordsJson);
     map['created_at'] = Variable<DateTime>(createdAt);
     map['updated_at'] = Variable<DateTime>(updatedAt);
     if (!nullToAbsent || staffFee != null) {
@@ -16396,6 +16454,8 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
           ? const Value.absent()
           : Value(contactPhone),
       medicationRecordsJson: Value(medicationRecordsJson),
+      paramedicRecordsJson: Value(paramedicRecordsJson),
+      vitalSignsRecordsJson: Value(vitalSignsRecordsJson),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
       staffFee: staffFee == null && nullToAbsent
@@ -16545,6 +16605,12 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
       medicationRecordsJson: serializer.fromJson<String>(
         json['medicationRecordsJson'],
       ),
+      paramedicRecordsJson: serializer.fromJson<String>(
+        json['paramedicRecordsJson'],
+      ),
+      vitalSignsRecordsJson: serializer.fromJson<String>(
+        json['vitalSignsRecordsJson'],
+      ),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
       staffFee: serializer.fromJson<int?>(json['staffFee']),
@@ -16649,6 +16715,8 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
       'contactName': serializer.toJson<String?>(contactName),
       'contactPhone': serializer.toJson<String?>(contactPhone),
       'medicationRecordsJson': serializer.toJson<String>(medicationRecordsJson),
+      'paramedicRecordsJson': serializer.toJson<String>(paramedicRecordsJson),
+      'vitalSignsRecordsJson': serializer.toJson<String>(vitalSignsRecordsJson),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
       'staffFee': serializer.toJson<int?>(staffFee),
@@ -16737,6 +16805,8 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
     Value<String?> contactName = const Value.absent(),
     Value<String?> contactPhone = const Value.absent(),
     String? medicationRecordsJson,
+    String? paramedicRecordsJson,
+    String? vitalSignsRecordsJson,
     DateTime? createdAt,
     DateTime? updatedAt,
     Value<int?> staffFee = const Value.absent(),
@@ -16871,6 +16941,8 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
     contactName: contactName.present ? contactName.value : this.contactName,
     contactPhone: contactPhone.present ? contactPhone.value : this.contactPhone,
     medicationRecordsJson: medicationRecordsJson ?? this.medicationRecordsJson,
+    paramedicRecordsJson: paramedicRecordsJson ?? this.paramedicRecordsJson,
+    vitalSignsRecordsJson: vitalSignsRecordsJson ?? this.vitalSignsRecordsJson,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
     staffFee: staffFee.present ? staffFee.value : this.staffFee,
@@ -17044,6 +17116,12 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
       medicationRecordsJson: data.medicationRecordsJson.present
           ? data.medicationRecordsJson.value
           : this.medicationRecordsJson,
+      paramedicRecordsJson: data.paramedicRecordsJson.present
+          ? data.paramedicRecordsJson.value
+          : this.paramedicRecordsJson,
+      vitalSignsRecordsJson: data.vitalSignsRecordsJson.present
+          ? data.vitalSignsRecordsJson.value
+          : this.vitalSignsRecordsJson,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
       staffFee: data.staffFee.present ? data.staffFee.value : this.staffFee,
@@ -17162,6 +17240,8 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
           ..write('contactName: $contactName, ')
           ..write('contactPhone: $contactPhone, ')
           ..write('medicationRecordsJson: $medicationRecordsJson, ')
+          ..write('paramedicRecordsJson: $paramedicRecordsJson, ')
+          ..write('vitalSignsRecordsJson: $vitalSignsRecordsJson, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('staffFee: $staffFee, ')
@@ -17244,6 +17324,8 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
     contactName,
     contactPhone,
     medicationRecordsJson,
+    paramedicRecordsJson,
+    vitalSignsRecordsJson,
     createdAt,
     updatedAt,
     staffFee,
@@ -17329,6 +17411,8 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
           other.contactName == this.contactName &&
           other.contactPhone == this.contactPhone &&
           other.medicationRecordsJson == this.medicationRecordsJson &&
+          other.paramedicRecordsJson == this.paramedicRecordsJson &&
+          other.vitalSignsRecordsJson == this.vitalSignsRecordsJson &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt &&
           other.staffFee == this.staffFee &&
@@ -17409,6 +17493,8 @@ class AmbulanceRecordsCompanion extends UpdateCompanion<AmbulanceRecord> {
   final Value<String?> contactName;
   final Value<String?> contactPhone;
   final Value<String> medicationRecordsJson;
+  final Value<String> paramedicRecordsJson;
+  final Value<String> vitalSignsRecordsJson;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
   final Value<int?> staffFee;
@@ -17486,6 +17572,8 @@ class AmbulanceRecordsCompanion extends UpdateCompanion<AmbulanceRecord> {
     this.contactName = const Value.absent(),
     this.contactPhone = const Value.absent(),
     this.medicationRecordsJson = const Value.absent(),
+    this.paramedicRecordsJson = const Value.absent(),
+    this.vitalSignsRecordsJson = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.staffFee = const Value.absent(),
@@ -17564,6 +17652,8 @@ class AmbulanceRecordsCompanion extends UpdateCompanion<AmbulanceRecord> {
     this.contactName = const Value.absent(),
     this.contactPhone = const Value.absent(),
     this.medicationRecordsJson = const Value.absent(),
+    this.paramedicRecordsJson = const Value.absent(),
+    this.vitalSignsRecordsJson = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.staffFee = const Value.absent(),
@@ -17642,6 +17732,8 @@ class AmbulanceRecordsCompanion extends UpdateCompanion<AmbulanceRecord> {
     Expression<String>? contactName,
     Expression<String>? contactPhone,
     Expression<String>? medicationRecordsJson,
+    Expression<String>? paramedicRecordsJson,
+    Expression<String>? vitalSignsRecordsJson,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
     Expression<int>? staffFee,
@@ -17732,6 +17824,10 @@ class AmbulanceRecordsCompanion extends UpdateCompanion<AmbulanceRecord> {
       if (contactPhone != null) 'contact_phone': contactPhone,
       if (medicationRecordsJson != null)
         'medication_records_json': medicationRecordsJson,
+      if (paramedicRecordsJson != null)
+        'paramedic_records_json': paramedicRecordsJson,
+      if (vitalSignsRecordsJson != null)
+        'vital_signs_records_json': vitalSignsRecordsJson,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (staffFee != null) 'staff_fee': staffFee,
@@ -17819,6 +17915,8 @@ class AmbulanceRecordsCompanion extends UpdateCompanion<AmbulanceRecord> {
     Value<String?>? contactName,
     Value<String?>? contactPhone,
     Value<String>? medicationRecordsJson,
+    Value<String>? paramedicRecordsJson,
+    Value<String>? vitalSignsRecordsJson,
     Value<DateTime>? createdAt,
     Value<DateTime>? updatedAt,
     Value<int?>? staffFee,
@@ -17903,6 +18001,9 @@ class AmbulanceRecordsCompanion extends UpdateCompanion<AmbulanceRecord> {
       contactPhone: contactPhone ?? this.contactPhone,
       medicationRecordsJson:
           medicationRecordsJson ?? this.medicationRecordsJson,
+      paramedicRecordsJson: paramedicRecordsJson ?? this.paramedicRecordsJson,
+      vitalSignsRecordsJson:
+          vitalSignsRecordsJson ?? this.vitalSignsRecordsJson,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       staffFee: staffFee ?? this.staffFee,
@@ -18113,6 +18214,16 @@ class AmbulanceRecordsCompanion extends UpdateCompanion<AmbulanceRecord> {
         medicationRecordsJson.value,
       );
     }
+    if (paramedicRecordsJson.present) {
+      map['paramedic_records_json'] = Variable<String>(
+        paramedicRecordsJson.value,
+      );
+    }
+    if (vitalSignsRecordsJson.present) {
+      map['vital_signs_records_json'] = Variable<String>(
+        vitalSignsRecordsJson.value,
+      );
+    }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
@@ -18261,6 +18372,8 @@ class AmbulanceRecordsCompanion extends UpdateCompanion<AmbulanceRecord> {
           ..write('contactName: $contactName, ')
           ..write('contactPhone: $contactPhone, ')
           ..write('medicationRecordsJson: $medicationRecordsJson, ')
+          ..write('paramedicRecordsJson: $paramedicRecordsJson, ')
+          ..write('vitalSignsRecordsJson: $vitalSignsRecordsJson, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('staffFee: $staffFee, ')
@@ -30436,6 +30549,8 @@ typedef $$AmbulanceRecordsTableCreateCompanionBuilder =
       Value<String?> contactName,
       Value<String?> contactPhone,
       Value<String> medicationRecordsJson,
+      Value<String> paramedicRecordsJson,
+      Value<String> vitalSignsRecordsJson,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
       Value<int?> staffFee,
@@ -30515,6 +30630,8 @@ typedef $$AmbulanceRecordsTableUpdateCompanionBuilder =
       Value<String?> contactName,
       Value<String?> contactPhone,
       Value<String> medicationRecordsJson,
+      Value<String> paramedicRecordsJson,
+      Value<String> vitalSignsRecordsJson,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
       Value<int?> staffFee,
@@ -30799,6 +30916,16 @@ class $$AmbulanceRecordsTableFilterComposer
 
   ColumnFilters<String> get medicationRecordsJson => $composableBuilder(
     column: $table.medicationRecordsJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get paramedicRecordsJson => $composableBuilder(
+    column: $table.paramedicRecordsJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get vitalSignsRecordsJson => $composableBuilder(
+    column: $table.vitalSignsRecordsJson,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -31193,6 +31320,16 @@ class $$AmbulanceRecordsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get paramedicRecordsJson => $composableBuilder(
+    column: $table.paramedicRecordsJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get vitalSignsRecordsJson => $composableBuilder(
+    column: $table.vitalSignsRecordsJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
     column: $table.createdAt,
     builder: (column) => ColumnOrderings(column),
@@ -31568,6 +31705,16 @@ class $$AmbulanceRecordsTableAnnotationComposer
     builder: (column) => column,
   );
 
+  GeneratedColumn<String> get paramedicRecordsJson => $composableBuilder(
+    column: $table.paramedicRecordsJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get vitalSignsRecordsJson => $composableBuilder(
+    column: $table.vitalSignsRecordsJson,
+    builder: (column) => column,
+  );
+
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
 
@@ -31769,6 +31916,8 @@ class $$AmbulanceRecordsTableTableManager
                 Value<String?> contactName = const Value.absent(),
                 Value<String?> contactPhone = const Value.absent(),
                 Value<String> medicationRecordsJson = const Value.absent(),
+                Value<String> paramedicRecordsJson = const Value.absent(),
+                Value<String> vitalSignsRecordsJson = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
                 Value<int?> staffFee = const Value.absent(),
@@ -31847,6 +31996,8 @@ class $$AmbulanceRecordsTableTableManager
                 contactName: contactName,
                 contactPhone: contactPhone,
                 medicationRecordsJson: medicationRecordsJson,
+                paramedicRecordsJson: paramedicRecordsJson,
+                vitalSignsRecordsJson: vitalSignsRecordsJson,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 staffFee: staffFee,
@@ -31927,6 +32078,8 @@ class $$AmbulanceRecordsTableTableManager
                 Value<String?> contactName = const Value.absent(),
                 Value<String?> contactPhone = const Value.absent(),
                 Value<String> medicationRecordsJson = const Value.absent(),
+                Value<String> paramedicRecordsJson = const Value.absent(),
+                Value<String> vitalSignsRecordsJson = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
                 Value<int?> staffFee = const Value.absent(),
@@ -32005,6 +32158,8 @@ class $$AmbulanceRecordsTableTableManager
                 contactName: contactName,
                 contactPhone: contactPhone,
                 medicationRecordsJson: medicationRecordsJson,
+                paramedicRecordsJson: paramedicRecordsJson,
+                vitalSignsRecordsJson: vitalSignsRecordsJson,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 staffFee: staffFee,

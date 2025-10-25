@@ -504,6 +504,10 @@ class AmbulanceRecords extends Table {
 
   TextColumn get medicationRecordsJson =>
       text().withDefault(const Constant('[]'))();
+  TextColumn get paramedicRecordsJson =>
+      text().withDefault(const Constant('[]'))();
+  TextColumn get vitalSignsRecordsJson =>
+      text().withDefault(const Constant('[]'))();
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
   DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
 

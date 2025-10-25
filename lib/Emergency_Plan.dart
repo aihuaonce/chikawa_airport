@@ -13,9 +13,13 @@ class EmergencyPlanPage extends StatefulWidget {
 }
 
 class _EmergencyPlanPageState extends State<EmergencyPlanPage> {
-  static const Color primaryDark = Color(0xFF274C4A);
-  static const Color white = Color(0xFFFFFFFF);
+  // Style Colors from Spec
+  static const Color primarySelectedColor = Color(0xFF274C4A);
+  static const Color buttonBackgroundColor = Color(0xFF83ACA9);
   static const Color pageBackground = Color(0xFFE8F4F7);
+
+  // General UI Colors
+  static const Color white = Color(0xFFFFFFFF);
   static const Color cardBackground = Colors.white;
   static const Color borderColor = Color(0xFFCBD5E1);
   static const Color labelColor = Color(0xFF4A5568);
@@ -316,6 +320,7 @@ class _EmergencyPlanPageState extends State<EmergencyPlanPage> {
                     return CheckboxListTile(
                       title: Text(name),
                       value: tempSelected.contains(name),
+                      activeColor: primarySelectedColor, // As requested
                       onChanged: (bool? checked) {
                         setState(() {
                           if (checked == true)
@@ -335,8 +340,8 @@ class _EmergencyPlanPageState extends State<EmergencyPlanPage> {
                 ),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: primaryDark,
-                    foregroundColor: white,
+                    backgroundColor: buttonBackgroundColor, // As requested
+                    foregroundColor: white, // As requested
                   ),
                   child: Text(t.confirm),
                   onPressed: () => Navigator.of(context).pop(tempSelected),
@@ -360,363 +365,390 @@ class _EmergencyPlanPageState extends State<EmergencyPlanPage> {
       builder: (context, data, child) {
         return Container(
           color: pageBackground,
+          alignment: Alignment.topCenter,
           child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(
               horizontal: 24.0,
-              vertical: 16.0,
+              vertical: 32.0,
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildInfoCard(
-                  title: t.emergencyBasicInfo,
-                  child: Column(
-                    children: [
-                      _buildTimeSection(
-                        title: t.firstAidStartTime,
-                        timeValue: data.firstAidStartTime ?? DateTime.now(),
-                        onUpdateTime: () =>
-                            data.updatePlan(firstAidStartTime: DateTime.now()),
-                      ),
-                      const SizedBox(height: 16),
-                      _buildTextField(
-                        t.diagnosis,
-                        diagnosisController,
-                        t.enterDiagnosis,
-                      ),
-                      const SizedBox(height: 16),
-                      _buildTextField(
-                        t.situationDescription,
-                        situationController,
-                        t.enterSituationDescription,
-                      ),
-                    ],
-                  ),
+            child: ConstrainedBox(
+              // As requested: maxWidth: 1000
+              constraints: const BoxConstraints(maxWidth: 1000),
+              child: Container(
+                // As requested: Main white card
+                padding: const EdgeInsets.all(32),
+                decoration: BoxDecoration(
+                  color: cardBackground,
+                  borderRadius: BorderRadius.circular(
+                    16,
+                  ), // As requested: borderRadius: 16
+                  boxShadow: const [
+                    BoxShadow(
+                      // As requested: soft shadow
+                      color: Color.fromRGBO(0, 0, 0, 0.08),
+                      blurRadius: 12,
+                      offset: Offset(0, 4),
+                    ),
+                  ],
                 ),
-
-                _buildInfoCard(
-                  title: t.patientCondition,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        t.consciousness,
-                        style: const TextStyle(fontSize: 14, color: labelColor),
-                      ),
-                      const SizedBox(height: 8),
-                      Row(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildSectionContainer(
+                      title: t.emergencyBasicInfo,
+                      child: Column(
                         children: [
-                          _buildLabeledSmallTextField('E', eController),
-                          const SizedBox(width: 16),
-                          _buildLabeledSmallTextField('V', vController),
-                          const SizedBox(width: 16),
-                          _buildLabeledSmallTextField('M', mController),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-
-                      _buildTextField(
-                        t.heartRate,
-                        heartRateController,
-                        t.enterValue,
-                      ),
-                      const SizedBox(height: 16),
-                      _buildTextField(
-                        t.respirationRate,
-                        respirationRateController,
-                        t.enterValue,
-                      ),
-                      const SizedBox(height: 16),
-
-                      _buildTextField(
-                        t.bloodPressure,
-                        bloodPressureController,
-                        t.enterSystolicDiastolic,
-                      ),
-                      const SizedBox(height: 16),
-
-                      Text(
-                        t.bodyTemperature,
-                        style: const TextStyle(fontSize: 14, color: labelColor),
-                      ),
-                      Row(
-                        children: [
-                          _buildTappableRadioOption(
-                            title: t.tempCold,
-                            groupValue: data.temperature,
-                            onChanged: (v) => data.updatePlan(temperature: v),
+                          _buildTimeSection(
+                            title: t.firstAidStartTime,
+                            timeValue: data.firstAidStartTime ?? DateTime.now(),
+                            onUpdateTime: () => data.updatePlan(
+                              firstAidStartTime: DateTime.now(),
+                            ),
                           ),
-                          _buildTappableRadioOption(
-                            title: t.tempWarm,
-                            groupValue: data.temperature,
-                            onChanged: (v) => data.updatePlan(temperature: v),
+                          const SizedBox(height: 16),
+                          _buildTextField(
+                            t.diagnosis,
+                            diagnosisController,
+                            t.enterDiagnosis,
+                          ),
+                          const SizedBox(height: 16),
+                          _buildTextField(
+                            t.situationDescription,
+                            situationController,
+                            t.enterSituationDescription,
                           ),
                         ],
                       ),
-                      const SizedBox(height: 16),
-
-                      Text(
-                        t.pupils,
-                        style: const TextStyle(fontSize: 14, color: labelColor),
-                      ),
-                      const SizedBox(height: 8),
-                      Row(
-                        children: [
-                          _buildLabeledSmallTextField(
-                            t.leftPupilSize,
-                            leftPupilSizeController,
-                          ),
-                          const SizedBox(width: 16),
-                          _buildLabeledSmallTextField(
-                            t.rightPupilSize,
-                            rightPupilSizeController,
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      _buildPupilLightReflexRow(
-                        label: t.leftPupilReaction,
-                        groupValue: data.leftPupilReaction,
-                        onChanged: (v) => data.updatePlan(leftPupilReaction: v),
-                      ),
-                      _buildPupilLightReflexRow(
-                        label: t.rightPupilReaction,
-                        groupValue: data.rightPupilReaction,
-                        onChanged: (v) =>
-                            data.updatePlan(rightPupilReaction: v),
-                      ),
-                    ],
-                  ),
-                ),
-
-                _buildInfoCard(
-                  title: t.emergencyProcedures,
-                  child: Column(
-                    children: [
-                      _buildTimeSection(
-                        title: t.intubationStartTime,
-                        timeValue: data.intubationStartTime ?? DateTime.now(),
-                        onUpdateTime: () => data.updatePlan(
-                          intubationStartTime: DateTime.now(),
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Row(
+                    ),
+                    _buildSectionContainer(
+                      title: t.patientCondition,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            t.intubationMethod,
-                            style: const TextStyle(color: labelColor),
+                            t.consciousness,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: labelColor,
+                            ),
                           ),
-                          _buildTappableRadioOption(
-                            title: 'ET',
-                            groupValue: data.insertionMethod,
-                            onChanged: (v) =>
-                                data.updatePlan(insertionMethod: v),
+                          const SizedBox(height: 8),
+                          Row(
+                            children: [
+                              _buildLabeledSmallTextField('E', eController),
+                              const SizedBox(width: 16),
+                              _buildLabeledSmallTextField('V', vController),
+                              const SizedBox(width: 16),
+                              _buildLabeledSmallTextField('M', mController),
+                            ],
                           ),
-                          _buildTappableRadioOption(
-                            title: 'LMA',
-                            groupValue: data.insertionMethod,
-                            onChanged: (v) =>
-                                data.updatePlan(insertionMethod: v),
+                          const SizedBox(height: 16),
+                          _buildTextField(
+                            t.heartRate,
+                            heartRateController,
+                            t.enterValue,
                           ),
-                          _buildTappableRadioOption(
-                            title: 'Igel',
-                            groupValue: data.insertionMethod,
-                            onChanged: (v) =>
-                                data.updatePlan(insertionMethod: v),
+                          const SizedBox(height: 16),
+                          _buildTextField(
+                            t.respirationRate,
+                            respirationRateController,
+                            t.enterValue,
                           ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      _buildTextField(
-                        t.airwayContentCode,
-                        airwayContentController,
-                        t.enterAirwayContentCode,
-                      ),
-                      const SizedBox(height: 16),
-                      _buildTextField(
-                        t.intubationRecord,
-                        insertionRecordController,
-                        t.enterIntubationRecord,
-                      ),
-
-                      const Divider(height: 32, thickness: 0.5),
-                      _buildTimeSection(
-                        title: t.onIvLineStartTime,
-                        timeValue: data.onIVLineStartTime ?? DateTime.now(),
-                        onUpdateTime: () =>
-                            data.updatePlan(onIVLineStartTime: DateTime.now()),
-                      ),
-                      const SizedBox(height: 16),
-                      _buildTextField(
-                        t.ivNeedleSize,
-                        ivNeedleSizeController,
-                        t.enterIvNeedleSize,
-                      ),
-                      const SizedBox(height: 16),
-                      _buildTextField(
-                        t.onIvLineRecord,
-                        ivLineRecordController,
-                        t.enterOnIvLineRecord,
-                      ),
-                      const Divider(height: 32, thickness: 0.5),
-                      _buildTimeSection(
-                        title: t.cardiacMassageStartTime,
-                        timeValue:
-                            data.cardiacMassageStartTime ?? DateTime.now(),
-                        onUpdateTime: () => data.updatePlan(
-                          cardiacMassageStartTime: DateTime.now(),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      _buildTimeSection(
-                        title: t.cardiacMassageEndTime,
-                        timeValue: data.cardiacMassageEndTime ?? DateTime.now(),
-                        onUpdateTime: () => data.updatePlan(
-                          cardiacMassageEndTime: DateTime.now(),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      _buildTextField(
-                        t.cardiacMassageRecord,
-                        cardiacMassageRecordController,
-                        t.enterCardiacMassageRecord,
-                      ),
-                    ],
-                  ),
-                ),
-
-                _buildInfoCard(
-                  title: t.postResuscitationStatus,
-                  child: _buildPostResuscitationStatusSection(data, t),
-                ),
-
-                _buildInfoCard(
-                  title: t.emergencyEndAndResult,
-                  child: Column(
-                    children: [
-                      _buildTimeSection(
-                        title: t.firstAidEndTime,
-                        timeValue: data.firstAidEndTime ?? DateTime.now(),
-                        onUpdateTime: () =>
-                            data.updatePlan(firstAidEndTime: DateTime.now()),
-                      ),
-                      const SizedBox(height: 16),
-                      _buildTextField(
-                        t.firstAidEndRecord,
-                        endRecordController,
-                        t.enterValue,
-                      ),
-                      const SizedBox(height: 16),
-                      Row(
-                        children: [
+                          const SizedBox(height: 16),
+                          _buildTextField(
+                            t.bloodPressure,
+                            bloodPressureController,
+                            t.enterSystolicDiastolic,
+                          ),
+                          const SizedBox(height: 16),
                           Text(
-                            t.emergencyResult,
-                            style: const TextStyle(color: labelColor),
+                            t.bodyTemperature,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: labelColor,
+                            ),
                           ),
-                          _buildTappableRadioOption(
-                            title: t.resultReferral,
-                            groupValue: data.endResult,
-                            onChanged: (v) => data.updatePlan(endResult: v),
-                          ),
-                          _buildTappableRadioOption(
-                            title: t.resultDeath,
-                            groupValue: data.endResult,
-                            onChanged: (v) => data.updatePlan(endResult: v),
-                          ),
-                          _buildTappableRadioOption(
-                            title: t.other,
-                            groupValue: data.endResult,
-                            onChanged: (v) => data.updatePlan(endResult: v),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-
-                _buildInfoCard(
-                  title: t.participatingPersonnel,
-                  child: Column(
-                    children: [
-                      _buildSelectorField(
-                        t.emergencyDoctor,
-                        data.selectedDoctor ?? '',
-                        () => _showDoctorDialog(t),
-                        isRequired: true,
-                      ),
-                      const SizedBox(height: 16),
-                      _buildSelectorField(
-                        t.emergencyNurse,
-                        data.selectedNurse ?? '',
-                        () => _showNurseDialog(t),
-                        isRequired: true,
-                      ),
-                      const SizedBox(height: 16),
-                      _buildTextField(
-                        t.nurseSignature,
-                        nurseSignatureController,
-                        t.signatureStamp,
-                        maxLines: 2,
-                      ),
-                      const SizedBox(height: 16),
-                      _buildSelectorField(
-                        t.emergencyEMT,
-                        data.selectedEMT ?? '',
-                        () => _showEMTDialog(t),
-                      ),
-                      const SizedBox(height: 16),
-                      _buildTextField(
-                        t.emtSignature,
-                        emtSignatureController,
-                        t.signatureStamp,
-                        maxLines: 2,
-                      ),
-                    ],
-                  ),
-                ),
-
-                _buildInfoCard(
-                  title: t.assistantPersonnelList,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        width: double.infinity,
-                        constraints: const BoxConstraints(minHeight: 100),
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: Colors.grey.shade50,
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: borderColor),
-                        ),
-                        child: data.selectedAssistants.isNotEmpty
-                            ? Wrap(
-                                spacing: 8.0,
-                                runSpacing: 4.0,
-                                children: data.selectedAssistants
-                                    .map((name) => Chip(label: Text(name)))
-                                    .toList(),
-                              )
-                            : Text(
-                                t.noAssistantsSelected,
-                                style: const TextStyle(color: Colors.grey),
+                          Row(
+                            children: [
+                              _buildTappableRadioOption(
+                                title: t.tempCold,
+                                groupValue: data.temperature,
+                                onChanged: (v) =>
+                                    data.updatePlan(temperature: v),
                               ),
+                              _buildTappableRadioOption(
+                                title: t.tempWarm,
+                                groupValue: data.temperature,
+                                onChanged: (v) =>
+                                    data.updatePlan(temperature: v),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            t.pupils,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: labelColor,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Row(
+                            children: [
+                              _buildLabeledSmallTextField(
+                                t.leftPupilSize,
+                                leftPupilSizeController,
+                              ),
+                              const SizedBox(width: 16),
+                              _buildLabeledSmallTextField(
+                                t.rightPupilSize,
+                                rightPupilSizeController,
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          _buildPupilLightReflexRow(
+                            label: t.leftPupilReaction,
+                            groupValue: data.leftPupilReaction,
+                            onChanged: (v) =>
+                                data.updatePlan(leftPupilReaction: v),
+                          ),
+                          _buildPupilLightReflexRow(
+                            label: t.rightPupilReaction,
+                            groupValue: data.rightPupilReaction,
+                            onChanged: (v) =>
+                                data.updatePlan(rightPupilReaction: v),
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 12),
-                      InkWell(
-                        onTap: () => _showHelperSelectionDialog(t),
-                        child: Text(
-                          t.addEditAssistants,
-                          style: const TextStyle(color: Colors.blue),
-                        ),
+                    ),
+                    _buildSectionContainer(
+                      title: t.emergencyProcedures,
+                      child: Column(
+                        children: [
+                          _buildTimeSection(
+                            title: t.intubationStartTime,
+                            timeValue:
+                                data.intubationStartTime ?? DateTime.now(),
+                            onUpdateTime: () => data.updatePlan(
+                              intubationStartTime: DateTime.now(),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Row(
+                            children: [
+                              Text(
+                                t.intubationMethod,
+                                style: const TextStyle(color: labelColor),
+                              ),
+                              _buildTappableRadioOption(
+                                title: 'ET',
+                                groupValue: data.insertionMethod,
+                                onChanged: (v) =>
+                                    data.updatePlan(insertionMethod: v),
+                              ),
+                              _buildTappableRadioOption(
+                                title: 'LMA',
+                                groupValue: data.insertionMethod,
+                                onChanged: (v) =>
+                                    data.updatePlan(insertionMethod: v),
+                              ),
+                              _buildTappableRadioOption(
+                                title: 'Igel',
+                                groupValue: data.insertionMethod,
+                                onChanged: (v) =>
+                                    data.updatePlan(insertionMethod: v),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          _buildTextField(
+                            t.airwayContentCode,
+                            airwayContentController,
+                            t.enterAirwayContentCode,
+                          ),
+                          const SizedBox(height: 16),
+                          _buildTextField(
+                            t.intubationRecord,
+                            insertionRecordController,
+                            t.enterIntubationRecord,
+                          ),
+                          const Divider(height: 32, thickness: 0.5),
+                          _buildTimeSection(
+                            title: t.onIvLineStartTime,
+                            timeValue: data.onIVLineStartTime ?? DateTime.now(),
+                            onUpdateTime: () => data.updatePlan(
+                              onIVLineStartTime: DateTime.now(),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          _buildTextField(
+                            t.ivNeedleSize,
+                            ivNeedleSizeController,
+                            t.enterIvNeedleSize,
+                          ),
+                          const SizedBox(height: 16),
+                          _buildTextField(
+                            t.onIvLineRecord,
+                            ivLineRecordController,
+                            t.enterOnIvLineRecord,
+                          ),
+                          const Divider(height: 32, thickness: 0.5),
+                          _buildTimeSection(
+                            title: t.cardiacMassageStartTime,
+                            timeValue:
+                                data.cardiacMassageStartTime ?? DateTime.now(),
+                            onUpdateTime: () => data.updatePlan(
+                              cardiacMassageStartTime: DateTime.now(),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          _buildTimeSection(
+                            title: t.cardiacMassageEndTime,
+                            timeValue:
+                                data.cardiacMassageEndTime ?? DateTime.now(),
+                            onUpdateTime: () => data.updatePlan(
+                              cardiacMassageEndTime: DateTime.now(),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          _buildTextField(
+                            t.cardiacMassageRecord,
+                            cardiacMassageRecordController,
+                            t.enterCardiacMassageRecord,
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                    _buildSectionContainer(
+                      title: t.postResuscitationStatus,
+                      child: _buildPostResuscitationStatusSection(data, t),
+                    ),
+                    _buildSectionContainer(
+                      title: t.emergencyEndAndResult,
+                      child: Column(
+                        children: [
+                          _buildTimeSection(
+                            title: t.firstAidEndTime,
+                            timeValue: data.firstAidEndTime ?? DateTime.now(),
+                            onUpdateTime: () => data.updatePlan(
+                              firstAidEndTime: DateTime.now(),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          _buildTextField(
+                            t.firstAidEndRecord,
+                            endRecordController,
+                            t.enterValue,
+                          ),
+                          const SizedBox(height: 16),
+                          Row(
+                            children: [
+                              Text(
+                                t.emergencyResult,
+                                style: const TextStyle(color: labelColor),
+                              ),
+                              _buildTappableRadioOption(
+                                title: t.resultReferral,
+                                groupValue: data.endResult,
+                                onChanged: (v) => data.updatePlan(endResult: v),
+                              ),
+                              _buildTappableRadioOption(
+                                title: t.resultDeath,
+                                groupValue: data.endResult,
+                                onChanged: (v) => data.updatePlan(endResult: v),
+                              ),
+                              _buildTappableRadioOption(
+                                title: t.other,
+                                groupValue: data.endResult,
+                                onChanged: (v) => data.updatePlan(endResult: v),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    _buildSectionContainer(
+                      title: t.participatingPersonnel,
+                      child: Column(
+                        children: [
+                          _buildSelectorField(
+                            t.emergencyDoctor,
+                            data.selectedDoctor ?? '',
+                            () => _showDoctorDialog(t),
+                            isRequired: true,
+                          ),
+                          const SizedBox(height: 16),
+                          _buildSelectorField(
+                            t.emergencyNurse,
+                            data.selectedNurse ?? '',
+                            () => _showNurseDialog(t),
+                            isRequired: true,
+                          ),
+                          const SizedBox(height: 16),
+                          _buildTextField(
+                            t.nurseSignature,
+                            nurseSignatureController,
+                            t.signatureStamp,
+                            maxLines: 2,
+                          ),
+                          const SizedBox(height: 16),
+                          _buildSelectorField(
+                            t.emergencyEMT,
+                            data.selectedEMT ?? '',
+                            () => _showEMTDialog(t),
+                          ),
+                          const SizedBox(height: 16),
+                          _buildTextField(
+                            t.emtSignature,
+                            emtSignatureController,
+                            t.signatureStamp,
+                            maxLines: 2,
+                          ),
+                        ],
+                      ),
+                    ),
+                    _buildSectionContainer(
+                      title: t.assistantPersonnelList,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            width: double.infinity,
+                            constraints: const BoxConstraints(minHeight: 100),
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade50,
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: borderColor),
+                            ),
+                            child: data.selectedAssistants.isNotEmpty
+                                ? Wrap(
+                                    spacing: 8.0,
+                                    runSpacing: 4.0,
+                                    children: data.selectedAssistants
+                                        .map((name) => Chip(label: Text(name)))
+                                        .toList(),
+                                  )
+                                : Text(
+                                    t.noAssistantsSelected,
+                                    style: const TextStyle(color: Colors.grey),
+                                  ),
+                          ),
+                          const SizedBox(height: 12),
+                          InkWell(
+                            onTap: () => _showHelperSelectionDialog(t),
+                            child: Text(
+                              t.addEditAssistants,
+                              style: const TextStyle(color: Colors.blue),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-
-                const SizedBox(height: 24),
-              ],
+              ),
             ),
           ),
         );
@@ -724,30 +756,26 @@ class _EmergencyPlanPageState extends State<EmergencyPlanPage> {
     );
   }
 
-  Widget _buildInfoCard({required String title, required Widget child}) {
-    return Card(
-      elevation: 1.5,
-      shadowColor: Colors.black.withOpacity(0.1),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      margin: const EdgeInsets.only(bottom: 24),
-      color: cardBackground,
-      child: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              title,
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: primaryDark,
-              ),
+  Widget _buildSectionContainer({
+    required String title,
+    required Widget child,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 24.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: primarySelectedColor,
             ),
-            const Divider(height: 24, thickness: 0.5),
-            child,
-          ],
-        ),
+          ),
+          const Divider(height: 24, thickness: 0.5),
+          child,
+        ],
       ),
     );
   }
@@ -779,7 +807,10 @@ class _EmergencyPlanPageState extends State<EmergencyPlanPage> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: primaryDark, width: 2),
+              borderSide: const BorderSide(
+                color: primarySelectedColor,
+                width: 2,
+              ),
             ),
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 16,
@@ -993,8 +1024,8 @@ class _EmergencyPlanPageState extends State<EmergencyPlanPage> {
             ElevatedButton(
               onPressed: onUpdateTime,
               style: ElevatedButton.styleFrom(
-                backgroundColor: primaryDark,
-                foregroundColor: white,
+                backgroundColor: buttonBackgroundColor, // As requested
+                foregroundColor: white, // As requested
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -1078,7 +1109,7 @@ class _EmergencyPlanPageState extends State<EmergencyPlanPage> {
               value: title,
               groupValue: groupValue,
               onChanged: onChanged,
-              activeColor: primaryDark,
+              activeColor: primarySelectedColor, // As requested
               materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
             ),
             Text(title),

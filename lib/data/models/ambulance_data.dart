@@ -6,6 +6,8 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import '../db/daos.dart';
 import 'medication_record_model.dart';
+import 'paramedic_record_model.dart';
+import 'vital_sign_record_model.dart';
 
 class AmbulanceData extends ChangeNotifier {
   final int visitId;
@@ -89,6 +91,8 @@ class AmbulanceData extends ChangeNotifier {
   String? contactName;
   String? contactPhone;
   List<MedicationRecordModel> medicationRecords = [];
+  List<ParamedicRecordModel> paramedicRecords = [];
+  List<VitalSignRecordModel> vitalSignsRecords = [];
 
   // ========== Expenses ==========
   int? staffFee;
@@ -242,6 +246,8 @@ class AmbulanceData extends ChangeNotifier {
     String? contactName,
     String? contactPhone,
     List<MedicationRecordModel>? medicationRecords,
+    List<ParamedicRecordModel>? paramedicRecords,
+    List<VitalSignRecordModel>? vitalSignsRecords,
   }) {
     if (emergencyTreatments != null)
       this.emergencyTreatments = emergencyTreatments;
@@ -272,6 +278,8 @@ class AmbulanceData extends ChangeNotifier {
     if (contactName != null) this.contactName = contactName;
     if (contactPhone != null) this.contactPhone = contactPhone;
     if (medicationRecords != null) this.medicationRecords = medicationRecords;
+    if (paramedicRecords != null) this.paramedicRecords = paramedicRecords;
+    if (vitalSignsRecords != null) this.vitalSignsRecords = vitalSignsRecords;
     notifyListeners();
   }
 
@@ -366,6 +374,8 @@ class AmbulanceData extends ChangeNotifier {
     contactName = null;
     contactPhone = null;
     medicationRecords = [];
+    paramedicRecords = [];
+    vitalSignsRecords = [];
 
     staffFee = null;
     oxygenFee = null;
@@ -423,7 +433,6 @@ class AmbulanceData extends ChangeNotifier {
         // 【【步驟 2】】 清除可能存在的舊資料，確保表單是乾淨的
         clearAll();
 
-        // 【【步驟 3】】 為新表單設定合理的預設值，確保 UI 不會因為 null 而崩潰或空白
         dutyTime = DateTime.now();
         receivingTime = DateTime.now();
         isRejection = false; // 預設為「否」
@@ -517,6 +526,7 @@ class AmbulanceData extends ChangeNotifier {
       relationshipType = record.relationshipType;
       contactName = record.contactName;
       contactPhone = record.contactPhone;
+
       try {
         medicationRecords = (jsonDecode(record.medicationRecordsJson) as List)
             .map((item) => MedicationRecordModel.fromJson(item))
@@ -524,6 +534,34 @@ class AmbulanceData extends ChangeNotifier {
       } catch (e) {
         print('⚠️ 解碼 medicationRecordsJson 失敗: $e');
         medicationRecords = [];
+      }
+
+      try {
+        final jsonString = record.paramedicRecordsJson; // 這是一個新欄位
+        if (jsonString != null && jsonString.isNotEmpty) {
+          paramedicRecords = (jsonDecode(jsonString) as List)
+              .map((item) => ParamedicRecordModel.fromJson(item))
+              .toList();
+        } else {
+          paramedicRecords = [];
+        }
+      } catch (e) {
+        print('⚠️ 解碼 paramedicRecordsJson 失敗: $e');
+        paramedicRecords = [];
+      }
+
+      try {
+        final jsonString = record.vitalSignsRecordsJson; // 使用新欄位
+        if (jsonString != null && jsonString.isNotEmpty) {
+          vitalSignsRecords = (jsonDecode(jsonString) as List)
+              .map((item) => VitalSignRecordModel.fromJson(item))
+              .toList();
+        } else {
+          vitalSignsRecords = [];
+        }
+      } catch (e) {
+        print('⚠️ 解碼 vitalSignsRecordsJson 失敗: $e');
+        vitalSignsRecords = [];
       }
 
       staffFee = record.staffFee;
@@ -646,6 +684,12 @@ class AmbulanceData extends ChangeNotifier {
       contactPhone: Value(contactPhone),
       medicationRecordsJson: Value(
         jsonEncode(medicationRecords.map((r) => r.toJson()).toList()),
+      ),
+      paramedicRecordsJson: Value(
+        jsonEncode(paramedicRecords.map((r) => r.toJson()).toList()),
+      ),
+      vitalSignsRecordsJson: Value(
+        jsonEncode(vitalSignsRecords.map((r) => r.toJson()).toList()),
       ),
       staffFee: Value(staffFee),
       oxygenFee: Value(oxygenFee),

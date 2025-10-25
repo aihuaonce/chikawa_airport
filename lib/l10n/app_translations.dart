@@ -244,6 +244,10 @@ class AppTranslations {
   String get enterOxygenFlow => isZh ? '請填寫氧氣流量' : 'Please enter oxygen flow';
   String get medicalCertType => isZh ? '診斷書種類' : 'Type of Medical Certificate';
   String get medicationRecord => isZh ? '藥物記錄表' : 'Medication Record';
+  String get paramedics => '隨車救護人員';
+  String get noSignature => '未簽名';
+  String get addParamedic => '新增隨車人員';
+  String get pleaseEnterName => '請輸入姓名';
   String get otherTreatmentSummary =>
       isZh ? '其他處理摘要' : 'Other Treatment Summary';
   String get enterOtherTreatmentSummary =>
