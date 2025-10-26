@@ -2234,6 +2234,7 @@ class _PlanPageState extends State<PlanPage>
           builder: (context, setState) {
             return AlertDialog(
               title: const Text('選擇隨車人員姓名'),
+              backgroundColor: Colors.white,
               content: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -2259,6 +2260,9 @@ class _PlanPageState extends State<PlanPage>
               actions: <Widget>[
                 TextButton(
                   child: const Text('取消'),
+                  style: TextButton.styleFrom(
+                    foregroundColor: const Color(0xFF83ACA9),
+                  ),
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
