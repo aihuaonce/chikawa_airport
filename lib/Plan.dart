@@ -1836,6 +1836,7 @@ class _PlanPageState extends State<PlanPage>
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
+        backgroundColor: Colors.white, // Dialog背景設為白色
         title: const Text("新增健康評估"),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -1857,10 +1858,15 @@ class _PlanPageState extends State<PlanPage>
         ),
         actions: [
           TextButton(
+            // 「取消」文字顏色設為 #83ACA9
+            style: TextButton.styleFrom(
+              foregroundColor: const Color(0xFF83ACA9),
+            ),
             onPressed: () => Navigator.pop(context),
             child: const Text("取消"),
           ),
           ElevatedButton(
+            // 主要按鈕樣式保持不變
             style: buttonStyle,
             onPressed: () {
               planData.healthData.add({
@@ -1960,6 +1966,7 @@ class _PlanPageState extends State<PlanPage>
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
+              backgroundColor: Colors.white, // Dialog背景設為白色
               title: const Text('選擇協助人員姓名'),
               content: SingleChildScrollView(
                 child: Column(
@@ -1984,12 +1991,17 @@ class _PlanPageState extends State<PlanPage>
               ),
               actions: <Widget>[
                 TextButton(
+                  // 「取消」文字顏色設為 #83ACA9
+                  style: TextButton.styleFrom(
+                    foregroundColor: const Color(0xFF83ACA9),
+                  ),
                   child: const Text('取消'),
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
                 ),
                 ElevatedButton(
+                  // 主要按鈕樣式保持不變
                   style: buttonStyle,
                   child: const Text('確定'),
                   onPressed: () {
