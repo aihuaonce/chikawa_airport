@@ -94,8 +94,8 @@ class _Home2PageState extends State<Home2Page> {
             ),
             const Divider(thickness: 1, color: Color(0xFFB7E1E6), height: 12),
             Expanded(
-              child: StreamBuilder<List<EmergencyRecord>>(
-                stream: emergencyRecordsDao.watchAll(keyword: keyword),
+              child: StreamBuilder<List<EmergencyRecordView>>(
+                stream: emergencyRecordsDao.watchAllDetails(keyword: keyword),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());
@@ -107,28 +107,26 @@ class _Home2PageState extends State<Home2Page> {
 
                   final records = snapshot.data!;
 
-                  if (records.isEmpty) {
-                    // 【修改】使用翻譯
-                    return Center(child: Text(t.noEmergencyRecords));
-                  }
-
                   return ListView.builder(
                     padding: EdgeInsets.zero,
                     itemCount: records.length,
                     itemBuilder: (context, index) {
-                      final record = records[index];
+                      // 【修改 3/3】從組合後的 recordView 中取得各個資料表的資料
+                      final recordView = records[index];
+                      final visit = recordView.visit;
+                      final emergencyRecord = recordView.emergencyRecord;
+                      final accidentRecord = recordView.accidentRecord;
 
                       return InkWell(
                         onTap: () async {
-                          // 【維持不變】仍然導航到 Nav4Page，但傳入 EmergencyRecord 的 visitId
+                          // 導航時使用 visit.visitId
                           await Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (context) =>
-                                  Nav4Page(visitId: record.visitId),
+                                  Nav4Page(visitId: visit.visitId),
                             ),
                           );
-                          // StreamBuilder 會自動處理更新，不需要手動 setState
                         },
                         child: Container(
                           padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -139,20 +137,23 @@ class _Home2PageState extends State<Home2Page> {
                           ),
                           child: Row(
                             children: [
+                              // 2. incidentDate 連 AccidentRecords 的 incidentDate
                               _TableCell(
-                                record.incidentDateTime != null
-                                    ? _fmtDateTime(record.incidentDateTime!)
+                                accidentRecord?.incidentDate != null
+                                    ? _fmtDateTime(accidentRecord!.incidentDate!)
                                     : t.valueNotAvailable,
                               ),
+                              // 1. patientName 連 Visits 的 patientName
                               _TableCell(
-                                record.patientName ?? t.valueNotAvailable,
+                                visit.patientName ?? t.valueNotAvailable,
                               ),
+                              // 3. nationality 連 Visits 的 nationality
                               _TableCell(
-                                record.nationality ?? t.valueNotAvailable,
+                                visit.nationality ?? t.valueNotAvailable,
                               ),
+                              // 4. emergencyResult 連 EmergencyRecords 的 endResult
                               _TableCell(
-                                record.endResult ??
-                                    t.valueNotAvailable, // 使用 EmergencyRecord 的 endResult
+                                emergencyRecord.endResult ?? t.valueNotAvailable,
                               ),
                             ],
                           ),

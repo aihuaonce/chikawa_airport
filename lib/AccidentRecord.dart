@@ -26,15 +26,150 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
 
   // ===== 外觀參數（只動樣式）=====
   static const double _outerHpad = 48;
-  static const double _cardMaxWidth = 1000; // ★ 白卡 maxWidth 規格：800
+  static const double _cardMaxWidth = 1000;
   static const double _radius = 16;
 
-  // ★ 主題色（不動邏輯）
-  static const Color _deepGreen = Color(0xFF274C4A); // 單/複選選中
-  static const Color _lightGreen = Color(0xFF83ACA9); // 更新時間按鈕
+  static const Color _deepGreen = Color(0xFF274C4A);
+  static const Color _lightGreen = Color(0xFF83ACA9);
   static const Color _border = Color(0xFFCBD5E1);
 
-  // 選項列表（保留原有項目）
+  // ✅ 修改:地點選項改為 Map,key 是儲存到 DB 的值
+  final Map<String, String> placeGroupOptions = const {
+    '第一航廈': '第一航廈',
+    '第二航廈': '第二航廈',
+    '遠端機坪': '遠端機坪',
+    '貨運站/機坪其他': '貨運站/機坪其他',
+    '諾富特飯店': '諾富特飯店',
+    '飛機機艙內': '飛機機艙內',
+  };
+
+  final Map<String, List<String>> placeDetailOptions = const {
+    '第一航廈': [
+      '出境查驗台',
+      '入境查驗台',
+      '貴賓室',
+      '出境大廳(管制區外)',
+      '出境層(管制區內)',
+      '入境大廳(管制區外)',
+      '入境層(管制區內)',
+      '美食街',
+      '航警局',
+      '機場捷運',
+      '1號停車場',
+      '2號停車場',
+      '出境巴士下車處',
+      '入境巴士上車處',
+      '出境安檢',
+      '行李轉盤',
+      '海關處',
+      '登機門A1',
+      '登機門A2',
+      '登機門A3',
+      '登機門A4',
+      '登機門A5',
+      '登機門A6',
+      '登機門A7',
+      '登機門A8',
+      '登機門A9',
+      'A區轉機櫃檯',
+      'B區轉機櫃檯',
+      'A區轉機安檢',
+      'B區轉機安檢',
+      '航廈電車(管制區內)',
+      '航廈電車(管制區外)',
+      '其他位置',
+      '登機門B1',
+      '登機門B2',
+      '登機門B3',
+      '登機門B4',
+      '登機門B5',
+      '登機門B6',
+      '登機門B7',
+      '登機門B8',
+      '登機門B9',
+      '登機門B1R',
+    ],
+    '第二航廈': [
+      '出境查驗台',
+      '入境查驗台',
+      '貴賓室',
+      '出境大廳(管制區外)',
+      '出境層(管制區內)',
+      '入境大廳(管制區外)',
+      '入境層(管制區內)',
+      '美食廣場',
+      '航警局',
+      '機場捷運',
+      '3號停車場',
+      '4號停車場',
+      '北側觀景台',
+      '南側觀景台',
+      '北暑5樓',
+      '南側5樓',
+      '登機門D1',
+      '登機門D2',
+      '登機門D3',
+      '登機門D4',
+      '登機門D5',
+      '登機門D6',
+      '登機門D7',
+      '登機門D8',
+      '登機門D9',
+      '登機門D10',
+      '登機門C1',
+      '登機門C2',
+      '登機門C3',
+      '登機門C4',
+      '登機門C5',
+      '登機門C6',
+      '登機門C7',
+      '登機門C8',
+      '登機門C9',
+      'C區轉機櫃檯',
+      'C區轉機安檢',
+      '航廈電車(管制區內)',
+      '航廈電車(管制區外)',
+      '其他位置',
+      '登機門C5R',
+    ],
+    '遠端機坪': [
+      '601',
+      '602',
+      '603',
+      '604',
+      '605',
+      '606',
+      '607',
+      '608',
+      '609',
+      '610',
+      '611',
+      '612',
+      '613',
+      '614',
+      '615',
+    ],
+    '貨運站/機坪其他': [
+      '滑行道',
+      '506',
+      '507',
+      '508',
+      '509',
+      '510',
+      '511',
+      '512',
+      '513',
+      '514',
+      '515',
+      '小飛棚廠',
+      '維修停機坪',
+      '長榮航太',
+      '機坪其他位置',
+    ],
+    '諾富特飯店': ['諾富特飯店'],
+    '飛機機艙內': ['飛機機艙內'],
+  };
+
   final List<String> reportUnits = const [
     'T1-OCC',
     'T2-OCC',
@@ -48,145 +183,6 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
     '其他',
   ];
 
-  final List<String> placeGroups = const [
-    '第一航廈',
-    '第二航廈',
-    '遠端機坪',
-    '貨運站/機坪其他',
-    '諾富特飯店',
-    '飛機機艙內',
-  ];
-
-  final List<String> t1Places = const [
-    '出境查驗台',
-    '入境查驗台',
-    '貴賓室',
-    '出境大廳(管制區外)',
-    '出境層(管制區內)',
-    '入境大廳(管制區外)',
-    '入境層(管制區內)',
-    '美食街',
-    '航警局',
-    '機場捷運',
-    '1號停車場',
-    '2號停車場',
-    '出境巴士下車處',
-    '入境巴士上車處',
-    '出境安檢',
-    '行李轉盤',
-    '海關處',
-    '登機門A1',
-    '登機門A2',
-    '登機門A3',
-    '登機門A4',
-    '登機門A5',
-    '登機門A6',
-    '登機門A7',
-    '登機門A8',
-    '登機門A9',
-    'A區轉機櫃檯',
-    'B區轉機櫃檯',
-    'A區轉機安檢',
-    'B區轉機安檢',
-    '航廈電車(管制區內)',
-    '航廈電車(管制區外)',
-    '其他位置',
-    '登機門B1',
-    '登機門B2',
-    '登機門B3',
-    '登機門B4',
-    '登機門B5',
-    '登機門B6',
-    '登機門B7',
-    '登機門B8',
-    '登機門B9',
-    '登機門B1R',
-  ];
-
-  final List<String> t2Places = const [
-    '出境查驗台',
-    '入境查驗台',
-    '貴賓室',
-    '出境大廳(管制區外)',
-    '出境層(管制區內)',
-    '入境大廳(管制區外)',
-    '入境層(管制區內)',
-    '美食廣場',
-    '航警局',
-    '機場捷運',
-    '3號停車場',
-    '4號停車場',
-    '北側觀景台',
-    '南側觀景台',
-    '北揚5樓',
-    '南側5樓',
-    '登機門D1',
-    '登機門D2',
-    '登機門D3',
-    '登機門D4',
-    '登機門D5',
-    '登機門D6',
-    '登機門D7',
-    '登機門D8',
-    '登機門D9',
-    '登機門D10',
-    '登機門C1',
-    '登機門C2',
-    '登機門C3',
-    '登機門C4',
-    '登機門C5',
-    '登機門C6',
-    '登機門C7',
-    '登機門C8',
-    '登機門C9',
-    'C區轉機櫃檯',
-    'C區轉機安檢',
-    '航廈電車(管制區內)',
-    '航廈電車(管制區外)',
-    '其他位置',
-    '登機門C5R',
-  ];
-
-  final List<String> remotePlaces = const [
-    '601',
-    '602',
-    '603',
-    '604',
-    '605',
-    '606',
-    '607',
-    '608',
-    '609',
-    '610',
-    '611',
-    '612',
-    '613',
-    '614',
-    '615',
-  ];
-
-  final List<String> cargoPlaces = const [
-    '滑行道',
-    '506',
-    '507',
-    '508',
-    '509',
-    '510',
-    '511',
-    '512',
-    '513',
-    '514',
-    '515',
-    '台飛棚廠',
-    '維修停機坪',
-    '長榮航太',
-    '機坪其他位置',
-  ];
-
-  final List<String> novotelPlaces = const ['諾富特飯店'];
-  final List<String> cabinPlaces = const ['飛機機艙內'];
-
-  // 控制器
   final TextEditingController notifierCtrl = TextEditingController();
   final TextEditingController phoneCtrl = TextEditingController();
   final TextEditingController placeNoteCtrl = TextEditingController();
@@ -251,16 +247,9 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
         accidentData.otherReportUnit = record.otherReportUnit;
         accidentData.notifier = record.notifier;
         accidentData.phone = record.phone;
-        accidentData.placeGroupIdx = record.placeIdx;
+        accidentData.placeGroup = record.placeGroup; // 文字
+        accidentData.placeDetail = record.placeDetail; // 文字
         accidentData.placeNote = record.placeNote;
-
-        accidentData.t1Selected = record.t1PlaceIdx;
-        accidentData.t2Selected = record.t2PlaceIdx;
-        accidentData.remoteSelected = record.remotePlaceIdx;
-        accidentData.cargoSelected = record.cargoPlaceIdx;
-        accidentData.novotelSelected = record.novotelPlaceIdx;
-        accidentData.cabinSelected = record.cabinPlaceIdx;
-
         accidentData.occArrived = record.occArrived;
         accidentData.cost = record.cost;
         accidentData.within10min = record.within10min;
@@ -284,7 +273,7 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
 
       _syncControllersFromData(accidentData);
     } catch (e) {
-      // 可加入錯誤處理或 log
+      // 錯誤處理
     } finally {
       if (mounted) {
         setState(() {
@@ -305,7 +294,6 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
 
   void _syncControllersToData() {
     final accidentData = context.read<AccidentData>();
-
     accidentData.notifier = notifierCtrl.text.trim().isEmpty
         ? null
         : notifierCtrl.text.trim();
@@ -330,18 +318,13 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
     try {
       final dao = context.read<AccidentRecordsDao>();
       final accidentData = context.read<AccidentData>();
-
-      // ✅ 正確做法：呼叫您在 AccidentData 中定義好的新方法
-      //    這個方法會自動處理 toCompanion 的轉換並呼叫 dao.upsert
       await accidentData.saveToDatabase(widget.visitId, dao);
     } catch (e) {
-      // 建議加上日誌記錄，以便追蹤問題
       print('❌ 在 AccidentRecordPage 儲存失敗: $e');
       rethrow;
     }
   }
 
-  // 計算醫護到達與通報時間差以顯示分秒與 within10min
   void _calculateTimeDifference(AccidentData accidentData) {
     if (accidentData.notifyTime != null &&
         accidentData.medicArriveTime != null) {
@@ -350,10 +333,8 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
       );
       final minutes = difference.inMinutes;
       final seconds = difference.inSeconds % 60;
-
       costCtrl.text = '${minutes}分${seconds}秒';
       accidentData.cost = costCtrl.text;
-
       if (difference.inMinutes < 10) {
         accidentData.within10min = 0;
       } else {
@@ -363,26 +344,21 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
     }
   }
 
-  // 延遲更新，避免每次輸入都立即同步
   void _onTextFieldChanged() {
     Future.delayed(const Duration(milliseconds: 500), () {
       if (mounted) _syncControllersToData();
     });
   }
 
-  // ===============================================
-  // UI 構建
-  // ===============================================
   @override
   Widget build(BuildContext context) {
-    super.build(context); // for AutomaticKeepAliveClientMixin
+    super.build(context);
     final t = AppTranslations.of(context);
 
     if (_isLoading) return const Center(child: CircularProgressIndicator());
 
     return Consumer<AccidentData>(
       builder: (context, accidentData, _) {
-        // 同步 AccidentData 回控制器，避免循環更新
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (mounted) {
             if (notifierCtrl.text != (accidentData.notifier ?? '')) {
@@ -446,9 +422,13 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
                       const SizedBox(height: 6),
                       _radioWrap(
                         options: reportUnits,
-                        groupIndex: accidentData.reportUnitIdx,
-                        onChanged: (i) {
-                          accidentData.reportUnitIdx = i;
+                        selectedValue: accidentData.reportUnitIdx != null
+                            ? reportUnits[accidentData.reportUnitIdx!]
+                            : null,
+                        onChanged: (value) {
+                          accidentData.reportUnitIdx = reportUnits.indexOf(
+                            value,
+                          );
                           accidentData.update();
                         },
                       ),
@@ -480,13 +460,13 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
                       const SizedBox(height: 12),
 
                       _dateTimePicker(
-                        label: t.oocPickUpTime, // OOC pick-up time
+                        label: t.oocPickUpTime,
                         value: accidentData.pickUpTime,
                         onChanged: (dt) {
                           accidentData.pickUpTime = dt;
                           accidentData.update();
                         },
-                        labelWidth: 160, // ← 只針對這一行放大，避免被省略
+                        labelWidth: 160,
                       ),
                       const SizedBox(height: 8),
                       _dateTimePicker(
@@ -499,25 +479,36 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
                       ),
                       const SizedBox(height: 16),
 
+                      // ✅ 修改:地點群組選擇
                       _boldLabel(t.accidentLocation),
                       const SizedBox(height: 6),
                       _radioWrap(
-                        options: placeGroups,
-                        groupIndex: accidentData.placeGroupIdx,
-                        onChanged: (i) {
-                          accidentData.placeGroupIdx = i;
-                          // reset sub selections
-                          accidentData.t1Selected = accidentData.t2Selected =
-                              accidentData.remoteSelected =
-                                  accidentData.cargoSelected =
-                                      accidentData.novotelSelected =
-                                          accidentData.cabinSelected = null;
+                        options: placeGroupOptions.values.toList(),
+                        selectedValue: accidentData.placeGroup,
+                        onChanged: (value) {
+                          accidentData.placeGroup = value;
+                          accidentData.placeDetail = null; // 清除詳細地點
                           accidentData.update();
                         },
                       ),
                       const SizedBox(height: 8),
-                      _placeSubOptions(accidentData),
-                      const SizedBox(height: 8),
+
+                      // ✅ 修改:詳細地點選擇
+                      if (accidentData.placeGroup != null) ...[
+                        _boldLabel('詳細地點'),
+                        const SizedBox(height: 6),
+                        _radioWrap(
+                          options:
+                              placeDetailOptions[accidentData.placeGroup] ?? [],
+                          selectedValue: accidentData.placeDetail,
+                          onChanged: (value) {
+                            accidentData.placeDetail = value;
+                            accidentData.update();
+                          },
+                        ),
+                        const SizedBox(height: 8),
+                      ],
+
                       _inputRowBold(
                         t.locationNotes,
                         t.enterLocationNotes,
@@ -559,11 +550,12 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
                       const SizedBox(height: 6),
                       _radioWrap(
                         options: [t.yes, t.no],
-                        groupIndex: accidentData.within10min,
-                        onChanged: (i) {
-                          accidentData.within10min = i;
-                          if (i == 0) {
-                            // 若為「是」，清除延遲原因
+                        selectedValue: accidentData.within10min == 0
+                            ? t.yes
+                            : (accidentData.within10min == 1 ? t.no : null),
+                        onChanged: (value) {
+                          accidentData.within10min = value == t.yes ? 0 : 1;
+                          if (accidentData.within10min == 0) {
                             accidentData.reasonPreLanding = false;
                             accidentData.reasonOnDuty = false;
                             accidentData.reasonOther = false;
@@ -659,7 +651,7 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
         borderRadius: BorderRadius.circular(_radius),
         boxShadow: const [
           BoxShadow(
-            color: Color(0x1A000000), // 柔和陰影（~10% 黑）
+            color: Color(0x1A000000),
             blurRadius: 14,
             offset: Offset(0, 6),
           ),
@@ -685,7 +677,6 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
     ),
   );
 
-  // ★ 共用：標籤在左、內容在右（縮小標籤寬，讓間距變小）
   Widget _labeledRowBold({
     required String label,
     required Widget child,
@@ -704,7 +695,7 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
             child: Text(
               label,
               softWrap: false,
-              overflow: TextOverflow.fade, // 避免斷行撐寬
+              overflow: TextOverflow.fade,
               style: const TextStyle(
                 fontSize: 15.5,
                 color: Colors.black87,
@@ -713,7 +704,7 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
               ),
             ),
           ),
-          const SizedBox(width: 6), // ← 固定小縫隙，視覺靠更近
+          const SizedBox(width: 6),
           Expanded(
             child: Align(alignment: Alignment.centerLeft, child: child),
           ),
@@ -731,7 +722,7 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
     final t = AppTranslations.of(context);
     return _labeledRowBold(
       label: label,
-      labelWidth: labelWidth, // 傳下去
+      labelWidth: labelWidth,
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -777,7 +768,7 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
     required String label,
     required DateTime? value,
     required ValueChanged<DateTime?> onChanged,
-    double labelWidth = 95, // 新增
+    double labelWidth = 95,
   }) {
     final t = AppTranslations.of(context);
     return _labeledRowBold(
@@ -815,7 +806,6 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
   }) {
     return _labeledRowBold(
       label: label,
-
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 300),
         child: TextField(
@@ -826,7 +816,7 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
             border: const OutlineInputBorder(),
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 10,
-              vertical: 8, // ★ 原 10 -> 8 視覺更緊
+              vertical: 8,
             ),
           ),
           onChanged: (value) {
@@ -848,7 +838,7 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
       child: Checkbox(
         value: value,
         onChanged: onChanged,
-        activeColor: _deepGreen, // ★ 勾選深綠
+        activeColor: _deepGreen,
         checkColor: Colors.white,
         materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
         visualDensity: const VisualDensity(horizontal: -1, vertical: -1),
@@ -857,18 +847,19 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
     );
   }
 
+  // ✅ 修改: 改為接收文字值而非索引
   Widget _radioWrap({
     required List<String> options,
-    required int? groupIndex,
-    required ValueChanged<int> onChanged,
+    required String? selectedValue,
+    required ValueChanged<String> onChanged,
   }) {
     return Wrap(
       spacing: 14,
-      runSpacing: 10, // ★ 原 4 -> 10：兩排行距更舒服
+      runSpacing: 10,
       children: List.generate(options.length, (i) {
-        final selected = groupIndex == i;
+        final selected = selectedValue == options[i];
         return InkWell(
-          onTap: () => onChanged(i),
+          onTap: () => onChanged(options[i]),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -896,7 +887,7 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
         Checkbox(
           value: value,
           onChanged: onChanged,
-          activeColor: _deepGreen, // ★ 深綠
+          activeColor: _deepGreen,
           checkColor: Colors.white,
           materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
           visualDensity: const VisualDensity(horizontal: -1, vertical: -1),
@@ -914,8 +905,8 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
           padding: const EdgeInsets.symmetric(horizontal: 12),
-          backgroundColor: _lightGreen, // ★ #83ACA9
-          foregroundColor: Colors.white, // ★ 白字
+          backgroundColor: _lightGreen,
+          foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           elevation: 0,
         ),
@@ -924,96 +915,6 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
           text,
           style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600),
         ),
-      ),
-    );
-  }
-
-  Widget _placeSubOptions(AccidentData accidentData) {
-    if (accidentData.placeGroupIdx == null) return const SizedBox.shrink();
-    final idx = accidentData.placeGroupIdx!;
-
-    List<String> opts;
-    int? groupIndex;
-    ValueChanged<int> onChanged;
-
-    switch (idx) {
-      case 0:
-        opts = t1Places;
-        groupIndex = accidentData.t1Selected;
-        onChanged = (i) {
-          accidentData.t1Selected = i;
-          accidentData.update();
-        };
-        break;
-      case 1:
-        opts = t2Places;
-        groupIndex = accidentData.t2Selected;
-        onChanged = (i) {
-          accidentData.t2Selected = i;
-          accidentData.update();
-        };
-        break;
-      case 2:
-        opts = remotePlaces;
-        groupIndex = accidentData.remoteSelected;
-        onChanged = (i) {
-          accidentData.remoteSelected = i;
-          accidentData.update();
-        };
-        break;
-      case 3:
-        opts = cargoPlaces;
-        groupIndex = accidentData.cargoSelected;
-        onChanged = (i) {
-          accidentData.cargoSelected = i;
-          accidentData.update();
-        };
-        break;
-      case 4:
-        opts = novotelPlaces;
-        groupIndex = accidentData.novotelSelected;
-        onChanged = (i) {
-          accidentData.novotelSelected = i;
-          accidentData.update();
-        };
-        break;
-      case 5:
-        opts = cabinPlaces;
-        groupIndex = accidentData.cabinSelected;
-        onChanged = (i) {
-          accidentData.cabinSelected = i;
-          accidentData.update();
-        };
-        break;
-      default:
-        return const SizedBox.shrink();
-    }
-
-    return Padding(
-      padding: const EdgeInsets.only(top: 6.0),
-      child: Wrap(
-        spacing: 18,
-        runSpacing: 8, // 微增垂直行距
-        children: List.generate(opts.length, (i) {
-          final selected = groupIndex == i;
-          return InkWell(
-            onTap: () => onChanged(i),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  selected
-                      ? Icons.radio_button_checked
-                      : Icons.radio_button_off,
-                  size: 20,
-                  color: selected ? _deepGreen : Colors.black45,
-                ),
-                const SizedBox(width: 6),
-                Text(opts[i], style: const TextStyle(fontSize: 15.5)),
-              ],
-            ),
-          );
-        }),
       ),
     );
   }

@@ -48,7 +48,7 @@ class _PlanPageState extends State<PlanPage>
     'sugarReading': TextEditingController(),
     'otherSummary': TextEditingController(),
     'referralOtherHospital': TextEditingController(),
-    'referralEscort': TextEditingController(),
+    'referralEscortText': TextEditingController(),
     'oxygenFlow': TextEditingController(),
     'nurseSignature': TextEditingController(),
     'emtSignature': TextEditingController(),
@@ -76,7 +76,7 @@ class _PlanPageState extends State<PlanPage>
     try {
       _syncControllersToData();
 
-      // 【核心修改】在儲存前執行條件檢查與建立
+      // 在儲存前執行條件檢查與建立
       await _handleConditionalCreation();
 
       // 執行原有的儲存邏輯
@@ -93,100 +93,79 @@ class _PlanPageState extends State<PlanPage>
 
   Future<void> _handleConditionalCreation() async {
     final planData = context.read<PlanData>();
-
-    // 只有當 "建議轉診" 被勾選時才需要繼續
-    if (planData.suggestReferral == false) {
-      return;
-    }
-
-    // 【修改】獲取所有需要的 DAO
     final treatmentsDao = context.read<TreatmentsDao>();
-    final referralFormsDao = context.read<ReferralFormsDao>();
-    final ambulanceRecordsDao = context.read<AmbulanceRecordsDao>();
 
-    // 1. 讀取資料庫中【儲存前】的原始 Treatment 資料
+    // 1. 讀取資料庫中「儲存前」的原始 Treatment 資料
+    // 這個 oldTreatment 對兩個條件判斷都有用，所以放在最前面
     final oldTreatment = await treatmentsDao.getByVisitId(widget.visitId);
 
-    // 2. 條件檢查：
-    //    - 舊資料不存在 (這是第一次儲存)，且新資料勾選了轉診
-    //    - 或者，舊資料的轉診狀態為 false，而新資料變成了 true
-    final shouldCreate =
-        (oldTreatment == null || oldTreatment.suggestReferral == false);
+    // === 邏輯一：獨立處理轉診相關記錄 ===
+    if (planData.suggestReferral == true) {
+      // 判斷是否需要建立：僅在「建議轉診」的狀態從 false 變為 true 時觸發
+      final shouldCreateReferral =
+          (oldTreatment == null || oldTreatment.suggestReferral == false);
 
-    if (shouldCreate) {
-      bool recordCreated = false; // 用一個旗標來判斷是否需要顯示提示
+      if (shouldCreateReferral) {
+        final referralFormsDao = context.read<ReferralFormsDao>();
+        final ambulanceRecordsDao = context.read<AmbulanceRecordsDao>();
+        bool recordCreated = false;
 
-      // --- 建立救護車紀錄 ---
-      bool ambulanceRecordExists = await ambulanceRecordsDao
-          .recordExistsForVisit(widget.visitId);
-      if (!ambulanceRecordExists) {
-        debugPrint('條件滿足！正在為 Visit ${widget.visitId} 建立救護車紀錄...');
-        await ambulanceRecordsDao.createRecordForVisit(widget.visitId);
-        recordCreated = true;
-      }
+        // 建立救護車紀錄
+        bool ambulanceRecordExists = await ambulanceRecordsDao
+            .recordExistsForVisit(widget.visitId);
+        if (!ambulanceRecordExists) {
+          debugPrint('條件滿足:正在為 Visit ${widget.visitId} 建立救護車紀錄...');
+          await ambulanceRecordsDao.createRecordForVisit(widget.visitId);
+          recordCreated = true;
+        }
 
-      // --- 建立轉診單紀錄 ---
-      bool referralFormExists = await referralFormsDao.formExistsForVisit(
-        widget.visitId,
-      );
-      if (!referralFormExists) {
-        debugPrint('條件滿足！正在為 Visit ${widget.visitId} 建立轉診單...');
-        await referralFormsDao.createFormForVisit(widget.visitId);
-        recordCreated = true;
-      }
-
-      // 如果有任何一筆紀錄被建立，就顯示一個統一的提示
-      if (mounted && recordCreated) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('已自動建立轉診單與救護車紀錄！'),
-            backgroundColor: Colors.green,
-          ),
+        // 建立轉診單紀錄
+        bool referralFormExists = await referralFormsDao.formExistsForVisit(
+          widget.visitId,
         );
-      }
-    }
-  }
+        if (!referralFormExists) {
+          debugPrint('條件滿足:正在為 Visit ${widget.visitId} 建立轉診單...');
+          await referralFormsDao.createFormForVisit(widget.visitId);
+          recordCreated = true;
+        }
 
-  // ===============================================
-  // Data Handling Logic
-  // ===============================================
-  Future<void> _generateEmergencyRecord() async {
-    try {
-      final emergencyRecordsDao = context.read<EmergencyRecordsDao>();
-
-      // 檢查是否已存在急救紀錄
-      bool recordExists = await emergencyRecordsDao.recordExistsForVisit(
-        widget.visitId,
-      );
-
-      if (recordExists) {
-        if (mounted) {
+        if (mounted && recordCreated) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('此患者已有急救紀錄單！'),
-              backgroundColor: Colors.orange,
+              content: Text('已自動建立轉診單與救護車紀錄!'),
+              backgroundColor: Colors.green,
             ),
           );
         }
-        return;
       }
+    }
 
-      // 建立急救紀錄
-      await emergencyRecordsDao.createRecordForVisit(widget.visitId);
+    // === 邏輯二：獨立處理 CPR 急救紀錄 ===
+    if (planData.cprChecked == true) {
+      // 判斷是否需要建立：僅在「CPR」的狀態從 false 變為 true 時觸發
+      final shouldCreateEmergency =
+          (oldTreatment == null || oldTreatment.cprChecked == false);
 
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('✅ 已成功產生急救紀錄單！'),
-            backgroundColor: Colors.green,
-          ),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('產生急救紀錄單失敗: $e'), backgroundColor: Colors.red),
-        );
+      if (shouldCreateEmergency) {
+        final emergencyRecordsDao = context.read<EmergencyRecordsDao>();
+
+        // 檢查是否已存在急救紀錄
+        bool emergencyRecordExists = await emergencyRecordsDao
+            .recordExistsForVisit(widget.visitId);
+
+        if (!emergencyRecordExists) {
+          debugPrint('條件滿足:正在為 Visit ${widget.visitId} 建立急救紀錄單...');
+          await emergencyRecordsDao.createRecordForVisit(widget.visitId);
+
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('✅ 已自動產生急救紀錄單!'),
+                backgroundColor: Colors.green,
+              ),
+            );
+          }
+        }
       }
     }
   }
@@ -275,7 +254,10 @@ class _PlanPageState extends State<PlanPage>
         planData.referralAmbulanceType = record.referralAmbulanceType;
         planData.referralHospitalIdx = record.referralHospitalIdx;
         planData.referralOtherHospital = record.referralOtherHospital;
-        planData.referralEscort = record.referralEscort;
+        planData.referralEscortText = record.referralEscortText;
+        planData.selectedEscorts = List<String>.from(
+          decodeJson(record.selectedEscortsJson, []),
+        );
         planData.intubationType = record.intubationType;
         planData.oxygenType = record.oxygenType;
         planData.oxygenFlow = record.oxygenFlow;
@@ -343,7 +325,7 @@ class _PlanPageState extends State<PlanPage>
         'sugarReading' => planData.sugarReading,
         'otherSummary' => planData.otherSummary,
         'referralOtherHospital' => planData.referralOtherHospital,
-        'referralEscort' => planData.referralEscort,
+        'referralEscortText' => planData.referralEscortText,
         'oxygenFlow' => planData.oxygenFlow,
         'nurseSignature' => planData.nurseSignature,
         'emtSignature' => planData.emtSignature,
@@ -429,8 +411,8 @@ class _PlanPageState extends State<PlanPage>
         case 'referralOtherHospital':
           planData.referralOtherHospital = text;
           break;
-        case 'referralEscort':
-          planData.referralEscort = text;
+        case 'referralEscortText':
+          planData.referralEscortText = text;
           break;
         case 'oxygenFlow':
           planData.oxygenFlow = text;
@@ -456,8 +438,8 @@ class _PlanPageState extends State<PlanPage>
     final visitsDao = context.read<VisitsDao>();
     final planData = context.read<PlanData>();
 
-    // ✅ 正確做法：一行程式碼，呼叫您在 PlanData 中完美封裝好的方法
-    //    這個方法會自動處理所有欄位的轉換，並同步更新 Visits 摘要表
+    // ✅ 正確做法:一行程式碼,呼叫您在 PlanData 中完美封裝好的方法
+    //    這個方法會自動處理所有欄位的轉換,並同步更新 Visits 摘要表
     await planData.saveToDatabase(widget.visitId, planDao, visitsDao);
   }
 
@@ -492,12 +474,7 @@ class _PlanPageState extends State<PlanPage>
                   borderRadius: BorderRadius.circular(16), // As requested: 圓角16
                   boxShadow: const [
                     BoxShadow(
-                      color: Color.fromRGBO(
-                        0,
-                        0,
-                        0,
-                        0.08,
-                      ), // As requested: 陰影柔和
+                      color: Color.fromRGBO(0, 0, 0, 0.08),
                       blurRadius: 12,
                       offset: Offset(0, 4),
                     ),
@@ -517,8 +494,8 @@ class _PlanPageState extends State<PlanPage>
   // ===============================================
   Widget _buildFullUI(PlanData planData) {
     final ButtonStyle actionButtonStyle = ElevatedButton.styleFrom(
-      backgroundColor: const Color(0xFF83ACA9), // As requested: 按鈕背景色
-      foregroundColor: Colors.white, // As requested: 文字白色
+      backgroundColor: const Color(0xFF83ACA9),
+      foregroundColor: Colors.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
     );
@@ -1034,7 +1011,6 @@ class _PlanPageState extends State<PlanPage>
                       ],
                     ),
                     const SizedBox(height: 16),
-                    // GCS calculation logic would go here
                     const Row(
                       children: [
                         Text(
@@ -1359,14 +1335,6 @@ class _PlanPageState extends State<PlanPage>
                 },
               ),
             ],
-          ),
-          const SizedBox(height: 16),
-        ],
-        if (planData.cprChecked) ...[
-          ElevatedButton(
-            style: actionButtonStyle,
-            onPressed: _generateEmergencyRecord, // 改為手動觸發
-            child: const Text('產生急救記錄單'),
           ),
           const SizedBox(height: 16),
         ],
@@ -1740,13 +1708,19 @@ class _PlanPageState extends State<PlanPage>
         const SizedBox(height: 8),
         _SectionTitle('隨車人員'),
         TextField(
-          controller: _controllers['referralEscort'],
+          controller: _controllers['referralEscortText'],
           decoration: const InputDecoration(
-            hintText: '請填寫隨車人員的姓名',
+            hintText: '請填寫其他隨車人員的姓名',
             border: OutlineInputBorder(),
           ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 12),
+        _EscortTable(
+          // 使用新的列表 Widget
+          selectedEscorts: planData.selectedEscorts,
+          onAdd: () => _showEscortSelectionDialog(planData, buttonStyle),
+        ),
+        const SizedBox(height: 8),
       ],
     );
   }
@@ -2035,9 +2009,7 @@ class _PlanPageState extends State<PlanPage>
                                       (drug) => ChoiceChip(
                                         label: Text(drug),
                                         selected: selectedDrug == drug,
-                                        selectedColor: const Color(
-                                          0xFF274C4A,
-                                        ), // As requested
+                                        selectedColor: const Color(0xFF274C4A),
                                         labelStyle: TextStyle(
                                           color: selectedDrug == drug
                                               ? Colors.white
@@ -2202,6 +2174,70 @@ class _PlanPageState extends State<PlanPage>
       ),
     );
   }
+
+  Future<void> _showEscortSelectionDialog(
+    PlanData planData,
+    ButtonStyle buttonStyle,
+  ) async {
+    List<String> tempSelected = List.from(planData.selectedEscorts);
+    List<String>? result = await showDialog<List<String>>(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text('選擇隨車人員姓名'),
+              backgroundColor: Colors.white,
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: PlanData.escortOptions.map((name) {
+                    // 使用隨車人員名單
+                    return CheckboxListTile(
+                      title: Text(name),
+                      value: tempSelected.contains(name),
+                      activeColor: const Color(0xFF274C4A),
+                      onChanged: (bool? checked) {
+                        setState(() {
+                          if (checked == true) {
+                            tempSelected.add(name);
+                          } else {
+                            tempSelected.remove(name);
+                          }
+                        });
+                      },
+                    );
+                  }).toList(),
+                ),
+              ),
+              actions: <Widget>[
+                TextButton(
+                  child: const Text('取消'),
+                  style: TextButton.styleFrom(
+                    foregroundColor: const Color(0xFF83ACA9),
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+                ElevatedButton(
+                  style: buttonStyle,
+                  child: const Text('確定'),
+                  onPressed: () {
+                    Navigator.of(context).pop(tempSelected);
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+    if (result != null) {
+      planData.selectedEscorts = result;
+      planData.update();
+    }
+  }
 }
 
 // ===============================================
@@ -2240,9 +2276,8 @@ class _RadioItem<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) => InkWell(
     onTap: () => onChanged(value),
-    borderRadius: BorderRadius.circular(8), // Add for better touch feedback
+    borderRadius: BorderRadius.circular(8),
     child: Padding(
-      // Add padding for better spacing
       padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 2.0),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -2250,7 +2285,7 @@ class _RadioItem<T> extends StatelessWidget {
           Radio<T>(
             value: value,
             groupValue: groupValue,
-            activeColor: const Color(0xFF274C4A), // As requested: 選中顏色
+            activeColor: const Color(0xFF274C4A),
             onChanged: onChanged,
           ),
           Flexible(
@@ -2274,16 +2309,15 @@ class _CheckBoxItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) => InkWell(
     onTap: () => onChanged(!value),
-    borderRadius: BorderRadius.circular(8), // Add for better touch feedback
+    borderRadius: BorderRadius.circular(8),
     child: Padding(
-      // Add padding for better spacing
       padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 2.0),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Checkbox(
             value: value,
-            activeColor: const Color(0xFF274C4A), // As requested: 選中顏色
+            activeColor: const Color(0xFF274C4A),
             onChanged: onChanged,
           ),
           Text(label, style: const TextStyle(color: Colors.black)),
@@ -2560,6 +2594,44 @@ class _HelperTable extends StatelessWidget {
           child: const Text('加入協助人員', style: TextStyle(color: Colors.blue)),
         ),
         const SizedBox(height: 24),
+      ],
+    ),
+  );
+}
+
+// 【新增】隨車人員列表 Widget
+class _EscortTable extends StatelessWidget {
+  final List<String> selectedEscorts;
+  final VoidCallback onAdd;
+  const _EscortTable({required this.selectedEscorts, required this.onAdd});
+  @override
+  Widget build(BuildContext context) => Container(
+    width: double.infinity,
+    color: const Color(0xFFF1F3F6),
+    padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (selectedEscorts.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: selectedEscorts
+                  .map(
+                    (escort) =>
+                        Text(escort, style: const TextStyle(fontSize: 16)),
+                  )
+                  .toList(),
+            ),
+          )
+        else
+          const Text('尚未選擇隨車人員', style: TextStyle(color: Colors.grey)),
+        const SizedBox(height: 12),
+        InkWell(
+          onTap: onAdd,
+          child: const Text('加入隨車人員', style: TextStyle(color: Colors.blue)),
+        ),
       ],
     ),
   );

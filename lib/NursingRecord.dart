@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'data/db/daos.dart';
+import 'data/db/app_database.dart'; // 導入 AppDatabase 以取得資料模型
 import 'data/models/nursing_record_data.dart';
 import 'l10n/app_translations.dart';
 import 'nav2.dart';
@@ -279,6 +280,7 @@ class _NursingRecordPageState extends State<NursingRecordPage>
         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
         child: Row(
           children: [
+            const Icon(Icons.add, color: Colors.blue),
             const SizedBox(width: 8),
             Text(
               t.addRow,
@@ -305,6 +307,19 @@ class _NursingRecordPageState extends State<NursingRecordPage>
     String? selectedPhrase;
     final recordTime = DateTime.now();
 
+    // ==================== ✅ 1. 讀取資料庫 ====================
+    final accidentRecordsDao = context.read<AccidentRecordsDao>();
+    final treatmentsDao = context.read<TreatmentsDao>();
+    final medicalCostsDao = context.read<MedicalCostsDao>();
+
+    // 使用 visitId 取得相關紀錄
+    final accidentRecord = await accidentRecordsDao.getByVisitId(
+      widget.visitId,
+    );
+    final treatment = await treatmentsDao.getByVisitId(widget.visitId);
+    final medicalCost = await medicalCostsDao.getByVisitId(widget.visitId);
+    // =========================================================
+
     // 預設片語清單
     final List<String> presetPhrases = [
       t.phraseReceptionNotified,
@@ -328,13 +343,69 @@ class _NursingRecordPageState extends State<NursingRecordPage>
       t.phraseReturnToStandby,
     ];
 
-    // 根據片語產生紀錄文字的輔助函式
-    String getPresetText(String phrase) {
-      if (phrase == t.phraseReceptionNotified) {
-        return '接獲[通報單位][通報人員]通報位於[事故地點]有旅客[主訴]身體不適，需要醫護出診協助。';
+    // ==================== ✅ 2. 修改 getPresetText 函式 ====================
+    // 根據片語產生紀錄文字的輔助函式，現在接收資料庫模型作為參數
+    String getPresetText(
+      String phrase,
+      AccidentRecord? accidentRecord,
+      Treatment? treatment,
+      MedicalCost? medicalCost,
+    ) {
+      // Helper function to safely get string value or placeholder
+      String val(String? value, String placeholder) {
+        return (value != null && value.isNotEmpty) ? value : placeholder;
       }
-      return phrase;
+
+      if (phrase == t.phraseReceptionNotified) {
+        return '接獲${val(accidentRecord?.reportUnitIdx?.toString(), '[通報單位]')}${val(accidentRecord?.notifier, '[通報人員]')}通報位於${val(accidentRecord?.placeGroup, '')}${val(accidentRecord?.placeDetail, '[事故地點]')}有旅客${val(treatment?.symptomNote, '[主訴]')}身體不適，需要醫護出診協助。';
+      } else if (phrase == t.phraseNotification1) {
+        return '通知T1-OCC。';
+      } else if (phrase == t.phraseNotification2) {
+        return '通知T2-OCC。';
+      } else if (phrase == t.phraseNotification3) {
+        return '通知另外航廈醫護及EMT請求支援。';
+      } else if (phrase == t.phraseArrivedAtScene) {
+        return '抵達現場，病人意識清楚，坐在椅子上/坐在機艙內/躺在地上，測量生命徵象體溫${val(treatment?.temperature, '[體溫]')}度、脈搏${val(treatment?.pulse, '[脈搏]')}次/分、呼吸${val(treatment?.respiration, '[呼吸]')}次/分、血壓${val(treatment?.bpSystolic, '[血壓收縮壓]')}/${val(treatment?.bpDiastolic, '[血壓舒張壓]')}mmHg、血氧${val(treatment?.spo2, '[血氧飽和度]')}%，自述撕裂傷，醫師診療評估中。';
+      } else if (phrase == t.phraseBloodSugarTest) {
+        // 使用 sugarReading 欄位
+        return '依醫囑執行測血糖${val(treatment?.sugarReading, '[血糖值]')}。';
+      } else if (phrase == t.phraseDiagnosisAndMedication) {
+        return '醫師診視後，診斷為${val(treatment?.initialDiagnosis, '[初步診斷]')}，向病人解釋後開立${val(treatment?.prescriptionRowsJson, '[藥物]')}使用並衛教。';
+      } else if (phrase == t.phraseIssueCertificate) {
+        return '開立中文診斷書。';
+      } else if (phrase == t.phraseReferral) {
+        return '醫師診視後，診斷為${val(treatment?.initialDiagnosis, '[初步診斷]')}，建議轉診至醫院進一步檢查及治療，醫師跟病人及家屬解釋後，表示同意，通知航空公司協助退關/入境後送事宜。';
+      } else if (phrase == t.phraseReferralHandover) {
+        return '協助醫師打電話至${val(treatment?.referralHospitalIdx?.toString(), '[交班單位]')}電話交班。';
+      } else if (phrase == t.phraseTransferNotification) {
+        return '通知救護車EMT，病人需後送至${val(treatment?.referralHospitalIdx?.toString(), '[轉送醫院]')}，請其待命等候病人入關。';
+      } else if (phrase == t.phraseGeneralCustoms) {
+        return '現由航勤人員協助推輪椅，陪同病人通關。';
+      } else if (phrase == t.phraseUrgentCustoms) {
+        return '由醫師判斷病人診斷為${val(treatment?.initialDiagnosis, '[初步診斷]')}，由於情況危急，需採緊急機坪通關，告知現場航空公司地勤，請其協助聯繫相關單位。';
+      } else if (phrase == t.phraseTransfer1) {
+        return '抵達醫療中心/北空橋，協助更換至擔架上。';
+      } else if (phrase == t.phraseTransfer2) {
+        return '出發前往${val(treatment?.referralHospitalIdx?.toString(), '[轉送醫院]')}';
+      } else if (phrase == t.phraseTransfer3) {
+        return '抵達${val(treatment?.referralHospitalIdx?.toString(), '[轉送醫院]')}急診，與急診檢傷護理師交班。';
+      } else if (phrase == t.phraseBilling) {
+        // 安全地加總費用
+        final visitFee = double.tryParse(medicalCost?.visitFee ?? '0') ?? 0;
+        final ambulanceFee =
+            double.tryParse(medicalCost?.ambulanceFee ?? '0') ?? 0;
+        final totalFee = visitFee + ambulanceFee;
+        final feeString = totalFee > 0 ? totalFee.toStringAsFixed(0) : '[費用]';
+        return '向病人及家屬解釋出診費用${feeString}元，病人表示了解及接受並採${val(medicalCost?.chargeMethod, '[支付方式]')}支付，並請其簽名，開立中文/英文收據一份。';
+      } else if (phrase == t.phraseEndOfVisit) {
+        return '收拾用物，結束出診。';
+      } else if (phrase == t.phraseReturnToStandby) {
+        return '返回醫療中心待命。';
+      } else {
+        return phrase;
+      }
     }
+    // ====================================================================
 
     final ButtonStyle actionButtonStyle = ElevatedButton.styleFrom(
       backgroundColor: const Color(0xFF83ACA9),
@@ -352,6 +423,7 @@ class _NursingRecordPageState extends State<NursingRecordPage>
           builder: (context, setDialogState) {
             return AlertDialog(
               title: Text(t.createNursingRecord),
+              backgroundColor: Colors.white,
               content: SizedBox(
                 width: MediaQuery.of(context).size.width * 0.6,
                 child: SingleChildScrollView(
@@ -385,9 +457,14 @@ class _NursingRecordPageState extends State<NursingRecordPage>
                                 onChanged: (value) {
                                   setDialogState(() {
                                     selectedPhrase = value;
+                                    // ==================== ✅ 3. 傳入資料以產生文字 ====================
                                     recordController.text = getPresetText(
                                       value!,
+                                      accidentRecord,
+                                      treatment,
+                                      medicalCost,
                                     );
+                                    // =================================================================
                                   });
                                 },
                               ),
@@ -433,6 +510,9 @@ class _NursingRecordPageState extends State<NursingRecordPage>
               actions: [
                 TextButton(
                   child: Text(t.discard),
+                  style: TextButton.styleFrom(
+                    foregroundColor: const Color(0xFF83ACA9),
+                  ),
                   onPressed: () => Navigator.of(context).pop(),
                 ),
                 ElevatedButton(
@@ -448,7 +528,7 @@ class _NursingRecordPageState extends State<NursingRecordPage>
                         nurseSign: signatureController.text,
                       );
                       dataModel.addRecord(newRecord);
-                      _saveData(); // ✅ 修改：新增後立即儲存
+                      _saveData();
 
                       // 重設 Dialog 以便新增下一筆
                       setDialogState(() {
@@ -473,7 +553,7 @@ class _NursingRecordPageState extends State<NursingRecordPage>
                         nurseSign: signatureController.text,
                       );
                       dataModel.addRecord(newRecord);
-                      _saveData(); // ✅ 修改：新增後立即儲存
+                      _saveData();
                       Navigator.of(context).pop();
                     }
                   },

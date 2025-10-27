@@ -6,6 +6,8 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import '../db/daos.dart';
 import 'medication_record_model.dart';
+import 'paramedic_record_model.dart';
+import 'vital_sign_record_model.dart';
 
 class AmbulanceData extends ChangeNotifier {
   final int visitId;
@@ -89,6 +91,8 @@ class AmbulanceData extends ChangeNotifier {
   String? contactName;
   String? contactPhone;
   List<MedicationRecordModel> medicationRecords = [];
+  List<ParamedicRecordModel> paramedicRecords = [];
+  List<VitalSignRecordModel> vitalSignsRecords = [];
 
   // Expenses
   int? staffFee;
@@ -241,6 +245,8 @@ class AmbulanceData extends ChangeNotifier {
     String? contactName,
     String? contactPhone,
     List<MedicationRecordModel>? medicationRecords,
+    List<ParamedicRecordModel>? paramedicRecords,
+    List<VitalSignRecordModel>? vitalSignsRecords,
   }) {
     if (emergencyTreatments != null)
       this.emergencyTreatments = emergencyTreatments;
@@ -271,6 +277,8 @@ class AmbulanceData extends ChangeNotifier {
     if (contactName != null) this.contactName = contactName;
     if (contactPhone != null) this.contactPhone = contactPhone;
     if (medicationRecords != null) this.medicationRecords = medicationRecords;
+    if (paramedicRecords != null) this.paramedicRecords = paramedicRecords;
+    if (vitalSignsRecords != null) this.vitalSignsRecords = vitalSignsRecords;
     notifyListeners();
   }
 
@@ -365,6 +373,8 @@ class AmbulanceData extends ChangeNotifier {
     contactName = null;
     contactPhone = null;
     medicationRecords = [];
+    paramedicRecords = [];
+    vitalSignsRecords = [];
 
     staffFee = null;
     oxygenFee = null;
@@ -376,47 +386,12 @@ class AmbulanceData extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> _prefillFromOtherTables(AmbulanceRecordsDao dao) async {
-    try {
-      print('🔍 開始從其他資料表預填資料...');
-      final profile = await dao.db.patientProfilesDao.getByVisitId(visitId);
-      if (profile != null) {
-        print('✅ 找到 PatientProfile 資料');
-        if (gender == null && profile.gender != null) gender = profile.gender;
-        if (age == null && profile.age != null) age = profile.age;
-        if (idNumber == null && profile.idNumber != null)
-          idNumber = profile.idNumber;
-        if (address == null && profile.address != null)
-          address = profile.address;
-      }
-      final accidentRecord = await dao.db.accidentRecordsDao.getByVisitId(
-        visitId,
-      );
-      if (accidentRecord != null) {
-        print('✅ 找到 AccidentRecord 資料');
-        if (placeGroupIdx == null && accidentRecord.placeIdx != null)
-          placeGroupIdx = accidentRecord.placeIdx;
-        if (t1PlaceIdx == null && accidentRecord.t1PlaceIdx != null)
-          t1PlaceIdx = accidentRecord.t1PlaceIdx;
-        if (t2PlaceIdx == null && accidentRecord.t2PlaceIdx != null)
-          t2PlaceIdx = accidentRecord.t2PlaceIdx;
-        if (placeNote == null && accidentRecord.placeNote != null)
-          placeNote = accidentRecord.placeNote;
-      }
-      print('✅ 預填資料完成!');
-    } catch (e) {
-      print('⚠️ 預填資料時發生錯誤: $e');
-    }
-  }
-
   Future<void> loadFromDatabase(AmbulanceRecordsDao dao) async {
     try {
       final record = await dao.getByVisitId(visitId);
       final profile = await dao.db.patientProfilesDao.getByVisitId(visitId);
 
       if (record == null) {
-        print('ℹ️ visitId $visitId 沒有救護車記錄,開始預填資料');
-        await _prefillFromOtherTables(dao);
         notifyListeners();
         return;
       }
@@ -470,7 +445,6 @@ class AmbulanceData extends ChangeNotifier {
       fallHeight = record.fallHeight;
       burnDegree = record.burnDegree;
       burnArea = record.burnArea;
-      traumaOther = record.traumaOther;
       isProxyStatement = record.isProxyStatement;
       traumaOther = record.traumaOther;
 
@@ -500,6 +474,7 @@ class AmbulanceData extends ChangeNotifier {
       relationshipType = record.relationshipType;
       contactName = record.contactName;
       contactPhone = record.contactPhone;
+
       try {
         medicationRecords = (jsonDecode(record.medicationRecordsJson) as List)
             .map((item) => MedicationRecordModel.fromJson(item))
@@ -509,14 +484,40 @@ class AmbulanceData extends ChangeNotifier {
         medicationRecords = [];
       }
 
+      try {
+        final jsonString = record.paramedicRecordsJson; // 這是一個新欄位
+        if (jsonString != null && jsonString.isNotEmpty) {
+          paramedicRecords = (jsonDecode(jsonString) as List)
+              .map((item) => ParamedicRecordModel.fromJson(item))
+              .toList();
+        } else {
+          paramedicRecords = [];
+        }
+      } catch (e) {
+        print('⚠️ 解碼 paramedicRecordsJson 失敗: $e');
+        paramedicRecords = [];
+      }
+
+      try {
+        final jsonString = record.vitalSignsRecordsJson; // 使用新欄位
+        if (jsonString != null && jsonString.isNotEmpty) {
+          vitalSignsRecords = (jsonDecode(jsonString) as List)
+              .map((item) => VitalSignRecordModel.fromJson(item))
+              .toList();
+        } else {
+          vitalSignsRecords = [];
+        }
+      } catch (e) {
+        print('⚠️ 解碼 vitalSignsRecordsJson 失敗: $e');
+        vitalSignsRecords = [];
+      }
+
       staffFee = record.staffFee;
       oxygenFee = record.oxygenFee;
       totalFee = record.totalFee;
       chargeStatus = record.chargeStatus;
       paidType = record.paidType;
       unpaidType = record.unpaidType;
-
-      await _prefillFromOtherTables(dao);
 
       notifyListeners();
       print('✅ 成功載入 visitId $visitId 的救護車記錄');
@@ -630,6 +631,12 @@ class AmbulanceData extends ChangeNotifier {
       contactPhone: Value(contactPhone),
       medicationRecordsJson: Value(
         jsonEncode(medicationRecords.map((r) => r.toJson()).toList()),
+      ),
+      paramedicRecordsJson: Value(
+        jsonEncode(paramedicRecords.map((r) => r.toJson()).toList()),
+      ),
+      vitalSignsRecordsJson: Value(
+        jsonEncode(vitalSignsRecords.map((r) => r.toJson()).toList()),
       ),
       staffFee: Value(staffFee),
       oxygenFee: Value(oxygenFee),

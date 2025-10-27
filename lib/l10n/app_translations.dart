@@ -44,6 +44,7 @@ class AppTranslations {
   String get phone => isZh ? '電話' : 'Phone Number';
   String get address => isZh ? '地址' : 'Address';
   String get signature => isZh ? '簽名' : 'Signature';
+  String get dataNotAvailable => isZh ? '未提供資料' : 'No Information Provided';
 
   // ========== 首頁 (home.dart) ==========
   String get addPatient => isZh ? '+新增病患資料' : '+ Add Patient';
@@ -242,6 +243,10 @@ class AppTranslations {
   String get enterOxygenFlow => isZh ? '請填寫氧氣流量' : 'Please enter oxygen flow';
   String get medicalCertType => isZh ? '診斷書種類' : 'Type of Medical Certificate';
   String get medicationRecord => isZh ? '藥物記錄表' : 'Medication Record';
+  String get paramedics => '隨車救護人員';
+  String get noSignature => '未簽名';
+  String get addParamedic => '新增隨車人員';
+  String get pleaseEnterName => '請輸入姓名';
   String get otherTreatmentSummary =>
       isZh ? '其他處理摘要' : 'Other Treatment Summary';
   String get enterOtherTreatmentSummary =>
@@ -791,7 +796,7 @@ class AppTranslations {
   String get fromOption2 => isZh ? 'T2 03-3983485' : 'T2 03-3983485';
 
   // ========== Emergency Accident Page (急救事故頁面) ==========
-  String get incidentDateTime => isZh ? '事發日期與時間' : 'Incident Date & Time';
+  String get incidentDateTime => isZh ? '事發日期' : 'Incident Date & Time';
 
   // ========== Emergency Flight Page (急救飛航頁面) ==========
   String get source => isZh ? '來源' : 'Source';

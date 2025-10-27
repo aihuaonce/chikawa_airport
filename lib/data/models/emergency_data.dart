@@ -11,20 +11,10 @@ class EmergencyData extends ChangeNotifier {
 
   EmergencyData(this.visitId);
 
-  // Personal
-  String? patientName;
-  String? idNumber;
-  String? passportNumber;
-  String? gender;
-  DateTime? birthDate;
-
   // Flight
-  int? sourceIndex;
+  String? travelStatus;
   int? purposeIndex;
-  int? airlineIndex;
-  bool useOtherAirline = false;
-  String? selectedOtherAirline;
-  String? nationality;
+  String? airline;
 
   // Accident
   DateTime? incidentDateTime;
@@ -79,37 +69,15 @@ class EmergencyData extends ChangeNotifier {
   List<String> selectedAssistants = [];
   List<Map<String, String>> medicationRecords = [];
 
-  // Update methods (保持不變)
-  void updatePersonal({
-    String? patientName,
-    String? idNumber,
-    String? passportNumber,
-    String? gender,
-    DateTime? birthDate,
-  }) {
-    if (patientName != null) this.patientName = patientName;
-    if (idNumber != null) this.idNumber = idNumber;
-    if (passportNumber != null) this.passportNumber = passportNumber;
-    if (gender != null) this.gender = gender;
-    if (birthDate != null) this.birthDate = birthDate;
-    notifyListeners();
-  }
-
+  // 【修改】更新方法以匹配新的屬性
   void updateFlight({
-    int? sourceIndex,
+    String? travelStatus,
     int? purposeIndex,
-    int? airlineIndex,
-    bool? useOtherAirline,
-    String? selectedOtherAirline,
-    String? nationality,
+    String? airline,
   }) {
-    if (sourceIndex != null) this.sourceIndex = sourceIndex;
+    if (travelStatus != null) this.travelStatus = travelStatus;
     if (purposeIndex != null) this.purposeIndex = purposeIndex;
-    if (airlineIndex != null) this.airlineIndex = airlineIndex;
-    if (useOtherAirline != null) this.useOtherAirline = useOtherAirline;
-    if (selectedOtherAirline != null)
-      this.selectedOtherAirline = selectedOtherAirline;
-    if (nationality != null) this.nationality = nationality;
+    if (airline != null) this.airline = airline;
     notifyListeners();
   }
 
@@ -259,17 +227,9 @@ class EmergencyData extends ChangeNotifier {
   }
 
   void clearAll() {
-    idNumber = null;
-    passportNumber = null;
-    gender = null;
-    birthDate = null;
-    patientName = null;
-    sourceIndex = null;
+    travelStatus = null;
     purposeIndex = null;
-    airlineIndex = null;
-    useOtherAirline = false;
-    selectedOtherAirline = null;
-    nationality = null;
+    airline = null;
     incidentDateTime = null;
     placeGroupIdx = null;
     t1Selected = null;
@@ -331,115 +291,35 @@ class EmergencyData extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> _prefillFromOtherTables(EmergencyRecordsDao dao) async {
+  // 【修改】重構載入邏輯
+  Future<void> loadFromDatabase(
+    EmergencyRecordsDao emergencyDao,
+    PatientProfilesDao profilesDao,
+    FlightLogsDao flightLogsDao,
+  ) async {
     try {
-      print('🔍 開始從其他資料表預填資料...');
-
-      final profile = await dao.db.patientProfilesDao.getByVisitId(visitId);
-      if (profile != null) {
-        print('✅ 找到 PatientProfile 資料');
-        if (gender == null && profile.gender != null) {
-          gender = profile.gender;
-          print('   - 預填性別: $gender');
-        }
-        if (birthDate == null && profile.birthday != null) {
-          birthDate = profile.birthday;
-          print('   - 預填生日: $birthDate');
-        }
-        if (idNumber == null && profile.idNumber != null) {
-          idNumber = profile.idNumber;
-          print('   - 預填身分證: $idNumber');
-        }
-        if (nationality == null && profile.nationality != null) {
-          nationality = profile.nationality;
-          print('   - 預填國籍: $nationality');
-        }
-      }
-
-      final visit = await dao.db.visitsDao.getById(visitId);
-      if (visit != null && visit.patientName != null) {
-        if (patientName == null) {
-          patientName = visit.patientName;
-          print('✅ 從 Visit 預填姓名: $patientName');
-        }
-      }
-
-      final flightLog = await dao.db.flightLogsDao.getByVisitId(visitId);
-      if (flightLog != null) {
-        print('✅ 找到 FlightLog 資料');
-        if (airlineIndex == null && flightLog.airlineIndex != null) {
-          airlineIndex = flightLog.airlineIndex;
-          print('   - 預填航空公司: $airlineIndex');
-        }
-        if (!useOtherAirline && flightLog.useOtherAirline) {
-          useOtherAirline = flightLog.useOtherAirline;
-          selectedOtherAirline = flightLog.otherAirline;
-          print('   - 預填其他航空公司: $selectedOtherAirline');
-        }
-      }
-
-      final accidentRecord = await dao.db.accidentRecordsDao.getByVisitId(
-        visitId,
-      );
-      if (accidentRecord != null) {
-        print('✅ 找到 AccidentRecord 資料');
-        if (incidentDateTime == null && accidentRecord.incidentDate != null) {
-          incidentDateTime = accidentRecord.incidentDate;
-          print('   - 預填事發時間: $incidentDateTime');
-        }
-        if (placeGroupIdx == null && accidentRecord.placeIdx != null) {
-          placeGroupIdx = accidentRecord.placeIdx;
-          print('   - 預填地點群組: $placeGroupIdx');
-        }
-        if (t1Selected == null && accidentRecord.t1PlaceIdx != null) {
-          t1Selected = accidentRecord.t1PlaceIdx;
-          print('   - 預填T1地點: $t1Selected');
-        }
-        if (t2Selected == null && accidentRecord.t2PlaceIdx != null) {
-          t2Selected = accidentRecord.t2PlaceIdx;
-          print('   - 預填T2地點: $t2Selected');
-        }
-        if (placeNote == null && accidentRecord.placeNote != null) {
-          placeNote = accidentRecord.placeNote;
-          print('   - 預填地點備註: $placeNote');
-        }
-      }
-
-      print('✅ 預填資料完成！');
-    } catch (e) {
-      print('⚠️ 預填資料時發生錯誤: $e');
-    }
-  }
-
-  Future<void> loadFromDatabase(EmergencyRecordsDao dao) async {
-    try {
-      // 步驟 1: 先清除舊資料，確保是一個乾淨的狀態
       clearAll();
 
-      // 步驟 2: 嘗試從資料庫讀取現有的急救紀錄
-      final record = await dao.getByVisitId(visitId);
+      // 1. 載入主急救記錄
+      final record = await emergencyDao.getByVisitId(visitId);
+      final profile = await profilesDao.getByVisitId(visitId);
+      final flightLog = await flightLogsDao.getByVisitId(visitId);
+
+      // 2. 載入飛航 & 個人資料相關
+      if (flightLog != null) {
+        travelStatus = flightLog.travelStatus;
+        airline = flightLog.airline;
+      }
+      if (profile != null) {
+        // 將文字轉回索引
+        const reasons = ["航空公司機組員", "旅客/民眾", "機場內部員工"];
+        purposeIndex = reasons.indexOf(profile.reason ?? "");
+        if (purposeIndex == -1) purposeIndex = null;
+      }
 
       // 步驟 3: 如果紀錄確實存在於資料庫，才載入資料
       if (record != null) {
         print('✅ 找到急救紀錄，載入資料...');
-
-        // 【核心修改】我們不再呼叫預填寫方法，已將其移除
-        // await _prefillFromOtherTables(dao); // <--- 此行已被移除
-
-        // --- 從資料庫紀錄載入所有欄位 ---
-        idNumber = record.idNumber;
-        passportNumber = record.passportNumber;
-        gender = record.gender;
-        birthDate = record.birthDate;
-        patientName = record.patientName;
-
-        sourceIndex = record.sourceIndex;
-        purposeIndex = record.purposeIndex;
-        airlineIndex = record.airlineIndex;
-        useOtherAirline = record.useOtherAirline;
-        selectedOtherAirline = record.selectedOtherAirline;
-        nationality = record.nationality;
-
         incidentDateTime = record.incidentDateTime;
         placeGroupIdx = record.placeGroupIdx;
         t1Selected = record.t1Selected;
@@ -541,26 +421,16 @@ class EmergencyData extends ChangeNotifier {
       // 步驟 6: 處理任何可能發生的錯誤
       print('❌ 載入急救紀錄時失敗: $e');
       isLoaded = true;
-      clearAll(); // 發生錯誤時清空所有資料
+      clearAll();
       notifyListeners();
     }
   }
 
   // ✅ 新增：轉換為 Companion
   EmergencyRecordsCompanion toCompanion() {
+    // 【修改】移除已不存在的欄位
     return EmergencyRecordsCompanion(
       visitId: Value(visitId),
-      patientName: Value(patientName),
-      idNumber: Value(idNumber),
-      passportNumber: Value(passportNumber),
-      gender: Value(gender),
-      birthDate: Value(birthDate),
-      sourceIndex: Value(sourceIndex),
-      purposeIndex: Value(purposeIndex),
-      airlineIndex: Value(airlineIndex),
-      useOtherAirline: Value(useOtherAirline),
-      selectedOtherAirline: Value(selectedOtherAirline),
-      nationality: Value(nationality),
       incidentDateTime: Value(incidentDateTime),
       placeGroupIdx: Value(placeGroupIdx),
       t1Selected: Value(t1Selected),
@@ -628,30 +498,50 @@ class EmergencyData extends ChangeNotifier {
     );
   }
 
-  // ✅ 簡化後的保存方法
-  Future<void> saveToDatabase(
-    EmergencyRecordsDao dao,
-    VisitsDao visitsDao,
-  ) async {
+  // 【修改】重構儲存邏輯，以儲存到多個資料表
+  Future<void> saveToDatabase({
+    required EmergencyRecordsDao emergencyDao,
+    required PatientProfilesDao profilesDao,
+    required FlightLogsDao flightLogsDao,
+    required VisitsDao visitsDao,
+  }) async {
     try {
-      // 直接用 upsert
-      await dao.upsert(toCompanion());
+      // 1. 儲存到 EmergencyRecords
+      await emergencyDao.upsert(toCompanion());
 
-      // 更新 Visits 表
+      // 2. 儲存到 FlightLogs
+      final flightCompanion = FlightLogsCompanion(
+        visitId: Value(visitId),
+        travelStatus: Value(travelStatus),
+        airline: Value(airline),
+      );
+      await flightLogsDao.upsert(flightCompanion);
+
+      // 3. 儲存到 PatientProfiles
+      String? reasonText;
+      if (purposeIndex != null) {
+        const reasons = ["航空公司機組員", "旅客/民眾", "機場內部員工"];
+        if (purposeIndex! >= 0 && purposeIndex! < reasons.length) {
+          reasonText = reasons[purposeIndex!];
+        }
+      }
+      final profileCompanion = PatientProfilesCompanion(
+        visitId: Value(visitId),
+        reason: Value(reasonText),
+      );
+      await profilesDao.upsert(profileCompanion);
+
+      // 4. 更新 Visits 表
       await visitsDao.updateVisit(
         visitId,
         VisitsCompanion(
           hasEmergencyRecord: const Value(true),
-          patientName: Value(patientName),
-          gender: Value(gender),
-          nationality: Value(nationality),
           incidentDateTime: Value(incidentDateTime),
           emergencyResult: Value(endResult),
           uploadedAt: Value(DateTime.now()),
         ),
       );
-
-      print('✅ 急救記錄已成功儲存到資料庫 (visitId: $visitId)');
+      print('✅ 急救相關記錄已成功儲存到資料庫 (visitId: $visitId)');
     } catch (e) {
       print('❌ 儲存失敗: $e');
       rethrow;

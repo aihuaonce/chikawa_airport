@@ -1,7 +1,9 @@
+import 'package:chikawa_airport/data/db/daos.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'data/models/emergency_data.dart';
 import 'l10n/app_translations.dart';
+import 'data/db/app_database.dart';
 
 class EmergencyPersonalPage extends StatefulWidget {
   final int visitId;
@@ -12,8 +14,7 @@ class EmergencyPersonalPage extends StatefulWidget {
 }
 
 class _EmergencyPersonalPageState extends State<EmergencyPersonalPage> {
-  final _idCtrl = TextEditingController();
-  final _passportCtrl = TextEditingController();
+  late final Future<PatientProfile?> _patientProfileFuture;
 
   static const Color _deepGreen = Color(0xFF274C4A);
   static const Color _lightGreen = Color(0xFF83ACA9);
@@ -26,57 +27,31 @@ class _EmergencyPersonalPageState extends State<EmergencyPersonalPage> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) _loadData();
-    });
-  }
-
-  void _loadData() {
-    final data = context.read<EmergencyData>();
-    _idCtrl.text = data.idNumber ?? '';
-    _passportCtrl.text = data.passportNumber ?? '';
-  }
-
-  @override
-  void dispose() {
-    _idCtrl.dispose();
-    _passportCtrl.dispose();
-    super.dispose();
-  }
-
-  void _saveToProvider() {
-    final data = context.read<EmergencyData>();
-    data.updatePersonal(
-      idNumber: _idCtrl.text,
-      passportNumber: _passportCtrl.text,
-      gender: data.gender,
-      birthDate: data.birthDate,
-    );
-  }
-
-  // 【修改】移除本地的日期格式化方法，將使用 AppTranslations 中的版本
-  // String _two(int n) => n.toString().padLeft(2, '0');
-  // String _fmtDate(DateTime dt) => ...
-
-  Future<void> _tapPickBirthDate() async {
-    final data = context.read<EmergencyData>();
-    final picked = await showDatePicker(
-      context: context,
-      initialDate: data.birthDate ?? DateTime(1983, 1, 1),
-      firstDate: DateTime(1900),
-      lastDate: DateTime.now(),
-    );
-    if (picked != null) {
-      data.updatePersonal(birthDate: picked);
-    }
+    // 【修改】在 initState 中初始化 Future，只執行一次資料庫查詢
+    final patientProfilesDao = context.read<PatientProfilesDao>();
+    _patientProfileFuture = patientProfilesDao.getByVisitId(widget.visitId);
   }
 
   @override
   Widget build(BuildContext context) {
     final t = AppTranslations.of(context);
 
-    return Consumer<EmergencyData>(
-      builder: (context, data, child) {
+    return FutureBuilder<PatientProfile?>(
+      future: _patientProfileFuture,
+      builder: (context, snapshot) {
+        // 狀況 1: 正在載入中
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        // 狀況 2: 發生錯誤
+        if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        }
+
+        // 狀況 3: 資料載入成功
+        final profile = snapshot.data;
+
         return Container(
           color: const Color(0xFFE6F6FB),
           padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 16),
@@ -84,121 +59,51 @@ class _EmergencyPersonalPageState extends State<EmergencyPersonalPage> {
             child: Align(
               alignment: Alignment.topCenter,
               child: ConstrainedBox(
-                constraints: const BoxConstraints(
-                  maxWidth: 1000,
-                ), // ✅ 卡片寬度固定 800
+                constraints: const BoxConstraints(maxWidth: 1000),
                 child: _card(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _rowTop(
                         label: t.idNumber,
-                        child: ConstrainedBox(
-                          constraints: const BoxConstraints(
-                            maxWidth: 300,
-                          ), // ✅ 輸入框變短
-                          child: TextField(
-                            controller: _idCtrl,
-                            onChanged: (_) => _saveToProvider(),
-                            decoration: InputDecoration(
-                              hintText: t.enterIdNumber,
-                              isDense: true,
-                              border: const OutlineInputBorder(),
-                              contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 8,
-                              ),
-                            ),
-                          ),
+                        // 【修改】使用 _DisplayField 來顯示資料
+                        child: _DisplayField(
+                          text: profile?.idNumber,
+                          hint: t.dataNotAvailable,
                         ),
                       ),
                       const SizedBox(height: 12),
 
                       _rowTop(
                         label: t.gender,
-                        child: Wrap(
-                          spacing: 18,
-                          children: [
-                            _genderRadio(t.male, data),
-                            _genderRadio(t.female, data),
-                          ],
+                        child: _DisplayField(
+                          text: profile?.gender,
+                          hint: t.dataNotAvailable,
                         ),
                       ),
                       const SizedBox(height: 12),
 
                       _rowTop(
                         label: t.birthDate,
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            InkWell(
-                              onTap: _tapPickBirthDate,
-                              borderRadius: BorderRadius.circular(4),
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 4,
-                                  vertical: 6,
-                                ),
-                                child: Text(
-                                  data.birthDate == null
-                                      ? t.selectDate
-                                      : t.formatDate(data.birthDate!),
-                                  style: const TextStyle(
-                                    fontSize: 15,
-                                    color: Colors.black87,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            SizedBox(
-                              height: 32,
-                              child: ElevatedButton(
-                                onPressed: () => data.updatePersonal(
-                                  birthDate: DateTime.now(),
-                                ),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: _lightGreen, // ✅ 淺綠色
-                                  foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                  ),
-                                  elevation: 0,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                ),
-                                child: Text(
-                                  t.today,
-                                  style: const TextStyle(
-                                    fontSize: 12.5,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
+                        child: _DisplayField(
+                          // 如果有生日，就格式化它
+                          text: profile?.birthday == null
+                              ? null
+                              : t.formatDate(profile!.birthday!),
+                          hint: t.dataNotAvailable,
                         ),
                       ),
                       const SizedBox(height: 12),
 
+                      // 注意：PatientProfiles 表中沒有 passportNumber
+                      // 如果需要顯示護照號碼，需要確認它的來源
+                      // 假設它也來自 PatientProfiles (您可能需要將其添加到表中)
+                      // 這裡暫時顯示為 "未提供"
                       _rowTop(
                         label: t.passportNumber,
-                        child: ConstrainedBox(
-                          constraints: const BoxConstraints(maxWidth: 300),
-                          child: TextField(
-                            controller: _passportCtrl,
-                            onChanged: (_) => _saveToProvider(),
-                            decoration: InputDecoration(
-                              hintText: t.enterPassportNumber,
-                              isDense: true,
-                              border: const OutlineInputBorder(),
-                              contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 8,
-                              ),
-                            ),
-                          ),
+                        child: _DisplayField(
+                          text: null, // 假設 PatientProfiles 沒有此欄位
+                          hint: t.dataNotAvailable, // 例如："資料未提供"
                         ),
                       ),
                     ],
@@ -209,6 +114,29 @@ class _EmergencyPersonalPageState extends State<EmergencyPersonalPage> {
           ),
         );
       },
+    );
+  }
+
+  Widget _DisplayField({required String? text, required String hint}) {
+    final hasText = text != null && text.isNotEmpty;
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 300),
+      child: Container(
+        width: double.infinity, // 佔滿可用寬度
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        decoration: BoxDecoration(
+          color: Colors.grey[200],
+          border: Border.all(color: Colors.grey.shade400),
+          borderRadius: BorderRadius.circular(4),
+        ),
+        child: Text(
+          hasText ? text : hint,
+          style: TextStyle(
+            fontSize: 15.5,
+            color: hasText ? Colors.black87 : Colors.grey[600],
+          ),
+        ),
+      ),
     );
   }
 
@@ -237,8 +165,8 @@ class _EmergencyPersonalPageState extends State<EmergencyPersonalPage> {
       children: [
         ConstrainedBox(
           constraints: const BoxConstraints(
-            minWidth: _labelMinW,
-            maxWidth: _labelMaxW,
+            minWidth: _labelMinW, // <-- 現在這裡可以找到定義了
+            maxWidth: _labelMaxW, // <-- 現在這裡可以找到定義了
           ),
           child: Padding(
             padding: const EdgeInsets.only(top: 8),
@@ -255,30 +183,11 @@ class _EmergencyPersonalPageState extends State<EmergencyPersonalPage> {
             ),
           ),
         ),
-        const SizedBox(width: _labelGap),
+        const SizedBox(width: _labelGap), // <-- 現在這裡可以找到定義了
         Expanded(
           child: Align(alignment: Alignment.topLeft, child: child),
         ),
       ],
-    );
-  }
-
-  Widget _genderRadio(String value, EmergencyData data) {
-    final selected = data.gender == value;
-    return InkWell(
-      onTap: () => data.updatePersonal(gender: value),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            selected ? Icons.radio_button_checked : Icons.radio_button_off,
-            size: 20,
-            color: selected ? _deepGreen : Colors.black45,
-          ),
-          const SizedBox(width: 6),
-          Text(value, style: const TextStyle(fontSize: 15.5)),
-        ],
-      ),
     );
   }
 }

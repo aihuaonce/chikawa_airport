@@ -1,3 +1,4 @@
+//daos.dart
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:chikawa_airport/data/models/AmbulanceView_Data.dart';
@@ -6,6 +7,19 @@ import 'app_database.dart';
 import 'tables.dart';
 
 part 'daos.g.dart';
+
+class EmergencyRecordView {
+  final EmergencyRecord emergencyRecord;
+  final Visit visit;
+  // AccidentRecord 可能不存在，所以設為 nullable
+  final AccidentRecord? accidentRecord;
+
+  EmergencyRecordView({
+    required this.emergencyRecord,
+    required this.visit,
+    this.accidentRecord,
+  });
+}
 
 // 說明：移除了未被使用的 `BaseUpsertMixin`，因為我們將在每個 DAO 中使用更明確的 onConflict 策略。
 
@@ -411,7 +425,7 @@ class ParamedicRecordsDao extends DatabaseAccessor<AppDatabase>
       (delete(paramedicRecords)..where((tbl) => tbl.id.equals(id))).go();
 }
 
-@DriftAccessor(tables: [EmergencyRecords, Visits])
+@DriftAccessor(tables: [EmergencyRecords, Visits, AccidentRecords])
 class EmergencyRecordsDao extends DatabaseAccessor<AppDatabase>
     with _$EmergencyRecordsDaoMixin {
   EmergencyRecordsDao(AppDatabase db) : super(db);
@@ -446,20 +460,44 @@ class EmergencyRecordsDao extends DatabaseAccessor<AppDatabase>
     );
   }
 
-  Stream<List<EmergencyRecord>> watchAll({String keyword = ''}) {
+  Stream<List<EmergencyRecordView>> watchAllDetails({String keyword = ''}) {
+    // 1. 建立查詢，從 emergencyRecords 開始
     final query = select(emergencyRecords)
-      ..orderBy([(t) => OrderingTerm.desc(t.incidentDateTime)]);
+        // 2. 透過 visitId 關聯 (JOIN) visits 和 accidentRecords
+        .join([
+          // innerJoin: EmergencyRecord 一定會有對應的 Visit
+          innerJoin(visits, visits.visitId.equalsExp(emergencyRecords.visitId)),
+          // leftOuterJoin: EmergencyRecord 不一定有對應的 AccidentRecord，用 left join 比較安全
+          leftOuterJoin(
+            accidentRecords,
+            accidentRecords.visitId.equalsExp(emergencyRecords.visitId),
+          ),
+        ]);
 
+    // 3. 處理關鍵字搜尋
     if (keyword.isNotEmpty) {
+      final like = '%$keyword%';
+      // 現在可以同時搜尋 Visits 和 EmergencyRecords 的欄位
       query.where(
-        (t) =>
-            t.patientName.like('%$keyword%') |
-            t.diagnosis.like('%$keyword%') |
-            t.selectedHospital.like('%$keyword%') |
-            t.nationality.like('%$keyword%'),
+        visits.patientName.like(like) |
+            visits.nationality.like(like) |
+            emergencyRecords.diagnosis.like(like) |
+            emergencyRecords.selectedHospital.like(like),
       );
     }
 
-    return query.watch();
+    // 4. 設定排序，我們依照事故記錄中的事發時間倒序排列
+    query.orderBy([OrderingTerm.desc(accidentRecords.incidentDate)]);
+
+    // 5. 監聽查詢結果，並將每一行 (row) 轉換成我們的 EmergencyRecordView 物件
+    return query.watch().map((rows) {
+      return rows.map((row) {
+        return EmergencyRecordView(
+          emergencyRecord: row.readTable(emergencyRecords),
+          visit: row.readTable(visits),
+          accidentRecord: row.readTableOrNull(accidentRecords),
+        );
+      }).toList();
+    });
   }
 }

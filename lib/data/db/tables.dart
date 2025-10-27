@@ -1,3 +1,4 @@
+//tables.dart
 import 'package:drift/drift.dart';
 
 /// 1) 個案主檔（HomePage 列表就讀這張）
@@ -49,6 +50,7 @@ class PatientProfiles extends Table {
   TextColumn get reason => text().nullable()();
   TextColumn get nationality => text().nullable()(); // 與主檔同步
   TextColumn get idNumber => text().nullable()();
+  TextColumn get passportNumber => text().nullable()();
   TextColumn get address => text().nullable()();
   TextColumn get phone => text().nullable()();
   TextColumn get photoPath => text().nullable()();
@@ -86,16 +88,9 @@ class AccidentRecords extends Table {
   TextColumn get otherReportUnit => text().nullable()(); // 其他通報單位
   TextColumn get notifier => text().nullable()(); // 通報人員
   TextColumn get phone => text().nullable()(); // 電話
-  IntColumn get placeIdx => integer().nullable()(); // 事故地點主群組索引
+  TextColumn get placeGroup => text().nullable()();
+  TextColumn get placeDetail => text().nullable()();
   TextColumn get placeNote => text().nullable()(); // 地點備註
-
-  // ✅ 新增：各地點群組的子項目索引
-  IntColumn get t1PlaceIdx => integer().nullable()(); // 第一航廈子地點索引
-  IntColumn get t2PlaceIdx => integer().nullable()(); // 第二航廈子地點索引
-  IntColumn get remotePlaceIdx => integer().nullable()(); // 遠端機坪子地點索引
-  IntColumn get cargoPlaceIdx => integer().nullable()(); // 貨運站子地點索引
-  IntColumn get novotelPlaceIdx => integer().nullable()(); // 諾富特子地點索引
-  IntColumn get cabinPlaceIdx => integer().nullable()(); // 機艙內子地點索引
 
   BoolColumn get occArrived =>
       boolean().withDefault(const Constant(false))(); // 營運控制中心到達現場
@@ -118,15 +113,10 @@ class FlightLogs extends Table {
   IntColumn get id => integer().autoIncrement()();
   IntColumn get visitId => integer().unique()(); // 關聯到 Visits
 
-  IntColumn get airlineIndex => integer().nullable()();
-  BoolColumn get useOtherAirline =>
-      boolean().withDefault(const Constant(false))();
-  TextColumn get otherAirline => text().nullable()();
-
+  // 【修改】從索引改為直接儲存文字
+  TextColumn get airline => text().nullable()();
   TextColumn get flightNo => text().nullable()();
-
-  IntColumn get travelStatusIndex => integer().nullable()();
-  TextColumn get otherTravelStatus => text().nullable()();
+  TextColumn get travelStatus => text().nullable()(); // 旅遊狀態 (即原本的 source)
 
   TextColumn get departure => text().nullable()();
   TextColumn get via => text().nullable()();
@@ -221,7 +211,8 @@ class Treatments extends Table {
   IntColumn get referralAmbulanceType => integer().nullable()();
   IntColumn get referralHospitalIdx => integer().nullable()();
   TextColumn get referralOtherHospital => text().nullable()();
-  TextColumn get referralEscort => text().nullable()();
+  TextColumn get referralEscortText => text().nullable()();
+  TextColumn get selectedEscortsJson => text().nullable()();
   IntColumn get intubationType => integer().nullable()();
   IntColumn get oxygenType => integer().nullable()();
   TextColumn get oxygenFlow => text().nullable()();
@@ -503,6 +494,12 @@ class AmbulanceRecords extends Table {
 
   TextColumn get medicationRecordsJson =>
       text().withDefault(const Constant('[]'))();
+  TextColumn get paramedicRecordsJson =>
+      text().withDefault(const Constant('[]'))();
+  TextColumn get vitalSignsRecordsJson =>
+      text().withDefault(const Constant('[]'))();
+  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+  DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
 
   // --- 對應 Ambulance_Expenses.dart ---
   IntColumn get staffFee => integer().nullable()();
@@ -542,10 +539,6 @@ class AmbulanceRecords extends Table {
 
   // Radio Button
   BoolColumn get isProxyStatement => boolean().nullable()(); // 是否代訴
-
-  // --- 紀錄時間 ---
-  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
-  DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
 }
 
 // 給藥紀錄表
@@ -591,22 +584,7 @@ class EmergencyRecords extends Table {
   IntColumn get id => integer().autoIncrement()();
   IntColumn get visitId => integer().unique()();
 
-  // Personal (個人資料)
-  TextColumn get patientName => text().nullable()(); // ✅ 新增：病患姓名
-  TextColumn get idNumber => text().nullable()();
-  TextColumn get passportNumber => text().nullable()();
-  TextColumn get gender => text().nullable()();
-  DateTimeColumn get birthDate => dateTime().nullable()();
-
-  // Flight (飛航記錄)
-  IntColumn get sourceIndex => integer().nullable()();
-  IntColumn get purposeIndex => integer().nullable()();
-  IntColumn get airlineIndex => integer().nullable()();
-  BoolColumn get useOtherAirline =>
-      boolean().withDefault(const Constant(false))();
-  TextColumn get selectedOtherAirline => text().nullable()();
-  TextColumn get nationality => text().nullable()();
-
+  // 【修改】Flight 和部分 Accident 資訊已移至各自的 Table，這裡移除對應欄位
   // Accident (事故記錄)
   DateTimeColumn get incidentDateTime => dateTime().nullable()();
   IntColumn get placeGroupIdx => integer().nullable()();

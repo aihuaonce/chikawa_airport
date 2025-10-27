@@ -17,18 +17,12 @@ class AccidentData extends ChangeNotifier {
   String? otherReportUnit;
   String? notifier;
   String? phone;
-  int? placeGroupIdx;
+  String? placeGroup;
+  String? placeDetail;
   String? placeNote;
   bool occArrived = false;
   String? cost;
   int? within10min;
-
-  int? t1Selected;
-  int? t2Selected;
-  int? remoteSelected;
-  int? cargoSelected;
-  int? novotelSelected;
-  int? cabinSelected;
 
   bool reasonPreLanding = false;
   bool reasonOnDuty = false;
@@ -51,13 +45,12 @@ class AccidentData extends ChangeNotifier {
     otherReportUnit = null;
     notifier = null;
     phone = null;
-    placeGroupIdx = null;
+    placeGroup = null;
     placeNote = null;
     occArrived = false;
     cost = null;
     within10min = null;
-    t1Selected = t2Selected = remoteSelected = cargoSelected = novotelSelected =
-        cabinSelected = null;
+    placeDetail = null;
     reasonPreLanding = false;
     reasonOnDuty = false;
     reasonOther = false;
@@ -80,14 +73,9 @@ class AccidentData extends ChangeNotifier {
       otherReportUnit: Value(otherReportUnit),
       notifier: Value(notifier),
       phone: Value(phone),
-      placeIdx: Value(placeGroupIdx),
+      placeGroup: Value(placeGroup),
       placeNote: Value(placeNote),
-      t1PlaceIdx: Value(t1Selected),
-      t2PlaceIdx: Value(t2Selected),
-      remotePlaceIdx: Value(remoteSelected),
-      cargoPlaceIdx: Value(cargoSelected),
-      novotelPlaceIdx: Value(novotelSelected),
-      cabinPlaceIdx: Value(cabinSelected),
+      placeDetail: Value(placeDetail),
       occArrived: Value(occArrived),
       cost: Value(cost),
       within10min: Value(within10min),
