@@ -188,50 +188,29 @@ class _MedicalExpensesPageState extends State<MedicalExpensesPage>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          t.medicalFeeForm,
-                          style: const TextStyle(
-                            fontSize: 20, // Slightly larger title
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(
-                              0xFF83ACA9,
-                            ), // As requested
-                            foregroundColor: Colors.white, // As requested
-                          ),
-                          onPressed: () => showDialog(
-                            context: context,
-                            builder: (ctx) => AlertDialog(
-                              title: Text(t.feeScheduleTitle),
-                              content: Text(t.feeScheduleContentPlaceholder),
-                              actions: [
-                                TextButton(
-                                  onPressed: () => Navigator.pop(ctx),
-                                  child: Text(t.close),
-                                ),
-                              ],
-                            ),
-                          ),
-                          child: Text(t.viewFeeSchedule),
-                        ),
-                      ],
+                    Text(
+                      t.medicalFeeForm,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     const SizedBox(height: 16),
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Expanded(
-                          flex: 2,
+                          flex: 1,
                           child: _buildChargeMethodSelector(t, dataModel),
                         ),
                         const SizedBox(width: 16),
-                        Expanded(flex: 1, child: _buildPhotoTaker(dataModel)),
+                        Expanded(
+                          flex: 1,
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(maxHeight: 300),
+                            child: _buildFeeScheduleImage(),
+                          ),
+                        ),
                       ],
                     ),
                     _buildConditionalFields(t, dataModel),
@@ -244,12 +223,10 @@ class _MedicalExpensesPageState extends State<MedicalExpensesPage>
                         hintText: t.enterAmountHint,
                         border: const OutlineInputBorder(),
                       ),
-                      onChanged: (_) {
+                      onChanged: (text) {
                         final dataModel = context.read<MedicalCostsData>();
-                        dataModel.visitFee = _visitFeeController.text.trim();
-                        dataModel.ambulanceFee = _ambulanceFeeController.text
-                            .trim();
-                        // ❌ 不立即 notify，改在儲存前呼叫 dataModel.update()
+                        dataModel.visitFee = text.trim();
+                        dataModel.update();
                       },
                     ),
                     const SizedBox(height: 16),
@@ -261,12 +238,10 @@ class _MedicalExpensesPageState extends State<MedicalExpensesPage>
                         hintText: t.enterAmountHint,
                         border: const OutlineInputBorder(),
                       ),
-                      onChanged: (_) {
+                      onChanged: (text) {
                         final dataModel = context.read<MedicalCostsData>();
-                        dataModel.visitFee = _visitFeeController.text.trim();
-                        dataModel.ambulanceFee = _ambulanceFeeController.text
-                            .trim();
-                        // ❌ 不立即 notify，改在儲存前呼叫 dataModel.update()
+                        dataModel.ambulanceFee = text.trim();
+                        dataModel.update();
                       },
                     ),
                     const SizedBox(height: 16),
@@ -655,20 +630,31 @@ class _MedicalExpensesPageState extends State<MedicalExpensesPage>
     );
   }
 
-  Widget _buildPhotoTaker(MedicalCostsData dataModel) {
+  Widget _buildFeeScheduleImage() {
     return GestureDetector(
       onTap: () {
-        // TODO: Implement image picking
+        showDialog(
+          context: context,
+          builder: (context) => Dialog(
+            insetPadding: const EdgeInsets.all(16.0),
+            child: InteractiveViewer(
+              child: Image.asset('assets/images/fee_schedule.png'),
+            ),
+          ),
+        );
       },
       child: Container(
-        height: 160,
         decoration: BoxDecoration(
-          color: Colors.grey[200],
+          color: Colors.white,
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: Colors.grey),
+          border: Border.all(color: Colors.grey.shade300),
         ),
-        child: const Center(
-          child: Icon(Icons.camera_alt, size: 48, color: Colors.grey),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(8),
+          child: Image.asset(
+            'assets/images/fee_schedule.png',
+            fit: BoxFit.contain,
+          ),
         ),
       ),
     );
