@@ -1,0 +1,967 @@
+//referralform.dart
+import 'dart:typed_data';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:signature/signature.dart';
+import '../data/db/daos.dart';
+import '../data/models/referral_data.dart';
+import 'nav2.dart';
+import '../l10n/app_translations.dart';
+
+class ReferralFormPage extends StatefulWidget {
+  final int visitId;
+
+  const ReferralFormPage({super.key, required this.visitId});
+
+  @override
+  State<ReferralFormPage> createState() => _ReferralFormPageState();
+}
+
+class _ReferralFormPageState extends State<ReferralFormPage>
+    with
+        AutomaticKeepAliveClientMixin<ReferralFormPage>,
+        SavableStateMixin<ReferralFormPage> {
+  // ===============================================
+  // 實作 SavablePage 的 saveData() 方法
+  // ===============================================
+  @override
+  Future<void> saveData() async {
+    try {
+      _syncControllersToData();
+      await _saveData();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  // ===============================================
+  // 保持頁面存活
+  // ===============================================
+  @override
+  bool get wantKeepAlive => true;
+
+  // ===============================================
+  // 狀態變數
+  // ===============================================
+  bool _isLoading = true;
+
+  // 選項列表將從翻譯中取得
+  List<String> get doctorList {
+    final t = AppTranslations.of(context);
+    return [
+      t.doctorFang,
+      t.doctorGu,
+      t.doctorJiang,
+      t.doctorLu,
+      t.doctorZhou,
+      t.doctorJin,
+      t.doctorXu,
+      t.doctorKang,
+      t.other,
+    ];
+  }
+
+  List<String> get deptList {
+    final t = AppTranslations.of(context);
+    return [
+      t.emergencyMedicineDept,
+      t.generalMedicineDept,
+      t.familyMedicineDept,
+      t.internalMedicineDept,
+      t.surgeryDept,
+      t.pediatricsDept,
+      t.obstetricsGynecologyDept,
+      t.orthopedicsDept,
+      t.ophthalmologyDept,
+      t.other,
+    ];
+  }
+
+  List<String> get referralPurposes {
+    final t = AppTranslations.of(context);
+    return [
+      t.emergencyTreatment,
+      t.inpatientTreatment,
+      t.outpatientTreatment,
+      t.furtherExamination,
+      t.returnForFollowup,
+      t.otherPurpose,
+    ];
+  }
+
+  // 簽名控制器
+  final SignatureController _doctorSignController = SignatureController(
+    penStrokeWidth: 2,
+    penColor: Colors.black,
+    exportBackgroundColor: Colors.white,
+  );
+  final SignatureController _consentSignController = SignatureController(
+    penStrokeWidth: 2,
+    penColor: Colors.black,
+    exportBackgroundColor: Colors.white,
+  );
+
+  // 文字欄位控制器
+  final TextEditingController contactNameCtrl = TextEditingController();
+  final TextEditingController contactPhoneCtrl = TextEditingController();
+  final TextEditingController contactAddressCtrl = TextEditingController();
+  final TextEditingController mainDiagnosisCtrl = TextEditingController();
+  final TextEditingController subDiagnosis1Ctrl = TextEditingController();
+  final TextEditingController subDiagnosis2Ctrl = TextEditingController();
+  final TextEditingController furtherExamCtrl = TextEditingController();
+  final TextEditingController otherPurposeCtrl = TextEditingController();
+  final TextEditingController otherDoctorCtrl = TextEditingController();
+  final TextEditingController otherDeptCtrl = TextEditingController();
+  final TextEditingController appointmentDeptCtrl = TextEditingController();
+  final TextEditingController appointmentRoomCtrl = TextEditingController();
+  final TextEditingController appointmentNumberCtrl = TextEditingController();
+  final TextEditingController referralHospitalCtrl = TextEditingController();
+  final TextEditingController otherReferralDeptCtrl = TextEditingController();
+  final TextEditingController referralDoctorCtrl = TextEditingController();
+  final TextEditingController referralAddressCtrl = TextEditingController();
+  final TextEditingController referralPhoneCtrl = TextEditingController();
+  final TextEditingController relationCtrl = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  @override
+  void dispose() {
+    contactNameCtrl.dispose();
+    contactPhoneCtrl.dispose();
+    contactAddressCtrl.dispose();
+    mainDiagnosisCtrl.dispose();
+    subDiagnosis1Ctrl.dispose();
+    subDiagnosis2Ctrl.dispose();
+    furtherExamCtrl.dispose();
+    otherPurposeCtrl.dispose();
+    otherDoctorCtrl.dispose();
+    otherDeptCtrl.dispose();
+    appointmentDeptCtrl.dispose();
+    appointmentRoomCtrl.dispose();
+    appointmentNumberCtrl.dispose();
+    referralHospitalCtrl.dispose();
+    otherReferralDeptCtrl.dispose();
+    referralDoctorCtrl.dispose();
+    referralAddressCtrl.dispose();
+    referralPhoneCtrl.dispose();
+    relationCtrl.dispose();
+    _doctorSignController.dispose();
+    _consentSignController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _loadData() async {
+    try {
+      final dao = context.read<ReferralFormsDao>();
+      final referralData = context.read<ReferralData>();
+      final record = await dao.getByVisitId(widget.visitId);
+
+      if (!mounted) return;
+
+      if (record != null) {
+        // 從資料庫載入到 ReferralData
+        referralData.contactName = record.contactName;
+        referralData.contactPhone = record.contactPhone;
+        referralData.contactAddress = record.contactAddress;
+        referralData.mainDiagnosis = record.mainDiagnosis;
+        referralData.subDiagnosis1 = record.subDiagnosis1;
+        referralData.subDiagnosis2 = record.subDiagnosis2;
+        referralData.lastExamDate = record.lastExamDate;
+        referralData.lastMedicationDate = record.lastMedicationDate;
+        referralData.referralPurposeIdx = record.referralPurposeIdx;
+        referralData.furtherExamDetail = record.furtherExamDetail;
+        referralData.otherPurposeDetail = record.otherPurposeDetail;
+        referralData.doctorIdx = record.doctorIdx;
+        referralData.otherDoctorName = record.otherDoctorName;
+        referralData.deptIdx = record.deptIdx;
+        referralData.otherDeptName = record.otherDeptName;
+        referralData.doctorSignature = record.doctorSignature;
+        referralData.issueDate = record.issueDate;
+        referralData.appointmentDate = record.appointmentDate;
+        referralData.appointmentDept = record.appointmentDept;
+        referralData.appointmentRoom = record.appointmentRoom;
+        referralData.appointmentNumber = record.appointmentNumber;
+        referralData.referralHospitalName = record.referralHospitalName;
+        referralData.referralDeptIdx = record.referralDeptIdx;
+        referralData.otherReferralDept = record.otherReferralDept;
+        referralData.referralDoctorName = record.referralDoctorName;
+        referralData.referralAddress = record.referralAddress;
+        referralData.referralPhone = record.referralPhone;
+        referralData.consentSignature = record.consentSignature;
+        referralData.relationToPatient = record.relationToPatient;
+        referralData.consentDateTime = record.consentDateTime;
+        referralData.update();
+      } else {
+        // 新記錄的預設值
+        final now = DateTime.now();
+        referralData.issueDate = now;
+        referralData.appointmentDate = now;
+        referralData.lastExamDate = now;
+        referralData.lastMedicationDate = now;
+        referralData.consentDateTime = now;
+        referralData.update();
+      }
+
+      _syncControllersFromData(referralData);
+    } catch (e) {
+      debugPrint('載入轉診表單資料錯誤: $e');
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  void _syncControllersFromData(ReferralData data) {
+    contactNameCtrl.text = data.contactName ?? '';
+    contactPhoneCtrl.text = data.contactPhone ?? '';
+    contactAddressCtrl.text = data.contactAddress ?? '';
+    mainDiagnosisCtrl.text = data.mainDiagnosis ?? '';
+    subDiagnosis1Ctrl.text = data.subDiagnosis1 ?? '';
+    subDiagnosis2Ctrl.text = data.subDiagnosis2 ?? '';
+    furtherExamCtrl.text = data.furtherExamDetail ?? '';
+    otherPurposeCtrl.text = data.otherPurposeDetail ?? '';
+    otherDoctorCtrl.text = data.otherDoctorName ?? '';
+    otherDeptCtrl.text = data.otherDeptName ?? '';
+    appointmentDeptCtrl.text = data.appointmentDept ?? '';
+    appointmentRoomCtrl.text = data.appointmentRoom ?? '';
+    appointmentNumberCtrl.text = data.appointmentNumber ?? '';
+    referralHospitalCtrl.text = data.referralHospitalName ?? '';
+    otherReferralDeptCtrl.text = data.otherReferralDept ?? '';
+    referralDoctorCtrl.text = data.referralDoctorName ?? '';
+    referralAddressCtrl.text = data.referralAddress ?? '';
+    referralPhoneCtrl.text = data.referralPhone ?? '';
+    relationCtrl.text = data.relationToPatient ?? '';
+  }
+
+  void _syncControllersToData() {
+    final data = context.read<ReferralData>();
+
+    data.contactName = contactNameCtrl.text.trim().isEmpty
+        ? null
+        : contactNameCtrl.text.trim();
+    data.contactPhone = contactPhoneCtrl.text.trim().isEmpty
+        ? null
+        : contactPhoneCtrl.text.trim();
+    data.contactAddress = contactAddressCtrl.text.trim().isEmpty
+        ? null
+        : contactAddressCtrl.text.trim();
+    data.mainDiagnosis = mainDiagnosisCtrl.text.trim().isEmpty
+        ? null
+        : mainDiagnosisCtrl.text.trim();
+    data.subDiagnosis1 = subDiagnosis1Ctrl.text.trim().isEmpty
+        ? null
+        : subDiagnosis1Ctrl.text.trim();
+    data.subDiagnosis2 = subDiagnosis2Ctrl.text.trim().isEmpty
+        ? null
+        : subDiagnosis2Ctrl.text.trim();
+    data.furtherExamDetail = furtherExamCtrl.text.trim().isEmpty
+        ? null
+        : furtherExamCtrl.text.trim();
+    data.otherPurposeDetail = otherPurposeCtrl.text.trim().isEmpty
+        ? null
+        : otherPurposeCtrl.text.trim();
+    data.otherDoctorName = otherDoctorCtrl.text.trim().isEmpty
+        ? null
+        : otherDoctorCtrl.text.trim();
+    data.otherDeptName = otherDeptCtrl.text.trim().isEmpty
+        ? null
+        : otherDeptCtrl.text.trim();
+    data.appointmentDept = appointmentDeptCtrl.text.trim().isEmpty
+        ? null
+        : appointmentDeptCtrl.text.trim();
+    data.appointmentRoom = appointmentRoomCtrl.text.trim().isEmpty
+        ? null
+        : appointmentRoomCtrl.text.trim();
+    data.appointmentNumber = appointmentNumberCtrl.text.trim().isEmpty
+        ? null
+        : appointmentNumberCtrl.text.trim();
+    data.referralHospitalName = referralHospitalCtrl.text.trim().isEmpty
+        ? null
+        : referralHospitalCtrl.text.trim();
+    data.otherReferralDept = otherReferralDeptCtrl.text.trim().isEmpty
+        ? null
+        : otherReferralDeptCtrl.text.trim();
+    data.referralDoctorName = referralDoctorCtrl.text.trim().isEmpty
+        ? null
+        : referralDoctorCtrl.text.trim();
+    data.referralAddress = referralAddressCtrl.text.trim().isEmpty
+        ? null
+        : referralAddressCtrl.text.trim();
+    data.referralPhone = referralPhoneCtrl.text.trim().isEmpty
+        ? null
+        : referralPhoneCtrl.text.trim();
+    data.relationToPatient = relationCtrl.text.trim().isEmpty
+        ? null
+        : relationCtrl.text.trim();
+  }
+
+  Future<void> _saveData() async {
+    try {
+      // 1. 取得所有需要的 DAO 和 Data Model
+      final referralDao = context.read<ReferralFormsDao>();
+      final visitsDao = context.read<VisitsDao>();
+      final referralData = context.read<ReferralData>();
+
+      // 2. ✅ 正確做法：一行程式碼，呼叫您在 ReferralData 中完美封裝好的方法
+      await referralData.saveToDatabase(widget.visitId, referralDao, visitsDao);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  void _openSignaturePad(
+    SignatureController controller,
+    Function(Uint8List) onSaved,
+  ) {
+    final t = AppTranslations.of(context);
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        child: SizedBox(
+          width: MediaQuery.of(context).size.width * 0.7,
+          height: MediaQuery.of(context).size.height * 0.7,
+          child: Column(
+            children: [
+              Expanded(
+                child: Signature(
+                  controller: controller,
+                  backgroundColor: Colors.white,
+                ),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: controller.clear,
+                    child: Text(t.redraw),
+                  ),
+                  TextButton(
+                    onPressed: () async {
+                      if (controller.isNotEmpty) {
+                        final data = await controller.toPngBytes();
+                        if (data != null) {
+                          onSaved(data);
+                        }
+                        Navigator.pop(context);
+                      }
+                    },
+                    child: Text(t.save),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+    final t = AppTranslations.of(context);
+
+    if (_isLoading) return const Center(child: CircularProgressIndicator());
+
+    return Consumer<ReferralData>(
+      builder: (context, data, _) {
+        return Container(
+          color: const Color(0xFFE6F6FB),
+          alignment: Alignment.topCenter,
+          child: SingleChildScrollView(
+            child: Container(
+              width: 950,
+              margin: const EdgeInsets.symmetric(vertical: 32),
+              padding: const EdgeInsets.all(32),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF9FAFB),
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: const [
+                  BoxShadow(color: Colors.black12, blurRadius: 8),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // 第一部分 - 聯絡人資料
+                  Text(
+                    t.contactInformation,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  _buildInputRow(
+                    t,
+                    t.contactName,
+                    t.enterContactName,
+                    contactNameCtrl,
+                  ),
+                  const SizedBox(height: 8),
+                  _buildInputRow(
+                    t,
+                    t.contactPhone,
+                    t.enterContactPhone,
+                    contactPhoneCtrl,
+                  ),
+                  const SizedBox(height: 8),
+                  _buildInputRow(
+                    t,
+                    t.contactAddress,
+                    t.enterContactAddress,
+                    contactAddressCtrl,
+                  ),
+
+                  const Divider(thickness: 1, height: 32),
+
+                  // 第二部分 - 診斷
+                  Text(
+                    t.diagnosisInformation,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  _buildInputRow(
+                    t,
+                    t.mainDiagnosisLabel,
+                    t.enterMainDiagnosis,
+                    mainDiagnosisCtrl,
+                  ),
+                  const SizedBox(height: 8),
+                  _buildInputRow(
+                    t,
+                    t.subDiagnosisLabel,
+                    t.enterSubDiagnosis,
+                    subDiagnosis1Ctrl,
+                  ),
+                  const SizedBox(height: 8),
+                  _buildInputRow(
+                    t,
+                    t.subDiagnosisLabel,
+                    t.enterSubDiagnosis,
+                    subDiagnosis2Ctrl,
+                  ),
+
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      Expanded(child: _buildLeftCard(t, data)),
+                      const SizedBox(width: 16),
+                      Expanded(child: _buildRightCard(t, data)),
+                    ],
+                  ),
+
+                  const Divider(thickness: 1, height: 32),
+
+                  // 第三部分 - 醫師資訊
+                  Text(
+                    t.referringPhysician,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  _buildDropdown(
+                    t,
+                    t.selectDoctorLabel,
+                    doctorList,
+                    data.doctorIdx,
+                    (idx) {
+                      data.doctorIdx = idx;
+                      data.update();
+                    },
+                  ),
+                  if (data.doctorIdx == doctorList.length - 1)
+                    _buildInputRow(
+                      t,
+                      t.otherDoctorLabel,
+                      t.enterDoctorName,
+                      otherDoctorCtrl,
+                    ),
+
+                  const SizedBox(height: 12),
+                  Text(
+                    t.departmentLabel,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  _buildDropdown(
+                    t,
+                    t.departmentLabel,
+                    deptList,
+                    data.deptIdx,
+                    (idx) {
+                      data.deptIdx = idx;
+                      data.update();
+                    },
+                  ),
+                  if (data.deptIdx == deptList.length - 1)
+                    _buildInputRow(
+                      t,
+                      t.otherDepartmentLabel,
+                      t.enterDepartmentName,
+                      otherDeptCtrl,
+                    ),
+
+                  const SizedBox(height: 12),
+                  Text(
+                    t.doctorSignatureLabel,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  GestureDetector(
+                    onTap: () =>
+                        _openSignaturePad(_doctorSignController, (signData) {
+                          setState(() => data.doctorSignature = signData);
+                          data.update();
+                        }),
+                    child: Container(
+                      height: 150,
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.black54),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      alignment: Alignment.center,
+                      child: data.doctorSignature == null
+                          ? Text(
+                              t.tapToSign,
+                              style: const TextStyle(color: Colors.grey),
+                            )
+                          : Image.memory(data.doctorSignature!),
+                    ),
+                  ),
+
+                  const Divider(thickness: 1, height: 32),
+
+                  // 第四部分 - 轉診院所
+                  Row(
+                    children: [
+                      Expanded(child: _buildLeftCard4(t, data)),
+                      const SizedBox(width: 16),
+                      Expanded(child: _buildRightCard4(t, data)),
+                    ],
+                  ),
+
+                  const Divider(thickness: 1, height: 32),
+
+                  // 同意區塊
+                  Text(
+                    t.consentStatement,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    t.consentSignatureLabel,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  GestureDetector(
+                    onTap: () =>
+                        _openSignaturePad(_consentSignController, (signData) {
+                          setState(() => data.consentSignature = signData);
+                          data.update();
+                        }),
+                    child: Container(
+                      height: 150,
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.black54),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      alignment: Alignment.center,
+                      child: data.consentSignature == null
+                          ? Text(
+                              t.tapToSign,
+                              style: const TextStyle(color: Colors.grey),
+                            )
+                          : Image.memory(data.consentSignature!),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  _buildInputRow(
+                    t,
+                    t.relationToPatient,
+                    t.enterRelationToPatient,
+                    relationCtrl,
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Text(
+                        "${t.signatureDate}${_formatDateTime(t, data.consentDateTime ?? DateTime.now())}",
+                      ),
+                      const SizedBox(width: 12),
+                      ElevatedButton(
+                        onPressed: () {
+                          data.consentDateTime = DateTime.now();
+                          data.update();
+                        },
+                        child: Text(t.updateTime),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  // ================= UI 小積木 =================
+
+  Widget _buildInputRow(
+    AppTranslations t,
+    String label,
+    String hint,
+    TextEditingController ctrl,
+  ) {
+    return Row(
+      children: [
+        Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
+        const SizedBox(width: 8),
+        SizedBox(
+          width: hint.length * 15.0 + 30,
+          child: TextField(
+            controller: ctrl,
+            decoration: InputDecoration(
+              hintText: hint,
+              hintStyle: const TextStyle(fontSize: 13, color: Colors.grey),
+              isDense: true,
+              contentPadding: const EdgeInsets.symmetric(
+                vertical: 8,
+                horizontal: 8,
+              ),
+              enabledBorder: const UnderlineInputBorder(
+                borderSide: BorderSide(color: Colors.grey),
+              ),
+              focusedBorder: const UnderlineInputBorder(
+                borderSide: BorderSide(color: Colors.blue),
+              ),
+            ),
+            onChanged: (_) => _syncControllersToData(),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDropdown(
+    AppTranslations t,
+    String label,
+    List<String> items,
+    int? selectedIdx,
+    Function(int) onChanged,
+  ) {
+    return Row(
+      children: [
+        Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
+        const SizedBox(width: 8),
+        SizedBox(
+          width: 180,
+          child: DropdownButtonFormField<int>(
+            value: selectedIdx,
+            items: List.generate(
+              items.length,
+              (i) => DropdownMenuItem(value: i, child: Text(items[i])),
+            ),
+            onChanged: (val) {
+              if (val != null) onChanged(val);
+            },
+            decoration: const InputDecoration(
+              isDense: true,
+              contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              enabledBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: Colors.grey),
+              ),
+              focusedBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: Colors.blue),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLeftCard(AppTranslations t, ReferralData data) => Card(
+    color: Colors.white,
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+    child: Padding(
+      padding: const EdgeInsets.all(12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            t.examTreatmentSummary,
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 8),
+          Text(t.lastExamResultDate),
+          TextButton(
+            onPressed: () => _pickDate(context, (d) {
+              data.lastExamDate = d;
+              data.update();
+            }),
+            child: Text(_formatDate(t, data.lastExamDate ?? DateTime.now())),
+          ),
+          const SizedBox(height: 8),
+          Text(t.lastMedicationSurgeryDate),
+          TextButton(
+            onPressed: () => _pickDate(context, (d) {
+              data.lastMedicationDate = d;
+              data.update();
+            }),
+            child: Text(
+              _formatDate(t, data.lastMedicationDate ?? DateTime.now()),
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+
+  Widget _buildRightCard(AppTranslations t, ReferralData data) => Card(
+    color: Colors.white,
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+    child: Padding(
+      padding: const EdgeInsets.all(12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            t.referralPurpose,
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
+          ...List.generate(referralPurposes.length, (i) {
+            if (i == 3) {
+              return _buildRadioWithInput(
+                t,
+                i,
+                referralPurposes[i],
+                t.examItems,
+                t.enterExamItems,
+                furtherExamCtrl,
+                data,
+              );
+            } else if (i == 5) {
+              return _buildRadioWithInput(
+                t,
+                i,
+                referralPurposes[i],
+                t.otherReferralPurpose,
+                t.enterOtherPurpose,
+                otherPurposeCtrl,
+                data,
+              );
+            } else {
+              return _buildRadio(t, i, referralPurposes[i], data);
+            }
+          }),
+        ],
+      ),
+    ),
+  );
+
+  Widget _buildLeftCard4(AppTranslations t, ReferralData data) => Card(
+    color: Colors.white,
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+    child: Padding(
+      padding: const EdgeInsets.all(12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            t.issueDate,
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
+          TextButton(
+            onPressed: () => _pickDate(context, (d) {
+              data.issueDate = d;
+              data.update();
+            }),
+            child: Text(
+              "${t.date}：${_formatDate(t, data.issueDate ?? DateTime.now())}",
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            t.appointmentDate,
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
+          TextButton(
+            onPressed: () => _pickDate(context, (d) {
+              data.appointmentDate = d;
+              data.update();
+            }),
+            child: Text(
+              "${t.date}：${_formatDate(t, data.appointmentDate ?? DateTime.now())}",
+            ),
+          ),
+          const SizedBox(height: 8),
+          _buildInputRow(
+            t,
+            t.appointmentDept,
+            t.optionalDept,
+            appointmentDeptCtrl,
+          ),
+          const SizedBox(height: 8),
+          _buildInputRow(
+            t,
+            t.appointmentRoom,
+            t.optionalRoom,
+            appointmentRoomCtrl,
+          ),
+          const SizedBox(height: 8),
+          _buildInputRow(
+            t,
+            t.appointmentNo,
+            t.optionalNumber,
+            appointmentNumberCtrl,
+          ),
+        ],
+      ),
+    ),
+  );
+
+  Widget _buildRightCard4(AppTranslations t, ReferralData data) => Card(
+    color: Colors.white,
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+    child: Padding(
+      padding: const EdgeInsets.all(12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildInputRow(
+            t,
+            t.referralHospitalName,
+            t.landseedHospital,
+            referralHospitalCtrl,
+          ),
+          const SizedBox(height: 8),
+          _buildDropdown(
+            t,
+            t.referralDepartment,
+            deptList,
+            data.referralDeptIdx,
+            (idx) {
+              data.referralDeptIdx = idx;
+              data.update();
+            },
+          ),
+          if (data.referralDeptIdx == deptList.length - 1)
+            _buildInputRow(
+              t,
+              "${t.other}：",
+              t.enterDepartmentName,
+              otherReferralDeptCtrl,
+            ),
+          const SizedBox(height: 8),
+          _buildInputRow(
+            t,
+            t.referralDoctorName,
+            t.optionalReferralDoctor,
+            referralDoctorCtrl,
+          ),
+          const SizedBox(height: 8),
+          _buildInputRow(
+            t,
+            t.hospitalAddress,
+            t.enterHospitalAddress,
+            referralAddressCtrl,
+          ),
+          const SizedBox(height: 8),
+          _buildInputRow(
+            t,
+            t.hospitalPhone,
+            t.enterHospitalPhone,
+            referralPhoneCtrl,
+          ),
+        ],
+      ),
+    ),
+  );
+
+  Widget _buildRadio(
+    AppTranslations t,
+    int value,
+    String text,
+    ReferralData data,
+  ) {
+    return Row(
+      children: [
+        Radio<int>(
+          value: value,
+          groupValue: data.referralPurposeIdx,
+          onChanged: (val) {
+            data.referralPurposeIdx = val;
+            data.update();
+          },
+        ),
+        Text(text),
+      ],
+    );
+  }
+
+  Widget _buildRadioWithInput(
+    AppTranslations t,
+    int value,
+    String text,
+    String label,
+    String hint,
+    TextEditingController ctrl,
+    ReferralData data,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Radio<int>(
+              value: value,
+              groupValue: data.referralPurposeIdx,
+              onChanged: (val) {
+                data.referralPurposeIdx = val;
+                data.update();
+              },
+            ),
+            Text(text),
+          ],
+        ),
+        if (data.referralPurposeIdx == value)
+          Padding(
+            padding: const EdgeInsets.only(left: 36),
+            child: _buildInputRow(t, label, hint, ctrl),
+          ),
+      ],
+    );
+  }
+
+  Future<void> _pickDate(
+    BuildContext context,
+    ValueChanged<DateTime> onPicked,
+  ) async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+    );
+    if (picked != null) {
+      onPicked(picked);
+    }
+  }
+
+  String _formatDate(AppTranslations t, DateTime dt) {
+    return t.formatDate(dt);
+  }
+
+  String _formatDateTime(AppTranslations t, DateTime dt) {
+    return t.formatDate(dt);
+  }
+}
