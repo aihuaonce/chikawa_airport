@@ -621,19 +621,19 @@ class AppTranslations {
   }
 
   // ========== Ambulance Personal (救護車個人資料) ==========
-  String get idOrPassportNumber => isZh ? '身分證字號/護照號碼:' : 'ID/Passport Number:';
+  String get idOrPassportNumber => isZh ? '身分證字號/護照號碼' : 'ID/Passport Number:';
   String get enterIdOrPassportHint =>
       isZh ? '請填寫證件號碼' : 'Please enter ID or passport number';
   String get enterAddressHint => isZh ? '請填寫住址' : 'Please enter the address';
-  String get patientBelongings => isZh ? '病患財物明細:' : 'Patient\'s Belongings:';
+  String get patientBelongings => isZh ? '病患財物明細' : 'Patient\'s Belongings:';
   String get enterBelongingsHint =>
       isZh ? '請填寫病患財物明細' : 'Please list patient\'s belongings';
-  String get belongingsHandled => isZh ? '是否有經手:' : 'Handled Belongings:';
+  String get belongingsHandled => isZh ? '是否有經手' : 'Handled Belongings:';
   String get notHandled => isZh ? '未經手' : 'Not Handled';
-  String get custodianName => isZh ? '保管人姓名:' : 'Custodian\'s Name:';
+  String get custodianName => isZh ? '保管人姓名' : 'Custodian\'s Name:';
   String get enterCustodianNameHint =>
       isZh ? '請填寫保管人姓名' : 'Please enter custodian\'s name';
-  String get custodianSignature => isZh ? '保管人簽名:' : 'Custodian\'s Signature:';
+  String get custodianSignature => isZh ? '保管人簽名' : 'Custodian\'s Signature:';
   String get tapToSign => isZh ? '請點擊此處簽名' : 'Tap here to sign';
 
   // Signature Dialog

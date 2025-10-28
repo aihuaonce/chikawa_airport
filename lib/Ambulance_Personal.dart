@@ -20,6 +20,34 @@ class _AmbulancePersonalPageState extends State<AmbulancePersonalPage> {
   final _belongingsCtrl = TextEditingController();
   final _custodianCtrl = TextEditingController();
 
+  // ✅【新增】統一主色
+  static const Color _deepGreen = Color(0xFF274C4A);
+
+  static const Color _border = Color.fromARGB(255, 105, 105, 105);
+  static const Color _lightGreen = Color(0xFF83ACA9);
+  static const double _fieldFontSize = 14;
+
+  InputDecoration _outlineDecoration(String hint) {
+    return InputDecoration(
+      hintText: hint,
+      hintStyle: const TextStyle(color: Colors.grey, fontSize: _fieldFontSize),
+      isDense: true,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: const BorderSide(color: _border),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: const BorderSide(color: _border),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: const BorderSide(color: _deepGreen),
+      ),
+    );
+  }
+
   final SignatureController _signatureController = SignatureController(
     penStrokeWidth: 2,
     penColor: Colors.black,
@@ -67,9 +95,9 @@ class _AmbulancePersonalPageState extends State<AmbulancePersonalPage> {
 
   @override
   Widget build(BuildContext context) {
-    final t = AppTranslations.of(context); // 【新增】取得翻譯物件
-    final genderOptions = [t.male, t.female]; // 【新增】性別選項
-    final handledOptions = [t.notHandled, t.yes]; // 【新增】經手選項
+    final t = AppTranslations.of(context);
+    final genderOptions = [t.male, t.female];
+    final handledOptions = [t.notHandled, t.yes];
 
     return Consumer<AmbulanceData>(
       builder: (context, data, child) {
@@ -89,24 +117,24 @@ class _AmbulancePersonalPageState extends State<AmbulancePersonalPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _buildRadioRow(
-                        title: t.gender, // 【修改】
+                        title: t.gender,
                         groupValue: data.gender,
-                        options: genderOptions, // 【修改】
+                        options: genderOptions,
                         onChanged: (val) => data.updatePersonal(gender: val),
                       ),
                       const SizedBox(height: 16),
 
                       _buildTextFieldRow(
-                        title: t.idOrPassportNumber, // 【修改】
-                        hint: t.enterIdOrPassportHint, // 【修改】
+                        title: t.idOrPassportNumber,
+                        hint: t.enterIdOrPassportHint,
                         controller: _idCtrl,
                         onChanged: _saveToProvider,
                       ),
                       const SizedBox(height: 16),
 
                       _buildTextFieldRow(
-                        title: t.age, // 【修改】
-                        hint: t.enterIntegerHint, // 【修改】
+                        title: t.age,
+                        hint: t.enterIntegerHint,
                         controller: _ageCtrl,
                         keyboardType: TextInputType.number,
                         onChanged: _saveToProvider,
@@ -114,45 +142,45 @@ class _AmbulancePersonalPageState extends State<AmbulancePersonalPage> {
                       const SizedBox(height: 16),
 
                       _buildTextFieldRow(
-                        title: t.address, // 【修改】
-                        hint: t.enterAddressHint, // 【修改】
+                        title: t.address,
+                        hint: t.enterAddressHint,
                         controller: _addressCtrl,
                         onChanged: _saveToProvider,
                       ),
                       const SizedBox(height: 16),
 
                       _buildTextFieldRow(
-                        title: t.patientBelongings, // 【修改】
-                        hint: t.enterBelongingsHint, // 【修改】
+                        title: t.patientBelongings,
+                        hint: t.enterBelongingsHint,
                         controller: _belongingsCtrl,
                         onChanged: _saveToProvider,
                       ),
                       const SizedBox(height: 16),
 
                       _buildRadioRow(
-                        title: t.belongingsHandled, // 【修改】
+                        title: t.belongingsHandled,
                         groupValue: data.belongingsHandled,
-                        options: handledOptions, // 【修改】
+                        options: handledOptions,
                         onChanged: (val) =>
                             data.updatePersonal(belongingsHandled: val),
                       ),
                       const SizedBox(height: 16),
 
                       _buildTextFieldRow(
-                        title: t.custodianName, // 【修改】
-                        hint: t.enterCustodianNameHint, // 【修改】
+                        title: t.custodianName,
+                        hint: t.enterCustodianNameHint,
                         controller: _custodianCtrl,
                         onChanged: _saveToProvider,
                       ),
                       const SizedBox(height: 16),
 
                       Text(
-                        t.custodianSignature, // 【修改】
+                        t.custodianSignature,
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 8),
                       GestureDetector(
-                        onTap: () => _handleSignatureTap(data, t), // 【修改】
+                        onTap: () => _handleSignatureTap(data, t),
                         child: Container(
                           height: 120,
                           decoration: BoxDecoration(
@@ -162,7 +190,7 @@ class _AmbulancePersonalPageState extends State<AmbulancePersonalPage> {
                           alignment: Alignment.center,
                           child: data.custodianSignature == null
                               ? Text(
-                                  t.tapToSign, // 【修改】
+                                  t.tapToSign,
                                   style: const TextStyle(color: Colors.grey),
                                 )
                               : Image.memory(data.custodianSignature!),
@@ -183,8 +211,7 @@ class _AmbulancePersonalPageState extends State<AmbulancePersonalPage> {
     AmbulanceData data,
     AppTranslations t,
   ) async {
-    // 【修改】
-    final result = await _openSignatureDialog(t); // 【修改】
+    final result = await _openSignatureDialog(t);
     if (result != null) {
       data.updatePersonal(custodianSignature: result);
     }
@@ -208,6 +235,7 @@ class _AmbulancePersonalPageState extends State<AmbulancePersonalPage> {
                 value: option,
                 groupValue: groupValue,
                 onChanged: onChanged,
+                activeColor: _deepGreen,
               ),
               Text(option),
               const SizedBox(width: 16),
@@ -221,35 +249,29 @@ class _AmbulancePersonalPageState extends State<AmbulancePersonalPage> {
     required String title,
     required String hint,
     required TextEditingController controller,
-    TextInputType? keyboardType,
-    VoidCallback? onChanged,
+    TextInputType keyboardType = TextInputType.text,
+    required VoidCallback onChanged,
   }) {
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         SizedBox(
           width: 150,
           child: Text(
             title,
-            style: const TextStyle(fontWeight: FontWeight.bold),
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: _fieldFontSize,
+            ),
           ),
         ),
+        const SizedBox(width: 16),
         Expanded(
           child: TextField(
             controller: controller,
             keyboardType: keyboardType,
-            onChanged: onChanged != null ? (_) => onChanged() : null,
-            decoration: InputDecoration(
-              hintText: hint,
-              hintStyle: const TextStyle(fontSize: 14, color: Colors.grey),
-              isDense: true,
-              contentPadding: const EdgeInsets.symmetric(vertical: 8),
-              enabledBorder: const UnderlineInputBorder(
-                borderSide: BorderSide(color: Colors.grey),
-              ),
-              focusedBorder: const UnderlineInputBorder(
-                borderSide: BorderSide(color: Colors.blue),
-              ),
-            ),
+            decoration: _outlineDecoration(hint),
+            onChanged: (_) => onChanged(),
           ),
         ),
       ],
@@ -257,7 +279,6 @@ class _AmbulancePersonalPageState extends State<AmbulancePersonalPage> {
   }
 
   Future<Uint8List?> _openSignatureDialog(AppTranslations t) async {
-    // 【修改】
     _signatureController.clear();
 
     return showDialog<Uint8List?>(
@@ -272,7 +293,7 @@ class _AmbulancePersonalPageState extends State<AmbulancePersonalPage> {
             child: Column(
               children: [
                 Text(
-                  t.signatureArea, // 【修改】
+                  t.signatureArea,
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
@@ -296,17 +317,21 @@ class _AmbulancePersonalPageState extends State<AmbulancePersonalPage> {
                   children: [
                     TextButton(
                       onPressed: () => _signatureController.clear(),
-                      child: Text(t.redraw), // 【修改】
+                      child: Text(t.redraw, style: const TextStyle(color: _deepGreen)),
                     ),
                     TextButton(
                       onPressed: () => Navigator.pop(context, null),
                       child: Text(
-                        t.clearSignature, // 【修改】
+                        t.clearSignature,
                         style: const TextStyle(color: Colors.red),
                       ),
                     ),
                     const Spacer(),
                     ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: _deepGreen,
+                        foregroundColor: Colors.white,
+                      ),
                       onPressed: () async {
                         if (_signatureController.isEmpty) {
                           Navigator.pop(context);
@@ -316,7 +341,7 @@ class _AmbulancePersonalPageState extends State<AmbulancePersonalPage> {
                         if (!context.mounted) return;
                         Navigator.pop(context, data);
                       },
-                      child: Text(t.done), // 【修改】
+                      child: Text(t.done),
                     ),
                   ],
                 ),
