@@ -2,12 +2,20 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import '../data/db/daos.dart';
 import '../data/models/patient_data.dart';
 import '../l10n/app_translations.dart';
 import 'nav2.dart';
+
+import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart' as p;
+
+import 'package:http/http.dart' as http;
+import 'package:flutter/services.dart' show rootBundle;
+import 'package:uuid/uuid.dart';
 
 class PersonalInformationPage extends StatefulWidget {
   final int visitId;
@@ -23,6 +31,7 @@ class _PersonalInformationPageState extends State<PersonalInformationPage>
     with AutomaticKeepAliveClientMixin, SavableStateMixin {
   late TextEditingController nameController;
   late TextEditingController idController;
+  late TextEditingController passportController;
   late TextEditingController addrController;
   late TextEditingController phoneController;
   bool _isLoading = true;
@@ -36,6 +45,7 @@ class _PersonalInformationPageState extends State<PersonalInformationPage>
     super.initState();
     nameController = TextEditingController();
     idController = TextEditingController();
+    passportController = TextEditingController();
     addrController = TextEditingController();
     phoneController = TextEditingController();
     _loadPatientProfile();
@@ -45,6 +55,7 @@ class _PersonalInformationPageState extends State<PersonalInformationPage>
   void dispose() {
     nameController.dispose();
     idController.dispose();
+    passportController.dispose();
     addrController.dispose();
     phoneController.dispose();
     super.dispose();
@@ -78,12 +89,14 @@ class _PersonalInformationPageState extends State<PersonalInformationPage>
         patientData.birthday = profile.birthday;
         patientData.age = profile.age;
         patientData.idNumber = profile.idNumber;
+        patientData.passportNumber = profile.passportNumber;
         patientData.address = profile.address;
         patientData.phone = profile.phone;
         patientData.photoBase64 = profile.photoPath;
         patientData.update();
 
         idController.text = patientData.idNumber ?? '';
+        passportController.text = patientData.passportNumber ?? '';
         addrController.text = patientData.address ?? '';
         phoneController.text = patientData.phone ?? '';
       }
@@ -131,10 +144,12 @@ class _PersonalInformationPageState extends State<PersonalInformationPage>
   Future<void> _pickPhoto() async {
     if (!mounted) return;
     final t = AppTranslations.of(context);
+
     try {
       final patientData = context.read<PatientData>();
       final ImagePicker picker = ImagePicker();
 
+      // 顯示選項對話框：從相簿選擇 或 拍照
       final source = await showDialog<ImageSource>(
         context: context,
         builder: (context) => AlertDialog(
@@ -157,29 +172,58 @@ class _PersonalInformationPageState extends State<PersonalInformationPage>
         ),
       );
 
-      if (source == null) return;
+      if (source == null) return; // 使用者取消
 
+      // 使用選擇的來源取得圖片
       final XFile? pickedFile = await picker.pickImage(
         source: source,
-        imageQuality: 85,
+        imageQuality: 85, // 壓縮圖片品質
+      );
+      if (pickedFile == null) return; // 使用者取消選擇
+
+      // 讀取圖片 bytes
+      final bytes = await pickedFile.readAsBytes();
+
+      // 建立 UUID 檔名
+      final uuid = Uuid();
+      final filename = '${uuid.v4()}.jpg';
+
+      // 暫存到本地暫存目錄（可選）
+      final tempDir = await getTemporaryDirectory();
+      final tempFile = File('${tempDir.path}/$filename');
+      await tempFile.writeAsBytes(bytes);
+
+      // 建立 Multipart 請求
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse(
+          'https://13e7a4bbf789.ngrok-free.app/todos/upload/',
+        ), // 模擬器連本機 Django
       );
 
-      if (pickedFile != null) {
-        File file = File(pickedFile.path);
-        List<int> bytes = await file.readAsBytes();
-        String base64Image = base64Encode(bytes);
+      request.files.add(
+        await http.MultipartFile.fromPath(
+          'file', // Django 後端用 request.FILES['file']
+          tempFile.path,
+          filename: filename,
+        ),
+      );
+      request.fields['filename'] = filename;
 
-        setState(() {
-          patientData.photoBase64 = base64Image;
-        });
-        patientData.update();
+      // 傳送請求
+      final response = await request.send();
+      final responseBody = await response.stream.bytesToString();
+
+      if (response.statusCode == 200) {
+        print('✅ 上傳成功: $filename');
+        print('伺服器回應: $responseBody');
+      } else {
+        print('❌ 上傳失敗: ${response.statusCode}');
+        print('伺服器錯誤回應: $responseBody');
       }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('${t.photoSelectionFailed}$e')));
-      }
+    } catch (e, stack) {
+      print('⚠️ Flutter 端錯誤: $e');
+      print('🔍 錯誤堆疊: $stack');
     }
   }
 
@@ -385,17 +429,30 @@ class _PersonalInformationPageState extends State<PersonalInformationPage>
                     TextFormField(
                       controller: idController,
                       decoration: InputDecoration(
-                        labelText: t.passportOrId,
+                        labelText: t.Id,
                         border: const OutlineInputBorder(),
                       ),
                       validator: (value) {
                         if (value == null || value.trim().isEmpty) {
-                          return t.enterPassportOrId;
+                          return t.enterId;
                         }
                         return null;
                       },
                       onChanged: (val) {
                         patientData.idNumber = val.trim();
+                        _onTextFieldChanged();
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: passportController,
+                      decoration: InputDecoration(
+                        labelText: t.passportId,
+                        hintText: t.enterPassportId,
+                        border: const OutlineInputBorder(),
+                      ),
+                      onChanged: (val) {
+                        patientData.passportNumber = val.trim();
                         _onTextFieldChanged();
                       },
                     ),

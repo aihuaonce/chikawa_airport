@@ -46,13 +46,64 @@ class _EmergencyFlightPageState extends State<EmergencyFlightPage> {
       t.airportStaff,
     ];
 
+    // 【新增】複製 FlightLogPage 的航空公司選項，用於建構唯讀 UI
+    final mainAirlineOptions = {
+      '長榮航空': t.evaAir,
+      '中華航空': t.chinaAirlines,
+      '國泰航空': t.cathayPacific,
+      '聯合航空': t.unitedAirlines,
+      '荷蘭皇家航空': t.klm,
+      '中國南方航空': t.chinaSouthern,
+      '台灣虎航': t.tigerairTaiwan,
+      '阿聯酋航空': t.emirates,
+      '中國國際航空': t.airChina,
+    };
+
+    final otherAirlineOptions = {
+      '星宇航空': t.starlux,
+      '華信航空': t.mandarinAirlines,
+      '立榮航空': t.uniAir,
+      '中國東方航空': t.chinaEastern,
+      '廈門航空': t.xiamenAir,
+      '樂桃航空': t.peachAviation,
+      '大韓航空': t.koreanAir,
+      '韓亞航空': t.asianaAirlines,
+    };
+
+    final nationalityOptions = {
+      '台灣': t.taiwanNationality,
+      '美國': t.nationalityUSA,
+      '越南': t.nationalityVietnam,
+      '泰國': t.nationalityThailand,
+      '印尼': t.nationalityIndonesia,
+      '菲律賓': t.nationalityPhilippines,
+      '香港': t.nationalityHongKong,
+      '澳門': t.nationalityMacau,
+      '加拿大': t.nationalityCanada,
+      '中國大陸': t.nationalityChina,
+      '日本': t.nationalityJapan,
+      '其他': t.nationalityOther,
+    };
+
+    // ==================【以下為修改部分 (1/2)】==================
+    // 【新增】複製 FlightLogPage 的旅遊狀態選項
+    final travelOptions = {
+      '出境': t.departure,
+      '入境': t.arrival,
+      '過境': t.transit,
+      '轉機': t.transfer,
+      '緊急迫降': t.emergencyLanding,
+      '備降': t.diversionLanding,
+      '技術性降落': t.technicalLanding,
+      '其他': t.other,
+    };
+    // ==================【以上為修改部分 (1/2)】==================
+
     return Consumer<EmergencyData>(
       builder: (context, data, child) {
-        // 【修改】判斷是否有值，用於決定 RadioButton 狀態
-        final bool hasTravelStatus =
-            data.travelStatus != null && data.travelStatus!.isNotEmpty;
-        final bool hasAirline =
-            data.airline != null && data.airline!.isNotEmpty;
+        // 這行 'hasTravelStatus' 在修改後不再需要，但保留也沒關係
+        // final bool hasTravelStatus =
+        //     data.travelStatus != null && data.travelStatus!.isNotEmpty;
 
         return Container(
           color: const Color(0xFFE6F6FB),
@@ -66,34 +117,114 @@ class _EmergencyFlightPageState extends State<EmergencyFlightPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // ==================【以下為修改部分 (2/2)】==================
                       _label(t.source),
                       const SizedBox(height: 6),
-                      // 【修改】顯示單一的、不可點擊的 radioRow
-                      _radioRow(
-                        label: hasTravelStatus
-                            ? data.travelStatus!
-                            : t.valueNotAvailable, // "N/A"
-                        selected: hasTravelStatus,
-                        onTap: () {}, // 空回調，使其不可點擊
+                      // 【修改】改用 _airlineRadioWrap 顯示唯讀的旅遊狀態
+                      _airlineRadioWrap(
+                        options: travelOptions.values.toList(),
+                        groupValue: data.travelStatus,
+                        dbValues: travelOptions.keys.toList(),
+                        onChanged: null, // 唯讀
                       ),
                       const SizedBox(height: 16),
 
+                      // ==================【以上為修改部分 (2/2)】==================
                       _label(t.purposeOfVisit),
                       const SizedBox(height: 6),
-                      _radioWrap(
+                      _purposeRadioWrap(
                         options: purposeOptions,
                         groupIndex: data.purposeIndex,
-                        onChanged: null, // 傳入 null 來禁用
+                        onChanged: null, // 禁用
                       ),
                       const SizedBox(height: 16),
 
                       _label(t.airline),
                       const SizedBox(height: 6),
-                      // 【修改】顯示單一的、不可點擊的 radioRow
-                      _radioRow(
-                        label: hasAirline ? data.airline! : t.valueNotAvailable,
-                        selected: hasAirline,
-                        onTap: () {}, // 空回調，使其不可點擊
+
+                      // ===== 航空公司：主清單（唯讀）=====
+                      _airlineRadioWrap(
+                        options: mainAirlineOptions.values.toList(),
+                        groupValue:
+                            otherAirlineOptions.containsKey(data.airline)
+                            ? null
+                            : data.airline,
+                        dbValues: mainAirlineOptions.keys.toList(),
+                        onChanged: null, // 【鎖定】傳入 null 來禁用互動
+                      ),
+                      const SizedBox(height: 8),
+
+                      // ===== 其他航空公司（唯讀）=====
+                      Padding(
+                        padding: const EdgeInsets.only(left: 0),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Transform.translate(
+                              offset: const Offset(-2, 0),
+                              child: SizedBox(
+                                height: 24,
+                                width: 24,
+                                child: Checkbox(
+                                  value: otherAirlineOptions.containsKey(
+                                    data.airline,
+                                  ),
+                                  onChanged: null, // 【鎖定】禁用 Checkbox
+                                  activeColor: _deepGreen,
+                                  checkColor: Colors.white,
+                                  materialTapTargetSize:
+                                      MaterialTapTargetSize.shrinkWrap,
+                                  visualDensity: const VisualDensity(
+                                    horizontal: -2,
+                                    vertical: -2,
+                                  ),
+                                  side: const BorderSide(
+                                    color: _border,
+                                    width: 1.2,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              t.otherAirline,
+                              style: TextStyle(
+                                color: Colors.black54,
+                              ), // 灰色文字表示禁用
+                            ),
+                            if (otherAirlineOptions.containsKey(
+                              data.airline,
+                            )) ...[
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: DropdownButtonFormField<String>(
+                                  value: data.airline,
+                                  items: otherAirlineOptions.entries
+                                      .map(
+                                        (e) => DropdownMenuItem(
+                                          value: e.key,
+                                          child: Text(e.value),
+                                        ),
+                                      )
+                                      .toList(),
+                                  onChanged: null, // 禁用 Dropdown
+                                  decoration: const InputDecoration(
+                                    isDense: true,
+                                    border: InputBorder.none, // 隱藏邊框
+                                  ),
+                                  disabledHint: Text(
+                                    otherAirlineOptions[data.airline] ?? '',
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.black87,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
                       ),
                       const SizedBox(height: 16),
 
@@ -101,28 +232,51 @@ class _EmergencyFlightPageState extends State<EmergencyFlightPage> {
                       const SizedBox(height: 6),
                       ConstrainedBox(
                         constraints: const BoxConstraints(maxWidth: 300),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 8,
+                        child: DropdownButtonFormField<String>(
+                          value: _patientNationality,
+                          items: nationalityOptions.entries.map((entry) {
+                            return DropdownMenuItem<String>(
+                              value: entry.key,
+                              child: Text(entry.value),
+                            );
+                          }).toList(),
+                          onChanged: null, // 禁用
+                          decoration: InputDecoration(
+                            filled: true,
+                            fillColor: Colors.grey[200],
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(4),
+                              borderSide: BorderSide(
+                                color: Colors.grey.shade400,
+                              ),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(4),
+                              borderSide: BorderSide(
+                                color: Colors.grey.shade400,
+                              ),
+                            ),
+                            disabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(4),
+                              borderSide: BorderSide(
+                                color: Colors.grey.shade400,
+                              ),
+                            ),
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 8,
+                            ),
                           ),
-                          decoration: BoxDecoration(
-                            color: Colors.grey[200],
-                            border: Border.all(color: Colors.grey.shade400),
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: Text(
+                          disabledHint: Text(
                             (_patientNationality != null &&
-                                    _patientNationality!.isNotEmpty)
-                                ? _patientNationality!
+                                    nationalityOptions.containsKey(
+                                      _patientNationality,
+                                    ))
+                                ? nationalityOptions[_patientNationality]!
                                 : t.dataNotAvailable,
                             style: TextStyle(
                               fontSize: 16,
-                              color:
-                                  (_patientNationality != null &&
-                                      _patientNationality!.isNotEmpty)
-                                  ? Colors.black87
-                                  : Colors.grey[600],
+                              color: Colors.grey[850],
                             ),
                           ),
                         ),
@@ -138,7 +292,7 @@ class _EmergencyFlightPageState extends State<EmergencyFlightPage> {
     );
   }
 
-  // ============== 小積木（只動樣式）===============
+  // ============== 小積木 ===============
   Widget _bigCard({required Widget child}) {
     return Container(
       margin: const EdgeInsets.fromLTRB(24, 0, 24, 16),
@@ -174,10 +328,9 @@ class _EmergencyFlightPageState extends State<EmergencyFlightPage> {
     ),
   );
 
-  Widget _radioWrap({
+  Widget _purposeRadioWrap({
     required List<String> options,
     required int? groupIndex,
-    // 【修改】將 onChanged 改為可選 (nullable)
     required ValueChanged<int>? onChanged,
   }) {
     return Wrap(
@@ -186,7 +339,6 @@ class _EmergencyFlightPageState extends State<EmergencyFlightPage> {
       children: List.generate(options.length, (i) {
         final selected = groupIndex == i;
         return InkWell(
-          // 【修改】只有當 onChanged 不是 null 時才啟用 onTap
           onTap: onChanged != null ? () => onChanged(i) : null,
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -201,8 +353,48 @@ class _EmergencyFlightPageState extends State<EmergencyFlightPage> {
                 options[i],
                 style: TextStyle(
                   fontSize: 16.5,
-                  // 【修改】如果禁用，文字顏色變灰
                   color: onChanged != null ? Colors.black87 : Colors.black54,
+                ),
+              ),
+            ],
+          ),
+        );
+      }),
+    );
+  }
+
+  // 【修改】此函式現在可以處理禁用狀態 (onChanged: null)
+  Widget _airlineRadioWrap({
+    required List<String> options,
+    required String? groupValue,
+    required List<String> dbValues,
+    required ValueChanged<String>? onChanged,
+  }) {
+    final isEnabled = onChanged != null;
+    return Wrap(
+      spacing: 14,
+      runSpacing: 10,
+      children: List.generate(options.length, (i) {
+        final selected = groupValue == dbValues[i];
+        return InkWell(
+          onTap: isEnabled ? () => onChanged(dbValues[i]) : null,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                selected ? Icons.radio_button_checked : Icons.radio_button_off,
+                size: 20,
+                // 禁用時顯示灰色
+                color: selected
+                    ? _deepGreen
+                    : (isEnabled ? Colors.black45 : Colors.grey.shade400),
+              ),
+              const SizedBox(width: 6),
+              Text(
+                options[i],
+                // 禁用時顯示灰色文字
+                style: TextStyle(
+                  color: isEnabled ? Colors.black87 : Colors.black54,
                 ),
               ),
             ],
@@ -216,13 +408,11 @@ class _EmergencyFlightPageState extends State<EmergencyFlightPage> {
     required String label,
     required bool selected,
     required VoidCallback onTap,
-    Widget? trailing,
   }) {
-    // 【修改】判斷是否可編輯
     final bool isEditable = onTap != () {};
 
     return InkWell(
-      onTap: isEditable ? onTap : null, // 如果 onTap 是空函數，則禁用
+      onTap: isEditable ? onTap : null,
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 6),
         child: Row(
@@ -243,7 +433,6 @@ class _EmergencyFlightPageState extends State<EmergencyFlightPage> {
                 ),
               ),
             ),
-            if (trailing != null) trailing,
           ],
         ),
       ),

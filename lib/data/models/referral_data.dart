@@ -16,6 +16,11 @@ class ReferralData extends ChangeNotifier {
   String? subDiagnosis1;
   String? subDiagnosis2;
 
+  // 新增 ICD-10 選擇欄位
+  String? selectedICD10Main;
+  String? selectedICD10Sub1;
+  String? selectedICD10Sub2;
+
   // 檢查及治療摘要
   DateTime? lastExamDate;
   DateTime? lastMedicationDate;

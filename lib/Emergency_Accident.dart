@@ -1,7 +1,9 @@
+// lib/Emergency_Accident.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'data/models/emergency_data.dart';
-import 'l10n/app_translations.dart'; // 【新增】引入翻譯
+import 'data/models/emergency_data.dart'; // 保持這個引入，或許還需要 EmergencyData 的其他屬性
+import 'data/models/accident_data.dart'; // 【新增/假設】 導入 AccidentData model
+import 'l10n/app_translations.dart';
 
 class EmergencyAccidentPage extends StatefulWidget {
   final int visitId;
@@ -13,30 +15,11 @@ class EmergencyAccidentPage extends StatefulWidget {
 
 class _EmergencyAccidentPageState extends State<EmergencyAccidentPage> {
   // 統一外觀
-  static const double _cardMaxWidth = 1000; // ★ 固定 1000
+  static const double _cardMaxWidth = 1000;
   static const double _radius = 16;
-  static const Color _deepGreen = Color(0xFF274C4A); // 單/複選選中顏色
-  static const Color _lightGreen = Color(0xFF83ACA9); // 更新時間按鈕
+  static const Color _deepGreen = Color(0xFF274C4A);
+  static const Color _lightGreen = Color(0xFF83ACA9);
   static const Color _bg = Color(0xFFE6F6FB);
-
-  // 只保留不需翻譯的列表
-  final List<String> remotePlaces = const [
-    '601',
-    '602',
-    '603',
-    '604',
-    '605',
-    '606',
-    '607',
-    '608',
-    '609',
-    '610',
-    '611',
-    '612',
-    '613',
-    '614',
-    '615',
-  ];
 
   final TextEditingController placeNoteCtrl = TextEditingController();
 
@@ -49,8 +32,14 @@ class _EmergencyAccidentPageState extends State<EmergencyAccidentPage> {
   }
 
   void _loadData() {
-    final data = context.read<EmergencyData>();
-    placeNoteCtrl.text = data.placeNote ?? '';
+    // 【修正】現在從 AccidentData 讀取資料
+    try {
+      final data = context.read<AccidentData>();
+      // 假設 AccidentData 中有 placeNote 屬性
+      placeNoteCtrl.text = data.placeNote ?? '';
+    } catch (e) {
+      // 如果 AccidentData 尚未提供，則靜默處理
+    }
   }
 
   @override
@@ -59,138 +48,157 @@ class _EmergencyAccidentPageState extends State<EmergencyAccidentPage> {
     super.dispose();
   }
 
-  void _saveToProvider() {
-    final data = context.read<EmergencyData>();
-    data.updateAccident(placeNote: placeNoteCtrl.text);
-  }
-
   @override
   Widget build(BuildContext context) {
     final t = AppTranslations.of(context);
 
-    // 動態建立翻譯後的選項列表
-    final List<String> placeGroups = [
-      t.terminal1,
-      t.terminal2,
-      t.remoteApron,
-      t.cargoOther,
-      t.novotelHotel,
-      t.insideAircraft,
-    ];
+    // 複製 AccidentRecord.dart 的選項
+    final Map<String, String> placeGroupOptions = {
+      '第一航廈': t.terminal1,
+      '第二航廈': t.terminal2,
+      '遠端機坪': t.remoteApron,
+      '貨運站/機坪其他': t.cargoOther,
+      '諾富特飯店': t.novotelHotel,
+      '飛機機艙內': t.insideAircraft,
+    };
 
-    final List<String> t1Places = [
-      t.departureCounter,
-      t.arrivalCounter,
-      t.vipLounge,
-      t.departureHallPublic,
-      t.departureLevelRestricted,
-      t.arrivalHallPublic,
-      t.arrivalLevelRestricted,
-      t.foodCourt,
-      t.aviationPolice,
-      t.airportMRT,
-      t.carPark1,
-      t.carPark2,
-      t.departureBusDropOff,
-      t.arrivalBusPickUp,
-      t.departureSecurityCheck,
-      t.baggageClaim,
-      t.customs,
-      t.gateLabel('A1'),
-      t.gateLabel('A2'),
-      t.gateLabel('A3'),
-      t.gateLabel('A4'),
-      t.gateLabel('A5'),
-      t.gateLabel('A6'),
-      t.gateLabel('A7'),
-      t.gateLabel('A8'),
-      t.gateLabel('A9'),
-      t.transferCounterA,
-      t.transferCounterB,
-      t.transferSecurityA,
-      t.transferSecurityB,
-      t.skytrainAirside,
-      t.skytrainLandside,
-      t.otherLocation,
-      t.gateLabel('B1'),
-      t.gateLabel('B2'),
-      t.gateLabel('B3'),
-      t.gateLabel('B4'),
-      t.gateLabel('B5'),
-      t.gateLabel('B6'),
-      t.gateLabel('B7'),
-      t.gateLabel('B8'),
-      t.gateLabel('B9'),
-      t.gateLabel('B1R'),
-    ];
+    // 複製 AccidentRecord.dart 的詳細選項
+    final Map<String, List<String>> placeDetailOptions = {
+      '第一航廈': [
+        t.departureCounter,
+        t.arrivalCounter,
+        t.vipLounge,
+        t.departureHallPublic,
+        t.departureLevelRestricted,
+        t.arrivalHallPublic,
+        t.arrivalLevelRestricted,
+        t.foodCourt,
+        t.aviationPolice,
+        t.airportMRT,
+        t.carPark1,
+        t.carPark2,
+        t.departureBusDropOff,
+        t.arrivalBusPickUp,
+        t.departureSecurityCheck,
+        t.baggageClaim,
+        t.customs,
+        t.gateLabel('A1'),
+        t.gateLabel('A2'),
+        t.gateLabel('A3'),
+        t.gateLabel('A4'),
+        t.gateLabel('A5'),
+        t.gateLabel('A6'),
+        t.gateLabel('A7'),
+        t.gateLabel('A8'),
+        t.gateLabel('A9'),
+        t.transferCounterA,
+        t.transferCounterB,
+        t.transferSecurityA,
+        t.transferSecurityB,
+        t.skytrainAirside,
+        t.skytrainLandside,
+        t.otherLocation,
+        t.gateLabel('B1'),
+        t.gateLabel('B2'),
+        t.gateLabel('B3'),
+        t.gateLabel('B4'),
+        t.gateLabel('B5'),
+        t.gateLabel('B6'),
+        t.gateLabel('B7'),
+        t.gateLabel('B8'),
+        t.gateLabel('B9'),
+        t.gateLabel('B1R'),
+      ],
+      '第二航廈': [
+        t.departureCounter,
+        t.arrivalCounter,
+        t.vipLounge,
+        t.departureHallPublic,
+        t.departureLevelRestricted,
+        t.arrivalHallPublic,
+        t.arrivalLevelRestricted,
+        t.foodCourt,
+        t.aviationPolice,
+        t.airportMRT,
+        t.carPark3,
+        t.carPark4,
+        t.northObservationDeck,
+        t.southObservationDeck,
+        t.northWing5F,
+        t.southWing5F,
+        t.gateLabel('D1'),
+        t.gateLabel('D2'),
+        t.gateLabel('D3'),
+        t.gateLabel('D4'),
+        t.gateLabel('D5'),
+        t.gateLabel('D6'),
+        t.gateLabel('D7'),
+        t.gateLabel('D8'),
+        t.gateLabel('D9'),
+        t.gateLabel('D10'),
+        t.gateLabel('C1'),
+        t.gateLabel('C2'),
+        t.gateLabel('C3'),
+        t.gateLabel('C4'),
+        t.gateLabel('C5'),
+        t.gateLabel('C6'),
+        t.gateLabel('C7'),
+        t.gateLabel('C8'),
+        t.gateLabel('C9'),
+        t.transferCounterC,
+        t.transferSecurityC,
+        t.skytrainAirside,
+        t.skytrainLandside,
+        t.otherLocation,
+        t.gateLabel('C5R'),
+      ],
+      '遠端機坪': const [
+        '601',
+        '602',
+        '603',
+        '604',
+        '605',
+        '606',
+        '607',
+        '608',
+        '609',
+        '610',
+        '611',
+        '612',
+        '613',
+        '614',
+        '615',
+      ],
+      '貨運站/機坪其他': [
+        t.taxiway,
+        '506',
+        '507',
+        '508',
+        '509',
+        '510',
+        '511',
+        '512',
+        '513',
+        '514',
+        '515',
+        t.tacHangar,
+        t.maintenanceApron,
+        t.evergreenAerospace,
+        t.otherApronLocation,
+      ],
+      '諾富特飯店': [t.novotelHotel],
+      '飛機機艙內': [t.insideAircraft],
+    };
 
-    final List<String> t2Places = [
-      t.departureCounter,
-      t.arrivalCounter,
-      t.vipLounge,
-      t.departureHallPublic,
-      t.departureLevelRestricted,
-      t.arrivalHallPublic,
-      t.arrivalLevelRestricted,
-      t.foodCourt,
-      t.aviationPolice,
-      t.airportMRT,
-      t.carPark3,
-      t.carPark4,
-      t.northObservationDeck,
-      t.southObservationDeck,
-      t.northWing5F,
-      t.southWing5F,
-      t.gateLabel('D1'),
-      t.gateLabel('D2'),
-      t.gateLabel('D3'),
-      t.gateLabel('D4'),
-      t.gateLabel('D5'),
-      t.gateLabel('D6'),
-      t.gateLabel('D7'),
-      t.gateLabel('D8'),
-      t.gateLabel('D9'),
-      t.gateLabel('D10'),
-      t.gateLabel('C1'),
-      t.gateLabel('C2'),
-      t.gateLabel('C3'),
-      t.gateLabel('C4'),
-      t.gateLabel('C5'),
-      t.gateLabel('C6'),
-      t.gateLabel('C7'),
-      t.gateLabel('C8'),
-      t.gateLabel('C9'),
-      t.transferCounterC,
-      t.transferSecurityC,
-      t.skytrainAirside,
-      t.skytrainLandside,
-      t.otherLocation,
-      t.gateLabel('C5R'),
-    ];
-
-    final List<String> cargoPlaces = [
-      t.taxiway,
-      '506',
-      '507',
-      '508',
-      '509',
-      '510',
-      '511',
-      '512',
-      '513',
-      '514',
-      '515',
-      t.tacHangar,
-      t.maintenanceApron,
-      t.evergreenAerospace,
-      t.otherApronLocation,
-    ];
-
-    final List<String> novotelPlaces = [t.novotelHotel];
-    final List<String> cabinPlaces = [t.insideAircraft];
-
-    return Consumer<EmergencyData>(
+    // 【修正】使用 Consumer<AccidentData>
+    return Consumer<AccidentData>(
       builder: (context, data, child) {
+        // 【假設】data 具有 placeGroup 和 placeDetail 屬性
+        final String? placeGroup = data.placeGroup;
+        final String? placeDetail = data.placeDetail;
+
+        final detailOptionsList = placeDetailOptions[placeGroup] ?? [];
+
         return Container(
           color: _bg,
           padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 16),
@@ -204,59 +212,44 @@ class _EmergencyAccidentPageState extends State<EmergencyAccidentPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _dateTimeRow(
-                        label: t.incidentDateTime, // 【修改】
-                        value: data.incidentDateTime,
-                        onPick: (dt) =>
-                            data.updateAccident(incidentDateTime: dt),
-                        onNow: () => data.updateAccident(
-                          incidentDateTime: DateTime.now(),
-                        ),
+                        label: t.incidentDateTime,
+                        // 【假設】AccidentData 中有 incidentDateTime 屬性
+                        value: data.incidentDate,
+                        onPick: null,
+                        onNow: null,
+                        isEnabled: false,
                       ),
                       const SizedBox(height: 16),
-                      _bold(t.incidentLocation),
+                      _bold(t.accidentLocation),
                       const SizedBox(height: 6),
-                      Container(
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        padding: const EdgeInsets.fromLTRB(0, 8, 12, 12),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _radioWrap(
-                              options: placeGroups,
-                              groupIndex: data.placeGroupIdx,
-                              onChanged: (i) {
-                                data.updateAccident(
-                                  placeGroupIdx: i,
-                                  t1Selected: null,
-                                  t2Selected: null,
-                                  remoteSelected: null,
-                                  cargoSelected: null,
-                                  novotelSelected: null,
-                                  cabinSelected: null,
-                                );
-                              },
-                            ),
-                            const SizedBox(height: 8),
-                            _placeSubOptions(
-                              data,
-                              t1Places,
-                              t2Places,
-                              cargoPlaces,
-                              novotelPlaces,
-                              cabinPlaces,
-                            ),
-                          ],
-                        ),
+
+                      // 顯示 placeGroup (唯讀)
+                      _stringRadioWrap(
+                        options: placeGroupOptions.values.toList(),
+                        groupValue: placeGroup,
+                        dbValues: placeGroupOptions.keys.toList(),
+                        onChanged: null, // 禁用
                       ),
+                      const SizedBox(height: 8),
+
+                      // 顯示 placeDetail (唯讀)
+                      if (placeGroup != null &&
+                          detailOptionsList.isNotEmpty) ...[
+                        const SizedBox(height: 6),
+                        _stringRadioWrap(
+                          options: detailOptionsList,
+                          groupValue: placeDetail,
+                          dbValues: detailOptionsList, // 假設 DB 值和顯示值相同
+                          onChanged: null, // 禁用
+                        ),
+                      ],
                       const SizedBox(height: 16),
 
                       _inputRowTight(
                         label: t.locationNotes,
                         hint: t.enterLocationNotes,
                         ctrl: placeNoteCtrl,
+                        isEnabled: false, // 禁用
                       ),
                     ],
                   ),
@@ -279,7 +272,7 @@ class _EmergencyAccidentPageState extends State<EmergencyAccidentPage> {
       borderRadius: BorderRadius.circular(_radius),
       boxShadow: const [
         BoxShadow(
-          color: Color(0x1A000000), // 柔和陰影
+          color: Color(0x1A000000),
           blurRadius: 14,
           offset: Offset(0, 6),
         ),
@@ -298,19 +291,19 @@ class _EmergencyAccidentPageState extends State<EmergencyAccidentPage> {
     ),
   );
 
-  // 標題縮短 + 按鈕換淺綠
   Widget _dateTimeRow({
     required String label,
     required DateTime? value,
-    required ValueChanged<DateTime?> onPick,
-    required VoidCallback onNow,
+    required ValueChanged<DateTime?>? onPick,
+    required VoidCallback? onNow,
+    bool isEnabled = true,
   }) {
     final t = AppTranslations.of(context);
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         SizedBox(
-          width: 120, // ★ 原 160 -> 120，減少標題後空白
+          width: 120,
           child: Text(
             label,
             style: const TextStyle(
@@ -321,67 +314,71 @@ class _EmergencyAccidentPageState extends State<EmergencyAccidentPage> {
           ),
         ),
         InkWell(
-          onTap: () async {
-            final newDate = await showDatePicker(
-              context: context,
-              initialDate: value ?? DateTime.now(),
-              firstDate: DateTime(2000),
-              lastDate: DateTime(2101),
-            );
-            if (newDate != null && mounted) {
-              final newTime = await showTimePicker(
-                context: context,
-                initialTime: TimeOfDay.fromDateTime(value ?? DateTime.now()),
-              );
-              if (newTime != null) {
-                onPick(
-                  DateTime(
-                    newDate.year,
-                    newDate.month,
-                    newDate.day,
-                    newTime.hour,
-                    newTime.minute,
-                  ),
-                );
-              }
-            }
-          },
+          onTap: isEnabled
+              ? () async {
+                  final newDate = await showDatePicker(
+                    context: context,
+                    initialDate: value ?? DateTime.now(),
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime(2101),
+                  );
+                  if (newDate != null && mounted) {
+                    final newTime = await showTimePicker(
+                      context: context,
+                      initialTime: TimeOfDay.fromDateTime(
+                        value ?? DateTime.now(),
+                      ),
+                    );
+                    if (newTime != null && onPick != null) {
+                      onPick(
+                        DateTime(
+                          newDate.year,
+                          newDate.month,
+                          newDate.day,
+                          newTime.hour,
+                          newTime.minute,
+                        ),
+                      );
+                    }
+                  }
+                }
+              : null,
           child: Text(
-            value == null
-                ? t.pleaseSelectTime
-                : t.formatFullDateTime(value), // 【修改】
-            style: const TextStyle(fontSize: 15, color: Colors.black87),
+            value == null ? t.pleaseSelectTime : t.formatFullDateTime(value),
+            style: TextStyle(
+              fontSize: 15,
+              color: isEnabled ? Colors.black87 : Colors.black54,
+            ),
           ),
         ),
         const SizedBox(width: 12),
         SizedBox(
           height: 32,
           child: ElevatedButton(
-            onPressed: onNow,
+            onPressed: isEnabled ? onNow : null,
             style: ElevatedButton.styleFrom(
-              backgroundColor: _lightGreen, // ★ 淺綠
+              backgroundColor: _lightGreen,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(horizontal: 12),
               elevation: 0,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
+              disabledBackgroundColor: Colors.grey.shade300,
+              disabledForegroundColor: Colors.grey.shade500,
             ),
-            child: Text(
-              t.updateTime,
-              style: const TextStyle(fontSize: 12.5),
-            ), // 【修改】
+            child: Text(t.updateTime, style: const TextStyle(fontSize: 12.5)),
           ),
         ),
       ],
     );
   }
 
-  // 輸入框縮短（保留 hint 與內容）
   Widget _inputRowTight({
     required String label,
     required String hint,
     required TextEditingController ctrl,
+    bool isEnabled = true,
   }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
@@ -389,7 +386,7 @@ class _EmergencyAccidentPageState extends State<EmergencyAccidentPage> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           SizedBox(
-            width: 84, // ★ 標題縮短
+            width: 84,
             child: Text(
               label,
               style: const TextStyle(
@@ -400,10 +397,11 @@ class _EmergencyAccidentPageState extends State<EmergencyAccidentPage> {
             ),
           ),
           SizedBox(
-            width: 200, // ★ 固定輸入框寬度 300
+            width: 200,
             child: TextField(
               controller: ctrl,
-              onChanged: (_) => _saveToProvider(),
+              onChanged: null, // 唯讀
+              enabled: isEnabled,
               decoration: InputDecoration(
                 isDense: true,
                 border: const OutlineInputBorder(),
@@ -412,6 +410,8 @@ class _EmergencyAccidentPageState extends State<EmergencyAccidentPage> {
                   horizontal: 10,
                   vertical: 8,
                 ),
+                filled: !isEnabled,
+                fillColor: Colors.grey.shade200,
               ),
             ),
           ),
@@ -420,112 +420,45 @@ class _EmergencyAccidentPageState extends State<EmergencyAccidentPage> {
     );
   }
 
-  Widget _radioWrap({
+  // 複製自 Emergency_Flight.dart 的 _airlineRadioWrap，並改名
+  Widget _stringRadioWrap({
     required List<String> options,
-    required int? groupIndex,
-    required ValueChanged<int> onChanged,
+    required String? groupValue,
+    required List<String> dbValues,
+    required ValueChanged<String>? onChanged,
   }) {
+    final isEnabled = onChanged != null;
     return Wrap(
-      alignment: WrapAlignment.start,
-      spacing: 18,
-      runSpacing: 6,
+      spacing: 14,
+      runSpacing: 10,
       children: List.generate(options.length, (i) {
-        final selected = groupIndex == i;
+        if (i >= dbValues.length) return const SizedBox.shrink();
+
+        final selected = groupValue == dbValues[i];
         return InkWell(
-          onTap: () => onChanged(i),
+          onTap: isEnabled ? () => onChanged(dbValues[i]) : null,
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(
                 selected ? Icons.radio_button_checked : Icons.radio_button_off,
                 size: 20,
-                color: selected ? _deepGreen : Colors.black45,
+                color: selected
+                    ? _deepGreen
+                    : (isEnabled ? Colors.black45 : Colors.grey.shade400),
               ),
               const SizedBox(width: 6),
-              Text(options[i], style: const TextStyle(fontSize: 15.5)),
+              Text(
+                options[i],
+                style: TextStyle(
+                  color: isEnabled ? Colors.black87 : Colors.black54,
+                  fontSize: 15.5,
+                ),
+              ),
             ],
           ),
         );
       }),
-    );
-  }
-
-  // 【修改】更新方法簽名以接收動態列表
-  Widget _placeSubOptions(
-    EmergencyData data,
-    List<String> t1Places,
-    List<String> t2Places,
-    List<String> cargoPlaces,
-    List<String> novotelPlaces,
-    List<String> cabinPlaces,
-  ) {
-    if (data.placeGroupIdx == null) return const SizedBox.shrink();
-
-    List<String> opts;
-    int? groupIndex;
-    ValueChanged<int> onChanged;
-
-    switch (data.placeGroupIdx!) {
-      case 0:
-        opts = t1Places;
-        groupIndex = data.t1Selected;
-        onChanged = (i) => data.updateAccident(t1Selected: i);
-        break;
-      case 1:
-        opts = t2Places;
-        groupIndex = data.t2Selected;
-        onChanged = (i) => data.updateAccident(t2Selected: i);
-        break;
-      case 2:
-        opts = remotePlaces;
-        groupIndex = data.remoteSelected;
-        onChanged = (i) => data.updateAccident(remoteSelected: i);
-        break;
-      case 3:
-        opts = cargoPlaces;
-        groupIndex = data.cargoSelected;
-        onChanged = (i) => data.updateAccident(cargoSelected: i);
-        break;
-      case 4:
-        opts = novotelPlaces;
-        groupIndex = data.novotelSelected;
-        onChanged = (i) => data.updateAccident(novotelSelected: i);
-        break;
-      case 5:
-        opts = cabinPlaces;
-        groupIndex = data.cabinSelected;
-        onChanged = (i) => data.updateAccident(cabinSelected: i);
-        break;
-      default:
-        return const SizedBox.shrink();
-    }
-
-    return Padding(
-      padding: const EdgeInsets.only(top: 6),
-      child: Wrap(
-        spacing: 18,
-        runSpacing: 6,
-        children: List.generate(opts.length, (i) {
-          final selected = groupIndex == i;
-          return InkWell(
-            onTap: () => onChanged(i),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  selected
-                      ? Icons.radio_button_checked
-                      : Icons.radio_button_off,
-                  size: 20,
-                  color: selected ? _deepGreen : Colors.black45,
-                ),
-                const SizedBox(width: 6),
-                Text(opts[i], style: const TextStyle(fontSize: 15.5)),
-              ],
-            ),
-          );
-        }),
-      ),
     );
   }
 }

@@ -123,9 +123,10 @@ class AppTranslations {
   String get notSelected => isZh ? '尚未選擇' : 'Not Selected';
   String get age => isZh ? '年齡' : 'Age';
   String get birthdayNotSelected => isZh ? '尚未選擇生日' : 'Birthday Not Selected';
-  String get passportOrId => isZh ? '護照號或身份證字號' : 'Passport No. / ID Number';
-  String get enterPassportOrId =>
-      isZh ? '請輸入護照號或身份證字號' : 'Please enter passport number or ID number';
+  String get Id => isZh ? '身份證字號' : 'ID Number';
+  String get enterId => isZh ? '請輸入身份證字號' : 'Please enter ID number';
+  String get passportId => isZh ? '護照號碼' : 'Passport ID';
+  String get enterPassportId => isZh ? '請輸入護照號碼' : 'Please enter Passport ID';
   String get purposeOfVisit => isZh ? '為何至機場？' : 'Purpose of Visit to Airport';
   String get airlineCrew => isZh ? '航空公司機組員' : 'Airline Crew Member';
   String get passenger => isZh ? '旅客/民眾' : 'Passenger / Visitor';

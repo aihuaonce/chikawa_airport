@@ -11,6 +11,7 @@ class PatientData extends ChangeNotifier {
   String? reason;
   String? nationality;
   String? idNumber;
+  String? passportNumber;
   String? address;
   String? phone;
   String? photoBase64;
@@ -26,6 +27,7 @@ class PatientData extends ChangeNotifier {
     reason = null;
     nationality = null;
     idNumber = null;
+    passportNumber = null;
     address = null;
     phone = null;
     photoBase64 = null;
@@ -43,6 +45,7 @@ class PatientData extends ChangeNotifier {
       reason: Value(reason),
       nationality: Value(nationality),
       idNumber: Value(idNumber),
+      passportNumber: Value(passportNumber),
       address: Value(address),
       phone: Value(phone),
       photoPath: Value(photoBase64),
