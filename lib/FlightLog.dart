@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../data/db/daos.dart';
 import '../data/models/flightlog_data.dart';
-import 'l10n/app_translations.dart'; // 【新增】引入翻譯
-import 'nav2.dart'; // SavablePage 介面
+import 'l10n/app_translations.dart';
+import 'nav2.dart';
 
 class FlightLogPage extends StatefulWidget {
   final int visitId;
@@ -22,11 +22,11 @@ class _FlightLogPageState extends State<FlightLogPage>
 
   // 外觀參數
   static const double _outerHpad = 48;
-  static const double _cardMaxWidth = 1000; // ★ 白卡 maxWidth 規格：800
+  static const double _cardMaxWidth = 1000;
   static const double _radius = 16;
 
-  // ★ 主題色（不動邏輯）
-  static const Color _deepGreen = Color(0xFF274C4A); // 單/複選選中
+  // 主題色
+  static const Color _deepGreen = Color(0xFF274C4A);
   static const Color _border = Color(0xFFCBD5E1);
 
   @override
@@ -57,12 +57,9 @@ class _FlightLogPageState extends State<FlightLogPage>
       if (!mounted) return;
 
       if (record != null) {
-        data.airlineIndex = record.airlineIndex;
-        data.useOtherAirline = record.useOtherAirline;
-        data.selectedOtherAirline = record.otherAirline;
+        data.airline = record.airline;
         data.flightNoCtrl.text = record.flightNo ?? '';
-        data.travelStatusIndex = record.travelStatusIndex;
-        data.otherTravelCtrl.text = record.otherTravelStatus ?? '';
+        data.travelStatus = record.travelStatus;
         data.departure = record.departure;
         data.via = record.via;
         data.destination = record.destination;
@@ -78,9 +75,6 @@ class _FlightLogPageState extends State<FlightLogPage>
 
   void _syncControllersFromData(FlightLogData data) {
     if (data.flightNo != null) data.flightNoCtrl.text = data.flightNo!;
-    if (data.otherTravelStatus != null) {
-      data.otherTravelCtrl.text = data.otherTravelStatus!;
-    }
   }
 
   void _syncControllersToData() {
@@ -88,58 +82,57 @@ class _FlightLogPageState extends State<FlightLogPage>
     data.flightNo = data.flightNoCtrl.text.trim().isEmpty
         ? null
         : data.flightNoCtrl.text.trim();
-    data.otherTravelStatus = data.otherTravelCtrl.text.trim().isEmpty
-        ? null
-        : data.otherTravelCtrl.text.trim();
   }
 
   Future<void> _saveData() async {
     final dao = context.read<FlightLogsDao>();
     final data = context.read<FlightLogData>();
-
-    // ✅ 正確做法：呼叫您在 FlightLogData 中定義好的新方法
     await data.saveToDatabase(widget.visitId, dao);
   }
 
-  // ================= build =================
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    final t = AppTranslations.of(context); // 【新增】
+    final t = AppTranslations.of(context);
 
-    // 【新增】動態建立翻譯後的選項列表
-    final List<String> mainAirlines = [
-      t.evaAir,
-      t.chinaAirlines,
-      t.cathayPacific,
-      t.unitedAirlines,
-      t.klm,
-      t.chinaSouthern,
-      t.tigerairTaiwan,
-      t.emirates,
-      t.airChina,
-    ];
-    final List<String> otherAirlines = [
-      t.starlux,
-      t.mandarinAirlines,
-      t.uniAir,
-      t.chinaEastern,
-      t.xiamenAir,
-      t.peachAviation,
-      t.koreanAir,
-      t.asianaAirlines,
-    ];
-    final List<String> travelOptions = [
-      t.departure,
-      t.arrival,
-      t.transit,
-      t.transfer,
-      t.emergencyLanding,
-      t.diversionLanding,
-      t.technicalLanding,
-      t.other,
-    ];
-    final List<String> airportOptions = [
+    // 定義航空公司選項（key 是資料庫值，value 是顯示文字）
+    final mainAirlineOptions = {
+      '長榮航空': t.evaAir,
+      '中華航空': t.chinaAirlines,
+      '國泰航空': t.cathayPacific,
+      '聯合航空': t.unitedAirlines,
+      '荷蘭皇家航空': t.klm,
+      '中國南方航空': t.chinaSouthern,
+      '台灣虎航': t.tigerairTaiwan,
+      '阿聯酋航空': t.emirates,
+      '中國國際航空': t.airChina,
+    };
+
+    // 其他航空公司（放在下拉選單中）
+    final otherAirlineOptions = {
+      '星宇航空': t.starlux,
+      '華信航空': t.mandarinAirlines,
+      '立榮航空': t.uniAir,
+      '中國東方航空': t.chinaEastern,
+      '廈門航空': t.xiamenAir,
+      '樂桃航空': t.peachAviation,
+      '大韓航空': t.koreanAir,
+      '韓亞航空': t.asianaAirlines,
+    };
+
+    // 定義旅遊狀態選項
+    final travelOptions = {
+      '出境': t.departure,
+      '入境': t.arrival,
+      '過境': t.transit,
+      '轉機': t.transfer,
+      '緊急迫降': t.emergencyLanding,
+      '備降': t.diversionLanding,
+      '技術性降落': t.technicalLanding,
+      '其他': t.other,
+    };
+
+    final airportOptions = [
       t.airportTPE,
       t.airportHKG,
       t.airportLAX,
@@ -174,14 +167,14 @@ class _FlightLogPageState extends State<FlightLogPage>
 
                       // ===== 航空公司：主清單（單選）=====
                       _radioWrap(
-                        options: mainAirlines,
-                        groupIndex: data.useOtherAirline
+                        options: mainAirlineOptions.values.toList(),
+                        groupValue:
+                            otherAirlineOptions.containsKey(data.airline)
                             ? null
-                            : data.airlineIndex,
-                        onChanged: (i) {
-                          data.useOtherAirline = false;
-                          data.airlineIndex = i;
-                          data.selectedOtherAirline = null;
+                            : data.airline,
+                        dbValues: mainAirlineOptions.keys.toList(),
+                        onChanged: (v) {
+                          data.airline = v;
                           data.update();
                         },
                       ),
@@ -189,7 +182,6 @@ class _FlightLogPageState extends State<FlightLogPage>
 
                       // ===== 其他航空公司（與上方單選左緣對齊、勾選色深綠）=====
                       Padding(
-                        // 保持與上方單選同一條左緣
                         padding: const EdgeInsets.only(left: 0),
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.center,
@@ -201,9 +193,18 @@ class _FlightLogPageState extends State<FlightLogPage>
                                 height: 24,
                                 width: 24,
                                 child: Checkbox(
-                                  value: data.useOtherAirline,
+                                  value: otherAirlineOptions.containsKey(
+                                    data.airline,
+                                  ),
                                   onChanged: (v) {
-                                    data.useOtherAirline = v ?? false;
+                                    if (v == true) {
+                                      // 選中時，設定為第一個其他航空公司
+                                      data.airline =
+                                          otherAirlineOptions.keys.first;
+                                    } else {
+                                      // 取消選中時，清空
+                                      data.airline = null;
+                                    }
                                     data.update();
                                   },
                                   activeColor: const Color(0xFF274C4A), // 深綠
@@ -223,21 +224,23 @@ class _FlightLogPageState extends State<FlightLogPage>
                             ),
                             const SizedBox(width: 8),
                             Text(t.otherAirline),
-                            if (data.useOtherAirline) ...[
+                            if (otherAirlineOptions.containsKey(
+                              data.airline,
+                            )) ...[
                               const SizedBox(width: 8),
                               DropdownButton<String>(
-                                value: data.selectedOtherAirline,
+                                value: data.airline,
                                 hint: Text(t.pleaseSelect),
-                                items: otherAirlines
+                                items: otherAirlineOptions.entries
                                     .map(
                                       (e) => DropdownMenuItem(
-                                        value: e,
-                                        child: Text(e),
+                                        value: e.key,
+                                        child: Text(e.value),
                                       ),
                                     )
                                     .toList(),
                                 onChanged: (v) {
-                                  data.selectedOtherAirline = v;
+                                  data.airline = v;
                                   data.update();
                                 },
                               ),
@@ -259,22 +262,14 @@ class _FlightLogPageState extends State<FlightLogPage>
                       _boldLabel(t.travelStatus),
                       const SizedBox(height: 6),
                       _radioWrap(
-                        options: travelOptions,
-                        groupIndex: data.travelStatusIndex,
-                        onChanged: (i) {
-                          data.travelStatusIndex = i;
-                          if (i != travelOptions.length - 1) {
-                            data.otherTravelCtrl.clear();
-                          }
+                        options: travelOptions.values.toList(),
+                        groupValue: data.travelStatus,
+                        dbValues: travelOptions.keys.toList(),
+                        onChanged: (v) {
+                          data.travelStatus = v;
                           data.update();
                         },
                       ),
-                      if (data.travelStatusIndex == travelOptions.length - 1)
-                        _inputRowBold(
-                          t.otherTravelStatus,
-                          t.enterTravelStatusHint,
-                          data.otherTravelCtrl,
-                        ),
                       const SizedBox(height: 16),
 
                       _boldLabel(t.departurePlace),
@@ -368,7 +363,6 @@ class _FlightLogPageState extends State<FlightLogPage>
               ),
             ),
           ),
-          // 原本是 Expanded，改為固定寬度讓輸入框縮短並與左側標籤齊頭
           SizedBox(
             width: 168, // ★ 可依需要微調
             child: TextField(
@@ -388,8 +382,6 @@ class _FlightLogPageState extends State<FlightLogPage>
             ),
           ),
           const SizedBox(width: 8),
-          // 如果要顯示 hint（但不佔 TextField 寬度），可加上這行：
-          // Expanded(child: Text(hint, style: TextStyle(color: Colors.black54, fontSize: 13))),
         ],
       ),
     );
@@ -397,16 +389,17 @@ class _FlightLogPageState extends State<FlightLogPage>
 
   Widget _radioWrap({
     required List<String> options,
-    required int? groupIndex,
-    required ValueChanged<int> onChanged,
+    required String? groupValue,
+    required List<String> dbValues,
+    required ValueChanged<String> onChanged,
   }) {
     return Wrap(
       spacing: 14,
       runSpacing: 10,
       children: List.generate(options.length, (i) {
-        final selected = groupIndex == i;
+        final selected = groupValue == dbValues[i];
         return InkWell(
-          onTap: () => onChanged(i),
+          onTap: () => onChanged(dbValues[i]),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [

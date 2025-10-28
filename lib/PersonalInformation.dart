@@ -21,11 +21,10 @@ class PersonalInformationPage extends StatefulWidget {
 
 class _PersonalInformationPageState extends State<PersonalInformationPage>
     with AutomaticKeepAliveClientMixin, SavableStateMixin {
-  late TextEditingController nameController; // 新增：姓名控制器
+  late TextEditingController nameController;
   late TextEditingController idController;
   late TextEditingController addrController;
   late TextEditingController phoneController;
-  late TextEditingController reasonController;
   bool _isLoading = true;
   final _formKey = GlobalKey<FormState>();
 
@@ -35,21 +34,19 @@ class _PersonalInformationPageState extends State<PersonalInformationPage>
   @override
   void initState() {
     super.initState();
-    nameController = TextEditingController(); // 新增
+    nameController = TextEditingController();
     idController = TextEditingController();
     addrController = TextEditingController();
     phoneController = TextEditingController();
-    reasonController = TextEditingController();
     _loadPatientProfile();
   }
 
   @override
   void dispose() {
-    nameController.dispose(); // 新增
+    nameController.dispose();
     idController.dispose();
     addrController.dispose();
     phoneController.dispose();
-    reasonController.dispose();
     super.dispose();
   }
 
@@ -68,7 +65,6 @@ class _PersonalInformationPageState extends State<PersonalInformationPage>
       final dao = context.read<PatientProfilesDao>();
       final profile = await dao.getByVisitId(widget.visitId);
 
-      // 同時載入 Visit 資料以取得姓名
       final visitDao = context.read<VisitsDao>();
       final visit = await visitDao.getById(widget.visitId);
 
@@ -90,13 +86,11 @@ class _PersonalInformationPageState extends State<PersonalInformationPage>
         idController.text = patientData.idNumber ?? '';
         addrController.text = patientData.address ?? '';
         phoneController.text = patientData.phone ?? '';
-        reasonController.text = patientData.reason ?? '';
       }
 
-      // 載入姓名
       if (visit != null && visit.patientName != null) {
         nameController.text = visit.patientName!;
-        patientData.patientName = visit.patientName; // 假設 PatientData 有這個欄位
+        patientData.patientName = visit.patientName;
         patientData.update();
       }
     } catch (e) {
@@ -141,7 +135,6 @@ class _PersonalInformationPageState extends State<PersonalInformationPage>
       final patientData = context.read<PatientData>();
       final ImagePicker picker = ImagePicker();
 
-      // 顯示選項對話框：從相簿選擇 或 拍照
       final source = await showDialog<ImageSource>(
         context: context,
         builder: (context) => AlertDialog(
@@ -164,12 +157,11 @@ class _PersonalInformationPageState extends State<PersonalInformationPage>
         ),
       );
 
-      if (source == null) return; // 使用者取消
+      if (source == null) return;
 
-      // 使用選擇的來源取得圖片
       final XFile? pickedFile = await picker.pickImage(
         source: source,
-        imageQuality: 85, // 壓縮圖片品質（可選）
+        imageQuality: 85,
       );
 
       if (pickedFile != null) {
@@ -197,14 +189,11 @@ class _PersonalInformationPageState extends State<PersonalInformationPage>
       final patientDao = context.read<PatientProfilesDao>();
       final visitsDao = context.read<VisitsDao>();
 
-      // 步驟 1：在儲存前，確保將 Controller 的最新內容同步到 patientData
       patientData.patientName = nameController.text.trim();
       patientData.idNumber = idController.text.trim();
       patientData.address = addrController.text.trim();
       patientData.phone = phoneController.text.trim();
-      patientData.reason = reasonController.text.trim();
 
-      // 步驟 2：✅ 正確做法：一行程式碼，呼叫您在 PatientData 中完美封裝好的方法
       await patientData.saveToDatabase(widget.visitId, patientDao, visitsDao);
     } catch (e) {
       rethrow;
@@ -218,7 +207,7 @@ class _PersonalInformationPageState extends State<PersonalInformationPage>
         patientData.idNumber = idController.text.trim();
         patientData.address = addrController.text.trim();
         patientData.phone = phoneController.text.trim();
-        patientData.patientName = nameController.text.trim(); // 新增
+        patientData.patientName = nameController.text.trim();
         patientData.update();
       }
     });
@@ -226,9 +215,11 @@ class _PersonalInformationPageState extends State<PersonalInformationPage>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     if (_isLoading) return const Center(child: CircularProgressIndicator());
     final t = AppTranslations.of(context);
 
+    // ✅ 改為文字對應（key 是資料庫值，value 是顯示文字）
     final purposeOptions = {
       '航空公司機組員': t.airlineCrew,
       '旅客/民眾': t.passenger,
@@ -273,16 +264,15 @@ class _PersonalInformationPageState extends State<PersonalInformationPage>
                     _SectionTitle(t.personalInformation),
                     const SizedBox(height: 16),
 
-                    // 新增：患者姓名輸入欄位
                     TextFormField(
                       controller: nameController,
                       decoration: InputDecoration(
-                        labelText: t.patientNamePlaceholder, // 使用翻譯的姓名標籤
+                        labelText: t.patientNamePlaceholder,
                         border: const OutlineInputBorder(),
                         labelStyle: TextStyle(
                           color: nameController.text.isEmpty
-                              ? const Color(0xFFDC3545) // 紅色
-                              : Colors.black54, // 正常顏色
+                              ? const Color(0xFFDC3545)
+                              : Colors.black54,
                           fontWeight: nameController.text.isEmpty
                               ? FontWeight.bold
                               : FontWeight.normal,
@@ -290,14 +280,14 @@ class _PersonalInformationPageState extends State<PersonalInformationPage>
                       ),
                       validator: (value) {
                         if (value == null || value.trim().isEmpty) {
-                          return t.patientNamePlaceholder; // 使用翻譯的錯誤訊息
+                          return t.patientNamePlaceholder;
                         }
                         return null;
                       },
                       onChanged: (val) {
                         patientData.patientName = val.trim();
                         _onTextFieldChanged();
-                        setState(() {}); // 觸發重繪以更新標籤顏色
+                        setState(() {});
                       },
                     ),
                     const SizedBox(height: 16),
@@ -368,7 +358,7 @@ class _PersonalInformationPageState extends State<PersonalInformationPage>
                         Expanded(
                           child: RadioListTile<String>(
                             title: Text(t.male),
-                            value: '男', // DB value
+                            value: '男',
                             groupValue: patientData.gender,
                             activeColor: const Color(0xFF83ACA9),
                             onChanged: (v) {
@@ -380,7 +370,7 @@ class _PersonalInformationPageState extends State<PersonalInformationPage>
                         Expanded(
                           child: RadioListTile<String>(
                             title: Text(t.female),
-                            value: '女', // DB value
+                            value: '女',
                             groupValue: patientData.gender,
                             activeColor: const Color(0xFF83ACA9),
                             onChanged: (v) {
@@ -415,7 +405,7 @@ class _PersonalInformationPageState extends State<PersonalInformationPage>
                       children: purposeOptions.entries.map((entry) {
                         return RadioListTile<String>(
                           title: Text(entry.value),
-                          value: entry.key,
+                          value: entry.key, // ✅ 直接存中文
                           groupValue: patientData.reason,
                           activeColor: const Color(0xFF83ACA9),
                           onChanged: (v) {

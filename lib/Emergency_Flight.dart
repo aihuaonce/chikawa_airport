@@ -80,7 +80,6 @@ class _EmergencyFlightPageState extends State<EmergencyFlightPage> {
 
                       _label(t.purposeOfVisit),
                       const SizedBox(height: 6),
-                      // 【修改】傳入 onChanged: null 來禁用整個 Wrap
                       _radioWrap(
                         options: purposeOptions,
                         groupIndex: data.purposeIndex,
@@ -139,6 +138,7 @@ class _EmergencyFlightPageState extends State<EmergencyFlightPage> {
     );
   }
 
+  // ============== 小積木（只動樣式）===============
   Widget _bigCard({required Widget child}) {
     return Container(
       margin: const EdgeInsets.fromLTRB(24, 0, 24, 16),

@@ -95,10 +95,6 @@ class _EmergencyPersonalPageState extends State<EmergencyPersonalPage> {
                       ),
                       const SizedBox(height: 12),
 
-                      // 注意：PatientProfiles 表中沒有 passportNumber
-                      // 如果需要顯示護照號碼，需要確認它的來源
-                      // 假設它也來自 PatientProfiles (您可能需要將其添加到表中)
-                      // 這裡暫時顯示為 "未提供"
                       _rowTop(
                         label: t.passportNumber,
                         child: _DisplayField(
@@ -165,8 +161,8 @@ class _EmergencyPersonalPageState extends State<EmergencyPersonalPage> {
       children: [
         ConstrainedBox(
           constraints: const BoxConstraints(
-            minWidth: _labelMinW, // <-- 現在這裡可以找到定義了
-            maxWidth: _labelMaxW, // <-- 現在這裡可以找到定義了
+            minWidth: _labelMinW,
+            maxWidth: _labelMaxW,
           ),
           child: Padding(
             padding: const EdgeInsets.only(top: 8),

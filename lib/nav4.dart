@@ -25,14 +25,35 @@ class Nav4Page extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => EmergencyNavigationProvider()),
-        ChangeNotifierProxyProvider<EmergencyRecordsDao, EmergencyData>(
+        ChangeNotifierProxyProvider5<
+          EmergencyRecordsDao,
+          PatientProfilesDao,
+          FlightLogsDao,
+          AccidentRecordsDao,
+          VisitsDao,
+          EmergencyData
+        >(
           create: (context) => EmergencyData(visitId),
-          update: (context, dao, previous) {
-            if (previous != null && !previous.isLoaded) {
-              previous.loadFromDatabase(dao);
-            }
-            return previous ?? EmergencyData(visitId);
-          },
+          update:
+              (
+                context,
+                emergencyDao,
+                profilesDao,
+                flightLogsDao,
+                accidentDao,
+                visitsDao,
+                previous,
+              ) {
+                if (previous != null && !previous.isLoaded) {
+                  // ✅ 傳入所有必需的 DAO
+                  previous.loadFromDatabase(
+                    emergencyDao,
+                    profilesDao,
+                    flightLogsDao,
+                  );
+                }
+                return previous ?? EmergencyData(visitId);
+              },
         ),
       ],
       child: const EmergencyMainLayout(),
@@ -106,10 +127,21 @@ class _EmergencyNavBarState extends State<EmergencyNavBar> {
 
     try {
       final emergencyData = context.read<EmergencyData>();
-      final dao = context.read<EmergencyRecordsDao>();
+
+      // ✅ 讀取所有必需的 DAO
+      final emergencyDao = context.read<EmergencyRecordsDao>();
+      final profilesDao = context.read<PatientProfilesDao>();
+      final flightLogsDao = context.read<FlightLogsDao>();
+      final accidentDao = context.read<AccidentRecordsDao>();
       final visitsDao = context.read<VisitsDao>();
 
-      await emergencyData.saveToDatabase(dao, visitsDao);
+      // ✅ 傳入所有必需的 DAO
+      await emergencyData.saveToDatabase(
+        emergencyDao: emergencyDao,
+        profilesDao: profilesDao,
+        flightLogsDao: flightLogsDao,
+        visitsDao: visitsDao,
+      );
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -122,8 +154,8 @@ class _EmergencyNavBarState extends State<EmergencyNavBar> {
         Navigator.of(context).pop();
       }
     } catch (e, stackTrace) {
-      print('❌ 儲存失敗: $e');
-      print('堆疊: $stackTrace');
+      debugPrint('❌ 儲存失敗: $e');
+      debugPrint('堆疊: $stackTrace');
 
       if (mounted) {
         final errorMessage = '${t.saveFailed}: $e';

@@ -26,7 +26,7 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
 
   // ===== 外觀參數（只動樣式）=====
   static const double _outerHpad = 48;
-  static const double _cardMaxWidth = 1000;
+  static const double _cardMaxWidth = 1000; // ★ 白卡 maxWidth 規格：800
   static const double _radius = 16;
 
   static const Color _deepGreen = Color(0xFF274C4A);
@@ -359,6 +359,7 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
 
     return Consumer<AccidentData>(
       builder: (context, accidentData, _) {
+        // 同步 AccidentData 回控制器，避免循環更新
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (mounted) {
             if (notifierCtrl.text != (accidentData.notifier ?? '')) {
@@ -847,7 +848,6 @@ class _AccidentRecordPageState extends State<AccidentRecordPage>
     );
   }
 
-  // ✅ 修改: 改為接收文字值而非索引
   Widget _radioWrap({
     required List<String> options,
     required String? selectedValue,

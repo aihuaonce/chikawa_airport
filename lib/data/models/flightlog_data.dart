@@ -5,16 +5,14 @@ import 'package:drift/drift.dart';
 import '../db/daos.dart';
 
 class FlightLogData extends ChangeNotifier {
-  int? airlineIndex;
-  bool useOtherAirline = false;
-  String? selectedOtherAirline;
+  // ✅ 改為直接存文字
+  String? airline; // 航空公司（直接存文字，如 "長榮航空"）
   String? flightNo;
-  String? otherTravelStatus;
+  String? travelStatus; // 旅遊狀態（直接存文字，如 "出境"）
 
   final TextEditingController flightNoCtrl = TextEditingController();
   final FocusNode flightNoFocus = FocusNode();
 
-  int? travelStatusIndex;
   final TextEditingController otherTravelCtrl = TextEditingController();
   final FocusNode otherTravelFocus = FocusNode();
 
@@ -27,15 +25,13 @@ class FlightLogData extends ChangeNotifier {
   }
 
   void clear() {
-    airlineIndex = null;
-    useOtherAirline = false;
-    selectedOtherAirline = null;
+    airline = null;
     flightNo = null;
+    travelStatus = null;
 
     flightNoCtrl.clear();
     otherTravelCtrl.clear();
 
-    travelStatusIndex = null;
     departure = null;
     via = null;
     destination = null;
@@ -52,16 +48,13 @@ class FlightLogData extends ChangeNotifier {
     super.dispose();
   }
 
-  // ✅ 新增：轉換為 Companion
+  // ✅ 轉換為 Companion
   FlightLogsCompanion toCompanion(int visitId) {
     return FlightLogsCompanion(
       visitId: Value(visitId),
-      airlineIndex: Value(airlineIndex),
-      useOtherAirline: Value(useOtherAirline),
-      otherAirline: Value(selectedOtherAirline),
+      airline: Value(airline), // 直接存文字
       flightNo: Value(flightNo),
-      travelStatusIndex: Value(travelStatusIndex),
-      otherTravelStatus: Value(otherTravelStatus),
+      travelStatus: Value(travelStatus), // 直接存文字
       departure: Value(departure),
       via: Value(via),
       destination: Value(destination),
