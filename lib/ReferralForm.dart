@@ -104,6 +104,7 @@ class _ReferralFormPageState extends State<ReferralFormPage>
    final MaterialStateProperty<Color?> radioColor = MaterialStateProperty.resolveWith<Color?>(
     (states) => states.contains(MaterialState.selected) ? const Color(0xFF83ACA9) : Colors.grey,
   );
+  final Color primaryColor = const Color(0xFF83ACA9);
   final TextEditingController mainDiagnosisCtrl = TextEditingController();
   final TextEditingController subDiagnosis1Ctrl = TextEditingController();
   final TextEditingController subDiagnosis2Ctrl = TextEditingController();
@@ -752,22 +753,24 @@ class _ReferralFormPageState extends State<ReferralFormPage>
         const SizedBox(height: 8),
         Text(t.isZh ? "1. 最近一次檢查結果日期" : "1. Last Exam Date"),
         TextButton(
-          onPressed: () => _pickDate(context, (d) {
+        onPressed: () => _pickDate(context, (d) {
             data.lastExamDate = d;
             data.update();
           }),
+          style: TextButton.styleFrom(foregroundColor: primaryColor),
           child: Text(_formatDate(t, data.lastExamDate ?? DateTime.now())),
-        ),
+         ),
         const SizedBox(height: 8),
         Text(t.isZh ? "2. 最近一次用藥或手術名稱日期" : "2. Last Medication/Surgery Date"),
         TextButton(
-          onPressed: () => _pickDate(context, (d) {
+        onPressed: () => _pickDate(context, (d) {
             data.lastMedicationDate = d;
             data.update();
           }),
+          style: TextButton.styleFrom(foregroundColor: primaryColor),
           child: Text(
             _formatDate(t, data.lastMedicationDate ?? DateTime.now()),
-          ),
+          ),  
         ),
       ],
     ),
@@ -869,12 +872,13 @@ class _ReferralFormPageState extends State<ReferralFormPage>
         ),
         TextButton(
           onPressed: () => _pickDate(context, (d) {
-            data.issueDate = d;
-            data.update();
-          }),
-          child: Text(
-            "${t.date}：${_formatDate(t, data.issueDate ?? DateTime.now())}",
-          ),
+              data.issueDate = d;
+              data.update();
+            }),
+            style: TextButton.styleFrom(foregroundColor: primaryColor),
+            child: Text(
+              "${t.date}：${_formatDate(t, data.issueDate ?? DateTime.now())}",
+            ),
         ),
         const SizedBox(height: 8),
         Text(
@@ -882,13 +886,14 @@ class _ReferralFormPageState extends State<ReferralFormPage>
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         TextButton(
-          onPressed: () => _pickDate(context, (d) {
-            data.appointmentDate = d;
+         onPressed: () => _pickDate(context, (d) {
+            data.issueDate = d;
             data.update();
           }),
+          style: TextButton.styleFrom(foregroundColor: primaryColor),
           child: Text(
-            "${t.date}：${_formatDate(t, data.appointmentDate ?? DateTime.now())}",
-          ),
+            "${t.date}：${_formatDate(t, data.issueDate ?? DateTime.now())}",
+          ), 
         ),
         const SizedBox(height: 8),
         _buildInputRow(
@@ -1033,12 +1038,26 @@ class _ReferralFormPageState extends State<ReferralFormPage>
     BuildContext context,
     ValueChanged<DateTime> onPicked,
   ) async {
-    final picked = await showDatePicker(
+  final picked = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
       firstDate: DateTime(2000),
       lastDate: DateTime(2100),
-    );
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: ColorScheme.light(
+              primary: primaryColor, // header / selected day
+              onPrimary: Colors.white,
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(foregroundColor: primaryColor),
+            ),
+          ),
+          child: child ?? const SizedBox.shrink(),
+        );
+      },
+    );  
     if (picked != null) {
       onPicked(picked);
     }
