@@ -131,16 +131,6 @@ class _PersonalInformationPageState extends State<PersonalInformationPage>
     }
   }
 
-  int _calculateAge(DateTime birthDate) {
-    final today = DateTime.now();
-    int years = today.year - birthDate.year;
-    if (today.month < birthDate.month ||
-        (today.month == birthDate.month && today.day < birthDate.day)) {
-      years--;
-    }
-    return years;
-  }
-
   Future<void> _pickPhoto() async {
     if (!mounted) return;
     final t = AppTranslations.of(context);
@@ -171,52 +161,86 @@ class _PersonalInformationPageState extends State<PersonalInformationPage>
           ),
         ),
       );
+      if (source == null) return;
 
-      if (source == null) return; // 使用者取消
-
-      // 使用選擇的來源取得圖片
+      // --- 取得圖片 ---
       final XFile? pickedFile = await picker.pickImage(
         source: source,
-        imageQuality: 85, // 壓縮圖片品質
+        imageQuality: 85,
       );
-      if (pickedFile == null) return; // 使用者取消選擇
+      if (pickedFile == null) return;
 
-      // 讀取圖片 bytes
       final bytes = await pickedFile.readAsBytes();
-
-      // 建立 UUID 檔名
       final uuid = Uuid();
       final filename = '${uuid.v4()}.jpg';
 
-      // 暫存到本地暫存目錄（可選）
+      // --- 暫存到本地 ---
       final tempDir = await getTemporaryDirectory();
       final tempFile = File('${tempDir.path}/$filename');
       await tempFile.writeAsBytes(bytes);
 
-      // 建立 Multipart 請求
+      // --- 建立 Multipart 上傳 ---
       var request = http.MultipartRequest(
         'POST',
-        Uri.parse(
-          'https://13e7a4bbf789.ngrok-free.app/todos/upload/',
-        ), // 模擬器連本機 Django
+        Uri.parse('https://fe10429aa800.ngrok-free.app/todos/upload/'),
       );
-
       request.files.add(
         await http.MultipartFile.fromPath(
-          'file', // Django 後端用 request.FILES['file']
+          'file',
           tempFile.path,
           filename: filename,
         ),
       );
-      request.fields['filename'] = filename;
 
-      // 傳送請求
+      // --- 發送請求 ---
       final response = await request.send();
       final responseBody = await response.stream.bytesToString();
 
       if (response.statusCode == 200) {
-        print('✅ 上傳成功: $filename');
-        print('伺服器回應: $responseBody');
+        final data = json.decode(responseBody);
+
+        // --- MRZ 自動填入 ---
+        if (data['mrz_result'] != null && data['mrz_result'] is List) {
+          final mrz = data['mrz_result'];
+
+          setState(() {
+            nameController.text = mrz[1]; // 姓名
+            idController.text = mrz[5]; // 證號
+            patientData.gender = (mrz[4].toUpperCase() == 'M') ? '男' : '女';
+
+            // 國籍對照字典（示例，可自行擴充）
+            const mrzToNationality = {
+              "台灣": "TWN",
+              "美國": "USA",
+              "越南": "VNM",
+              "泰國": "THA",
+              "印尼": "IDN",
+              "菲律賓": "PHL",
+              "香港": "HKG",
+              "澳門": "MAC",
+              "加拿大": "CAN",
+              "中國大陸": "CHN",
+              "日本": "JPN",
+            };
+            patientData.nationality =
+                mrzToNationality[mrz[2].toUpperCase()] ?? '其他';
+
+            // 生日 & 年齡
+            final birthDate = _parseDate(mrz[3]);
+            if (birthDate != null) {
+              patientData.birthday = birthDate;
+              patientData.age = _calculateAge(birthDate);
+            }
+
+            patientData.update();
+          });
+        }
+
+        // --- 更新照片顯示 ---
+        setState(() {
+          patientData.photoBase64 = base64Encode(bytes);
+          patientData.update();
+        });
       } else {
         print('❌ 上傳失敗: ${response.statusCode}');
         print('伺服器錯誤回應: $responseBody');
@@ -227,12 +251,38 @@ class _PersonalInformationPageState extends State<PersonalInformationPage>
     }
   }
 
+  /// MRZ 日期 (YYMMDD) 轉 DateTime
+  DateTime? _parseDate(String dateStr) {
+    try {
+      if (dateStr.length != 6) return null;
+      final year = int.parse(dateStr.substring(0, 2));
+      final month = int.parse(dateStr.substring(2, 4));
+      final day = int.parse(dateStr.substring(4, 6));
+      final fullYear = (year < 25 ? 2000 + year : 1900 + year);
+      return DateTime(fullYear, month, day);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// 計算年齡
+  int _calculateAge(DateTime birthDate) {
+    final now = DateTime.now();
+    int age = now.year - birthDate.year;
+    if (now.month < birthDate.month ||
+        (now.month == birthDate.month && now.day < birthDate.day)) {
+      age--;
+    }
+    return age;
+  }
+
   Future<void> _save() async {
     try {
       final patientData = context.read<PatientData>();
       final patientDao = context.read<PatientProfilesDao>();
       final visitsDao = context.read<VisitsDao>();
 
+      // 步驟 1：在儲存前，確保將 Controller 的最新內容同步到 patientData
       patientData.patientName = nameController.text.trim();
       patientData.idNumber = idController.text.trim();
       patientData.address = addrController.text.trim();
