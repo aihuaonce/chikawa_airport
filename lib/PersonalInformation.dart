@@ -182,7 +182,7 @@ class _PersonalInformationPageState extends State<PersonalInformationPage>
       // --- 建立 Multipart 上傳 ---
       var request = http.MultipartRequest(
         'POST',
-        Uri.parse('https://fe10429aa800.ngrok-free.app/todos/upload/'),
+        Uri.parse('https://6689f2d1b4b4.ngrok-free.app/todos/upload/'),
       );
       request.files.add(
         await http.MultipartFile.fromPath(
@@ -204,23 +204,24 @@ class _PersonalInformationPageState extends State<PersonalInformationPage>
           final mrz = data['mrz_result'];
 
           setState(() {
-            nameController.text = mrz[1]; // 姓名
-            idController.text = mrz[5]; // 證號
+            nameController.text = mrz[1].replaceAll('<', ''); // 姓名
+            idController.text = mrz[5].replaceAll('<', ''); // 證號
+            passportController.text = mrz[0].replaceAll('<', ''); // 護照
             patientData.gender = (mrz[4].toUpperCase() == 'M') ? '男' : '女';
 
             // 國籍對照字典（示例，可自行擴充）
             const mrzToNationality = {
-              "台灣": "TWN",
-              "美國": "USA",
-              "越南": "VNM",
-              "泰國": "THA",
-              "印尼": "IDN",
-              "菲律賓": "PHL",
-              "香港": "HKG",
-              "澳門": "MAC",
-              "加拿大": "CAN",
-              "中國大陸": "CHN",
-              "日本": "JPN",
+              "TWN": "台灣",
+              "USA": "美國",
+              "VNM": "越南",
+              "THA": "泰國",
+              "IDN": "印尼",
+              "PHL": "菲律賓",
+              "HKG": "香港",
+              "MAC": "澳門",
+              "CAN": "加拿大",
+              "CHN": "中國大陸",
+              "JPN": "日本",
             };
             patientData.nationality =
                 mrzToNationality[mrz[2].toUpperCase()] ?? '其他';
