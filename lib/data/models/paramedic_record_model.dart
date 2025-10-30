@@ -8,11 +8,9 @@ class ParamedicRecordModel {
 
   ParamedicRecordModel({required this.name, this.signature});
 
-  // 從 JSON 建立模型
   factory ParamedicRecordModel.fromJson(Map<String, dynamic> json) {
     return ParamedicRecordModel(
       name: json['name'] as String,
-      // 簽名在 JSON 中通常是 Base64 字串，需要解碼
       signature: json['signature'] != null
           ? Uint8List.fromList(List<int>.from(json['signature']))
           : null,

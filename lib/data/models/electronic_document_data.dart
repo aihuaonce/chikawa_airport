@@ -1,4 +1,4 @@
-// ==================== 7️⃣ electronic_document_data.dart ====================
+//electronic_document_data.dart
 import 'package:chikawa_airport/data/db/app_database.dart';
 import 'package:flutter/material.dart';
 import 'package:drift/drift.dart';
@@ -18,7 +18,6 @@ class ElectronicDocumentData extends ChangeNotifier {
     notifyListeners();
   }
 
-  // ✅ 新增：轉換為 Companion
   ElectronicDocumentsCompanion toCompanion(int visitId) {
     return ElectronicDocumentsCompanion(
       visitId: Value(visitId),
@@ -27,13 +26,12 @@ class ElectronicDocumentData extends ChangeNotifier {
     );
   }
 
-  // ✅ 簡化後的保存方法
   Future<void> saveToDatabase(int visitId, ElectronicDocumentsDao dao) async {
     try {
       await dao.upsert(toCompanion(visitId));
-      print('✅ 電子文件已儲存');
+      print('電子文件已儲存');
     } catch (e) {
-      print('❌ 儲存失敗: $e');
+      print('儲存失敗: $e');
       rethrow;
     }
   }

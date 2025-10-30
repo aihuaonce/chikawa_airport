@@ -32,7 +32,8 @@ class _EmergencyPlanPageState extends State<EmergencyPlanPage> {
   final mController = TextEditingController();
   final heartRateController = TextEditingController();
   final respirationRateController = TextEditingController();
-  final bloodPressureController = TextEditingController();
+  final bpSystolicController = TextEditingController();
+  final bpDiastolicController = TextEditingController();
   final leftPupilSizeController = TextEditingController();
   final rightPupilSizeController = TextEditingController();
   final airwayContentController = TextEditingController();
@@ -54,7 +55,7 @@ class _EmergencyPlanPageState extends State<EmergencyPlanPage> {
   final postResuscitationRightPupilSizeController = TextEditingController();
   final otherSupplementsController = TextEditingController();
 
-  // 【註】人員名單通常不進行翻譯，因此保留為靜態數據
+  // 【註】人員名單通常不進行翻譯,因此保留為靜態數據
   final List<String> VisitingStaff = [
     '方詩旋',
     '夏瑿正',
@@ -120,7 +121,14 @@ class _EmergencyPlanPageState extends State<EmergencyPlanPage> {
     mController.text = data.evmM ?? '';
     heartRateController.text = data.heartRate ?? '';
     respirationRateController.text = data.respirationRate ?? '';
-    bloodPressureController.text = data.bloodPressure ?? '';
+    // 【修改】拆分血壓
+    if (data.bloodPressure != null && data.bloodPressure!.contains('/')) {
+      final parts = data.bloodPressure!.split('/');
+      if (parts.length == 2) {
+        bpSystolicController.text = parts[0];
+        bpDiastolicController.text = parts[1];
+      }
+    }
     leftPupilSizeController.text = data.leftPupilSize ?? '';
     rightPupilSizeController.text = data.rightPupilSize ?? '';
     airwayContentController.text = data.airwayContent ?? '';
@@ -156,7 +164,8 @@ class _EmergencyPlanPageState extends State<EmergencyPlanPage> {
     mController.dispose();
     heartRateController.dispose();
     respirationRateController.dispose();
-    bloodPressureController.dispose();
+    bpSystolicController.dispose();
+    bpDiastolicController.dispose();
     leftPupilSizeController.dispose();
     rightPupilSizeController.dispose();
     airwayContentController.dispose();
@@ -183,6 +192,13 @@ class _EmergencyPlanPageState extends State<EmergencyPlanPage> {
 
   void _saveToProvider() {
     final data = context.read<EmergencyData>();
+    // 【修改】組合血壓
+    final systolic = bpSystolicController.text.trim();
+    final diastolic = bpDiastolicController.text.trim();
+    final bloodPressure = (systolic.isNotEmpty && diastolic.isNotEmpty)
+        ? '$systolic/$diastolic'
+        : null;
+
     data.updatePlan(
       diagnosis: diagnosisController.text,
       situation: situationController.text,
@@ -191,7 +207,7 @@ class _EmergencyPlanPageState extends State<EmergencyPlanPage> {
       evmM: mController.text,
       heartRate: heartRateController.text,
       respirationRate: respirationRateController.text,
-      bloodPressure: bloodPressureController.text,
+      bloodPressure: bloodPressure,
       leftPupilSize: leftPupilSizeController.text,
       rightPupilSize: rightPupilSizeController.text,
       airwayContent: airwayContentController.text,
@@ -320,7 +336,7 @@ class _EmergencyPlanPageState extends State<EmergencyPlanPage> {
                     return CheckboxListTile(
                       title: Text(name),
                       value: tempSelected.contains(name),
-                      activeColor: primarySelectedColor, // As requested
+                      activeColor: primarySelectedColor,
                       onChanged: (bool? checked) {
                         setState(() {
                           if (checked == true)
@@ -340,8 +356,8 @@ class _EmergencyPlanPageState extends State<EmergencyPlanPage> {
                 ),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: buttonBackgroundColor, // As requested
-                    foregroundColor: white, // As requested
+                    backgroundColor: buttonBackgroundColor,
+                    foregroundColor: white,
                   ),
                   child: Text(t.confirm),
                   onPressed: () => Navigator.of(context).pop(tempSelected),
@@ -372,19 +388,14 @@ class _EmergencyPlanPageState extends State<EmergencyPlanPage> {
               vertical: 32.0,
             ),
             child: ConstrainedBox(
-              // As requested: maxWidth: 1000
               constraints: const BoxConstraints(maxWidth: 1000),
               child: Container(
-                // As requested: Main white card
                 padding: const EdgeInsets.all(32),
                 decoration: BoxDecoration(
                   color: cardBackground,
-                  borderRadius: BorderRadius.circular(
-                    16,
-                  ), // As requested: borderRadius: 16
+                  borderRadius: BorderRadius.circular(16),
                   boxShadow: const [
                     BoxShadow(
-                      // As requested: soft shadow
                       color: Color.fromRGBO(0, 0, 0, 0.08),
                       blurRadius: 12,
                       offset: Offset(0, 4),
@@ -455,10 +466,86 @@ class _EmergencyPlanPageState extends State<EmergencyPlanPage> {
                             t.enterValue,
                           ),
                           const SizedBox(height: 16),
-                          _buildTextField(
+                          // 【修改】血壓改為兩個獨立輸入框
+                          Text(
                             t.bloodPressure,
-                            bloodPressureController,
-                            t.enterSystolicDiastolic,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: labelColor,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: TextField(
+                                  controller: bpSystolicController,
+                                  onChanged: (_) => _saveToProvider(),
+                                  decoration: InputDecoration(
+                                    hintText: t.enterValue,
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                      borderSide: const BorderSide(
+                                        color: borderColor,
+                                      ),
+                                    ),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                      borderSide: const BorderSide(
+                                        color: borderColor,
+                                      ),
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                      borderSide: const BorderSide(
+                                        color: primarySelectedColor,
+                                        width: 2,
+                                      ),
+                                    ),
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 16,
+                                      vertical: 12,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 8),
+                                child: Text('/'),
+                              ),
+                              Expanded(
+                                child: TextField(
+                                  controller: bpDiastolicController,
+                                  onChanged: (_) => _saveToProvider(),
+                                  decoration: InputDecoration(
+                                    hintText: t.enterValue,
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                      borderSide: const BorderSide(
+                                        color: borderColor,
+                                      ),
+                                    ),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                      borderSide: const BorderSide(
+                                        color: borderColor,
+                                      ),
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                      borderSide: const BorderSide(
+                                        color: primarySelectedColor,
+                                        width: 2,
+                                      ),
+                                    ),
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 16,
+                                      vertical: 12,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                           const SizedBox(height: 16),
                           Text(
@@ -877,14 +964,12 @@ class _EmergencyPlanPageState extends State<EmergencyPlanPage> {
           ],
         ),
         const SizedBox(height: 16),
-
         _buildTextField(
           t.heartRate,
           postResuscitationHeartRateController,
           t.enterValue,
         ),
         const SizedBox(height: 16),
-
         Text(
           t.respiration,
           style: const TextStyle(fontSize: 14, color: labelColor),
@@ -912,14 +997,12 @@ class _EmergencyPlanPageState extends State<EmergencyPlanPage> {
           ],
         ),
         const SizedBox(height: 16),
-
         _buildTextField(
           t.bloodPressure,
           postResuscitationBloodPressureController,
           t.enterSystolicDiastolic,
         ),
         const SizedBox(height: 16),
-
         Row(
           children: [
             _buildLabeledSmallTextField(
@@ -934,7 +1017,6 @@ class _EmergencyPlanPageState extends State<EmergencyPlanPage> {
           ],
         ),
         const SizedBox(height: 8),
-
         _buildPupilLightReflexRow(
           label: t.leftPupilReaction,
           groupValue: data.postResuscitationLeftPupilLightReflex,
@@ -948,7 +1030,6 @@ class _EmergencyPlanPageState extends State<EmergencyPlanPage> {
               data.updatePlan(postResuscitationRightPupilLightReflex: v),
         ),
         const SizedBox(height: 16),
-
         _buildTextField(
           t.otherSupplements,
           otherSupplementsController,
@@ -1024,8 +1105,8 @@ class _EmergencyPlanPageState extends State<EmergencyPlanPage> {
             ElevatedButton(
               onPressed: onUpdateTime,
               style: ElevatedButton.styleFrom(
-                backgroundColor: buttonBackgroundColor, // As requested
-                foregroundColor: white, // As requested
+                backgroundColor: buttonBackgroundColor,
+                foregroundColor: white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -1109,7 +1190,7 @@ class _EmergencyPlanPageState extends State<EmergencyPlanPage> {
               value: title,
               groupValue: groupValue,
               onChanged: onChanged,
-              activeColor: primarySelectedColor, // As requested
+              activeColor: primarySelectedColor,
               materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
             ),
             Text(title),

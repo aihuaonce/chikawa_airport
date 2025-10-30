@@ -17,7 +17,9 @@ class PatientData extends ChangeNotifier {
   String? photoBase64;
   String? note;
 
-  void update() => notifyListeners();
+  void update() {
+    notifyListeners();
+  }
 
   void clear() {
     patientName = null;
@@ -35,7 +37,6 @@ class PatientData extends ChangeNotifier {
     notifyListeners();
   }
 
-  // ✅ patient_records Companion
   PatientProfilesCompanion toCompanion(int visitId) {
     return PatientProfilesCompanion(
       visitId: Value(visitId),
@@ -52,7 +53,6 @@ class PatientData extends ChangeNotifier {
     );
   }
 
-  // ✅ 更新 visits 摘要表
   VisitsCompanion toVisitsCompanion() {
     return VisitsCompanion(
       patientName: Value(patientName),
@@ -62,7 +62,6 @@ class PatientData extends ChangeNotifier {
     );
   }
 
-  // ✅ 資料庫保存
   Future<void> saveToDatabase(
     int visitId,
     PatientProfilesDao patientDao,
@@ -71,9 +70,9 @@ class PatientData extends ChangeNotifier {
     try {
       await patientDao.upsert(toCompanion(visitId));
       await visitsDao.updateVisit(visitId, toVisitsCompanion());
-      print('✅ 病患資料與 Visits 摘要已更新');
+      print('病患資料與 Visits 摘要已更新');
     } catch (e) {
-      print('❌ 儲存病患資料失敗: $e');
+      print('儲存病患資料失敗: $e');
       rethrow;
     }
   }

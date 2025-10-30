@@ -94,7 +94,6 @@ class ReferralData extends ChangeNotifier {
     notifyListeners();
   }
 
-  // ✅ Companion 轉換
   ReferralFormsCompanion toCompanion(int visitId) {
     return ReferralFormsCompanion(
       visitId: Value(visitId),
@@ -132,7 +131,6 @@ class ReferralData extends ChangeNotifier {
     );
   }
 
-  // ✅ 同步更新 Visits 摘要
   VisitsCompanion toVisitsCompanion() {
     return VisitsCompanion(
       dept: Value(otherDeptName),
@@ -142,7 +140,6 @@ class ReferralData extends ChangeNotifier {
     );
   }
 
-  // ✅ 資料庫保存
   Future<void> saveToDatabase(
     int visitId,
     ReferralFormsDao referralDao,
@@ -151,9 +148,9 @@ class ReferralData extends ChangeNotifier {
     try {
       await referralDao.upsert(toCompanion(visitId));
       await visitsDao.updateVisit(visitId, toVisitsCompanion());
-      print('✅ 轉診資料與 Visits 摘要已更新');
+      print('轉診資料與 Visits 摘要已更新');
     } catch (e) {
-      print('❌ 儲存轉診資料失敗: $e');
+      print('儲存轉診資料失敗: $e');
       rethrow;
     }
   }

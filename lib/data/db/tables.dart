@@ -1,19 +1,18 @@
 //tables.dart
 import 'package:drift/drift.dart';
 
-/// 1) 個案主檔（HomePage 列表就讀這張）
+/// 1) 個案主檔（HomePage 列表讀這張）
 class Visits extends Table {
   IntColumn get visitId => integer().autoIncrement()();
 
-  // HomePage 顯示用的摘要欄位（分頁各自回寫）
-  TextColumn get patientName => text().nullable()(); // 之後在姓名頁回寫
-  TextColumn get gender => text().nullable()(); // 個人資料頁回寫
-  TextColumn get nationality => text().nullable()(); // 個人資料頁回寫
-  TextColumn get dept => text().nullable()(); // 之後在科別頁回寫
-  TextColumn get note => text().nullable()(); // 之後某頁回寫
-  TextColumn get filledBy => text().nullable()(); // 之後某頁回寫
+  TextColumn get patientName => text().nullable()(); 
+  TextColumn get gender => text().nullable()(); 
+  TextColumn get nationality => text().nullable()();
+  TextColumn get dept => text().nullable()();
+  TextColumn get note => text().nullable()(); 
+  TextColumn get filledBy => text().nullable()(); 
 
-  // ✅ 新增：急救記錄專用欄位
+  // 急救記錄專用欄位
   BoolColumn get hasEmergencyRecord =>
       boolean().withDefault(const Constant(false))(); // 標記是否為急救記錄
   DateTimeColumn get incidentDateTime => dateTime().nullable()(); // 事發時間
@@ -31,8 +30,8 @@ class Visits extends Table {
     {nationality},
     {dept},
     {uploadedAt},
-    {hasEmergencyRecord}, // ✅ 新增索引
-    {incidentDateTime}, // ✅ 新增索引
+    {hasEmergencyRecord},
+    {incidentDateTime},
   ];
 }
 
@@ -45,10 +44,10 @@ class PatientProfiles extends Table {
 
   // 個人資料欄位
   DateTimeColumn get birthday => dateTime().nullable()();
-  IntColumn get age => integer().nullable()(); // ✅ 建議加 age 欄位
-  TextColumn get gender => text().nullable()(); // 與主檔同步
+  IntColumn get age => integer().nullable()(); 
+  TextColumn get gender => text().nullable()();
   TextColumn get reason => text().nullable()();
-  TextColumn get nationality => text().nullable()(); // 與主檔同步
+  TextColumn get nationality => text().nullable()();
   TextColumn get idNumber => text().nullable()();
   TextColumn get passportNumber => text().nullable()();
   TextColumn get address => text().nullable()();
@@ -113,10 +112,9 @@ class FlightLogs extends Table {
   IntColumn get id => integer().autoIncrement()();
   IntColumn get visitId => integer().unique()(); // 關聯到 Visits
 
-  // 【修改】從索引改為直接儲存文字
   TextColumn get airline => text().nullable()();
   TextColumn get flightNo => text().nullable()();
-  TextColumn get travelStatus => text().nullable()(); // 旅遊狀態 (即原本的 source)
+  TextColumn get travelStatus => text().nullable()(); // 旅遊狀態
 
   TextColumn get departure => text().nullable()();
   TextColumn get via => text().nullable()();
@@ -133,13 +131,13 @@ class Treatments extends Table {
   BoolColumn get screeningChecked =>
       boolean().withDefault(const Constant(false))();
   TextColumn get screeningMethodsJson =>
-      text().nullable()(); // JSON-encoded Map<String, bool>
+      text().nullable()(); 
   TextColumn get otherScreeningMethod => text().nullable()();
   TextColumn get healthDataJson =>
-      text().nullable()(); // JSON-encoded List<Map<String, String>>
+      text().nullable()(); 
 
   // 主訴
-  IntColumn get mainSymptom => integer().nullable()();
+  TextColumn get mainSymptom => text().nullable()(); // trauma, non_trauma
   TextColumn get traumaSymptomsJson => text().nullable()();
   TextColumn get nonTraumaSymptomsJson => text().nullable()();
   TextColumn get symptomNote => text().nullable()();
@@ -177,16 +175,16 @@ class Treatments extends Table {
   TextColumn get rightPupilSize => text().nullable()();
 
   // 病史
-  IntColumn get history => integer().nullable()();
-  IntColumn get allergy => integer().nullable()();
+  TextColumn get history => text().nullable()(); // none, unknown, yes
+  TextColumn get allergy => text().nullable()(); // none, unknown, yes
 
   // 初步診斷
   TextColumn get initialDiagnosis => text().nullable()();
-  IntColumn get diagnosisCategory => integer().nullable()();
+  TextColumn get diagnosisCategory => text().nullable()(); // 儲存類別文字
   TextColumn get selectedICD10Main => text().nullable()();
   TextColumn get selectedICD10Sub1 => text().nullable()();
   TextColumn get selectedICD10Sub2 => text().nullable()();
-  IntColumn get triageCategory => integer().nullable()();
+  TextColumn get triageCategory => text().nullable()(); // level_1, level_2...
 
   // 處理摘要 & 後續
   TextColumn get onSiteTreatmentsJson => text().nullable()();
@@ -207,19 +205,20 @@ class Treatments extends Table {
       boolean().withDefault(const Constant(false))();
   BoolColumn get otherChecked => boolean().withDefault(const Constant(false))();
   TextColumn get otherSummary => text().nullable()();
-  IntColumn get referralPassageType => integer().nullable()();
-  IntColumn get referralAmbulanceType => integer().nullable()();
-  IntColumn get referralHospitalIdx => integer().nullable()();
+  TextColumn get referralPassageType =>
+      text().nullable()(); // general, emergency
+  TextColumn get referralAmbulanceType =>
+      text().nullable()(); // medical_center, private, fire_dept
+  TextColumn get referralHospital => text().nullable()(); // 直接存醫院名稱
   TextColumn get referralOtherHospital => text().nullable()();
   TextColumn get referralEscortText => text().nullable()();
   TextColumn get selectedEscortsJson => text().nullable()();
-  IntColumn get intubationType => integer().nullable()();
-  IntColumn get oxygenType => integer().nullable()();
+  TextColumn get intubationType => text().nullable()(); // endotracheal, lma
+  TextColumn get oxygenType => text().nullable()(); // nc, mask, nrm, ambu
   TextColumn get oxygenFlow => text().nullable()();
   TextColumn get medicalCertificateTypesJson => text().nullable()();
   TextColumn get prescriptionRowsJson => text().nullable()();
   TextColumn get followUpResultsJson => text().nullable()();
-  IntColumn get otherHospitalIdx => integer().nullable()();
 
   // 人員
   TextColumn get selectedMainDoctor => text().nullable()();
@@ -241,7 +240,7 @@ class Treatments extends Table {
 
 class MedicalCosts extends Table {
   IntColumn get id => integer().autoIncrement()();
-  IntColumn get visitId => integer().unique()(); // 確保一個 Visit 只有一筆費用紀錄
+  IntColumn get visitId => integer().unique()(); 
 
   // 費用收取方式
   TextColumn get chargeMethod => text().nullable()();
@@ -258,26 +257,26 @@ class MedicalCosts extends Table {
   TextColumn get agreementSignaturePath => text().nullable()();
   TextColumn get witnessSignaturePath => text().nullable()();
 
-  // 【新增】自付相關欄位
+  // 自付相關欄位
   TextColumn get paymentMethod => text().nullable()(); // '現金' or '刷卡'
 
-  // 【新增】統一請款、總院會核代收、收費異常共用欄位
+  // 統一請款、總院會核代收、收費異常欄位
   TextColumn get paymentStatus => text().nullable()(); // '尚未收款', '已收款', '不需要'
   TextColumn get selectedCurrency =>
       text().nullable()(); // '台幣', '美金', '人民幣', '日幣', '加幣'
   TextColumn get foreignCurrencyAmount => text().nullable()(); // 外幣金額
   TextColumn get convertedTwdAmount => text().nullable()(); // 兌換後的台幣金額
 
-  // 【新增】統一請款專用欄位
+  // 統一請款專用欄位
   TextColumn get applicantName => text().nullable()(); // 申請人
   TextColumn get applicantUnit => text().nullable()(); // 申請單位
   TextColumn get contactPhone => text().nullable()(); // 聯絡電話
 
-  // 【新增】總院會核代收專用欄位
+  // 總院會核代收專用欄位
   BoolColumn get receiptIssuedAndTransferred =>
       boolean().nullable()(); // 已開立收據並轉交
 
-  // 【新增】收費異常專用欄位
+  // 收費異常專用欄位
   TextColumn get billingErrorReason => text().nullable()(); // 收費異常原因
 
   // 紀錄時間
@@ -410,29 +409,17 @@ class ReferralForms extends Table {
   DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
 }
 
-// 在您的 table 定義檔案中
-// 修改 AmbulanceRecords 表
-
 class AmbulanceRecords extends Table {
   IntColumn get id => integer().autoIncrement()();
   IntColumn get visitId => integer().unique()();
 
   // --- 對應 Ambulance_Information.dart ---
   TextColumn get plateNumber => text().nullable()();
-  IntColumn get placeGroupIdx => integer().nullable()();
-  IntColumn get t1PlaceIdx => integer().nullable()(); // <-- 名稱是 t1PlaceIdx
-  IntColumn get t2PlaceIdx => integer().nullable()(); // <-- 名稱是 t2PlaceIdx
-  IntColumn get remotePlaceIdx => integer().nullable()();
-  IntColumn get cargoPlaceIdx => integer().nullable()();
-  IntColumn get novotelPlaceIdx => integer().nullable()();
-  IntColumn get cabinPlaceIdx => integer().nullable()();
-  TextColumn get placeNote => text().nullable()();
-
   DateTimeColumn get dutyTime => dateTime().nullable()();
   DateTimeColumn get arriveSceneTime =>
-      dateTime().nullable()(); // <-- 名稱是 arriveSceneTime
+      dateTime().nullable()();
   DateTimeColumn get leaveSceneTime =>
-      dateTime().nullable()(); // <-- 名稱是 leaveSceneTime
+      dateTime().nullable()(); 
   DateTimeColumn get arriveHospitalTime => dateTime().nullable()();
   DateTimeColumn get leaveHospitalTime => dateTime().nullable()();
   DateTimeColumn get backStandbyTime => dateTime().nullable()();
@@ -452,9 +439,6 @@ class AmbulanceRecords extends Table {
 
   // --- 對應 Ambulance_Plan.dart ---
 
-  // 【修正 JSON 欄位定義】
-  // 將所有 .nullable() 移除，並使用 .withDefault(const Constant('{}'))
-  // 來確保欄位永遠不會是 null，這樣在解碼 JSON 時更安全
   TextColumn get emergencyTreatmentsJson =>
       text().withDefault(const Constant('{}'))();
   TextColumn get airwayTreatmentsJson =>
@@ -510,7 +494,6 @@ class AmbulanceRecords extends Table {
   TextColumn get unpaidType => text().nullable()();
 
   // --- 對應 Ambulance_Situation.dart ---
-  // 將 Set<String> 轉為 JSON 儲存，並提供預設值 '[]' (空的 JSON 陣列)
   TextColumn get traumaClassJson => text().withDefault(const Constant('[]'))();
   TextColumn get nonTraumaTypeJson =>
       text().withDefault(const Constant('[]'))();
@@ -584,18 +567,6 @@ class EmergencyRecords extends Table {
   IntColumn get id => integer().autoIncrement()();
   IntColumn get visitId => integer().unique()();
 
-  // 【修改】Flight 和部分 Accident 資訊已移至各自的 Table，這裡移除對應欄位
-  // Accident (事故記錄)
-  DateTimeColumn get incidentDateTime => dateTime().nullable()();
-  IntColumn get placeGroupIdx => integer().nullable()();
-  IntColumn get t1Selected => integer().nullable()();
-  IntColumn get t2Selected => integer().nullable()();
-  IntColumn get remoteSelected => integer().nullable()();
-  IntColumn get cargoSelected => integer().nullable()();
-  IntColumn get novotelSelected => integer().nullable()();
-  IntColumn get cabinSelected => integer().nullable()();
-  TextColumn get placeNote => text().nullable()();
-
   // Plan (處置記錄)
   DateTimeColumn get firstAidStartTime => dateTime().nullable()();
   DateTimeColumn get intubationStartTime => dateTime().nullable()();
@@ -608,17 +579,7 @@ class EmergencyRecords extends Table {
   TextColumn get situation => text().nullable()();
 
   // 病況
-  TextColumn get evmE => text().nullable()();
-  TextColumn get evmV => text().nullable()();
-  TextColumn get evmM => text().nullable()();
-  TextColumn get heartRate => text().nullable()();
-  TextColumn get respirationRate => text().nullable()();
-  TextColumn get bloodPressure => text().nullable()();
   TextColumn get temperature => text().nullable()();
-  TextColumn get leftPupilSize => text().nullable()();
-  TextColumn get rightPupilSize => text().nullable()();
-  TextColumn get leftPupilReaction => text().nullable()();
-  TextColumn get rightPupilReaction => text().nullable()();
 
   // 急救處置
   TextColumn get insertionMethod => text().nullable()();

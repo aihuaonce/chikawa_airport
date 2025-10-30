@@ -376,9 +376,9 @@ class _NursingRecordPageState extends State<NursingRecordPage>
       } else if (phrase == t.phraseReferral) {
         return '醫師診視後，診斷為${val(treatment?.initialDiagnosis, '[初步診斷]')}，建議轉診至醫院進一步檢查及治療，醫師跟病人及家屬解釋後，表示同意，通知航空公司協助退關/入境後送事宜。';
       } else if (phrase == t.phraseReferralHandover) {
-        return '協助醫師打電話至${val(treatment?.referralHospitalIdx?.toString(), '[交班單位]')}電話交班。';
+        return '協助醫師打電話至${val(treatment?.referralHospital?.toString(), '[交班單位]')}電話交班。';
       } else if (phrase == t.phraseTransferNotification) {
-        return '通知救護車EMT，病人需後送至${val(treatment?.referralHospitalIdx?.toString(), '[轉送醫院]')}，請其待命等候病人入關。';
+        return '通知救護車EMT，病人需後送至${val(treatment?.referralHospital?.toString(), '[轉送醫院]')}，請其待命等候病人入關。';
       } else if (phrase == t.phraseGeneralCustoms) {
         return '現由航勤人員協助推輪椅，陪同病人通關。';
       } else if (phrase == t.phraseUrgentCustoms) {
@@ -386,9 +386,9 @@ class _NursingRecordPageState extends State<NursingRecordPage>
       } else if (phrase == t.phraseTransfer1) {
         return '抵達醫療中心/北空橋，協助更換至擔架上。';
       } else if (phrase == t.phraseTransfer2) {
-        return '出發前往${val(treatment?.referralHospitalIdx?.toString(), '[轉送醫院]')}';
+        return '出發前往${val(treatment?.referralHospital?.toString(), '[轉送醫院]')}';
       } else if (phrase == t.phraseTransfer3) {
-        return '抵達${val(treatment?.referralHospitalIdx?.toString(), '[轉送醫院]')}急診，與急診檢傷護理師交班。';
+        return '抵達${val(treatment?.referralHospital?.toString(), '[轉送醫院]')}急診，與急診檢傷護理師交班。';
       } else if (phrase == t.phraseBilling) {
         // 安全地加總費用
         final visitFee = double.tryParse(medicalCost?.visitFee ?? '0') ?? 0;

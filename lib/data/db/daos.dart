@@ -11,7 +11,6 @@ part 'daos.g.dart';
 class EmergencyRecordView {
   final EmergencyRecord emergencyRecord;
   final Visit visit;
-  // AccidentRecord 可能不存在，所以設為 nullable
   final AccidentRecord? accidentRecord;
 
   EmergencyRecordView({
@@ -21,7 +20,6 @@ class EmergencyRecordView {
   });
 }
 
-// 說明：移除了未被使用的 `BaseUpsertMixin`，因為我們將在每個 DAO 中使用更明確的 onConflict 策略。
 
 @DriftAccessor(tables: [Visits])
 class VisitsDao extends DatabaseAccessor<AppDatabase> with _$VisitsDaoMixin {
@@ -52,7 +50,6 @@ class VisitsDao extends DatabaseAccessor<AppDatabase> with _$VisitsDaoMixin {
     return q.watch();
   }
 
-  // ✅ 簡化：使用 Companion 更新
   Future<int> updateVisit(int visitId, VisitsCompanion companion) {
     return (update(visits)..where((t) => t.visitId.equals(visitId))).write(
       companion.copyWith(updatedAt: Value(DateTime.now())),
@@ -80,7 +77,6 @@ class PatientProfilesDao extends DatabaseAccessor<AppDatabase>
     patientProfiles,
   )..where((t) => t.visitId.equals(visitId))).getSingleOrNull();
 
-  // ✅ 您的這個 `upsert` 寫法已經是最佳實踐，無需修改。它高效地利用了 onConflict 機制。
   Future<int> upsert(PatientProfilesCompanion companion) {
     final companionWithTimestamp = companion.copyWith(
       updatedAt: Value(DateTime.now()),
@@ -88,7 +84,6 @@ class PatientProfilesDao extends DatabaseAccessor<AppDatabase>
 
     return into(patientProfiles).insert(
       companionWithTimestamp,
-      // 當 visit_id 衝突時，執行更新
       onConflict: DoUpdate(
         (old) => companionWithTimestamp, // 使用新的資料來更新
         target: [patientProfiles.visitId], // 告訴 Drift 監聽 visitId 欄位的衝突
@@ -96,18 +91,15 @@ class PatientProfilesDao extends DatabaseAccessor<AppDatabase>
     );
   }
 
-  // 保留專門的 BodyMap 更新方法（因為邏輯特殊）
   Future<void> upsertBodyMap(int visitId, String? bodyMapJson) async {
     final companion = PatientProfilesCompanion(
       visitId: Value(visitId),
       bodyMapJson: Value(bodyMapJson),
     );
-    // 這裡的呼叫也會自動使用上面修改過的新 upsert 邏輯，無需改動
     await upsert(companion);
   }
 }
 
-// 範本：以下所有 DAO 的 upsert 方法都將遵循此優化模式
 abstract class _BaseDaoWithVisitId<Tbl extends Table, D>
     extends DatabaseAccessor<AppDatabase> {
   _BaseDaoWithVisitId(AppDatabase db) : super(db);
@@ -129,8 +121,6 @@ class AccidentRecordsDao extends DatabaseAccessor<AppDatabase>
     accidentRecords,
   )..where((t) => t.visitId.equals(visitId))).getSingleOrNull();
 
-  // 🔥 優化：使用 `insertOnConflictUpdate` 將查詢和寫入合併為一個原子操作。
-  // 前提：`accidentRecords.visitId` 欄位在資料庫中有 UNIQUE 約束。
   Future<int> upsert(AccidentRecordsCompanion companion) {
     final updated = companion.copyWith(updatedAt: Value(DateTime.now()));
     return into(accidentRecords).insert(
@@ -149,7 +139,6 @@ class FlightLogsDao extends DatabaseAccessor<AppDatabase>
     flightLogs,
   )..where((t) => t.visitId.equals(visitId))).getSingleOrNull();
 
-  // 🔥 優化：使用 `insertOnConflictUpdate`
   Future<int> upsert(FlightLogsCompanion companion) {
     final updated = companion.copyWith(updatedAt: Value(DateTime.now()));
     return into(flightLogs).insert(
@@ -168,7 +157,6 @@ class TreatmentsDao extends DatabaseAccessor<AppDatabase>
     treatments,
   )..where((t) => t.visitId.equals(visitId))).getSingleOrNull();
 
-  // 🔥 優化：使用 `insertOnConflictUpdate`
   Future<int> upsert(TreatmentsCompanion companion) {
     final updated = companion.copyWith(updatedAt: Value(DateTime.now()));
     return into(treatments).insert(
@@ -187,7 +175,6 @@ class MedicalCostsDao extends DatabaseAccessor<AppDatabase>
     medicalCosts,
   )..where((t) => t.visitId.equals(visitId))).getSingleOrNull();
 
-  // 🔥 優化：使用 `insertOnConflictUpdate`
   Future<int> upsert(MedicalCostsCompanion companion) {
     final updated = companion.copyWith(updatedAt: Value(DateTime.now()));
     return into(medicalCosts).insert(
@@ -206,7 +193,6 @@ class MedicalCertificatesDao extends DatabaseAccessor<AppDatabase>
     medicalCertificates,
   )..where((t) => t.visitId.equals(visitId))).getSingleOrNull();
 
-  // 🔥 優化：使用 `insertOnConflictUpdate`
   Future<int> upsert(MedicalCertificatesCompanion companion) {
     final updated = companion.copyWith(updatedAt: Value(DateTime.now()));
     return into(medicalCertificates).insert(
@@ -228,7 +214,6 @@ class UndertakingsDao extends DatabaseAccessor<AppDatabase>
     undertakings,
   )..where((t) => t.visitId.equals(visitId))).getSingleOrNull();
 
-  // 🔥 優化：使用 `insertOnConflictUpdate`
   Future<int> upsert(UndertakingsCompanion companion) {
     final updated = companion.copyWith(updatedAt: Value(DateTime.now()));
     return into(undertakings).insert(
@@ -247,7 +232,6 @@ class ElectronicDocumentsDao extends DatabaseAccessor<AppDatabase>
     electronicDocuments,
   )..where((t) => t.visitId.equals(visitId))).getSingleOrNull();
 
-  // 🔥 優化：使用 `insertOnConflictUpdate`
   Future<int> upsert(ElectronicDocumentsCompanion companion) {
     final updated = companion.copyWith(updatedAt: Value(DateTime.now()));
     return into(electronicDocuments).insert(
@@ -269,7 +253,6 @@ class NursingRecordsDao extends DatabaseAccessor<AppDatabase>
     nursingRecords,
   )..where((t) => t.visitId.equals(visitId))).getSingleOrNull();
 
-  // 🔥 優化：使用 `insertOnConflictUpdate`
   Future<int> upsert(NursingRecordsCompanion companion) {
     final updated = companion.copyWith(updatedAt: Value(DateTime.now()));
     return into(nursingRecords).insert(
@@ -299,7 +282,6 @@ class ReferralFormsDao extends DatabaseAccessor<AppDatabase>
     return existing != null;
   }
 
-  // 🔥 優化：使用 `insertOnConflictUpdate`
   Future<int> upsert(ReferralFormsCompanion companion) {
     final updated = companion.copyWith(updatedAt: Value(DateTime.now()));
     return into(referralForms).insert(
@@ -361,8 +343,7 @@ class AmbulanceRecordsDao extends DatabaseAccessor<AppDatabase>
     return existing != null;
   }
 
-  // 🔥 優化：使用 `insertOnConflictUpdate` 簡化邏輯。
-  // 此方法會自動處理新增（如果 visitId 不存在）或更新（如果 visitId 已存在）的情況。
+  // 自動處理新增（如果 visitId 不存在）或更新（如果 visitId 已存在）的情況。
   Future<int> upsert(AmbulanceRecordsCompanion companion) {
     return into(ambulanceRecords).insert(
       companion,
@@ -374,8 +355,6 @@ class AmbulanceRecordsDao extends DatabaseAccessor<AppDatabase>
   }
 }
 
-// 以下處理一對多關係的 DAO (如 MedicationRecords, VitalSignsRecords) 不需要 upsert 邏輯，
-// 其原有的 add/delete/watch 設計是正確的，因此保持不變。
 
 @DriftAccessor(tables: [MedicationRecords])
 class MedicationRecordsDao extends DatabaseAccessor<AppDatabase>
@@ -448,7 +427,6 @@ class EmergencyRecordsDao extends DatabaseAccessor<AppDatabase>
     return existing != null;
   }
 
-  // 🔥 優化：使用 `insertOnConflictUpdate`
   Future<int> upsert(EmergencyRecordsCompanion companion) {
     final updated = companion.copyWith(updatedAt: Value(DateTime.now()));
     return into(emergencyRecords).insert(
@@ -461,23 +439,20 @@ class EmergencyRecordsDao extends DatabaseAccessor<AppDatabase>
   }
 
   Stream<List<EmergencyRecordView>> watchAllDetails({String keyword = ''}) {
-    // 1. 建立查詢，從 emergencyRecords 開始
+    // 建立查詢，從 emergencyRecords 開始
     final query = select(emergencyRecords)
-        // 2. 透過 visitId 關聯 (JOIN) visits 和 accidentRecords
+        // 過 visitId 關聯 (JOIN) visits 和 accidentRecords
         .join([
-          // innerJoin: EmergencyRecord 一定會有對應的 Visit
           innerJoin(visits, visits.visitId.equalsExp(emergencyRecords.visitId)),
-          // leftOuterJoin: EmergencyRecord 不一定有對應的 AccidentRecord，用 left join 比較安全
           leftOuterJoin(
             accidentRecords,
             accidentRecords.visitId.equalsExp(emergencyRecords.visitId),
           ),
         ]);
 
-    // 3. 處理關鍵字搜尋
+    // 處理關鍵字搜尋
     if (keyword.isNotEmpty) {
       final like = '%$keyword%';
-      // 現在可以同時搜尋 Visits 和 EmergencyRecords 的欄位
       query.where(
         visits.patientName.like(like) |
             visits.nationality.like(like) |
@@ -486,10 +461,9 @@ class EmergencyRecordsDao extends DatabaseAccessor<AppDatabase>
       );
     }
 
-    // 4. 設定排序，我們依照事故記錄中的事發時間倒序排列
     query.orderBy([OrderingTerm.desc(accidentRecords.incidentDate)]);
 
-    // 5. 監聽查詢結果，並將每一行 (row) 轉換成我們的 EmergencyRecordView 物件
+
     return query.watch().map((rows) {
       return rows.map((row) {
         return EmergencyRecordView(

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'data/models/ambulance_data.dart';
-import 'l10n/app_translations.dart'; // 【新增】引入翻譯
+import 'data/db/daos.dart';
+import 'l10n/app_translations.dart';
 
 class AmbulanceInformationPage extends StatefulWidget {
   final int visitId;
@@ -15,15 +16,21 @@ class AmbulanceInformationPage extends StatefulWidget {
 class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
   // ===== 版面外觀 (靜態常量) =====
   static const double _cardRadius = 16;
-  static const double _labelWidth = 120; // ★ 縮短標題欄寬，減少標題與輸入框的空隙
-  static const double _cardMaxWidth = 1000; // ★ 卡片最大寬度統一為1000
+  static const double _labelWidth = 120;
+  static const double _cardMaxWidth = 1000;
+  static const Color _deepGreen = Color(0xFF274C4A);
 
   // ===== 文字輸入控制器 =====
   final _plateCtrl = TextEditingController();
-  final _placeNoteCtrl = TextEditingController();
   final _otherDestCtrl = TextEditingController();
 
-  // ===== 選項列表 (靜態常量，無需翻譯) =====
+  // 🔥 新增：從 AccidentRecords 讀取的唯讀資料
+  String? _accidentPlaceGroup;
+  String? _accidentPlaceDetail;
+  String? _accidentPlaceNote;
+  bool _isLoadingAccident = true;
+
+  // ===== 選項列表 (靜態常量,無需翻譯) =====
   static const List<String> remotePlaces = [
     '601',
     '602',
@@ -45,35 +52,55 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
   @override
   void initState() {
     super.initState();
-    // 延遲一幀執行,確保 Provider 已經準備好
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) _loadInitialData();
+      if (mounted) {
+        _loadInitialData();
+        _loadAccidentData(); // 🔥 載入事故地點資料
+      }
     });
   }
 
   void _loadInitialData() {
     final data = context.read<AmbulanceData>();
     _plateCtrl.text = data.plateNumber ?? '';
-    _placeNoteCtrl.text = data.placeNote ?? '';
     _otherDestCtrl.text = data.otherDestinationHospital ?? '';
+  }
+
+  // 🔥 新增：從 AccidentRecords 讀取事故地點
+  Future<void> _loadAccidentData() async {
+    try {
+      final accidentDao = context.read<AccidentRecordsDao>();
+      final record = await accidentDao.getByVisitId(widget.visitId);
+
+      if (record != null && mounted) {
+        setState(() {
+          _accidentPlaceGroup = record.placeGroup;
+          _accidentPlaceDetail = record.placeDetail;
+          _accidentPlaceNote = record.placeNote;
+          _isLoadingAccident = false;
+        });
+      } else {
+        setState(() => _isLoadingAccident = false);
+      }
+    } catch (e) {
+      print('❌ 讀取事故地點失敗: $e');
+      setState(() => _isLoadingAccident = false);
+    }
   }
 
   @override
   void dispose() {
     _plateCtrl.dispose();
-    _placeNoteCtrl.dispose();
     _otherDestCtrl.dispose();
     super.dispose();
   }
 
   void _saveToProvider(List<String> hospitals) {
-    // 【修改】傳入醫院列表
     final data = context.read<AmbulanceData>();
 
     String? destinationHospitalName;
     if (data.destinationHospitalIdx != null) {
       if (data.destinationHospitalIdx == hospitals.length - 1) {
-        // 如果是「其他」
         destinationHospitalName = _otherDestCtrl.text;
       } else {
         destinationHospitalName = hospitals[data.destinationHospitalIdx!];
@@ -82,7 +109,6 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
 
     data.updateInformation(
       plateNumber: _plateCtrl.text,
-      placeNote: _placeNoteCtrl.text,
       otherDestinationHospital: _otherDestCtrl.text,
       destinationHospital: destinationHospitalName,
     );
@@ -115,122 +141,126 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
   Widget build(BuildContext context) {
     final t = AppTranslations.of(context);
 
-    // 【修改】將靜態列表改為在 build 方法中動態建立
-    final List<String> placeGroups = [
-      t.terminal1,
-      t.terminal2,
-      t.remoteApron,
-      t.cargoOther,
-      t.novotelHotel,
-      t.insideAircraft,
-    ];
-    final List<String> t1Places = [
-      t.departureCounter,
-      t.arrivalCounter,
-      t.vipLounge,
-      t.departureHallPublic,
-      t.departureLevelRestricted,
-      t.arrivalHallPublic,
-      t.arrivalLevelRestricted,
-      t.foodCourt,
-      t.aviationPolice,
-      t.airportMRT,
-      t.carPark1,
-      t.carPark2,
-      t.departureBusDropOff,
-      t.arrivalBusPickUp,
-      t.departureSecurityCheck,
-      t.baggageClaim,
-      t.customs,
-      t.gateLabel('A1'),
-      t.gateLabel('A2'),
-      t.gateLabel('A3'),
-      t.gateLabel('A4'),
-      t.gateLabel('A5'),
-      t.gateLabel('A6'),
-      t.gateLabel('A7'),
-      t.gateLabel('A8'),
-      t.gateLabel('A9'),
-      t.transferCounterA,
-      t.transferCounterB,
-      t.transferSecurityA,
-      t.transferSecurityB,
-      t.skytrainAirside,
-      t.skytrainLandside,
-      t.otherLocation,
-      t.gateLabel('B1'),
-      t.gateLabel('B2'),
-      t.gateLabel('B3'),
-      t.gateLabel('B4'),
-      t.gateLabel('B5'),
-      t.gateLabel('B6'),
-      t.gateLabel('B7'),
-      t.gateLabel('B8'),
-      t.gateLabel('B9'),
-      t.gateLabel('B1R'),
-    ];
-    final List<String> t2Places = [
-      t.departureCounter,
-      t.arrivalCounter,
-      t.vipLounge,
-      t.departureHallPublic,
-      t.departureLevelRestricted,
-      t.arrivalHallPublic,
-      t.arrivalLevelRestricted,
-      t.foodCourt,
-      t.aviationPolice,
-      t.airportMRT,
-      t.carPark3,
-      t.carPark4,
-      t.northObservationDeck,
-      t.southObservationDeck,
-      t.northWing5F,
-      t.southWing5F,
-      t.gateLabel('D1'),
-      t.gateLabel('D2'),
-      t.gateLabel('D3'),
-      t.gateLabel('D4'),
-      t.gateLabel('D5'),
-      t.gateLabel('D6'),
-      t.gateLabel('D7'),
-      t.gateLabel('D8'),
-      t.gateLabel('D9'),
-      t.gateLabel('D10'),
-      t.gateLabel('C1'),
-      t.gateLabel('C2'),
-      t.gateLabel('C3'),
-      t.gateLabel('C4'),
-      t.gateLabel('C5'),
-      t.gateLabel('C6'),
-      t.gateLabel('C7'),
-      t.gateLabel('C8'),
-      t.gateLabel('C9'),
-      t.transferCounterC,
-      t.transferSecurityC,
-      t.skytrainAirside,
-      t.skytrainLandside,
-      t.otherLocation,
-      t.gateLabel('C5R'),
-    ];
-    final List<String> cargoPlaces = [
-      t.taxiway,
-      '506',
-      '507',
-      '508',
-      '509',
-      '510',
-      '511',
-      '512',
-      '513',
-      '514',
-      '515',
-      t.tacHangar,
-      t.maintenanceApron,
-      t.evergreenAerospace,
-      t.otherApronLocation,
-    ];
-    final List<String> novotelPlaces = [t.novotelHotel];
-    final List<String> cabinPlaces = [t.insideAircraft];
+    // 🔥 地點選項 Map（用於顯示）
+    final Map<String, String> placeGroupOptions = {
+      '第一航廈': t.terminal1,
+      '第二航廈': t.terminal2,
+      '遠端機坪': t.remoteApron,
+      '貨運站/機坪其他': t.cargoOther,
+      '諾富特飯店': t.novotelHotel,
+      '飛機機艙內': t.insideAircraft,
+    };
+
+    final Map<String, List<String>> placeDetailOptions = {
+      '第一航廈': [
+        t.departureCounter,
+        t.arrivalCounter,
+        t.vipLounge,
+        t.departureHallPublic,
+        t.departureLevelRestricted,
+        t.arrivalHallPublic,
+        t.arrivalLevelRestricted,
+        t.foodCourt,
+        t.aviationPolice,
+        t.airportMRT,
+        t.carPark1,
+        t.carPark2,
+        t.departureBusDropOff,
+        t.arrivalBusPickUp,
+        t.departureSecurityCheck,
+        t.baggageClaim,
+        t.customs,
+        t.gateLabel('A1'),
+        t.gateLabel('A2'),
+        t.gateLabel('A3'),
+        t.gateLabel('A4'),
+        t.gateLabel('A5'),
+        t.gateLabel('A6'),
+        t.gateLabel('A7'),
+        t.gateLabel('A8'),
+        t.gateLabel('A9'),
+        t.transferCounterA,
+        t.transferCounterB,
+        t.transferSecurityA,
+        t.transferSecurityB,
+        t.skytrainAirside,
+        t.skytrainLandside,
+        t.otherLocation,
+        t.gateLabel('B1'),
+        t.gateLabel('B2'),
+        t.gateLabel('B3'),
+        t.gateLabel('B4'),
+        t.gateLabel('B5'),
+        t.gateLabel('B6'),
+        t.gateLabel('B7'),
+        t.gateLabel('B8'),
+        t.gateLabel('B9'),
+        t.gateLabel('B1R'),
+      ],
+      '第二航廈': [
+        t.departureCounter,
+        t.arrivalCounter,
+        t.vipLounge,
+        t.departureHallPublic,
+        t.departureLevelRestricted,
+        t.arrivalHallPublic,
+        t.arrivalLevelRestricted,
+        t.foodCourt,
+        t.aviationPolice,
+        t.airportMRT,
+        t.carPark3,
+        t.carPark4,
+        t.northObservationDeck,
+        t.southObservationDeck,
+        t.northWing5F,
+        t.southWing5F,
+        t.gateLabel('D1'),
+        t.gateLabel('D2'),
+        t.gateLabel('D3'),
+        t.gateLabel('D4'),
+        t.gateLabel('D5'),
+        t.gateLabel('D6'),
+        t.gateLabel('D7'),
+        t.gateLabel('D8'),
+        t.gateLabel('D9'),
+        t.gateLabel('D10'),
+        t.gateLabel('C1'),
+        t.gateLabel('C2'),
+        t.gateLabel('C3'),
+        t.gateLabel('C4'),
+        t.gateLabel('C5'),
+        t.gateLabel('C6'),
+        t.gateLabel('C7'),
+        t.gateLabel('C8'),
+        t.gateLabel('C9'),
+        t.transferCounterC,
+        t.transferSecurityC,
+        t.skytrainAirside,
+        t.skytrainLandside,
+        t.otherLocation,
+        t.gateLabel('C5R'),
+      ],
+      '遠端機坪': remotePlaces,
+      '貨運站/機坪其他': [
+        t.taxiway,
+        '506',
+        '507',
+        '508',
+        '509',
+        '510',
+        '511',
+        '512',
+        '513',
+        '514',
+        '515',
+        t.tacHangar,
+        t.maintenanceApron,
+        t.evergreenAerospace,
+        t.otherApronLocation,
+      ],
+      '諾富特飯店': [t.novotelHotel],
+      '飛機機艙內': [t.insideAircraft],
+    };
 
     final List<String> hospitals = [
       t.landseedHospital,
@@ -245,14 +275,11 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
       t.other,
     ];
 
-    int? hospitalIdx;
-
-    // ===== 運送原因（★ Added）=====
     final List<String> transportReasons = [
       t.patientConditionRequired,
       t.patientOrFamilyRequest,
-    ]; // ★ Added
-    int? transportReasonIdx; // ★ Added
+    ];
+    int? transportReasonIdx;
 
     return Consumer<AmbulanceData>(
       builder: (context, data, child) {
@@ -261,9 +288,7 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
           child: Align(
             alignment: Alignment.topCenter,
             child: ConstrainedBox(
-              constraints: const BoxConstraints(
-                maxWidth: _cardMaxWidth,
-              ), // ★ 800
+              constraints: const BoxConstraints(maxWidth: _cardMaxWidth),
               child: _card(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -272,9 +297,7 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
                       label: t.plateNumber,
                       labelWidth: 84,
                       child: ConstrainedBox(
-                        constraints: const BoxConstraints(
-                          maxWidth: 250,
-                        ), // ★ 輸入框略短
+                        constraints: const BoxConstraints(maxWidth: 250),
                         child: TextField(
                           controller: _plateCtrl,
                           onChanged: (_) => _saveToProvider(hospitals),
@@ -292,65 +315,52 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
                     ),
                     const SizedBox(height: 12),
 
-                    _bold(t.incidentLocation),
+                    // 🔥 事故地點區塊（唯讀）
+                    _bold('${t.incidentLocation}'),
                     const SizedBox(height: 6),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(0, 0, 0, 4),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _radioWrap(
-                            options: placeGroups,
-                            groupIndex: data.placeGroupIdx,
-                            onChanged: (i) {
-                              data.updateInformation(
-                                placeGroupIdx: i,
-                                t1PlaceIdx: null,
-                                t2PlaceIdx: null,
-                                remotePlaceIdx: null,
-                                cargoPlaceIdx: null,
-                                novotelPlaceIdx: null,
-                                cabinPlaceIdx: null,
-                              );
-                            },
-                          ),
-                          const SizedBox(height: 8),
-                          _placeSubOptions(
-                            data,
-                            t1Places,
-                            t2Places,
-                            cargoPlaces,
-                            novotelPlaces,
-                            cabinPlaces,
-                          ),
-                        ],
+                    if (_isLoadingAccident)
+                      const Padding(
+                        padding: EdgeInsets.all(16),
+                        child: Center(child: CircularProgressIndicator()),
+                      )
+                    else ...[
+                      // 顯示 placeGroup（唯讀）
+                      _stringRadioWrap(
+                        options: placeGroupOptions.values.toList(),
+                        groupValue: _accidentPlaceGroup,
+                        dbValues: placeGroupOptions.keys.toList(),
+                        onChanged: null, // 🔥 禁用
                       ),
-                    ),
-                    const SizedBox(height: 12),
+                      const SizedBox(height: 8),
 
-                    _rowTop(
-                      label: t.locationNotes,
-                      labelWidth: 84,
-                      child: ConstrainedBox(
-                        constraints: const BoxConstraints(
-                          maxWidth: 300,
-                        ), // ★ 略縮短
-                        child: TextField(
-                          controller: _placeNoteCtrl,
-                          onChanged: (_) => _saveToProvider(hospitals),
-                          decoration: InputDecoration(
-                            hintText:
-                                t.enterLocationNotes, // 若沒有此 key 也不會影響既有內容
-                            border: const OutlineInputBorder(),
-                            isDense: true,
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 10,
+                      // 顯示 placeDetail（唯讀）
+                      if (_accidentPlaceGroup != null &&
+                          placeDetailOptions.containsKey(
+                            _accidentPlaceGroup,
+                          )) ...[
+                        _stringRadioWrap(
+                          options: placeDetailOptions[_accidentPlaceGroup]!,
+                          groupValue: _accidentPlaceDetail,
+                          dbValues: placeDetailOptions[_accidentPlaceGroup]!,
+                          onChanged: null, // 🔥 禁用
+                        ),
+                        const SizedBox(height: 8),
+                      ],
+
+                      // 顯示 placeNote（唯讀）
+                      if (_accidentPlaceNote != null &&
+                          _accidentPlaceNote!.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8),
+                          child: Text(
+                            '${t.locationNotes}: $_accidentPlaceNote',
+                            style: const TextStyle(
+                              fontSize: 15,
+                              color: Colors.black87,
                             ),
                           ),
                         ),
-                      ),
-                    ),
+                    ],
                     const SizedBox(height: 16),
 
                     _dateTimeRow(
@@ -513,7 +523,7 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SizedBox(
-          width: labelWidth ?? _labelWidth, // ★ 縮短後，右側空白變小
+          width: labelWidth ?? _labelWidth,
           child: Padding(
             padding: const EdgeInsets.only(top: 8),
             child: Text(
@@ -567,7 +577,7 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
             child: ElevatedButton(
               onPressed: () => onChanged(DateTime.now()),
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF83ACA9), // ★ 規格色
+                backgroundColor: const Color(0xFF83ACA9),
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(horizontal: 12),
                 elevation: 1,
@@ -596,9 +606,7 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
           Icon(
             isSelected ? Icons.radio_button_checked : Icons.radio_button_off,
             size: 20,
-            color: isSelected
-                ? const Color(0xFF274C4A)
-                : Colors.black45, // ★ 深綠
+            color: isSelected ? _deepGreen : Colors.black45,
           ),
           const SizedBox(width: 8),
           Text(label, style: const TextStyle(fontSize: 15.5)),
@@ -614,7 +622,7 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
   }) {
     return Wrap(
       spacing: 14,
-      runSpacing: 6, // ★ 行距拉開一點
+      runSpacing: 6,
       children: List.generate(options.length, (i) {
         return _radioOption(
           label: options[i],
@@ -625,61 +633,45 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
     );
   }
 
-  Widget _placeSubOptions(
-    AmbulanceData data,
-    List<String> t1Places,
-    List<String> t2Places,
-    List<String> cargoPlaces,
-    List<String> novotelPlaces,
-    List<String> cabinPlaces,
-  ) {
-    // 【修改】接收翻譯好的列表
-    final List<String> opts;
-    final int? groupIndex;
-    final ValueChanged<int> onChanged;
+  // 🔥 唯讀版本的 _stringRadioWrap
+  Widget _stringRadioWrap({
+    required List<String> options,
+    required String? groupValue,
+    required List<String> dbValues,
+    required ValueChanged<String>? onChanged, // 🔥 可為 null
+  }) {
+    final isEnabled = onChanged != null;
+    return Wrap(
+      spacing: 14,
+      runSpacing: 10,
+      children: List.generate(options.length, (i) {
+        if (i >= dbValues.length) return const SizedBox.shrink();
 
-    switch (data.placeGroupIdx) {
-      case 0:
-        opts = t1Places;
-        groupIndex = data.t1PlaceIdx;
-        onChanged = (i) => data.updateInformation(t1PlaceIdx: i);
-        break;
-      case 1:
-        opts = t2Places;
-        groupIndex = data.t2PlaceIdx;
-        onChanged = (i) => data.updateInformation(t2PlaceIdx: i);
-        break;
-      case 2:
-        opts = remotePlaces;
-        groupIndex = data.remotePlaceIdx;
-        onChanged = (i) => data.updateInformation(remotePlaceIdx: i);
-        break;
-      case 3:
-        opts = cargoPlaces;
-        groupIndex = data.cargoPlaceIdx;
-        onChanged = (i) => data.updateInformation(cargoPlaceIdx: i);
-        break;
-      case 4:
-        opts = novotelPlaces;
-        groupIndex = data.novotelPlaceIdx;
-        onChanged = (i) => data.updateInformation(novotelPlaceIdx: i);
-        break;
-      case 5:
-        opts = cabinPlaces;
-        groupIndex = data.cabinPlaceIdx;
-        onChanged = (i) => data.updateInformation(cabinPlaceIdx: i);
-        break;
-      default:
-        return const SizedBox.shrink();
-    }
-
-    return Padding(
-      padding: const EdgeInsets.only(top: 6),
-      child: _radioWrap(
-        options: opts,
-        groupIndex: groupIndex,
-        onChanged: onChanged,
-      ),
+        final selected = groupValue == dbValues[i];
+        return InkWell(
+          onTap: isEnabled ? () => onChanged(dbValues[i]) : null,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                selected ? Icons.radio_button_checked : Icons.radio_button_off,
+                size: 20,
+                color: selected
+                    ? _deepGreen
+                    : (isEnabled ? Colors.black45 : Colors.grey.shade400),
+              ),
+              const SizedBox(width: 6),
+              Text(
+                options[i],
+                style: TextStyle(
+                  color: isEnabled ? Colors.black87 : Colors.black54,
+                  fontSize: 15.5,
+                ),
+              ),
+            ],
+          ),
+        );
+      }),
     );
   }
 }

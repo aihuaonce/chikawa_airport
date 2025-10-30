@@ -3691,11 +3691,11 @@ class $TreatmentsTable extends Treatments
     'mainSymptom',
   );
   @override
-  late final GeneratedColumn<int> mainSymptom = GeneratedColumn<int>(
+  late final GeneratedColumn<String> mainSymptom = GeneratedColumn<String>(
     'main_symptom',
     aliasedName,
     true,
-    type: DriftSqlType.int,
+    type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
   static const VerificationMeta _traumaSymptomsJsonMeta =
@@ -4004,22 +4004,22 @@ class $TreatmentsTable extends Treatments
     'history',
   );
   @override
-  late final GeneratedColumn<int> history = GeneratedColumn<int>(
+  late final GeneratedColumn<String> history = GeneratedColumn<String>(
     'history',
     aliasedName,
     true,
-    type: DriftSqlType.int,
+    type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
   static const VerificationMeta _allergyMeta = const VerificationMeta(
     'allergy',
   );
   @override
-  late final GeneratedColumn<int> allergy = GeneratedColumn<int>(
+  late final GeneratedColumn<String> allergy = GeneratedColumn<String>(
     'allergy',
     aliasedName,
     true,
-    type: DriftSqlType.int,
+    type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
   static const VerificationMeta _initialDiagnosisMeta = const VerificationMeta(
@@ -4037,13 +4037,14 @@ class $TreatmentsTable extends Treatments
     'diagnosisCategory',
   );
   @override
-  late final GeneratedColumn<int> diagnosisCategory = GeneratedColumn<int>(
-    'diagnosis_category',
-    aliasedName,
-    true,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
-  );
+  late final GeneratedColumn<String> diagnosisCategory =
+      GeneratedColumn<String>(
+        'diagnosis_category',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
   static const VerificationMeta _selectedICD10MainMeta = const VerificationMeta(
     'selectedICD10Main',
   );
@@ -4084,11 +4085,11 @@ class $TreatmentsTable extends Treatments
     'triageCategory',
   );
   @override
-  late final GeneratedColumn<int> triageCategory = GeneratedColumn<int>(
+  late final GeneratedColumn<String> triageCategory = GeneratedColumn<String>(
     'triage_category',
     aliasedName,
     true,
-    type: DriftSqlType.int,
+    type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
   static const VerificationMeta _onSiteTreatmentsJsonMeta =
@@ -4271,31 +4272,34 @@ class $TreatmentsTable extends Treatments
   static const VerificationMeta _referralPassageTypeMeta =
       const VerificationMeta('referralPassageType');
   @override
-  late final GeneratedColumn<int> referralPassageType = GeneratedColumn<int>(
-    'referral_passage_type',
-    aliasedName,
-    true,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
-  );
+  late final GeneratedColumn<String> referralPassageType =
+      GeneratedColumn<String>(
+        'referral_passage_type',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
   static const VerificationMeta _referralAmbulanceTypeMeta =
       const VerificationMeta('referralAmbulanceType');
   @override
-  late final GeneratedColumn<int> referralAmbulanceType = GeneratedColumn<int>(
-    'referral_ambulance_type',
-    aliasedName,
-    true,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
+  late final GeneratedColumn<String> referralAmbulanceType =
+      GeneratedColumn<String>(
+        'referral_ambulance_type',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _referralHospitalMeta = const VerificationMeta(
+    'referralHospital',
   );
-  static const VerificationMeta _referralHospitalIdxMeta =
-      const VerificationMeta('referralHospitalIdx');
   @override
-  late final GeneratedColumn<int> referralHospitalIdx = GeneratedColumn<int>(
-    'referral_hospital_idx',
+  late final GeneratedColumn<String> referralHospital = GeneratedColumn<String>(
+    'referral_hospital',
     aliasedName,
     true,
-    type: DriftSqlType.int,
+    type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
   static const VerificationMeta _referralOtherHospitalMeta =
@@ -4335,22 +4339,22 @@ class $TreatmentsTable extends Treatments
     'intubationType',
   );
   @override
-  late final GeneratedColumn<int> intubationType = GeneratedColumn<int>(
+  late final GeneratedColumn<String> intubationType = GeneratedColumn<String>(
     'intubation_type',
     aliasedName,
     true,
-    type: DriftSqlType.int,
+    type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
   static const VerificationMeta _oxygenTypeMeta = const VerificationMeta(
     'oxygenType',
   );
   @override
-  late final GeneratedColumn<int> oxygenType = GeneratedColumn<int>(
+  late final GeneratedColumn<String> oxygenType = GeneratedColumn<String>(
     'oxygen_type',
     aliasedName,
     true,
-    type: DriftSqlType.int,
+    type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
   static const VerificationMeta _oxygenFlowMeta = const VerificationMeta(
@@ -4397,17 +4401,6 @@ class $TreatmentsTable extends Treatments
         type: DriftSqlType.string,
         requiredDuringInsert: false,
       );
-  static const VerificationMeta _otherHospitalIdxMeta = const VerificationMeta(
-    'otherHospitalIdx',
-  );
-  @override
-  late final GeneratedColumn<int> otherHospitalIdx = GeneratedColumn<int>(
-    'other_hospital_idx',
-    aliasedName,
-    true,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
-  );
   static const VerificationMeta _selectedMainDoctorMeta =
       const VerificationMeta('selectedMainDoctor');
   @override
@@ -4592,7 +4585,7 @@ class $TreatmentsTable extends Treatments
     otherSummary,
     referralPassageType,
     referralAmbulanceType,
-    referralHospitalIdx,
+    referralHospital,
     referralOtherHospital,
     referralEscortText,
     selectedEscortsJson,
@@ -4602,7 +4595,6 @@ class $TreatmentsTable extends Treatments
     medicalCertificateTypesJson,
     prescriptionRowsJson,
     followUpResultsJson,
-    otherHospitalIdx,
     selectedMainDoctor,
     selectedMainNurse,
     nurseSignature,
@@ -5109,12 +5101,12 @@ class $TreatmentsTable extends Treatments
         ),
       );
     }
-    if (data.containsKey('referral_hospital_idx')) {
+    if (data.containsKey('referral_hospital')) {
       context.handle(
-        _referralHospitalIdxMeta,
-        referralHospitalIdx.isAcceptableOrUnknown(
-          data['referral_hospital_idx']!,
-          _referralHospitalIdxMeta,
+        _referralHospitalMeta,
+        referralHospital.isAcceptableOrUnknown(
+          data['referral_hospital']!,
+          _referralHospitalMeta,
         ),
       );
     }
@@ -5190,15 +5182,6 @@ class $TreatmentsTable extends Treatments
         followUpResultsJson.isAcceptableOrUnknown(
           data['follow_up_results_json']!,
           _followUpResultsJsonMeta,
-        ),
-      );
-    }
-    if (data.containsKey('other_hospital_idx')) {
-      context.handle(
-        _otherHospitalIdxMeta,
-        otherHospitalIdx.isAcceptableOrUnknown(
-          data['other_hospital_idx']!,
-          _otherHospitalIdxMeta,
         ),
       );
     }
@@ -5329,7 +5312,7 @@ class $TreatmentsTable extends Treatments
         data['${effectivePrefix}health_data_json'],
       ),
       mainSymptom: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
+        DriftSqlType.string,
         data['${effectivePrefix}main_symptom'],
       ),
       traumaSymptomsJson: attachedDatabase.typeMapping.read(
@@ -5445,11 +5428,11 @@ class $TreatmentsTable extends Treatments
         data['${effectivePrefix}right_pupil_size'],
       ),
       history: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
+        DriftSqlType.string,
         data['${effectivePrefix}history'],
       ),
       allergy: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
+        DriftSqlType.string,
         data['${effectivePrefix}allergy'],
       ),
       initialDiagnosis: attachedDatabase.typeMapping.read(
@@ -5457,7 +5440,7 @@ class $TreatmentsTable extends Treatments
         data['${effectivePrefix}initial_diagnosis'],
       ),
       diagnosisCategory: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
+        DriftSqlType.string,
         data['${effectivePrefix}diagnosis_category'],
       ),
       selectedICD10Main: attachedDatabase.typeMapping.read(
@@ -5473,7 +5456,7 @@ class $TreatmentsTable extends Treatments
         data['${effectivePrefix}selected_i_c_d10_sub2'],
       ),
       triageCategory: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
+        DriftSqlType.string,
         data['${effectivePrefix}triage_category'],
       ),
       onSiteTreatmentsJson: attachedDatabase.typeMapping.read(
@@ -5529,16 +5512,16 @@ class $TreatmentsTable extends Treatments
         data['${effectivePrefix}other_summary'],
       ),
       referralPassageType: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
+        DriftSqlType.string,
         data['${effectivePrefix}referral_passage_type'],
       ),
       referralAmbulanceType: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
+        DriftSqlType.string,
         data['${effectivePrefix}referral_ambulance_type'],
       ),
-      referralHospitalIdx: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}referral_hospital_idx'],
+      referralHospital: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}referral_hospital'],
       ),
       referralOtherHospital: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
@@ -5553,11 +5536,11 @@ class $TreatmentsTable extends Treatments
         data['${effectivePrefix}selected_escorts_json'],
       ),
       intubationType: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
+        DriftSqlType.string,
         data['${effectivePrefix}intubation_type'],
       ),
       oxygenType: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
+        DriftSqlType.string,
         data['${effectivePrefix}oxygen_type'],
       ),
       oxygenFlow: attachedDatabase.typeMapping.read(
@@ -5575,10 +5558,6 @@ class $TreatmentsTable extends Treatments
       followUpResultsJson: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}follow_up_results_json'],
-      ),
-      otherHospitalIdx: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}other_hospital_idx'],
       ),
       selectedMainDoctor: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
@@ -5640,7 +5619,7 @@ class Treatment extends DataClass implements Insertable<Treatment> {
   final String? screeningMethodsJson;
   final String? otherScreeningMethod;
   final String? healthDataJson;
-  final int? mainSymptom;
+  final String? mainSymptom;
   final String? traumaSymptomsJson;
   final String? nonTraumaSymptomsJson;
   final String? symptomNote;
@@ -5669,14 +5648,14 @@ class Treatment extends DataClass implements Insertable<Treatment> {
   final String? leftPupilSize;
   final int? rightPupilScale;
   final String? rightPupilSize;
-  final int? history;
-  final int? allergy;
+  final String? history;
+  final String? allergy;
   final String? initialDiagnosis;
-  final int? diagnosisCategory;
+  final String? diagnosisCategory;
   final String? selectedICD10Main;
   final String? selectedICD10Sub1;
   final String? selectedICD10Sub2;
-  final int? triageCategory;
+  final String? triageCategory;
   final String? onSiteTreatmentsJson;
   final bool ekgChecked;
   final String? ekgReading;
@@ -5690,19 +5669,18 @@ class Treatment extends DataClass implements Insertable<Treatment> {
   final bool prescriptionChecked;
   final bool otherChecked;
   final String? otherSummary;
-  final int? referralPassageType;
-  final int? referralAmbulanceType;
-  final int? referralHospitalIdx;
+  final String? referralPassageType;
+  final String? referralAmbulanceType;
+  final String? referralHospital;
   final String? referralOtherHospital;
   final String? referralEscortText;
   final String? selectedEscortsJson;
-  final int? intubationType;
-  final int? oxygenType;
+  final String? intubationType;
+  final String? oxygenType;
   final String? oxygenFlow;
   final String? medicalCertificateTypesJson;
   final String? prescriptionRowsJson;
   final String? followUpResultsJson;
-  final int? otherHospitalIdx;
   final String? selectedMainDoctor;
   final String? selectedMainNurse;
   final String? nurseSignature;
@@ -5773,7 +5751,7 @@ class Treatment extends DataClass implements Insertable<Treatment> {
     this.otherSummary,
     this.referralPassageType,
     this.referralAmbulanceType,
-    this.referralHospitalIdx,
+    this.referralHospital,
     this.referralOtherHospital,
     this.referralEscortText,
     this.selectedEscortsJson,
@@ -5783,7 +5761,6 @@ class Treatment extends DataClass implements Insertable<Treatment> {
     this.medicalCertificateTypesJson,
     this.prescriptionRowsJson,
     this.followUpResultsJson,
-    this.otherHospitalIdx,
     this.selectedMainDoctor,
     this.selectedMainNurse,
     this.nurseSignature,
@@ -5812,7 +5789,7 @@ class Treatment extends DataClass implements Insertable<Treatment> {
       map['health_data_json'] = Variable<String>(healthDataJson);
     }
     if (!nullToAbsent || mainSymptom != null) {
-      map['main_symptom'] = Variable<int>(mainSymptom);
+      map['main_symptom'] = Variable<String>(mainSymptom);
     }
     if (!nullToAbsent || traumaSymptomsJson != null) {
       map['trauma_symptoms_json'] = Variable<String>(traumaSymptomsJson);
@@ -5907,16 +5884,16 @@ class Treatment extends DataClass implements Insertable<Treatment> {
       map['right_pupil_size'] = Variable<String>(rightPupilSize);
     }
     if (!nullToAbsent || history != null) {
-      map['history'] = Variable<int>(history);
+      map['history'] = Variable<String>(history);
     }
     if (!nullToAbsent || allergy != null) {
-      map['allergy'] = Variable<int>(allergy);
+      map['allergy'] = Variable<String>(allergy);
     }
     if (!nullToAbsent || initialDiagnosis != null) {
       map['initial_diagnosis'] = Variable<String>(initialDiagnosis);
     }
     if (!nullToAbsent || diagnosisCategory != null) {
-      map['diagnosis_category'] = Variable<int>(diagnosisCategory);
+      map['diagnosis_category'] = Variable<String>(diagnosisCategory);
     }
     if (!nullToAbsent || selectedICD10Main != null) {
       map['selected_i_c_d10_main'] = Variable<String>(selectedICD10Main);
@@ -5928,7 +5905,7 @@ class Treatment extends DataClass implements Insertable<Treatment> {
       map['selected_i_c_d10_sub2'] = Variable<String>(selectedICD10Sub2);
     }
     if (!nullToAbsent || triageCategory != null) {
-      map['triage_category'] = Variable<int>(triageCategory);
+      map['triage_category'] = Variable<String>(triageCategory);
     }
     if (!nullToAbsent || onSiteTreatmentsJson != null) {
       map['on_site_treatments_json'] = Variable<String>(onSiteTreatmentsJson);
@@ -5954,13 +5931,13 @@ class Treatment extends DataClass implements Insertable<Treatment> {
       map['other_summary'] = Variable<String>(otherSummary);
     }
     if (!nullToAbsent || referralPassageType != null) {
-      map['referral_passage_type'] = Variable<int>(referralPassageType);
+      map['referral_passage_type'] = Variable<String>(referralPassageType);
     }
     if (!nullToAbsent || referralAmbulanceType != null) {
-      map['referral_ambulance_type'] = Variable<int>(referralAmbulanceType);
+      map['referral_ambulance_type'] = Variable<String>(referralAmbulanceType);
     }
-    if (!nullToAbsent || referralHospitalIdx != null) {
-      map['referral_hospital_idx'] = Variable<int>(referralHospitalIdx);
+    if (!nullToAbsent || referralHospital != null) {
+      map['referral_hospital'] = Variable<String>(referralHospital);
     }
     if (!nullToAbsent || referralOtherHospital != null) {
       map['referral_other_hospital'] = Variable<String>(referralOtherHospital);
@@ -5972,10 +5949,10 @@ class Treatment extends DataClass implements Insertable<Treatment> {
       map['selected_escorts_json'] = Variable<String>(selectedEscortsJson);
     }
     if (!nullToAbsent || intubationType != null) {
-      map['intubation_type'] = Variable<int>(intubationType);
+      map['intubation_type'] = Variable<String>(intubationType);
     }
     if (!nullToAbsent || oxygenType != null) {
-      map['oxygen_type'] = Variable<int>(oxygenType);
+      map['oxygen_type'] = Variable<String>(oxygenType);
     }
     if (!nullToAbsent || oxygenFlow != null) {
       map['oxygen_flow'] = Variable<String>(oxygenFlow);
@@ -5990,9 +5967,6 @@ class Treatment extends DataClass implements Insertable<Treatment> {
     }
     if (!nullToAbsent || followUpResultsJson != null) {
       map['follow_up_results_json'] = Variable<String>(followUpResultsJson);
-    }
-    if (!nullToAbsent || otherHospitalIdx != null) {
-      map['other_hospital_idx'] = Variable<int>(otherHospitalIdx);
     }
     if (!nullToAbsent || selectedMainDoctor != null) {
       map['selected_main_doctor'] = Variable<String>(selectedMainDoctor);
@@ -6173,9 +6147,9 @@ class Treatment extends DataClass implements Insertable<Treatment> {
       referralAmbulanceType: referralAmbulanceType == null && nullToAbsent
           ? const Value.absent()
           : Value(referralAmbulanceType),
-      referralHospitalIdx: referralHospitalIdx == null && nullToAbsent
+      referralHospital: referralHospital == null && nullToAbsent
           ? const Value.absent()
-          : Value(referralHospitalIdx),
+          : Value(referralHospital),
       referralOtherHospital: referralOtherHospital == null && nullToAbsent
           ? const Value.absent()
           : Value(referralOtherHospital),
@@ -6204,9 +6178,6 @@ class Treatment extends DataClass implements Insertable<Treatment> {
       followUpResultsJson: followUpResultsJson == null && nullToAbsent
           ? const Value.absent()
           : Value(followUpResultsJson),
-      otherHospitalIdx: otherHospitalIdx == null && nullToAbsent
-          ? const Value.absent()
-          : Value(otherHospitalIdx),
       selectedMainDoctor: selectedMainDoctor == null && nullToAbsent
           ? const Value.absent()
           : Value(selectedMainDoctor),
@@ -6255,7 +6226,7 @@ class Treatment extends DataClass implements Insertable<Treatment> {
         json['otherScreeningMethod'],
       ),
       healthDataJson: serializer.fromJson<String?>(json['healthDataJson']),
-      mainSymptom: serializer.fromJson<int?>(json['mainSymptom']),
+      mainSymptom: serializer.fromJson<String?>(json['mainSymptom']),
       traumaSymptomsJson: serializer.fromJson<String?>(
         json['traumaSymptomsJson'],
       ),
@@ -6298,10 +6269,12 @@ class Treatment extends DataClass implements Insertable<Treatment> {
       leftPupilSize: serializer.fromJson<String?>(json['leftPupilSize']),
       rightPupilScale: serializer.fromJson<int?>(json['rightPupilScale']),
       rightPupilSize: serializer.fromJson<String?>(json['rightPupilSize']),
-      history: serializer.fromJson<int?>(json['history']),
-      allergy: serializer.fromJson<int?>(json['allergy']),
+      history: serializer.fromJson<String?>(json['history']),
+      allergy: serializer.fromJson<String?>(json['allergy']),
       initialDiagnosis: serializer.fromJson<String?>(json['initialDiagnosis']),
-      diagnosisCategory: serializer.fromJson<int?>(json['diagnosisCategory']),
+      diagnosisCategory: serializer.fromJson<String?>(
+        json['diagnosisCategory'],
+      ),
       selectedICD10Main: serializer.fromJson<String?>(
         json['selectedICD10Main'],
       ),
@@ -6311,7 +6284,7 @@ class Treatment extends DataClass implements Insertable<Treatment> {
       selectedICD10Sub2: serializer.fromJson<String?>(
         json['selectedICD10Sub2'],
       ),
-      triageCategory: serializer.fromJson<int?>(json['triageCategory']),
+      triageCategory: serializer.fromJson<String?>(json['triageCategory']),
       onSiteTreatmentsJson: serializer.fromJson<String?>(
         json['onSiteTreatmentsJson'],
       ),
@@ -6333,15 +6306,13 @@ class Treatment extends DataClass implements Insertable<Treatment> {
       ),
       otherChecked: serializer.fromJson<bool>(json['otherChecked']),
       otherSummary: serializer.fromJson<String?>(json['otherSummary']),
-      referralPassageType: serializer.fromJson<int?>(
+      referralPassageType: serializer.fromJson<String?>(
         json['referralPassageType'],
       ),
-      referralAmbulanceType: serializer.fromJson<int?>(
+      referralAmbulanceType: serializer.fromJson<String?>(
         json['referralAmbulanceType'],
       ),
-      referralHospitalIdx: serializer.fromJson<int?>(
-        json['referralHospitalIdx'],
-      ),
+      referralHospital: serializer.fromJson<String?>(json['referralHospital']),
       referralOtherHospital: serializer.fromJson<String?>(
         json['referralOtherHospital'],
       ),
@@ -6351,8 +6322,8 @@ class Treatment extends DataClass implements Insertable<Treatment> {
       selectedEscortsJson: serializer.fromJson<String?>(
         json['selectedEscortsJson'],
       ),
-      intubationType: serializer.fromJson<int?>(json['intubationType']),
-      oxygenType: serializer.fromJson<int?>(json['oxygenType']),
+      intubationType: serializer.fromJson<String?>(json['intubationType']),
+      oxygenType: serializer.fromJson<String?>(json['oxygenType']),
       oxygenFlow: serializer.fromJson<String?>(json['oxygenFlow']),
       medicalCertificateTypesJson: serializer.fromJson<String?>(
         json['medicalCertificateTypesJson'],
@@ -6363,7 +6334,6 @@ class Treatment extends DataClass implements Insertable<Treatment> {
       followUpResultsJson: serializer.fromJson<String?>(
         json['followUpResultsJson'],
       ),
-      otherHospitalIdx: serializer.fromJson<int?>(json['otherHospitalIdx']),
       selectedMainDoctor: serializer.fromJson<String?>(
         json['selectedMainDoctor'],
       ),
@@ -6393,7 +6363,7 @@ class Treatment extends DataClass implements Insertable<Treatment> {
       'screeningMethodsJson': serializer.toJson<String?>(screeningMethodsJson),
       'otherScreeningMethod': serializer.toJson<String?>(otherScreeningMethod),
       'healthDataJson': serializer.toJson<String?>(healthDataJson),
-      'mainSymptom': serializer.toJson<int?>(mainSymptom),
+      'mainSymptom': serializer.toJson<String?>(mainSymptom),
       'traumaSymptomsJson': serializer.toJson<String?>(traumaSymptomsJson),
       'nonTraumaSymptomsJson': serializer.toJson<String?>(
         nonTraumaSymptomsJson,
@@ -6434,14 +6404,14 @@ class Treatment extends DataClass implements Insertable<Treatment> {
       'leftPupilSize': serializer.toJson<String?>(leftPupilSize),
       'rightPupilScale': serializer.toJson<int?>(rightPupilScale),
       'rightPupilSize': serializer.toJson<String?>(rightPupilSize),
-      'history': serializer.toJson<int?>(history),
-      'allergy': serializer.toJson<int?>(allergy),
+      'history': serializer.toJson<String?>(history),
+      'allergy': serializer.toJson<String?>(allergy),
       'initialDiagnosis': serializer.toJson<String?>(initialDiagnosis),
-      'diagnosisCategory': serializer.toJson<int?>(diagnosisCategory),
+      'diagnosisCategory': serializer.toJson<String?>(diagnosisCategory),
       'selectedICD10Main': serializer.toJson<String?>(selectedICD10Main),
       'selectedICD10Sub1': serializer.toJson<String?>(selectedICD10Sub1),
       'selectedICD10Sub2': serializer.toJson<String?>(selectedICD10Sub2),
-      'triageCategory': serializer.toJson<int?>(triageCategory),
+      'triageCategory': serializer.toJson<String?>(triageCategory),
       'onSiteTreatmentsJson': serializer.toJson<String?>(onSiteTreatmentsJson),
       'ekgChecked': serializer.toJson<bool>(ekgChecked),
       'ekgReading': serializer.toJson<String?>(ekgReading),
@@ -6457,23 +6427,24 @@ class Treatment extends DataClass implements Insertable<Treatment> {
       'prescriptionChecked': serializer.toJson<bool>(prescriptionChecked),
       'otherChecked': serializer.toJson<bool>(otherChecked),
       'otherSummary': serializer.toJson<String?>(otherSummary),
-      'referralPassageType': serializer.toJson<int?>(referralPassageType),
-      'referralAmbulanceType': serializer.toJson<int?>(referralAmbulanceType),
-      'referralHospitalIdx': serializer.toJson<int?>(referralHospitalIdx),
+      'referralPassageType': serializer.toJson<String?>(referralPassageType),
+      'referralAmbulanceType': serializer.toJson<String?>(
+        referralAmbulanceType,
+      ),
+      'referralHospital': serializer.toJson<String?>(referralHospital),
       'referralOtherHospital': serializer.toJson<String?>(
         referralOtherHospital,
       ),
       'referralEscortText': serializer.toJson<String?>(referralEscortText),
       'selectedEscortsJson': serializer.toJson<String?>(selectedEscortsJson),
-      'intubationType': serializer.toJson<int?>(intubationType),
-      'oxygenType': serializer.toJson<int?>(oxygenType),
+      'intubationType': serializer.toJson<String?>(intubationType),
+      'oxygenType': serializer.toJson<String?>(oxygenType),
       'oxygenFlow': serializer.toJson<String?>(oxygenFlow),
       'medicalCertificateTypesJson': serializer.toJson<String?>(
         medicalCertificateTypesJson,
       ),
       'prescriptionRowsJson': serializer.toJson<String?>(prescriptionRowsJson),
       'followUpResultsJson': serializer.toJson<String?>(followUpResultsJson),
-      'otherHospitalIdx': serializer.toJson<int?>(otherHospitalIdx),
       'selectedMainDoctor': serializer.toJson<String?>(selectedMainDoctor),
       'selectedMainNurse': serializer.toJson<String?>(selectedMainNurse),
       'nurseSignature': serializer.toJson<String?>(nurseSignature),
@@ -6495,7 +6466,7 @@ class Treatment extends DataClass implements Insertable<Treatment> {
     Value<String?> screeningMethodsJson = const Value.absent(),
     Value<String?> otherScreeningMethod = const Value.absent(),
     Value<String?> healthDataJson = const Value.absent(),
-    Value<int?> mainSymptom = const Value.absent(),
+    Value<String?> mainSymptom = const Value.absent(),
     Value<String?> traumaSymptomsJson = const Value.absent(),
     Value<String?> nonTraumaSymptomsJson = const Value.absent(),
     Value<String?> symptomNote = const Value.absent(),
@@ -6524,14 +6495,14 @@ class Treatment extends DataClass implements Insertable<Treatment> {
     Value<String?> leftPupilSize = const Value.absent(),
     Value<int?> rightPupilScale = const Value.absent(),
     Value<String?> rightPupilSize = const Value.absent(),
-    Value<int?> history = const Value.absent(),
-    Value<int?> allergy = const Value.absent(),
+    Value<String?> history = const Value.absent(),
+    Value<String?> allergy = const Value.absent(),
     Value<String?> initialDiagnosis = const Value.absent(),
-    Value<int?> diagnosisCategory = const Value.absent(),
+    Value<String?> diagnosisCategory = const Value.absent(),
     Value<String?> selectedICD10Main = const Value.absent(),
     Value<String?> selectedICD10Sub1 = const Value.absent(),
     Value<String?> selectedICD10Sub2 = const Value.absent(),
-    Value<int?> triageCategory = const Value.absent(),
+    Value<String?> triageCategory = const Value.absent(),
     Value<String?> onSiteTreatmentsJson = const Value.absent(),
     bool? ekgChecked,
     Value<String?> ekgReading = const Value.absent(),
@@ -6545,19 +6516,18 @@ class Treatment extends DataClass implements Insertable<Treatment> {
     bool? prescriptionChecked,
     bool? otherChecked,
     Value<String?> otherSummary = const Value.absent(),
-    Value<int?> referralPassageType = const Value.absent(),
-    Value<int?> referralAmbulanceType = const Value.absent(),
-    Value<int?> referralHospitalIdx = const Value.absent(),
+    Value<String?> referralPassageType = const Value.absent(),
+    Value<String?> referralAmbulanceType = const Value.absent(),
+    Value<String?> referralHospital = const Value.absent(),
     Value<String?> referralOtherHospital = const Value.absent(),
     Value<String?> referralEscortText = const Value.absent(),
     Value<String?> selectedEscortsJson = const Value.absent(),
-    Value<int?> intubationType = const Value.absent(),
-    Value<int?> oxygenType = const Value.absent(),
+    Value<String?> intubationType = const Value.absent(),
+    Value<String?> oxygenType = const Value.absent(),
     Value<String?> oxygenFlow = const Value.absent(),
     Value<String?> medicalCertificateTypesJson = const Value.absent(),
     Value<String?> prescriptionRowsJson = const Value.absent(),
     Value<String?> followUpResultsJson = const Value.absent(),
-    Value<int?> otherHospitalIdx = const Value.absent(),
     Value<String?> selectedMainDoctor = const Value.absent(),
     Value<String?> selectedMainNurse = const Value.absent(),
     Value<String?> nurseSignature = const Value.absent(),
@@ -6687,9 +6657,9 @@ class Treatment extends DataClass implements Insertable<Treatment> {
     referralAmbulanceType: referralAmbulanceType.present
         ? referralAmbulanceType.value
         : this.referralAmbulanceType,
-    referralHospitalIdx: referralHospitalIdx.present
-        ? referralHospitalIdx.value
-        : this.referralHospitalIdx,
+    referralHospital: referralHospital.present
+        ? referralHospital.value
+        : this.referralHospital,
     referralOtherHospital: referralOtherHospital.present
         ? referralOtherHospital.value
         : this.referralOtherHospital,
@@ -6713,9 +6683,6 @@ class Treatment extends DataClass implements Insertable<Treatment> {
     followUpResultsJson: followUpResultsJson.present
         ? followUpResultsJson.value
         : this.followUpResultsJson,
-    otherHospitalIdx: otherHospitalIdx.present
-        ? otherHospitalIdx.value
-        : this.otherHospitalIdx,
     selectedMainDoctor: selectedMainDoctor.present
         ? selectedMainDoctor.value
         : this.selectedMainDoctor,
@@ -6900,9 +6867,9 @@ class Treatment extends DataClass implements Insertable<Treatment> {
       referralAmbulanceType: data.referralAmbulanceType.present
           ? data.referralAmbulanceType.value
           : this.referralAmbulanceType,
-      referralHospitalIdx: data.referralHospitalIdx.present
-          ? data.referralHospitalIdx.value
-          : this.referralHospitalIdx,
+      referralHospital: data.referralHospital.present
+          ? data.referralHospital.value
+          : this.referralHospital,
       referralOtherHospital: data.referralOtherHospital.present
           ? data.referralOtherHospital.value
           : this.referralOtherHospital,
@@ -6930,9 +6897,6 @@ class Treatment extends DataClass implements Insertable<Treatment> {
       followUpResultsJson: data.followUpResultsJson.present
           ? data.followUpResultsJson.value
           : this.followUpResultsJson,
-      otherHospitalIdx: data.otherHospitalIdx.present
-          ? data.otherHospitalIdx.value
-          : this.otherHospitalIdx,
       selectedMainDoctor: data.selectedMainDoctor.present
           ? data.selectedMainDoctor.value
           : this.selectedMainDoctor,
@@ -7028,7 +6992,7 @@ class Treatment extends DataClass implements Insertable<Treatment> {
           ..write('otherSummary: $otherSummary, ')
           ..write('referralPassageType: $referralPassageType, ')
           ..write('referralAmbulanceType: $referralAmbulanceType, ')
-          ..write('referralHospitalIdx: $referralHospitalIdx, ')
+          ..write('referralHospital: $referralHospital, ')
           ..write('referralOtherHospital: $referralOtherHospital, ')
           ..write('referralEscortText: $referralEscortText, ')
           ..write('selectedEscortsJson: $selectedEscortsJson, ')
@@ -7038,7 +7002,6 @@ class Treatment extends DataClass implements Insertable<Treatment> {
           ..write('medicalCertificateTypesJson: $medicalCertificateTypesJson, ')
           ..write('prescriptionRowsJson: $prescriptionRowsJson, ')
           ..write('followUpResultsJson: $followUpResultsJson, ')
-          ..write('otherHospitalIdx: $otherHospitalIdx, ')
           ..write('selectedMainDoctor: $selectedMainDoctor, ')
           ..write('selectedMainNurse: $selectedMainNurse, ')
           ..write('nurseSignature: $nurseSignature, ')
@@ -7114,7 +7077,7 @@ class Treatment extends DataClass implements Insertable<Treatment> {
     otherSummary,
     referralPassageType,
     referralAmbulanceType,
-    referralHospitalIdx,
+    referralHospital,
     referralOtherHospital,
     referralEscortText,
     selectedEscortsJson,
@@ -7124,7 +7087,6 @@ class Treatment extends DataClass implements Insertable<Treatment> {
     medicalCertificateTypesJson,
     prescriptionRowsJson,
     followUpResultsJson,
-    otherHospitalIdx,
     selectedMainDoctor,
     selectedMainNurse,
     nurseSignature,
@@ -7200,7 +7162,7 @@ class Treatment extends DataClass implements Insertable<Treatment> {
           other.otherSummary == this.otherSummary &&
           other.referralPassageType == this.referralPassageType &&
           other.referralAmbulanceType == this.referralAmbulanceType &&
-          other.referralHospitalIdx == this.referralHospitalIdx &&
+          other.referralHospital == this.referralHospital &&
           other.referralOtherHospital == this.referralOtherHospital &&
           other.referralEscortText == this.referralEscortText &&
           other.selectedEscortsJson == this.selectedEscortsJson &&
@@ -7211,7 +7173,6 @@ class Treatment extends DataClass implements Insertable<Treatment> {
               this.medicalCertificateTypesJson &&
           other.prescriptionRowsJson == this.prescriptionRowsJson &&
           other.followUpResultsJson == this.followUpResultsJson &&
-          other.otherHospitalIdx == this.otherHospitalIdx &&
           other.selectedMainDoctor == this.selectedMainDoctor &&
           other.selectedMainNurse == this.selectedMainNurse &&
           other.nurseSignature == this.nurseSignature &&
@@ -7232,7 +7193,7 @@ class TreatmentsCompanion extends UpdateCompanion<Treatment> {
   final Value<String?> screeningMethodsJson;
   final Value<String?> otherScreeningMethod;
   final Value<String?> healthDataJson;
-  final Value<int?> mainSymptom;
+  final Value<String?> mainSymptom;
   final Value<String?> traumaSymptomsJson;
   final Value<String?> nonTraumaSymptomsJson;
   final Value<String?> symptomNote;
@@ -7261,14 +7222,14 @@ class TreatmentsCompanion extends UpdateCompanion<Treatment> {
   final Value<String?> leftPupilSize;
   final Value<int?> rightPupilScale;
   final Value<String?> rightPupilSize;
-  final Value<int?> history;
-  final Value<int?> allergy;
+  final Value<String?> history;
+  final Value<String?> allergy;
   final Value<String?> initialDiagnosis;
-  final Value<int?> diagnosisCategory;
+  final Value<String?> diagnosisCategory;
   final Value<String?> selectedICD10Main;
   final Value<String?> selectedICD10Sub1;
   final Value<String?> selectedICD10Sub2;
-  final Value<int?> triageCategory;
+  final Value<String?> triageCategory;
   final Value<String?> onSiteTreatmentsJson;
   final Value<bool> ekgChecked;
   final Value<String?> ekgReading;
@@ -7282,19 +7243,18 @@ class TreatmentsCompanion extends UpdateCompanion<Treatment> {
   final Value<bool> prescriptionChecked;
   final Value<bool> otherChecked;
   final Value<String?> otherSummary;
-  final Value<int?> referralPassageType;
-  final Value<int?> referralAmbulanceType;
-  final Value<int?> referralHospitalIdx;
+  final Value<String?> referralPassageType;
+  final Value<String?> referralAmbulanceType;
+  final Value<String?> referralHospital;
   final Value<String?> referralOtherHospital;
   final Value<String?> referralEscortText;
   final Value<String?> selectedEscortsJson;
-  final Value<int?> intubationType;
-  final Value<int?> oxygenType;
+  final Value<String?> intubationType;
+  final Value<String?> oxygenType;
   final Value<String?> oxygenFlow;
   final Value<String?> medicalCertificateTypesJson;
   final Value<String?> prescriptionRowsJson;
   final Value<String?> followUpResultsJson;
-  final Value<int?> otherHospitalIdx;
   final Value<String?> selectedMainDoctor;
   final Value<String?> selectedMainNurse;
   final Value<String?> nurseSignature;
@@ -7365,7 +7325,7 @@ class TreatmentsCompanion extends UpdateCompanion<Treatment> {
     this.otherSummary = const Value.absent(),
     this.referralPassageType = const Value.absent(),
     this.referralAmbulanceType = const Value.absent(),
-    this.referralHospitalIdx = const Value.absent(),
+    this.referralHospital = const Value.absent(),
     this.referralOtherHospital = const Value.absent(),
     this.referralEscortText = const Value.absent(),
     this.selectedEscortsJson = const Value.absent(),
@@ -7375,7 +7335,6 @@ class TreatmentsCompanion extends UpdateCompanion<Treatment> {
     this.medicalCertificateTypesJson = const Value.absent(),
     this.prescriptionRowsJson = const Value.absent(),
     this.followUpResultsJson = const Value.absent(),
-    this.otherHospitalIdx = const Value.absent(),
     this.selectedMainDoctor = const Value.absent(),
     this.selectedMainNurse = const Value.absent(),
     this.nurseSignature = const Value.absent(),
@@ -7447,7 +7406,7 @@ class TreatmentsCompanion extends UpdateCompanion<Treatment> {
     this.otherSummary = const Value.absent(),
     this.referralPassageType = const Value.absent(),
     this.referralAmbulanceType = const Value.absent(),
-    this.referralHospitalIdx = const Value.absent(),
+    this.referralHospital = const Value.absent(),
     this.referralOtherHospital = const Value.absent(),
     this.referralEscortText = const Value.absent(),
     this.selectedEscortsJson = const Value.absent(),
@@ -7457,7 +7416,6 @@ class TreatmentsCompanion extends UpdateCompanion<Treatment> {
     this.medicalCertificateTypesJson = const Value.absent(),
     this.prescriptionRowsJson = const Value.absent(),
     this.followUpResultsJson = const Value.absent(),
-    this.otherHospitalIdx = const Value.absent(),
     this.selectedMainDoctor = const Value.absent(),
     this.selectedMainNurse = const Value.absent(),
     this.nurseSignature = const Value.absent(),
@@ -7477,7 +7435,7 @@ class TreatmentsCompanion extends UpdateCompanion<Treatment> {
     Expression<String>? screeningMethodsJson,
     Expression<String>? otherScreeningMethod,
     Expression<String>? healthDataJson,
-    Expression<int>? mainSymptom,
+    Expression<String>? mainSymptom,
     Expression<String>? traumaSymptomsJson,
     Expression<String>? nonTraumaSymptomsJson,
     Expression<String>? symptomNote,
@@ -7506,14 +7464,14 @@ class TreatmentsCompanion extends UpdateCompanion<Treatment> {
     Expression<String>? leftPupilSize,
     Expression<int>? rightPupilScale,
     Expression<String>? rightPupilSize,
-    Expression<int>? history,
-    Expression<int>? allergy,
+    Expression<String>? history,
+    Expression<String>? allergy,
     Expression<String>? initialDiagnosis,
-    Expression<int>? diagnosisCategory,
+    Expression<String>? diagnosisCategory,
     Expression<String>? selectedICD10Main,
     Expression<String>? selectedICD10Sub1,
     Expression<String>? selectedICD10Sub2,
-    Expression<int>? triageCategory,
+    Expression<String>? triageCategory,
     Expression<String>? onSiteTreatmentsJson,
     Expression<bool>? ekgChecked,
     Expression<String>? ekgReading,
@@ -7527,19 +7485,18 @@ class TreatmentsCompanion extends UpdateCompanion<Treatment> {
     Expression<bool>? prescriptionChecked,
     Expression<bool>? otherChecked,
     Expression<String>? otherSummary,
-    Expression<int>? referralPassageType,
-    Expression<int>? referralAmbulanceType,
-    Expression<int>? referralHospitalIdx,
+    Expression<String>? referralPassageType,
+    Expression<String>? referralAmbulanceType,
+    Expression<String>? referralHospital,
     Expression<String>? referralOtherHospital,
     Expression<String>? referralEscortText,
     Expression<String>? selectedEscortsJson,
-    Expression<int>? intubationType,
-    Expression<int>? oxygenType,
+    Expression<String>? intubationType,
+    Expression<String>? oxygenType,
     Expression<String>? oxygenFlow,
     Expression<String>? medicalCertificateTypesJson,
     Expression<String>? prescriptionRowsJson,
     Expression<String>? followUpResultsJson,
-    Expression<int>? otherHospitalIdx,
     Expression<String>? selectedMainDoctor,
     Expression<String>? selectedMainNurse,
     Expression<String>? nurseSignature,
@@ -7626,8 +7583,7 @@ class TreatmentsCompanion extends UpdateCompanion<Treatment> {
         'referral_passage_type': referralPassageType,
       if (referralAmbulanceType != null)
         'referral_ambulance_type': referralAmbulanceType,
-      if (referralHospitalIdx != null)
-        'referral_hospital_idx': referralHospitalIdx,
+      if (referralHospital != null) 'referral_hospital': referralHospital,
       if (referralOtherHospital != null)
         'referral_other_hospital': referralOtherHospital,
       if (referralEscortText != null)
@@ -7643,7 +7599,6 @@ class TreatmentsCompanion extends UpdateCompanion<Treatment> {
         'prescription_rows_json': prescriptionRowsJson,
       if (followUpResultsJson != null)
         'follow_up_results_json': followUpResultsJson,
-      if (otherHospitalIdx != null) 'other_hospital_idx': otherHospitalIdx,
       if (selectedMainDoctor != null)
         'selected_main_doctor': selectedMainDoctor,
       if (selectedMainNurse != null) 'selected_main_nurse': selectedMainNurse,
@@ -7667,7 +7622,7 @@ class TreatmentsCompanion extends UpdateCompanion<Treatment> {
     Value<String?>? screeningMethodsJson,
     Value<String?>? otherScreeningMethod,
     Value<String?>? healthDataJson,
-    Value<int?>? mainSymptom,
+    Value<String?>? mainSymptom,
     Value<String?>? traumaSymptomsJson,
     Value<String?>? nonTraumaSymptomsJson,
     Value<String?>? symptomNote,
@@ -7696,14 +7651,14 @@ class TreatmentsCompanion extends UpdateCompanion<Treatment> {
     Value<String?>? leftPupilSize,
     Value<int?>? rightPupilScale,
     Value<String?>? rightPupilSize,
-    Value<int?>? history,
-    Value<int?>? allergy,
+    Value<String?>? history,
+    Value<String?>? allergy,
     Value<String?>? initialDiagnosis,
-    Value<int?>? diagnosisCategory,
+    Value<String?>? diagnosisCategory,
     Value<String?>? selectedICD10Main,
     Value<String?>? selectedICD10Sub1,
     Value<String?>? selectedICD10Sub2,
-    Value<int?>? triageCategory,
+    Value<String?>? triageCategory,
     Value<String?>? onSiteTreatmentsJson,
     Value<bool>? ekgChecked,
     Value<String?>? ekgReading,
@@ -7717,19 +7672,18 @@ class TreatmentsCompanion extends UpdateCompanion<Treatment> {
     Value<bool>? prescriptionChecked,
     Value<bool>? otherChecked,
     Value<String?>? otherSummary,
-    Value<int?>? referralPassageType,
-    Value<int?>? referralAmbulanceType,
-    Value<int?>? referralHospitalIdx,
+    Value<String?>? referralPassageType,
+    Value<String?>? referralAmbulanceType,
+    Value<String?>? referralHospital,
     Value<String?>? referralOtherHospital,
     Value<String?>? referralEscortText,
     Value<String?>? selectedEscortsJson,
-    Value<int?>? intubationType,
-    Value<int?>? oxygenType,
+    Value<String?>? intubationType,
+    Value<String?>? oxygenType,
     Value<String?>? oxygenFlow,
     Value<String?>? medicalCertificateTypesJson,
     Value<String?>? prescriptionRowsJson,
     Value<String?>? followUpResultsJson,
-    Value<int?>? otherHospitalIdx,
     Value<String?>? selectedMainDoctor,
     Value<String?>? selectedMainNurse,
     Value<String?>? nurseSignature,
@@ -7809,7 +7763,7 @@ class TreatmentsCompanion extends UpdateCompanion<Treatment> {
       referralPassageType: referralPassageType ?? this.referralPassageType,
       referralAmbulanceType:
           referralAmbulanceType ?? this.referralAmbulanceType,
-      referralHospitalIdx: referralHospitalIdx ?? this.referralHospitalIdx,
+      referralHospital: referralHospital ?? this.referralHospital,
       referralOtherHospital:
           referralOtherHospital ?? this.referralOtherHospital,
       referralEscortText: referralEscortText ?? this.referralEscortText,
@@ -7821,7 +7775,6 @@ class TreatmentsCompanion extends UpdateCompanion<Treatment> {
           medicalCertificateTypesJson ?? this.medicalCertificateTypesJson,
       prescriptionRowsJson: prescriptionRowsJson ?? this.prescriptionRowsJson,
       followUpResultsJson: followUpResultsJson ?? this.followUpResultsJson,
-      otherHospitalIdx: otherHospitalIdx ?? this.otherHospitalIdx,
       selectedMainDoctor: selectedMainDoctor ?? this.selectedMainDoctor,
       selectedMainNurse: selectedMainNurse ?? this.selectedMainNurse,
       nurseSignature: nurseSignature ?? this.nurseSignature,
@@ -7862,7 +7815,7 @@ class TreatmentsCompanion extends UpdateCompanion<Treatment> {
       map['health_data_json'] = Variable<String>(healthDataJson.value);
     }
     if (mainSymptom.present) {
-      map['main_symptom'] = Variable<int>(mainSymptom.value);
+      map['main_symptom'] = Variable<String>(mainSymptom.value);
     }
     if (traumaSymptomsJson.present) {
       map['trauma_symptoms_json'] = Variable<String>(traumaSymptomsJson.value);
@@ -7961,16 +7914,16 @@ class TreatmentsCompanion extends UpdateCompanion<Treatment> {
       map['right_pupil_size'] = Variable<String>(rightPupilSize.value);
     }
     if (history.present) {
-      map['history'] = Variable<int>(history.value);
+      map['history'] = Variable<String>(history.value);
     }
     if (allergy.present) {
-      map['allergy'] = Variable<int>(allergy.value);
+      map['allergy'] = Variable<String>(allergy.value);
     }
     if (initialDiagnosis.present) {
       map['initial_diagnosis'] = Variable<String>(initialDiagnosis.value);
     }
     if (diagnosisCategory.present) {
-      map['diagnosis_category'] = Variable<int>(diagnosisCategory.value);
+      map['diagnosis_category'] = Variable<String>(diagnosisCategory.value);
     }
     if (selectedICD10Main.present) {
       map['selected_i_c_d10_main'] = Variable<String>(selectedICD10Main.value);
@@ -7982,7 +7935,7 @@ class TreatmentsCompanion extends UpdateCompanion<Treatment> {
       map['selected_i_c_d10_sub2'] = Variable<String>(selectedICD10Sub2.value);
     }
     if (triageCategory.present) {
-      map['triage_category'] = Variable<int>(triageCategory.value);
+      map['triage_category'] = Variable<String>(triageCategory.value);
     }
     if (onSiteTreatmentsJson.present) {
       map['on_site_treatments_json'] = Variable<String>(
@@ -8030,15 +7983,17 @@ class TreatmentsCompanion extends UpdateCompanion<Treatment> {
       map['other_summary'] = Variable<String>(otherSummary.value);
     }
     if (referralPassageType.present) {
-      map['referral_passage_type'] = Variable<int>(referralPassageType.value);
+      map['referral_passage_type'] = Variable<String>(
+        referralPassageType.value,
+      );
     }
     if (referralAmbulanceType.present) {
-      map['referral_ambulance_type'] = Variable<int>(
+      map['referral_ambulance_type'] = Variable<String>(
         referralAmbulanceType.value,
       );
     }
-    if (referralHospitalIdx.present) {
-      map['referral_hospital_idx'] = Variable<int>(referralHospitalIdx.value);
+    if (referralHospital.present) {
+      map['referral_hospital'] = Variable<String>(referralHospital.value);
     }
     if (referralOtherHospital.present) {
       map['referral_other_hospital'] = Variable<String>(
@@ -8054,10 +8009,10 @@ class TreatmentsCompanion extends UpdateCompanion<Treatment> {
       );
     }
     if (intubationType.present) {
-      map['intubation_type'] = Variable<int>(intubationType.value);
+      map['intubation_type'] = Variable<String>(intubationType.value);
     }
     if (oxygenType.present) {
-      map['oxygen_type'] = Variable<int>(oxygenType.value);
+      map['oxygen_type'] = Variable<String>(oxygenType.value);
     }
     if (oxygenFlow.present) {
       map['oxygen_flow'] = Variable<String>(oxygenFlow.value);
@@ -8076,9 +8031,6 @@ class TreatmentsCompanion extends UpdateCompanion<Treatment> {
       map['follow_up_results_json'] = Variable<String>(
         followUpResultsJson.value,
       );
-    }
-    if (otherHospitalIdx.present) {
-      map['other_hospital_idx'] = Variable<int>(otherHospitalIdx.value);
     }
     if (selectedMainDoctor.present) {
       map['selected_main_doctor'] = Variable<String>(selectedMainDoctor.value);
@@ -8181,7 +8133,7 @@ class TreatmentsCompanion extends UpdateCompanion<Treatment> {
           ..write('otherSummary: $otherSummary, ')
           ..write('referralPassageType: $referralPassageType, ')
           ..write('referralAmbulanceType: $referralAmbulanceType, ')
-          ..write('referralHospitalIdx: $referralHospitalIdx, ')
+          ..write('referralHospital: $referralHospital, ')
           ..write('referralOtherHospital: $referralOtherHospital, ')
           ..write('referralEscortText: $referralEscortText, ')
           ..write('selectedEscortsJson: $selectedEscortsJson, ')
@@ -8191,7 +8143,6 @@ class TreatmentsCompanion extends UpdateCompanion<Treatment> {
           ..write('medicalCertificateTypesJson: $medicalCertificateTypesJson, ')
           ..write('prescriptionRowsJson: $prescriptionRowsJson, ')
           ..write('followUpResultsJson: $followUpResultsJson, ')
-          ..write('otherHospitalIdx: $otherHospitalIdx, ')
           ..write('selectedMainDoctor: $selectedMainDoctor, ')
           ..write('selectedMainNurse: $selectedMainNurse, ')
           ..write('nurseSignature: $nurseSignature, ')
@@ -13638,94 +13589,6 @@ class $AmbulanceRecordsTable extends AmbulanceRecords
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
-  static const VerificationMeta _placeGroupIdxMeta = const VerificationMeta(
-    'placeGroupIdx',
-  );
-  @override
-  late final GeneratedColumn<int> placeGroupIdx = GeneratedColumn<int>(
-    'place_group_idx',
-    aliasedName,
-    true,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
-  );
-  static const VerificationMeta _t1PlaceIdxMeta = const VerificationMeta(
-    't1PlaceIdx',
-  );
-  @override
-  late final GeneratedColumn<int> t1PlaceIdx = GeneratedColumn<int>(
-    't1_place_idx',
-    aliasedName,
-    true,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
-  );
-  static const VerificationMeta _t2PlaceIdxMeta = const VerificationMeta(
-    't2PlaceIdx',
-  );
-  @override
-  late final GeneratedColumn<int> t2PlaceIdx = GeneratedColumn<int>(
-    't2_place_idx',
-    aliasedName,
-    true,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
-  );
-  static const VerificationMeta _remotePlaceIdxMeta = const VerificationMeta(
-    'remotePlaceIdx',
-  );
-  @override
-  late final GeneratedColumn<int> remotePlaceIdx = GeneratedColumn<int>(
-    'remote_place_idx',
-    aliasedName,
-    true,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
-  );
-  static const VerificationMeta _cargoPlaceIdxMeta = const VerificationMeta(
-    'cargoPlaceIdx',
-  );
-  @override
-  late final GeneratedColumn<int> cargoPlaceIdx = GeneratedColumn<int>(
-    'cargo_place_idx',
-    aliasedName,
-    true,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
-  );
-  static const VerificationMeta _novotelPlaceIdxMeta = const VerificationMeta(
-    'novotelPlaceIdx',
-  );
-  @override
-  late final GeneratedColumn<int> novotelPlaceIdx = GeneratedColumn<int>(
-    'novotel_place_idx',
-    aliasedName,
-    true,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
-  );
-  static const VerificationMeta _cabinPlaceIdxMeta = const VerificationMeta(
-    'cabinPlaceIdx',
-  );
-  @override
-  late final GeneratedColumn<int> cabinPlaceIdx = GeneratedColumn<int>(
-    'cabin_place_idx',
-    aliasedName,
-    true,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
-  );
-  static const VerificationMeta _placeNoteMeta = const VerificationMeta(
-    'placeNote',
-  );
-  @override
-  late final GeneratedColumn<String> placeNote = GeneratedColumn<String>(
-    'place_note',
-    aliasedName,
-    true,
-    type: DriftSqlType.string,
-    requiredDuringInsert: false,
-  );
   static const VerificationMeta _dutyTimeMeta = const VerificationMeta(
     'dutyTime',
   );
@@ -14504,14 +14367,6 @@ class $AmbulanceRecordsTable extends AmbulanceRecords
     id,
     visitId,
     plateNumber,
-    placeGroupIdx,
-    t1PlaceIdx,
-    t2PlaceIdx,
-    remotePlaceIdx,
-    cargoPlaceIdx,
-    novotelPlaceIdx,
-    cabinPlaceIdx,
-    placeNote,
     dutyTime,
     arriveSceneTime,
     leaveSceneTime,
@@ -14610,75 +14465,6 @@ class $AmbulanceRecordsTable extends AmbulanceRecords
           data['plate_number']!,
           _plateNumberMeta,
         ),
-      );
-    }
-    if (data.containsKey('place_group_idx')) {
-      context.handle(
-        _placeGroupIdxMeta,
-        placeGroupIdx.isAcceptableOrUnknown(
-          data['place_group_idx']!,
-          _placeGroupIdxMeta,
-        ),
-      );
-    }
-    if (data.containsKey('t1_place_idx')) {
-      context.handle(
-        _t1PlaceIdxMeta,
-        t1PlaceIdx.isAcceptableOrUnknown(
-          data['t1_place_idx']!,
-          _t1PlaceIdxMeta,
-        ),
-      );
-    }
-    if (data.containsKey('t2_place_idx')) {
-      context.handle(
-        _t2PlaceIdxMeta,
-        t2PlaceIdx.isAcceptableOrUnknown(
-          data['t2_place_idx']!,
-          _t2PlaceIdxMeta,
-        ),
-      );
-    }
-    if (data.containsKey('remote_place_idx')) {
-      context.handle(
-        _remotePlaceIdxMeta,
-        remotePlaceIdx.isAcceptableOrUnknown(
-          data['remote_place_idx']!,
-          _remotePlaceIdxMeta,
-        ),
-      );
-    }
-    if (data.containsKey('cargo_place_idx')) {
-      context.handle(
-        _cargoPlaceIdxMeta,
-        cargoPlaceIdx.isAcceptableOrUnknown(
-          data['cargo_place_idx']!,
-          _cargoPlaceIdxMeta,
-        ),
-      );
-    }
-    if (data.containsKey('novotel_place_idx')) {
-      context.handle(
-        _novotelPlaceIdxMeta,
-        novotelPlaceIdx.isAcceptableOrUnknown(
-          data['novotel_place_idx']!,
-          _novotelPlaceIdxMeta,
-        ),
-      );
-    }
-    if (data.containsKey('cabin_place_idx')) {
-      context.handle(
-        _cabinPlaceIdxMeta,
-        cabinPlaceIdx.isAcceptableOrUnknown(
-          data['cabin_place_idx']!,
-          _cabinPlaceIdxMeta,
-        ),
-      );
-    }
-    if (data.containsKey('place_note')) {
-      context.handle(
-        _placeNoteMeta,
-        placeNote.isAcceptableOrUnknown(data['place_note']!, _placeNoteMeta),
       );
     }
     if (data.containsKey('duty_time')) {
@@ -15254,38 +15040,6 @@ class $AmbulanceRecordsTable extends AmbulanceRecords
         DriftSqlType.string,
         data['${effectivePrefix}plate_number'],
       ),
-      placeGroupIdx: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}place_group_idx'],
-      ),
-      t1PlaceIdx: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}t1_place_idx'],
-      ),
-      t2PlaceIdx: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}t2_place_idx'],
-      ),
-      remotePlaceIdx: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}remote_place_idx'],
-      ),
-      cargoPlaceIdx: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}cargo_place_idx'],
-      ),
-      novotelPlaceIdx: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}novotel_place_idx'],
-      ),
-      cabinPlaceIdx: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}cabin_place_idx'],
-      ),
-      placeNote: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}place_note'],
-      ),
       dutyTime: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}duty_time'],
@@ -15567,14 +15321,6 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
   final int id;
   final int visitId;
   final String? plateNumber;
-  final int? placeGroupIdx;
-  final int? t1PlaceIdx;
-  final int? t2PlaceIdx;
-  final int? remotePlaceIdx;
-  final int? cargoPlaceIdx;
-  final int? novotelPlaceIdx;
-  final int? cabinPlaceIdx;
-  final String? placeNote;
   final DateTime? dutyTime;
   final DateTime? arriveSceneTime;
   final DateTime? leaveSceneTime;
@@ -15646,14 +15392,6 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
     required this.id,
     required this.visitId,
     this.plateNumber,
-    this.placeGroupIdx,
-    this.t1PlaceIdx,
-    this.t2PlaceIdx,
-    this.remotePlaceIdx,
-    this.cargoPlaceIdx,
-    this.novotelPlaceIdx,
-    this.cabinPlaceIdx,
-    this.placeNote,
     this.dutyTime,
     this.arriveSceneTime,
     this.leaveSceneTime,
@@ -15729,30 +15467,6 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
     map['visit_id'] = Variable<int>(visitId);
     if (!nullToAbsent || plateNumber != null) {
       map['plate_number'] = Variable<String>(plateNumber);
-    }
-    if (!nullToAbsent || placeGroupIdx != null) {
-      map['place_group_idx'] = Variable<int>(placeGroupIdx);
-    }
-    if (!nullToAbsent || t1PlaceIdx != null) {
-      map['t1_place_idx'] = Variable<int>(t1PlaceIdx);
-    }
-    if (!nullToAbsent || t2PlaceIdx != null) {
-      map['t2_place_idx'] = Variable<int>(t2PlaceIdx);
-    }
-    if (!nullToAbsent || remotePlaceIdx != null) {
-      map['remote_place_idx'] = Variable<int>(remotePlaceIdx);
-    }
-    if (!nullToAbsent || cargoPlaceIdx != null) {
-      map['cargo_place_idx'] = Variable<int>(cargoPlaceIdx);
-    }
-    if (!nullToAbsent || novotelPlaceIdx != null) {
-      map['novotel_place_idx'] = Variable<int>(novotelPlaceIdx);
-    }
-    if (!nullToAbsent || cabinPlaceIdx != null) {
-      map['cabin_place_idx'] = Variable<int>(cabinPlaceIdx);
-    }
-    if (!nullToAbsent || placeNote != null) {
-      map['place_note'] = Variable<String>(placeNote);
     }
     if (!nullToAbsent || dutyTime != null) {
       map['duty_time'] = Variable<DateTime>(dutyTime);
@@ -15937,30 +15651,6 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
       plateNumber: plateNumber == null && nullToAbsent
           ? const Value.absent()
           : Value(plateNumber),
-      placeGroupIdx: placeGroupIdx == null && nullToAbsent
-          ? const Value.absent()
-          : Value(placeGroupIdx),
-      t1PlaceIdx: t1PlaceIdx == null && nullToAbsent
-          ? const Value.absent()
-          : Value(t1PlaceIdx),
-      t2PlaceIdx: t2PlaceIdx == null && nullToAbsent
-          ? const Value.absent()
-          : Value(t2PlaceIdx),
-      remotePlaceIdx: remotePlaceIdx == null && nullToAbsent
-          ? const Value.absent()
-          : Value(remotePlaceIdx),
-      cargoPlaceIdx: cargoPlaceIdx == null && nullToAbsent
-          ? const Value.absent()
-          : Value(cargoPlaceIdx),
-      novotelPlaceIdx: novotelPlaceIdx == null && nullToAbsent
-          ? const Value.absent()
-          : Value(novotelPlaceIdx),
-      cabinPlaceIdx: cabinPlaceIdx == null && nullToAbsent
-          ? const Value.absent()
-          : Value(cabinPlaceIdx),
-      placeNote: placeNote == null && nullToAbsent
-          ? const Value.absent()
-          : Value(placeNote),
       dutyTime: dutyTime == null && nullToAbsent
           ? const Value.absent()
           : Value(dutyTime),
@@ -16130,14 +15820,6 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
       id: serializer.fromJson<int>(json['id']),
       visitId: serializer.fromJson<int>(json['visitId']),
       plateNumber: serializer.fromJson<String?>(json['plateNumber']),
-      placeGroupIdx: serializer.fromJson<int?>(json['placeGroupIdx']),
-      t1PlaceIdx: serializer.fromJson<int?>(json['t1PlaceIdx']),
-      t2PlaceIdx: serializer.fromJson<int?>(json['t2PlaceIdx']),
-      remotePlaceIdx: serializer.fromJson<int?>(json['remotePlaceIdx']),
-      cargoPlaceIdx: serializer.fromJson<int?>(json['cargoPlaceIdx']),
-      novotelPlaceIdx: serializer.fromJson<int?>(json['novotelPlaceIdx']),
-      cabinPlaceIdx: serializer.fromJson<int?>(json['cabinPlaceIdx']),
-      placeNote: serializer.fromJson<String?>(json['placeNote']),
       dutyTime: serializer.fromJson<DateTime?>(json['dutyTime']),
       arriveSceneTime: serializer.fromJson<DateTime?>(json['arriveSceneTime']),
       leaveSceneTime: serializer.fromJson<DateTime?>(json['leaveSceneTime']),
@@ -16266,14 +15948,6 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
       'id': serializer.toJson<int>(id),
       'visitId': serializer.toJson<int>(visitId),
       'plateNumber': serializer.toJson<String?>(plateNumber),
-      'placeGroupIdx': serializer.toJson<int?>(placeGroupIdx),
-      't1PlaceIdx': serializer.toJson<int?>(t1PlaceIdx),
-      't2PlaceIdx': serializer.toJson<int?>(t2PlaceIdx),
-      'remotePlaceIdx': serializer.toJson<int?>(remotePlaceIdx),
-      'cargoPlaceIdx': serializer.toJson<int?>(cargoPlaceIdx),
-      'novotelPlaceIdx': serializer.toJson<int?>(novotelPlaceIdx),
-      'cabinPlaceIdx': serializer.toJson<int?>(cabinPlaceIdx),
-      'placeNote': serializer.toJson<String?>(placeNote),
       'dutyTime': serializer.toJson<DateTime?>(dutyTime),
       'arriveSceneTime': serializer.toJson<DateTime?>(arriveSceneTime),
       'leaveSceneTime': serializer.toJson<DateTime?>(leaveSceneTime),
@@ -16364,14 +16038,6 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
     int? id,
     int? visitId,
     Value<String?> plateNumber = const Value.absent(),
-    Value<int?> placeGroupIdx = const Value.absent(),
-    Value<int?> t1PlaceIdx = const Value.absent(),
-    Value<int?> t2PlaceIdx = const Value.absent(),
-    Value<int?> remotePlaceIdx = const Value.absent(),
-    Value<int?> cargoPlaceIdx = const Value.absent(),
-    Value<int?> novotelPlaceIdx = const Value.absent(),
-    Value<int?> cabinPlaceIdx = const Value.absent(),
-    Value<String?> placeNote = const Value.absent(),
     Value<DateTime?> dutyTime = const Value.absent(),
     Value<DateTime?> arriveSceneTime = const Value.absent(),
     Value<DateTime?> leaveSceneTime = const Value.absent(),
@@ -16443,24 +16109,6 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
     id: id ?? this.id,
     visitId: visitId ?? this.visitId,
     plateNumber: plateNumber.present ? plateNumber.value : this.plateNumber,
-    placeGroupIdx: placeGroupIdx.present
-        ? placeGroupIdx.value
-        : this.placeGroupIdx,
-    t1PlaceIdx: t1PlaceIdx.present ? t1PlaceIdx.value : this.t1PlaceIdx,
-    t2PlaceIdx: t2PlaceIdx.present ? t2PlaceIdx.value : this.t2PlaceIdx,
-    remotePlaceIdx: remotePlaceIdx.present
-        ? remotePlaceIdx.value
-        : this.remotePlaceIdx,
-    cargoPlaceIdx: cargoPlaceIdx.present
-        ? cargoPlaceIdx.value
-        : this.cargoPlaceIdx,
-    novotelPlaceIdx: novotelPlaceIdx.present
-        ? novotelPlaceIdx.value
-        : this.novotelPlaceIdx,
-    cabinPlaceIdx: cabinPlaceIdx.present
-        ? cabinPlaceIdx.value
-        : this.cabinPlaceIdx,
-    placeNote: placeNote.present ? placeNote.value : this.placeNote,
     dutyTime: dutyTime.present ? dutyTime.value : this.dutyTime,
     arriveSceneTime: arriveSceneTime.present
         ? arriveSceneTime.value
@@ -16593,28 +16241,6 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
       plateNumber: data.plateNumber.present
           ? data.plateNumber.value
           : this.plateNumber,
-      placeGroupIdx: data.placeGroupIdx.present
-          ? data.placeGroupIdx.value
-          : this.placeGroupIdx,
-      t1PlaceIdx: data.t1PlaceIdx.present
-          ? data.t1PlaceIdx.value
-          : this.t1PlaceIdx,
-      t2PlaceIdx: data.t2PlaceIdx.present
-          ? data.t2PlaceIdx.value
-          : this.t2PlaceIdx,
-      remotePlaceIdx: data.remotePlaceIdx.present
-          ? data.remotePlaceIdx.value
-          : this.remotePlaceIdx,
-      cargoPlaceIdx: data.cargoPlaceIdx.present
-          ? data.cargoPlaceIdx.value
-          : this.cargoPlaceIdx,
-      novotelPlaceIdx: data.novotelPlaceIdx.present
-          ? data.novotelPlaceIdx.value
-          : this.novotelPlaceIdx,
-      cabinPlaceIdx: data.cabinPlaceIdx.present
-          ? data.cabinPlaceIdx.value
-          : this.cabinPlaceIdx,
-      placeNote: data.placeNote.present ? data.placeNote.value : this.placeNote,
       dutyTime: data.dutyTime.present ? data.dutyTime.value : this.dutyTime,
       arriveSceneTime: data.arriveSceneTime.present
           ? data.arriveSceneTime.value
@@ -16797,14 +16423,6 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
           ..write('id: $id, ')
           ..write('visitId: $visitId, ')
           ..write('plateNumber: $plateNumber, ')
-          ..write('placeGroupIdx: $placeGroupIdx, ')
-          ..write('t1PlaceIdx: $t1PlaceIdx, ')
-          ..write('t2PlaceIdx: $t2PlaceIdx, ')
-          ..write('remotePlaceIdx: $remotePlaceIdx, ')
-          ..write('cargoPlaceIdx: $cargoPlaceIdx, ')
-          ..write('novotelPlaceIdx: $novotelPlaceIdx, ')
-          ..write('cabinPlaceIdx: $cabinPlaceIdx, ')
-          ..write('placeNote: $placeNote, ')
           ..write('dutyTime: $dutyTime, ')
           ..write('arriveSceneTime: $arriveSceneTime, ')
           ..write('leaveSceneTime: $leaveSceneTime, ')
@@ -16883,14 +16501,6 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
     id,
     visitId,
     plateNumber,
-    placeGroupIdx,
-    t1PlaceIdx,
-    t2PlaceIdx,
-    remotePlaceIdx,
-    cargoPlaceIdx,
-    novotelPlaceIdx,
-    cabinPlaceIdx,
-    placeNote,
     dutyTime,
     arriveSceneTime,
     leaveSceneTime,
@@ -16966,14 +16576,6 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
           other.id == this.id &&
           other.visitId == this.visitId &&
           other.plateNumber == this.plateNumber &&
-          other.placeGroupIdx == this.placeGroupIdx &&
-          other.t1PlaceIdx == this.t1PlaceIdx &&
-          other.t2PlaceIdx == this.t2PlaceIdx &&
-          other.remotePlaceIdx == this.remotePlaceIdx &&
-          other.cargoPlaceIdx == this.cargoPlaceIdx &&
-          other.novotelPlaceIdx == this.novotelPlaceIdx &&
-          other.cabinPlaceIdx == this.cabinPlaceIdx &&
-          other.placeNote == this.placeNote &&
           other.dutyTime == this.dutyTime &&
           other.arriveSceneTime == this.arriveSceneTime &&
           other.leaveSceneTime == this.leaveSceneTime &&
@@ -17052,14 +16654,6 @@ class AmbulanceRecordsCompanion extends UpdateCompanion<AmbulanceRecord> {
   final Value<int> id;
   final Value<int> visitId;
   final Value<String?> plateNumber;
-  final Value<int?> placeGroupIdx;
-  final Value<int?> t1PlaceIdx;
-  final Value<int?> t2PlaceIdx;
-  final Value<int?> remotePlaceIdx;
-  final Value<int?> cargoPlaceIdx;
-  final Value<int?> novotelPlaceIdx;
-  final Value<int?> cabinPlaceIdx;
-  final Value<String?> placeNote;
   final Value<DateTime?> dutyTime;
   final Value<DateTime?> arriveSceneTime;
   final Value<DateTime?> leaveSceneTime;
@@ -17131,14 +16725,6 @@ class AmbulanceRecordsCompanion extends UpdateCompanion<AmbulanceRecord> {
     this.id = const Value.absent(),
     this.visitId = const Value.absent(),
     this.plateNumber = const Value.absent(),
-    this.placeGroupIdx = const Value.absent(),
-    this.t1PlaceIdx = const Value.absent(),
-    this.t2PlaceIdx = const Value.absent(),
-    this.remotePlaceIdx = const Value.absent(),
-    this.cargoPlaceIdx = const Value.absent(),
-    this.novotelPlaceIdx = const Value.absent(),
-    this.cabinPlaceIdx = const Value.absent(),
-    this.placeNote = const Value.absent(),
     this.dutyTime = const Value.absent(),
     this.arriveSceneTime = const Value.absent(),
     this.leaveSceneTime = const Value.absent(),
@@ -17211,14 +16797,6 @@ class AmbulanceRecordsCompanion extends UpdateCompanion<AmbulanceRecord> {
     this.id = const Value.absent(),
     required int visitId,
     this.plateNumber = const Value.absent(),
-    this.placeGroupIdx = const Value.absent(),
-    this.t1PlaceIdx = const Value.absent(),
-    this.t2PlaceIdx = const Value.absent(),
-    this.remotePlaceIdx = const Value.absent(),
-    this.cargoPlaceIdx = const Value.absent(),
-    this.novotelPlaceIdx = const Value.absent(),
-    this.cabinPlaceIdx = const Value.absent(),
-    this.placeNote = const Value.absent(),
     this.dutyTime = const Value.absent(),
     this.arriveSceneTime = const Value.absent(),
     this.leaveSceneTime = const Value.absent(),
@@ -17291,14 +16869,6 @@ class AmbulanceRecordsCompanion extends UpdateCompanion<AmbulanceRecord> {
     Expression<int>? id,
     Expression<int>? visitId,
     Expression<String>? plateNumber,
-    Expression<int>? placeGroupIdx,
-    Expression<int>? t1PlaceIdx,
-    Expression<int>? t2PlaceIdx,
-    Expression<int>? remotePlaceIdx,
-    Expression<int>? cargoPlaceIdx,
-    Expression<int>? novotelPlaceIdx,
-    Expression<int>? cabinPlaceIdx,
-    Expression<String>? placeNote,
     Expression<DateTime>? dutyTime,
     Expression<DateTime>? arriveSceneTime,
     Expression<DateTime>? leaveSceneTime,
@@ -17371,14 +16941,6 @@ class AmbulanceRecordsCompanion extends UpdateCompanion<AmbulanceRecord> {
       if (id != null) 'id': id,
       if (visitId != null) 'visit_id': visitId,
       if (plateNumber != null) 'plate_number': plateNumber,
-      if (placeGroupIdx != null) 'place_group_idx': placeGroupIdx,
-      if (t1PlaceIdx != null) 't1_place_idx': t1PlaceIdx,
-      if (t2PlaceIdx != null) 't2_place_idx': t2PlaceIdx,
-      if (remotePlaceIdx != null) 'remote_place_idx': remotePlaceIdx,
-      if (cargoPlaceIdx != null) 'cargo_place_idx': cargoPlaceIdx,
-      if (novotelPlaceIdx != null) 'novotel_place_idx': novotelPlaceIdx,
-      if (cabinPlaceIdx != null) 'cabin_place_idx': cabinPlaceIdx,
-      if (placeNote != null) 'place_note': placeNote,
       if (dutyTime != null) 'duty_time': dutyTime,
       if (arriveSceneTime != null) 'arrive_scene_time': arriveSceneTime,
       if (leaveSceneTime != null) 'leave_scene_time': leaveSceneTime,
@@ -17474,14 +17036,6 @@ class AmbulanceRecordsCompanion extends UpdateCompanion<AmbulanceRecord> {
     Value<int>? id,
     Value<int>? visitId,
     Value<String?>? plateNumber,
-    Value<int?>? placeGroupIdx,
-    Value<int?>? t1PlaceIdx,
-    Value<int?>? t2PlaceIdx,
-    Value<int?>? remotePlaceIdx,
-    Value<int?>? cargoPlaceIdx,
-    Value<int?>? novotelPlaceIdx,
-    Value<int?>? cabinPlaceIdx,
-    Value<String?>? placeNote,
     Value<DateTime?>? dutyTime,
     Value<DateTime?>? arriveSceneTime,
     Value<DateTime?>? leaveSceneTime,
@@ -17554,14 +17108,6 @@ class AmbulanceRecordsCompanion extends UpdateCompanion<AmbulanceRecord> {
       id: id ?? this.id,
       visitId: visitId ?? this.visitId,
       plateNumber: plateNumber ?? this.plateNumber,
-      placeGroupIdx: placeGroupIdx ?? this.placeGroupIdx,
-      t1PlaceIdx: t1PlaceIdx ?? this.t1PlaceIdx,
-      t2PlaceIdx: t2PlaceIdx ?? this.t2PlaceIdx,
-      remotePlaceIdx: remotePlaceIdx ?? this.remotePlaceIdx,
-      cargoPlaceIdx: cargoPlaceIdx ?? this.cargoPlaceIdx,
-      novotelPlaceIdx: novotelPlaceIdx ?? this.novotelPlaceIdx,
-      cabinPlaceIdx: cabinPlaceIdx ?? this.cabinPlaceIdx,
-      placeNote: placeNote ?? this.placeNote,
       dutyTime: dutyTime ?? this.dutyTime,
       arriveSceneTime: arriveSceneTime ?? this.arriveSceneTime,
       leaveSceneTime: leaveSceneTime ?? this.leaveSceneTime,
@@ -17654,30 +17200,6 @@ class AmbulanceRecordsCompanion extends UpdateCompanion<AmbulanceRecord> {
     }
     if (plateNumber.present) {
       map['plate_number'] = Variable<String>(plateNumber.value);
-    }
-    if (placeGroupIdx.present) {
-      map['place_group_idx'] = Variable<int>(placeGroupIdx.value);
-    }
-    if (t1PlaceIdx.present) {
-      map['t1_place_idx'] = Variable<int>(t1PlaceIdx.value);
-    }
-    if (t2PlaceIdx.present) {
-      map['t2_place_idx'] = Variable<int>(t2PlaceIdx.value);
-    }
-    if (remotePlaceIdx.present) {
-      map['remote_place_idx'] = Variable<int>(remotePlaceIdx.value);
-    }
-    if (cargoPlaceIdx.present) {
-      map['cargo_place_idx'] = Variable<int>(cargoPlaceIdx.value);
-    }
-    if (novotelPlaceIdx.present) {
-      map['novotel_place_idx'] = Variable<int>(novotelPlaceIdx.value);
-    }
-    if (cabinPlaceIdx.present) {
-      map['cabin_place_idx'] = Variable<int>(cabinPlaceIdx.value);
-    }
-    if (placeNote.present) {
-      map['place_note'] = Variable<String>(placeNote.value);
     }
     if (dutyTime.present) {
       map['duty_time'] = Variable<DateTime>(dutyTime.value);
@@ -17929,14 +17451,6 @@ class AmbulanceRecordsCompanion extends UpdateCompanion<AmbulanceRecord> {
           ..write('id: $id, ')
           ..write('visitId: $visitId, ')
           ..write('plateNumber: $plateNumber, ')
-          ..write('placeGroupIdx: $placeGroupIdx, ')
-          ..write('t1PlaceIdx: $t1PlaceIdx, ')
-          ..write('t2PlaceIdx: $t2PlaceIdx, ')
-          ..write('remotePlaceIdx: $remotePlaceIdx, ')
-          ..write('cargoPlaceIdx: $cargoPlaceIdx, ')
-          ..write('novotelPlaceIdx: $novotelPlaceIdx, ')
-          ..write('cabinPlaceIdx: $cabinPlaceIdx, ')
-          ..write('placeNote: $placeNote, ')
           ..write('dutyTime: $dutyTime, ')
           ..write('arriveSceneTime: $arriveSceneTime, ')
           ..write('leaveSceneTime: $leaveSceneTime, ')
@@ -19525,106 +19039,6 @@ class $EmergencyRecordsTable extends EmergencyRecords
     requiredDuringInsert: true,
     defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'),
   );
-  static const VerificationMeta _incidentDateTimeMeta = const VerificationMeta(
-    'incidentDateTime',
-  );
-  @override
-  late final GeneratedColumn<DateTime> incidentDateTime =
-      GeneratedColumn<DateTime>(
-        'incident_date_time',
-        aliasedName,
-        true,
-        type: DriftSqlType.dateTime,
-        requiredDuringInsert: false,
-      );
-  static const VerificationMeta _placeGroupIdxMeta = const VerificationMeta(
-    'placeGroupIdx',
-  );
-  @override
-  late final GeneratedColumn<int> placeGroupIdx = GeneratedColumn<int>(
-    'place_group_idx',
-    aliasedName,
-    true,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
-  );
-  static const VerificationMeta _t1SelectedMeta = const VerificationMeta(
-    't1Selected',
-  );
-  @override
-  late final GeneratedColumn<int> t1Selected = GeneratedColumn<int>(
-    't1_selected',
-    aliasedName,
-    true,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
-  );
-  static const VerificationMeta _t2SelectedMeta = const VerificationMeta(
-    't2Selected',
-  );
-  @override
-  late final GeneratedColumn<int> t2Selected = GeneratedColumn<int>(
-    't2_selected',
-    aliasedName,
-    true,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
-  );
-  static const VerificationMeta _remoteSelectedMeta = const VerificationMeta(
-    'remoteSelected',
-  );
-  @override
-  late final GeneratedColumn<int> remoteSelected = GeneratedColumn<int>(
-    'remote_selected',
-    aliasedName,
-    true,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
-  );
-  static const VerificationMeta _cargoSelectedMeta = const VerificationMeta(
-    'cargoSelected',
-  );
-  @override
-  late final GeneratedColumn<int> cargoSelected = GeneratedColumn<int>(
-    'cargo_selected',
-    aliasedName,
-    true,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
-  );
-  static const VerificationMeta _novotelSelectedMeta = const VerificationMeta(
-    'novotelSelected',
-  );
-  @override
-  late final GeneratedColumn<int> novotelSelected = GeneratedColumn<int>(
-    'novotel_selected',
-    aliasedName,
-    true,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
-  );
-  static const VerificationMeta _cabinSelectedMeta = const VerificationMeta(
-    'cabinSelected',
-  );
-  @override
-  late final GeneratedColumn<int> cabinSelected = GeneratedColumn<int>(
-    'cabin_selected',
-    aliasedName,
-    true,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
-  );
-  static const VerificationMeta _placeNoteMeta = const VerificationMeta(
-    'placeNote',
-  );
-  @override
-  late final GeneratedColumn<String> placeNote = GeneratedColumn<String>(
-    'place_note',
-    aliasedName,
-    true,
-    type: DriftSqlType.string,
-    requiredDuringInsert: false,
-  );
   static const VerificationMeta _firstAidStartTimeMeta = const VerificationMeta(
     'firstAidStartTime',
   );
@@ -19716,66 +19130,6 @@ class $EmergencyRecordsTable extends EmergencyRecords
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
-  static const VerificationMeta _evmEMeta = const VerificationMeta('evmE');
-  @override
-  late final GeneratedColumn<String> evmE = GeneratedColumn<String>(
-    'evm_e',
-    aliasedName,
-    true,
-    type: DriftSqlType.string,
-    requiredDuringInsert: false,
-  );
-  static const VerificationMeta _evmVMeta = const VerificationMeta('evmV');
-  @override
-  late final GeneratedColumn<String> evmV = GeneratedColumn<String>(
-    'evm_v',
-    aliasedName,
-    true,
-    type: DriftSqlType.string,
-    requiredDuringInsert: false,
-  );
-  static const VerificationMeta _evmMMeta = const VerificationMeta('evmM');
-  @override
-  late final GeneratedColumn<String> evmM = GeneratedColumn<String>(
-    'evm_m',
-    aliasedName,
-    true,
-    type: DriftSqlType.string,
-    requiredDuringInsert: false,
-  );
-  static const VerificationMeta _heartRateMeta = const VerificationMeta(
-    'heartRate',
-  );
-  @override
-  late final GeneratedColumn<String> heartRate = GeneratedColumn<String>(
-    'heart_rate',
-    aliasedName,
-    true,
-    type: DriftSqlType.string,
-    requiredDuringInsert: false,
-  );
-  static const VerificationMeta _respirationRateMeta = const VerificationMeta(
-    'respirationRate',
-  );
-  @override
-  late final GeneratedColumn<String> respirationRate = GeneratedColumn<String>(
-    'respiration_rate',
-    aliasedName,
-    true,
-    type: DriftSqlType.string,
-    requiredDuringInsert: false,
-  );
-  static const VerificationMeta _bloodPressureMeta = const VerificationMeta(
-    'bloodPressure',
-  );
-  @override
-  late final GeneratedColumn<String> bloodPressure = GeneratedColumn<String>(
-    'blood_pressure',
-    aliasedName,
-    true,
-    type: DriftSqlType.string,
-    requiredDuringInsert: false,
-  );
   static const VerificationMeta _temperatureMeta = const VerificationMeta(
     'temperature',
   );
@@ -19787,51 +19141,6 @@ class $EmergencyRecordsTable extends EmergencyRecords
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
-  static const VerificationMeta _leftPupilSizeMeta = const VerificationMeta(
-    'leftPupilSize',
-  );
-  @override
-  late final GeneratedColumn<String> leftPupilSize = GeneratedColumn<String>(
-    'left_pupil_size',
-    aliasedName,
-    true,
-    type: DriftSqlType.string,
-    requiredDuringInsert: false,
-  );
-  static const VerificationMeta _rightPupilSizeMeta = const VerificationMeta(
-    'rightPupilSize',
-  );
-  @override
-  late final GeneratedColumn<String> rightPupilSize = GeneratedColumn<String>(
-    'right_pupil_size',
-    aliasedName,
-    true,
-    type: DriftSqlType.string,
-    requiredDuringInsert: false,
-  );
-  static const VerificationMeta _leftPupilReactionMeta = const VerificationMeta(
-    'leftPupilReaction',
-  );
-  @override
-  late final GeneratedColumn<String> leftPupilReaction =
-      GeneratedColumn<String>(
-        'left_pupil_reaction',
-        aliasedName,
-        true,
-        type: DriftSqlType.string,
-        requiredDuringInsert: false,
-      );
-  static const VerificationMeta _rightPupilReactionMeta =
-      const VerificationMeta('rightPupilReaction');
-  @override
-  late final GeneratedColumn<String> rightPupilReaction =
-      GeneratedColumn<String>(
-        'right_pupil_reaction',
-        aliasedName,
-        true,
-        type: DriftSqlType.string,
-        requiredDuringInsert: false,
-      );
   static const VerificationMeta _insertionMethodMeta = const VerificationMeta(
     'insertionMethod',
   );
@@ -20192,15 +19501,6 @@ class $EmergencyRecordsTable extends EmergencyRecords
   List<GeneratedColumn> get $columns => [
     id,
     visitId,
-    incidentDateTime,
-    placeGroupIdx,
-    t1Selected,
-    t2Selected,
-    remoteSelected,
-    cargoSelected,
-    novotelSelected,
-    cabinSelected,
-    placeNote,
     firstAidStartTime,
     intubationStartTime,
     onIVLineStartTime,
@@ -20209,17 +19509,7 @@ class $EmergencyRecordsTable extends EmergencyRecords
     firstAidEndTime,
     diagnosis,
     situation,
-    evmE,
-    evmV,
-    evmM,
-    heartRate,
-    respirationRate,
-    bloodPressure,
     temperature,
-    leftPupilSize,
-    rightPupilSize,
-    leftPupilReaction,
-    rightPupilReaction,
     insertionMethod,
     airwayContent,
     insertionRecord,
@@ -20275,78 +19565,6 @@ class $EmergencyRecordsTable extends EmergencyRecords
       );
     } else if (isInserting) {
       context.missing(_visitIdMeta);
-    }
-    if (data.containsKey('incident_date_time')) {
-      context.handle(
-        _incidentDateTimeMeta,
-        incidentDateTime.isAcceptableOrUnknown(
-          data['incident_date_time']!,
-          _incidentDateTimeMeta,
-        ),
-      );
-    }
-    if (data.containsKey('place_group_idx')) {
-      context.handle(
-        _placeGroupIdxMeta,
-        placeGroupIdx.isAcceptableOrUnknown(
-          data['place_group_idx']!,
-          _placeGroupIdxMeta,
-        ),
-      );
-    }
-    if (data.containsKey('t1_selected')) {
-      context.handle(
-        _t1SelectedMeta,
-        t1Selected.isAcceptableOrUnknown(data['t1_selected']!, _t1SelectedMeta),
-      );
-    }
-    if (data.containsKey('t2_selected')) {
-      context.handle(
-        _t2SelectedMeta,
-        t2Selected.isAcceptableOrUnknown(data['t2_selected']!, _t2SelectedMeta),
-      );
-    }
-    if (data.containsKey('remote_selected')) {
-      context.handle(
-        _remoteSelectedMeta,
-        remoteSelected.isAcceptableOrUnknown(
-          data['remote_selected']!,
-          _remoteSelectedMeta,
-        ),
-      );
-    }
-    if (data.containsKey('cargo_selected')) {
-      context.handle(
-        _cargoSelectedMeta,
-        cargoSelected.isAcceptableOrUnknown(
-          data['cargo_selected']!,
-          _cargoSelectedMeta,
-        ),
-      );
-    }
-    if (data.containsKey('novotel_selected')) {
-      context.handle(
-        _novotelSelectedMeta,
-        novotelSelected.isAcceptableOrUnknown(
-          data['novotel_selected']!,
-          _novotelSelectedMeta,
-        ),
-      );
-    }
-    if (data.containsKey('cabin_selected')) {
-      context.handle(
-        _cabinSelectedMeta,
-        cabinSelected.isAcceptableOrUnknown(
-          data['cabin_selected']!,
-          _cabinSelectedMeta,
-        ),
-      );
-    }
-    if (data.containsKey('place_note')) {
-      context.handle(
-        _placeNoteMeta,
-        placeNote.isAcceptableOrUnknown(data['place_note']!, _placeNoteMeta),
-      );
     }
     if (data.containsKey('first_aid_start_time')) {
       context.handle(
@@ -20414,90 +19632,12 @@ class $EmergencyRecordsTable extends EmergencyRecords
         situation.isAcceptableOrUnknown(data['situation']!, _situationMeta),
       );
     }
-    if (data.containsKey('evm_e')) {
-      context.handle(
-        _evmEMeta,
-        evmE.isAcceptableOrUnknown(data['evm_e']!, _evmEMeta),
-      );
-    }
-    if (data.containsKey('evm_v')) {
-      context.handle(
-        _evmVMeta,
-        evmV.isAcceptableOrUnknown(data['evm_v']!, _evmVMeta),
-      );
-    }
-    if (data.containsKey('evm_m')) {
-      context.handle(
-        _evmMMeta,
-        evmM.isAcceptableOrUnknown(data['evm_m']!, _evmMMeta),
-      );
-    }
-    if (data.containsKey('heart_rate')) {
-      context.handle(
-        _heartRateMeta,
-        heartRate.isAcceptableOrUnknown(data['heart_rate']!, _heartRateMeta),
-      );
-    }
-    if (data.containsKey('respiration_rate')) {
-      context.handle(
-        _respirationRateMeta,
-        respirationRate.isAcceptableOrUnknown(
-          data['respiration_rate']!,
-          _respirationRateMeta,
-        ),
-      );
-    }
-    if (data.containsKey('blood_pressure')) {
-      context.handle(
-        _bloodPressureMeta,
-        bloodPressure.isAcceptableOrUnknown(
-          data['blood_pressure']!,
-          _bloodPressureMeta,
-        ),
-      );
-    }
     if (data.containsKey('temperature')) {
       context.handle(
         _temperatureMeta,
         temperature.isAcceptableOrUnknown(
           data['temperature']!,
           _temperatureMeta,
-        ),
-      );
-    }
-    if (data.containsKey('left_pupil_size')) {
-      context.handle(
-        _leftPupilSizeMeta,
-        leftPupilSize.isAcceptableOrUnknown(
-          data['left_pupil_size']!,
-          _leftPupilSizeMeta,
-        ),
-      );
-    }
-    if (data.containsKey('right_pupil_size')) {
-      context.handle(
-        _rightPupilSizeMeta,
-        rightPupilSize.isAcceptableOrUnknown(
-          data['right_pupil_size']!,
-          _rightPupilSizeMeta,
-        ),
-      );
-    }
-    if (data.containsKey('left_pupil_reaction')) {
-      context.handle(
-        _leftPupilReactionMeta,
-        leftPupilReaction.isAcceptableOrUnknown(
-          data['left_pupil_reaction']!,
-          _leftPupilReactionMeta,
-        ),
-      );
-    }
-    if (data.containsKey('right_pupil_reaction')) {
-      context.handle(
-        _rightPupilReactionMeta,
-        rightPupilReaction.isAcceptableOrUnknown(
-          data['right_pupil_reaction']!,
-          _rightPupilReactionMeta,
         ),
       );
     }
@@ -20791,42 +19931,6 @@ class $EmergencyRecordsTable extends EmergencyRecords
         DriftSqlType.int,
         data['${effectivePrefix}visit_id'],
       )!,
-      incidentDateTime: attachedDatabase.typeMapping.read(
-        DriftSqlType.dateTime,
-        data['${effectivePrefix}incident_date_time'],
-      ),
-      placeGroupIdx: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}place_group_idx'],
-      ),
-      t1Selected: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}t1_selected'],
-      ),
-      t2Selected: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}t2_selected'],
-      ),
-      remoteSelected: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}remote_selected'],
-      ),
-      cargoSelected: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}cargo_selected'],
-      ),
-      novotelSelected: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}novotel_selected'],
-      ),
-      cabinSelected: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}cabin_selected'],
-      ),
-      placeNote: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}place_note'],
-      ),
       firstAidStartTime: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}first_aid_start_time'],
@@ -20859,49 +19963,9 @@ class $EmergencyRecordsTable extends EmergencyRecords
         DriftSqlType.string,
         data['${effectivePrefix}situation'],
       ),
-      evmE: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}evm_e'],
-      ),
-      evmV: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}evm_v'],
-      ),
-      evmM: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}evm_m'],
-      ),
-      heartRate: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}heart_rate'],
-      ),
-      respirationRate: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}respiration_rate'],
-      ),
-      bloodPressure: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}blood_pressure'],
-      ),
       temperature: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}temperature'],
-      ),
-      leftPupilSize: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}left_pupil_size'],
-      ),
-      rightPupilSize: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}right_pupil_size'],
-      ),
-      leftPupilReaction: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}left_pupil_reaction'],
-      ),
-      rightPupilReaction: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}right_pupil_reaction'],
       ),
       insertionMethod: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
@@ -21043,15 +20107,6 @@ class $EmergencyRecordsTable extends EmergencyRecords
 class EmergencyRecord extends DataClass implements Insertable<EmergencyRecord> {
   final int id;
   final int visitId;
-  final DateTime? incidentDateTime;
-  final int? placeGroupIdx;
-  final int? t1Selected;
-  final int? t2Selected;
-  final int? remoteSelected;
-  final int? cargoSelected;
-  final int? novotelSelected;
-  final int? cabinSelected;
-  final String? placeNote;
   final DateTime? firstAidStartTime;
   final DateTime? intubationStartTime;
   final DateTime? onIVLineStartTime;
@@ -21060,17 +20115,7 @@ class EmergencyRecord extends DataClass implements Insertable<EmergencyRecord> {
   final DateTime? firstAidEndTime;
   final String? diagnosis;
   final String? situation;
-  final String? evmE;
-  final String? evmV;
-  final String? evmM;
-  final String? heartRate;
-  final String? respirationRate;
-  final String? bloodPressure;
   final String? temperature;
-  final String? leftPupilSize;
-  final String? rightPupilSize;
-  final String? leftPupilReaction;
-  final String? rightPupilReaction;
   final String? insertionMethod;
   final String? airwayContent;
   final String? insertionRecord;
@@ -21106,15 +20151,6 @@ class EmergencyRecord extends DataClass implements Insertable<EmergencyRecord> {
   const EmergencyRecord({
     required this.id,
     required this.visitId,
-    this.incidentDateTime,
-    this.placeGroupIdx,
-    this.t1Selected,
-    this.t2Selected,
-    this.remoteSelected,
-    this.cargoSelected,
-    this.novotelSelected,
-    this.cabinSelected,
-    this.placeNote,
     this.firstAidStartTime,
     this.intubationStartTime,
     this.onIVLineStartTime,
@@ -21123,17 +20159,7 @@ class EmergencyRecord extends DataClass implements Insertable<EmergencyRecord> {
     this.firstAidEndTime,
     this.diagnosis,
     this.situation,
-    this.evmE,
-    this.evmV,
-    this.evmM,
-    this.heartRate,
-    this.respirationRate,
-    this.bloodPressure,
     this.temperature,
-    this.leftPupilSize,
-    this.rightPupilSize,
-    this.leftPupilReaction,
-    this.rightPupilReaction,
     this.insertionMethod,
     this.airwayContent,
     this.insertionRecord,
@@ -21172,33 +20198,6 @@ class EmergencyRecord extends DataClass implements Insertable<EmergencyRecord> {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
     map['visit_id'] = Variable<int>(visitId);
-    if (!nullToAbsent || incidentDateTime != null) {
-      map['incident_date_time'] = Variable<DateTime>(incidentDateTime);
-    }
-    if (!nullToAbsent || placeGroupIdx != null) {
-      map['place_group_idx'] = Variable<int>(placeGroupIdx);
-    }
-    if (!nullToAbsent || t1Selected != null) {
-      map['t1_selected'] = Variable<int>(t1Selected);
-    }
-    if (!nullToAbsent || t2Selected != null) {
-      map['t2_selected'] = Variable<int>(t2Selected);
-    }
-    if (!nullToAbsent || remoteSelected != null) {
-      map['remote_selected'] = Variable<int>(remoteSelected);
-    }
-    if (!nullToAbsent || cargoSelected != null) {
-      map['cargo_selected'] = Variable<int>(cargoSelected);
-    }
-    if (!nullToAbsent || novotelSelected != null) {
-      map['novotel_selected'] = Variable<int>(novotelSelected);
-    }
-    if (!nullToAbsent || cabinSelected != null) {
-      map['cabin_selected'] = Variable<int>(cabinSelected);
-    }
-    if (!nullToAbsent || placeNote != null) {
-      map['place_note'] = Variable<String>(placeNote);
-    }
     if (!nullToAbsent || firstAidStartTime != null) {
       map['first_aid_start_time'] = Variable<DateTime>(firstAidStartTime);
     }
@@ -21227,38 +20226,8 @@ class EmergencyRecord extends DataClass implements Insertable<EmergencyRecord> {
     if (!nullToAbsent || situation != null) {
       map['situation'] = Variable<String>(situation);
     }
-    if (!nullToAbsent || evmE != null) {
-      map['evm_e'] = Variable<String>(evmE);
-    }
-    if (!nullToAbsent || evmV != null) {
-      map['evm_v'] = Variable<String>(evmV);
-    }
-    if (!nullToAbsent || evmM != null) {
-      map['evm_m'] = Variable<String>(evmM);
-    }
-    if (!nullToAbsent || heartRate != null) {
-      map['heart_rate'] = Variable<String>(heartRate);
-    }
-    if (!nullToAbsent || respirationRate != null) {
-      map['respiration_rate'] = Variable<String>(respirationRate);
-    }
-    if (!nullToAbsent || bloodPressure != null) {
-      map['blood_pressure'] = Variable<String>(bloodPressure);
-    }
     if (!nullToAbsent || temperature != null) {
       map['temperature'] = Variable<String>(temperature);
-    }
-    if (!nullToAbsent || leftPupilSize != null) {
-      map['left_pupil_size'] = Variable<String>(leftPupilSize);
-    }
-    if (!nullToAbsent || rightPupilSize != null) {
-      map['right_pupil_size'] = Variable<String>(rightPupilSize);
-    }
-    if (!nullToAbsent || leftPupilReaction != null) {
-      map['left_pupil_reaction'] = Variable<String>(leftPupilReaction);
-    }
-    if (!nullToAbsent || rightPupilReaction != null) {
-      map['right_pupil_reaction'] = Variable<String>(rightPupilReaction);
     }
     if (!nullToAbsent || insertionMethod != null) {
       map['insertion_method'] = Variable<String>(insertionMethod);
@@ -21369,33 +20338,6 @@ class EmergencyRecord extends DataClass implements Insertable<EmergencyRecord> {
     return EmergencyRecordsCompanion(
       id: Value(id),
       visitId: Value(visitId),
-      incidentDateTime: incidentDateTime == null && nullToAbsent
-          ? const Value.absent()
-          : Value(incidentDateTime),
-      placeGroupIdx: placeGroupIdx == null && nullToAbsent
-          ? const Value.absent()
-          : Value(placeGroupIdx),
-      t1Selected: t1Selected == null && nullToAbsent
-          ? const Value.absent()
-          : Value(t1Selected),
-      t2Selected: t2Selected == null && nullToAbsent
-          ? const Value.absent()
-          : Value(t2Selected),
-      remoteSelected: remoteSelected == null && nullToAbsent
-          ? const Value.absent()
-          : Value(remoteSelected),
-      cargoSelected: cargoSelected == null && nullToAbsent
-          ? const Value.absent()
-          : Value(cargoSelected),
-      novotelSelected: novotelSelected == null && nullToAbsent
-          ? const Value.absent()
-          : Value(novotelSelected),
-      cabinSelected: cabinSelected == null && nullToAbsent
-          ? const Value.absent()
-          : Value(cabinSelected),
-      placeNote: placeNote == null && nullToAbsent
-          ? const Value.absent()
-          : Value(placeNote),
       firstAidStartTime: firstAidStartTime == null && nullToAbsent
           ? const Value.absent()
           : Value(firstAidStartTime),
@@ -21420,33 +20362,9 @@ class EmergencyRecord extends DataClass implements Insertable<EmergencyRecord> {
       situation: situation == null && nullToAbsent
           ? const Value.absent()
           : Value(situation),
-      evmE: evmE == null && nullToAbsent ? const Value.absent() : Value(evmE),
-      evmV: evmV == null && nullToAbsent ? const Value.absent() : Value(evmV),
-      evmM: evmM == null && nullToAbsent ? const Value.absent() : Value(evmM),
-      heartRate: heartRate == null && nullToAbsent
-          ? const Value.absent()
-          : Value(heartRate),
-      respirationRate: respirationRate == null && nullToAbsent
-          ? const Value.absent()
-          : Value(respirationRate),
-      bloodPressure: bloodPressure == null && nullToAbsent
-          ? const Value.absent()
-          : Value(bloodPressure),
       temperature: temperature == null && nullToAbsent
           ? const Value.absent()
           : Value(temperature),
-      leftPupilSize: leftPupilSize == null && nullToAbsent
-          ? const Value.absent()
-          : Value(leftPupilSize),
-      rightPupilSize: rightPupilSize == null && nullToAbsent
-          ? const Value.absent()
-          : Value(rightPupilSize),
-      leftPupilReaction: leftPupilReaction == null && nullToAbsent
-          ? const Value.absent()
-          : Value(leftPupilReaction),
-      rightPupilReaction: rightPupilReaction == null && nullToAbsent
-          ? const Value.absent()
-          : Value(rightPupilReaction),
       insertionMethod: insertionMethod == null && nullToAbsent
           ? const Value.absent()
           : Value(insertionMethod),
@@ -21553,17 +20471,6 @@ class EmergencyRecord extends DataClass implements Insertable<EmergencyRecord> {
     return EmergencyRecord(
       id: serializer.fromJson<int>(json['id']),
       visitId: serializer.fromJson<int>(json['visitId']),
-      incidentDateTime: serializer.fromJson<DateTime?>(
-        json['incidentDateTime'],
-      ),
-      placeGroupIdx: serializer.fromJson<int?>(json['placeGroupIdx']),
-      t1Selected: serializer.fromJson<int?>(json['t1Selected']),
-      t2Selected: serializer.fromJson<int?>(json['t2Selected']),
-      remoteSelected: serializer.fromJson<int?>(json['remoteSelected']),
-      cargoSelected: serializer.fromJson<int?>(json['cargoSelected']),
-      novotelSelected: serializer.fromJson<int?>(json['novotelSelected']),
-      cabinSelected: serializer.fromJson<int?>(json['cabinSelected']),
-      placeNote: serializer.fromJson<String?>(json['placeNote']),
       firstAidStartTime: serializer.fromJson<DateTime?>(
         json['firstAidStartTime'],
       ),
@@ -21582,21 +20489,7 @@ class EmergencyRecord extends DataClass implements Insertable<EmergencyRecord> {
       firstAidEndTime: serializer.fromJson<DateTime?>(json['firstAidEndTime']),
       diagnosis: serializer.fromJson<String?>(json['diagnosis']),
       situation: serializer.fromJson<String?>(json['situation']),
-      evmE: serializer.fromJson<String?>(json['evmE']),
-      evmV: serializer.fromJson<String?>(json['evmV']),
-      evmM: serializer.fromJson<String?>(json['evmM']),
-      heartRate: serializer.fromJson<String?>(json['heartRate']),
-      respirationRate: serializer.fromJson<String?>(json['respirationRate']),
-      bloodPressure: serializer.fromJson<String?>(json['bloodPressure']),
       temperature: serializer.fromJson<String?>(json['temperature']),
-      leftPupilSize: serializer.fromJson<String?>(json['leftPupilSize']),
-      rightPupilSize: serializer.fromJson<String?>(json['rightPupilSize']),
-      leftPupilReaction: serializer.fromJson<String?>(
-        json['leftPupilReaction'],
-      ),
-      rightPupilReaction: serializer.fromJson<String?>(
-        json['rightPupilReaction'],
-      ),
       insertionMethod: serializer.fromJson<String?>(json['insertionMethod']),
       airwayContent: serializer.fromJson<String?>(json['airwayContent']),
       insertionRecord: serializer.fromJson<String?>(json['insertionRecord']),
@@ -21663,15 +20556,6 @@ class EmergencyRecord extends DataClass implements Insertable<EmergencyRecord> {
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
       'visitId': serializer.toJson<int>(visitId),
-      'incidentDateTime': serializer.toJson<DateTime?>(incidentDateTime),
-      'placeGroupIdx': serializer.toJson<int?>(placeGroupIdx),
-      't1Selected': serializer.toJson<int?>(t1Selected),
-      't2Selected': serializer.toJson<int?>(t2Selected),
-      'remoteSelected': serializer.toJson<int?>(remoteSelected),
-      'cargoSelected': serializer.toJson<int?>(cargoSelected),
-      'novotelSelected': serializer.toJson<int?>(novotelSelected),
-      'cabinSelected': serializer.toJson<int?>(cabinSelected),
-      'placeNote': serializer.toJson<String?>(placeNote),
       'firstAidStartTime': serializer.toJson<DateTime?>(firstAidStartTime),
       'intubationStartTime': serializer.toJson<DateTime?>(intubationStartTime),
       'onIVLineStartTime': serializer.toJson<DateTime?>(onIVLineStartTime),
@@ -21684,17 +20568,7 @@ class EmergencyRecord extends DataClass implements Insertable<EmergencyRecord> {
       'firstAidEndTime': serializer.toJson<DateTime?>(firstAidEndTime),
       'diagnosis': serializer.toJson<String?>(diagnosis),
       'situation': serializer.toJson<String?>(situation),
-      'evmE': serializer.toJson<String?>(evmE),
-      'evmV': serializer.toJson<String?>(evmV),
-      'evmM': serializer.toJson<String?>(evmM),
-      'heartRate': serializer.toJson<String?>(heartRate),
-      'respirationRate': serializer.toJson<String?>(respirationRate),
-      'bloodPressure': serializer.toJson<String?>(bloodPressure),
       'temperature': serializer.toJson<String?>(temperature),
-      'leftPupilSize': serializer.toJson<String?>(leftPupilSize),
-      'rightPupilSize': serializer.toJson<String?>(rightPupilSize),
-      'leftPupilReaction': serializer.toJson<String?>(leftPupilReaction),
-      'rightPupilReaction': serializer.toJson<String?>(rightPupilReaction),
       'insertionMethod': serializer.toJson<String?>(insertionMethod),
       'airwayContent': serializer.toJson<String?>(airwayContent),
       'insertionRecord': serializer.toJson<String?>(insertionRecord),
@@ -21755,15 +20629,6 @@ class EmergencyRecord extends DataClass implements Insertable<EmergencyRecord> {
   EmergencyRecord copyWith({
     int? id,
     int? visitId,
-    Value<DateTime?> incidentDateTime = const Value.absent(),
-    Value<int?> placeGroupIdx = const Value.absent(),
-    Value<int?> t1Selected = const Value.absent(),
-    Value<int?> t2Selected = const Value.absent(),
-    Value<int?> remoteSelected = const Value.absent(),
-    Value<int?> cargoSelected = const Value.absent(),
-    Value<int?> novotelSelected = const Value.absent(),
-    Value<int?> cabinSelected = const Value.absent(),
-    Value<String?> placeNote = const Value.absent(),
     Value<DateTime?> firstAidStartTime = const Value.absent(),
     Value<DateTime?> intubationStartTime = const Value.absent(),
     Value<DateTime?> onIVLineStartTime = const Value.absent(),
@@ -21772,17 +20637,7 @@ class EmergencyRecord extends DataClass implements Insertable<EmergencyRecord> {
     Value<DateTime?> firstAidEndTime = const Value.absent(),
     Value<String?> diagnosis = const Value.absent(),
     Value<String?> situation = const Value.absent(),
-    Value<String?> evmE = const Value.absent(),
-    Value<String?> evmV = const Value.absent(),
-    Value<String?> evmM = const Value.absent(),
-    Value<String?> heartRate = const Value.absent(),
-    Value<String?> respirationRate = const Value.absent(),
-    Value<String?> bloodPressure = const Value.absent(),
     Value<String?> temperature = const Value.absent(),
-    Value<String?> leftPupilSize = const Value.absent(),
-    Value<String?> rightPupilSize = const Value.absent(),
-    Value<String?> leftPupilReaction = const Value.absent(),
-    Value<String?> rightPupilReaction = const Value.absent(),
     Value<String?> insertionMethod = const Value.absent(),
     Value<String?> airwayContent = const Value.absent(),
     Value<String?> insertionRecord = const Value.absent(),
@@ -21819,27 +20674,6 @@ class EmergencyRecord extends DataClass implements Insertable<EmergencyRecord> {
   }) => EmergencyRecord(
     id: id ?? this.id,
     visitId: visitId ?? this.visitId,
-    incidentDateTime: incidentDateTime.present
-        ? incidentDateTime.value
-        : this.incidentDateTime,
-    placeGroupIdx: placeGroupIdx.present
-        ? placeGroupIdx.value
-        : this.placeGroupIdx,
-    t1Selected: t1Selected.present ? t1Selected.value : this.t1Selected,
-    t2Selected: t2Selected.present ? t2Selected.value : this.t2Selected,
-    remoteSelected: remoteSelected.present
-        ? remoteSelected.value
-        : this.remoteSelected,
-    cargoSelected: cargoSelected.present
-        ? cargoSelected.value
-        : this.cargoSelected,
-    novotelSelected: novotelSelected.present
-        ? novotelSelected.value
-        : this.novotelSelected,
-    cabinSelected: cabinSelected.present
-        ? cabinSelected.value
-        : this.cabinSelected,
-    placeNote: placeNote.present ? placeNote.value : this.placeNote,
     firstAidStartTime: firstAidStartTime.present
         ? firstAidStartTime.value
         : this.firstAidStartTime,
@@ -21860,29 +20694,7 @@ class EmergencyRecord extends DataClass implements Insertable<EmergencyRecord> {
         : this.firstAidEndTime,
     diagnosis: diagnosis.present ? diagnosis.value : this.diagnosis,
     situation: situation.present ? situation.value : this.situation,
-    evmE: evmE.present ? evmE.value : this.evmE,
-    evmV: evmV.present ? evmV.value : this.evmV,
-    evmM: evmM.present ? evmM.value : this.evmM,
-    heartRate: heartRate.present ? heartRate.value : this.heartRate,
-    respirationRate: respirationRate.present
-        ? respirationRate.value
-        : this.respirationRate,
-    bloodPressure: bloodPressure.present
-        ? bloodPressure.value
-        : this.bloodPressure,
     temperature: temperature.present ? temperature.value : this.temperature,
-    leftPupilSize: leftPupilSize.present
-        ? leftPupilSize.value
-        : this.leftPupilSize,
-    rightPupilSize: rightPupilSize.present
-        ? rightPupilSize.value
-        : this.rightPupilSize,
-    leftPupilReaction: leftPupilReaction.present
-        ? leftPupilReaction.value
-        : this.leftPupilReaction,
-    rightPupilReaction: rightPupilReaction.present
-        ? rightPupilReaction.value
-        : this.rightPupilReaction,
     insertionMethod: insertionMethod.present
         ? insertionMethod.value
         : this.insertionMethod,
@@ -21966,31 +20778,6 @@ class EmergencyRecord extends DataClass implements Insertable<EmergencyRecord> {
     return EmergencyRecord(
       id: data.id.present ? data.id.value : this.id,
       visitId: data.visitId.present ? data.visitId.value : this.visitId,
-      incidentDateTime: data.incidentDateTime.present
-          ? data.incidentDateTime.value
-          : this.incidentDateTime,
-      placeGroupIdx: data.placeGroupIdx.present
-          ? data.placeGroupIdx.value
-          : this.placeGroupIdx,
-      t1Selected: data.t1Selected.present
-          ? data.t1Selected.value
-          : this.t1Selected,
-      t2Selected: data.t2Selected.present
-          ? data.t2Selected.value
-          : this.t2Selected,
-      remoteSelected: data.remoteSelected.present
-          ? data.remoteSelected.value
-          : this.remoteSelected,
-      cargoSelected: data.cargoSelected.present
-          ? data.cargoSelected.value
-          : this.cargoSelected,
-      novotelSelected: data.novotelSelected.present
-          ? data.novotelSelected.value
-          : this.novotelSelected,
-      cabinSelected: data.cabinSelected.present
-          ? data.cabinSelected.value
-          : this.cabinSelected,
-      placeNote: data.placeNote.present ? data.placeNote.value : this.placeNote,
       firstAidStartTime: data.firstAidStartTime.present
           ? data.firstAidStartTime.value
           : this.firstAidStartTime,
@@ -22011,31 +20798,9 @@ class EmergencyRecord extends DataClass implements Insertable<EmergencyRecord> {
           : this.firstAidEndTime,
       diagnosis: data.diagnosis.present ? data.diagnosis.value : this.diagnosis,
       situation: data.situation.present ? data.situation.value : this.situation,
-      evmE: data.evmE.present ? data.evmE.value : this.evmE,
-      evmV: data.evmV.present ? data.evmV.value : this.evmV,
-      evmM: data.evmM.present ? data.evmM.value : this.evmM,
-      heartRate: data.heartRate.present ? data.heartRate.value : this.heartRate,
-      respirationRate: data.respirationRate.present
-          ? data.respirationRate.value
-          : this.respirationRate,
-      bloodPressure: data.bloodPressure.present
-          ? data.bloodPressure.value
-          : this.bloodPressure,
       temperature: data.temperature.present
           ? data.temperature.value
           : this.temperature,
-      leftPupilSize: data.leftPupilSize.present
-          ? data.leftPupilSize.value
-          : this.leftPupilSize,
-      rightPupilSize: data.rightPupilSize.present
-          ? data.rightPupilSize.value
-          : this.rightPupilSize,
-      leftPupilReaction: data.leftPupilReaction.present
-          ? data.leftPupilReaction.value
-          : this.leftPupilReaction,
-      rightPupilReaction: data.rightPupilReaction.present
-          ? data.rightPupilReaction.value
-          : this.rightPupilReaction,
       insertionMethod: data.insertionMethod.present
           ? data.insertionMethod.value
           : this.insertionMethod,
@@ -22136,15 +20901,6 @@ class EmergencyRecord extends DataClass implements Insertable<EmergencyRecord> {
     return (StringBuffer('EmergencyRecord(')
           ..write('id: $id, ')
           ..write('visitId: $visitId, ')
-          ..write('incidentDateTime: $incidentDateTime, ')
-          ..write('placeGroupIdx: $placeGroupIdx, ')
-          ..write('t1Selected: $t1Selected, ')
-          ..write('t2Selected: $t2Selected, ')
-          ..write('remoteSelected: $remoteSelected, ')
-          ..write('cargoSelected: $cargoSelected, ')
-          ..write('novotelSelected: $novotelSelected, ')
-          ..write('cabinSelected: $cabinSelected, ')
-          ..write('placeNote: $placeNote, ')
           ..write('firstAidStartTime: $firstAidStartTime, ')
           ..write('intubationStartTime: $intubationStartTime, ')
           ..write('onIVLineStartTime: $onIVLineStartTime, ')
@@ -22153,17 +20909,7 @@ class EmergencyRecord extends DataClass implements Insertable<EmergencyRecord> {
           ..write('firstAidEndTime: $firstAidEndTime, ')
           ..write('diagnosis: $diagnosis, ')
           ..write('situation: $situation, ')
-          ..write('evmE: $evmE, ')
-          ..write('evmV: $evmV, ')
-          ..write('evmM: $evmM, ')
-          ..write('heartRate: $heartRate, ')
-          ..write('respirationRate: $respirationRate, ')
-          ..write('bloodPressure: $bloodPressure, ')
           ..write('temperature: $temperature, ')
-          ..write('leftPupilSize: $leftPupilSize, ')
-          ..write('rightPupilSize: $rightPupilSize, ')
-          ..write('leftPupilReaction: $leftPupilReaction, ')
-          ..write('rightPupilReaction: $rightPupilReaction, ')
           ..write('insertionMethod: $insertionMethod, ')
           ..write('airwayContent: $airwayContent, ')
           ..write('insertionRecord: $insertionRecord, ')
@@ -22216,15 +20962,6 @@ class EmergencyRecord extends DataClass implements Insertable<EmergencyRecord> {
   int get hashCode => Object.hashAll([
     id,
     visitId,
-    incidentDateTime,
-    placeGroupIdx,
-    t1Selected,
-    t2Selected,
-    remoteSelected,
-    cargoSelected,
-    novotelSelected,
-    cabinSelected,
-    placeNote,
     firstAidStartTime,
     intubationStartTime,
     onIVLineStartTime,
@@ -22233,17 +20970,7 @@ class EmergencyRecord extends DataClass implements Insertable<EmergencyRecord> {
     firstAidEndTime,
     diagnosis,
     situation,
-    evmE,
-    evmV,
-    evmM,
-    heartRate,
-    respirationRate,
-    bloodPressure,
     temperature,
-    leftPupilSize,
-    rightPupilSize,
-    leftPupilReaction,
-    rightPupilReaction,
     insertionMethod,
     airwayContent,
     insertionRecord,
@@ -22283,15 +21010,6 @@ class EmergencyRecord extends DataClass implements Insertable<EmergencyRecord> {
       (other is EmergencyRecord &&
           other.id == this.id &&
           other.visitId == this.visitId &&
-          other.incidentDateTime == this.incidentDateTime &&
-          other.placeGroupIdx == this.placeGroupIdx &&
-          other.t1Selected == this.t1Selected &&
-          other.t2Selected == this.t2Selected &&
-          other.remoteSelected == this.remoteSelected &&
-          other.cargoSelected == this.cargoSelected &&
-          other.novotelSelected == this.novotelSelected &&
-          other.cabinSelected == this.cabinSelected &&
-          other.placeNote == this.placeNote &&
           other.firstAidStartTime == this.firstAidStartTime &&
           other.intubationStartTime == this.intubationStartTime &&
           other.onIVLineStartTime == this.onIVLineStartTime &&
@@ -22300,17 +21018,7 @@ class EmergencyRecord extends DataClass implements Insertable<EmergencyRecord> {
           other.firstAidEndTime == this.firstAidEndTime &&
           other.diagnosis == this.diagnosis &&
           other.situation == this.situation &&
-          other.evmE == this.evmE &&
-          other.evmV == this.evmV &&
-          other.evmM == this.evmM &&
-          other.heartRate == this.heartRate &&
-          other.respirationRate == this.respirationRate &&
-          other.bloodPressure == this.bloodPressure &&
           other.temperature == this.temperature &&
-          other.leftPupilSize == this.leftPupilSize &&
-          other.rightPupilSize == this.rightPupilSize &&
-          other.leftPupilReaction == this.leftPupilReaction &&
-          other.rightPupilReaction == this.rightPupilReaction &&
           other.insertionMethod == this.insertionMethod &&
           other.airwayContent == this.airwayContent &&
           other.insertionRecord == this.insertionRecord &&
@@ -22354,15 +21062,6 @@ class EmergencyRecord extends DataClass implements Insertable<EmergencyRecord> {
 class EmergencyRecordsCompanion extends UpdateCompanion<EmergencyRecord> {
   final Value<int> id;
   final Value<int> visitId;
-  final Value<DateTime?> incidentDateTime;
-  final Value<int?> placeGroupIdx;
-  final Value<int?> t1Selected;
-  final Value<int?> t2Selected;
-  final Value<int?> remoteSelected;
-  final Value<int?> cargoSelected;
-  final Value<int?> novotelSelected;
-  final Value<int?> cabinSelected;
-  final Value<String?> placeNote;
   final Value<DateTime?> firstAidStartTime;
   final Value<DateTime?> intubationStartTime;
   final Value<DateTime?> onIVLineStartTime;
@@ -22371,17 +21070,7 @@ class EmergencyRecordsCompanion extends UpdateCompanion<EmergencyRecord> {
   final Value<DateTime?> firstAidEndTime;
   final Value<String?> diagnosis;
   final Value<String?> situation;
-  final Value<String?> evmE;
-  final Value<String?> evmV;
-  final Value<String?> evmM;
-  final Value<String?> heartRate;
-  final Value<String?> respirationRate;
-  final Value<String?> bloodPressure;
   final Value<String?> temperature;
-  final Value<String?> leftPupilSize;
-  final Value<String?> rightPupilSize;
-  final Value<String?> leftPupilReaction;
-  final Value<String?> rightPupilReaction;
   final Value<String?> insertionMethod;
   final Value<String?> airwayContent;
   final Value<String?> insertionRecord;
@@ -22417,15 +21106,6 @@ class EmergencyRecordsCompanion extends UpdateCompanion<EmergencyRecord> {
   const EmergencyRecordsCompanion({
     this.id = const Value.absent(),
     this.visitId = const Value.absent(),
-    this.incidentDateTime = const Value.absent(),
-    this.placeGroupIdx = const Value.absent(),
-    this.t1Selected = const Value.absent(),
-    this.t2Selected = const Value.absent(),
-    this.remoteSelected = const Value.absent(),
-    this.cargoSelected = const Value.absent(),
-    this.novotelSelected = const Value.absent(),
-    this.cabinSelected = const Value.absent(),
-    this.placeNote = const Value.absent(),
     this.firstAidStartTime = const Value.absent(),
     this.intubationStartTime = const Value.absent(),
     this.onIVLineStartTime = const Value.absent(),
@@ -22434,17 +21114,7 @@ class EmergencyRecordsCompanion extends UpdateCompanion<EmergencyRecord> {
     this.firstAidEndTime = const Value.absent(),
     this.diagnosis = const Value.absent(),
     this.situation = const Value.absent(),
-    this.evmE = const Value.absent(),
-    this.evmV = const Value.absent(),
-    this.evmM = const Value.absent(),
-    this.heartRate = const Value.absent(),
-    this.respirationRate = const Value.absent(),
-    this.bloodPressure = const Value.absent(),
     this.temperature = const Value.absent(),
-    this.leftPupilSize = const Value.absent(),
-    this.rightPupilSize = const Value.absent(),
-    this.leftPupilReaction = const Value.absent(),
-    this.rightPupilReaction = const Value.absent(),
     this.insertionMethod = const Value.absent(),
     this.airwayContent = const Value.absent(),
     this.insertionRecord = const Value.absent(),
@@ -22481,15 +21151,6 @@ class EmergencyRecordsCompanion extends UpdateCompanion<EmergencyRecord> {
   EmergencyRecordsCompanion.insert({
     this.id = const Value.absent(),
     required int visitId,
-    this.incidentDateTime = const Value.absent(),
-    this.placeGroupIdx = const Value.absent(),
-    this.t1Selected = const Value.absent(),
-    this.t2Selected = const Value.absent(),
-    this.remoteSelected = const Value.absent(),
-    this.cargoSelected = const Value.absent(),
-    this.novotelSelected = const Value.absent(),
-    this.cabinSelected = const Value.absent(),
-    this.placeNote = const Value.absent(),
     this.firstAidStartTime = const Value.absent(),
     this.intubationStartTime = const Value.absent(),
     this.onIVLineStartTime = const Value.absent(),
@@ -22498,17 +21159,7 @@ class EmergencyRecordsCompanion extends UpdateCompanion<EmergencyRecord> {
     this.firstAidEndTime = const Value.absent(),
     this.diagnosis = const Value.absent(),
     this.situation = const Value.absent(),
-    this.evmE = const Value.absent(),
-    this.evmV = const Value.absent(),
-    this.evmM = const Value.absent(),
-    this.heartRate = const Value.absent(),
-    this.respirationRate = const Value.absent(),
-    this.bloodPressure = const Value.absent(),
     this.temperature = const Value.absent(),
-    this.leftPupilSize = const Value.absent(),
-    this.rightPupilSize = const Value.absent(),
-    this.leftPupilReaction = const Value.absent(),
-    this.rightPupilReaction = const Value.absent(),
     this.insertionMethod = const Value.absent(),
     this.airwayContent = const Value.absent(),
     this.insertionRecord = const Value.absent(),
@@ -22545,15 +21196,6 @@ class EmergencyRecordsCompanion extends UpdateCompanion<EmergencyRecord> {
   static Insertable<EmergencyRecord> custom({
     Expression<int>? id,
     Expression<int>? visitId,
-    Expression<DateTime>? incidentDateTime,
-    Expression<int>? placeGroupIdx,
-    Expression<int>? t1Selected,
-    Expression<int>? t2Selected,
-    Expression<int>? remoteSelected,
-    Expression<int>? cargoSelected,
-    Expression<int>? novotelSelected,
-    Expression<int>? cabinSelected,
-    Expression<String>? placeNote,
     Expression<DateTime>? firstAidStartTime,
     Expression<DateTime>? intubationStartTime,
     Expression<DateTime>? onIVLineStartTime,
@@ -22562,17 +21204,7 @@ class EmergencyRecordsCompanion extends UpdateCompanion<EmergencyRecord> {
     Expression<DateTime>? firstAidEndTime,
     Expression<String>? diagnosis,
     Expression<String>? situation,
-    Expression<String>? evmE,
-    Expression<String>? evmV,
-    Expression<String>? evmM,
-    Expression<String>? heartRate,
-    Expression<String>? respirationRate,
-    Expression<String>? bloodPressure,
     Expression<String>? temperature,
-    Expression<String>? leftPupilSize,
-    Expression<String>? rightPupilSize,
-    Expression<String>? leftPupilReaction,
-    Expression<String>? rightPupilReaction,
     Expression<String>? insertionMethod,
     Expression<String>? airwayContent,
     Expression<String>? insertionRecord,
@@ -22609,15 +21241,6 @@ class EmergencyRecordsCompanion extends UpdateCompanion<EmergencyRecord> {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (visitId != null) 'visit_id': visitId,
-      if (incidentDateTime != null) 'incident_date_time': incidentDateTime,
-      if (placeGroupIdx != null) 'place_group_idx': placeGroupIdx,
-      if (t1Selected != null) 't1_selected': t1Selected,
-      if (t2Selected != null) 't2_selected': t2Selected,
-      if (remoteSelected != null) 'remote_selected': remoteSelected,
-      if (cargoSelected != null) 'cargo_selected': cargoSelected,
-      if (novotelSelected != null) 'novotel_selected': novotelSelected,
-      if (cabinSelected != null) 'cabin_selected': cabinSelected,
-      if (placeNote != null) 'place_note': placeNote,
       if (firstAidStartTime != null) 'first_aid_start_time': firstAidStartTime,
       if (intubationStartTime != null)
         'intubation_start_time': intubationStartTime,
@@ -22630,18 +21253,7 @@ class EmergencyRecordsCompanion extends UpdateCompanion<EmergencyRecord> {
       if (firstAidEndTime != null) 'first_aid_end_time': firstAidEndTime,
       if (diagnosis != null) 'diagnosis': diagnosis,
       if (situation != null) 'situation': situation,
-      if (evmE != null) 'evm_e': evmE,
-      if (evmV != null) 'evm_v': evmV,
-      if (evmM != null) 'evm_m': evmM,
-      if (heartRate != null) 'heart_rate': heartRate,
-      if (respirationRate != null) 'respiration_rate': respirationRate,
-      if (bloodPressure != null) 'blood_pressure': bloodPressure,
       if (temperature != null) 'temperature': temperature,
-      if (leftPupilSize != null) 'left_pupil_size': leftPupilSize,
-      if (rightPupilSize != null) 'right_pupil_size': rightPupilSize,
-      if (leftPupilReaction != null) 'left_pupil_reaction': leftPupilReaction,
-      if (rightPupilReaction != null)
-        'right_pupil_reaction': rightPupilReaction,
       if (insertionMethod != null) 'insertion_method': insertionMethod,
       if (airwayContent != null) 'airway_content': airwayContent,
       if (insertionRecord != null) 'insertion_record': insertionRecord,
@@ -22696,15 +21308,6 @@ class EmergencyRecordsCompanion extends UpdateCompanion<EmergencyRecord> {
   EmergencyRecordsCompanion copyWith({
     Value<int>? id,
     Value<int>? visitId,
-    Value<DateTime?>? incidentDateTime,
-    Value<int?>? placeGroupIdx,
-    Value<int?>? t1Selected,
-    Value<int?>? t2Selected,
-    Value<int?>? remoteSelected,
-    Value<int?>? cargoSelected,
-    Value<int?>? novotelSelected,
-    Value<int?>? cabinSelected,
-    Value<String?>? placeNote,
     Value<DateTime?>? firstAidStartTime,
     Value<DateTime?>? intubationStartTime,
     Value<DateTime?>? onIVLineStartTime,
@@ -22713,17 +21316,7 @@ class EmergencyRecordsCompanion extends UpdateCompanion<EmergencyRecord> {
     Value<DateTime?>? firstAidEndTime,
     Value<String?>? diagnosis,
     Value<String?>? situation,
-    Value<String?>? evmE,
-    Value<String?>? evmV,
-    Value<String?>? evmM,
-    Value<String?>? heartRate,
-    Value<String?>? respirationRate,
-    Value<String?>? bloodPressure,
     Value<String?>? temperature,
-    Value<String?>? leftPupilSize,
-    Value<String?>? rightPupilSize,
-    Value<String?>? leftPupilReaction,
-    Value<String?>? rightPupilReaction,
     Value<String?>? insertionMethod,
     Value<String?>? airwayContent,
     Value<String?>? insertionRecord,
@@ -22760,15 +21353,6 @@ class EmergencyRecordsCompanion extends UpdateCompanion<EmergencyRecord> {
     return EmergencyRecordsCompanion(
       id: id ?? this.id,
       visitId: visitId ?? this.visitId,
-      incidentDateTime: incidentDateTime ?? this.incidentDateTime,
-      placeGroupIdx: placeGroupIdx ?? this.placeGroupIdx,
-      t1Selected: t1Selected ?? this.t1Selected,
-      t2Selected: t2Selected ?? this.t2Selected,
-      remoteSelected: remoteSelected ?? this.remoteSelected,
-      cargoSelected: cargoSelected ?? this.cargoSelected,
-      novotelSelected: novotelSelected ?? this.novotelSelected,
-      cabinSelected: cabinSelected ?? this.cabinSelected,
-      placeNote: placeNote ?? this.placeNote,
       firstAidStartTime: firstAidStartTime ?? this.firstAidStartTime,
       intubationStartTime: intubationStartTime ?? this.intubationStartTime,
       onIVLineStartTime: onIVLineStartTime ?? this.onIVLineStartTime,
@@ -22779,17 +21363,7 @@ class EmergencyRecordsCompanion extends UpdateCompanion<EmergencyRecord> {
       firstAidEndTime: firstAidEndTime ?? this.firstAidEndTime,
       diagnosis: diagnosis ?? this.diagnosis,
       situation: situation ?? this.situation,
-      evmE: evmE ?? this.evmE,
-      evmV: evmV ?? this.evmV,
-      evmM: evmM ?? this.evmM,
-      heartRate: heartRate ?? this.heartRate,
-      respirationRate: respirationRate ?? this.respirationRate,
-      bloodPressure: bloodPressure ?? this.bloodPressure,
       temperature: temperature ?? this.temperature,
-      leftPupilSize: leftPupilSize ?? this.leftPupilSize,
-      rightPupilSize: rightPupilSize ?? this.rightPupilSize,
-      leftPupilReaction: leftPupilReaction ?? this.leftPupilReaction,
-      rightPupilReaction: rightPupilReaction ?? this.rightPupilReaction,
       insertionMethod: insertionMethod ?? this.insertionMethod,
       airwayContent: airwayContent ?? this.airwayContent,
       insertionRecord: insertionRecord ?? this.insertionRecord,
@@ -22850,33 +21424,6 @@ class EmergencyRecordsCompanion extends UpdateCompanion<EmergencyRecord> {
     if (visitId.present) {
       map['visit_id'] = Variable<int>(visitId.value);
     }
-    if (incidentDateTime.present) {
-      map['incident_date_time'] = Variable<DateTime>(incidentDateTime.value);
-    }
-    if (placeGroupIdx.present) {
-      map['place_group_idx'] = Variable<int>(placeGroupIdx.value);
-    }
-    if (t1Selected.present) {
-      map['t1_selected'] = Variable<int>(t1Selected.value);
-    }
-    if (t2Selected.present) {
-      map['t2_selected'] = Variable<int>(t2Selected.value);
-    }
-    if (remoteSelected.present) {
-      map['remote_selected'] = Variable<int>(remoteSelected.value);
-    }
-    if (cargoSelected.present) {
-      map['cargo_selected'] = Variable<int>(cargoSelected.value);
-    }
-    if (novotelSelected.present) {
-      map['novotel_selected'] = Variable<int>(novotelSelected.value);
-    }
-    if (cabinSelected.present) {
-      map['cabin_selected'] = Variable<int>(cabinSelected.value);
-    }
-    if (placeNote.present) {
-      map['place_note'] = Variable<String>(placeNote.value);
-    }
     if (firstAidStartTime.present) {
       map['first_aid_start_time'] = Variable<DateTime>(firstAidStartTime.value);
     }
@@ -22909,38 +21456,8 @@ class EmergencyRecordsCompanion extends UpdateCompanion<EmergencyRecord> {
     if (situation.present) {
       map['situation'] = Variable<String>(situation.value);
     }
-    if (evmE.present) {
-      map['evm_e'] = Variable<String>(evmE.value);
-    }
-    if (evmV.present) {
-      map['evm_v'] = Variable<String>(evmV.value);
-    }
-    if (evmM.present) {
-      map['evm_m'] = Variable<String>(evmM.value);
-    }
-    if (heartRate.present) {
-      map['heart_rate'] = Variable<String>(heartRate.value);
-    }
-    if (respirationRate.present) {
-      map['respiration_rate'] = Variable<String>(respirationRate.value);
-    }
-    if (bloodPressure.present) {
-      map['blood_pressure'] = Variable<String>(bloodPressure.value);
-    }
     if (temperature.present) {
       map['temperature'] = Variable<String>(temperature.value);
-    }
-    if (leftPupilSize.present) {
-      map['left_pupil_size'] = Variable<String>(leftPupilSize.value);
-    }
-    if (rightPupilSize.present) {
-      map['right_pupil_size'] = Variable<String>(rightPupilSize.value);
-    }
-    if (leftPupilReaction.present) {
-      map['left_pupil_reaction'] = Variable<String>(leftPupilReaction.value);
-    }
-    if (rightPupilReaction.present) {
-      map['right_pupil_reaction'] = Variable<String>(rightPupilReaction.value);
     }
     if (insertionMethod.present) {
       map['insertion_method'] = Variable<String>(insertionMethod.value);
@@ -23072,15 +21589,6 @@ class EmergencyRecordsCompanion extends UpdateCompanion<EmergencyRecord> {
     return (StringBuffer('EmergencyRecordsCompanion(')
           ..write('id: $id, ')
           ..write('visitId: $visitId, ')
-          ..write('incidentDateTime: $incidentDateTime, ')
-          ..write('placeGroupIdx: $placeGroupIdx, ')
-          ..write('t1Selected: $t1Selected, ')
-          ..write('t2Selected: $t2Selected, ')
-          ..write('remoteSelected: $remoteSelected, ')
-          ..write('cargoSelected: $cargoSelected, ')
-          ..write('novotelSelected: $novotelSelected, ')
-          ..write('cabinSelected: $cabinSelected, ')
-          ..write('placeNote: $placeNote, ')
           ..write('firstAidStartTime: $firstAidStartTime, ')
           ..write('intubationStartTime: $intubationStartTime, ')
           ..write('onIVLineStartTime: $onIVLineStartTime, ')
@@ -23089,17 +21597,7 @@ class EmergencyRecordsCompanion extends UpdateCompanion<EmergencyRecord> {
           ..write('firstAidEndTime: $firstAidEndTime, ')
           ..write('diagnosis: $diagnosis, ')
           ..write('situation: $situation, ')
-          ..write('evmE: $evmE, ')
-          ..write('evmV: $evmV, ')
-          ..write('evmM: $evmM, ')
-          ..write('heartRate: $heartRate, ')
-          ..write('respirationRate: $respirationRate, ')
-          ..write('bloodPressure: $bloodPressure, ')
           ..write('temperature: $temperature, ')
-          ..write('leftPupilSize: $leftPupilSize, ')
-          ..write('rightPupilSize: $rightPupilSize, ')
-          ..write('leftPupilReaction: $leftPupilReaction, ')
-          ..write('rightPupilReaction: $rightPupilReaction, ')
           ..write('insertionMethod: $insertionMethod, ')
           ..write('airwayContent: $airwayContent, ')
           ..write('insertionRecord: $insertionRecord, ')
@@ -25212,7 +23710,7 @@ typedef $$TreatmentsTableCreateCompanionBuilder =
       Value<String?> screeningMethodsJson,
       Value<String?> otherScreeningMethod,
       Value<String?> healthDataJson,
-      Value<int?> mainSymptom,
+      Value<String?> mainSymptom,
       Value<String?> traumaSymptomsJson,
       Value<String?> nonTraumaSymptomsJson,
       Value<String?> symptomNote,
@@ -25241,14 +23739,14 @@ typedef $$TreatmentsTableCreateCompanionBuilder =
       Value<String?> leftPupilSize,
       Value<int?> rightPupilScale,
       Value<String?> rightPupilSize,
-      Value<int?> history,
-      Value<int?> allergy,
+      Value<String?> history,
+      Value<String?> allergy,
       Value<String?> initialDiagnosis,
-      Value<int?> diagnosisCategory,
+      Value<String?> diagnosisCategory,
       Value<String?> selectedICD10Main,
       Value<String?> selectedICD10Sub1,
       Value<String?> selectedICD10Sub2,
-      Value<int?> triageCategory,
+      Value<String?> triageCategory,
       Value<String?> onSiteTreatmentsJson,
       Value<bool> ekgChecked,
       Value<String?> ekgReading,
@@ -25262,19 +23760,18 @@ typedef $$TreatmentsTableCreateCompanionBuilder =
       Value<bool> prescriptionChecked,
       Value<bool> otherChecked,
       Value<String?> otherSummary,
-      Value<int?> referralPassageType,
-      Value<int?> referralAmbulanceType,
-      Value<int?> referralHospitalIdx,
+      Value<String?> referralPassageType,
+      Value<String?> referralAmbulanceType,
+      Value<String?> referralHospital,
       Value<String?> referralOtherHospital,
       Value<String?> referralEscortText,
       Value<String?> selectedEscortsJson,
-      Value<int?> intubationType,
-      Value<int?> oxygenType,
+      Value<String?> intubationType,
+      Value<String?> oxygenType,
       Value<String?> oxygenFlow,
       Value<String?> medicalCertificateTypesJson,
       Value<String?> prescriptionRowsJson,
       Value<String?> followUpResultsJson,
-      Value<int?> otherHospitalIdx,
       Value<String?> selectedMainDoctor,
       Value<String?> selectedMainNurse,
       Value<String?> nurseSignature,
@@ -25295,7 +23792,7 @@ typedef $$TreatmentsTableUpdateCompanionBuilder =
       Value<String?> screeningMethodsJson,
       Value<String?> otherScreeningMethod,
       Value<String?> healthDataJson,
-      Value<int?> mainSymptom,
+      Value<String?> mainSymptom,
       Value<String?> traumaSymptomsJson,
       Value<String?> nonTraumaSymptomsJson,
       Value<String?> symptomNote,
@@ -25324,14 +23821,14 @@ typedef $$TreatmentsTableUpdateCompanionBuilder =
       Value<String?> leftPupilSize,
       Value<int?> rightPupilScale,
       Value<String?> rightPupilSize,
-      Value<int?> history,
-      Value<int?> allergy,
+      Value<String?> history,
+      Value<String?> allergy,
       Value<String?> initialDiagnosis,
-      Value<int?> diagnosisCategory,
+      Value<String?> diagnosisCategory,
       Value<String?> selectedICD10Main,
       Value<String?> selectedICD10Sub1,
       Value<String?> selectedICD10Sub2,
-      Value<int?> triageCategory,
+      Value<String?> triageCategory,
       Value<String?> onSiteTreatmentsJson,
       Value<bool> ekgChecked,
       Value<String?> ekgReading,
@@ -25345,19 +23842,18 @@ typedef $$TreatmentsTableUpdateCompanionBuilder =
       Value<bool> prescriptionChecked,
       Value<bool> otherChecked,
       Value<String?> otherSummary,
-      Value<int?> referralPassageType,
-      Value<int?> referralAmbulanceType,
-      Value<int?> referralHospitalIdx,
+      Value<String?> referralPassageType,
+      Value<String?> referralAmbulanceType,
+      Value<String?> referralHospital,
       Value<String?> referralOtherHospital,
       Value<String?> referralEscortText,
       Value<String?> selectedEscortsJson,
-      Value<int?> intubationType,
-      Value<int?> oxygenType,
+      Value<String?> intubationType,
+      Value<String?> oxygenType,
       Value<String?> oxygenFlow,
       Value<String?> medicalCertificateTypesJson,
       Value<String?> prescriptionRowsJson,
       Value<String?> followUpResultsJson,
-      Value<int?> otherHospitalIdx,
       Value<String?> selectedMainDoctor,
       Value<String?> selectedMainNurse,
       Value<String?> nurseSignature,
@@ -25410,7 +23906,7 @@ class $$TreatmentsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<int> get mainSymptom => $composableBuilder(
+  ColumnFilters<String> get mainSymptom => $composableBuilder(
     column: $table.mainSymptom,
     builder: (column) => ColumnFilters(column),
   );
@@ -25555,12 +24051,12 @@ class $$TreatmentsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<int> get history => $composableBuilder(
+  ColumnFilters<String> get history => $composableBuilder(
     column: $table.history,
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<int> get allergy => $composableBuilder(
+  ColumnFilters<String> get allergy => $composableBuilder(
     column: $table.allergy,
     builder: (column) => ColumnFilters(column),
   );
@@ -25570,7 +24066,7 @@ class $$TreatmentsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<int> get diagnosisCategory => $composableBuilder(
+  ColumnFilters<String> get diagnosisCategory => $composableBuilder(
     column: $table.diagnosisCategory,
     builder: (column) => ColumnFilters(column),
   );
@@ -25590,7 +24086,7 @@ class $$TreatmentsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<int> get triageCategory => $composableBuilder(
+  ColumnFilters<String> get triageCategory => $composableBuilder(
     column: $table.triageCategory,
     builder: (column) => ColumnFilters(column),
   );
@@ -25660,18 +24156,18 @@ class $$TreatmentsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<int> get referralPassageType => $composableBuilder(
+  ColumnFilters<String> get referralPassageType => $composableBuilder(
     column: $table.referralPassageType,
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<int> get referralAmbulanceType => $composableBuilder(
+  ColumnFilters<String> get referralAmbulanceType => $composableBuilder(
     column: $table.referralAmbulanceType,
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<int> get referralHospitalIdx => $composableBuilder(
-    column: $table.referralHospitalIdx,
+  ColumnFilters<String> get referralHospital => $composableBuilder(
+    column: $table.referralHospital,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -25690,12 +24186,12 @@ class $$TreatmentsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<int> get intubationType => $composableBuilder(
+  ColumnFilters<String> get intubationType => $composableBuilder(
     column: $table.intubationType,
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<int> get oxygenType => $composableBuilder(
+  ColumnFilters<String> get oxygenType => $composableBuilder(
     column: $table.oxygenType,
     builder: (column) => ColumnFilters(column),
   );
@@ -25717,11 +24213,6 @@ class $$TreatmentsTableFilterComposer
 
   ColumnFilters<String> get followUpResultsJson => $composableBuilder(
     column: $table.followUpResultsJson,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<int> get otherHospitalIdx => $composableBuilder(
-    column: $table.otherHospitalIdx,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -25820,7 +24311,7 @@ class $$TreatmentsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<int> get mainSymptom => $composableBuilder(
+  ColumnOrderings<String> get mainSymptom => $composableBuilder(
     column: $table.mainSymptom,
     builder: (column) => ColumnOrderings(column),
   );
@@ -25966,12 +24457,12 @@ class $$TreatmentsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<int> get history => $composableBuilder(
+  ColumnOrderings<String> get history => $composableBuilder(
     column: $table.history,
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<int> get allergy => $composableBuilder(
+  ColumnOrderings<String> get allergy => $composableBuilder(
     column: $table.allergy,
     builder: (column) => ColumnOrderings(column),
   );
@@ -25981,7 +24472,7 @@ class $$TreatmentsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<int> get diagnosisCategory => $composableBuilder(
+  ColumnOrderings<String> get diagnosisCategory => $composableBuilder(
     column: $table.diagnosisCategory,
     builder: (column) => ColumnOrderings(column),
   );
@@ -26001,7 +24492,7 @@ class $$TreatmentsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<int> get triageCategory => $composableBuilder(
+  ColumnOrderings<String> get triageCategory => $composableBuilder(
     column: $table.triageCategory,
     builder: (column) => ColumnOrderings(column),
   );
@@ -26071,18 +24562,18 @@ class $$TreatmentsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<int> get referralPassageType => $composableBuilder(
+  ColumnOrderings<String> get referralPassageType => $composableBuilder(
     column: $table.referralPassageType,
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<int> get referralAmbulanceType => $composableBuilder(
+  ColumnOrderings<String> get referralAmbulanceType => $composableBuilder(
     column: $table.referralAmbulanceType,
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<int> get referralHospitalIdx => $composableBuilder(
-    column: $table.referralHospitalIdx,
+  ColumnOrderings<String> get referralHospital => $composableBuilder(
+    column: $table.referralHospital,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -26101,12 +24592,12 @@ class $$TreatmentsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<int> get intubationType => $composableBuilder(
+  ColumnOrderings<String> get intubationType => $composableBuilder(
     column: $table.intubationType,
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<int> get oxygenType => $composableBuilder(
+  ColumnOrderings<String> get oxygenType => $composableBuilder(
     column: $table.oxygenType,
     builder: (column) => ColumnOrderings(column),
   );
@@ -26128,11 +24619,6 @@ class $$TreatmentsTableOrderingComposer
 
   ColumnOrderings<String> get followUpResultsJson => $composableBuilder(
     column: $table.followUpResultsJson,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<int> get otherHospitalIdx => $composableBuilder(
-    column: $table.otherHospitalIdx,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -26227,7 +24713,7 @@ class $$TreatmentsTableAnnotationComposer
     builder: (column) => column,
   );
 
-  GeneratedColumn<int> get mainSymptom => $composableBuilder(
+  GeneratedColumn<String> get mainSymptom => $composableBuilder(
     column: $table.mainSymptom,
     builder: (column) => column,
   );
@@ -26363,10 +24849,10 @@ class $$TreatmentsTableAnnotationComposer
     builder: (column) => column,
   );
 
-  GeneratedColumn<int> get history =>
+  GeneratedColumn<String> get history =>
       $composableBuilder(column: $table.history, builder: (column) => column);
 
-  GeneratedColumn<int> get allergy =>
+  GeneratedColumn<String> get allergy =>
       $composableBuilder(column: $table.allergy, builder: (column) => column);
 
   GeneratedColumn<String> get initialDiagnosis => $composableBuilder(
@@ -26374,7 +24860,7 @@ class $$TreatmentsTableAnnotationComposer
     builder: (column) => column,
   );
 
-  GeneratedColumn<int> get diagnosisCategory => $composableBuilder(
+  GeneratedColumn<String> get diagnosisCategory => $composableBuilder(
     column: $table.diagnosisCategory,
     builder: (column) => column,
   );
@@ -26394,7 +24880,7 @@ class $$TreatmentsTableAnnotationComposer
     builder: (column) => column,
   );
 
-  GeneratedColumn<int> get triageCategory => $composableBuilder(
+  GeneratedColumn<String> get triageCategory => $composableBuilder(
     column: $table.triageCategory,
     builder: (column) => column,
   );
@@ -26464,18 +24950,18 @@ class $$TreatmentsTableAnnotationComposer
     builder: (column) => column,
   );
 
-  GeneratedColumn<int> get referralPassageType => $composableBuilder(
+  GeneratedColumn<String> get referralPassageType => $composableBuilder(
     column: $table.referralPassageType,
     builder: (column) => column,
   );
 
-  GeneratedColumn<int> get referralAmbulanceType => $composableBuilder(
+  GeneratedColumn<String> get referralAmbulanceType => $composableBuilder(
     column: $table.referralAmbulanceType,
     builder: (column) => column,
   );
 
-  GeneratedColumn<int> get referralHospitalIdx => $composableBuilder(
-    column: $table.referralHospitalIdx,
+  GeneratedColumn<String> get referralHospital => $composableBuilder(
+    column: $table.referralHospital,
     builder: (column) => column,
   );
 
@@ -26494,12 +24980,12 @@ class $$TreatmentsTableAnnotationComposer
     builder: (column) => column,
   );
 
-  GeneratedColumn<int> get intubationType => $composableBuilder(
+  GeneratedColumn<String> get intubationType => $composableBuilder(
     column: $table.intubationType,
     builder: (column) => column,
   );
 
-  GeneratedColumn<int> get oxygenType => $composableBuilder(
+  GeneratedColumn<String> get oxygenType => $composableBuilder(
     column: $table.oxygenType,
     builder: (column) => column,
   );
@@ -26521,11 +25007,6 @@ class $$TreatmentsTableAnnotationComposer
 
   GeneratedColumn<String> get followUpResultsJson => $composableBuilder(
     column: $table.followUpResultsJson,
-    builder: (column) => column,
-  );
-
-  GeneratedColumn<int> get otherHospitalIdx => $composableBuilder(
-    column: $table.otherHospitalIdx,
     builder: (column) => column,
   );
 
@@ -26618,7 +25099,7 @@ class $$TreatmentsTableTableManager
                 Value<String?> screeningMethodsJson = const Value.absent(),
                 Value<String?> otherScreeningMethod = const Value.absent(),
                 Value<String?> healthDataJson = const Value.absent(),
-                Value<int?> mainSymptom = const Value.absent(),
+                Value<String?> mainSymptom = const Value.absent(),
                 Value<String?> traumaSymptomsJson = const Value.absent(),
                 Value<String?> nonTraumaSymptomsJson = const Value.absent(),
                 Value<String?> symptomNote = const Value.absent(),
@@ -26651,14 +25132,14 @@ class $$TreatmentsTableTableManager
                 Value<String?> leftPupilSize = const Value.absent(),
                 Value<int?> rightPupilScale = const Value.absent(),
                 Value<String?> rightPupilSize = const Value.absent(),
-                Value<int?> history = const Value.absent(),
-                Value<int?> allergy = const Value.absent(),
+                Value<String?> history = const Value.absent(),
+                Value<String?> allergy = const Value.absent(),
                 Value<String?> initialDiagnosis = const Value.absent(),
-                Value<int?> diagnosisCategory = const Value.absent(),
+                Value<String?> diagnosisCategory = const Value.absent(),
                 Value<String?> selectedICD10Main = const Value.absent(),
                 Value<String?> selectedICD10Sub1 = const Value.absent(),
                 Value<String?> selectedICD10Sub2 = const Value.absent(),
-                Value<int?> triageCategory = const Value.absent(),
+                Value<String?> triageCategory = const Value.absent(),
                 Value<String?> onSiteTreatmentsJson = const Value.absent(),
                 Value<bool> ekgChecked = const Value.absent(),
                 Value<String?> ekgReading = const Value.absent(),
@@ -26672,20 +25153,19 @@ class $$TreatmentsTableTableManager
                 Value<bool> prescriptionChecked = const Value.absent(),
                 Value<bool> otherChecked = const Value.absent(),
                 Value<String?> otherSummary = const Value.absent(),
-                Value<int?> referralPassageType = const Value.absent(),
-                Value<int?> referralAmbulanceType = const Value.absent(),
-                Value<int?> referralHospitalIdx = const Value.absent(),
+                Value<String?> referralPassageType = const Value.absent(),
+                Value<String?> referralAmbulanceType = const Value.absent(),
+                Value<String?> referralHospital = const Value.absent(),
                 Value<String?> referralOtherHospital = const Value.absent(),
                 Value<String?> referralEscortText = const Value.absent(),
                 Value<String?> selectedEscortsJson = const Value.absent(),
-                Value<int?> intubationType = const Value.absent(),
-                Value<int?> oxygenType = const Value.absent(),
+                Value<String?> intubationType = const Value.absent(),
+                Value<String?> oxygenType = const Value.absent(),
                 Value<String?> oxygenFlow = const Value.absent(),
                 Value<String?> medicalCertificateTypesJson =
                     const Value.absent(),
                 Value<String?> prescriptionRowsJson = const Value.absent(),
                 Value<String?> followUpResultsJson = const Value.absent(),
-                Value<int?> otherHospitalIdx = const Value.absent(),
                 Value<String?> selectedMainDoctor = const Value.absent(),
                 Value<String?> selectedMainNurse = const Value.absent(),
                 Value<String?> nurseSignature = const Value.absent(),
@@ -26756,7 +25236,7 @@ class $$TreatmentsTableTableManager
                 otherSummary: otherSummary,
                 referralPassageType: referralPassageType,
                 referralAmbulanceType: referralAmbulanceType,
-                referralHospitalIdx: referralHospitalIdx,
+                referralHospital: referralHospital,
                 referralOtherHospital: referralOtherHospital,
                 referralEscortText: referralEscortText,
                 selectedEscortsJson: selectedEscortsJson,
@@ -26766,7 +25246,6 @@ class $$TreatmentsTableTableManager
                 medicalCertificateTypesJson: medicalCertificateTypesJson,
                 prescriptionRowsJson: prescriptionRowsJson,
                 followUpResultsJson: followUpResultsJson,
-                otherHospitalIdx: otherHospitalIdx,
                 selectedMainDoctor: selectedMainDoctor,
                 selectedMainNurse: selectedMainNurse,
                 nurseSignature: nurseSignature,
@@ -26787,7 +25266,7 @@ class $$TreatmentsTableTableManager
                 Value<String?> screeningMethodsJson = const Value.absent(),
                 Value<String?> otherScreeningMethod = const Value.absent(),
                 Value<String?> healthDataJson = const Value.absent(),
-                Value<int?> mainSymptom = const Value.absent(),
+                Value<String?> mainSymptom = const Value.absent(),
                 Value<String?> traumaSymptomsJson = const Value.absent(),
                 Value<String?> nonTraumaSymptomsJson = const Value.absent(),
                 Value<String?> symptomNote = const Value.absent(),
@@ -26820,14 +25299,14 @@ class $$TreatmentsTableTableManager
                 Value<String?> leftPupilSize = const Value.absent(),
                 Value<int?> rightPupilScale = const Value.absent(),
                 Value<String?> rightPupilSize = const Value.absent(),
-                Value<int?> history = const Value.absent(),
-                Value<int?> allergy = const Value.absent(),
+                Value<String?> history = const Value.absent(),
+                Value<String?> allergy = const Value.absent(),
                 Value<String?> initialDiagnosis = const Value.absent(),
-                Value<int?> diagnosisCategory = const Value.absent(),
+                Value<String?> diagnosisCategory = const Value.absent(),
                 Value<String?> selectedICD10Main = const Value.absent(),
                 Value<String?> selectedICD10Sub1 = const Value.absent(),
                 Value<String?> selectedICD10Sub2 = const Value.absent(),
-                Value<int?> triageCategory = const Value.absent(),
+                Value<String?> triageCategory = const Value.absent(),
                 Value<String?> onSiteTreatmentsJson = const Value.absent(),
                 Value<bool> ekgChecked = const Value.absent(),
                 Value<String?> ekgReading = const Value.absent(),
@@ -26841,20 +25320,19 @@ class $$TreatmentsTableTableManager
                 Value<bool> prescriptionChecked = const Value.absent(),
                 Value<bool> otherChecked = const Value.absent(),
                 Value<String?> otherSummary = const Value.absent(),
-                Value<int?> referralPassageType = const Value.absent(),
-                Value<int?> referralAmbulanceType = const Value.absent(),
-                Value<int?> referralHospitalIdx = const Value.absent(),
+                Value<String?> referralPassageType = const Value.absent(),
+                Value<String?> referralAmbulanceType = const Value.absent(),
+                Value<String?> referralHospital = const Value.absent(),
                 Value<String?> referralOtherHospital = const Value.absent(),
                 Value<String?> referralEscortText = const Value.absent(),
                 Value<String?> selectedEscortsJson = const Value.absent(),
-                Value<int?> intubationType = const Value.absent(),
-                Value<int?> oxygenType = const Value.absent(),
+                Value<String?> intubationType = const Value.absent(),
+                Value<String?> oxygenType = const Value.absent(),
                 Value<String?> oxygenFlow = const Value.absent(),
                 Value<String?> medicalCertificateTypesJson =
                     const Value.absent(),
                 Value<String?> prescriptionRowsJson = const Value.absent(),
                 Value<String?> followUpResultsJson = const Value.absent(),
-                Value<int?> otherHospitalIdx = const Value.absent(),
                 Value<String?> selectedMainDoctor = const Value.absent(),
                 Value<String?> selectedMainNurse = const Value.absent(),
                 Value<String?> nurseSignature = const Value.absent(),
@@ -26925,7 +25403,7 @@ class $$TreatmentsTableTableManager
                 otherSummary: otherSummary,
                 referralPassageType: referralPassageType,
                 referralAmbulanceType: referralAmbulanceType,
-                referralHospitalIdx: referralHospitalIdx,
+                referralHospital: referralHospital,
                 referralOtherHospital: referralOtherHospital,
                 referralEscortText: referralEscortText,
                 selectedEscortsJson: selectedEscortsJson,
@@ -26935,7 +25413,6 @@ class $$TreatmentsTableTableManager
                 medicalCertificateTypesJson: medicalCertificateTypesJson,
                 prescriptionRowsJson: prescriptionRowsJson,
                 followUpResultsJson: followUpResultsJson,
-                otherHospitalIdx: otherHospitalIdx,
                 selectedMainDoctor: selectedMainDoctor,
                 selectedMainNurse: selectedMainNurse,
                 nurseSignature: nurseSignature,
@@ -29375,14 +27852,6 @@ typedef $$AmbulanceRecordsTableCreateCompanionBuilder =
       Value<int> id,
       required int visitId,
       Value<String?> plateNumber,
-      Value<int?> placeGroupIdx,
-      Value<int?> t1PlaceIdx,
-      Value<int?> t2PlaceIdx,
-      Value<int?> remotePlaceIdx,
-      Value<int?> cargoPlaceIdx,
-      Value<int?> novotelPlaceIdx,
-      Value<int?> cabinPlaceIdx,
-      Value<String?> placeNote,
       Value<DateTime?> dutyTime,
       Value<DateTime?> arriveSceneTime,
       Value<DateTime?> leaveSceneTime,
@@ -29456,14 +27925,6 @@ typedef $$AmbulanceRecordsTableUpdateCompanionBuilder =
       Value<int> id,
       Value<int> visitId,
       Value<String?> plateNumber,
-      Value<int?> placeGroupIdx,
-      Value<int?> t1PlaceIdx,
-      Value<int?> t2PlaceIdx,
-      Value<int?> remotePlaceIdx,
-      Value<int?> cargoPlaceIdx,
-      Value<int?> novotelPlaceIdx,
-      Value<int?> cabinPlaceIdx,
-      Value<String?> placeNote,
       Value<DateTime?> dutyTime,
       Value<DateTime?> arriveSceneTime,
       Value<DateTime?> leaveSceneTime,
@@ -29554,46 +28015,6 @@ class $$AmbulanceRecordsTableFilterComposer
 
   ColumnFilters<String> get plateNumber => $composableBuilder(
     column: $table.plateNumber,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<int> get placeGroupIdx => $composableBuilder(
-    column: $table.placeGroupIdx,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<int> get t1PlaceIdx => $composableBuilder(
-    column: $table.t1PlaceIdx,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<int> get t2PlaceIdx => $composableBuilder(
-    column: $table.t2PlaceIdx,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<int> get remotePlaceIdx => $composableBuilder(
-    column: $table.remotePlaceIdx,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<int> get cargoPlaceIdx => $composableBuilder(
-    column: $table.cargoPlaceIdx,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<int> get novotelPlaceIdx => $composableBuilder(
-    column: $table.novotelPlaceIdx,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<int> get cabinPlaceIdx => $composableBuilder(
-    column: $table.cabinPlaceIdx,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get placeNote => $composableBuilder(
-    column: $table.placeNote,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -29957,46 +28378,6 @@ class $$AmbulanceRecordsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<int> get placeGroupIdx => $composableBuilder(
-    column: $table.placeGroupIdx,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<int> get t1PlaceIdx => $composableBuilder(
-    column: $table.t1PlaceIdx,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<int> get t2PlaceIdx => $composableBuilder(
-    column: $table.t2PlaceIdx,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<int> get remotePlaceIdx => $composableBuilder(
-    column: $table.remotePlaceIdx,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<int> get cargoPlaceIdx => $composableBuilder(
-    column: $table.cargoPlaceIdx,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<int> get novotelPlaceIdx => $composableBuilder(
-    column: $table.novotelPlaceIdx,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<int> get cabinPlaceIdx => $composableBuilder(
-    column: $table.cabinPlaceIdx,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get placeNote => $composableBuilder(
-    column: $table.placeNote,
-    builder: (column) => ColumnOrderings(column),
-  );
-
   ColumnOrderings<DateTime> get dutyTime => $composableBuilder(
     column: $table.dutyTime,
     builder: (column) => ColumnOrderings(column),
@@ -30354,44 +28735,6 @@ class $$AmbulanceRecordsTableAnnotationComposer
     builder: (column) => column,
   );
 
-  GeneratedColumn<int> get placeGroupIdx => $composableBuilder(
-    column: $table.placeGroupIdx,
-    builder: (column) => column,
-  );
-
-  GeneratedColumn<int> get t1PlaceIdx => $composableBuilder(
-    column: $table.t1PlaceIdx,
-    builder: (column) => column,
-  );
-
-  GeneratedColumn<int> get t2PlaceIdx => $composableBuilder(
-    column: $table.t2PlaceIdx,
-    builder: (column) => column,
-  );
-
-  GeneratedColumn<int> get remotePlaceIdx => $composableBuilder(
-    column: $table.remotePlaceIdx,
-    builder: (column) => column,
-  );
-
-  GeneratedColumn<int> get cargoPlaceIdx => $composableBuilder(
-    column: $table.cargoPlaceIdx,
-    builder: (column) => column,
-  );
-
-  GeneratedColumn<int> get novotelPlaceIdx => $composableBuilder(
-    column: $table.novotelPlaceIdx,
-    builder: (column) => column,
-  );
-
-  GeneratedColumn<int> get cabinPlaceIdx => $composableBuilder(
-    column: $table.cabinPlaceIdx,
-    builder: (column) => column,
-  );
-
-  GeneratedColumn<String> get placeNote =>
-      $composableBuilder(column: $table.placeNote, builder: (column) => column);
-
   GeneratedColumn<DateTime> get dutyTime =>
       $composableBuilder(column: $table.dutyTime, builder: (column) => column);
 
@@ -30741,14 +29084,6 @@ class $$AmbulanceRecordsTableTableManager
                 Value<int> id = const Value.absent(),
                 Value<int> visitId = const Value.absent(),
                 Value<String?> plateNumber = const Value.absent(),
-                Value<int?> placeGroupIdx = const Value.absent(),
-                Value<int?> t1PlaceIdx = const Value.absent(),
-                Value<int?> t2PlaceIdx = const Value.absent(),
-                Value<int?> remotePlaceIdx = const Value.absent(),
-                Value<int?> cargoPlaceIdx = const Value.absent(),
-                Value<int?> novotelPlaceIdx = const Value.absent(),
-                Value<int?> cabinPlaceIdx = const Value.absent(),
-                Value<String?> placeNote = const Value.absent(),
                 Value<DateTime?> dutyTime = const Value.absent(),
                 Value<DateTime?> arriveSceneTime = const Value.absent(),
                 Value<DateTime?> leaveSceneTime = const Value.absent(),
@@ -30822,14 +29157,6 @@ class $$AmbulanceRecordsTableTableManager
                 id: id,
                 visitId: visitId,
                 plateNumber: plateNumber,
-                placeGroupIdx: placeGroupIdx,
-                t1PlaceIdx: t1PlaceIdx,
-                t2PlaceIdx: t2PlaceIdx,
-                remotePlaceIdx: remotePlaceIdx,
-                cargoPlaceIdx: cargoPlaceIdx,
-                novotelPlaceIdx: novotelPlaceIdx,
-                cabinPlaceIdx: cabinPlaceIdx,
-                placeNote: placeNote,
                 dutyTime: dutyTime,
                 arriveSceneTime: arriveSceneTime,
                 leaveSceneTime: leaveSceneTime,
@@ -30903,14 +29230,6 @@ class $$AmbulanceRecordsTableTableManager
                 Value<int> id = const Value.absent(),
                 required int visitId,
                 Value<String?> plateNumber = const Value.absent(),
-                Value<int?> placeGroupIdx = const Value.absent(),
-                Value<int?> t1PlaceIdx = const Value.absent(),
-                Value<int?> t2PlaceIdx = const Value.absent(),
-                Value<int?> remotePlaceIdx = const Value.absent(),
-                Value<int?> cargoPlaceIdx = const Value.absent(),
-                Value<int?> novotelPlaceIdx = const Value.absent(),
-                Value<int?> cabinPlaceIdx = const Value.absent(),
-                Value<String?> placeNote = const Value.absent(),
                 Value<DateTime?> dutyTime = const Value.absent(),
                 Value<DateTime?> arriveSceneTime = const Value.absent(),
                 Value<DateTime?> leaveSceneTime = const Value.absent(),
@@ -30984,14 +29303,6 @@ class $$AmbulanceRecordsTableTableManager
                 id: id,
                 visitId: visitId,
                 plateNumber: plateNumber,
-                placeGroupIdx: placeGroupIdx,
-                t1PlaceIdx: t1PlaceIdx,
-                t2PlaceIdx: t2PlaceIdx,
-                remotePlaceIdx: remotePlaceIdx,
-                cargoPlaceIdx: cargoPlaceIdx,
-                novotelPlaceIdx: novotelPlaceIdx,
-                cabinPlaceIdx: cabinPlaceIdx,
-                placeNote: placeNote,
                 dutyTime: dutyTime,
                 arriveSceneTime: arriveSceneTime,
                 leaveSceneTime: leaveSceneTime,
@@ -32234,15 +30545,6 @@ typedef $$EmergencyRecordsTableCreateCompanionBuilder =
     EmergencyRecordsCompanion Function({
       Value<int> id,
       required int visitId,
-      Value<DateTime?> incidentDateTime,
-      Value<int?> placeGroupIdx,
-      Value<int?> t1Selected,
-      Value<int?> t2Selected,
-      Value<int?> remoteSelected,
-      Value<int?> cargoSelected,
-      Value<int?> novotelSelected,
-      Value<int?> cabinSelected,
-      Value<String?> placeNote,
       Value<DateTime?> firstAidStartTime,
       Value<DateTime?> intubationStartTime,
       Value<DateTime?> onIVLineStartTime,
@@ -32251,17 +30553,7 @@ typedef $$EmergencyRecordsTableCreateCompanionBuilder =
       Value<DateTime?> firstAidEndTime,
       Value<String?> diagnosis,
       Value<String?> situation,
-      Value<String?> evmE,
-      Value<String?> evmV,
-      Value<String?> evmM,
-      Value<String?> heartRate,
-      Value<String?> respirationRate,
-      Value<String?> bloodPressure,
       Value<String?> temperature,
-      Value<String?> leftPupilSize,
-      Value<String?> rightPupilSize,
-      Value<String?> leftPupilReaction,
-      Value<String?> rightPupilReaction,
       Value<String?> insertionMethod,
       Value<String?> airwayContent,
       Value<String?> insertionRecord,
@@ -32299,15 +30591,6 @@ typedef $$EmergencyRecordsTableUpdateCompanionBuilder =
     EmergencyRecordsCompanion Function({
       Value<int> id,
       Value<int> visitId,
-      Value<DateTime?> incidentDateTime,
-      Value<int?> placeGroupIdx,
-      Value<int?> t1Selected,
-      Value<int?> t2Selected,
-      Value<int?> remoteSelected,
-      Value<int?> cargoSelected,
-      Value<int?> novotelSelected,
-      Value<int?> cabinSelected,
-      Value<String?> placeNote,
       Value<DateTime?> firstAidStartTime,
       Value<DateTime?> intubationStartTime,
       Value<DateTime?> onIVLineStartTime,
@@ -32316,17 +30599,7 @@ typedef $$EmergencyRecordsTableUpdateCompanionBuilder =
       Value<DateTime?> firstAidEndTime,
       Value<String?> diagnosis,
       Value<String?> situation,
-      Value<String?> evmE,
-      Value<String?> evmV,
-      Value<String?> evmM,
-      Value<String?> heartRate,
-      Value<String?> respirationRate,
-      Value<String?> bloodPressure,
       Value<String?> temperature,
-      Value<String?> leftPupilSize,
-      Value<String?> rightPupilSize,
-      Value<String?> leftPupilReaction,
-      Value<String?> rightPupilReaction,
       Value<String?> insertionMethod,
       Value<String?> airwayContent,
       Value<String?> insertionRecord,
@@ -32380,51 +30653,6 @@ class $$EmergencyRecordsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<DateTime> get incidentDateTime => $composableBuilder(
-    column: $table.incidentDateTime,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<int> get placeGroupIdx => $composableBuilder(
-    column: $table.placeGroupIdx,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<int> get t1Selected => $composableBuilder(
-    column: $table.t1Selected,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<int> get t2Selected => $composableBuilder(
-    column: $table.t2Selected,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<int> get remoteSelected => $composableBuilder(
-    column: $table.remoteSelected,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<int> get cargoSelected => $composableBuilder(
-    column: $table.cargoSelected,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<int> get novotelSelected => $composableBuilder(
-    column: $table.novotelSelected,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<int> get cabinSelected => $composableBuilder(
-    column: $table.cabinSelected,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get placeNote => $composableBuilder(
-    column: $table.placeNote,
-    builder: (column) => ColumnFilters(column),
-  );
-
   ColumnFilters<DateTime> get firstAidStartTime => $composableBuilder(
     column: $table.firstAidStartTime,
     builder: (column) => ColumnFilters(column),
@@ -32465,58 +30693,8 @@ class $$EmergencyRecordsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get evmE => $composableBuilder(
-    column: $table.evmE,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get evmV => $composableBuilder(
-    column: $table.evmV,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get evmM => $composableBuilder(
-    column: $table.evmM,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get heartRate => $composableBuilder(
-    column: $table.heartRate,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get respirationRate => $composableBuilder(
-    column: $table.respirationRate,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get bloodPressure => $composableBuilder(
-    column: $table.bloodPressure,
-    builder: (column) => ColumnFilters(column),
-  );
-
   ColumnFilters<String> get temperature => $composableBuilder(
     column: $table.temperature,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get leftPupilSize => $composableBuilder(
-    column: $table.leftPupilSize,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get rightPupilSize => $composableBuilder(
-    column: $table.rightPupilSize,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get leftPupilReaction => $composableBuilder(
-    column: $table.leftPupilReaction,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get rightPupilReaction => $composableBuilder(
-    column: $table.rightPupilReaction,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -32706,51 +30884,6 @@ class $$EmergencyRecordsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<DateTime> get incidentDateTime => $composableBuilder(
-    column: $table.incidentDateTime,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<int> get placeGroupIdx => $composableBuilder(
-    column: $table.placeGroupIdx,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<int> get t1Selected => $composableBuilder(
-    column: $table.t1Selected,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<int> get t2Selected => $composableBuilder(
-    column: $table.t2Selected,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<int> get remoteSelected => $composableBuilder(
-    column: $table.remoteSelected,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<int> get cargoSelected => $composableBuilder(
-    column: $table.cargoSelected,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<int> get novotelSelected => $composableBuilder(
-    column: $table.novotelSelected,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<int> get cabinSelected => $composableBuilder(
-    column: $table.cabinSelected,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get placeNote => $composableBuilder(
-    column: $table.placeNote,
-    builder: (column) => ColumnOrderings(column),
-  );
-
   ColumnOrderings<DateTime> get firstAidStartTime => $composableBuilder(
     column: $table.firstAidStartTime,
     builder: (column) => ColumnOrderings(column),
@@ -32791,58 +30924,8 @@ class $$EmergencyRecordsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get evmE => $composableBuilder(
-    column: $table.evmE,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get evmV => $composableBuilder(
-    column: $table.evmV,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get evmM => $composableBuilder(
-    column: $table.evmM,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get heartRate => $composableBuilder(
-    column: $table.heartRate,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get respirationRate => $composableBuilder(
-    column: $table.respirationRate,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get bloodPressure => $composableBuilder(
-    column: $table.bloodPressure,
-    builder: (column) => ColumnOrderings(column),
-  );
-
   ColumnOrderings<String> get temperature => $composableBuilder(
     column: $table.temperature,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get leftPupilSize => $composableBuilder(
-    column: $table.leftPupilSize,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get rightPupilSize => $composableBuilder(
-    column: $table.rightPupilSize,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get leftPupilReaction => $composableBuilder(
-    column: $table.leftPupilReaction,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get rightPupilReaction => $composableBuilder(
-    column: $table.rightPupilReaction,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -33028,49 +31111,6 @@ class $$EmergencyRecordsTableAnnotationComposer
   GeneratedColumn<int> get visitId =>
       $composableBuilder(column: $table.visitId, builder: (column) => column);
 
-  GeneratedColumn<DateTime> get incidentDateTime => $composableBuilder(
-    column: $table.incidentDateTime,
-    builder: (column) => column,
-  );
-
-  GeneratedColumn<int> get placeGroupIdx => $composableBuilder(
-    column: $table.placeGroupIdx,
-    builder: (column) => column,
-  );
-
-  GeneratedColumn<int> get t1Selected => $composableBuilder(
-    column: $table.t1Selected,
-    builder: (column) => column,
-  );
-
-  GeneratedColumn<int> get t2Selected => $composableBuilder(
-    column: $table.t2Selected,
-    builder: (column) => column,
-  );
-
-  GeneratedColumn<int> get remoteSelected => $composableBuilder(
-    column: $table.remoteSelected,
-    builder: (column) => column,
-  );
-
-  GeneratedColumn<int> get cargoSelected => $composableBuilder(
-    column: $table.cargoSelected,
-    builder: (column) => column,
-  );
-
-  GeneratedColumn<int> get novotelSelected => $composableBuilder(
-    column: $table.novotelSelected,
-    builder: (column) => column,
-  );
-
-  GeneratedColumn<int> get cabinSelected => $composableBuilder(
-    column: $table.cabinSelected,
-    builder: (column) => column,
-  );
-
-  GeneratedColumn<String> get placeNote =>
-      $composableBuilder(column: $table.placeNote, builder: (column) => column);
-
   GeneratedColumn<DateTime> get firstAidStartTime => $composableBuilder(
     column: $table.firstAidStartTime,
     builder: (column) => column,
@@ -33107,50 +31147,8 @@ class $$EmergencyRecordsTableAnnotationComposer
   GeneratedColumn<String> get situation =>
       $composableBuilder(column: $table.situation, builder: (column) => column);
 
-  GeneratedColumn<String> get evmE =>
-      $composableBuilder(column: $table.evmE, builder: (column) => column);
-
-  GeneratedColumn<String> get evmV =>
-      $composableBuilder(column: $table.evmV, builder: (column) => column);
-
-  GeneratedColumn<String> get evmM =>
-      $composableBuilder(column: $table.evmM, builder: (column) => column);
-
-  GeneratedColumn<String> get heartRate =>
-      $composableBuilder(column: $table.heartRate, builder: (column) => column);
-
-  GeneratedColumn<String> get respirationRate => $composableBuilder(
-    column: $table.respirationRate,
-    builder: (column) => column,
-  );
-
-  GeneratedColumn<String> get bloodPressure => $composableBuilder(
-    column: $table.bloodPressure,
-    builder: (column) => column,
-  );
-
   GeneratedColumn<String> get temperature => $composableBuilder(
     column: $table.temperature,
-    builder: (column) => column,
-  );
-
-  GeneratedColumn<String> get leftPupilSize => $composableBuilder(
-    column: $table.leftPupilSize,
-    builder: (column) => column,
-  );
-
-  GeneratedColumn<String> get rightPupilSize => $composableBuilder(
-    column: $table.rightPupilSize,
-    builder: (column) => column,
-  );
-
-  GeneratedColumn<String> get leftPupilReaction => $composableBuilder(
-    column: $table.leftPupilReaction,
-    builder: (column) => column,
-  );
-
-  GeneratedColumn<String> get rightPupilReaction => $composableBuilder(
-    column: $table.rightPupilReaction,
     builder: (column) => column,
   );
 
@@ -33350,15 +31348,6 @@ class $$EmergencyRecordsTableTableManager
               ({
                 Value<int> id = const Value.absent(),
                 Value<int> visitId = const Value.absent(),
-                Value<DateTime?> incidentDateTime = const Value.absent(),
-                Value<int?> placeGroupIdx = const Value.absent(),
-                Value<int?> t1Selected = const Value.absent(),
-                Value<int?> t2Selected = const Value.absent(),
-                Value<int?> remoteSelected = const Value.absent(),
-                Value<int?> cargoSelected = const Value.absent(),
-                Value<int?> novotelSelected = const Value.absent(),
-                Value<int?> cabinSelected = const Value.absent(),
-                Value<String?> placeNote = const Value.absent(),
                 Value<DateTime?> firstAidStartTime = const Value.absent(),
                 Value<DateTime?> intubationStartTime = const Value.absent(),
                 Value<DateTime?> onIVLineStartTime = const Value.absent(),
@@ -33367,17 +31356,7 @@ class $$EmergencyRecordsTableTableManager
                 Value<DateTime?> firstAidEndTime = const Value.absent(),
                 Value<String?> diagnosis = const Value.absent(),
                 Value<String?> situation = const Value.absent(),
-                Value<String?> evmE = const Value.absent(),
-                Value<String?> evmV = const Value.absent(),
-                Value<String?> evmM = const Value.absent(),
-                Value<String?> heartRate = const Value.absent(),
-                Value<String?> respirationRate = const Value.absent(),
-                Value<String?> bloodPressure = const Value.absent(),
                 Value<String?> temperature = const Value.absent(),
-                Value<String?> leftPupilSize = const Value.absent(),
-                Value<String?> rightPupilSize = const Value.absent(),
-                Value<String?> leftPupilReaction = const Value.absent(),
-                Value<String?> rightPupilReaction = const Value.absent(),
                 Value<String?> insertionMethod = const Value.absent(),
                 Value<String?> airwayContent = const Value.absent(),
                 Value<String?> insertionRecord = const Value.absent(),
@@ -33420,15 +31399,6 @@ class $$EmergencyRecordsTableTableManager
               }) => EmergencyRecordsCompanion(
                 id: id,
                 visitId: visitId,
-                incidentDateTime: incidentDateTime,
-                placeGroupIdx: placeGroupIdx,
-                t1Selected: t1Selected,
-                t2Selected: t2Selected,
-                remoteSelected: remoteSelected,
-                cargoSelected: cargoSelected,
-                novotelSelected: novotelSelected,
-                cabinSelected: cabinSelected,
-                placeNote: placeNote,
                 firstAidStartTime: firstAidStartTime,
                 intubationStartTime: intubationStartTime,
                 onIVLineStartTime: onIVLineStartTime,
@@ -33437,17 +31407,7 @@ class $$EmergencyRecordsTableTableManager
                 firstAidEndTime: firstAidEndTime,
                 diagnosis: diagnosis,
                 situation: situation,
-                evmE: evmE,
-                evmV: evmV,
-                evmM: evmM,
-                heartRate: heartRate,
-                respirationRate: respirationRate,
-                bloodPressure: bloodPressure,
                 temperature: temperature,
-                leftPupilSize: leftPupilSize,
-                rightPupilSize: rightPupilSize,
-                leftPupilReaction: leftPupilReaction,
-                rightPupilReaction: rightPupilReaction,
                 insertionMethod: insertionMethod,
                 airwayContent: airwayContent,
                 insertionRecord: insertionRecord,
@@ -33489,15 +31449,6 @@ class $$EmergencyRecordsTableTableManager
               ({
                 Value<int> id = const Value.absent(),
                 required int visitId,
-                Value<DateTime?> incidentDateTime = const Value.absent(),
-                Value<int?> placeGroupIdx = const Value.absent(),
-                Value<int?> t1Selected = const Value.absent(),
-                Value<int?> t2Selected = const Value.absent(),
-                Value<int?> remoteSelected = const Value.absent(),
-                Value<int?> cargoSelected = const Value.absent(),
-                Value<int?> novotelSelected = const Value.absent(),
-                Value<int?> cabinSelected = const Value.absent(),
-                Value<String?> placeNote = const Value.absent(),
                 Value<DateTime?> firstAidStartTime = const Value.absent(),
                 Value<DateTime?> intubationStartTime = const Value.absent(),
                 Value<DateTime?> onIVLineStartTime = const Value.absent(),
@@ -33506,17 +31457,7 @@ class $$EmergencyRecordsTableTableManager
                 Value<DateTime?> firstAidEndTime = const Value.absent(),
                 Value<String?> diagnosis = const Value.absent(),
                 Value<String?> situation = const Value.absent(),
-                Value<String?> evmE = const Value.absent(),
-                Value<String?> evmV = const Value.absent(),
-                Value<String?> evmM = const Value.absent(),
-                Value<String?> heartRate = const Value.absent(),
-                Value<String?> respirationRate = const Value.absent(),
-                Value<String?> bloodPressure = const Value.absent(),
                 Value<String?> temperature = const Value.absent(),
-                Value<String?> leftPupilSize = const Value.absent(),
-                Value<String?> rightPupilSize = const Value.absent(),
-                Value<String?> leftPupilReaction = const Value.absent(),
-                Value<String?> rightPupilReaction = const Value.absent(),
                 Value<String?> insertionMethod = const Value.absent(),
                 Value<String?> airwayContent = const Value.absent(),
                 Value<String?> insertionRecord = const Value.absent(),
@@ -33559,15 +31500,6 @@ class $$EmergencyRecordsTableTableManager
               }) => EmergencyRecordsCompanion.insert(
                 id: id,
                 visitId: visitId,
-                incidentDateTime: incidentDateTime,
-                placeGroupIdx: placeGroupIdx,
-                t1Selected: t1Selected,
-                t2Selected: t2Selected,
-                remoteSelected: remoteSelected,
-                cargoSelected: cargoSelected,
-                novotelSelected: novotelSelected,
-                cabinSelected: cabinSelected,
-                placeNote: placeNote,
                 firstAidStartTime: firstAidStartTime,
                 intubationStartTime: intubationStartTime,
                 onIVLineStartTime: onIVLineStartTime,
@@ -33576,17 +31508,7 @@ class $$EmergencyRecordsTableTableManager
                 firstAidEndTime: firstAidEndTime,
                 diagnosis: diagnosis,
                 situation: situation,
-                evmE: evmE,
-                evmV: evmV,
-                evmM: evmM,
-                heartRate: heartRate,
-                respirationRate: respirationRate,
-                bloodPressure: bloodPressure,
                 temperature: temperature,
-                leftPupilSize: leftPupilSize,
-                rightPupilSize: rightPupilSize,
-                leftPupilReaction: leftPupilReaction,
-                rightPupilReaction: rightPupilReaction,
                 insertionMethod: insertionMethod,
                 airwayContent: airwayContent,
                 insertionRecord: insertionRecord,

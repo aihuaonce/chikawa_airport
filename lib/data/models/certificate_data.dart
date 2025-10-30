@@ -1,4 +1,4 @@
-// ==================== 5️⃣ certificate_data.dart ====================
+//certificate_data.dart
 import 'package:flutter/material.dart';
 import 'package:chikawa_airport/data/db/app_database.dart';
 import 'package:drift/drift.dart';
@@ -24,7 +24,6 @@ class CertificateData extends ChangeNotifier {
     notifyListeners();
   }
 
-  // ✅ 新增：轉換為 Companion
   MedicalCertificatesCompanion toCompanion(int visitId) {
     return MedicalCertificatesCompanion(
       visitId: Value(visitId),
@@ -36,13 +35,12 @@ class CertificateData extends ChangeNotifier {
     );
   }
 
-  // ✅ 簡化後的保存方法
   Future<void> saveToDatabase(int visitId, MedicalCertificatesDao dao) async {
     try {
       await dao.upsert(toCompanion(visitId));
-      print('✅ 診斷書已儲存');
+      print('診斷書已儲存');
     } catch (e) {
-      print('❌ 儲存失敗: $e');
+      print('儲存失敗: $e');
       rethrow;
     }
   }

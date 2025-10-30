@@ -25,10 +25,11 @@ class Nav4Page extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => EmergencyNavigationProvider()),
-        ChangeNotifierProxyProvider5<
+        ChangeNotifierProxyProvider6<
           EmergencyRecordsDao,
           PatientProfilesDao,
           FlightLogsDao,
+          TreatmentsDao,
           AccidentRecordsDao,
           VisitsDao,
           EmergencyData
@@ -40,6 +41,7 @@ class Nav4Page extends StatelessWidget {
                 emergencyDao,
                 profilesDao,
                 flightLogsDao,
+                treatmentsDao,
                 accidentDao,
                 visitsDao,
                 previous,
@@ -50,6 +52,7 @@ class Nav4Page extends StatelessWidget {
                     emergencyDao,
                     profilesDao,
                     flightLogsDao,
+                    treatmentsDao,
                   );
                 }
                 return previous ?? EmergencyData(visitId);
@@ -133,6 +136,7 @@ class _EmergencyNavBarState extends State<EmergencyNavBar> {
       final profilesDao = context.read<PatientProfilesDao>();
       final flightLogsDao = context.read<FlightLogsDao>();
       final accidentDao = context.read<AccidentRecordsDao>();
+      final treatmentsDao = context.read<TreatmentsDao>();
       final visitsDao = context.read<VisitsDao>();
 
       // ✅ 傳入所有必需的 DAO
@@ -141,6 +145,7 @@ class _EmergencyNavBarState extends State<EmergencyNavBar> {
         profilesDao: profilesDao,
         flightLogsDao: flightLogsDao,
         visitsDao: visitsDao,
+        treatmentsDao: treatmentsDao,
       );
 
       if (mounted) {

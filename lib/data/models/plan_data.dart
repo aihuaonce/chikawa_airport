@@ -5,9 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:chikawa_airport/data/db/app_database.dart';
 import 'package:drift/drift.dart';
 import '../db/daos.dart';
+import 'package:flutter/foundation.dart'; 
 
 class PlanData extends ChangeNotifier {
-  // === 常數列表 (從 plan.dart 移過來) ===
   static final List<String> icd10List = [
     'A00 Cholera - 霍亂',
     'A00.0 Cholera due to Vibrio cholerae 01, biovar cholerae - 血清型01霍亂弧菌霍亂',
@@ -27,16 +27,6 @@ class PlanData extends ChangeNotifier {
     '桃園國際敏盛醫院',
     '聖保祿醫院',
     '中壢天晟醫院',
-    '桃園榮民總醫院',
-    '三峽恩主公醫院',
-    '其他',
-  ];
-
-  static final List<String> otherHospitals = [
-    '桃園經國敏盛醫院',
-    '聖保祿醫院',
-    '衛生福利部桃園醫院',
-    '衛生福利部桃園療養院',
     '桃園榮民總醫院',
     '三峽恩主公醫院',
     '其他',
@@ -223,65 +213,23 @@ class PlanData extends ChangeNotifier {
 
   // === 篩檢 ===
   bool screeningChecked = false;
-  Map<String, bool> screeningMethods = {
-    '喉頭採檢': false,
-    '抽血驗證': false,
-    '其他': false,
-  };
+  Set<String> screeningMethods = {};
   String? otherScreeningMethod;
   List<Map<String, String>> healthData = [];
 
   // === 主訴 ===
-  int? mainSymptom;
-  Map<String, bool> traumaSymptoms = {
-    '鈍挫傷': false,
-    '扭傷': false,
-    '撕裂傷': false,
-    '擦傷': false,
-    '肢體變形': false,
-    '其他': false,
-  };
-  Map<String, bool> nonTraumaSymptoms = {
-    '頭頸部': false,
-    '胸部': false,
-    '腹部': false,
-    '四肢': false,
-    '其他': false,
-  };
-  Map<String, bool> nonTraumaHeadSymptoms = {
-    '頭痛': false,
-    '頭暈目眩': false,
-    '意識改變': false,
-    '癲癇': false,
-    '喉嚨痛': false,
-    '鼻塞鼻水': false,
-    '五官症狀': false,
-  };
-  Map<String, bool> nonTraumaChestSymptoms = {
-    '咳嗽': false,
-    '呼吸困難': false,
-    '胸悶胸痛': false,
-    '心悸': false,
-  };
-  Map<String, bool> nonTraumaAbdomenSymptoms = {
-    '腹脹腹痛': false,
-    '噁心嘔吐': false,
-    '腹瀉': false,
-  };
-  Map<String, bool> nonTraumaLimbsSymptoms = {'疼痛': false, '麻木無力': false};
-  Map<String, bool> nonTraumaOtherSymptoms = {
-    '發燒': false,
-    '倦怠無力': false,
-    '頻尿、解尿疼痛': false,
-    '暈厥': false,
-    '過敏': false,
-    '精神異常': false,
-    '其他': false,
-  };
+  String? mainSymptom; // 'trauma' or 'non_trauma'
+  Set<String> traumaSymptoms = {};
+  Set<String> nonTraumaSymptoms = {};
+  Set<String> nonTraumaHeadSymptoms = {};
+  Set<String> nonTraumaChestSymptoms = {};
+  Set<String> nonTraumaAbdomenSymptoms = {};
+  Set<String> nonTraumaLimbsSymptoms = {};
+  Set<String> nonTraumaOtherSymptoms = {};
   String? symptomNote;
 
   // === 照片 ===
-  Map<String, bool> photoTypes = {'外傷': false, '心電圖': false, '其他': false};
+  Set<String> photoTypes = {};
 
   // === 身體檢查 ===
   String? bodyCheckHead;
@@ -306,76 +254,46 @@ class PlanData extends ChangeNotifier {
   int? rightPupilScale;
   String? rightPupilSize;
 
-  // === 病史 ===
-  int? history;
-  int? allergy;
+  String? history; // 'none', 'unknown', 'yes'
+  String? allergy; // 'none', 'unknown', 'yes'
 
-  // === 診斷 ===
   String? initialDiagnosis;
-  int? diagnosisCategory;
+  String? diagnosisCategory;
   String? selectedICD10Main;
   String? selectedICD10Sub1;
   String? selectedICD10Sub2;
-  int? triageCategory;
+  String? triageCategory; // 'level_1', 'level_2', ...
 
-  // === 處理摘要 ===
-  Map<String, bool> onSiteTreatments = {
-    '諮詢衛教': false,
-    '內科處置': false,
-    '外科處置': false,
-    '拒絕處置': false,
-    '疑似傳染病診療': false,
-  };
-  bool icePack = false;
+  Set<String> onSiteTreatments = {};
+
   bool ekgChecked = false;
   String? ekgReading;
   bool sugarChecked = false;
   String? sugarReading;
-  bool woundCare = false;
-  bool signQuadruplicate = false;
   bool suggestReferral = false;
   bool intubationChecked = false;
   bool cprChecked = false;
   bool oxygenTherapyChecked = false;
   bool medicalCertificateChecked = false;
-  bool suction = false;
   bool prescriptionChecked = false;
   bool otherChecked = false;
   String? otherSummary;
 
-  // === 轉診詳情 ===
-  int? referralPassageType;
-  int? referralAmbulanceType;
-  int? referralHospitalIdx;
+  String? referralPassageType; // 'general', 'emergency'
+  String? referralAmbulanceType; // 'medical_center', 'private', 'fire_dept'
+  String? referralHospital;
   String? referralOtherHospital;
   String? referralEscortText;
   List<String> selectedEscorts = [];
 
-  // === 處置詳情 ===
-  int? intubationType;
-  int? oxygenType;
+  String? intubationType; // 'endotracheal', 'lma'
+  String? oxygenType; // 'nc', 'mask', 'nrm', 'ambu'
   String? oxygenFlow;
-  Map<String, bool> medicalCertificateTypes = {
-    '中文診斷書': false,
-    '英文診斷書': false,
-    '中英文適航證明': false,
-  };
+  Set<String> medicalCertificateTypes = {};
   List<Map<String, String>> prescriptionRows = [];
 
-  // === 後續結果 ===
-  Map<String, bool> followUpResults = {
-    '繼續搭機旅行': false,
-    '休息觀察或自行回家': false,
-    '轉聯新國際醫院': false,
-    '轉林口長庚醫院': false,
-    '轉其他醫院': false,
-    '建議轉診門診追蹤': false,
-    '死亡': false,
-    '拒絕轉診': false,
-  };
-  int? otherHospitalIdx;
+  Set<String> followUpResults = {};
 
-  // === 人員簽名 ===
   String? selectedMainDoctor;
   String? selectedMainNurse;
   String? nurseSignature;
@@ -384,74 +302,35 @@ class PlanData extends ChangeNotifier {
   String? helperNamesText;
   List<String> selectedHelpers = [];
 
-  // === 特別註記 ===
-  Map<String, bool> specialNotes = {
-    'OHCA醫護團隊到場前有CPR': false,
-    'OHCA醫護團隊到場前有使用AED但無電擊': false,
-    'OHCA醫護團隊到場前有使用AED有電擊': false,
-    '現場恢復呼吸': false,
-    '使用自動心律復甦機': false,
-    '空白': false,
-  };
+  Set<String> specialNotes = {};
   String? otherSpecialNote;
 
   void update() => notifyListeners();
 
   void clear() {
-    // 將所有欄位重設為初始值
     screeningChecked = false;
-    screeningMethods = {'喉頭採檢': false, '抽血驗證': false, '其他': false};
+    screeningMethods = {};
     otherScreeningMethod = null;
     healthData = [];
+
     mainSymptom = null;
-    traumaSymptoms = {
-      '鈍挫傷': false,
-      '扭傷': false,
-      '撕裂傷': false,
-      '擦傷': false,
-      '肢體變形': false,
-      '其他': false,
-    };
-    nonTraumaSymptoms = {
-      '頭頸部': false,
-      '胸部': false,
-      '腹部': false,
-      '四肢': false,
-      '其他': false,
-    };
-    nonTraumaHeadSymptoms = {
-      '頭痛': false,
-      '頭暈目眩': false,
-      '意識改變': false,
-      '癲癇': false,
-      '喉嚨痛': false,
-      '鼻塞鼻水': false,
-      '五官症狀': false,
-    };
-    nonTraumaChestSymptoms = {
-      '咳嗽': false,
-      '呼吸困難': false,
-      '胸悶胸痛': false,
-      '心悸': false,
-    };
-    nonTraumaAbdomenSymptoms = {'腹脹腹痛': false, '噁心嘔吐': false, '腹瀉': false};
-    nonTraumaLimbsSymptoms = {'疼痛': false, '麻木無力': false};
-    nonTraumaOtherSymptoms = {
-      '發燒': false,
-      '倦怠無力': false,
-      '頻尿、解尿疼痛': false,
-      '暈厥': false,
-      '過敏': false,
-      '精神異常': false,
-      '其他': false,
-    };
+    traumaSymptoms = {};
+    nonTraumaSymptoms = {};
+    nonTraumaHeadSymptoms = {};
+    nonTraumaChestSymptoms = {};
+    nonTraumaAbdomenSymptoms = {};
+    nonTraumaLimbsSymptoms = {};
+    nonTraumaOtherSymptoms = {};
     symptomNote = null;
-    photoTypes = {'外傷': false, '心電圖': false, '其他': false};
+
+    photoTypes = {};
+
     bodyCheckHead = null;
     bodyCheckChest = null;
     bodyCheckAbdomen = null;
     bodyCheckLimbs = null;
     bodyCheckOther = null;
+
     temperature = null;
     pulse = null;
     respiration = null;
@@ -466,63 +345,46 @@ class PlanData extends ChangeNotifier {
     leftPupilSize = null;
     rightPupilScale = null;
     rightPupilSize = null;
+
     history = null;
     allergy = null;
+
     initialDiagnosis = null;
     diagnosisCategory = null;
     selectedICD10Main = null;
     selectedICD10Sub1 = null;
     selectedICD10Sub2 = null;
     triageCategory = null;
-    onSiteTreatments = {
-      '諮詢衛教': false,
-      '內科處置': false,
-      '外科處置': false,
-      '拒絕處置': false,
-      '疑似傳染病診療': false,
-    };
-    icePack = false;
+
+    onSiteTreatments = {};
     ekgChecked = false;
     ekgReading = null;
     sugarChecked = false;
     sugarReading = null;
-    woundCare = false;
-    signQuadruplicate = false;
     suggestReferral = false;
     intubationChecked = false;
     cprChecked = false;
     oxygenTherapyChecked = false;
     medicalCertificateChecked = false;
-    suction = false;
     prescriptionChecked = false;
     otherChecked = false;
     otherSummary = null;
+
     referralPassageType = null;
     referralAmbulanceType = null;
-    referralHospitalIdx = null;
+    referralHospital = null;
     referralOtherHospital = null;
     referralEscortText = null;
     selectedEscorts = [];
+
     intubationType = null;
     oxygenType = null;
     oxygenFlow = null;
-    medicalCertificateTypes = {
-      '中文診斷書': false,
-      '英文診斷書': false,
-      '中英文適航證明': false,
-    };
+    medicalCertificateTypes = {};
     prescriptionRows = [];
-    followUpResults = {
-      '繼續搭機旅行': false,
-      '休息觀察或自行回家': false,
-      '轉聯新國際醫院': false,
-      '轉林口長庚醫院': false,
-      '轉其他醫院': false,
-      '建議轉診門診追蹤': false,
-      '死亡': false,
-      '拒絕轉診': false,
-    };
-    otherHospitalIdx = null;
+
+    followUpResults = {};
+
     selectedMainDoctor = null;
     selectedMainNurse = null;
     nurseSignature = null;
@@ -530,37 +392,40 @@ class PlanData extends ChangeNotifier {
     emtSignature = null;
     helperNamesText = null;
     selectedHelpers = [];
-    specialNotes = {
-      'OHCA醫護團隊到場前有CPR': false,
-      'OHCA醫護團隊到場前有使用AED但無電擊': false,
-      'OHCA醫護團隊到場前有使用AED有電擊': false,
-      '現場恢復呼吸': false,
-      '使用自動心律復甦機': false,
-      '空白': false,
-    };
+
+    specialNotes = {};
     otherSpecialNote = null;
 
     notifyListeners();
   }
 
-  // ✅ 轉換為 Companion (完整版)
   TreatmentsCompanion toCompanion(int visitId) {
     return TreatmentsCompanion(
       visitId: Value(visitId),
       screeningChecked: Value(screeningChecked),
-      screeningMethodsJson: Value(jsonEncode(screeningMethods)),
+      screeningMethodsJson: Value(jsonEncode(screeningMethods.toList())),
       otherScreeningMethod: Value(otherScreeningMethod),
       healthDataJson: Value(jsonEncode(healthData)),
       mainSymptom: Value(mainSymptom),
-      traumaSymptomsJson: Value(jsonEncode(traumaSymptoms)),
-      nonTraumaSymptomsJson: Value(jsonEncode(nonTraumaSymptoms)),
-      nonTraumaHeadSymptomsJson: Value(jsonEncode(nonTraumaHeadSymptoms)),
-      nonTraumaChestSymptomsJson: Value(jsonEncode(nonTraumaChestSymptoms)),
-      nonTraumaAbdomenSymptomsJson: Value(jsonEncode(nonTraumaAbdomenSymptoms)),
-      nonTraumaLimbsSymptomsJson: Value(jsonEncode(nonTraumaLimbsSymptoms)),
-      nonTraumaOtherSymptomsJson: Value(jsonEncode(nonTraumaOtherSymptoms)),
+      traumaSymptomsJson: Value(jsonEncode(traumaSymptoms.toList())),
+      nonTraumaSymptomsJson: Value(jsonEncode(nonTraumaSymptoms.toList())),
+      nonTraumaHeadSymptomsJson: Value(
+        jsonEncode(nonTraumaHeadSymptoms.toList()),
+      ),
+      nonTraumaChestSymptomsJson: Value(
+        jsonEncode(nonTraumaChestSymptoms.toList()),
+      ),
+      nonTraumaAbdomenSymptomsJson: Value(
+        jsonEncode(nonTraumaAbdomenSymptoms.toList()),
+      ),
+      nonTraumaLimbsSymptomsJson: Value(
+        jsonEncode(nonTraumaLimbsSymptoms.toList()),
+      ),
+      nonTraumaOtherSymptomsJson: Value(
+        jsonEncode(nonTraumaOtherSymptoms.toList()),
+      ),
       symptomNote: Value(symptomNote),
-      photoTypesJson: Value(jsonEncode(photoTypes)),
+      photoTypesJson: Value(jsonEncode(photoTypes.toList())),
       bodyCheckHead: Value(bodyCheckHead),
       bodyCheckChest: Value(bodyCheckChest),
       bodyCheckAbdomen: Value(bodyCheckAbdomen),
@@ -588,7 +453,7 @@ class PlanData extends ChangeNotifier {
       selectedICD10Sub1: Value(selectedICD10Sub1),
       selectedICD10Sub2: Value(selectedICD10Sub2),
       triageCategory: Value(triageCategory),
-      onSiteTreatmentsJson: Value(jsonEncode(onSiteTreatments)),
+      onSiteTreatmentsJson: Value(jsonEncode(onSiteTreatments.toList())),
       ekgChecked: Value(ekgChecked),
       ekgReading: Value(ekgReading),
       sugarChecked: Value(sugarChecked),
@@ -603,17 +468,18 @@ class PlanData extends ChangeNotifier {
       otherSummary: Value(otherSummary),
       referralPassageType: Value(referralPassageType),
       referralAmbulanceType: Value(referralAmbulanceType),
-      referralHospitalIdx: Value(referralHospitalIdx),
+      referralHospital: Value(referralHospital),
       referralOtherHospital: Value(referralOtherHospital),
       referralEscortText: Value(referralEscortText),
       selectedEscortsJson: Value(jsonEncode(selectedEscorts)),
       intubationType: Value(intubationType),
       oxygenType: Value(oxygenType),
       oxygenFlow: Value(oxygenFlow),
-      medicalCertificateTypesJson: Value(jsonEncode(medicalCertificateTypes)),
+      medicalCertificateTypesJson: Value(
+        jsonEncode(medicalCertificateTypes.toList()),
+      ),
       prescriptionRowsJson: Value(jsonEncode(prescriptionRows)),
-      followUpResultsJson: Value(jsonEncode(followUpResults)),
-      otherHospitalIdx: Value(otherHospitalIdx),
+      followUpResultsJson: Value(jsonEncode(followUpResults.toList())),
       selectedMainDoctor: Value(selectedMainDoctor),
       selectedMainNurse: Value(selectedMainNurse),
       nurseSignature: Value(nurseSignature),
@@ -621,24 +487,18 @@ class PlanData extends ChangeNotifier {
       emtSignature: Value(emtSignature),
       helperNamesText: Value(helperNamesText),
       selectedHelpersJson: Value(jsonEncode(selectedHelpers)),
-      specialNotesJson: Value(jsonEncode(specialNotes)),
+      specialNotesJson: Value(jsonEncode(specialNotes.toList())),
       otherSpecialNote: Value(otherSpecialNote),
     );
   }
 
-  // ✅ 同步更新 Visits 摘要表
   VisitsCompanion toVisitsCompanion() {
-    String? result = followUpResults.entries
-        .where((e) => e.value)
-        .map((e) => e.key)
-        .join('、');
     return VisitsCompanion(
-      emergencyResult: Value(result.isNotEmpty ? result : null),
+      emergencyResult: Value(followUpResults.join('、')),
       note: Value(initialDiagnosis),
     );
   }
 
-  // ✅ 資料庫保存
   Future<void> saveToDatabase(
     int visitId,
     TreatmentsDao planDao,
@@ -647,9 +507,9 @@ class PlanData extends ChangeNotifier {
     try {
       await planDao.upsert(toCompanion(visitId));
       await visitsDao.updateVisit(visitId, toVisitsCompanion());
-      print('✅ 現場處置與診斷資料已儲存並同步更新 Visits');
+      debugPrint('現場處置與診斷資料已儲存並同步更新 Visits');
     } catch (e) {
-      print('❌ 儲存現場處置資料失敗: $e');
+      debugPrint('儲存現場處置資料失敗: $e');
       rethrow;
     }
   }

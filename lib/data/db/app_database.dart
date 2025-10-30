@@ -27,7 +27,6 @@ part 'app_database.g.dart';
     VitalSignsRecords,
     ParamedicRecords,
     EmergencyRecords,
-    // 之後還有 Treatments, MedicalCosts, Diagnoses... 全部加在這裡
   ],
   daos: [
     VisitsDao,
@@ -46,13 +45,11 @@ part 'app_database.g.dart';
     VitalSignsRecordsDao,
     ParamedicRecordsDao,
     EmergencyRecordsDao,
-    // 之後還有 TreatmentsDao, MedicalCostsDao, DiagnosesDao... 全部加在這裡
   ],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
-  // 每次資料庫 schema 有變更（加表/加欄位），這裡要 +1
   @override
   int get schemaVersion => 1;
 

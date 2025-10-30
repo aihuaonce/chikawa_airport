@@ -164,6 +164,13 @@ class AppTranslations {
       ? '已自動建立轉診單與救護車紀錄！'
       : 'Referral form and ambulance record have been automatically created!';
   String get loadDataFailed => isZh ? '載入資料失敗: ' : 'Failed to load data: ';
+
+  // Screening Methods
+  String get nasalSwab => isZh ? '鼻咽採檢' : 'Nasal Swab';
+  String get throatSwab => isZh ? '口咽採檢' : 'Throat Swab';
+  String get deepSaliva => isZh ? '深喉唾液採檢' : 'Deep Saliva';
+  String get rapidTestKit => isZh ? '快篩試劑' : 'Rapid Test Kit';
+
   String get cdcScreening => isZh ? '疾病管制署篩檢' : 'CDC Screening';
   String get enableScreening => isZh ? '啟用篩檢' : 'Enable Screening';
   String get screeningMethod => isZh ? '篩檢方式' : 'Screening Method';
@@ -186,11 +193,11 @@ class AppTranslations {
       isZh ? '請輸入檢查資訊' : 'Please enter examination info';
   String get voiceInput => isZh ? '語音輸入：' : 'Voice Input:';
   String get voiceInputHint => isZh
-      ? '這裡依序輸入體溫、脈搏、呼吸、血壓、血氧、血糖'
+      ? '這裡依序輸入體溫、心跳、呼吸、血壓、血氧、血糖'
       : 'Enter temp, pulse, respiration, BP, SpO2, blood sugar in order';
   String get temperatureLabel => isZh ? '體溫(°C)' : 'Temperature (°C)';
-  String get pulseLabel => isZh ? '脈搏(次/min)' : 'Pulse (bpm)';
-  String get respirationLabel => isZh ? '呼吸(次/min)' : 'Respiration (rpm)';
+  String get pulseLabel => isZh ? '心跳(次/分)' : 'Pulse (bpm)';
+  String get respirationLabel => isZh ? '呼吸(次/分)' : 'Respiration (rpm)';
   String get bloodPressureLabel => isZh ? '血壓(mmHg)' : 'Blood Pressure (mmHg)';
   String get spo2Label => isZh ? '血氧(%)' : 'SpO2 (%)';
   String get consciousClear => isZh ? '意識清晰' : 'Conscious Clear';
@@ -232,7 +239,7 @@ class AppTranslations {
   String get fireDeptAmbulance => isZh ? '消防隊' : 'Fire Department';
   String get transferHospital => isZh ? '轉送醫院' : 'Transfer Hospital';
   String get otherTransferHospital =>
-      isZh ? '其他轉送醫院?' : 'Other transfer hospital?';
+      isZh ? '其他轉送醫院' : 'Other transfer hospital?';
   String get enterOtherTransferHospital =>
       isZh ? '請填寫其他轉送醫院' : 'Please enter other transfer hospital';
   String get escortPersonnel => isZh ? '隨車人員' : 'Escort Personnel';
@@ -314,6 +321,7 @@ class AppTranslations {
       isZh ? '轉林口長庚醫院' : 'Transfer to Linkou Chang Gung';
   String get transferOtherHospital =>
       isZh ? '轉其他醫院' : 'Transfer to Other Hospital';
+  String get recommendReferral => isZh ? '建議轉診' : 'Recommend referral';
   String get recommendOutpatient =>
       isZh ? '建議轉診門診追蹤' : 'Recommend Outpatient Follow-up';
   String get deceased => isZh ? '死亡' : 'Deceased';
@@ -347,7 +355,7 @@ class AppTranslations {
   String get airwayTreatment => isZh ? '呼吸道處置' : 'Airway Management';
   String get traumaTreatment => isZh ? '創傷處置' : 'Trauma Care';
   String get transport => isZh ? '搬運' : 'Transport';
-  String get cpr => isZh ? '心肺復甦術' : 'Cardiopulmonary Resuscitation (CPR)';
+  String get cpr => isZh ? 'CPR' : 'Cardiopulmonary Resuscitation (CPR)';
   String get medicationProcedure => isZh ? '藥物處置' : 'Medication Administration';
   String get otherProcedure => isZh ? '其他處置' : 'Other Interventions';
 

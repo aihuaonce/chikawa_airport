@@ -16,14 +16,6 @@ class AmbulanceData extends ChangeNotifier {
 
   // Information
   String? plateNumber;
-  int? placeGroupIdx;
-  int? t1PlaceIdx;
-  int? t2PlaceIdx;
-  int? remotePlaceIdx;
-  int? cargoPlaceIdx;
-  int? novotelPlaceIdx;
-  int? cabinPlaceIdx;
-  String? placeNote;
   DateTime? dutyTime;
   DateTime? arriveSceneTime;
   DateTime? leaveSceneTime;
@@ -102,7 +94,6 @@ class AmbulanceData extends ChangeNotifier {
   String? paidType;
   String? unpaidType;
 
-  // Update methods (保持不變)
   void updateInformation({
     String? plateNumber,
     int? placeGroupIdx,
@@ -124,14 +115,6 @@ class AmbulanceData extends ChangeNotifier {
     String? destinationHospital,
   }) {
     if (plateNumber != null) this.plateNumber = plateNumber;
-    if (placeGroupIdx != null) this.placeGroupIdx = placeGroupIdx;
-    if (t1PlaceIdx != null) this.t1PlaceIdx = t1PlaceIdx;
-    if (t2PlaceIdx != null) this.t2PlaceIdx = t2PlaceIdx;
-    if (remotePlaceIdx != null) this.remotePlaceIdx = remotePlaceIdx;
-    if (cargoPlaceIdx != null) this.cargoPlaceIdx = cargoPlaceIdx;
-    if (novotelPlaceIdx != null) this.novotelPlaceIdx = novotelPlaceIdx;
-    if (cabinPlaceIdx != null) this.cabinPlaceIdx = cabinPlaceIdx;
-    if (placeNote != null) this.placeNote = placeNote;
     if (dutyTime != null) this.dutyTime = dutyTime;
     if (arriveSceneTime != null) this.arriveSceneTime = arriveSceneTime;
     if (leaveSceneTime != null) this.leaveSceneTime = leaveSceneTime;
@@ -301,14 +284,6 @@ class AmbulanceData extends ChangeNotifier {
 
   void clearAll() {
     plateNumber = null;
-    placeGroupIdx = null;
-    t1PlaceIdx = null;
-    t2PlaceIdx = null;
-    remotePlaceIdx = null;
-    cargoPlaceIdx = null;
-    novotelPlaceIdx = null;
-    cabinPlaceIdx = null;
-    placeNote = null;
     dutyTime = null;
     arriveSceneTime = null;
     leaveSceneTime = null;
@@ -396,17 +371,9 @@ class AmbulanceData extends ChangeNotifier {
         return;
       }
 
-      print('✅ 找到救護車記錄,載入資料...');
+      print('載入資救護車記錄料');
 
       plateNumber = record.plateNumber;
-      placeGroupIdx = record.placeGroupIdx;
-      t1PlaceIdx = record.t1PlaceIdx;
-      t2PlaceIdx = record.t2PlaceIdx;
-      remotePlaceIdx = record.remotePlaceIdx;
-      cargoPlaceIdx = record.cargoPlaceIdx;
-      novotelPlaceIdx = record.novotelPlaceIdx;
-      cabinPlaceIdx = record.cabinPlaceIdx;
-      placeNote = record.placeNote;
       dutyTime = record.dutyTime;
       arriveSceneTime = record.arriveSceneTime;
       leaveSceneTime = record.leaveSceneTime;
@@ -485,7 +452,7 @@ class AmbulanceData extends ChangeNotifier {
       }
 
       try {
-        final jsonString = record.paramedicRecordsJson; // 這是一個新欄位
+        final jsonString = record.paramedicRecordsJson; 
         if (jsonString != null && jsonString.isNotEmpty) {
           paramedicRecords = (jsonDecode(jsonString) as List)
               .map((item) => ParamedicRecordModel.fromJson(item))
@@ -494,7 +461,7 @@ class AmbulanceData extends ChangeNotifier {
           paramedicRecords = [];
         }
       } catch (e) {
-        print('⚠️ 解碼 paramedicRecordsJson 失敗: $e');
+        print('解碼 paramedicRecordsJson 失敗: $e');
         paramedicRecords = [];
       }
 
@@ -508,7 +475,7 @@ class AmbulanceData extends ChangeNotifier {
           vitalSignsRecords = [];
         }
       } catch (e) {
-        print('⚠️ 解碼 vitalSignsRecordsJson 失敗: $e');
+        print('解碼 vitalSignsRecordsJson 失敗: $e');
         vitalSignsRecords = [];
       }
 
@@ -520,11 +487,11 @@ class AmbulanceData extends ChangeNotifier {
       unpaidType = record.unpaidType;
 
       notifyListeners();
-      print('✅ 成功載入 visitId $visitId 的救護車記錄');
+      print('成功載入 visitId $visitId 的救護車記錄');
     } catch (e) {
-      print('❌ 載入救護車記錄失敗: $e');
+      print('載入救護車記錄失敗: $e');
       clearAll();
-      notifyListeners(); // 發生錯誤時也通知 UI 更新為空白狀態
+      notifyListeners(); 
     }
   }
 
@@ -552,19 +519,10 @@ class AmbulanceData extends ChangeNotifier {
     }
   }
 
-  // ✅ 新增：轉換為 Companion
   AmbulanceRecordsCompanion toCompanion() {
     return AmbulanceRecordsCompanion(
       visitId: Value(visitId),
       plateNumber: Value(plateNumber),
-      placeGroupIdx: Value(placeGroupIdx),
-      t1PlaceIdx: Value(t1PlaceIdx),
-      t2PlaceIdx: Value(t2PlaceIdx),
-      remotePlaceIdx: Value(remotePlaceIdx),
-      cargoPlaceIdx: Value(cargoPlaceIdx),
-      novotelPlaceIdx: Value(novotelPlaceIdx),
-      cabinPlaceIdx: Value(cabinPlaceIdx),
-      placeNote: Value(placeNote),
       dutyTime: Value(dutyTime),
       arriveSceneTime: Value(arriveSceneTime),
       leaveSceneTime: Value(leaveSceneTime),
@@ -647,14 +605,12 @@ class AmbulanceData extends ChangeNotifier {
     );
   }
 
-  // ✅ 簡化後的保存方法
   Future<void> saveToDatabase(
     AmbulanceRecordsDao dao,
     PatientProfilesDao profileDao,
     VisitsDao visitsDao,
   ) async {
     try {
-      // 直接用 upsert
       await dao.upsert(toCompanion());
 
       // 更新 PatientProfile
@@ -676,9 +632,9 @@ class AmbulanceData extends ChangeNotifier {
         ),
       );
 
-      print('✅ 救護車記錄已成功儲存到資料庫 (visitId: $visitId)');
+      print('救護車記錄已成功儲存到資料庫 (visitId: $visitId)');
     } catch (e) {
-      print('❌ 儲存失敗: $e');
+      print('儲存失敗: $e');
       rethrow;
     }
   }

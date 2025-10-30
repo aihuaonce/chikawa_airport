@@ -1,4 +1,4 @@
-// ==================== 3️⃣ emergency_data.dart ====================
+//emergency_data.dart
 import 'dart:convert';
 import 'package:chikawa_airport/data/db/app_database.dart';
 import 'package:flutter/material.dart';
@@ -69,7 +69,6 @@ class EmergencyData extends ChangeNotifier {
   List<String> selectedAssistants = [];
   List<Map<String, String>> medicationRecords = [];
 
-  // 【修改】更新方法以匹配新的屬性
   void updateFlight({
     String? travelStatus,
     int? purposeIndex,
@@ -291,11 +290,11 @@ class EmergencyData extends ChangeNotifier {
     notifyListeners();
   }
 
-  // 【修改】重構載入邏輯
   Future<void> loadFromDatabase(
     EmergencyRecordsDao emergencyDao,
     PatientProfilesDao profilesDao,
     FlightLogsDao flightLogsDao,
+    TreatmentsDao treatmentsDao,
   ) async {
     try {
       clearAll();
@@ -304,6 +303,7 @@ class EmergencyData extends ChangeNotifier {
       final record = await emergencyDao.getByVisitId(visitId);
       final profile = await profilesDao.getByVisitId(visitId);
       final flightLog = await flightLogsDao.getByVisitId(visitId);
+      final treatment = await treatmentsDao.getByVisitId(visitId);
 
       // 2. 載入飛航 & 個人資料相關
       if (flightLog != null) {
@@ -311,25 +311,34 @@ class EmergencyData extends ChangeNotifier {
         airline = flightLog.airline;
       }
       if (profile != null) {
-        // 將文字轉回索引
         const reasons = ["航空公司機組員", "旅客/民眾", "機場內部員工"];
         purposeIndex = reasons.indexOf(profile.reason ?? "");
         if (purposeIndex == -1) purposeIndex = null;
       }
 
-      // 步驟 3: 如果紀錄確實存在於資料庫，才載入資料
-      if (record != null) {
-        print('✅ 找到急救紀錄，載入資料...');
-        incidentDateTime = record.incidentDateTime;
-        placeGroupIdx = record.placeGroupIdx;
-        t1Selected = record.t1Selected;
-        t2Selected = record.t2Selected;
-        remoteSelected = record.remoteSelected;
-        cargoSelected = record.cargoSelected;
-        novotelSelected = record.novotelSelected;
-        cabinSelected = record.cabinSelected;
-        placeNote = record.placeNote;
+      //從 Treatments 載入生命徵象資料
+      if (treatment != null) {
+        evmE = treatment.evmE;
+        evmV = treatment.evmV;
+        evmM = treatment.evmM;
+        heartRate = treatment.pulse;
+        respirationRate = treatment.respiration;
+        temperature = treatment.temperature;
+        if (treatment.bpSystolic != null && treatment.bpDiastolic != null) {
+          bloodPressure = '${treatment.bpSystolic}/${treatment.bpDiastolic}';
+        }
+        leftPupilSize = treatment.leftPupilSize;
+        rightPupilSize = treatment.rightPupilSize;
+        if (treatment.leftPupilScale != null) {
+          leftPupilReaction = ['+', '-', '±'][treatment.leftPupilScale!];
+        }
+        if (treatment.rightPupilScale != null) {
+          rightPupilReaction = ['+', '-', '±'][treatment.rightPupilScale!];
+        }
+      }
 
+      if (record != null) {
+        print('找到急救紀錄，載入資料...');
         firstAidStartTime = record.firstAidStartTime;
         intubationStartTime = record.intubationStartTime;
         onIVLineStartTime = record.onIVLineStartTime;
@@ -339,17 +348,8 @@ class EmergencyData extends ChangeNotifier {
 
         diagnosis = record.diagnosis;
         situation = record.situation;
-        evmE = record.evmE;
-        evmV = record.evmV;
-        evmM = record.evmM;
-        heartRate = record.heartRate;
-        respirationRate = record.respirationRate;
-        bloodPressure = record.bloodPressure;
+
         temperature = record.temperature;
-        leftPupilSize = record.leftPupilSize;
-        rightPupilSize = record.rightPupilSize;
-        leftPupilReaction = record.leftPupilReaction;
-        rightPupilReaction = record.rightPupilReaction;
 
         insertionMethod = record.insertionMethod;
         airwayContent = record.airwayContent;
@@ -357,7 +357,6 @@ class EmergencyData extends ChangeNotifier {
         ivNeedleSize = record.ivNeedleSize;
         ivLineRecord = record.ivLineRecord;
         cardiacMassageRecord = record.cardiacMassageRecord;
-
         postResuscitationEvmE = record.postResuscitationEvmE;
         postResuscitationEvmV = record.postResuscitationEvmV;
         postResuscitationEvmM = record.postResuscitationEvmM;
@@ -373,14 +372,12 @@ class EmergencyData extends ChangeNotifier {
         postResuscitationRightPupilLightReflex =
             record.postResuscitationRightPupilLightReflex;
         otherSupplements = record.otherSupplements;
-
         endRecord = record.endRecord;
         endResult = record.endResult;
         selectedHospital = record.selectedHospital;
         otherHospital = record.otherHospital;
         otherEndResult = record.otherEndResult;
         deathTime = record.deathTime;
-
         selectedDoctor = record.selectedDoctor;
         selectedNurse = record.selectedNurse;
         selectedEMT = record.selectedEMT;
@@ -393,7 +390,7 @@ class EmergencyData extends ChangeNotifier {
             selectedAssistants = List<String>.from(decoded);
           }
         } catch (e) {
-          print('⚠️ 解析 selectedAssistantsJson 失敗: $e');
+          print('解析 selectedAssistantsJson 失敗: $e');
           selectedAssistants = [];
         }
 
@@ -405,41 +402,27 @@ class EmergencyData extends ChangeNotifier {
             );
           }
         } catch (e) {
-          print('⚠️ 解析 medicationRecordsJson 失敗: $e');
+          print('解析 medicationRecordsJson 失敗: $e');
           medicationRecords = [];
         }
-
-        print('✅ 成功載入 visitId $visitId 的急救紀錄');
+        print('成功載入 visitId $visitId 的急救紀錄');
       } else {
-        print('ℹ️ visitId $visitId 尚無急救紀錄，將顯示空白表單。');
+        print('visitId $visitId 尚無急救紀錄,將顯示空白表單。');
       }
 
-      // 步驟 5: 最後，通知所有監聽者(UI)更新畫面
       isLoaded = true;
       notifyListeners();
     } catch (e) {
-      // 步驟 6: 處理任何可能發生的錯誤
-      print('❌ 載入急救紀錄時失敗: $e');
+      print('載入急救紀錄時失敗: $e');
       isLoaded = true;
       clearAll();
       notifyListeners();
     }
   }
 
-  // ✅ 新增：轉換為 Companion
   EmergencyRecordsCompanion toCompanion() {
-    // 【修改】移除已不存在的欄位
     return EmergencyRecordsCompanion(
       visitId: Value(visitId),
-      incidentDateTime: Value(incidentDateTime),
-      placeGroupIdx: Value(placeGroupIdx),
-      t1Selected: Value(t1Selected),
-      t2Selected: Value(t2Selected),
-      remoteSelected: Value(remoteSelected),
-      cargoSelected: Value(cargoSelected),
-      novotelSelected: Value(novotelSelected),
-      cabinSelected: Value(cabinSelected),
-      placeNote: Value(placeNote),
       firstAidStartTime: Value(firstAidStartTime),
       intubationStartTime: Value(intubationStartTime),
       onIVLineStartTime: Value(onIVLineStartTime),
@@ -448,17 +431,7 @@ class EmergencyData extends ChangeNotifier {
       firstAidEndTime: Value(firstAidEndTime),
       diagnosis: Value(diagnosis),
       situation: Value(situation),
-      evmE: Value(evmE),
-      evmV: Value(evmV),
-      evmM: Value(evmM),
-      heartRate: Value(heartRate),
-      respirationRate: Value(respirationRate),
-      bloodPressure: Value(bloodPressure),
-      temperature: Value(temperature),
-      leftPupilSize: Value(leftPupilSize),
-      rightPupilSize: Value(rightPupilSize),
-      leftPupilReaction: Value(leftPupilReaction),
-      rightPupilReaction: Value(rightPupilReaction),
+
       insertionMethod: Value(insertionMethod),
       airwayContent: Value(airwayContent),
       insertionRecord: Value(insertionRecord),
@@ -498,18 +471,16 @@ class EmergencyData extends ChangeNotifier {
     );
   }
 
-  // 【修改】重構儲存邏輯，以儲存到多個資料表
   Future<void> saveToDatabase({
     required EmergencyRecordsDao emergencyDao,
     required PatientProfilesDao profilesDao,
     required FlightLogsDao flightLogsDao,
     required VisitsDao visitsDao,
+    required TreatmentsDao treatmentsDao,
   }) async {
     try {
-      // 1. 儲存到 EmergencyRecords
       await emergencyDao.upsert(toCompanion());
 
-      // 2. 儲存到 FlightLogs
       final flightCompanion = FlightLogsCompanion(
         visitId: Value(visitId),
         travelStatus: Value(travelStatus),
@@ -517,7 +488,6 @@ class EmergencyData extends ChangeNotifier {
       );
       await flightLogsDao.upsert(flightCompanion);
 
-      // 3. 儲存到 PatientProfiles
       String? reasonText;
       if (purposeIndex != null) {
         const reasons = ["航空公司機組員", "旅客/民眾", "機場內部員工"];
@@ -531,7 +501,6 @@ class EmergencyData extends ChangeNotifier {
       );
       await profilesDao.upsert(profileCompanion);
 
-      // 4. 更新 Visits 表
       await visitsDao.updateVisit(
         visitId,
         VisitsCompanion(
@@ -541,9 +510,40 @@ class EmergencyData extends ChangeNotifier {
           uploadedAt: Value(DateTime.now()),
         ),
       );
-      print('✅ 急救相關記錄已成功儲存到資料庫 (visitId: $visitId)');
+
+      String? systolic;
+      String? diastolic;
+      if (bloodPressure != null && bloodPressure!.contains('/')) {
+        final parts = bloodPressure!.split('/');
+        if (parts.length == 2) {
+          systolic = parts[0].isNotEmpty ? parts[0] : null;
+          diastolic = parts[1].isNotEmpty ? parts[1] : null;
+        }
+      }
+
+      final pupilMap = {'+': 0, '-': 1, '±': 2};
+
+      final treatmentsCompanion = TreatmentsCompanion(
+        visitId: Value(visitId),
+        evmE: Value(evmE),
+        evmV: Value(evmV),
+        evmM: Value(evmM),
+        pulse: Value(heartRate), 
+        respiration: Value(respirationRate), 
+        temperature: Value(temperature),
+        bpSystolic: Value(systolic),
+        bpDiastolic: Value(diastolic),
+        leftPupilSize: Value(leftPupilSize),
+        rightPupilSize: Value(rightPupilSize),
+        leftPupilScale: Value(pupilMap[leftPupilReaction]),
+        rightPupilScale: Value(pupilMap[rightPupilReaction]),
+      );
+      await treatmentsDao.upsert(treatmentsCompanion);
+
+      print('急救相關記錄已成功儲存到資料庫 (visitId: $visitId)');
+      print('生命徵象已同步回存至 Treatments (visitId: $visitId)');
     } catch (e) {
-      print('❌ 儲存失敗: $e');
+      print('儲存失敗: $e');
       rethrow;
     }
   }

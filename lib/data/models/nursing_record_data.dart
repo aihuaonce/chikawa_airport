@@ -1,4 +1,4 @@
-// ==================== 8️⃣ nursing_record_data.dart ====================
+//nursing_record_data.dart
 import 'dart:convert';
 import 'package:chikawa_airport/data/db/app_database.dart';
 import 'package:flutter/material.dart';
@@ -63,7 +63,6 @@ class NursingRecordData extends ChangeNotifier {
     notifyListeners();
   }
 
-  // ✅ 新增：轉換為 Companion
   NursingRecordsCompanion toCompanion(int visitId) {
     return NursingRecordsCompanion(
       visitId: Value(visitId),
@@ -73,13 +72,12 @@ class NursingRecordData extends ChangeNotifier {
     );
   }
 
-  // ✅ 簡化後的保存方法
   Future<void> saveToDatabase(int visitId, NursingRecordsDao dao) async {
     try {
       await dao.upsert(toCompanion(visitId));
-      print('✅ 護理記錄已儲存');
+      print('護理記錄已儲存');
     } catch (e) {
-      print('❌ 儲存失敗: $e');
+      print('儲存失敗: $e');
       rethrow;
     }
   }
