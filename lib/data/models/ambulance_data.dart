@@ -94,6 +94,19 @@ class AmbulanceData extends ChangeNotifier {
   String? paidType;
   String? unpaidType;
 
+  String? _bodyMapJson;
+  String? get bodyMapJson => _bodyMapJson;
+
+  set bodyMapJson(String? value) {
+    _bodyMapJson = value;
+    notifyListeners();
+  }
+
+  void updateBodyMap({String? bodyMapJson}) {
+    if (bodyMapJson != null) _bodyMapJson = bodyMapJson;
+    notifyListeners();
+  }
+
   void updateInformation({
     String? plateNumber,
     int? placeGroupIdx,
@@ -358,6 +371,8 @@ class AmbulanceData extends ChangeNotifier {
     paidType = null;
     unpaidType = null;
 
+    _bodyMapJson = null;
+
     notifyListeners();
   }
 
@@ -390,6 +405,7 @@ class AmbulanceData extends ChangeNotifier {
         age = profile.age;
         address = profile.address;
       }
+
       patientBelongings = record.patientBelongings;
       belongingsHandled = record.belongingsHandled;
       custodianName = record.custodianName;
@@ -452,7 +468,7 @@ class AmbulanceData extends ChangeNotifier {
       }
 
       try {
-        final jsonString = record.paramedicRecordsJson; 
+        final jsonString = record.paramedicRecordsJson;
         if (jsonString != null && jsonString.isNotEmpty) {
           paramedicRecords = (jsonDecode(jsonString) as List)
               .map((item) => ParamedicRecordModel.fromJson(item))
@@ -491,7 +507,7 @@ class AmbulanceData extends ChangeNotifier {
     } catch (e) {
       print('載入救護車記錄失敗: $e');
       clearAll();
-      notifyListeners(); 
+      notifyListeners();
     }
   }
 

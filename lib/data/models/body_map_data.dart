@@ -1,27 +1,28 @@
 //body_map_data.dart
 import 'package:flutter/material.dart';
-import '../db/daos.dart';
 
 class BodyMapData extends ChangeNotifier {
-  String? bodyMapJson;
+  String? _bodyMapJson;
+  int? _currentVisitId;
 
-  void setBodyMap(String? json) {
-    bodyMapJson = json;
+  String? get bodyMapJson => _bodyMapJson;
+  int? get currentVisitId => _currentVisitId;
+
+  void setBodyMap(String? json, {int? visitId}) {
+    _bodyMapJson = json;
+    if (visitId != null) {
+      _currentVisitId = visitId;
+    }
     notifyListeners();
   }
 
   void clear() {
-    bodyMapJson = null;
+    _bodyMapJson = null;
+    _currentVisitId = null;
     notifyListeners();
   }
 
-  Future<void> saveToDatabase(int visitId, PatientProfilesDao dao) async {
-    try {
-      await dao.upsertBodyMap(visitId, bodyMapJson);
-      print('BodyMap 已儲存');
-    } catch (e) {
-      print('儲存失敗: $e');
-      rethrow;
-    }
+  bool isForVisit(int visitId) {
+    return _currentVisitId == visitId;
   }
 }

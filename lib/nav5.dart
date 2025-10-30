@@ -1,4 +1,5 @@
 // nav5.dart
+import 'package:chikawa_airport/data/models/body_map_data.dart';
 import 'package:chikawa_airport/providers/ambulance_routes_config.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -22,6 +23,16 @@ class Nav5Page extends StatelessWidget {
         ChangeNotifierProvider(
           create: (context) => AmbulanceNavigationProvider(),
         ),
+        ChangeNotifierProxyProvider<PatientProfilesDao, BodyMapData>(
+          // 【修改】使用 PatientProfilesDao
+          create: (context) {
+            final data = BodyMapData();
+            final profileDao = context.read<PatientProfilesDao>();
+            _loadBodyMapData(data, profileDao, visitId);
+            return data;
+          },
+          update: (context, profileDao, previous) => previous ?? BodyMapData(),
+        ),
         ChangeNotifierProxyProvider<AmbulanceRecordsDao, AmbulanceData>(
           create: (context) {
             final data = AmbulanceData(visitId);
@@ -35,6 +46,36 @@ class Nav5Page extends StatelessWidget {
       ],
       child: AmbulanceMainLayout(visitId: visitId),
     );
+  }
+
+  // 【修改】載入 BodyMap 資料的方法
+  static Future<void> _loadBodyMapData(
+    BodyMapData bodyMapData,
+    PatientProfilesDao profileDao,
+    int visitId,
+  ) async {
+    try {
+      final profile = await profileDao.getByVisitId(visitId);
+
+      // 【加強檢查邏輯】
+      final hasBodyMapData =
+          profile?.bodyMapJson != null &&
+          profile!.bodyMapJson!.trim().isNotEmpty &&
+          profile.bodyMapJson != "null" &&
+          profile.bodyMapJson != "[]";
+
+      if (hasBodyMapData) {
+        bodyMapData.setBodyMap(profile.bodyMapJson, visitId: visitId);
+        debugPrint(
+          "✅ BodyMap 資料已載入到 BodyMapData, 長度: ${profile.bodyMapJson!.length}",
+        );
+      } else {
+        debugPrint("ℹ️ 資料庫中沒有 BodyMap 資料或資料為空");
+        bodyMapData.setBodyMap(null, visitId: visitId);
+      }
+    } catch (e) {
+      debugPrint("❌ 載入 BodyMap 資料失敗: $e");
+    }
   }
 }
 
@@ -118,6 +159,9 @@ class _AmbulanceNavBarState extends State<AmbulanceNavBar> {
     setState(() => _isSaving = true);
 
     try {
+      // 【新增】首先儲存 BodyMap 資料
+      await _saveBodyMapData();
+
       final ambulanceData = context.read<AmbulanceData>();
       final dao = context.read<AmbulanceRecordsDao>();
       final profileDao = context.read<PatientProfilesDao>();
@@ -149,6 +193,35 @@ class _AmbulanceNavBarState extends State<AmbulanceNavBar> {
       if (mounted) {
         setState(() => _isSaving = false);
       }
+    }
+  }
+
+  Future<void> _saveBodyMapData() async {
+    try {
+      final bodyMapData = context.read<BodyMapData>();
+      final profileDao = context.read<PatientProfilesDao>();
+
+      debugPrint("🔄 正在儲存 BodyMap 資料...");
+      debugPrint(
+        "📝 BodyMapData.bodyMapJson: ${bodyMapData.bodyMapJson != null}",
+      );
+      debugPrint(
+        "📝 BodyMapData.currentVisitId: ${bodyMapData.currentVisitId}",
+      );
+
+      if (bodyMapData.bodyMapJson != null &&
+          bodyMapData.currentVisitId != null) {
+        await profileDao.upsertBodyMap(
+          bodyMapData.currentVisitId!,
+          bodyMapData.bodyMapJson,
+        );
+        debugPrint("✅ BodyMap 資料已儲存到資料庫");
+      } else {
+        debugPrint("ℹ️ 沒有 BodyMap 資料需要儲存");
+      }
+    } catch (e) {
+      debugPrint("❌ BodyMap 資料儲存失敗: $e");
+      rethrow;
     }
   }
 
