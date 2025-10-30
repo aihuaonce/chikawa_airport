@@ -370,7 +370,7 @@ class AmbulanceData extends ChangeNotifier {
         return;
       }
 
-      print('載入資救護車記錄料');
+      print('載入救護車記錄資料');
 
       plateNumber = record.plateNumber;
       dutyTime = record.dutyTime;

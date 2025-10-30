@@ -68,24 +68,23 @@ class _BodyMapPageState extends State<BodyMapPage>
     try {
       final drawables = _controller!.drawables;
 
-      if (drawables.isEmpty) {
-        _isSaving = false;
-        return;
+      // 【修改】即使沒有繪圖內容也要處理
+      String? jsonString;
+      if (drawables.isNotEmpty) {
+        final drawablesList = drawables
+            .map((d) => _drawableToJson(d))
+            .whereType<Map<String, dynamic>>()
+            .toList();
+        jsonString = jsonEncode(drawablesList);
       }
-
-      final drawablesList = drawables
-          .map((d) => _drawableToJson(d))
-          .whereType<Map<String, dynamic>>()
-          .toList();
-
-      final jsonString = jsonEncode(drawablesList);
 
       final dao = context.read<PatientProfilesDao>();
       debugPrint("開始寫入資料庫，visitId: ${widget.visitId}");
 
+      // 【修改】支援儲存 null 值來清除記錄
       await dao.upsertBodyMap(widget.visitId, jsonString);
 
-      debugPrint("BodyMap 資料庫寫入完成");
+      debugPrint("BodyMap 資料庫寫入完成 - 資料: ${jsonString ?? '空'}");
 
       // 更新本地狀態
       final dataModel = context.read<BodyMapData>();
@@ -191,24 +190,44 @@ class _BodyMapPageState extends State<BodyMapPage>
 
       final drawables = _controller!.drawables;
 
-      // 如果沒有繪圖內容,清除資料
-      if (drawables.isEmpty) {
-        context.read<BodyMapData>().setBodyMap(null, visitId: widget.visitId);
-        return;
-      }
-
-      // 轉換並儲存
+      // 轉換並儲存 - 即使沒有繪圖內容也要更新
       final drawablesList = drawables
           .map((d) => _drawableToJson(d))
           .whereType<Map<String, dynamic>>()
           .toList();
 
-      final jsonString = jsonEncode(drawablesList);
+      final jsonString = drawablesList.isEmpty
+          ? null
+          : jsonEncode(drawablesList);
+
+      // 更新本地狀態
       context.read<BodyMapData>().setBodyMap(
         jsonString,
         visitId: widget.visitId,
       );
-    } catch (e) {}
+
+      // 【新增】立即儲存到資料庫
+      _saveToDatabase(jsonString);
+    } catch (e) {
+      debugPrint("更新 BodyMap 資料失敗: $e");
+    }
+  }
+
+  // 【新增】立即儲存到資料庫的方法
+  Future<void> _saveToDatabase(String? jsonString) async {
+    try {
+      final dao = context.read<PatientProfilesDao>();
+
+      if (jsonString == null) {
+        // 如果沒有資料，清除資料庫中的記錄
+        await dao.upsertBodyMap(widget.visitId, null);
+      } else {
+        // 如果有資料，正常儲存
+        await dao.upsertBodyMap(widget.visitId, jsonString);
+      }
+    } catch (e) {
+      debugPrint("立即儲存到資料庫失敗: $e");
+    }
   }
 
   void _loadDrawablesFromJson(String jsonString) {
@@ -318,9 +337,6 @@ class _BodyMapPageState extends State<BodyMapPage>
     return null;
   }
 
-  // ===============================================
-  // UI Build Method
-  // ===============================================
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -360,30 +376,61 @@ class _BodyMapPageState extends State<BodyMapPage>
       return Center(child: Text(t.bodyMapInitFailed));
     }
 
-    return Container(
-      color: const Color(0xFFE6F6FB),
-      child: Stack(
-        children: [
-          Center(
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: AspectRatio(
-                aspectRatio: _backgroundImage!.width / _backgroundImage!.height,
-                child: FlutterPainter(controller: _controller!),
-              ),
-            ),
+    return Stack(
+      children: [
+        // 使用 LayoutBuilder 获取父级约束
+        Positioned.fill(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              // 固定宽度为屏幕宽度的90%
+              double containerWidth = constraints.maxWidth * 0.9;
+              double imageWidth = _backgroundImage!.width.toDouble();
+              double imageHeight = _backgroundImage!.height.toDouble();
+
+              // 按比例计算高度
+              double containerHeight =
+                  imageHeight * (containerWidth / imageWidth);
+
+              return Center(
+                child: Container(
+                  width: containerWidth,
+                  constraints: BoxConstraints(maxHeight: constraints.maxHeight),
+                  child: SingleChildScrollView(
+                    child: InteractiveViewer(
+                      boundaryMargin: EdgeInsets.all(20),
+                      minScale: 0.5,
+                      maxScale: 3.0,
+                      child: Container(
+                        width: containerWidth,
+                        height: containerHeight,
+                        child: FittedBox(
+                          fit: BoxFit.fitWidth,
+                          alignment: Alignment.topCenter,
+                          child: SizedBox(
+                            width: imageWidth,
+                            height: imageHeight,
+                            child: FlutterPainter(controller: _controller!),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            },
           ),
-          Positioned(
-            top: 50,
-            left: 8,
-            bottom: 50,
-            child: ValueListenableBuilder<PainterControllerValue>(
-              valueListenable: _controller!,
-              builder: (context, _, __) => _buildVerticalToolbar(t),
-            ),
+        ),
+        // 工具栏
+        Positioned(
+          top: 50,
+          left: 8,
+          bottom: 50,
+          child: ValueListenableBuilder<PainterControllerValue>(
+            valueListenable: _controller!,
+            builder: (context, _, __) => _buildVerticalToolbar(t),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -414,9 +461,11 @@ class _BodyMapPageState extends State<BodyMapPage>
                     ? Theme.of(context).colorScheme.secondary
                     : null,
               ),
-              onPressed: () => setState(() {
-                _controller!.freeStyleMode = FreeStyleMode.none;
-              }),
+              onPressed: () {
+                setState(() {
+                  _controller!.freeStyleMode = FreeStyleMode.none;
+                });
+              },
               tooltip: t.moveZoom,
             ),
             IconButton(
@@ -426,14 +475,18 @@ class _BodyMapPageState extends State<BodyMapPage>
                     ? Theme.of(context).colorScheme.secondary
                     : null,
               ),
-              onPressed: () => setState(() {
-                _controller!.freeStyleMode = FreeStyleMode.draw;
-              }),
+              onPressed: () {
+                setState(() {
+                  _controller!.freeStyleMode = FreeStyleMode.draw;
+                });
+              },
               tooltip: t.freeDraw,
             ),
             IconButton(
               icon: const Icon(Icons.text_fields),
-              onPressed: () => _controller!.addText(),
+              onPressed: () {
+                _controller!.addText();
+              },
               tooltip: t.addText,
             ),
             IconButton(
@@ -451,21 +504,9 @@ class _BodyMapPageState extends State<BodyMapPage>
               tooltip: t.redo,
             ),
             IconButton(
-              icon: Icon(
-                Icons.delete_outline,
-                color: _controller!.freeStyleMode == FreeStyleMode.erase
-                    ? Theme.of(context).colorScheme.secondary
-                    : null,
-              ),
-              onPressed: () => setState(() {
-                _controller!.freeStyleMode = FreeStyleMode.erase;
-              }),
-              tooltip: t.eraser,
-            ),
-            IconButton(
               icon: const Icon(Icons.clear),
               onPressed: () => _showClearConfirmationDialog(t),
-              tooltip: t.clearAllItems,
+              tooltip: t.clearAllItems, // 這才是"清空所有項目"
             ),
             const Divider(),
             _buildColorPicker(t),
@@ -487,7 +528,7 @@ class _BodyMapPageState extends State<BodyMapPage>
       context: context,
       builder: (context) => AlertDialog(
         title: Text(t.confirmClearTitle),
-        content: Text(t.confirmClearContent),
+        content: Text("確定要清除所有筆跡和文字嗎？此操作無法復原。"), // 更明確的說明
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -496,7 +537,17 @@ class _BodyMapPageState extends State<BodyMapPage>
           TextButton(
             onPressed: () {
               _controller!.clearDrawables();
+              // 立即觸發資料更新
+              _updateBodyMapData();
               Navigator.pop(context);
+
+              // 顯示清除成功的提示
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('已清除所有筆跡和文字'),
+                  duration: Duration(seconds: 1),
+                ),
+              );
             },
             child: Text(t.confirm, style: const TextStyle(color: Colors.red)),
           ),

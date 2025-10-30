@@ -91,6 +91,9 @@ class AmbulanceNavigationProvider extends ChangeNotifier {
 // ===================================================================
 // 3. 頁面佈局 (AmbulanceMainLayout)
 // ===================================================================
+// ===================================================================
+// 3. 頁面佈局 (AmbulanceMainLayout)
+// ===================================================================
 class AmbulanceMainLayout extends StatelessWidget {
   final int visitId;
   const AmbulanceMainLayout({super.key, required this.visitId});
@@ -117,13 +120,13 @@ class AmbulanceMainLayout extends StatelessWidget {
             Expanded(
               child: Column(
                 children: [
-                  // 【移除】Nav3Section
-                  // const Padding(
-                  //   padding: EdgeInsets.only(top: 12),
-                  //   child: Nav3Section(),
-                  // ),
-                  const SizedBox(height: 20), // 【新增】替代的間距
-                  Expanded(child: SingleChildScrollView(child: currentPage)),
+                  const SizedBox(height: 20),
+                  // 【修改】根據頁面索引決定佈局方式
+                  _buildPageContent(
+                    context,
+                    currentPage,
+                    navProvider.selectedIndex,
+                  ),
                 ],
               ),
             ),
@@ -131,6 +134,29 @@ class AmbulanceMainLayout extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  // 【修改】根據頁面類型決定佈局方式
+  Widget _buildPageContent(
+    BuildContext context,
+    Widget page,
+    int selectedIndex,
+  ) {
+    if (selectedIndex == 5) {
+      // BodyMap 页面：使用 ConstrainedBox 确保有最大约束
+      return Expanded(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: MediaQuery.of(context).size.width,
+            maxHeight: MediaQuery.of(context).size.height,
+          ),
+          child: page,
+        ),
+      );
+    } else {
+      // 其他页面：使用滚动
+      return Expanded(child: SingleChildScrollView(child: page));
+    }
   }
 }
 
