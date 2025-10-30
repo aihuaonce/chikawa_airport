@@ -39,13 +39,6 @@ class _BodyMapPageState extends State<BodyMapPage>
   }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    // 設置控制器變化監聽
-    _setupControllerListener();
-  }
-
-  @override
   void dispose() {
     _controller?.dispose();
     _backgroundImage?.dispose();
@@ -57,20 +50,15 @@ class _BodyMapPageState extends State<BodyMapPage>
   // ===============================================
   @override
   Future<void> saveData() async {
-    debugPrint("🔄 BodyMapPage.saveData() 被 nav5 調用");
-
     if (_controller == null) {
-      debugPrint("❌ _controller 為 null，無法儲存");
       return;
     }
 
     if (!mounted) {
-      debugPrint("❌ Widget 未 mounted，無法儲存");
       return;
     }
 
     if (_isSaving) {
-      debugPrint("⚠️ 正在儲存中，跳過重複儲存");
       return;
     }
 
@@ -79,10 +67,8 @@ class _BodyMapPageState extends State<BodyMapPage>
 
     try {
       final drawables = _controller!.drawables;
-      debugPrint("📝 當前繪圖元素數量: ${drawables.length}");
 
       if (drawables.isEmpty) {
-        debugPrint("ℹ️ 沒有繪圖內容，跳過儲存");
         _isSaving = false;
         return;
       }
@@ -92,23 +78,18 @@ class _BodyMapPageState extends State<BodyMapPage>
           .whereType<Map<String, dynamic>>()
           .toList();
 
-      debugPrint("📝 轉換為 JSON: ${drawablesList.length} 個元素");
-
       final jsonString = jsonEncode(drawablesList);
-      debugPrint("📝 JSON 字串長度: ${jsonString.length}");
 
       final dao = context.read<PatientProfilesDao>();
-      debugPrint("📝 開始寫入資料庫，visitId: ${widget.visitId}");
+      debugPrint("開始寫入資料庫，visitId: ${widget.visitId}");
 
       await dao.upsertBodyMap(widget.visitId, jsonString);
 
-      debugPrint("✅ BodyMap 資料庫寫入完成");
+      debugPrint("BodyMap 資料庫寫入完成");
 
       // 更新本地狀態
       final dataModel = context.read<BodyMapData>();
       dataModel.setBodyMap(jsonString);
-
-      debugPrint("✅ BodyMap 本地狀態更新完成");
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -119,8 +100,7 @@ class _BodyMapPageState extends State<BodyMapPage>
         );
       }
     } catch (e, stackTrace) {
-      debugPrint("❌ BodyMap 儲存失敗: $e");
-      debugPrint("❌ Stack trace: $stackTrace");
+      debugPrint("Stack trace: $stackTrace");
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -142,8 +122,6 @@ class _BodyMapPageState extends State<BodyMapPage>
   // ===============================================
   Future<void> _initializeAndLoadPainter() async {
     try {
-      debugPrint("🔄 BodyMap 開始初始化...");
-
       final bodyMapData = context.read<BodyMapData>();
       final dao = context.read<PatientProfilesDao>();
 
@@ -155,13 +133,10 @@ class _BodyMapPageState extends State<BodyMapPage>
           profile?.bodyMapJson != null &&
           profile?.bodyMapJson != "null" &&
           profile?.bodyMapJson != "[]";
-      debugPrint("📝 從資料庫讀取 BodyMap 資料: $hasBodyMapData");
 
       if (hasBodyMapData) {
-        debugPrint("📝 BodyMap JSON 長度: ${profile?.bodyMapJson!.length}");
         bodyMapData.setBodyMap(profile?.bodyMapJson, visitId: widget.visitId);
       } else {
-        debugPrint("ℹ️ 資料庫中沒有 BodyMap 資料");
         bodyMapData.setBodyMap(null, visitId: widget.visitId);
       }
 
@@ -185,19 +160,14 @@ class _BodyMapPageState extends State<BodyMapPage>
 
       // 載入現有資料
       if (hasBodyMapData) {
-        debugPrint("📝 載入現有 BodyMap 資料到繪圖板");
         _loadDrawablesFromJson(profile!.bodyMapJson!);
-      } else {
-        debugPrint("ℹ️ 沒有現有 BodyMap 資料");
-      }
+      } else {}
 
       setState(() => _loading = false);
-      debugPrint("✅ BodyMap 初始化完成");
 
       // 初始化完成後設置監聽
       _setupControllerListener();
     } catch (e) {
-      debugPrint("❌ BodyMap 初始化失敗: $e");
       if (mounted) {
         setState(() {
           _rawErrorMessage = e.toString();
@@ -209,44 +179,36 @@ class _BodyMapPageState extends State<BodyMapPage>
 
   void _setupControllerListener() {
     _controller?.addListener(() {
-      // 防抖動，避免頻繁更新
-      Future.delayed(const Duration(milliseconds: 1000), () {
-        if (mounted && _controller != null) {
-          _updateBodyMapData();
-        }
-      });
+      if (mounted && _controller != null) {
+        _updateBodyMapData();
+      }
     });
   }
 
   void _updateBodyMapData() {
     try {
-      if (_controller == null) return;
+      if (_controller == null || !mounted) return;
 
       final drawables = _controller!.drawables;
-      debugPrint("📝 檢測到繪圖變化，當前元素數量: ${drawables.length}");
 
+      // 如果沒有繪圖內容,清除資料
       if (drawables.isEmpty) {
-        debugPrint("ℹ️ 沒有繪圖內容，清除 BodyMapData");
-        final bodyMapData = context.read<BodyMapData>();
-        bodyMapData.setBodyMap(null, visitId: widget.visitId);
+        context.read<BodyMapData>().setBodyMap(null, visitId: widget.visitId);
         return;
       }
 
+      // 轉換並儲存
       final drawablesList = drawables
           .map((d) => _drawableToJson(d))
           .whereType<Map<String, dynamic>>()
           .toList();
 
       final jsonString = jsonEncode(drawablesList);
-      debugPrint("📝 更新 BodyMapData，JSON 長度: ${jsonString.length}");
-
-      final bodyMapData = context.read<BodyMapData>();
-      bodyMapData.setBodyMap(jsonString, visitId: widget.visitId);
-
-      debugPrint("✅ BodyMapData 已更新");
-    } catch (e) {
-      debugPrint("❌ 更新 BodyMapData 失敗: $e");
-    }
+      context.read<BodyMapData>().setBodyMap(
+        jsonString,
+        visitId: widget.visitId,
+      );
+    } catch (e) {}
   }
 
   void _loadDrawablesFromJson(String jsonString) {
@@ -259,16 +221,15 @@ class _BodyMapPageState extends State<BodyMapPage>
           final d = _drawableFromJson(Map<String, dynamic>.from(json));
           if (d != null) drawables.add(d);
         } catch (e) {
-          debugPrint("❌ 解析單筆 Drawable 失敗: $e");
+          debugPrint("解析單筆 Drawable 失敗: $e");
         }
       }
 
       if (drawables.isNotEmpty) {
         _controller!.addDrawables(drawables);
-        debugPrint("✅ 成功載入 ${drawables.length} 個繪圖元素");
       }
     } catch (e) {
-      debugPrint("❌ JSON 解析失敗: $e");
+      debugPrint("JSON 解析失敗: $e");
     }
   }
 
@@ -279,10 +240,8 @@ class _BodyMapPageState extends State<BodyMapPage>
       final Uint8List bytes = data.buffer.asUint8List();
       final ui.Codec codec = await ui.instantiateImageCodec(bytes);
       final ui.FrameInfo frameInfo = await codec.getNextFrame();
-      debugPrint("✅ 背景圖片載入成功");
       return frameInfo.image;
     } catch (e) {
-      debugPrint("❌ 背景圖片載入失敗: $e");
       rethrow;
     }
   }
@@ -327,11 +286,10 @@ class _BodyMapPageState extends State<BodyMapPage>
           return TextDrawable(text: text, position: position, style: textStyle);
 
         default:
-          debugPrint("❌ 未知的 drawable 類型: $type");
           return null;
       }
     } catch (e) {
-      debugPrint("❌ 解析 drawable 失敗: $json , 錯誤: $e");
+      debugPrint("解析 drawable 失敗: $json , 錯誤: $e");
       return null;
     }
   }

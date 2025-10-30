@@ -56,25 +56,20 @@ class Nav5Page extends StatelessWidget {
   ) async {
     try {
       final profile = await profileDao.getByVisitId(visitId);
+      final jsonData = profile?.bodyMapJson;
 
-      // 【加強檢查邏輯】
-      final hasBodyMapData =
-          profile?.bodyMapJson != null &&
-          profile!.bodyMapJson!.trim().isNotEmpty &&
-          profile.bodyMapJson != "null" &&
-          profile.bodyMapJson != "[]";
-
-      if (hasBodyMapData) {
-        bodyMapData.setBodyMap(profile.bodyMapJson, visitId: visitId);
-        debugPrint(
-          "✅ BodyMap 資料已載入到 BodyMapData, 長度: ${profile.bodyMapJson!.length}",
-        );
+      // 簡化檢查
+      if (jsonData != null &&
+          jsonData.trim().isNotEmpty &&
+          jsonData != "null" &&
+          jsonData != "[]") {
+        bodyMapData.setBodyMap(jsonData, visitId: visitId);
       } else {
-        debugPrint("ℹ️ 資料庫中沒有 BodyMap 資料或資料為空");
         bodyMapData.setBodyMap(null, visitId: visitId);
       }
     } catch (e) {
-      debugPrint("❌ 載入 BodyMap 資料失敗: $e");
+      debugPrint("載入 BodyMap 失敗: $e");
+      bodyMapData.setBodyMap(null, visitId: visitId);
     }
   }
 }
@@ -197,31 +192,15 @@ class _AmbulanceNavBarState extends State<AmbulanceNavBar> {
   }
 
   Future<void> _saveBodyMapData() async {
-    try {
-      final bodyMapData = context.read<BodyMapData>();
-      final profileDao = context.read<PatientProfilesDao>();
+    final bodyMapData = context.read<BodyMapData>();
+    final profileDao = context.read<PatientProfilesDao>();
 
-      debugPrint("🔄 正在儲存 BodyMap 資料...");
-      debugPrint(
-        "📝 BodyMapData.bodyMapJson: ${bodyMapData.bodyMapJson != null}",
+    // 只在有資料時才儲存
+    if (bodyMapData.bodyMapJson != null && bodyMapData.currentVisitId != null) {
+      await profileDao.upsertBodyMap(
+        bodyMapData.currentVisitId!,
+        bodyMapData.bodyMapJson,
       );
-      debugPrint(
-        "📝 BodyMapData.currentVisitId: ${bodyMapData.currentVisitId}",
-      );
-
-      if (bodyMapData.bodyMapJson != null &&
-          bodyMapData.currentVisitId != null) {
-        await profileDao.upsertBodyMap(
-          bodyMapData.currentVisitId!,
-          bodyMapData.bodyMapJson,
-        );
-        debugPrint("✅ BodyMap 資料已儲存到資料庫");
-      } else {
-        debugPrint("ℹ️ 沒有 BodyMap 資料需要儲存");
-      }
-    } catch (e) {
-      debugPrint("❌ BodyMap 資料儲存失敗: $e");
-      rethrow;
     }
   }
 

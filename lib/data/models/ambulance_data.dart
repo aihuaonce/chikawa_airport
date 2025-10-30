@@ -94,19 +94,6 @@ class AmbulanceData extends ChangeNotifier {
   String? paidType;
   String? unpaidType;
 
-  String? _bodyMapJson;
-  String? get bodyMapJson => _bodyMapJson;
-
-  set bodyMapJson(String? value) {
-    _bodyMapJson = value;
-    notifyListeners();
-  }
-
-  void updateBodyMap({String? bodyMapJson}) {
-    if (bodyMapJson != null) _bodyMapJson = bodyMapJson;
-    notifyListeners();
-  }
-
   void updateInformation({
     String? plateNumber,
     int? placeGroupIdx,
@@ -370,9 +357,6 @@ class AmbulanceData extends ChangeNotifier {
     chargeStatus = null;
     paidType = null;
     unpaidType = null;
-
-    _bodyMapJson = null;
-
     notifyListeners();
   }
 
