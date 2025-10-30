@@ -1,9 +1,10 @@
 import 'package:chikawa_airport/data/models/AmbulanceView_Data.dart';
+import 'data/db/app_database.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'data/db/daos.dart';
 import 'nav5.dart';
-import 'l10n/app_translations.dart'; // 【新增】引入翻譯
+import 'l10n/app_translations.dart';
 
 class Home3Page extends StatefulWidget {
   const Home3Page({super.key});
@@ -32,10 +33,50 @@ class _Home3PageState extends State<Home3Page> {
     super.dispose();
   }
 
+  String _getDestination(dynamic treatment) {
+    final t = AppTranslations.of(context);
+    if (treatment == null) return t.valueNotAvailable;
+
+    final Map<String, String> hospitalOptions = {
+      'landseed': t.landseedHospital,
+      'linkou_chang_gung': t.linkouChangGung,
+      'taoyuan_general': t.taoyuanHospital,
+      'taoyuan_psychiatric': t.taoyuanPsychiatricCenter,
+      'minsheng': t.taoyuanMinSheng,
+      'st_pauls': t.stPaulsHospital,
+      'tien_sheng': t.tienShengHospital,
+      'taoyuan_veterans': t.taoyuanVeteransHospital,
+      'en_chu_kung': t.enChuKungHospital,
+      'other': t.other,
+    };
+
+    // 如果選擇了 "other" 並且有輸入其他醫院名稱，顯示輸入的名稱
+    if (treatment.referralHospital == 'other' &&
+        treatment.referralOtherHospital != null &&
+        treatment.referralOtherHospital.isNotEmpty) {
+      return treatment.referralOtherHospital;
+    }
+
+    // 如果選擇了預設醫院，顯示對應的醫院名稱
+    if (treatment.referralHospital != null &&
+        treatment.referralHospital.isNotEmpty) {
+      return hospitalOptions[treatment.referralHospital] ??
+          treatment.referralHospital;
+    }
+
+    // 如果只有 referralOtherHospital，顯示它
+    if (treatment.referralOtherHospital != null &&
+        treatment.referralOtherHospital.isNotEmpty) {
+      return treatment.referralOtherHospital;
+    }
+
+    return t.valueNotAvailable;
+  }
+
   @override
   Widget build(BuildContext context) {
     final ambulanceRecordsDao = context.watch<AmbulanceRecordsDao>();
-    final t = AppTranslations.of(context); // 【新增】取得翻譯
+    final t = AppTranslations.of(context);
 
     return Scaffold(
       backgroundColor: const Color(0xFFE6F6FB),
@@ -57,13 +98,11 @@ class _Home3PageState extends State<Home3Page> {
                   onPressed: () {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        // 【修改】使用翻譯
                         content: Text(t.ambulanceRecordHint),
                         backgroundColor: const Color(0xFF274C4A),
                       ),
                     );
                   },
-                  // 【修改】使用翻譯
                   child: Text(t.addAmbulanceRecord),
                 ),
                 const Spacer(),
@@ -73,7 +112,6 @@ class _Home3PageState extends State<Home3Page> {
                     controller: _searchController,
                     decoration: InputDecoration(
                       prefixIcon: const Icon(Icons.search),
-                      // 【修改】使用翻譯
                       hintText: t.searchAmbulance,
                       filled: true,
                       fillColor: Colors.white,
@@ -95,7 +133,6 @@ class _Home3PageState extends State<Home3Page> {
                   ),
                 ),
                 const SizedBox(width: 16),
-                // 【備註】此處為開發中功能，暫不修改提示文字
                 IconButton(
                   icon: const Icon(Icons.filter_list),
                   tooltip: '篩選',
@@ -110,7 +147,6 @@ class _Home3PageState extends State<Home3Page> {
             const SizedBox(height: 32),
             Container(
               color: Colors.transparent,
-              // 【修改】使用翻譯
               child: Row(
                 children: [
                   _TableHeader(t.patientName),
@@ -134,7 +170,6 @@ class _Home3PageState extends State<Home3Page> {
                     return const Center(child: CircularProgressIndicator());
                   }
                   if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    // 【修改】使用翻譯
                     return Center(child: Text(t.noAmbulanceRecords));
                   }
 
@@ -162,7 +197,6 @@ class _Home3PageState extends State<Home3Page> {
                               bottom: BorderSide(color: Colors.grey.shade300),
                             ),
                           ),
-                          // 【修改】所有表格內容都使用翻譯或替代文字
                           child: Row(
                             children: [
                               _TableCell(
@@ -178,8 +212,7 @@ class _Home3PageState extends State<Home3Page> {
                                     t.valueNotAvailable,
                               ),
                               _TableCell(
-                                item.record.destinationHospital ??
-                                    t.valueNotAvailable,
+                                _getDestination(item.treatment), // 使用修正後的方法
                               ),
                               _TableCell(
                                 item.record.totalFee?.toString() ??
@@ -212,7 +245,6 @@ class _Home3PageState extends State<Home3Page> {
       '${dt.year}-${_two(dt.month)}-${_two(dt.day)} ${_two(dt.hour)}:${_two(dt.minute)}';
 }
 
-// 【維持不變】_TableHeader 和 _TableCell 元件不需要修改
 class _TableHeader extends StatelessWidget {
   final String title;
   const _TableHeader(this.title);

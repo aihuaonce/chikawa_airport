@@ -22,13 +22,17 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
 
   // ===== 文字輸入控制器 =====
   final _plateCtrl = TextEditingController();
-  final _otherDestCtrl = TextEditingController();
 
-  // 🔥 新增：從 AccidentRecords 讀取的唯讀資料
+  // 🔥 從 AccidentRecords 讀取的唯讀資料
   String? _accidentPlaceGroup;
   String? _accidentPlaceDetail;
   String? _accidentPlaceNote;
   bool _isLoadingAccident = true;
+
+  // 🔥 從 Treatments 讀取的轉送醫院資料
+  String? _referralHospital;
+  String? _referralOtherHospital;
+  bool _isLoadingReferral = true;
 
   // ===== 選項列表 (靜態常量,無需翻譯) =====
   static const List<String> remotePlaces = [
@@ -55,7 +59,8 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         _loadInitialData();
-        _loadAccidentData(); // 🔥 載入事故地點資料
+        _loadAccidentData();
+        _loadReferralData();
       }
     });
   }
@@ -63,10 +68,9 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
   void _loadInitialData() {
     final data = context.read<AmbulanceData>();
     _plateCtrl.text = data.plateNumber ?? '';
-    _otherDestCtrl.text = data.otherDestinationHospital ?? '';
   }
 
-  // 🔥 新增：從 AccidentRecords 讀取事故地點
+  // 🔥 從 AccidentRecords 讀取事故地點
   Future<void> _loadAccidentData() async {
     try {
       final accidentDao = context.read<AccidentRecordsDao>();
@@ -88,30 +92,31 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
     }
   }
 
+  // 🔥 從 Treatments 讀取轉送醫院資料
+  Future<void> _loadReferralData() async {
+    try {
+      final treatmentsDao = context.read<TreatmentsDao>();
+      final record = await treatmentsDao.getByVisitId(widget.visitId);
+
+      if (record != null && mounted) {
+        setState(() {
+          _referralHospital = record.referralHospital;
+          _referralOtherHospital = record.referralOtherHospital;
+          _isLoadingReferral = false;
+        });
+      } else {
+        setState(() => _isLoadingReferral = false);
+      }
+    } catch (e) {
+      print('❌ 讀取轉送醫院資料失敗: $e');
+      setState(() => _isLoadingReferral = false);
+    }
+  }
+
   @override
   void dispose() {
     _plateCtrl.dispose();
-    _otherDestCtrl.dispose();
     super.dispose();
-  }
-
-  void _saveToProvider(List<String> hospitals) {
-    final data = context.read<AmbulanceData>();
-
-    String? destinationHospitalName;
-    if (data.destinationHospitalIdx != null) {
-      if (data.destinationHospitalIdx == hospitals.length - 1) {
-        destinationHospitalName = _otherDestCtrl.text;
-      } else {
-        destinationHospitalName = hospitals[data.destinationHospitalIdx!];
-      }
-    }
-
-    data.updateInformation(
-      plateNumber: _plateCtrl.text,
-      otherDestinationHospital: _otherDestCtrl.text,
-      destinationHospital: destinationHospitalName,
-    );
   }
 
   // ===== 工具函式 =====
@@ -262,24 +267,19 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
       '飛機機艙內': [t.insideAircraft],
     };
 
-    final List<String> hospitals = [
-      t.landseedHospital,
-      t.linkouChangGung,
-      t.taoyuanHospital,
-      t.taoyuanPsychiatricCenter,
-      t.taoyuanMinSheng,
-      t.stPaulsHospital,
-      t.tienShengHospital,
-      t.taoyuanVeteransHospital,
-      t.enChuKungHospital,
-      t.other,
-    ];
-
-    final List<String> transportReasons = [
-      t.patientConditionRequired,
-      t.patientOrFamilyRequest,
-    ];
-    int? transportReasonIdx;
+    // 🔥 醫院選項 Map（用於顯示）
+    final Map<String, String> hospitalOptions = {
+      'landseed': t.landseedHospital,
+      'linkou_chang_gung': t.linkouChangGung,
+      'taoyuan_general': t.taoyuanHospital,
+      'taoyuan_psychiatric': t.taoyuanPsychiatricCenter,
+      'minsheng': t.taoyuanMinSheng,
+      'st_pauls': t.stPaulsHospital,
+      'tien_sheng': t.tienShengHospital,
+      'taoyuan_veterans': t.taoyuanVeteransHospital,
+      'en_chu_kung': t.enChuKungHospital,
+      'other': t.other,
+    };
 
     return Consumer<AmbulanceData>(
       builder: (context, data, child) {
@@ -300,7 +300,9 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
                         constraints: const BoxConstraints(maxWidth: 250),
                         child: TextField(
                           controller: _plateCtrl,
-                          onChanged: (_) => _saveToProvider(hospitals),
+                          onChanged: (_) => data.updateInformation(
+                            plateNumber: _plateCtrl.text,
+                          ),
                           decoration: InputDecoration(
                             hintText: t.enterPlateNumberHint,
                             border: const OutlineInputBorder(),
@@ -324,16 +326,14 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
                         child: Center(child: CircularProgressIndicator()),
                       )
                     else ...[
-                      // 顯示 placeGroup（唯讀）
                       _stringRadioWrap(
                         options: placeGroupOptions.values.toList(),
                         groupValue: _accidentPlaceGroup,
                         dbValues: placeGroupOptions.keys.toList(),
-                        onChanged: null, // 🔥 禁用
+                        onChanged: null,
                       ),
                       const SizedBox(height: 8),
 
-                      // 顯示 placeDetail（唯讀）
                       if (_accidentPlaceGroup != null &&
                           placeDetailOptions.containsKey(
                             _accidentPlaceGroup,
@@ -342,12 +342,11 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
                           options: placeDetailOptions[_accidentPlaceGroup]!,
                           groupValue: _accidentPlaceDetail,
                           dbValues: placeDetailOptions[_accidentPlaceGroup]!,
-                          onChanged: null, // 🔥 禁用
+                          onChanged: null,
                         ),
                         const SizedBox(height: 8),
                       ],
 
-                      // 顯示 placeNote（唯讀）
                       if (_accidentPlaceNote != null &&
                           _accidentPlaceNote!.isNotEmpty)
                         Padding(
@@ -358,6 +357,45 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
                               fontSize: 15,
                               color: Colors.black87,
                             ),
+                          ),
+                        ),
+                    ],
+                    const SizedBox(height: 16),
+
+                    // 🔥 轉送醫院區塊（唯讀）
+                    _bold('${t.destinationHospitalOrPlace}'),
+                    const SizedBox(height: 6),
+                    if (_isLoadingReferral)
+                      const Padding(
+                        padding: EdgeInsets.all(16),
+                        child: Center(child: CircularProgressIndicator()),
+                      )
+                    else ...[
+                      _stringRadioWrap(
+                        options: hospitalOptions.values.toList(),
+                        groupValue: _referralHospital,
+                        dbValues: hospitalOptions.keys.toList(),
+                        onChanged: null,
+                      ),
+                      const SizedBox(height: 8),
+
+                      // 🔥 其他醫院名稱加粗體
+                      if (_referralHospital == 'other' &&
+                          _referralOtherHospital != null &&
+                          _referralOtherHospital!.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8),
+                          child: Row(
+                            children: [
+                              _bold('${t.otherHospitalName}: '),
+                              Text(
+                                _referralOtherHospital!,
+                                style: const TextStyle(
+                                  fontSize: 15,
+                                  color: Colors.black87,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                     ],
@@ -376,63 +414,6 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
                           data.updateInformation(arriveSceneTime: dt),
                     ),
                     const SizedBox(height: 16),
-
-                    _rowTop(
-                      label: t.destinationHospitalOrPlace,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: List.generate(hospitals.length, (i) {
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 2),
-                            child: _radioOption(
-                              label: hospitals[i],
-                              isSelected: data.destinationHospitalIdx == i,
-                              onTap: () {
-                                data.updateInformation(
-                                  destinationHospitalIdx: i,
-                                );
-                                _saveToProvider(hospitals);
-                              },
-                            ),
-                          );
-                        }),
-                      ),
-                    ),
-
-                    if (data.destinationHospitalIdx ==
-                        hospitals.length - 1) ...[
-                      const SizedBox(height: 10),
-                      _rowTop(
-                        label: t.otherHospitalName,
-                        child: ConstrainedBox(
-                          constraints: const BoxConstraints(maxWidth: 300),
-                          child: TextField(
-                            controller: _otherDestCtrl,
-                            onChanged: (_) => _saveToProvider(hospitals),
-                            decoration: const InputDecoration(
-                              border: OutlineInputBorder(),
-                              isDense: true,
-                              contentPadding: EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 10,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-
-                    const SizedBox(height: 12),
-                    _rowTop(
-                      label: '運送原因',
-                      labelWidth: 84,
-                      child: _radioWrap(
-                        options: transportReasons,
-                        groupIndex: transportReasonIdx,
-                        onChanged: (i) =>
-                            setState(() => transportReasonIdx = i),
-                      ),
-                    ),
 
                     const SizedBox(height: 16),
                     _dateTimeRow(
@@ -593,52 +574,12 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
     );
   }
 
-  Widget _radioOption({
-    required String label,
-    required bool isSelected,
-    required VoidCallback onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            isSelected ? Icons.radio_button_checked : Icons.radio_button_off,
-            size: 20,
-            color: isSelected ? _deepGreen : Colors.black45,
-          ),
-          const SizedBox(width: 8),
-          Text(label, style: const TextStyle(fontSize: 15.5)),
-        ],
-      ),
-    );
-  }
-
-  Widget _radioWrap({
-    required List<String> options,
-    required int? groupIndex,
-    required ValueChanged<int> onChanged,
-  }) {
-    return Wrap(
-      spacing: 14,
-      runSpacing: 6,
-      children: List.generate(options.length, (i) {
-        return _radioOption(
-          label: options[i],
-          isSelected: groupIndex == i,
-          onTap: () => onChanged(i),
-        );
-      }),
-    );
-  }
-
   // 🔥 唯讀版本的 _stringRadioWrap
   Widget _stringRadioWrap({
     required List<String> options,
     required String? groupValue,
     required List<String> dbValues,
-    required ValueChanged<String>? onChanged, // 🔥 可為 null
+    required ValueChanged<String>? onChanged,
   }) {
     final isEnabled = onChanged != null;
     return Wrap(
@@ -649,7 +590,7 @@ class _AmbulanceInformationPageState extends State<AmbulanceInformationPage> {
 
         final selected = groupValue == dbValues[i];
         return InkWell(
-          onTap: isEnabled ? () => onChanged(dbValues[i]) : null,
+          onTap: isEnabled ? () => onChanged!(dbValues[i]) : null,
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [

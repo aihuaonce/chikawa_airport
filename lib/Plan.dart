@@ -1822,6 +1822,10 @@ class _PlanPageState extends State<PlanPage>
           onChanged: (value) {
             setState(() {
               planData.referralHospital = value;
+              if (value != 'other') {
+                planData.referralOtherHospital = '';
+                _controllers['referralOtherHospital']?.text = '';
+              }
             });
           },
         ),
