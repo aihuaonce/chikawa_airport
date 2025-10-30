@@ -45,9 +45,6 @@ class _BodyMapPageState extends State<BodyMapPage>
     super.dispose();
   }
 
-  // ===============================================
-  // SavableStateMixin 介面實作 - nav5 會調用這個方法
-  // ===============================================
   @override
   Future<void> saveData() async {
     if (_controller == null) {
@@ -144,7 +141,7 @@ class _BodyMapPageState extends State<BodyMapPage>
 
       _controller = PainterController(
         settings: PainterSettings(
-          freeStyle: FreeStyleSettings(color: Colors.red, strokeWidth: 4),
+          freeStyle: FreeStyleSettings(color: Colors.red, strokeWidth: 2),
           text: TextSettings(
             textStyle: TextStyle(
               color: Colors.black,
@@ -376,6 +373,9 @@ class _BodyMapPageState extends State<BodyMapPage>
       return Center(child: Text(t.bodyMapInitFailed));
     }
 
+    final bool isDrawing = _controller!.freeStyleMode == FreeStyleMode.draw;
+    // --- 【核心修改結束】 ---
+
     return Stack(
       children: [
         // 使用 LayoutBuilder 获取父级约束
@@ -396,10 +396,15 @@ class _BodyMapPageState extends State<BodyMapPage>
                   width: containerWidth,
                   constraints: BoxConstraints(maxHeight: constraints.maxHeight),
                   child: SingleChildScrollView(
+                    physics: isDrawing
+                        ? const NeverScrollableScrollPhysics()
+                        : const AlwaysScrollableScrollPhysics(),
                     child: InteractiveViewer(
                       boundaryMargin: EdgeInsets.all(20),
                       minScale: 0.5,
                       maxScale: 3.0,
+                      panEnabled: !isDrawing,
+                      scaleEnabled: !isDrawing,
                       child: Container(
                         width: containerWidth,
                         height: containerHeight,
@@ -456,7 +461,7 @@ class _BodyMapPageState extends State<BodyMapPage>
           children: [
             IconButton(
               icon: Icon(
-                Icons.pan_tool,
+                Icons.open_with,
                 color: _controller!.freeStyleMode == FreeStyleMode.none
                     ? Theme.of(context).colorScheme.secondary
                     : null,
@@ -466,7 +471,7 @@ class _BodyMapPageState extends State<BodyMapPage>
                   _controller!.freeStyleMode = FreeStyleMode.none;
                 });
               },
-              tooltip: t.moveZoom,
+              tooltip: "平移/縮放",
             ),
             IconButton(
               icon: Icon(
@@ -482,13 +487,18 @@ class _BodyMapPageState extends State<BodyMapPage>
               },
               tooltip: t.freeDraw,
             ),
+
             IconButton(
               icon: const Icon(Icons.text_fields),
               onPressed: () {
+                setState(() {
+                  _controller!.freeStyleMode = FreeStyleMode.none;
+                });
                 _controller!.addText();
               },
               tooltip: t.addText,
             ),
+
             IconButton(
               icon: const Icon(Icons.undo),
               onPressed: _controller!.canUndo
@@ -506,17 +516,10 @@ class _BodyMapPageState extends State<BodyMapPage>
             IconButton(
               icon: const Icon(Icons.clear),
               onPressed: () => _showClearConfirmationDialog(t),
-              tooltip: t.clearAllItems, // 這才是"清空所有項目"
+              tooltip: t.clearAllItems,
             ),
-            const Divider(),
             _buildColorPicker(t),
             _buildStrokeWidthPicker(t),
-            const Divider(),
-            IconButton(
-              icon: const Icon(Icons.download),
-              onPressed: () => _exportAsImage(t),
-              tooltip: t.exportImage,
-            ),
           ],
         ),
       ),
@@ -528,7 +531,7 @@ class _BodyMapPageState extends State<BodyMapPage>
       context: context,
       builder: (context) => AlertDialog(
         title: Text(t.confirmClearTitle),
-        content: Text("確定要清除所有筆跡和文字嗎？此操作無法復原。"), // 更明確的說明
+        content: Text("確定要清除所有筆跡和文字嗎？此操作無法復原。"),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -537,17 +540,8 @@ class _BodyMapPageState extends State<BodyMapPage>
           TextButton(
             onPressed: () {
               _controller!.clearDrawables();
-              // 立即觸發資料更新
               _updateBodyMapData();
               Navigator.pop(context);
-
-              // 顯示清除成功的提示
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('已清除所有筆跡和文字'),
-                  duration: Duration(seconds: 1),
-                ),
-              );
             },
             child: Text(t.confirm, style: const TextStyle(color: Colors.red)),
           ),
@@ -619,32 +613,5 @@ class _BodyMapPageState extends State<BodyMapPage>
         );
       }).toList(),
     );
-  }
-
-  Future<void> _exportAsImage(AppTranslations t) async {
-    if (_controller == null || !mounted) return;
-    try {
-      final image = await _controller!.renderImage(
-        Size(
-          _backgroundImage!.width.toDouble(),
-          _backgroundImage!.height.toDouble(),
-        ),
-      );
-      final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
-      final bytes = byteData!.buffer.asUint8List();
-
-      if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(t.imageRenderedSuccess)));
-      }
-    } catch (e) {
-      debugPrint("匯出圖片失敗: $e");
-      if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text("${t.exportFailed}$e")));
-      }
-    }
   }
 }

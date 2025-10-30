@@ -1256,6 +1256,9 @@ class AppTranslations {
       isZh ? '婦產科' : 'Obstetrics & Gynecology';
   String get orthopedicsDept => isZh ? '骨科' : 'Orthopedics';
   String get ophthalmologyDept => isZh ? '眼科' : 'Ophthalmology';
+
+  String get enableScroll => '啟動手動滑動';
+  String get disableScroll => '關閉手動滑動';
 }
 
 // Delegate for AppTranslations
