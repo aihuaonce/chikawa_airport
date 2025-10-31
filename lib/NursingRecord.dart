@@ -280,7 +280,6 @@ class _NursingRecordPageState extends State<NursingRecordPage>
         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
         child: Row(
           children: [
-            const Icon(Icons.add, color: Colors.blue),
             const SizedBox(width: 8),
             Text(
               t.addRow,
