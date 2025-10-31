@@ -98,8 +98,8 @@ class _EmergencyPersonalPageState extends State<EmergencyPersonalPage> {
                       _rowTop(
                         label: t.passportNumber,
                         child: _DisplayField(
-                          text: null, // 假設 PatientProfiles 沒有此欄位
-                          hint: t.dataNotAvailable, // 例如："資料未提供"
+                          text: profile?.passportNumber,
+                          hint: t.dataNotAvailable,
                         ),
                       ),
                     ],
@@ -179,7 +179,7 @@ class _EmergencyPersonalPageState extends State<EmergencyPersonalPage> {
             ),
           ),
         ),
-        const SizedBox(width: _labelGap), // <-- 現在這裡可以找到定義了
+        const SizedBox(width: _labelGap),
         Expanded(
           child: Align(alignment: Alignment.topLeft, child: child),
         ),
