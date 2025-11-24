@@ -23,6 +23,7 @@ class Visits extends Table {
       dateTime().withDefault(currentDateAndTime)(); // 建立/更新時間
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
   DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
+  BoolColumn get synced => boolean().withDefault(Constant(false))();
 
   @override
   List<Set<Column>> get indexes => [
@@ -59,6 +60,7 @@ class PatientProfiles extends Table {
 
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
   DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
+  BoolColumn get synced => boolean().withDefault(Constant(false))();
 
   @override
   List<Set<Column>> get indexes => [
@@ -107,6 +109,7 @@ class AccidentRecords extends Table {
   // 紀錄時間
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
   DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
+  BoolColumn get synced => boolean().withDefault(Constant(false))();
 }
 
 class FlightLogs extends Table {
@@ -123,6 +126,7 @@ class FlightLogs extends Table {
   TextColumn get destination => text().nullable()();
 
   DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
+  BoolColumn get synced => boolean().withDefault(Constant(false))();
 }
 
 class Treatments extends Table {
@@ -237,6 +241,7 @@ class Treatments extends Table {
   // 紀錄時間
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
   DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
+  BoolColumn get synced => boolean().withDefault(Constant(false))();
 }
 
 class MedicalCosts extends Table {
@@ -283,6 +288,7 @@ class MedicalCosts extends Table {
   // 紀錄時間
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
   DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
+  BoolColumn get synced => boolean().withDefault(Constant(false))();
 }
 
 class MedicalCertificates extends Table {
@@ -305,6 +311,7 @@ class MedicalCertificates extends Table {
   // 紀錄時間
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
   DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
+  BoolColumn get synced => boolean().withDefault(Constant(false))();
 }
 
 class Undertakings extends Table {
@@ -326,6 +333,7 @@ class Undertakings extends Table {
   // 紀錄時間
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
   DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
+  BoolColumn get synced => boolean().withDefault(Constant(false))();
 }
 
 class ElectronicDocuments extends Table {
@@ -341,6 +349,7 @@ class ElectronicDocuments extends Table {
   // 紀錄時間
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
   DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
+  BoolColumn get synced => boolean().withDefault(Constant(false))();
 }
 
 class NursingRecords extends Table {
@@ -353,6 +362,7 @@ class NursingRecords extends Table {
   // 紀錄時間
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
   DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
+  BoolColumn get synced => boolean().withDefault(Constant(false))();
 }
 
 class ReferralForms extends Table {
@@ -408,6 +418,7 @@ class ReferralForms extends Table {
   // 紀錄時間
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
   DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
+  BoolColumn get synced => boolean().withDefault(Constant(false))();
 }
 
 // 在您的 table 定義檔案中
@@ -539,6 +550,7 @@ class AmbulanceRecords extends Table {
 
   // Radio Button
   BoolColumn get isProxyStatement => boolean().nullable()(); // 是否代訴
+  BoolColumn get synced => boolean().withDefault(Constant(false))();
 }
 
 // 給藥紀錄表
@@ -552,6 +564,7 @@ class MedicationRecords extends Table {
   TextColumn get route => text().nullable()(); // 途徑
   TextColumn get dose => text().nullable()(); // 劑量
   TextColumn get executor => text().nullable()(); // 執行者
+  BoolColumn get synced => boolean().withDefault(Constant(false))();
 }
 
 // 生命徵象紀錄表
@@ -569,6 +582,7 @@ class VitalSignsRecords extends Table {
   TextColumn get bloodPressure => text().nullable()(); // 血壓
   TextColumn get spo2 => text().nullable()(); // 血氧
   TextColumn get gcs => text().nullable()(); // GCS 分數 (e.g., "15 (E4V5M6)")
+  BoolColumn get synced => boolean().withDefault(Constant(false))();
 }
 
 // 隨車救護人員紀錄表
@@ -578,6 +592,7 @@ class ParamedicRecords extends Table {
 
   TextColumn get name => text().nullable()();
   BlobColumn get signature => blob().nullable()(); // 簽名
+  BoolColumn get synced => boolean().withDefault(Constant(false))();
 }
 
 class EmergencyRecords extends Table {
@@ -665,4 +680,5 @@ class EmergencyRecords extends Table {
   // 記錄時間
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
   DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
+  BoolColumn get synced => boolean().withDefault(Constant(false))();
 }

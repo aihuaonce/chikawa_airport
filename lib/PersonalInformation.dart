@@ -182,7 +182,7 @@ class _PersonalInformationPageState extends State<PersonalInformationPage>
       // --- 建立 Multipart 上傳 ---
       var request = http.MultipartRequest(
         'POST',
-        Uri.parse('https://6689f2d1b4b4.ngrok-free.app/todos/upload/'),
+        Uri.parse('https://a63d8baf4050.ngrok-free.app/todos/upload/'),
       );
       request.files.add(
         await http.MultipartFile.fromPath(

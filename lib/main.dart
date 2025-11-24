@@ -22,11 +22,19 @@ import 'data/models/referral_data.dart';
 // Database & UI
 import 'data/db/app_database.dart';
 import 'main_page.dart';
+import '../data/db/sync_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   final db = AppDatabase();
+
+  // ✅ 確保資料庫開啟
+  await db.customSelect('SELECT 1').get();
+
+  // ✅ 啟動同步排程
+  final syncService = SyncService(db);
+  syncService.start();
 
   final localeProvider = LocaleProvider();
   await localeProvider.loadLocale();
@@ -34,7 +42,6 @@ Future<void> main() async {
   runApp(
     MultiProvider(
       providers: [
-        // --- 狀態管理 Provider (ChangeNotifier) ---
         ChangeNotifierProvider.value(value: localeProvider),
         ChangeNotifierProvider(create: (_) => AppNavigationProvider()),
         ChangeNotifierProvider(create: (_) => PatientData()),
@@ -49,10 +56,7 @@ Future<void> main() async {
         ChangeNotifierProvider(create: (_) => BodyMapData()),
         ChangeNotifierProvider(create: (_) => ReferralData()),
 
-        // --- 資料庫實例 Provider ---
         Provider<AppDatabase>.value(value: db),
-
-        // --- DAO 注入 ---
         Provider<VisitsDao>(create: (_) => db.visitsDao),
         Provider<PatientProfilesDao>(create: (_) => db.patientProfilesDao),
         Provider<FlightLogsDao>(create: (_) => db.flightLogsDao),
@@ -68,8 +72,6 @@ Future<void> main() async {
         ),
         Provider<NursingRecordsDao>(create: (_) => db.nursingRecordsDao),
         Provider<ReferralFormsDao>(create: (_) => db.referralFormsDao),
-
-        // 【【【 請在這裡加入這四行新的 DAO 註冊 】】】
         Provider<AmbulanceRecordsDao>(create: (_) => db.ambulanceRecordsDao),
         Provider<MedicationRecordsDao>(create: (_) => db.medicationRecordsDao),
         Provider<VitalSignsRecordsDao>(create: (_) => db.vitalSignsRecordsDao),
@@ -80,6 +82,7 @@ Future<void> main() async {
     ),
   );
 }
+
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});

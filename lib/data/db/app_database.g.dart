@@ -156,6 +156,19 @@ class $VisitsTable extends Visits with TableInfo<$VisitsTable, Visit> {
     requiredDuringInsert: false,
     defaultValue: currentDateAndTime,
   );
+  static const VerificationMeta _syncedMeta = const VerificationMeta('synced');
+  @override
+  late final GeneratedColumn<bool> synced = GeneratedColumn<bool>(
+    'synced',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("synced" IN (0, 1))',
+    ),
+    defaultValue: Constant(false),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     visitId,
@@ -171,6 +184,7 @@ class $VisitsTable extends Visits with TableInfo<$VisitsTable, Visit> {
     uploadedAt,
     createdAt,
     updatedAt,
+    synced,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -277,6 +291,12 @@ class $VisitsTable extends Visits with TableInfo<$VisitsTable, Visit> {
         updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
       );
     }
+    if (data.containsKey('synced')) {
+      context.handle(
+        _syncedMeta,
+        synced.isAcceptableOrUnknown(data['synced']!, _syncedMeta),
+      );
+    }
     return context;
   }
 
@@ -338,6 +358,10 @@ class $VisitsTable extends Visits with TableInfo<$VisitsTable, Visit> {
         DriftSqlType.dateTime,
         data['${effectivePrefix}updated_at'],
       )!,
+      synced: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}synced'],
+      )!,
     );
   }
 
@@ -361,6 +385,7 @@ class Visit extends DataClass implements Insertable<Visit> {
   final DateTime uploadedAt;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final bool synced;
   const Visit({
     required this.visitId,
     this.patientName,
@@ -375,6 +400,7 @@ class Visit extends DataClass implements Insertable<Visit> {
     required this.uploadedAt,
     required this.createdAt,
     required this.updatedAt,
+    required this.synced,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -408,6 +434,7 @@ class Visit extends DataClass implements Insertable<Visit> {
     map['uploaded_at'] = Variable<DateTime>(uploadedAt);
     map['created_at'] = Variable<DateTime>(createdAt);
     map['updated_at'] = Variable<DateTime>(updatedAt);
+    map['synced'] = Variable<bool>(synced);
     return map;
   }
 
@@ -438,6 +465,7 @@ class Visit extends DataClass implements Insertable<Visit> {
       uploadedAt: Value(uploadedAt),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
+      synced: Value(synced),
     );
   }
 
@@ -462,6 +490,7 @@ class Visit extends DataClass implements Insertable<Visit> {
       uploadedAt: serializer.fromJson<DateTime>(json['uploadedAt']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      synced: serializer.fromJson<bool>(json['synced']),
     );
   }
   @override
@@ -481,6 +510,7 @@ class Visit extends DataClass implements Insertable<Visit> {
       'uploadedAt': serializer.toJson<DateTime>(uploadedAt),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'synced': serializer.toJson<bool>(synced),
     };
   }
 
@@ -498,6 +528,7 @@ class Visit extends DataClass implements Insertable<Visit> {
     DateTime? uploadedAt,
     DateTime? createdAt,
     DateTime? updatedAt,
+    bool? synced,
   }) => Visit(
     visitId: visitId ?? this.visitId,
     patientName: patientName.present ? patientName.value : this.patientName,
@@ -516,6 +547,7 @@ class Visit extends DataClass implements Insertable<Visit> {
     uploadedAt: uploadedAt ?? this.uploadedAt,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
+    synced: synced ?? this.synced,
   );
   Visit copyWithCompanion(VisitsCompanion data) {
     return Visit(
@@ -544,6 +576,7 @@ class Visit extends DataClass implements Insertable<Visit> {
           : this.uploadedAt,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      synced: data.synced.present ? data.synced.value : this.synced,
     );
   }
 
@@ -562,7 +595,8 @@ class Visit extends DataClass implements Insertable<Visit> {
           ..write('emergencyResult: $emergencyResult, ')
           ..write('uploadedAt: $uploadedAt, ')
           ..write('createdAt: $createdAt, ')
-          ..write('updatedAt: $updatedAt')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('synced: $synced')
           ..write(')'))
         .toString();
   }
@@ -582,6 +616,7 @@ class Visit extends DataClass implements Insertable<Visit> {
     uploadedAt,
     createdAt,
     updatedAt,
+    synced,
   );
   @override
   bool operator ==(Object other) =>
@@ -599,7 +634,8 @@ class Visit extends DataClass implements Insertable<Visit> {
           other.emergencyResult == this.emergencyResult &&
           other.uploadedAt == this.uploadedAt &&
           other.createdAt == this.createdAt &&
-          other.updatedAt == this.updatedAt);
+          other.updatedAt == this.updatedAt &&
+          other.synced == this.synced);
 }
 
 class VisitsCompanion extends UpdateCompanion<Visit> {
@@ -616,6 +652,7 @@ class VisitsCompanion extends UpdateCompanion<Visit> {
   final Value<DateTime> uploadedAt;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
+  final Value<bool> synced;
   const VisitsCompanion({
     this.visitId = const Value.absent(),
     this.patientName = const Value.absent(),
@@ -630,6 +667,7 @@ class VisitsCompanion extends UpdateCompanion<Visit> {
     this.uploadedAt = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
+    this.synced = const Value.absent(),
   });
   VisitsCompanion.insert({
     this.visitId = const Value.absent(),
@@ -645,6 +683,7 @@ class VisitsCompanion extends UpdateCompanion<Visit> {
     this.uploadedAt = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
+    this.synced = const Value.absent(),
   });
   static Insertable<Visit> custom({
     Expression<int>? visitId,
@@ -660,6 +699,7 @@ class VisitsCompanion extends UpdateCompanion<Visit> {
     Expression<DateTime>? uploadedAt,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
+    Expression<bool>? synced,
   }) {
     return RawValuesInsertable({
       if (visitId != null) 'visit_id': visitId,
@@ -676,6 +716,7 @@ class VisitsCompanion extends UpdateCompanion<Visit> {
       if (uploadedAt != null) 'uploaded_at': uploadedAt,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
+      if (synced != null) 'synced': synced,
     });
   }
 
@@ -693,6 +734,7 @@ class VisitsCompanion extends UpdateCompanion<Visit> {
     Value<DateTime>? uploadedAt,
     Value<DateTime>? createdAt,
     Value<DateTime>? updatedAt,
+    Value<bool>? synced,
   }) {
     return VisitsCompanion(
       visitId: visitId ?? this.visitId,
@@ -708,6 +750,7 @@ class VisitsCompanion extends UpdateCompanion<Visit> {
       uploadedAt: uploadedAt ?? this.uploadedAt,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      synced: synced ?? this.synced,
     );
   }
 
@@ -753,6 +796,9 @@ class VisitsCompanion extends UpdateCompanion<Visit> {
     if (updatedAt.present) {
       map['updated_at'] = Variable<DateTime>(updatedAt.value);
     }
+    if (synced.present) {
+      map['synced'] = Variable<bool>(synced.value);
+    }
     return map;
   }
 
@@ -771,7 +817,8 @@ class VisitsCompanion extends UpdateCompanion<Visit> {
           ..write('emergencyResult: $emergencyResult, ')
           ..write('uploadedAt: $uploadedAt, ')
           ..write('createdAt: $createdAt, ')
-          ..write('updatedAt: $updatedAt')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('synced: $synced')
           ..write(')'))
         .toString();
   }
@@ -945,6 +992,19 @@ class $PatientProfilesTable extends PatientProfiles
     requiredDuringInsert: false,
     defaultValue: currentDateAndTime,
   );
+  static const VerificationMeta _syncedMeta = const VerificationMeta('synced');
+  @override
+  late final GeneratedColumn<bool> synced = GeneratedColumn<bool>(
+    'synced',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("synced" IN (0, 1))',
+    ),
+    defaultValue: Constant(false),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -962,6 +1022,7 @@ class $PatientProfilesTable extends PatientProfiles
     bodyMapJson,
     createdAt,
     updatedAt,
+    synced,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -1073,6 +1134,12 @@ class $PatientProfilesTable extends PatientProfiles
         updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
       );
     }
+    if (data.containsKey('synced')) {
+      context.handle(
+        _syncedMeta,
+        synced.isAcceptableOrUnknown(data['synced']!, _syncedMeta),
+      );
+    }
     return context;
   }
 
@@ -1142,6 +1209,10 @@ class $PatientProfilesTable extends PatientProfiles
         DriftSqlType.dateTime,
         data['${effectivePrefix}updated_at'],
       )!,
+      synced: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}synced'],
+      )!,
     );
   }
 
@@ -1167,6 +1238,7 @@ class PatientProfile extends DataClass implements Insertable<PatientProfile> {
   final String? bodyMapJson;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final bool synced;
   const PatientProfile({
     required this.id,
     required this.visitId,
@@ -1183,6 +1255,7 @@ class PatientProfile extends DataClass implements Insertable<PatientProfile> {
     this.bodyMapJson,
     required this.createdAt,
     required this.updatedAt,
+    required this.synced,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -1224,6 +1297,7 @@ class PatientProfile extends DataClass implements Insertable<PatientProfile> {
     }
     map['created_at'] = Variable<DateTime>(createdAt);
     map['updated_at'] = Variable<DateTime>(updatedAt);
+    map['synced'] = Variable<bool>(synced);
     return map;
   }
 
@@ -1264,6 +1338,7 @@ class PatientProfile extends DataClass implements Insertable<PatientProfile> {
           : Value(bodyMapJson),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
+      synced: Value(synced),
     );
   }
 
@@ -1288,6 +1363,7 @@ class PatientProfile extends DataClass implements Insertable<PatientProfile> {
       bodyMapJson: serializer.fromJson<String?>(json['bodyMapJson']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      synced: serializer.fromJson<bool>(json['synced']),
     );
   }
   @override
@@ -1309,6 +1385,7 @@ class PatientProfile extends DataClass implements Insertable<PatientProfile> {
       'bodyMapJson': serializer.toJson<String?>(bodyMapJson),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'synced': serializer.toJson<bool>(synced),
     };
   }
 
@@ -1328,6 +1405,7 @@ class PatientProfile extends DataClass implements Insertable<PatientProfile> {
     Value<String?> bodyMapJson = const Value.absent(),
     DateTime? createdAt,
     DateTime? updatedAt,
+    bool? synced,
   }) => PatientProfile(
     id: id ?? this.id,
     visitId: visitId ?? this.visitId,
@@ -1346,6 +1424,7 @@ class PatientProfile extends DataClass implements Insertable<PatientProfile> {
     bodyMapJson: bodyMapJson.present ? bodyMapJson.value : this.bodyMapJson,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
+    synced: synced ?? this.synced,
   );
   PatientProfile copyWithCompanion(PatientProfilesCompanion data) {
     return PatientProfile(
@@ -1370,6 +1449,7 @@ class PatientProfile extends DataClass implements Insertable<PatientProfile> {
           : this.bodyMapJson,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      synced: data.synced.present ? data.synced.value : this.synced,
     );
   }
 
@@ -1390,7 +1470,8 @@ class PatientProfile extends DataClass implements Insertable<PatientProfile> {
           ..write('photoPath: $photoPath, ')
           ..write('bodyMapJson: $bodyMapJson, ')
           ..write('createdAt: $createdAt, ')
-          ..write('updatedAt: $updatedAt')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('synced: $synced')
           ..write(')'))
         .toString();
   }
@@ -1412,6 +1493,7 @@ class PatientProfile extends DataClass implements Insertable<PatientProfile> {
     bodyMapJson,
     createdAt,
     updatedAt,
+    synced,
   );
   @override
   bool operator ==(Object other) =>
@@ -1431,7 +1513,8 @@ class PatientProfile extends DataClass implements Insertable<PatientProfile> {
           other.photoPath == this.photoPath &&
           other.bodyMapJson == this.bodyMapJson &&
           other.createdAt == this.createdAt &&
-          other.updatedAt == this.updatedAt);
+          other.updatedAt == this.updatedAt &&
+          other.synced == this.synced);
 }
 
 class PatientProfilesCompanion extends UpdateCompanion<PatientProfile> {
@@ -1450,6 +1533,7 @@ class PatientProfilesCompanion extends UpdateCompanion<PatientProfile> {
   final Value<String?> bodyMapJson;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
+  final Value<bool> synced;
   const PatientProfilesCompanion({
     this.id = const Value.absent(),
     this.visitId = const Value.absent(),
@@ -1466,6 +1550,7 @@ class PatientProfilesCompanion extends UpdateCompanion<PatientProfile> {
     this.bodyMapJson = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
+    this.synced = const Value.absent(),
   });
   PatientProfilesCompanion.insert({
     this.id = const Value.absent(),
@@ -1483,6 +1568,7 @@ class PatientProfilesCompanion extends UpdateCompanion<PatientProfile> {
     this.bodyMapJson = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
+    this.synced = const Value.absent(),
   }) : visitId = Value(visitId);
   static Insertable<PatientProfile> custom({
     Expression<int>? id,
@@ -1500,6 +1586,7 @@ class PatientProfilesCompanion extends UpdateCompanion<PatientProfile> {
     Expression<String>? bodyMapJson,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
+    Expression<bool>? synced,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -1517,6 +1604,7 @@ class PatientProfilesCompanion extends UpdateCompanion<PatientProfile> {
       if (bodyMapJson != null) 'body_map_json': bodyMapJson,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
+      if (synced != null) 'synced': synced,
     });
   }
 
@@ -1536,6 +1624,7 @@ class PatientProfilesCompanion extends UpdateCompanion<PatientProfile> {
     Value<String?>? bodyMapJson,
     Value<DateTime>? createdAt,
     Value<DateTime>? updatedAt,
+    Value<bool>? synced,
   }) {
     return PatientProfilesCompanion(
       id: id ?? this.id,
@@ -1553,6 +1642,7 @@ class PatientProfilesCompanion extends UpdateCompanion<PatientProfile> {
       bodyMapJson: bodyMapJson ?? this.bodyMapJson,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      synced: synced ?? this.synced,
     );
   }
 
@@ -1604,6 +1694,9 @@ class PatientProfilesCompanion extends UpdateCompanion<PatientProfile> {
     if (updatedAt.present) {
       map['updated_at'] = Variable<DateTime>(updatedAt.value);
     }
+    if (synced.present) {
+      map['synced'] = Variable<bool>(synced.value);
+    }
     return map;
   }
 
@@ -1624,7 +1717,8 @@ class PatientProfilesCompanion extends UpdateCompanion<PatientProfile> {
           ..write('photoPath: $photoPath, ')
           ..write('bodyMapJson: $bodyMapJson, ')
           ..write('createdAt: $createdAt, ')
-          ..write('updatedAt: $updatedAt')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('synced: $synced')
           ..write(')'))
         .toString();
   }
@@ -1929,6 +2023,19 @@ class $AccidentRecordsTable extends AccidentRecords
     requiredDuringInsert: false,
     defaultValue: currentDateAndTime,
   );
+  static const VerificationMeta _syncedMeta = const VerificationMeta('synced');
+  @override
+  late final GeneratedColumn<bool> synced = GeneratedColumn<bool>(
+    'synced',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("synced" IN (0, 1))',
+    ),
+    defaultValue: Constant(false),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -1956,6 +2063,7 @@ class $AccidentRecordsTable extends AccidentRecords
     reasonOtherText,
     createdAt,
     updatedAt,
+    synced,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -2157,6 +2265,12 @@ class $AccidentRecordsTable extends AccidentRecords
         updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
       );
     }
+    if (data.containsKey('synced')) {
+      context.handle(
+        _syncedMeta,
+        synced.isAcceptableOrUnknown(data['synced']!, _syncedMeta),
+      );
+    }
     return context;
   }
 
@@ -2266,6 +2380,10 @@ class $AccidentRecordsTable extends AccidentRecords
         DriftSqlType.dateTime,
         data['${effectivePrefix}updated_at'],
       )!,
+      synced: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}synced'],
+      )!,
     );
   }
 
@@ -2301,6 +2419,7 @@ class AccidentRecord extends DataClass implements Insertable<AccidentRecord> {
   final String? reasonOtherText;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final bool synced;
   const AccidentRecord({
     required this.id,
     required this.visitId,
@@ -2327,6 +2446,7 @@ class AccidentRecord extends DataClass implements Insertable<AccidentRecord> {
     this.reasonOtherText,
     required this.createdAt,
     required this.updatedAt,
+    required this.synced,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -2390,6 +2510,7 @@ class AccidentRecord extends DataClass implements Insertable<AccidentRecord> {
     }
     map['created_at'] = Variable<DateTime>(createdAt);
     map['updated_at'] = Variable<DateTime>(updatedAt);
+    map['synced'] = Variable<bool>(synced);
     return map;
   }
 
@@ -2452,6 +2573,7 @@ class AccidentRecord extends DataClass implements Insertable<AccidentRecord> {
           : Value(reasonOtherText),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
+      synced: Value(synced),
     );
   }
 
@@ -2488,6 +2610,7 @@ class AccidentRecord extends DataClass implements Insertable<AccidentRecord> {
       reasonOtherText: serializer.fromJson<String?>(json['reasonOtherText']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      synced: serializer.fromJson<bool>(json['synced']),
     );
   }
   @override
@@ -2519,6 +2642,7 @@ class AccidentRecord extends DataClass implements Insertable<AccidentRecord> {
       'reasonOtherText': serializer.toJson<String?>(reasonOtherText),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'synced': serializer.toJson<bool>(synced),
     };
   }
 
@@ -2548,6 +2672,7 @@ class AccidentRecord extends DataClass implements Insertable<AccidentRecord> {
     Value<String?> reasonOtherText = const Value.absent(),
     DateTime? createdAt,
     DateTime? updatedAt,
+    bool? synced,
   }) => AccidentRecord(
     id: id ?? this.id,
     visitId: visitId ?? this.visitId,
@@ -2584,6 +2709,7 @@ class AccidentRecord extends DataClass implements Insertable<AccidentRecord> {
         : this.reasonOtherText,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
+    synced: synced ?? this.synced,
   );
   AccidentRecord copyWithCompanion(AccidentRecordsCompanion data) {
     return AccidentRecord(
@@ -2644,6 +2770,7 @@ class AccidentRecord extends DataClass implements Insertable<AccidentRecord> {
           : this.reasonOtherText,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      synced: data.synced.present ? data.synced.value : this.synced,
     );
   }
 
@@ -2674,7 +2801,8 @@ class AccidentRecord extends DataClass implements Insertable<AccidentRecord> {
           ..write('reasonOther: $reasonOther, ')
           ..write('reasonOtherText: $reasonOtherText, ')
           ..write('createdAt: $createdAt, ')
-          ..write('updatedAt: $updatedAt')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('synced: $synced')
           ..write(')'))
         .toString();
   }
@@ -2706,6 +2834,7 @@ class AccidentRecord extends DataClass implements Insertable<AccidentRecord> {
     reasonOtherText,
     createdAt,
     updatedAt,
+    synced,
   ]);
   @override
   bool operator ==(Object other) =>
@@ -2735,7 +2864,8 @@ class AccidentRecord extends DataClass implements Insertable<AccidentRecord> {
           other.reasonOther == this.reasonOther &&
           other.reasonOtherText == this.reasonOtherText &&
           other.createdAt == this.createdAt &&
-          other.updatedAt == this.updatedAt);
+          other.updatedAt == this.updatedAt &&
+          other.synced == this.synced);
 }
 
 class AccidentRecordsCompanion extends UpdateCompanion<AccidentRecord> {
@@ -2764,6 +2894,7 @@ class AccidentRecordsCompanion extends UpdateCompanion<AccidentRecord> {
   final Value<String?> reasonOtherText;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
+  final Value<bool> synced;
   const AccidentRecordsCompanion({
     this.id = const Value.absent(),
     this.visitId = const Value.absent(),
@@ -2790,6 +2921,7 @@ class AccidentRecordsCompanion extends UpdateCompanion<AccidentRecord> {
     this.reasonOtherText = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
+    this.synced = const Value.absent(),
   });
   AccidentRecordsCompanion.insert({
     this.id = const Value.absent(),
@@ -2817,6 +2949,7 @@ class AccidentRecordsCompanion extends UpdateCompanion<AccidentRecord> {
     this.reasonOtherText = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
+    this.synced = const Value.absent(),
   }) : visitId = Value(visitId);
   static Insertable<AccidentRecord> custom({
     Expression<int>? id,
@@ -2844,6 +2977,7 @@ class AccidentRecordsCompanion extends UpdateCompanion<AccidentRecord> {
     Expression<String>? reasonOtherText,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
+    Expression<bool>? synced,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -2872,6 +3006,7 @@ class AccidentRecordsCompanion extends UpdateCompanion<AccidentRecord> {
       if (reasonOtherText != null) 'reason_other_text': reasonOtherText,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
+      if (synced != null) 'synced': synced,
     });
   }
 
@@ -2901,6 +3036,7 @@ class AccidentRecordsCompanion extends UpdateCompanion<AccidentRecord> {
     Value<String?>? reasonOtherText,
     Value<DateTime>? createdAt,
     Value<DateTime>? updatedAt,
+    Value<bool>? synced,
   }) {
     return AccidentRecordsCompanion(
       id: id ?? this.id,
@@ -2928,6 +3064,7 @@ class AccidentRecordsCompanion extends UpdateCompanion<AccidentRecord> {
       reasonOtherText: reasonOtherText ?? this.reasonOtherText,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      synced: synced ?? this.synced,
     );
   }
 
@@ -3011,6 +3148,9 @@ class AccidentRecordsCompanion extends UpdateCompanion<AccidentRecord> {
     if (updatedAt.present) {
       map['updated_at'] = Variable<DateTime>(updatedAt.value);
     }
+    if (synced.present) {
+      map['synced'] = Variable<bool>(synced.value);
+    }
     return map;
   }
 
@@ -3041,7 +3181,8 @@ class AccidentRecordsCompanion extends UpdateCompanion<AccidentRecord> {
           ..write('reasonOther: $reasonOther, ')
           ..write('reasonOtherText: $reasonOtherText, ')
           ..write('createdAt: $createdAt, ')
-          ..write('updatedAt: $updatedAt')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('synced: $synced')
           ..write(')'))
         .toString();
   }
@@ -3154,6 +3295,19 @@ class $FlightLogsTable extends FlightLogs
     requiredDuringInsert: false,
     defaultValue: currentDateAndTime,
   );
+  static const VerificationMeta _syncedMeta = const VerificationMeta('synced');
+  @override
+  late final GeneratedColumn<bool> synced = GeneratedColumn<bool>(
+    'synced',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("synced" IN (0, 1))',
+    ),
+    defaultValue: Constant(false),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -3165,6 +3319,7 @@ class $FlightLogsTable extends FlightLogs
     via,
     destination,
     updatedAt,
+    synced,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -3237,6 +3392,12 @@ class $FlightLogsTable extends FlightLogs
         updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
       );
     }
+    if (data.containsKey('synced')) {
+      context.handle(
+        _syncedMeta,
+        synced.isAcceptableOrUnknown(data['synced']!, _syncedMeta),
+      );
+    }
     return context;
   }
 
@@ -3282,6 +3443,10 @@ class $FlightLogsTable extends FlightLogs
         DriftSqlType.dateTime,
         data['${effectivePrefix}updated_at'],
       )!,
+      synced: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}synced'],
+      )!,
     );
   }
 
@@ -3301,6 +3466,7 @@ class FlightLog extends DataClass implements Insertable<FlightLog> {
   final String? via;
   final String? destination;
   final DateTime updatedAt;
+  final bool synced;
   const FlightLog({
     required this.id,
     required this.visitId,
@@ -3311,6 +3477,7 @@ class FlightLog extends DataClass implements Insertable<FlightLog> {
     this.via,
     this.destination,
     required this.updatedAt,
+    required this.synced,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -3336,6 +3503,7 @@ class FlightLog extends DataClass implements Insertable<FlightLog> {
       map['destination'] = Variable<String>(destination);
     }
     map['updated_at'] = Variable<DateTime>(updatedAt);
+    map['synced'] = Variable<bool>(synced);
     return map;
   }
 
@@ -3360,6 +3528,7 @@ class FlightLog extends DataClass implements Insertable<FlightLog> {
           ? const Value.absent()
           : Value(destination),
       updatedAt: Value(updatedAt),
+      synced: Value(synced),
     );
   }
 
@@ -3378,6 +3547,7 @@ class FlightLog extends DataClass implements Insertable<FlightLog> {
       via: serializer.fromJson<String?>(json['via']),
       destination: serializer.fromJson<String?>(json['destination']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      synced: serializer.fromJson<bool>(json['synced']),
     );
   }
   @override
@@ -3393,6 +3563,7 @@ class FlightLog extends DataClass implements Insertable<FlightLog> {
       'via': serializer.toJson<String?>(via),
       'destination': serializer.toJson<String?>(destination),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'synced': serializer.toJson<bool>(synced),
     };
   }
 
@@ -3406,6 +3577,7 @@ class FlightLog extends DataClass implements Insertable<FlightLog> {
     Value<String?> via = const Value.absent(),
     Value<String?> destination = const Value.absent(),
     DateTime? updatedAt,
+    bool? synced,
   }) => FlightLog(
     id: id ?? this.id,
     visitId: visitId ?? this.visitId,
@@ -3416,6 +3588,7 @@ class FlightLog extends DataClass implements Insertable<FlightLog> {
     via: via.present ? via.value : this.via,
     destination: destination.present ? destination.value : this.destination,
     updatedAt: updatedAt ?? this.updatedAt,
+    synced: synced ?? this.synced,
   );
   FlightLog copyWithCompanion(FlightLogsCompanion data) {
     return FlightLog(
@@ -3432,6 +3605,7 @@ class FlightLog extends DataClass implements Insertable<FlightLog> {
           ? data.destination.value
           : this.destination,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      synced: data.synced.present ? data.synced.value : this.synced,
     );
   }
 
@@ -3446,7 +3620,8 @@ class FlightLog extends DataClass implements Insertable<FlightLog> {
           ..write('departure: $departure, ')
           ..write('via: $via, ')
           ..write('destination: $destination, ')
-          ..write('updatedAt: $updatedAt')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('synced: $synced')
           ..write(')'))
         .toString();
   }
@@ -3462,6 +3637,7 @@ class FlightLog extends DataClass implements Insertable<FlightLog> {
     via,
     destination,
     updatedAt,
+    synced,
   );
   @override
   bool operator ==(Object other) =>
@@ -3475,7 +3651,8 @@ class FlightLog extends DataClass implements Insertable<FlightLog> {
           other.departure == this.departure &&
           other.via == this.via &&
           other.destination == this.destination &&
-          other.updatedAt == this.updatedAt);
+          other.updatedAt == this.updatedAt &&
+          other.synced == this.synced);
 }
 
 class FlightLogsCompanion extends UpdateCompanion<FlightLog> {
@@ -3488,6 +3665,7 @@ class FlightLogsCompanion extends UpdateCompanion<FlightLog> {
   final Value<String?> via;
   final Value<String?> destination;
   final Value<DateTime> updatedAt;
+  final Value<bool> synced;
   const FlightLogsCompanion({
     this.id = const Value.absent(),
     this.visitId = const Value.absent(),
@@ -3498,6 +3676,7 @@ class FlightLogsCompanion extends UpdateCompanion<FlightLog> {
     this.via = const Value.absent(),
     this.destination = const Value.absent(),
     this.updatedAt = const Value.absent(),
+    this.synced = const Value.absent(),
   });
   FlightLogsCompanion.insert({
     this.id = const Value.absent(),
@@ -3509,6 +3688,7 @@ class FlightLogsCompanion extends UpdateCompanion<FlightLog> {
     this.via = const Value.absent(),
     this.destination = const Value.absent(),
     this.updatedAt = const Value.absent(),
+    this.synced = const Value.absent(),
   }) : visitId = Value(visitId);
   static Insertable<FlightLog> custom({
     Expression<int>? id,
@@ -3520,6 +3700,7 @@ class FlightLogsCompanion extends UpdateCompanion<FlightLog> {
     Expression<String>? via,
     Expression<String>? destination,
     Expression<DateTime>? updatedAt,
+    Expression<bool>? synced,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -3531,6 +3712,7 @@ class FlightLogsCompanion extends UpdateCompanion<FlightLog> {
       if (via != null) 'via': via,
       if (destination != null) 'destination': destination,
       if (updatedAt != null) 'updated_at': updatedAt,
+      if (synced != null) 'synced': synced,
     });
   }
 
@@ -3544,6 +3726,7 @@ class FlightLogsCompanion extends UpdateCompanion<FlightLog> {
     Value<String?>? via,
     Value<String?>? destination,
     Value<DateTime>? updatedAt,
+    Value<bool>? synced,
   }) {
     return FlightLogsCompanion(
       id: id ?? this.id,
@@ -3555,6 +3738,7 @@ class FlightLogsCompanion extends UpdateCompanion<FlightLog> {
       via: via ?? this.via,
       destination: destination ?? this.destination,
       updatedAt: updatedAt ?? this.updatedAt,
+      synced: synced ?? this.synced,
     );
   }
 
@@ -3588,6 +3772,9 @@ class FlightLogsCompanion extends UpdateCompanion<FlightLog> {
     if (updatedAt.present) {
       map['updated_at'] = Variable<DateTime>(updatedAt.value);
     }
+    if (synced.present) {
+      map['synced'] = Variable<bool>(synced.value);
+    }
     return map;
   }
 
@@ -3602,7 +3789,8 @@ class FlightLogsCompanion extends UpdateCompanion<FlightLog> {
           ..write('departure: $departure, ')
           ..write('via: $via, ')
           ..write('destination: $destination, ')
-          ..write('updatedAt: $updatedAt')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('synced: $synced')
           ..write(')'))
         .toString();
   }
@@ -4532,6 +4720,19 @@ class $TreatmentsTable extends Treatments
     requiredDuringInsert: false,
     defaultValue: currentDateAndTime,
   );
+  static const VerificationMeta _syncedMeta = const VerificationMeta('synced');
+  @override
+  late final GeneratedColumn<bool> synced = GeneratedColumn<bool>(
+    'synced',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("synced" IN (0, 1))',
+    ),
+    defaultValue: Constant(false),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -4614,6 +4815,7 @@ class $TreatmentsTable extends Treatments
     otherSpecialNote,
     createdAt,
     updatedAt,
+    synced,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -5295,6 +5497,12 @@ class $TreatmentsTable extends Treatments
         updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
       );
     }
+    if (data.containsKey('synced')) {
+      context.handle(
+        _syncedMeta,
+        synced.isAcceptableOrUnknown(data['synced']!, _syncedMeta),
+      );
+    }
     return context;
   }
 
@@ -5624,6 +5832,10 @@ class $TreatmentsTable extends Treatments
         DriftSqlType.dateTime,
         data['${effectivePrefix}updated_at'],
       )!,
+      synced: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}synced'],
+      )!,
     );
   }
 
@@ -5714,6 +5926,7 @@ class Treatment extends DataClass implements Insertable<Treatment> {
   final String? otherSpecialNote;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final bool synced;
   const Treatment({
     required this.id,
     required this.visitId,
@@ -5795,6 +6008,7 @@ class Treatment extends DataClass implements Insertable<Treatment> {
     this.otherSpecialNote,
     required this.createdAt,
     required this.updatedAt,
+    required this.synced,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -6023,6 +6237,7 @@ class Treatment extends DataClass implements Insertable<Treatment> {
     }
     map['created_at'] = Variable<DateTime>(createdAt);
     map['updated_at'] = Variable<DateTime>(updatedAt);
+    map['synced'] = Variable<bool>(synced);
     return map;
   }
 
@@ -6236,6 +6451,7 @@ class Treatment extends DataClass implements Insertable<Treatment> {
           : Value(otherSpecialNote),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
+      synced: Value(synced),
     );
   }
 
@@ -6381,6 +6597,7 @@ class Treatment extends DataClass implements Insertable<Treatment> {
       otherSpecialNote: serializer.fromJson<String?>(json['otherSpecialNote']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      synced: serializer.fromJson<bool>(json['synced']),
     );
   }
   @override
@@ -6485,6 +6702,7 @@ class Treatment extends DataClass implements Insertable<Treatment> {
       'otherSpecialNote': serializer.toJson<String?>(otherSpecialNote),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'synced': serializer.toJson<bool>(synced),
     };
   }
 
@@ -6569,6 +6787,7 @@ class Treatment extends DataClass implements Insertable<Treatment> {
     Value<String?> otherSpecialNote = const Value.absent(),
     DateTime? createdAt,
     DateTime? updatedAt,
+    bool? synced,
   }) => Treatment(
     id: id ?? this.id,
     visitId: visitId ?? this.visitId,
@@ -6741,6 +6960,7 @@ class Treatment extends DataClass implements Insertable<Treatment> {
         : this.otherSpecialNote,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
+    synced: synced ?? this.synced,
   );
   Treatment copyWithCompanion(TreatmentsCompanion data) {
     return Treatment(
@@ -6962,6 +7182,7 @@ class Treatment extends DataClass implements Insertable<Treatment> {
           : this.otherSpecialNote,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      synced: data.synced.present ? data.synced.value : this.synced,
     );
   }
 
@@ -7049,7 +7270,8 @@ class Treatment extends DataClass implements Insertable<Treatment> {
           ..write('specialNotesJson: $specialNotesJson, ')
           ..write('otherSpecialNote: $otherSpecialNote, ')
           ..write('createdAt: $createdAt, ')
-          ..write('updatedAt: $updatedAt')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('synced: $synced')
           ..write(')'))
         .toString();
   }
@@ -7136,6 +7358,7 @@ class Treatment extends DataClass implements Insertable<Treatment> {
     otherSpecialNote,
     createdAt,
     updatedAt,
+    synced,
   ]);
   @override
   bool operator ==(Object other) =>
@@ -7222,7 +7445,8 @@ class Treatment extends DataClass implements Insertable<Treatment> {
           other.specialNotesJson == this.specialNotesJson &&
           other.otherSpecialNote == this.otherSpecialNote &&
           other.createdAt == this.createdAt &&
-          other.updatedAt == this.updatedAt);
+          other.updatedAt == this.updatedAt &&
+          other.synced == this.synced);
 }
 
 class TreatmentsCompanion extends UpdateCompanion<Treatment> {
@@ -7306,6 +7530,7 @@ class TreatmentsCompanion extends UpdateCompanion<Treatment> {
   final Value<String?> otherSpecialNote;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
+  final Value<bool> synced;
   const TreatmentsCompanion({
     this.id = const Value.absent(),
     this.visitId = const Value.absent(),
@@ -7387,6 +7612,7 @@ class TreatmentsCompanion extends UpdateCompanion<Treatment> {
     this.otherSpecialNote = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
+    this.synced = const Value.absent(),
   });
   TreatmentsCompanion.insert({
     this.id = const Value.absent(),
@@ -7469,6 +7695,7 @@ class TreatmentsCompanion extends UpdateCompanion<Treatment> {
     this.otherSpecialNote = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
+    this.synced = const Value.absent(),
   }) : visitId = Value(visitId);
   static Insertable<Treatment> custom({
     Expression<int>? id,
@@ -7551,6 +7778,7 @@ class TreatmentsCompanion extends UpdateCompanion<Treatment> {
     Expression<String>? otherSpecialNote,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
+    Expression<bool>? synced,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -7657,6 +7885,7 @@ class TreatmentsCompanion extends UpdateCompanion<Treatment> {
       if (otherSpecialNote != null) 'other_special_note': otherSpecialNote,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
+      if (synced != null) 'synced': synced,
     });
   }
 
@@ -7741,6 +7970,7 @@ class TreatmentsCompanion extends UpdateCompanion<Treatment> {
     Value<String?>? otherSpecialNote,
     Value<DateTime>? createdAt,
     Value<DateTime>? updatedAt,
+    Value<bool>? synced,
   }) {
     return TreatmentsCompanion(
       id: id ?? this.id,
@@ -7833,6 +8063,7 @@ class TreatmentsCompanion extends UpdateCompanion<Treatment> {
       otherSpecialNote: otherSpecialNote ?? this.otherSpecialNote,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      synced: synced ?? this.synced,
     );
   }
 
@@ -8115,6 +8346,9 @@ class TreatmentsCompanion extends UpdateCompanion<Treatment> {
     if (updatedAt.present) {
       map['updated_at'] = Variable<DateTime>(updatedAt.value);
     }
+    if (synced.present) {
+      map['synced'] = Variable<bool>(synced.value);
+    }
     return map;
   }
 
@@ -8202,7 +8436,8 @@ class TreatmentsCompanion extends UpdateCompanion<Treatment> {
           ..write('specialNotesJson: $specialNotesJson, ')
           ..write('otherSpecialNote: $otherSpecialNote, ')
           ..write('createdAt: $createdAt, ')
-          ..write('updatedAt: $updatedAt')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('synced: $synced')
           ..write(')'))
         .toString();
   }
@@ -8451,6 +8686,19 @@ class $MedicalCostsTable extends MedicalCosts
     requiredDuringInsert: false,
     defaultValue: currentDateAndTime,
   );
+  static const VerificationMeta _syncedMeta = const VerificationMeta('synced');
+  @override
+  late final GeneratedColumn<bool> synced = GeneratedColumn<bool>(
+    'synced',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("synced" IN (0, 1))',
+    ),
+    defaultValue: Constant(false),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -8474,6 +8722,7 @@ class $MedicalCostsTable extends MedicalCosts
     billingErrorReason,
     createdAt,
     updatedAt,
+    synced,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -8654,6 +8903,12 @@ class $MedicalCostsTable extends MedicalCosts
         updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
       );
     }
+    if (data.containsKey('synced')) {
+      context.handle(
+        _syncedMeta,
+        synced.isAcceptableOrUnknown(data['synced']!, _syncedMeta),
+      );
+    }
     return context;
   }
 
@@ -8747,6 +9002,10 @@ class $MedicalCostsTable extends MedicalCosts
         DriftSqlType.dateTime,
         data['${effectivePrefix}updated_at'],
       )!,
+      synced: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}synced'],
+      )!,
     );
   }
 
@@ -8778,6 +9037,7 @@ class MedicalCost extends DataClass implements Insertable<MedicalCost> {
   final String? billingErrorReason;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final bool synced;
   const MedicalCost({
     required this.id,
     required this.visitId,
@@ -8800,6 +9060,7 @@ class MedicalCost extends DataClass implements Insertable<MedicalCost> {
     this.billingErrorReason,
     required this.createdAt,
     required this.updatedAt,
+    required this.synced,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -8863,6 +9124,7 @@ class MedicalCost extends DataClass implements Insertable<MedicalCost> {
     }
     map['created_at'] = Variable<DateTime>(createdAt);
     map['updated_at'] = Variable<DateTime>(updatedAt);
+    map['synced'] = Variable<bool>(synced);
     return map;
   }
 
@@ -8922,6 +9184,7 @@ class MedicalCost extends DataClass implements Insertable<MedicalCost> {
           : Value(billingErrorReason),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
+      synced: Value(synced),
     );
   }
 
@@ -8964,6 +9227,7 @@ class MedicalCost extends DataClass implements Insertable<MedicalCost> {
       ),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      synced: serializer.fromJson<bool>(json['synced']),
     );
   }
   @override
@@ -8997,6 +9261,7 @@ class MedicalCost extends DataClass implements Insertable<MedicalCost> {
       'billingErrorReason': serializer.toJson<String?>(billingErrorReason),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'synced': serializer.toJson<bool>(synced),
     };
   }
 
@@ -9022,6 +9287,7 @@ class MedicalCost extends DataClass implements Insertable<MedicalCost> {
     Value<String?> billingErrorReason = const Value.absent(),
     DateTime? createdAt,
     DateTime? updatedAt,
+    bool? synced,
   }) => MedicalCost(
     id: id ?? this.id,
     visitId: visitId ?? this.visitId,
@@ -9066,6 +9332,7 @@ class MedicalCost extends DataClass implements Insertable<MedicalCost> {
         : this.billingErrorReason,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
+    synced: synced ?? this.synced,
   );
   MedicalCost copyWithCompanion(MedicalCostsCompanion data) {
     return MedicalCost(
@@ -9118,6 +9385,7 @@ class MedicalCost extends DataClass implements Insertable<MedicalCost> {
           : this.billingErrorReason,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      synced: data.synced.present ? data.synced.value : this.synced,
     );
   }
 
@@ -9144,7 +9412,8 @@ class MedicalCost extends DataClass implements Insertable<MedicalCost> {
           ..write('receiptIssuedAndTransferred: $receiptIssuedAndTransferred, ')
           ..write('billingErrorReason: $billingErrorReason, ')
           ..write('createdAt: $createdAt, ')
-          ..write('updatedAt: $updatedAt')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('synced: $synced')
           ..write(')'))
         .toString();
   }
@@ -9172,6 +9441,7 @@ class MedicalCost extends DataClass implements Insertable<MedicalCost> {
     billingErrorReason,
     createdAt,
     updatedAt,
+    synced,
   ]);
   @override
   bool operator ==(Object other) =>
@@ -9198,7 +9468,8 @@ class MedicalCost extends DataClass implements Insertable<MedicalCost> {
               this.receiptIssuedAndTransferred &&
           other.billingErrorReason == this.billingErrorReason &&
           other.createdAt == this.createdAt &&
-          other.updatedAt == this.updatedAt);
+          other.updatedAt == this.updatedAt &&
+          other.synced == this.synced);
 }
 
 class MedicalCostsCompanion extends UpdateCompanion<MedicalCost> {
@@ -9223,6 +9494,7 @@ class MedicalCostsCompanion extends UpdateCompanion<MedicalCost> {
   final Value<String?> billingErrorReason;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
+  final Value<bool> synced;
   const MedicalCostsCompanion({
     this.id = const Value.absent(),
     this.visitId = const Value.absent(),
@@ -9245,6 +9517,7 @@ class MedicalCostsCompanion extends UpdateCompanion<MedicalCost> {
     this.billingErrorReason = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
+    this.synced = const Value.absent(),
   });
   MedicalCostsCompanion.insert({
     this.id = const Value.absent(),
@@ -9268,6 +9541,7 @@ class MedicalCostsCompanion extends UpdateCompanion<MedicalCost> {
     this.billingErrorReason = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
+    this.synced = const Value.absent(),
   }) : visitId = Value(visitId);
   static Insertable<MedicalCost> custom({
     Expression<int>? id,
@@ -9291,6 +9565,7 @@ class MedicalCostsCompanion extends UpdateCompanion<MedicalCost> {
     Expression<String>? billingErrorReason,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
+    Expression<bool>? synced,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -9320,6 +9595,7 @@ class MedicalCostsCompanion extends UpdateCompanion<MedicalCost> {
         'billing_error_reason': billingErrorReason,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
+      if (synced != null) 'synced': synced,
     });
   }
 
@@ -9345,6 +9621,7 @@ class MedicalCostsCompanion extends UpdateCompanion<MedicalCost> {
     Value<String?>? billingErrorReason,
     Value<DateTime>? createdAt,
     Value<DateTime>? updatedAt,
+    Value<bool>? synced,
   }) {
     return MedicalCostsCompanion(
       id: id ?? this.id,
@@ -9371,6 +9648,7 @@ class MedicalCostsCompanion extends UpdateCompanion<MedicalCost> {
       billingErrorReason: billingErrorReason ?? this.billingErrorReason,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      synced: synced ?? this.synced,
     );
   }
 
@@ -9448,6 +9726,9 @@ class MedicalCostsCompanion extends UpdateCompanion<MedicalCost> {
     if (updatedAt.present) {
       map['updated_at'] = Variable<DateTime>(updatedAt.value);
     }
+    if (synced.present) {
+      map['synced'] = Variable<bool>(synced.value);
+    }
     return map;
   }
 
@@ -9474,7 +9755,8 @@ class MedicalCostsCompanion extends UpdateCompanion<MedicalCost> {
           ..write('receiptIssuedAndTransferred: $receiptIssuedAndTransferred, ')
           ..write('billingErrorReason: $billingErrorReason, ')
           ..write('createdAt: $createdAt, ')
-          ..write('updatedAt: $updatedAt')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('synced: $synced')
           ..write(')'))
         .toString();
   }
@@ -9590,6 +9872,19 @@ class $MedicalCertificatesTable extends MedicalCertificates
     requiredDuringInsert: false,
     defaultValue: currentDateAndTime,
   );
+  static const VerificationMeta _syncedMeta = const VerificationMeta('synced');
+  @override
+  late final GeneratedColumn<bool> synced = GeneratedColumn<bool>(
+    'synced',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("synced" IN (0, 1))',
+    ),
+    defaultValue: Constant(false),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -9601,6 +9896,7 @@ class $MedicalCertificatesTable extends MedicalCertificates
     issueDate,
     createdAt,
     updatedAt,
+    synced,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -9676,6 +9972,12 @@ class $MedicalCertificatesTable extends MedicalCertificates
         updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
       );
     }
+    if (data.containsKey('synced')) {
+      context.handle(
+        _syncedMeta,
+        synced.isAcceptableOrUnknown(data['synced']!, _syncedMeta),
+      );
+    }
     return context;
   }
 
@@ -9721,6 +10023,10 @@ class $MedicalCertificatesTable extends MedicalCertificates
         DriftSqlType.dateTime,
         data['${effectivePrefix}updated_at'],
       )!,
+      synced: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}synced'],
+      )!,
     );
   }
 
@@ -9741,6 +10047,7 @@ class MedicalCertificate extends DataClass
   final DateTime? issueDate;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final bool synced;
   const MedicalCertificate({
     required this.id,
     required this.visitId,
@@ -9751,6 +10058,7 @@ class MedicalCertificate extends DataClass
     this.issueDate,
     required this.createdAt,
     required this.updatedAt,
+    required this.synced,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -9774,6 +10082,7 @@ class MedicalCertificate extends DataClass
     }
     map['created_at'] = Variable<DateTime>(createdAt);
     map['updated_at'] = Variable<DateTime>(updatedAt);
+    map['synced'] = Variable<bool>(synced);
     return map;
   }
 
@@ -9798,6 +10107,7 @@ class MedicalCertificate extends DataClass
           : Value(issueDate),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
+      synced: Value(synced),
     );
   }
 
@@ -9820,6 +10130,7 @@ class MedicalCertificate extends DataClass
       issueDate: serializer.fromJson<DateTime?>(json['issueDate']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      synced: serializer.fromJson<bool>(json['synced']),
     );
   }
   @override
@@ -9835,6 +10146,7 @@ class MedicalCertificate extends DataClass
       'issueDate': serializer.toJson<DateTime?>(issueDate),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'synced': serializer.toJson<bool>(synced),
     };
   }
 
@@ -9848,6 +10160,7 @@ class MedicalCertificate extends DataClass
     Value<DateTime?> issueDate = const Value.absent(),
     DateTime? createdAt,
     DateTime? updatedAt,
+    bool? synced,
   }) => MedicalCertificate(
     id: id ?? this.id,
     visitId: visitId ?? this.visitId,
@@ -9864,6 +10177,7 @@ class MedicalCertificate extends DataClass
     issueDate: issueDate.present ? issueDate.value : this.issueDate,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
+    synced: synced ?? this.synced,
   );
   MedicalCertificate copyWithCompanion(MedicalCertificatesCompanion data) {
     return MedicalCertificate(
@@ -9882,6 +10196,7 @@ class MedicalCertificate extends DataClass
       issueDate: data.issueDate.present ? data.issueDate.value : this.issueDate,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      synced: data.synced.present ? data.synced.value : this.synced,
     );
   }
 
@@ -9896,7 +10211,8 @@ class MedicalCertificate extends DataClass
           ..write('englishInstruction: $englishInstruction, ')
           ..write('issueDate: $issueDate, ')
           ..write('createdAt: $createdAt, ')
-          ..write('updatedAt: $updatedAt')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('synced: $synced')
           ..write(')'))
         .toString();
   }
@@ -9912,6 +10228,7 @@ class MedicalCertificate extends DataClass
     issueDate,
     createdAt,
     updatedAt,
+    synced,
   );
   @override
   bool operator ==(Object other) =>
@@ -9925,7 +10242,8 @@ class MedicalCertificate extends DataClass
           other.englishInstruction == this.englishInstruction &&
           other.issueDate == this.issueDate &&
           other.createdAt == this.createdAt &&
-          other.updatedAt == this.updatedAt);
+          other.updatedAt == this.updatedAt &&
+          other.synced == this.synced);
 }
 
 class MedicalCertificatesCompanion extends UpdateCompanion<MedicalCertificate> {
@@ -9938,6 +10256,7 @@ class MedicalCertificatesCompanion extends UpdateCompanion<MedicalCertificate> {
   final Value<DateTime?> issueDate;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
+  final Value<bool> synced;
   const MedicalCertificatesCompanion({
     this.id = const Value.absent(),
     this.visitId = const Value.absent(),
@@ -9948,6 +10267,7 @@ class MedicalCertificatesCompanion extends UpdateCompanion<MedicalCertificate> {
     this.issueDate = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
+    this.synced = const Value.absent(),
   });
   MedicalCertificatesCompanion.insert({
     this.id = const Value.absent(),
@@ -9959,6 +10279,7 @@ class MedicalCertificatesCompanion extends UpdateCompanion<MedicalCertificate> {
     this.issueDate = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
+    this.synced = const Value.absent(),
   }) : visitId = Value(visitId);
   static Insertable<MedicalCertificate> custom({
     Expression<int>? id,
@@ -9970,6 +10291,7 @@ class MedicalCertificatesCompanion extends UpdateCompanion<MedicalCertificate> {
     Expression<DateTime>? issueDate,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
+    Expression<bool>? synced,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -9981,6 +10303,7 @@ class MedicalCertificatesCompanion extends UpdateCompanion<MedicalCertificate> {
       if (issueDate != null) 'issue_date': issueDate,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
+      if (synced != null) 'synced': synced,
     });
   }
 
@@ -9994,6 +10317,7 @@ class MedicalCertificatesCompanion extends UpdateCompanion<MedicalCertificate> {
     Value<DateTime?>? issueDate,
     Value<DateTime>? createdAt,
     Value<DateTime>? updatedAt,
+    Value<bool>? synced,
   }) {
     return MedicalCertificatesCompanion(
       id: id ?? this.id,
@@ -10005,6 +10329,7 @@ class MedicalCertificatesCompanion extends UpdateCompanion<MedicalCertificate> {
       issueDate: issueDate ?? this.issueDate,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      synced: synced ?? this.synced,
     );
   }
 
@@ -10038,6 +10363,9 @@ class MedicalCertificatesCompanion extends UpdateCompanion<MedicalCertificate> {
     if (updatedAt.present) {
       map['updated_at'] = Variable<DateTime>(updatedAt.value);
     }
+    if (synced.present) {
+      map['synced'] = Variable<bool>(synced.value);
+    }
     return map;
   }
 
@@ -10052,7 +10380,8 @@ class MedicalCertificatesCompanion extends UpdateCompanion<MedicalCertificate> {
           ..write('englishInstruction: $englishInstruction, ')
           ..write('issueDate: $issueDate, ')
           ..write('createdAt: $createdAt, ')
-          ..write('updatedAt: $updatedAt')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('synced: $synced')
           ..write(')'))
         .toString();
   }
@@ -10200,6 +10529,19 @@ class $UndertakingsTable extends Undertakings
     requiredDuringInsert: false,
     defaultValue: currentDateAndTime,
   );
+  static const VerificationMeta _syncedMeta = const VerificationMeta('synced');
+  @override
+  late final GeneratedColumn<bool> synced = GeneratedColumn<bool>(
+    'synced',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("synced" IN (0, 1))',
+    ),
+    defaultValue: Constant(false),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -10214,6 +10556,7 @@ class $UndertakingsTable extends Undertakings
     signatureBytes,
     createdAt,
     updatedAt,
+    synced,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -10301,6 +10644,12 @@ class $UndertakingsTable extends Undertakings
         updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
       );
     }
+    if (data.containsKey('synced')) {
+      context.handle(
+        _syncedMeta,
+        synced.isAcceptableOrUnknown(data['synced']!, _syncedMeta),
+      );
+    }
     return context;
   }
 
@@ -10358,6 +10707,10 @@ class $UndertakingsTable extends Undertakings
         DriftSqlType.dateTime,
         data['${effectivePrefix}updated_at'],
       )!,
+      synced: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}synced'],
+      )!,
     );
   }
 
@@ -10380,6 +10733,7 @@ class Undertaking extends DataClass implements Insertable<Undertaking> {
   final Uint8List? signatureBytes;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final bool synced;
   const Undertaking({
     required this.id,
     required this.visitId,
@@ -10393,6 +10747,7 @@ class Undertaking extends DataClass implements Insertable<Undertaking> {
     this.signatureBytes,
     required this.createdAt,
     required this.updatedAt,
+    required this.synced,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -10423,6 +10778,7 @@ class Undertaking extends DataClass implements Insertable<Undertaking> {
     }
     map['created_at'] = Variable<DateTime>(createdAt);
     map['updated_at'] = Variable<DateTime>(updatedAt);
+    map['synced'] = Variable<bool>(synced);
     return map;
   }
 
@@ -10454,6 +10810,7 @@ class Undertaking extends DataClass implements Insertable<Undertaking> {
           : Value(signatureBytes),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
+      synced: Value(synced),
     );
   }
 
@@ -10475,6 +10832,7 @@ class Undertaking extends DataClass implements Insertable<Undertaking> {
       signatureBytes: serializer.fromJson<Uint8List?>(json['signatureBytes']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      synced: serializer.fromJson<bool>(json['synced']),
     );
   }
   @override
@@ -10493,6 +10851,7 @@ class Undertaking extends DataClass implements Insertable<Undertaking> {
       'signatureBytes': serializer.toJson<Uint8List?>(signatureBytes),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'synced': serializer.toJson<bool>(synced),
     };
   }
 
@@ -10509,6 +10868,7 @@ class Undertaking extends DataClass implements Insertable<Undertaking> {
     Value<Uint8List?> signatureBytes = const Value.absent(),
     DateTime? createdAt,
     DateTime? updatedAt,
+    bool? synced,
   }) => Undertaking(
     id: id ?? this.id,
     visitId: visitId ?? this.visitId,
@@ -10524,6 +10884,7 @@ class Undertaking extends DataClass implements Insertable<Undertaking> {
         : this.signatureBytes,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
+    synced: synced ?? this.synced,
   );
   Undertaking copyWithCompanion(UndertakingsCompanion data) {
     return Undertaking(
@@ -10543,6 +10904,7 @@ class Undertaking extends DataClass implements Insertable<Undertaking> {
           : this.signatureBytes,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      synced: data.synced.present ? data.synced.value : this.synced,
     );
   }
 
@@ -10560,7 +10922,8 @@ class Undertaking extends DataClass implements Insertable<Undertaking> {
           ..write('doctor: $doctor, ')
           ..write('signatureBytes: $signatureBytes, ')
           ..write('createdAt: $createdAt, ')
-          ..write('updatedAt: $updatedAt')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('synced: $synced')
           ..write(')'))
         .toString();
   }
@@ -10579,6 +10942,7 @@ class Undertaking extends DataClass implements Insertable<Undertaking> {
     $driftBlobEquality.hash(signatureBytes),
     createdAt,
     updatedAt,
+    synced,
   );
   @override
   bool operator ==(Object other) =>
@@ -10598,7 +10962,8 @@ class Undertaking extends DataClass implements Insertable<Undertaking> {
             this.signatureBytes,
           ) &&
           other.createdAt == this.createdAt &&
-          other.updatedAt == this.updatedAt);
+          other.updatedAt == this.updatedAt &&
+          other.synced == this.synced);
 }
 
 class UndertakingsCompanion extends UpdateCompanion<Undertaking> {
@@ -10614,6 +10979,7 @@ class UndertakingsCompanion extends UpdateCompanion<Undertaking> {
   final Value<Uint8List?> signatureBytes;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
+  final Value<bool> synced;
   const UndertakingsCompanion({
     this.id = const Value.absent(),
     this.visitId = const Value.absent(),
@@ -10627,6 +10993,7 @@ class UndertakingsCompanion extends UpdateCompanion<Undertaking> {
     this.signatureBytes = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
+    this.synced = const Value.absent(),
   });
   UndertakingsCompanion.insert({
     this.id = const Value.absent(),
@@ -10641,6 +11008,7 @@ class UndertakingsCompanion extends UpdateCompanion<Undertaking> {
     this.signatureBytes = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
+    this.synced = const Value.absent(),
   }) : visitId = Value(visitId);
   static Insertable<Undertaking> custom({
     Expression<int>? id,
@@ -10655,6 +11023,7 @@ class UndertakingsCompanion extends UpdateCompanion<Undertaking> {
     Expression<Uint8List>? signatureBytes,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
+    Expression<bool>? synced,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -10669,6 +11038,7 @@ class UndertakingsCompanion extends UpdateCompanion<Undertaking> {
       if (signatureBytes != null) 'signature_bytes': signatureBytes,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
+      if (synced != null) 'synced': synced,
     });
   }
 
@@ -10685,6 +11055,7 @@ class UndertakingsCompanion extends UpdateCompanion<Undertaking> {
     Value<Uint8List?>? signatureBytes,
     Value<DateTime>? createdAt,
     Value<DateTime>? updatedAt,
+    Value<bool>? synced,
   }) {
     return UndertakingsCompanion(
       id: id ?? this.id,
@@ -10699,6 +11070,7 @@ class UndertakingsCompanion extends UpdateCompanion<Undertaking> {
       signatureBytes: signatureBytes ?? this.signatureBytes,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      synced: synced ?? this.synced,
     );
   }
 
@@ -10741,6 +11113,9 @@ class UndertakingsCompanion extends UpdateCompanion<Undertaking> {
     if (updatedAt.present) {
       map['updated_at'] = Variable<DateTime>(updatedAt.value);
     }
+    if (synced.present) {
+      map['synced'] = Variable<bool>(synced.value);
+    }
     return map;
   }
 
@@ -10758,7 +11133,8 @@ class UndertakingsCompanion extends UpdateCompanion<Undertaking> {
           ..write('doctor: $doctor, ')
           ..write('signatureBytes: $signatureBytes, ')
           ..write('createdAt: $createdAt, ')
-          ..write('updatedAt: $updatedAt')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('synced: $synced')
           ..write(')'))
         .toString();
   }
@@ -10841,6 +11217,19 @@ class $ElectronicDocumentsTable extends ElectronicDocuments
     requiredDuringInsert: false,
     defaultValue: currentDateAndTime,
   );
+  static const VerificationMeta _syncedMeta = const VerificationMeta('synced');
+  @override
+  late final GeneratedColumn<bool> synced = GeneratedColumn<bool>(
+    'synced',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("synced" IN (0, 1))',
+    ),
+    defaultValue: Constant(false),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -10849,6 +11238,7 @@ class $ElectronicDocumentsTable extends ElectronicDocuments
     fromSelectedIndex,
     createdAt,
     updatedAt,
+    synced,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -10903,6 +11293,12 @@ class $ElectronicDocumentsTable extends ElectronicDocuments
         updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
       );
     }
+    if (data.containsKey('synced')) {
+      context.handle(
+        _syncedMeta,
+        synced.isAcceptableOrUnknown(data['synced']!, _syncedMeta),
+      );
+    }
     return context;
   }
 
@@ -10936,6 +11332,10 @@ class $ElectronicDocumentsTable extends ElectronicDocuments
         DriftSqlType.dateTime,
         data['${effectivePrefix}updated_at'],
       )!,
+      synced: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}synced'],
+      )!,
     );
   }
 
@@ -10953,6 +11353,7 @@ class ElectronicDocument extends DataClass
   final int? fromSelectedIndex;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final bool synced;
   const ElectronicDocument({
     required this.id,
     required this.visitId,
@@ -10960,6 +11361,7 @@ class ElectronicDocument extends DataClass
     this.fromSelectedIndex,
     required this.createdAt,
     required this.updatedAt,
+    required this.synced,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -10974,6 +11376,7 @@ class ElectronicDocument extends DataClass
     }
     map['created_at'] = Variable<DateTime>(createdAt);
     map['updated_at'] = Variable<DateTime>(updatedAt);
+    map['synced'] = Variable<bool>(synced);
     return map;
   }
 
@@ -10989,6 +11392,7 @@ class ElectronicDocument extends DataClass
           : Value(fromSelectedIndex),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
+      synced: Value(synced),
     );
   }
 
@@ -11004,6 +11408,7 @@ class ElectronicDocument extends DataClass
       fromSelectedIndex: serializer.fromJson<int?>(json['fromSelectedIndex']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      synced: serializer.fromJson<bool>(json['synced']),
     );
   }
   @override
@@ -11016,6 +11421,7 @@ class ElectronicDocument extends DataClass
       'fromSelectedIndex': serializer.toJson<int?>(fromSelectedIndex),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'synced': serializer.toJson<bool>(synced),
     };
   }
 
@@ -11026,6 +11432,7 @@ class ElectronicDocument extends DataClass
     Value<int?> fromSelectedIndex = const Value.absent(),
     DateTime? createdAt,
     DateTime? updatedAt,
+    bool? synced,
   }) => ElectronicDocument(
     id: id ?? this.id,
     visitId: visitId ?? this.visitId,
@@ -11037,6 +11444,7 @@ class ElectronicDocument extends DataClass
         : this.fromSelectedIndex,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
+    synced: synced ?? this.synced,
   );
   ElectronicDocument copyWithCompanion(ElectronicDocumentsCompanion data) {
     return ElectronicDocument(
@@ -11050,6 +11458,7 @@ class ElectronicDocument extends DataClass
           : this.fromSelectedIndex,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      synced: data.synced.present ? data.synced.value : this.synced,
     );
   }
 
@@ -11061,7 +11470,8 @@ class ElectronicDocument extends DataClass
           ..write('toSelectedIndex: $toSelectedIndex, ')
           ..write('fromSelectedIndex: $fromSelectedIndex, ')
           ..write('createdAt: $createdAt, ')
-          ..write('updatedAt: $updatedAt')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('synced: $synced')
           ..write(')'))
         .toString();
   }
@@ -11074,6 +11484,7 @@ class ElectronicDocument extends DataClass
     fromSelectedIndex,
     createdAt,
     updatedAt,
+    synced,
   );
   @override
   bool operator ==(Object other) =>
@@ -11084,7 +11495,8 @@ class ElectronicDocument extends DataClass
           other.toSelectedIndex == this.toSelectedIndex &&
           other.fromSelectedIndex == this.fromSelectedIndex &&
           other.createdAt == this.createdAt &&
-          other.updatedAt == this.updatedAt);
+          other.updatedAt == this.updatedAt &&
+          other.synced == this.synced);
 }
 
 class ElectronicDocumentsCompanion extends UpdateCompanion<ElectronicDocument> {
@@ -11094,6 +11506,7 @@ class ElectronicDocumentsCompanion extends UpdateCompanion<ElectronicDocument> {
   final Value<int?> fromSelectedIndex;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
+  final Value<bool> synced;
   const ElectronicDocumentsCompanion({
     this.id = const Value.absent(),
     this.visitId = const Value.absent(),
@@ -11101,6 +11514,7 @@ class ElectronicDocumentsCompanion extends UpdateCompanion<ElectronicDocument> {
     this.fromSelectedIndex = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
+    this.synced = const Value.absent(),
   });
   ElectronicDocumentsCompanion.insert({
     this.id = const Value.absent(),
@@ -11109,6 +11523,7 @@ class ElectronicDocumentsCompanion extends UpdateCompanion<ElectronicDocument> {
     this.fromSelectedIndex = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
+    this.synced = const Value.absent(),
   }) : visitId = Value(visitId);
   static Insertable<ElectronicDocument> custom({
     Expression<int>? id,
@@ -11117,6 +11532,7 @@ class ElectronicDocumentsCompanion extends UpdateCompanion<ElectronicDocument> {
     Expression<int>? fromSelectedIndex,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
+    Expression<bool>? synced,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -11125,6 +11541,7 @@ class ElectronicDocumentsCompanion extends UpdateCompanion<ElectronicDocument> {
       if (fromSelectedIndex != null) 'from_selected_index': fromSelectedIndex,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
+      if (synced != null) 'synced': synced,
     });
   }
 
@@ -11135,6 +11552,7 @@ class ElectronicDocumentsCompanion extends UpdateCompanion<ElectronicDocument> {
     Value<int?>? fromSelectedIndex,
     Value<DateTime>? createdAt,
     Value<DateTime>? updatedAt,
+    Value<bool>? synced,
   }) {
     return ElectronicDocumentsCompanion(
       id: id ?? this.id,
@@ -11143,6 +11561,7 @@ class ElectronicDocumentsCompanion extends UpdateCompanion<ElectronicDocument> {
       fromSelectedIndex: fromSelectedIndex ?? this.fromSelectedIndex,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      synced: synced ?? this.synced,
     );
   }
 
@@ -11167,6 +11586,9 @@ class ElectronicDocumentsCompanion extends UpdateCompanion<ElectronicDocument> {
     if (updatedAt.present) {
       map['updated_at'] = Variable<DateTime>(updatedAt.value);
     }
+    if (synced.present) {
+      map['synced'] = Variable<bool>(synced.value);
+    }
     return map;
   }
 
@@ -11178,7 +11600,8 @@ class ElectronicDocumentsCompanion extends UpdateCompanion<ElectronicDocument> {
           ..write('toSelectedIndex: $toSelectedIndex, ')
           ..write('fromSelectedIndex: $fromSelectedIndex, ')
           ..write('createdAt: $createdAt, ')
-          ..write('updatedAt: $updatedAt')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('synced: $synced')
           ..write(')'))
         .toString();
   }
@@ -11250,6 +11673,19 @@ class $NursingRecordsTable extends NursingRecords
     requiredDuringInsert: false,
     defaultValue: currentDateAndTime,
   );
+  static const VerificationMeta _syncedMeta = const VerificationMeta('synced');
+  @override
+  late final GeneratedColumn<bool> synced = GeneratedColumn<bool>(
+    'synced',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("synced" IN (0, 1))',
+    ),
+    defaultValue: Constant(false),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -11257,6 +11693,7 @@ class $NursingRecordsTable extends NursingRecords
     recordsJson,
     createdAt,
     updatedAt,
+    synced,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -11302,6 +11739,12 @@ class $NursingRecordsTable extends NursingRecords
         updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
       );
     }
+    if (data.containsKey('synced')) {
+      context.handle(
+        _syncedMeta,
+        synced.isAcceptableOrUnknown(data['synced']!, _syncedMeta),
+      );
+    }
     return context;
   }
 
@@ -11331,6 +11774,10 @@ class $NursingRecordsTable extends NursingRecords
         DriftSqlType.dateTime,
         data['${effectivePrefix}updated_at'],
       )!,
+      synced: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}synced'],
+      )!,
     );
   }
 
@@ -11346,12 +11793,14 @@ class NursingRecord extends DataClass implements Insertable<NursingRecord> {
   final String? recordsJson;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final bool synced;
   const NursingRecord({
     required this.id,
     required this.visitId,
     this.recordsJson,
     required this.createdAt,
     required this.updatedAt,
+    required this.synced,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -11363,6 +11812,7 @@ class NursingRecord extends DataClass implements Insertable<NursingRecord> {
     }
     map['created_at'] = Variable<DateTime>(createdAt);
     map['updated_at'] = Variable<DateTime>(updatedAt);
+    map['synced'] = Variable<bool>(synced);
     return map;
   }
 
@@ -11375,6 +11825,7 @@ class NursingRecord extends DataClass implements Insertable<NursingRecord> {
           : Value(recordsJson),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
+      synced: Value(synced),
     );
   }
 
@@ -11389,6 +11840,7 @@ class NursingRecord extends DataClass implements Insertable<NursingRecord> {
       recordsJson: serializer.fromJson<String?>(json['recordsJson']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      synced: serializer.fromJson<bool>(json['synced']),
     );
   }
   @override
@@ -11400,6 +11852,7 @@ class NursingRecord extends DataClass implements Insertable<NursingRecord> {
       'recordsJson': serializer.toJson<String?>(recordsJson),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'synced': serializer.toJson<bool>(synced),
     };
   }
 
@@ -11409,12 +11862,14 @@ class NursingRecord extends DataClass implements Insertable<NursingRecord> {
     Value<String?> recordsJson = const Value.absent(),
     DateTime? createdAt,
     DateTime? updatedAt,
+    bool? synced,
   }) => NursingRecord(
     id: id ?? this.id,
     visitId: visitId ?? this.visitId,
     recordsJson: recordsJson.present ? recordsJson.value : this.recordsJson,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
+    synced: synced ?? this.synced,
   );
   NursingRecord copyWithCompanion(NursingRecordsCompanion data) {
     return NursingRecord(
@@ -11425,6 +11880,7 @@ class NursingRecord extends DataClass implements Insertable<NursingRecord> {
           : this.recordsJson,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      synced: data.synced.present ? data.synced.value : this.synced,
     );
   }
 
@@ -11435,14 +11891,15 @@ class NursingRecord extends DataClass implements Insertable<NursingRecord> {
           ..write('visitId: $visitId, ')
           ..write('recordsJson: $recordsJson, ')
           ..write('createdAt: $createdAt, ')
-          ..write('updatedAt: $updatedAt')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('synced: $synced')
           ..write(')'))
         .toString();
   }
 
   @override
   int get hashCode =>
-      Object.hash(id, visitId, recordsJson, createdAt, updatedAt);
+      Object.hash(id, visitId, recordsJson, createdAt, updatedAt, synced);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -11451,7 +11908,8 @@ class NursingRecord extends DataClass implements Insertable<NursingRecord> {
           other.visitId == this.visitId &&
           other.recordsJson == this.recordsJson &&
           other.createdAt == this.createdAt &&
-          other.updatedAt == this.updatedAt);
+          other.updatedAt == this.updatedAt &&
+          other.synced == this.synced);
 }
 
 class NursingRecordsCompanion extends UpdateCompanion<NursingRecord> {
@@ -11460,12 +11918,14 @@ class NursingRecordsCompanion extends UpdateCompanion<NursingRecord> {
   final Value<String?> recordsJson;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
+  final Value<bool> synced;
   const NursingRecordsCompanion({
     this.id = const Value.absent(),
     this.visitId = const Value.absent(),
     this.recordsJson = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
+    this.synced = const Value.absent(),
   });
   NursingRecordsCompanion.insert({
     this.id = const Value.absent(),
@@ -11473,6 +11933,7 @@ class NursingRecordsCompanion extends UpdateCompanion<NursingRecord> {
     this.recordsJson = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
+    this.synced = const Value.absent(),
   }) : visitId = Value(visitId);
   static Insertable<NursingRecord> custom({
     Expression<int>? id,
@@ -11480,6 +11941,7 @@ class NursingRecordsCompanion extends UpdateCompanion<NursingRecord> {
     Expression<String>? recordsJson,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
+    Expression<bool>? synced,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -11487,6 +11949,7 @@ class NursingRecordsCompanion extends UpdateCompanion<NursingRecord> {
       if (recordsJson != null) 'records_json': recordsJson,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
+      if (synced != null) 'synced': synced,
     });
   }
 
@@ -11496,6 +11959,7 @@ class NursingRecordsCompanion extends UpdateCompanion<NursingRecord> {
     Value<String?>? recordsJson,
     Value<DateTime>? createdAt,
     Value<DateTime>? updatedAt,
+    Value<bool>? synced,
   }) {
     return NursingRecordsCompanion(
       id: id ?? this.id,
@@ -11503,6 +11967,7 @@ class NursingRecordsCompanion extends UpdateCompanion<NursingRecord> {
       recordsJson: recordsJson ?? this.recordsJson,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      synced: synced ?? this.synced,
     );
   }
 
@@ -11524,6 +11989,9 @@ class NursingRecordsCompanion extends UpdateCompanion<NursingRecord> {
     if (updatedAt.present) {
       map['updated_at'] = Variable<DateTime>(updatedAt.value);
     }
+    if (synced.present) {
+      map['synced'] = Variable<bool>(synced.value);
+    }
     return map;
   }
 
@@ -11534,7 +12002,8 @@ class NursingRecordsCompanion extends UpdateCompanion<NursingRecord> {
           ..write('visitId: $visitId, ')
           ..write('recordsJson: $recordsJson, ')
           ..write('createdAt: $createdAt, ')
-          ..write('updatedAt: $updatedAt')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('synced: $synced')
           ..write(')'))
         .toString();
   }
@@ -11943,6 +12412,19 @@ class $ReferralFormsTable extends ReferralForms
     requiredDuringInsert: false,
     defaultValue: currentDateAndTime,
   );
+  static const VerificationMeta _syncedMeta = const VerificationMeta('synced');
+  @override
+  late final GeneratedColumn<bool> synced = GeneratedColumn<bool>(
+    'synced',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("synced" IN (0, 1))',
+    ),
+    defaultValue: Constant(false),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -11980,6 +12462,7 @@ class $ReferralFormsTable extends ReferralForms
     consentDateTime,
     createdAt,
     updatedAt,
+    synced,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -12286,6 +12769,12 @@ class $ReferralFormsTable extends ReferralForms
         updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
       );
     }
+    if (data.containsKey('synced')) {
+      context.handle(
+        _syncedMeta,
+        synced.isAcceptableOrUnknown(data['synced']!, _syncedMeta),
+      );
+    }
     return context;
   }
 
@@ -12435,6 +12924,10 @@ class $ReferralFormsTable extends ReferralForms
         DriftSqlType.dateTime,
         data['${effectivePrefix}updated_at'],
       )!,
+      synced: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}synced'],
+      )!,
     );
   }
 
@@ -12480,6 +12973,7 @@ class ReferralForm extends DataClass implements Insertable<ReferralForm> {
   final DateTime? consentDateTime;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final bool synced;
   const ReferralForm({
     required this.id,
     required this.visitId,
@@ -12516,6 +13010,7 @@ class ReferralForm extends DataClass implements Insertable<ReferralForm> {
     this.consentDateTime,
     required this.createdAt,
     required this.updatedAt,
+    required this.synced,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -12617,6 +13112,7 @@ class ReferralForm extends DataClass implements Insertable<ReferralForm> {
     }
     map['created_at'] = Variable<DateTime>(createdAt);
     map['updated_at'] = Variable<DateTime>(updatedAt);
+    map['synced'] = Variable<bool>(synced);
     return map;
   }
 
@@ -12719,6 +13215,7 @@ class ReferralForm extends DataClass implements Insertable<ReferralForm> {
           : Value(consentDateTime),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
+      synced: Value(synced),
     );
   }
 
@@ -12781,6 +13278,7 @@ class ReferralForm extends DataClass implements Insertable<ReferralForm> {
       consentDateTime: serializer.fromJson<DateTime?>(json['consentDateTime']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      synced: serializer.fromJson<bool>(json['synced']),
     );
   }
   @override
@@ -12822,6 +13320,7 @@ class ReferralForm extends DataClass implements Insertable<ReferralForm> {
       'consentDateTime': serializer.toJson<DateTime?>(consentDateTime),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'synced': serializer.toJson<bool>(synced),
     };
   }
 
@@ -12861,6 +13360,7 @@ class ReferralForm extends DataClass implements Insertable<ReferralForm> {
     Value<DateTime?> consentDateTime = const Value.absent(),
     DateTime? createdAt,
     DateTime? updatedAt,
+    bool? synced,
   }) => ReferralForm(
     id: id ?? this.id,
     visitId: visitId ?? this.visitId,
@@ -12947,6 +13447,7 @@ class ReferralForm extends DataClass implements Insertable<ReferralForm> {
         : this.consentDateTime,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
+    synced: synced ?? this.synced,
   );
   ReferralForm copyWithCompanion(ReferralFormsCompanion data) {
     return ReferralForm(
@@ -13041,6 +13542,7 @@ class ReferralForm extends DataClass implements Insertable<ReferralForm> {
           : this.consentDateTime,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      synced: data.synced.present ? data.synced.value : this.synced,
     );
   }
 
@@ -13081,7 +13583,8 @@ class ReferralForm extends DataClass implements Insertable<ReferralForm> {
           ..write('relationToPatient: $relationToPatient, ')
           ..write('consentDateTime: $consentDateTime, ')
           ..write('createdAt: $createdAt, ')
-          ..write('updatedAt: $updatedAt')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('synced: $synced')
           ..write(')'))
         .toString();
   }
@@ -13123,6 +13626,7 @@ class ReferralForm extends DataClass implements Insertable<ReferralForm> {
     consentDateTime,
     createdAt,
     updatedAt,
+    synced,
   ]);
   @override
   bool operator ==(Object other) =>
@@ -13168,7 +13672,8 @@ class ReferralForm extends DataClass implements Insertable<ReferralForm> {
           other.relationToPatient == this.relationToPatient &&
           other.consentDateTime == this.consentDateTime &&
           other.createdAt == this.createdAt &&
-          other.updatedAt == this.updatedAt);
+          other.updatedAt == this.updatedAt &&
+          other.synced == this.synced);
 }
 
 class ReferralFormsCompanion extends UpdateCompanion<ReferralForm> {
@@ -13207,6 +13712,7 @@ class ReferralFormsCompanion extends UpdateCompanion<ReferralForm> {
   final Value<DateTime?> consentDateTime;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
+  final Value<bool> synced;
   const ReferralFormsCompanion({
     this.id = const Value.absent(),
     this.visitId = const Value.absent(),
@@ -13243,6 +13749,7 @@ class ReferralFormsCompanion extends UpdateCompanion<ReferralForm> {
     this.consentDateTime = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
+    this.synced = const Value.absent(),
   });
   ReferralFormsCompanion.insert({
     this.id = const Value.absent(),
@@ -13280,6 +13787,7 @@ class ReferralFormsCompanion extends UpdateCompanion<ReferralForm> {
     this.consentDateTime = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
+    this.synced = const Value.absent(),
   }) : visitId = Value(visitId);
   static Insertable<ReferralForm> custom({
     Expression<int>? id,
@@ -13317,6 +13825,7 @@ class ReferralFormsCompanion extends UpdateCompanion<ReferralForm> {
     Expression<DateTime>? consentDateTime,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
+    Expression<bool>? synced,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -13359,6 +13868,7 @@ class ReferralFormsCompanion extends UpdateCompanion<ReferralForm> {
       if (consentDateTime != null) 'consent_date_time': consentDateTime,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
+      if (synced != null) 'synced': synced,
     });
   }
 
@@ -13398,6 +13908,7 @@ class ReferralFormsCompanion extends UpdateCompanion<ReferralForm> {
     Value<DateTime?>? consentDateTime,
     Value<DateTime>? createdAt,
     Value<DateTime>? updatedAt,
+    Value<bool>? synced,
   }) {
     return ReferralFormsCompanion(
       id: id ?? this.id,
@@ -13435,6 +13946,7 @@ class ReferralFormsCompanion extends UpdateCompanion<ReferralForm> {
       consentDateTime: consentDateTime ?? this.consentDateTime,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      synced: synced ?? this.synced,
     );
   }
 
@@ -13550,6 +14062,9 @@ class ReferralFormsCompanion extends UpdateCompanion<ReferralForm> {
     if (updatedAt.present) {
       map['updated_at'] = Variable<DateTime>(updatedAt.value);
     }
+    if (synced.present) {
+      map['synced'] = Variable<bool>(synced.value);
+    }
     return map;
   }
 
@@ -13590,7 +14105,8 @@ class ReferralFormsCompanion extends UpdateCompanion<ReferralForm> {
           ..write('relationToPatient: $relationToPatient, ')
           ..write('consentDateTime: $consentDateTime, ')
           ..write('createdAt: $createdAt, ')
-          ..write('updatedAt: $updatedAt')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('synced: $synced')
           ..write(')'))
         .toString();
   }
@@ -14499,6 +15015,19 @@ class $AmbulanceRecordsTable extends AmbulanceRecords
       'CHECK ("is_proxy_statement" IN (0, 1))',
     ),
   );
+  static const VerificationMeta _syncedMeta = const VerificationMeta('synced');
+  @override
+  late final GeneratedColumn<bool> synced = GeneratedColumn<bool>(
+    'synced',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("synced" IN (0, 1))',
+    ),
+    defaultValue: Constant(false),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -14579,6 +15108,7 @@ class $AmbulanceRecordsTable extends AmbulanceRecords
     burnArea,
     traumaOther,
     isProxyStatement,
+    synced,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -15233,6 +15763,12 @@ class $AmbulanceRecordsTable extends AmbulanceRecords
         ),
       );
     }
+    if (data.containsKey('synced')) {
+      context.handle(
+        _syncedMeta,
+        synced.isAcceptableOrUnknown(data['synced']!, _syncedMeta),
+      );
+    }
     return context;
   }
 
@@ -15554,6 +16090,10 @@ class $AmbulanceRecordsTable extends AmbulanceRecords
         DriftSqlType.bool,
         data['${effectivePrefix}is_proxy_statement'],
       ),
+      synced: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}synced'],
+      )!,
     );
   }
 
@@ -15642,6 +16182,7 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
   final String? burnArea;
   final String? traumaOther;
   final bool? isProxyStatement;
+  final bool synced;
   const AmbulanceRecord({
     required this.id,
     required this.visitId,
@@ -15721,6 +16262,7 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
     this.burnArea,
     this.traumaOther,
     this.isProxyStatement,
+    required this.synced,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -15927,6 +16469,7 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
     if (!nullToAbsent || isProxyStatement != null) {
       map['is_proxy_statement'] = Variable<bool>(isProxyStatement);
     }
+    map['synced'] = Variable<bool>(synced);
     return map;
   }
 
@@ -16118,6 +16661,7 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
       isProxyStatement: isProxyStatement == null && nullToAbsent
           ? const Value.absent()
           : Value(isProxyStatement),
+      synced: Value(synced),
     );
   }
 
@@ -16257,6 +16801,7 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
       burnArea: serializer.fromJson<String?>(json['burnArea']),
       traumaOther: serializer.fromJson<String?>(json['traumaOther']),
       isProxyStatement: serializer.fromJson<bool?>(json['isProxyStatement']),
+      synced: serializer.fromJson<bool>(json['synced']),
     );
   }
   @override
@@ -16357,6 +16902,7 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
       'burnArea': serializer.toJson<String?>(burnArea),
       'traumaOther': serializer.toJson<String?>(traumaOther),
       'isProxyStatement': serializer.toJson<bool?>(isProxyStatement),
+      'synced': serializer.toJson<bool>(synced),
     };
   }
 
@@ -16439,6 +16985,7 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
     Value<String?> burnArea = const Value.absent(),
     Value<String?> traumaOther = const Value.absent(),
     Value<bool?> isProxyStatement = const Value.absent(),
+    bool? synced,
   }) => AmbulanceRecord(
     id: id ?? this.id,
     visitId: visitId ?? this.visitId,
@@ -16585,6 +17132,7 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
     isProxyStatement: isProxyStatement.present
         ? isProxyStatement.value
         : this.isProxyStatement,
+    synced: synced ?? this.synced,
   );
   AmbulanceRecord copyWithCompanion(AmbulanceRecordsCompanion data) {
     return AmbulanceRecord(
@@ -16788,6 +17336,7 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
       isProxyStatement: data.isProxyStatement.present
           ? data.isProxyStatement.value
           : this.isProxyStatement,
+      synced: data.synced.present ? data.synced.value : this.synced,
     );
   }
 
@@ -16873,7 +17422,8 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
           ..write('burnDegree: $burnDegree, ')
           ..write('burnArea: $burnArea, ')
           ..write('traumaOther: $traumaOther, ')
-          ..write('isProxyStatement: $isProxyStatement')
+          ..write('isProxyStatement: $isProxyStatement, ')
+          ..write('synced: $synced')
           ..write(')'))
         .toString();
   }
@@ -16958,6 +17508,7 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
     burnArea,
     traumaOther,
     isProxyStatement,
+    synced,
   ]);
   @override
   bool operator ==(Object other) =>
@@ -17045,7 +17596,8 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
           other.burnDegree == this.burnDegree &&
           other.burnArea == this.burnArea &&
           other.traumaOther == this.traumaOther &&
-          other.isProxyStatement == this.isProxyStatement);
+          other.isProxyStatement == this.isProxyStatement &&
+          other.synced == this.synced);
 }
 
 class AmbulanceRecordsCompanion extends UpdateCompanion<AmbulanceRecord> {
@@ -17127,6 +17679,7 @@ class AmbulanceRecordsCompanion extends UpdateCompanion<AmbulanceRecord> {
   final Value<String?> burnArea;
   final Value<String?> traumaOther;
   final Value<bool?> isProxyStatement;
+  final Value<bool> synced;
   const AmbulanceRecordsCompanion({
     this.id = const Value.absent(),
     this.visitId = const Value.absent(),
@@ -17206,6 +17759,7 @@ class AmbulanceRecordsCompanion extends UpdateCompanion<AmbulanceRecord> {
     this.burnArea = const Value.absent(),
     this.traumaOther = const Value.absent(),
     this.isProxyStatement = const Value.absent(),
+    this.synced = const Value.absent(),
   });
   AmbulanceRecordsCompanion.insert({
     this.id = const Value.absent(),
@@ -17286,6 +17840,7 @@ class AmbulanceRecordsCompanion extends UpdateCompanion<AmbulanceRecord> {
     this.burnArea = const Value.absent(),
     this.traumaOther = const Value.absent(),
     this.isProxyStatement = const Value.absent(),
+    this.synced = const Value.absent(),
   }) : visitId = Value(visitId);
   static Insertable<AmbulanceRecord> custom({
     Expression<int>? id,
@@ -17366,6 +17921,7 @@ class AmbulanceRecordsCompanion extends UpdateCompanion<AmbulanceRecord> {
     Expression<String>? burnArea,
     Expression<String>? traumaOther,
     Expression<bool>? isProxyStatement,
+    Expression<bool>? synced,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -17467,6 +18023,7 @@ class AmbulanceRecordsCompanion extends UpdateCompanion<AmbulanceRecord> {
       if (burnArea != null) 'burn_area': burnArea,
       if (traumaOther != null) 'trauma_other': traumaOther,
       if (isProxyStatement != null) 'is_proxy_statement': isProxyStatement,
+      if (synced != null) 'synced': synced,
     });
   }
 
@@ -17549,6 +18106,7 @@ class AmbulanceRecordsCompanion extends UpdateCompanion<AmbulanceRecord> {
     Value<String?>? burnArea,
     Value<String?>? traumaOther,
     Value<bool?>? isProxyStatement,
+    Value<bool>? synced,
   }) {
     return AmbulanceRecordsCompanion(
       id: id ?? this.id,
@@ -17640,6 +18198,7 @@ class AmbulanceRecordsCompanion extends UpdateCompanion<AmbulanceRecord> {
       burnArea: burnArea ?? this.burnArea,
       traumaOther: traumaOther ?? this.traumaOther,
       isProxyStatement: isProxyStatement ?? this.isProxyStatement,
+      synced: synced ?? this.synced,
     );
   }
 
@@ -17920,6 +18479,9 @@ class AmbulanceRecordsCompanion extends UpdateCompanion<AmbulanceRecord> {
     if (isProxyStatement.present) {
       map['is_proxy_statement'] = Variable<bool>(isProxyStatement.value);
     }
+    if (synced.present) {
+      map['synced'] = Variable<bool>(synced.value);
+    }
     return map;
   }
 
@@ -18005,7 +18567,8 @@ class AmbulanceRecordsCompanion extends UpdateCompanion<AmbulanceRecord> {
           ..write('burnDegree: $burnDegree, ')
           ..write('burnArea: $burnArea, ')
           ..write('traumaOther: $traumaOther, ')
-          ..write('isProxyStatement: $isProxyStatement')
+          ..write('isProxyStatement: $isProxyStatement, ')
+          ..write('synced: $synced')
           ..write(')'))
         .toString();
   }
@@ -18093,6 +18656,19 @@ class $MedicationRecordsTable extends MedicationRecords
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _syncedMeta = const VerificationMeta('synced');
+  @override
+  late final GeneratedColumn<bool> synced = GeneratedColumn<bool>(
+    'synced',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("synced" IN (0, 1))',
+    ),
+    defaultValue: Constant(false),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -18102,6 +18678,7 @@ class $MedicationRecordsTable extends MedicationRecords
     route,
     dose,
     executor,
+    synced,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -18156,6 +18733,12 @@ class $MedicationRecordsTable extends MedicationRecords
         executor.isAcceptableOrUnknown(data['executor']!, _executorMeta),
       );
     }
+    if (data.containsKey('synced')) {
+      context.handle(
+        _syncedMeta,
+        synced.isAcceptableOrUnknown(data['synced']!, _syncedMeta),
+      );
+    }
     return context;
   }
 
@@ -18193,6 +18776,10 @@ class $MedicationRecordsTable extends MedicationRecords
         DriftSqlType.string,
         data['${effectivePrefix}executor'],
       ),
+      synced: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}synced'],
+      )!,
     );
   }
 
@@ -18211,6 +18798,7 @@ class MedicationRecord extends DataClass
   final String? route;
   final String? dose;
   final String? executor;
+  final bool synced;
   const MedicationRecord({
     required this.id,
     required this.visitId,
@@ -18219,6 +18807,7 @@ class MedicationRecord extends DataClass
     this.route,
     this.dose,
     this.executor,
+    required this.synced,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -18240,6 +18829,7 @@ class MedicationRecord extends DataClass
     if (!nullToAbsent || executor != null) {
       map['executor'] = Variable<String>(executor);
     }
+    map['synced'] = Variable<bool>(synced);
     return map;
   }
 
@@ -18258,6 +18848,7 @@ class MedicationRecord extends DataClass
       executor: executor == null && nullToAbsent
           ? const Value.absent()
           : Value(executor),
+      synced: Value(synced),
     );
   }
 
@@ -18274,6 +18865,7 @@ class MedicationRecord extends DataClass
       route: serializer.fromJson<String?>(json['route']),
       dose: serializer.fromJson<String?>(json['dose']),
       executor: serializer.fromJson<String?>(json['executor']),
+      synced: serializer.fromJson<bool>(json['synced']),
     );
   }
   @override
@@ -18287,6 +18879,7 @@ class MedicationRecord extends DataClass
       'route': serializer.toJson<String?>(route),
       'dose': serializer.toJson<String?>(dose),
       'executor': serializer.toJson<String?>(executor),
+      'synced': serializer.toJson<bool>(synced),
     };
   }
 
@@ -18298,6 +18891,7 @@ class MedicationRecord extends DataClass
     Value<String?> route = const Value.absent(),
     Value<String?> dose = const Value.absent(),
     Value<String?> executor = const Value.absent(),
+    bool? synced,
   }) => MedicationRecord(
     id: id ?? this.id,
     visitId: visitId ?? this.visitId,
@@ -18306,6 +18900,7 @@ class MedicationRecord extends DataClass
     route: route.present ? route.value : this.route,
     dose: dose.present ? dose.value : this.dose,
     executor: executor.present ? executor.value : this.executor,
+    synced: synced ?? this.synced,
   );
   MedicationRecord copyWithCompanion(MedicationRecordsCompanion data) {
     return MedicationRecord(
@@ -18318,6 +18913,7 @@ class MedicationRecord extends DataClass
       route: data.route.present ? data.route.value : this.route,
       dose: data.dose.present ? data.dose.value : this.dose,
       executor: data.executor.present ? data.executor.value : this.executor,
+      synced: data.synced.present ? data.synced.value : this.synced,
     );
   }
 
@@ -18330,14 +18926,15 @@ class MedicationRecord extends DataClass
           ..write('name: $name, ')
           ..write('route: $route, ')
           ..write('dose: $dose, ')
-          ..write('executor: $executor')
+          ..write('executor: $executor, ')
+          ..write('synced: $synced')
           ..write(')'))
         .toString();
   }
 
   @override
   int get hashCode =>
-      Object.hash(id, visitId, recordTime, name, route, dose, executor);
+      Object.hash(id, visitId, recordTime, name, route, dose, executor, synced);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -18348,7 +18945,8 @@ class MedicationRecord extends DataClass
           other.name == this.name &&
           other.route == this.route &&
           other.dose == this.dose &&
-          other.executor == this.executor);
+          other.executor == this.executor &&
+          other.synced == this.synced);
 }
 
 class MedicationRecordsCompanion extends UpdateCompanion<MedicationRecord> {
@@ -18359,6 +18957,7 @@ class MedicationRecordsCompanion extends UpdateCompanion<MedicationRecord> {
   final Value<String?> route;
   final Value<String?> dose;
   final Value<String?> executor;
+  final Value<bool> synced;
   const MedicationRecordsCompanion({
     this.id = const Value.absent(),
     this.visitId = const Value.absent(),
@@ -18367,6 +18966,7 @@ class MedicationRecordsCompanion extends UpdateCompanion<MedicationRecord> {
     this.route = const Value.absent(),
     this.dose = const Value.absent(),
     this.executor = const Value.absent(),
+    this.synced = const Value.absent(),
   });
   MedicationRecordsCompanion.insert({
     this.id = const Value.absent(),
@@ -18376,6 +18976,7 @@ class MedicationRecordsCompanion extends UpdateCompanion<MedicationRecord> {
     this.route = const Value.absent(),
     this.dose = const Value.absent(),
     this.executor = const Value.absent(),
+    this.synced = const Value.absent(),
   }) : visitId = Value(visitId);
   static Insertable<MedicationRecord> custom({
     Expression<int>? id,
@@ -18385,6 +18986,7 @@ class MedicationRecordsCompanion extends UpdateCompanion<MedicationRecord> {
     Expression<String>? route,
     Expression<String>? dose,
     Expression<String>? executor,
+    Expression<bool>? synced,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -18394,6 +18996,7 @@ class MedicationRecordsCompanion extends UpdateCompanion<MedicationRecord> {
       if (route != null) 'route': route,
       if (dose != null) 'dose': dose,
       if (executor != null) 'executor': executor,
+      if (synced != null) 'synced': synced,
     });
   }
 
@@ -18405,6 +19008,7 @@ class MedicationRecordsCompanion extends UpdateCompanion<MedicationRecord> {
     Value<String?>? route,
     Value<String?>? dose,
     Value<String?>? executor,
+    Value<bool>? synced,
   }) {
     return MedicationRecordsCompanion(
       id: id ?? this.id,
@@ -18414,6 +19018,7 @@ class MedicationRecordsCompanion extends UpdateCompanion<MedicationRecord> {
       route: route ?? this.route,
       dose: dose ?? this.dose,
       executor: executor ?? this.executor,
+      synced: synced ?? this.synced,
     );
   }
 
@@ -18441,6 +19046,9 @@ class MedicationRecordsCompanion extends UpdateCompanion<MedicationRecord> {
     if (executor.present) {
       map['executor'] = Variable<String>(executor.value);
     }
+    if (synced.present) {
+      map['synced'] = Variable<bool>(synced.value);
+    }
     return map;
   }
 
@@ -18453,7 +19061,8 @@ class MedicationRecordsCompanion extends UpdateCompanion<MedicationRecord> {
           ..write('name: $name, ')
           ..write('route: $route, ')
           ..write('dose: $dose, ')
-          ..write('executor: $executor')
+          ..write('executor: $executor, ')
+          ..write('synced: $synced')
           ..write(')'))
         .toString();
   }
@@ -18600,6 +19209,19 @@ class $VitalSignsRecordsTable extends VitalSignsRecords
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _syncedMeta = const VerificationMeta('synced');
+  @override
+  late final GeneratedColumn<bool> synced = GeneratedColumn<bool>(
+    'synced',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("synced" IN (0, 1))',
+    ),
+    defaultValue: Constant(false),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -18614,6 +19236,7 @@ class $VitalSignsRecordsTable extends VitalSignsRecords
     bloodPressure,
     spo2,
     gcs,
+    synced,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -18713,6 +19336,12 @@ class $VitalSignsRecordsTable extends VitalSignsRecords
         gcs.isAcceptableOrUnknown(data['gcs']!, _gcsMeta),
       );
     }
+    if (data.containsKey('synced')) {
+      context.handle(
+        _syncedMeta,
+        synced.isAcceptableOrUnknown(data['synced']!, _syncedMeta),
+      );
+    }
     return context;
   }
 
@@ -18770,6 +19399,10 @@ class $VitalSignsRecordsTable extends VitalSignsRecords
         DriftSqlType.string,
         data['${effectivePrefix}gcs'],
       ),
+      synced: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}synced'],
+      )!,
     );
   }
 
@@ -18793,6 +19426,7 @@ class VitalSignsRecord extends DataClass
   final String? bloodPressure;
   final String? spo2;
   final String? gcs;
+  final bool synced;
   const VitalSignsRecord({
     required this.id,
     required this.visitId,
@@ -18806,6 +19440,7 @@ class VitalSignsRecord extends DataClass
     this.bloodPressure,
     this.spo2,
     this.gcs,
+    required this.synced,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -18840,6 +19475,7 @@ class VitalSignsRecord extends DataClass
     if (!nullToAbsent || gcs != null) {
       map['gcs'] = Variable<String>(gcs);
     }
+    map['synced'] = Variable<bool>(synced);
     return map;
   }
 
@@ -18871,6 +19507,7 @@ class VitalSignsRecord extends DataClass
           : Value(bloodPressure),
       spo2: spo2 == null && nullToAbsent ? const Value.absent() : Value(spo2),
       gcs: gcs == null && nullToAbsent ? const Value.absent() : Value(gcs),
+      synced: Value(synced),
     );
   }
 
@@ -18892,6 +19529,7 @@ class VitalSignsRecord extends DataClass
       bloodPressure: serializer.fromJson<String?>(json['bloodPressure']),
       spo2: serializer.fromJson<String?>(json['spo2']),
       gcs: serializer.fromJson<String?>(json['gcs']),
+      synced: serializer.fromJson<bool>(json['synced']),
     );
   }
   @override
@@ -18910,6 +19548,7 @@ class VitalSignsRecord extends DataClass
       'bloodPressure': serializer.toJson<String?>(bloodPressure),
       'spo2': serializer.toJson<String?>(spo2),
       'gcs': serializer.toJson<String?>(gcs),
+      'synced': serializer.toJson<bool>(synced),
     };
   }
 
@@ -18926,6 +19565,7 @@ class VitalSignsRecord extends DataClass
     Value<String?> bloodPressure = const Value.absent(),
     Value<String?> spo2 = const Value.absent(),
     Value<String?> gcs = const Value.absent(),
+    bool? synced,
   }) => VitalSignsRecord(
     id: id ?? this.id,
     visitId: visitId ?? this.visitId,
@@ -18945,6 +19585,7 @@ class VitalSignsRecord extends DataClass
         : this.bloodPressure,
     spo2: spo2.present ? spo2.value : this.spo2,
     gcs: gcs.present ? gcs.value : this.gcs,
+    synced: synced ?? this.synced,
   );
   VitalSignsRecord copyWithCompanion(VitalSignsRecordsCompanion data) {
     return VitalSignsRecord(
@@ -18974,6 +19615,7 @@ class VitalSignsRecord extends DataClass
           : this.bloodPressure,
       spo2: data.spo2.present ? data.spo2.value : this.spo2,
       gcs: data.gcs.present ? data.gcs.value : this.gcs,
+      synced: data.synced.present ? data.synced.value : this.synced,
     );
   }
 
@@ -18991,7 +19633,8 @@ class VitalSignsRecord extends DataClass
           ..write('respiration: $respiration, ')
           ..write('bloodPressure: $bloodPressure, ')
           ..write('spo2: $spo2, ')
-          ..write('gcs: $gcs')
+          ..write('gcs: $gcs, ')
+          ..write('synced: $synced')
           ..write(')'))
         .toString();
   }
@@ -19010,6 +19653,7 @@ class VitalSignsRecord extends DataClass
     bloodPressure,
     spo2,
     gcs,
+    synced,
   );
   @override
   bool operator ==(Object other) =>
@@ -19026,7 +19670,8 @@ class VitalSignsRecord extends DataClass
           other.respiration == this.respiration &&
           other.bloodPressure == this.bloodPressure &&
           other.spo2 == this.spo2 &&
-          other.gcs == this.gcs);
+          other.gcs == this.gcs &&
+          other.synced == this.synced);
 }
 
 class VitalSignsRecordsCompanion extends UpdateCompanion<VitalSignsRecord> {
@@ -19042,6 +19687,7 @@ class VitalSignsRecordsCompanion extends UpdateCompanion<VitalSignsRecord> {
   final Value<String?> bloodPressure;
   final Value<String?> spo2;
   final Value<String?> gcs;
+  final Value<bool> synced;
   const VitalSignsRecordsCompanion({
     this.id = const Value.absent(),
     this.visitId = const Value.absent(),
@@ -19055,6 +19701,7 @@ class VitalSignsRecordsCompanion extends UpdateCompanion<VitalSignsRecord> {
     this.bloodPressure = const Value.absent(),
     this.spo2 = const Value.absent(),
     this.gcs = const Value.absent(),
+    this.synced = const Value.absent(),
   });
   VitalSignsRecordsCompanion.insert({
     this.id = const Value.absent(),
@@ -19069,6 +19716,7 @@ class VitalSignsRecordsCompanion extends UpdateCompanion<VitalSignsRecord> {
     this.bloodPressure = const Value.absent(),
     this.spo2 = const Value.absent(),
     this.gcs = const Value.absent(),
+    this.synced = const Value.absent(),
   }) : visitId = Value(visitId);
   static Insertable<VitalSignsRecord> custom({
     Expression<int>? id,
@@ -19083,6 +19731,7 @@ class VitalSignsRecordsCompanion extends UpdateCompanion<VitalSignsRecord> {
     Expression<String>? bloodPressure,
     Expression<String>? spo2,
     Expression<String>? gcs,
+    Expression<bool>? synced,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -19097,6 +19746,7 @@ class VitalSignsRecordsCompanion extends UpdateCompanion<VitalSignsRecord> {
       if (bloodPressure != null) 'blood_pressure': bloodPressure,
       if (spo2 != null) 'spo2': spo2,
       if (gcs != null) 'gcs': gcs,
+      if (synced != null) 'synced': synced,
     });
   }
 
@@ -19113,6 +19763,7 @@ class VitalSignsRecordsCompanion extends UpdateCompanion<VitalSignsRecord> {
     Value<String?>? bloodPressure,
     Value<String?>? spo2,
     Value<String?>? gcs,
+    Value<bool>? synced,
   }) {
     return VitalSignsRecordsCompanion(
       id: id ?? this.id,
@@ -19127,6 +19778,7 @@ class VitalSignsRecordsCompanion extends UpdateCompanion<VitalSignsRecord> {
       bloodPressure: bloodPressure ?? this.bloodPressure,
       spo2: spo2 ?? this.spo2,
       gcs: gcs ?? this.gcs,
+      synced: synced ?? this.synced,
     );
   }
 
@@ -19169,6 +19821,9 @@ class VitalSignsRecordsCompanion extends UpdateCompanion<VitalSignsRecord> {
     if (gcs.present) {
       map['gcs'] = Variable<String>(gcs.value);
     }
+    if (synced.present) {
+      map['synced'] = Variable<bool>(synced.value);
+    }
     return map;
   }
 
@@ -19186,7 +19841,8 @@ class VitalSignsRecordsCompanion extends UpdateCompanion<VitalSignsRecord> {
           ..write('respiration: $respiration, ')
           ..write('bloodPressure: $bloodPressure, ')
           ..write('spo2: $spo2, ')
-          ..write('gcs: $gcs')
+          ..write('gcs: $gcs, ')
+          ..write('synced: $synced')
           ..write(')'))
         .toString();
   }
@@ -19245,8 +19901,21 @@ class $ParamedicRecordsTable extends ParamedicRecords
     type: DriftSqlType.blob,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _syncedMeta = const VerificationMeta('synced');
   @override
-  List<GeneratedColumn> get $columns => [id, visitId, name, signature];
+  late final GeneratedColumn<bool> synced = GeneratedColumn<bool>(
+    'synced',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("synced" IN (0, 1))',
+    ),
+    defaultValue: Constant(false),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, visitId, name, signature, synced];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -19282,6 +19951,12 @@ class $ParamedicRecordsTable extends ParamedicRecords
         signature.isAcceptableOrUnknown(data['signature']!, _signatureMeta),
       );
     }
+    if (data.containsKey('synced')) {
+      context.handle(
+        _syncedMeta,
+        synced.isAcceptableOrUnknown(data['synced']!, _syncedMeta),
+      );
+    }
     return context;
   }
 
@@ -19307,6 +19982,10 @@ class $ParamedicRecordsTable extends ParamedicRecords
         DriftSqlType.blob,
         data['${effectivePrefix}signature'],
       ),
+      synced: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}synced'],
+      )!,
     );
   }
 
@@ -19321,11 +20000,13 @@ class ParamedicRecord extends DataClass implements Insertable<ParamedicRecord> {
   final int visitId;
   final String? name;
   final Uint8List? signature;
+  final bool synced;
   const ParamedicRecord({
     required this.id,
     required this.visitId,
     this.name,
     this.signature,
+    required this.synced,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -19338,6 +20019,7 @@ class ParamedicRecord extends DataClass implements Insertable<ParamedicRecord> {
     if (!nullToAbsent || signature != null) {
       map['signature'] = Variable<Uint8List>(signature);
     }
+    map['synced'] = Variable<bool>(synced);
     return map;
   }
 
@@ -19349,6 +20031,7 @@ class ParamedicRecord extends DataClass implements Insertable<ParamedicRecord> {
       signature: signature == null && nullToAbsent
           ? const Value.absent()
           : Value(signature),
+      synced: Value(synced),
     );
   }
 
@@ -19362,6 +20045,7 @@ class ParamedicRecord extends DataClass implements Insertable<ParamedicRecord> {
       visitId: serializer.fromJson<int>(json['visitId']),
       name: serializer.fromJson<String?>(json['name']),
       signature: serializer.fromJson<Uint8List?>(json['signature']),
+      synced: serializer.fromJson<bool>(json['synced']),
     );
   }
   @override
@@ -19372,6 +20056,7 @@ class ParamedicRecord extends DataClass implements Insertable<ParamedicRecord> {
       'visitId': serializer.toJson<int>(visitId),
       'name': serializer.toJson<String?>(name),
       'signature': serializer.toJson<Uint8List?>(signature),
+      'synced': serializer.toJson<bool>(synced),
     };
   }
 
@@ -19380,11 +20065,13 @@ class ParamedicRecord extends DataClass implements Insertable<ParamedicRecord> {
     int? visitId,
     Value<String?> name = const Value.absent(),
     Value<Uint8List?> signature = const Value.absent(),
+    bool? synced,
   }) => ParamedicRecord(
     id: id ?? this.id,
     visitId: visitId ?? this.visitId,
     name: name.present ? name.value : this.name,
     signature: signature.present ? signature.value : this.signature,
+    synced: synced ?? this.synced,
   );
   ParamedicRecord copyWithCompanion(ParamedicRecordsCompanion data) {
     return ParamedicRecord(
@@ -19392,6 +20079,7 @@ class ParamedicRecord extends DataClass implements Insertable<ParamedicRecord> {
       visitId: data.visitId.present ? data.visitId.value : this.visitId,
       name: data.name.present ? data.name.value : this.name,
       signature: data.signature.present ? data.signature.value : this.signature,
+      synced: data.synced.present ? data.synced.value : this.synced,
     );
   }
 
@@ -19401,14 +20089,20 @@ class ParamedicRecord extends DataClass implements Insertable<ParamedicRecord> {
           ..write('id: $id, ')
           ..write('visitId: $visitId, ')
           ..write('name: $name, ')
-          ..write('signature: $signature')
+          ..write('signature: $signature, ')
+          ..write('synced: $synced')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode =>
-      Object.hash(id, visitId, name, $driftBlobEquality.hash(signature));
+  int get hashCode => Object.hash(
+    id,
+    visitId,
+    name,
+    $driftBlobEquality.hash(signature),
+    synced,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -19416,7 +20110,8 @@ class ParamedicRecord extends DataClass implements Insertable<ParamedicRecord> {
           other.id == this.id &&
           other.visitId == this.visitId &&
           other.name == this.name &&
-          $driftBlobEquality.equals(other.signature, this.signature));
+          $driftBlobEquality.equals(other.signature, this.signature) &&
+          other.synced == this.synced);
 }
 
 class ParamedicRecordsCompanion extends UpdateCompanion<ParamedicRecord> {
@@ -19424,29 +20119,34 @@ class ParamedicRecordsCompanion extends UpdateCompanion<ParamedicRecord> {
   final Value<int> visitId;
   final Value<String?> name;
   final Value<Uint8List?> signature;
+  final Value<bool> synced;
   const ParamedicRecordsCompanion({
     this.id = const Value.absent(),
     this.visitId = const Value.absent(),
     this.name = const Value.absent(),
     this.signature = const Value.absent(),
+    this.synced = const Value.absent(),
   });
   ParamedicRecordsCompanion.insert({
     this.id = const Value.absent(),
     required int visitId,
     this.name = const Value.absent(),
     this.signature = const Value.absent(),
+    this.synced = const Value.absent(),
   }) : visitId = Value(visitId);
   static Insertable<ParamedicRecord> custom({
     Expression<int>? id,
     Expression<int>? visitId,
     Expression<String>? name,
     Expression<Uint8List>? signature,
+    Expression<bool>? synced,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (visitId != null) 'visit_id': visitId,
       if (name != null) 'name': name,
       if (signature != null) 'signature': signature,
+      if (synced != null) 'synced': synced,
     });
   }
 
@@ -19455,12 +20155,14 @@ class ParamedicRecordsCompanion extends UpdateCompanion<ParamedicRecord> {
     Value<int>? visitId,
     Value<String?>? name,
     Value<Uint8List?>? signature,
+    Value<bool>? synced,
   }) {
     return ParamedicRecordsCompanion(
       id: id ?? this.id,
       visitId: visitId ?? this.visitId,
       name: name ?? this.name,
       signature: signature ?? this.signature,
+      synced: synced ?? this.synced,
     );
   }
 
@@ -19479,6 +20181,9 @@ class ParamedicRecordsCompanion extends UpdateCompanion<ParamedicRecord> {
     if (signature.present) {
       map['signature'] = Variable<Uint8List>(signature.value);
     }
+    if (synced.present) {
+      map['synced'] = Variable<bool>(synced.value);
+    }
     return map;
   }
 
@@ -19488,7 +20193,8 @@ class ParamedicRecordsCompanion extends UpdateCompanion<ParamedicRecord> {
           ..write('id: $id, ')
           ..write('visitId: $visitId, ')
           ..write('name: $name, ')
-          ..write('signature: $signature')
+          ..write('signature: $signature, ')
+          ..write('synced: $synced')
           ..write(')'))
         .toString();
   }
@@ -20188,6 +20894,19 @@ class $EmergencyRecordsTable extends EmergencyRecords
     requiredDuringInsert: false,
     defaultValue: currentDateAndTime,
   );
+  static const VerificationMeta _syncedMeta = const VerificationMeta('synced');
+  @override
+  late final GeneratedColumn<bool> synced = GeneratedColumn<bool>(
+    'synced',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("synced" IN (0, 1))',
+    ),
+    defaultValue: Constant(false),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -20252,6 +20971,7 @@ class $EmergencyRecordsTable extends EmergencyRecords
     medicationRecordsJson,
     createdAt,
     updatedAt,
+    synced,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -20774,6 +21494,12 @@ class $EmergencyRecordsTable extends EmergencyRecords
         updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
       );
     }
+    if (data.containsKey('synced')) {
+      context.handle(
+        _syncedMeta,
+        synced.isAcceptableOrUnknown(data['synced']!, _syncedMeta),
+      );
+    }
     return context;
   }
 
@@ -21031,6 +21757,10 @@ class $EmergencyRecordsTable extends EmergencyRecords
         DriftSqlType.dateTime,
         data['${effectivePrefix}updated_at'],
       )!,
+      synced: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}synced'],
+      )!,
     );
   }
 
@@ -21103,6 +21833,7 @@ class EmergencyRecord extends DataClass implements Insertable<EmergencyRecord> {
   final String medicationRecordsJson;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final bool synced;
   const EmergencyRecord({
     required this.id,
     required this.visitId,
@@ -21166,6 +21897,7 @@ class EmergencyRecord extends DataClass implements Insertable<EmergencyRecord> {
     required this.medicationRecordsJson,
     required this.createdAt,
     required this.updatedAt,
+    required this.synced,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -21362,6 +22094,7 @@ class EmergencyRecord extends DataClass implements Insertable<EmergencyRecord> {
     map['medication_records_json'] = Variable<String>(medicationRecordsJson);
     map['created_at'] = Variable<DateTime>(createdAt);
     map['updated_at'] = Variable<DateTime>(updatedAt);
+    map['synced'] = Variable<bool>(synced);
     return map;
   }
 
@@ -21542,6 +22275,7 @@ class EmergencyRecord extends DataClass implements Insertable<EmergencyRecord> {
       medicationRecordsJson: Value(medicationRecordsJson),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
+      synced: Value(synced),
     );
   }
 
@@ -21655,6 +22389,7 @@ class EmergencyRecord extends DataClass implements Insertable<EmergencyRecord> {
       ),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      synced: serializer.fromJson<bool>(json['synced']),
     );
   }
   @override
@@ -21749,6 +22484,7 @@ class EmergencyRecord extends DataClass implements Insertable<EmergencyRecord> {
       'medicationRecordsJson': serializer.toJson<String>(medicationRecordsJson),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'synced': serializer.toJson<bool>(synced),
     };
   }
 
@@ -21816,6 +22552,7 @@ class EmergencyRecord extends DataClass implements Insertable<EmergencyRecord> {
     String? medicationRecordsJson,
     DateTime? createdAt,
     DateTime? updatedAt,
+    bool? synced,
   }) => EmergencyRecord(
     id: id ?? this.id,
     visitId: visitId ?? this.visitId,
@@ -21961,6 +22698,7 @@ class EmergencyRecord extends DataClass implements Insertable<EmergencyRecord> {
     medicationRecordsJson: medicationRecordsJson ?? this.medicationRecordsJson,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
+    synced: synced ?? this.synced,
   );
   EmergencyRecord copyWithCompanion(EmergencyRecordsCompanion data) {
     return EmergencyRecord(
@@ -22128,6 +22866,7 @@ class EmergencyRecord extends DataClass implements Insertable<EmergencyRecord> {
           : this.medicationRecordsJson,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      synced: data.synced.present ? data.synced.value : this.synced,
     );
   }
 
@@ -22207,7 +22946,8 @@ class EmergencyRecord extends DataClass implements Insertable<EmergencyRecord> {
           ..write('selectedAssistantsJson: $selectedAssistantsJson, ')
           ..write('medicationRecordsJson: $medicationRecordsJson, ')
           ..write('createdAt: $createdAt, ')
-          ..write('updatedAt: $updatedAt')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('synced: $synced')
           ..write(')'))
         .toString();
   }
@@ -22276,6 +23016,7 @@ class EmergencyRecord extends DataClass implements Insertable<EmergencyRecord> {
     medicationRecordsJson,
     createdAt,
     updatedAt,
+    synced,
   ]);
   @override
   bool operator ==(Object other) =>
@@ -22348,7 +23089,8 @@ class EmergencyRecord extends DataClass implements Insertable<EmergencyRecord> {
           other.selectedAssistantsJson == this.selectedAssistantsJson &&
           other.medicationRecordsJson == this.medicationRecordsJson &&
           other.createdAt == this.createdAt &&
-          other.updatedAt == this.updatedAt);
+          other.updatedAt == this.updatedAt &&
+          other.synced == this.synced);
 }
 
 class EmergencyRecordsCompanion extends UpdateCompanion<EmergencyRecord> {
@@ -22414,6 +23156,7 @@ class EmergencyRecordsCompanion extends UpdateCompanion<EmergencyRecord> {
   final Value<String> medicationRecordsJson;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
+  final Value<bool> synced;
   const EmergencyRecordsCompanion({
     this.id = const Value.absent(),
     this.visitId = const Value.absent(),
@@ -22477,6 +23220,7 @@ class EmergencyRecordsCompanion extends UpdateCompanion<EmergencyRecord> {
     this.medicationRecordsJson = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
+    this.synced = const Value.absent(),
   });
   EmergencyRecordsCompanion.insert({
     this.id = const Value.absent(),
@@ -22541,6 +23285,7 @@ class EmergencyRecordsCompanion extends UpdateCompanion<EmergencyRecord> {
     this.medicationRecordsJson = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
+    this.synced = const Value.absent(),
   }) : visitId = Value(visitId);
   static Insertable<EmergencyRecord> custom({
     Expression<int>? id,
@@ -22605,6 +23350,7 @@ class EmergencyRecordsCompanion extends UpdateCompanion<EmergencyRecord> {
     Expression<String>? medicationRecordsJson,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
+    Expression<bool>? synced,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -22690,6 +23436,7 @@ class EmergencyRecordsCompanion extends UpdateCompanion<EmergencyRecord> {
         'medication_records_json': medicationRecordsJson,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
+      if (synced != null) 'synced': synced,
     });
   }
 
@@ -22756,6 +23503,7 @@ class EmergencyRecordsCompanion extends UpdateCompanion<EmergencyRecord> {
     Value<String>? medicationRecordsJson,
     Value<DateTime>? createdAt,
     Value<DateTime>? updatedAt,
+    Value<bool>? synced,
   }) {
     return EmergencyRecordsCompanion(
       id: id ?? this.id,
@@ -22838,6 +23586,7 @@ class EmergencyRecordsCompanion extends UpdateCompanion<EmergencyRecord> {
           medicationRecordsJson ?? this.medicationRecordsJson,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      synced: synced ?? this.synced,
     );
   }
 
@@ -23064,6 +23813,9 @@ class EmergencyRecordsCompanion extends UpdateCompanion<EmergencyRecord> {
     if (updatedAt.present) {
       map['updated_at'] = Variable<DateTime>(updatedAt.value);
     }
+    if (synced.present) {
+      map['synced'] = Variable<bool>(synced.value);
+    }
     return map;
   }
 
@@ -23143,7 +23895,8 @@ class EmergencyRecordsCompanion extends UpdateCompanion<EmergencyRecord> {
           ..write('selectedAssistantsJson: $selectedAssistantsJson, ')
           ..write('medicationRecordsJson: $medicationRecordsJson, ')
           ..write('createdAt: $createdAt, ')
-          ..write('updatedAt: $updatedAt')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('synced: $synced')
           ..write(')'))
         .toString();
   }
@@ -23261,6 +24014,7 @@ typedef $$VisitsTableCreateCompanionBuilder =
       Value<DateTime> uploadedAt,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
+      Value<bool> synced,
     });
 typedef $$VisitsTableUpdateCompanionBuilder =
     VisitsCompanion Function({
@@ -23277,6 +24031,7 @@ typedef $$VisitsTableUpdateCompanionBuilder =
       Value<DateTime> uploadedAt,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
+      Value<bool> synced,
     });
 
 final class $$VisitsTableReferences
@@ -23435,6 +24190,11 @@ class $$VisitsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<bool> get synced => $composableBuilder(
+    column: $table.synced,
+    builder: (column) => ColumnFilters(column),
+  );
+
   Expression<bool> medicationRecordsRefs(
     Expression<bool> Function($$MedicationRecordsTableFilterComposer f) f,
   ) {
@@ -23584,6 +24344,11 @@ class $$VisitsTableOrderingComposer
     column: $table.updatedAt,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<bool> get synced => $composableBuilder(
+    column: $table.synced,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$VisitsTableAnnotationComposer
@@ -23645,6 +24410,9 @@ class $$VisitsTableAnnotationComposer
 
   GeneratedColumn<DateTime> get updatedAt =>
       $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<bool> get synced =>
+      $composableBuilder(column: $table.synced, builder: (column) => column);
 
   Expression<T> medicationRecordsRefs<T extends Object>(
     Expression<T> Function($$MedicationRecordsTableAnnotationComposer a) f,
@@ -23769,6 +24537,7 @@ class $$VisitsTableTableManager
                 Value<DateTime> uploadedAt = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
+                Value<bool> synced = const Value.absent(),
               }) => VisitsCompanion(
                 visitId: visitId,
                 patientName: patientName,
@@ -23783,6 +24552,7 @@ class $$VisitsTableTableManager
                 uploadedAt: uploadedAt,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
+                synced: synced,
               ),
           createCompanionCallback:
               ({
@@ -23799,6 +24569,7 @@ class $$VisitsTableTableManager
                 Value<DateTime> uploadedAt = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
+                Value<bool> synced = const Value.absent(),
               }) => VisitsCompanion.insert(
                 visitId: visitId,
                 patientName: patientName,
@@ -23813,6 +24584,7 @@ class $$VisitsTableTableManager
                 uploadedAt: uploadedAt,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
+                synced: synced,
               ),
           withReferenceMapper: (p0) => p0
               .map(
@@ -23942,6 +24714,7 @@ typedef $$PatientProfilesTableCreateCompanionBuilder =
       Value<String?> bodyMapJson,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
+      Value<bool> synced,
     });
 typedef $$PatientProfilesTableUpdateCompanionBuilder =
     PatientProfilesCompanion Function({
@@ -23960,6 +24733,7 @@ typedef $$PatientProfilesTableUpdateCompanionBuilder =
       Value<String?> bodyMapJson,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
+      Value<bool> synced,
     });
 
 class $$PatientProfilesTableFilterComposer
@@ -24043,6 +24817,11 @@ class $$PatientProfilesTableFilterComposer
 
   ColumnFilters<DateTime> get updatedAt => $composableBuilder(
     column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get synced => $composableBuilder(
+    column: $table.synced,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -24130,6 +24909,11 @@ class $$PatientProfilesTableOrderingComposer
     column: $table.updatedAt,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<bool> get synced => $composableBuilder(
+    column: $table.synced,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$PatientProfilesTableAnnotationComposer
@@ -24191,6 +24975,9 @@ class $$PatientProfilesTableAnnotationComposer
 
   GeneratedColumn<DateTime> get updatedAt =>
       $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<bool> get synced =>
+      $composableBuilder(column: $table.synced, builder: (column) => column);
 }
 
 class $$PatientProfilesTableTableManager
@@ -24245,6 +25032,7 @@ class $$PatientProfilesTableTableManager
                 Value<String?> bodyMapJson = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
+                Value<bool> synced = const Value.absent(),
               }) => PatientProfilesCompanion(
                 id: id,
                 visitId: visitId,
@@ -24261,6 +25049,7 @@ class $$PatientProfilesTableTableManager
                 bodyMapJson: bodyMapJson,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
+                synced: synced,
               ),
           createCompanionCallback:
               ({
@@ -24279,6 +25068,7 @@ class $$PatientProfilesTableTableManager
                 Value<String?> bodyMapJson = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
+                Value<bool> synced = const Value.absent(),
               }) => PatientProfilesCompanion.insert(
                 id: id,
                 visitId: visitId,
@@ -24295,6 +25085,7 @@ class $$PatientProfilesTableTableManager
                 bodyMapJson: bodyMapJson,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
+                synced: synced,
               ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
@@ -24348,6 +25139,7 @@ typedef $$AccidentRecordsTableCreateCompanionBuilder =
       Value<String?> reasonOtherText,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
+      Value<bool> synced,
     });
 typedef $$AccidentRecordsTableUpdateCompanionBuilder =
     AccidentRecordsCompanion Function({
@@ -24376,6 +25168,7 @@ typedef $$AccidentRecordsTableUpdateCompanionBuilder =
       Value<String?> reasonOtherText,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
+      Value<bool> synced,
     });
 
 class $$AccidentRecordsTableFilterComposer
@@ -24509,6 +25302,11 @@ class $$AccidentRecordsTableFilterComposer
 
   ColumnFilters<DateTime> get updatedAt => $composableBuilder(
     column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get synced => $composableBuilder(
+    column: $table.synced,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -24646,6 +25444,11 @@ class $$AccidentRecordsTableOrderingComposer
     column: $table.updatedAt,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<bool> get synced => $composableBuilder(
+    column: $table.synced,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$AccidentRecordsTableAnnotationComposer
@@ -24763,6 +25566,9 @@ class $$AccidentRecordsTableAnnotationComposer
 
   GeneratedColumn<DateTime> get updatedAt =>
       $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<bool> get synced =>
+      $composableBuilder(column: $table.synced, builder: (column) => column);
 }
 
 class $$AccidentRecordsTableTableManager
@@ -24827,6 +25633,7 @@ class $$AccidentRecordsTableTableManager
                 Value<String?> reasonOtherText = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
+                Value<bool> synced = const Value.absent(),
               }) => AccidentRecordsCompanion(
                 id: id,
                 visitId: visitId,
@@ -24853,6 +25660,7 @@ class $$AccidentRecordsTableTableManager
                 reasonOtherText: reasonOtherText,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
+                synced: synced,
               ),
           createCompanionCallback:
               ({
@@ -24881,6 +25689,7 @@ class $$AccidentRecordsTableTableManager
                 Value<String?> reasonOtherText = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
+                Value<bool> synced = const Value.absent(),
               }) => AccidentRecordsCompanion.insert(
                 id: id,
                 visitId: visitId,
@@ -24907,6 +25716,7 @@ class $$AccidentRecordsTableTableManager
                 reasonOtherText: reasonOtherText,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
+                synced: synced,
               ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
@@ -24944,6 +25754,7 @@ typedef $$FlightLogsTableCreateCompanionBuilder =
       Value<String?> via,
       Value<String?> destination,
       Value<DateTime> updatedAt,
+      Value<bool> synced,
     });
 typedef $$FlightLogsTableUpdateCompanionBuilder =
     FlightLogsCompanion Function({
@@ -24956,6 +25767,7 @@ typedef $$FlightLogsTableUpdateCompanionBuilder =
       Value<String?> via,
       Value<String?> destination,
       Value<DateTime> updatedAt,
+      Value<bool> synced,
     });
 
 class $$FlightLogsTableFilterComposer
@@ -25009,6 +25821,11 @@ class $$FlightLogsTableFilterComposer
 
   ColumnFilters<DateTime> get updatedAt => $composableBuilder(
     column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get synced => $composableBuilder(
+    column: $table.synced,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -25066,6 +25883,11 @@ class $$FlightLogsTableOrderingComposer
     column: $table.updatedAt,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<bool> get synced => $composableBuilder(
+    column: $table.synced,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$FlightLogsTableAnnotationComposer
@@ -25107,6 +25929,9 @@ class $$FlightLogsTableAnnotationComposer
 
   GeneratedColumn<DateTime> get updatedAt =>
       $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<bool> get synced =>
+      $composableBuilder(column: $table.synced, builder: (column) => column);
 }
 
 class $$FlightLogsTableTableManager
@@ -25149,6 +25974,7 @@ class $$FlightLogsTableTableManager
                 Value<String?> via = const Value.absent(),
                 Value<String?> destination = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
+                Value<bool> synced = const Value.absent(),
               }) => FlightLogsCompanion(
                 id: id,
                 visitId: visitId,
@@ -25159,6 +25985,7 @@ class $$FlightLogsTableTableManager
                 via: via,
                 destination: destination,
                 updatedAt: updatedAt,
+                synced: synced,
               ),
           createCompanionCallback:
               ({
@@ -25171,6 +25998,7 @@ class $$FlightLogsTableTableManager
                 Value<String?> via = const Value.absent(),
                 Value<String?> destination = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
+                Value<bool> synced = const Value.absent(),
               }) => FlightLogsCompanion.insert(
                 id: id,
                 visitId: visitId,
@@ -25181,6 +26009,7 @@ class $$FlightLogsTableTableManager
                 via: via,
                 destination: destination,
                 updatedAt: updatedAt,
+                synced: synced,
               ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
@@ -25286,6 +26115,7 @@ typedef $$TreatmentsTableCreateCompanionBuilder =
       Value<String?> otherSpecialNote,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
+      Value<bool> synced,
     });
 typedef $$TreatmentsTableUpdateCompanionBuilder =
     TreatmentsCompanion Function({
@@ -25369,6 +26199,7 @@ typedef $$TreatmentsTableUpdateCompanionBuilder =
       Value<String?> otherSpecialNote,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
+      Value<bool> synced,
     });
 
 class $$TreatmentsTableFilterComposer
@@ -25777,6 +26608,11 @@ class $$TreatmentsTableFilterComposer
 
   ColumnFilters<DateTime> get updatedAt => $composableBuilder(
     column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get synced => $composableBuilder(
+    column: $table.synced,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -26190,6 +27026,11 @@ class $$TreatmentsTableOrderingComposer
     column: $table.updatedAt,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<bool> get synced => $composableBuilder(
+    column: $table.synced,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$TreatmentsTableAnnotationComposer
@@ -26579,6 +27420,9 @@ class $$TreatmentsTableAnnotationComposer
 
   GeneratedColumn<DateTime> get updatedAt =>
       $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<bool> get synced =>
+      $composableBuilder(column: $table.synced, builder: (column) => column);
 }
 
 class $$TreatmentsTableTableManager
@@ -26697,6 +27541,7 @@ class $$TreatmentsTableTableManager
                 Value<String?> otherSpecialNote = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
+                Value<bool> synced = const Value.absent(),
               }) => TreatmentsCompanion(
                 id: id,
                 visitId: visitId,
@@ -26778,6 +27623,7 @@ class $$TreatmentsTableTableManager
                 otherSpecialNote: otherSpecialNote,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
+                synced: synced,
               ),
           createCompanionCallback:
               ({
@@ -26866,6 +27712,7 @@ class $$TreatmentsTableTableManager
                 Value<String?> otherSpecialNote = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
+                Value<bool> synced = const Value.absent(),
               }) => TreatmentsCompanion.insert(
                 id: id,
                 visitId: visitId,
@@ -26947,6 +27794,7 @@ class $$TreatmentsTableTableManager
                 otherSpecialNote: otherSpecialNote,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
+                synced: synced,
               ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
@@ -26993,6 +27841,7 @@ typedef $$MedicalCostsTableCreateCompanionBuilder =
       Value<String?> billingErrorReason,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
+      Value<bool> synced,
     });
 typedef $$MedicalCostsTableUpdateCompanionBuilder =
     MedicalCostsCompanion Function({
@@ -27017,6 +27866,7 @@ typedef $$MedicalCostsTableUpdateCompanionBuilder =
       Value<String?> billingErrorReason,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
+      Value<bool> synced,
     });
 
 class $$MedicalCostsTableFilterComposer
@@ -27130,6 +27980,11 @@ class $$MedicalCostsTableFilterComposer
 
   ColumnFilters<DateTime> get updatedAt => $composableBuilder(
     column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get synced => $composableBuilder(
+    column: $table.synced,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -27247,6 +28102,11 @@ class $$MedicalCostsTableOrderingComposer
     column: $table.updatedAt,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<bool> get synced => $composableBuilder(
+    column: $table.synced,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$MedicalCostsTableAnnotationComposer
@@ -27348,6 +28208,9 @@ class $$MedicalCostsTableAnnotationComposer
 
   GeneratedColumn<DateTime> get updatedAt =>
       $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<bool> get synced =>
+      $composableBuilder(column: $table.synced, builder: (column) => column);
 }
 
 class $$MedicalCostsTableTableManager
@@ -27402,6 +28265,7 @@ class $$MedicalCostsTableTableManager
                 Value<String?> billingErrorReason = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
+                Value<bool> synced = const Value.absent(),
               }) => MedicalCostsCompanion(
                 id: id,
                 visitId: visitId,
@@ -27424,6 +28288,7 @@ class $$MedicalCostsTableTableManager
                 billingErrorReason: billingErrorReason,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
+                synced: synced,
               ),
           createCompanionCallback:
               ({
@@ -27448,6 +28313,7 @@ class $$MedicalCostsTableTableManager
                 Value<String?> billingErrorReason = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
+                Value<bool> synced = const Value.absent(),
               }) => MedicalCostsCompanion.insert(
                 id: id,
                 visitId: visitId,
@@ -27470,6 +28336,7 @@ class $$MedicalCostsTableTableManager
                 billingErrorReason: billingErrorReason,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
+                synced: synced,
               ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
@@ -27507,6 +28374,7 @@ typedef $$MedicalCertificatesTableCreateCompanionBuilder =
       Value<DateTime?> issueDate,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
+      Value<bool> synced,
     });
 typedef $$MedicalCertificatesTableUpdateCompanionBuilder =
     MedicalCertificatesCompanion Function({
@@ -27519,6 +28387,7 @@ typedef $$MedicalCertificatesTableUpdateCompanionBuilder =
       Value<DateTime?> issueDate,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
+      Value<bool> synced,
     });
 
 class $$MedicalCertificatesTableFilterComposer
@@ -27572,6 +28441,11 @@ class $$MedicalCertificatesTableFilterComposer
 
   ColumnFilters<DateTime> get updatedAt => $composableBuilder(
     column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get synced => $composableBuilder(
+    column: $table.synced,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -27629,6 +28503,11 @@ class $$MedicalCertificatesTableOrderingComposer
     column: $table.updatedAt,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<bool> get synced => $composableBuilder(
+    column: $table.synced,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$MedicalCertificatesTableAnnotationComposer
@@ -27672,6 +28551,9 @@ class $$MedicalCertificatesTableAnnotationComposer
 
   GeneratedColumn<DateTime> get updatedAt =>
       $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<bool> get synced =>
+      $composableBuilder(column: $table.synced, builder: (column) => column);
 }
 
 class $$MedicalCertificatesTableTableManager
@@ -27726,6 +28608,7 @@ class $$MedicalCertificatesTableTableManager
                 Value<DateTime?> issueDate = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
+                Value<bool> synced = const Value.absent(),
               }) => MedicalCertificatesCompanion(
                 id: id,
                 visitId: visitId,
@@ -27736,6 +28619,7 @@ class $$MedicalCertificatesTableTableManager
                 issueDate: issueDate,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
+                synced: synced,
               ),
           createCompanionCallback:
               ({
@@ -27748,6 +28632,7 @@ class $$MedicalCertificatesTableTableManager
                 Value<DateTime?> issueDate = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
+                Value<bool> synced = const Value.absent(),
               }) => MedicalCertificatesCompanion.insert(
                 id: id,
                 visitId: visitId,
@@ -27758,6 +28643,7 @@ class $$MedicalCertificatesTableTableManager
                 issueDate: issueDate,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
+                synced: synced,
               ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
@@ -27802,6 +28688,7 @@ typedef $$UndertakingsTableCreateCompanionBuilder =
       Value<Uint8List?> signatureBytes,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
+      Value<bool> synced,
     });
 typedef $$UndertakingsTableUpdateCompanionBuilder =
     UndertakingsCompanion Function({
@@ -27817,6 +28704,7 @@ typedef $$UndertakingsTableUpdateCompanionBuilder =
       Value<Uint8List?> signatureBytes,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
+      Value<bool> synced,
     });
 
 class $$UndertakingsTableFilterComposer
@@ -27885,6 +28773,11 @@ class $$UndertakingsTableFilterComposer
 
   ColumnFilters<DateTime> get updatedAt => $composableBuilder(
     column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get synced => $composableBuilder(
+    column: $table.synced,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -27957,6 +28850,11 @@ class $$UndertakingsTableOrderingComposer
     column: $table.updatedAt,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<bool> get synced => $composableBuilder(
+    column: $table.synced,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$UndertakingsTableAnnotationComposer
@@ -28007,6 +28905,9 @@ class $$UndertakingsTableAnnotationComposer
 
   GeneratedColumn<DateTime> get updatedAt =>
       $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<bool> get synced =>
+      $composableBuilder(column: $table.synced, builder: (column) => column);
 }
 
 class $$UndertakingsTableTableManager
@@ -28052,6 +28953,7 @@ class $$UndertakingsTableTableManager
                 Value<Uint8List?> signatureBytes = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
+                Value<bool> synced = const Value.absent(),
               }) => UndertakingsCompanion(
                 id: id,
                 visitId: visitId,
@@ -28065,6 +28967,7 @@ class $$UndertakingsTableTableManager
                 signatureBytes: signatureBytes,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
+                synced: synced,
               ),
           createCompanionCallback:
               ({
@@ -28080,6 +28983,7 @@ class $$UndertakingsTableTableManager
                 Value<Uint8List?> signatureBytes = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
+                Value<bool> synced = const Value.absent(),
               }) => UndertakingsCompanion.insert(
                 id: id,
                 visitId: visitId,
@@ -28093,6 +28997,7 @@ class $$UndertakingsTableTableManager
                 signatureBytes: signatureBytes,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
+                synced: synced,
               ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
@@ -28127,6 +29032,7 @@ typedef $$ElectronicDocumentsTableCreateCompanionBuilder =
       Value<int?> fromSelectedIndex,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
+      Value<bool> synced,
     });
 typedef $$ElectronicDocumentsTableUpdateCompanionBuilder =
     ElectronicDocumentsCompanion Function({
@@ -28136,6 +29042,7 @@ typedef $$ElectronicDocumentsTableUpdateCompanionBuilder =
       Value<int?> fromSelectedIndex,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
+      Value<bool> synced,
     });
 
 class $$ElectronicDocumentsTableFilterComposer
@@ -28174,6 +29081,11 @@ class $$ElectronicDocumentsTableFilterComposer
 
   ColumnFilters<DateTime> get updatedAt => $composableBuilder(
     column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get synced => $composableBuilder(
+    column: $table.synced,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -28216,6 +29128,11 @@ class $$ElectronicDocumentsTableOrderingComposer
     column: $table.updatedAt,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<bool> get synced => $composableBuilder(
+    column: $table.synced,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$ElectronicDocumentsTableAnnotationComposer
@@ -28248,6 +29165,9 @@ class $$ElectronicDocumentsTableAnnotationComposer
 
   GeneratedColumn<DateTime> get updatedAt =>
       $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<bool> get synced =>
+      $composableBuilder(column: $table.synced, builder: (column) => column);
 }
 
 class $$ElectronicDocumentsTableTableManager
@@ -28299,6 +29219,7 @@ class $$ElectronicDocumentsTableTableManager
                 Value<int?> fromSelectedIndex = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
+                Value<bool> synced = const Value.absent(),
               }) => ElectronicDocumentsCompanion(
                 id: id,
                 visitId: visitId,
@@ -28306,6 +29227,7 @@ class $$ElectronicDocumentsTableTableManager
                 fromSelectedIndex: fromSelectedIndex,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
+                synced: synced,
               ),
           createCompanionCallback:
               ({
@@ -28315,6 +29237,7 @@ class $$ElectronicDocumentsTableTableManager
                 Value<int?> fromSelectedIndex = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
+                Value<bool> synced = const Value.absent(),
               }) => ElectronicDocumentsCompanion.insert(
                 id: id,
                 visitId: visitId,
@@ -28322,6 +29245,7 @@ class $$ElectronicDocumentsTableTableManager
                 fromSelectedIndex: fromSelectedIndex,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
+                synced: synced,
               ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
@@ -28359,6 +29283,7 @@ typedef $$NursingRecordsTableCreateCompanionBuilder =
       Value<String?> recordsJson,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
+      Value<bool> synced,
     });
 typedef $$NursingRecordsTableUpdateCompanionBuilder =
     NursingRecordsCompanion Function({
@@ -28367,6 +29292,7 @@ typedef $$NursingRecordsTableUpdateCompanionBuilder =
       Value<String?> recordsJson,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
+      Value<bool> synced,
     });
 
 class $$NursingRecordsTableFilterComposer
@@ -28400,6 +29326,11 @@ class $$NursingRecordsTableFilterComposer
 
   ColumnFilters<DateTime> get updatedAt => $composableBuilder(
     column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get synced => $composableBuilder(
+    column: $table.synced,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -28437,6 +29368,11 @@ class $$NursingRecordsTableOrderingComposer
     column: $table.updatedAt,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<bool> get synced => $composableBuilder(
+    column: $table.synced,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$NursingRecordsTableAnnotationComposer
@@ -28464,6 +29400,9 @@ class $$NursingRecordsTableAnnotationComposer
 
   GeneratedColumn<DateTime> get updatedAt =>
       $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<bool> get synced =>
+      $composableBuilder(column: $table.synced, builder: (column) => column);
 }
 
 class $$NursingRecordsTableTableManager
@@ -28504,12 +29443,14 @@ class $$NursingRecordsTableTableManager
                 Value<String?> recordsJson = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
+                Value<bool> synced = const Value.absent(),
               }) => NursingRecordsCompanion(
                 id: id,
                 visitId: visitId,
                 recordsJson: recordsJson,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
+                synced: synced,
               ),
           createCompanionCallback:
               ({
@@ -28518,12 +29459,14 @@ class $$NursingRecordsTableTableManager
                 Value<String?> recordsJson = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
+                Value<bool> synced = const Value.absent(),
               }) => NursingRecordsCompanion.insert(
                 id: id,
                 visitId: visitId,
                 recordsJson: recordsJson,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
+                synced: synced,
               ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
@@ -28587,6 +29530,7 @@ typedef $$ReferralFormsTableCreateCompanionBuilder =
       Value<DateTime?> consentDateTime,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
+      Value<bool> synced,
     });
 typedef $$ReferralFormsTableUpdateCompanionBuilder =
     ReferralFormsCompanion Function({
@@ -28625,6 +29569,7 @@ typedef $$ReferralFormsTableUpdateCompanionBuilder =
       Value<DateTime?> consentDateTime,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
+      Value<bool> synced,
     });
 
 class $$ReferralFormsTableFilterComposer
@@ -28808,6 +29753,11 @@ class $$ReferralFormsTableFilterComposer
 
   ColumnFilters<DateTime> get updatedAt => $composableBuilder(
     column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get synced => $composableBuilder(
+    column: $table.synced,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -28995,6 +29945,11 @@ class $$ReferralFormsTableOrderingComposer
     column: $table.updatedAt,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<bool> get synced => $composableBuilder(
+    column: $table.synced,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$ReferralFormsTableAnnotationComposer
@@ -29166,6 +30121,9 @@ class $$ReferralFormsTableAnnotationComposer
 
   GeneratedColumn<DateTime> get updatedAt =>
       $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<bool> get synced =>
+      $composableBuilder(column: $table.synced, builder: (column) => column);
 }
 
 class $$ReferralFormsTableTableManager
@@ -29234,6 +30192,7 @@ class $$ReferralFormsTableTableManager
                 Value<DateTime?> consentDateTime = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
+                Value<bool> synced = const Value.absent(),
               }) => ReferralFormsCompanion(
                 id: id,
                 visitId: visitId,
@@ -29270,6 +30229,7 @@ class $$ReferralFormsTableTableManager
                 consentDateTime: consentDateTime,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
+                synced: synced,
               ),
           createCompanionCallback:
               ({
@@ -29308,6 +30268,7 @@ class $$ReferralFormsTableTableManager
                 Value<DateTime?> consentDateTime = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
+                Value<bool> synced = const Value.absent(),
               }) => ReferralFormsCompanion.insert(
                 id: id,
                 visitId: visitId,
@@ -29344,6 +30305,7 @@ class $$ReferralFormsTableTableManager
                 consentDateTime: consentDateTime,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
+                synced: synced,
               ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
@@ -29450,6 +30412,7 @@ typedef $$AmbulanceRecordsTableCreateCompanionBuilder =
       Value<String?> burnArea,
       Value<String?> traumaOther,
       Value<bool?> isProxyStatement,
+      Value<bool> synced,
     });
 typedef $$AmbulanceRecordsTableUpdateCompanionBuilder =
     AmbulanceRecordsCompanion Function({
@@ -29531,6 +30494,7 @@ typedef $$AmbulanceRecordsTableUpdateCompanionBuilder =
       Value<String?> burnArea,
       Value<String?> traumaOther,
       Value<bool?> isProxyStatement,
+      Value<bool> synced,
     });
 
 class $$AmbulanceRecordsTableFilterComposer
@@ -29929,6 +30893,11 @@ class $$AmbulanceRecordsTableFilterComposer
 
   ColumnFilters<bool> get isProxyStatement => $composableBuilder(
     column: $table.isProxyStatement,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get synced => $composableBuilder(
+    column: $table.synced,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -30332,6 +31301,11 @@ class $$AmbulanceRecordsTableOrderingComposer
     column: $table.isProxyStatement,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<bool> get synced => $composableBuilder(
+    column: $table.synced,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$AmbulanceRecordsTableAnnotationComposer
@@ -30699,6 +31673,9 @@ class $$AmbulanceRecordsTableAnnotationComposer
     column: $table.isProxyStatement,
     builder: (column) => column,
   );
+
+  GeneratedColumn<bool> get synced =>
+      $composableBuilder(column: $table.synced, builder: (column) => column);
 }
 
 class $$AmbulanceRecordsTableTableManager
@@ -30818,6 +31795,7 @@ class $$AmbulanceRecordsTableTableManager
                 Value<String?> burnArea = const Value.absent(),
                 Value<String?> traumaOther = const Value.absent(),
                 Value<bool?> isProxyStatement = const Value.absent(),
+                Value<bool> synced = const Value.absent(),
               }) => AmbulanceRecordsCompanion(
                 id: id,
                 visitId: visitId,
@@ -30897,6 +31875,7 @@ class $$AmbulanceRecordsTableTableManager
                 burnArea: burnArea,
                 traumaOther: traumaOther,
                 isProxyStatement: isProxyStatement,
+                synced: synced,
               ),
           createCompanionCallback:
               ({
@@ -30980,6 +31959,7 @@ class $$AmbulanceRecordsTableTableManager
                 Value<String?> burnArea = const Value.absent(),
                 Value<String?> traumaOther = const Value.absent(),
                 Value<bool?> isProxyStatement = const Value.absent(),
+                Value<bool> synced = const Value.absent(),
               }) => AmbulanceRecordsCompanion.insert(
                 id: id,
                 visitId: visitId,
@@ -31059,6 +32039,7 @@ class $$AmbulanceRecordsTableTableManager
                 burnArea: burnArea,
                 traumaOther: traumaOther,
                 isProxyStatement: isProxyStatement,
+                synced: synced,
               ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
@@ -31094,6 +32075,7 @@ typedef $$MedicationRecordsTableCreateCompanionBuilder =
       Value<String?> route,
       Value<String?> dose,
       Value<String?> executor,
+      Value<bool> synced,
     });
 typedef $$MedicationRecordsTableUpdateCompanionBuilder =
     MedicationRecordsCompanion Function({
@@ -31104,6 +32086,7 @@ typedef $$MedicationRecordsTableUpdateCompanionBuilder =
       Value<String?> route,
       Value<String?> dose,
       Value<String?> executor,
+      Value<bool> synced,
     });
 
 final class $$MedicationRecordsTableReferences
@@ -31177,6 +32160,11 @@ class $$MedicationRecordsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<bool> get synced => $composableBuilder(
+    column: $table.synced,
+    builder: (column) => ColumnFilters(column),
+  );
+
   $$VisitsTableFilterComposer get visitId {
     final $$VisitsTableFilterComposer composer = $composerBuilder(
       composer: this,
@@ -31240,6 +32228,11 @@ class $$MedicationRecordsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<bool> get synced => $composableBuilder(
+    column: $table.synced,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   $$VisitsTableOrderingComposer get visitId {
     final $$VisitsTableOrderingComposer composer = $composerBuilder(
       composer: this,
@@ -31292,6 +32285,9 @@ class $$MedicationRecordsTableAnnotationComposer
 
   GeneratedColumn<String> get executor =>
       $composableBuilder(column: $table.executor, builder: (column) => column);
+
+  GeneratedColumn<bool> get synced =>
+      $composableBuilder(column: $table.synced, builder: (column) => column);
 
   $$VisitsTableAnnotationComposer get visitId {
     final $$VisitsTableAnnotationComposer composer = $composerBuilder(
@@ -31357,6 +32353,7 @@ class $$MedicationRecordsTableTableManager
                 Value<String?> route = const Value.absent(),
                 Value<String?> dose = const Value.absent(),
                 Value<String?> executor = const Value.absent(),
+                Value<bool> synced = const Value.absent(),
               }) => MedicationRecordsCompanion(
                 id: id,
                 visitId: visitId,
@@ -31365,6 +32362,7 @@ class $$MedicationRecordsTableTableManager
                 route: route,
                 dose: dose,
                 executor: executor,
+                synced: synced,
               ),
           createCompanionCallback:
               ({
@@ -31375,6 +32373,7 @@ class $$MedicationRecordsTableTableManager
                 Value<String?> route = const Value.absent(),
                 Value<String?> dose = const Value.absent(),
                 Value<String?> executor = const Value.absent(),
+                Value<bool> synced = const Value.absent(),
               }) => MedicationRecordsCompanion.insert(
                 id: id,
                 visitId: visitId,
@@ -31383,6 +32382,7 @@ class $$MedicationRecordsTableTableManager
                 route: route,
                 dose: dose,
                 executor: executor,
+                synced: synced,
               ),
           withReferenceMapper: (p0) => p0
               .map(
@@ -31467,6 +32467,7 @@ typedef $$VitalSignsRecordsTableCreateCompanionBuilder =
       Value<String?> bloodPressure,
       Value<String?> spo2,
       Value<String?> gcs,
+      Value<bool> synced,
     });
 typedef $$VitalSignsRecordsTableUpdateCompanionBuilder =
     VitalSignsRecordsCompanion Function({
@@ -31482,6 +32483,7 @@ typedef $$VitalSignsRecordsTableUpdateCompanionBuilder =
       Value<String?> bloodPressure,
       Value<String?> spo2,
       Value<String?> gcs,
+      Value<bool> synced,
     });
 
 final class $$VitalSignsRecordsTableReferences
@@ -31580,6 +32582,11 @@ class $$VitalSignsRecordsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<bool> get synced => $composableBuilder(
+    column: $table.synced,
+    builder: (column) => ColumnFilters(column),
+  );
+
   $$VisitsTableFilterComposer get visitId {
     final $$VisitsTableFilterComposer composer = $composerBuilder(
       composer: this,
@@ -31668,6 +32675,11 @@ class $$VitalSignsRecordsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<bool> get synced => $composableBuilder(
+    column: $table.synced,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   $$VisitsTableOrderingComposer get visitId {
     final $$VisitsTableOrderingComposer composer = $composerBuilder(
       composer: this,
@@ -31748,6 +32760,9 @@ class $$VitalSignsRecordsTableAnnotationComposer
   GeneratedColumn<String> get gcs =>
       $composableBuilder(column: $table.gcs, builder: (column) => column);
 
+  GeneratedColumn<bool> get synced =>
+      $composableBuilder(column: $table.synced, builder: (column) => column);
+
   $$VisitsTableAnnotationComposer get visitId {
     final $$VisitsTableAnnotationComposer composer = $composerBuilder(
       composer: this,
@@ -31817,6 +32832,7 @@ class $$VitalSignsRecordsTableTableManager
                 Value<String?> bloodPressure = const Value.absent(),
                 Value<String?> spo2 = const Value.absent(),
                 Value<String?> gcs = const Value.absent(),
+                Value<bool> synced = const Value.absent(),
               }) => VitalSignsRecordsCompanion(
                 id: id,
                 visitId: visitId,
@@ -31830,6 +32846,7 @@ class $$VitalSignsRecordsTableTableManager
                 bloodPressure: bloodPressure,
                 spo2: spo2,
                 gcs: gcs,
+                synced: synced,
               ),
           createCompanionCallback:
               ({
@@ -31845,6 +32862,7 @@ class $$VitalSignsRecordsTableTableManager
                 Value<String?> bloodPressure = const Value.absent(),
                 Value<String?> spo2 = const Value.absent(),
                 Value<String?> gcs = const Value.absent(),
+                Value<bool> synced = const Value.absent(),
               }) => VitalSignsRecordsCompanion.insert(
                 id: id,
                 visitId: visitId,
@@ -31858,6 +32876,7 @@ class $$VitalSignsRecordsTableTableManager
                 bloodPressure: bloodPressure,
                 spo2: spo2,
                 gcs: gcs,
+                synced: synced,
               ),
           withReferenceMapper: (p0) => p0
               .map(
@@ -31934,6 +32953,7 @@ typedef $$ParamedicRecordsTableCreateCompanionBuilder =
       required int visitId,
       Value<String?> name,
       Value<Uint8List?> signature,
+      Value<bool> synced,
     });
 typedef $$ParamedicRecordsTableUpdateCompanionBuilder =
     ParamedicRecordsCompanion Function({
@@ -31941,6 +32961,7 @@ typedef $$ParamedicRecordsTableUpdateCompanionBuilder =
       Value<int> visitId,
       Value<String?> name,
       Value<Uint8List?> signature,
+      Value<bool> synced,
     });
 
 final class $$ParamedicRecordsTableReferences
@@ -31995,6 +33016,11 @@ class $$ParamedicRecordsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<bool> get synced => $composableBuilder(
+    column: $table.synced,
+    builder: (column) => ColumnFilters(column),
+  );
+
   $$VisitsTableFilterComposer get visitId {
     final $$VisitsTableFilterComposer composer = $composerBuilder(
       composer: this,
@@ -32043,6 +33069,11 @@ class $$ParamedicRecordsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<bool> get synced => $composableBuilder(
+    column: $table.synced,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   $$VisitsTableOrderingComposer get visitId {
     final $$VisitsTableOrderingComposer composer = $composerBuilder(
       composer: this,
@@ -32084,6 +33115,9 @@ class $$ParamedicRecordsTableAnnotationComposer
 
   GeneratedColumn<Uint8List> get signature =>
       $composableBuilder(column: $table.signature, builder: (column) => column);
+
+  GeneratedColumn<bool> get synced =>
+      $composableBuilder(column: $table.synced, builder: (column) => column);
 
   $$VisitsTableAnnotationComposer get visitId {
     final $$VisitsTableAnnotationComposer composer = $composerBuilder(
@@ -32143,11 +33177,13 @@ class $$ParamedicRecordsTableTableManager
                 Value<int> visitId = const Value.absent(),
                 Value<String?> name = const Value.absent(),
                 Value<Uint8List?> signature = const Value.absent(),
+                Value<bool> synced = const Value.absent(),
               }) => ParamedicRecordsCompanion(
                 id: id,
                 visitId: visitId,
                 name: name,
                 signature: signature,
+                synced: synced,
               ),
           createCompanionCallback:
               ({
@@ -32155,11 +33191,13 @@ class $$ParamedicRecordsTableTableManager
                 required int visitId,
                 Value<String?> name = const Value.absent(),
                 Value<Uint8List?> signature = const Value.absent(),
+                Value<bool> synced = const Value.absent(),
               }) => ParamedicRecordsCompanion.insert(
                 id: id,
                 visitId: visitId,
                 name: name,
                 signature: signature,
+                synced: synced,
               ),
           withReferenceMapper: (p0) => p0
               .map(
@@ -32294,6 +33332,7 @@ typedef $$EmergencyRecordsTableCreateCompanionBuilder =
       Value<String> medicationRecordsJson,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
+      Value<bool> synced,
     });
 typedef $$EmergencyRecordsTableUpdateCompanionBuilder =
     EmergencyRecordsCompanion Function({
@@ -32359,6 +33398,7 @@ typedef $$EmergencyRecordsTableUpdateCompanionBuilder =
       Value<String> medicationRecordsJson,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
+      Value<bool> synced,
     });
 
 class $$EmergencyRecordsTableFilterComposer
@@ -32683,6 +33723,11 @@ class $$EmergencyRecordsTableFilterComposer
 
   ColumnFilters<DateTime> get updatedAt => $composableBuilder(
     column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get synced => $composableBuilder(
+    column: $table.synced,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -33011,6 +34056,11 @@ class $$EmergencyRecordsTableOrderingComposer
     column: $table.updatedAt,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<bool> get synced => $composableBuilder(
+    column: $table.synced,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$EmergencyRecordsTableAnnotationComposer
@@ -33309,6 +34359,9 @@ class $$EmergencyRecordsTableAnnotationComposer
 
   GeneratedColumn<DateTime> get updatedAt =>
       $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<bool> get synced =>
+      $composableBuilder(column: $table.synced, builder: (column) => column);
 }
 
 class $$EmergencyRecordsTableTableManager
@@ -33417,6 +34470,7 @@ class $$EmergencyRecordsTableTableManager
                 Value<String> medicationRecordsJson = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
+                Value<bool> synced = const Value.absent(),
               }) => EmergencyRecordsCompanion(
                 id: id,
                 visitId: visitId,
@@ -33484,6 +34538,7 @@ class $$EmergencyRecordsTableTableManager
                 medicationRecordsJson: medicationRecordsJson,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
+                synced: synced,
               ),
           createCompanionCallback:
               ({
@@ -33556,6 +34611,7 @@ class $$EmergencyRecordsTableTableManager
                 Value<String> medicationRecordsJson = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
+                Value<bool> synced = const Value.absent(),
               }) => EmergencyRecordsCompanion.insert(
                 id: id,
                 visitId: visitId,
@@ -33623,6 +34679,7 @@ class $$EmergencyRecordsTableTableManager
                 medicationRecordsJson: medicationRecordsJson,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
+                synced: synced,
               ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))

@@ -54,11 +54,25 @@ class AppDatabase extends _$AppDatabase {
 
   // 每次資料庫 schema 有變更（加表/加欄位），這裡要 +1
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 6;
 
   @override
-  MigrationStrategy get migration =>
-      MigrationStrategy(onCreate: (m) async => m.createAll());
+  MigrationStrategy get migration => MigrationStrategy(
+    onCreate: (m) async {
+      await m.createAll(); // 第一次創建時
+    },
+    onUpgrade: (m, from, to) async {
+      print('資料庫升級：從 $from → $to');
+
+      // ⚠️開發用：刪除所有舊表重建（會清空資料）
+      final tables = allTables;
+      for (final table in tables) {
+        await m.deleteTable(table.actualTableName);
+      }
+      await m.createAll();
+    },
+  );
+      
 }
 
 LazyDatabase _openConnection() {
