@@ -3,6 +3,8 @@ import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
+import 'package:flutter/foundation.dart';
+
 
 import 'tables.dart';
 import 'daos.dart';
@@ -72,6 +74,22 @@ class AppDatabase extends _$AppDatabase {
       await m.createAll();
     },
   );
+
+  /// 重置所有資料表 synced 欄位為 0
+  Future<void> resetAllSynced() async {
+    await transaction(() async {
+      for (final table in allTables) {
+        final columns = table.$columns.map((c) => c.$name).toList();
+        if (!columns.contains('synced')) continue;
+
+        // ⚡ 直接用 SQL 更新
+        await customStatement('UPDATE ${table.actualTableName} SET synced = 0;');
+      }
+    });
+
+    debugPrint("🔄 所有表的 synced 已重置為 0");
+  }
+
       
 }
 
@@ -82,3 +100,5 @@ LazyDatabase _openConnection() {
     return NativeDatabase.createInBackground(file);
   });
 }
+
+

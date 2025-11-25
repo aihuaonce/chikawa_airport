@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'app_database.dart'; // 你的主資料庫定義
+import 'app_database.dart';
 import 'package:drift/drift.dart';
 
 class SyncService {
@@ -11,10 +11,12 @@ class SyncService {
 
   SyncService(this.db);
 
-  /// 啟動排程（每 30 秒）
   void start() {
     _timer?.cancel();
-    _timer = Timer.periodic(const Duration(seconds: 30), (_) => _syncIfNotRunning());
+    _timer = Timer.periodic(
+      const Duration(seconds: 30),
+      (_) => _syncIfNotRunning(),
+    );
   }
 
   void stop() {
@@ -22,20 +24,27 @@ class SyncService {
     _timer = null;
   }
 
-  /// 防止重複執行
   Future<void> _syncIfNotRunning() async {
     if (_isSyncing) return;
     _isSyncing = true;
     try {
       await syncAllTables();
     } catch (e) {
-      print("⚠️ 同步流程發生錯誤: $e");
+      print("⚠️ 同步錯誤: $e");
     } finally {
       _isSyncing = false;
     }
   }
 
-  /// 所有資料表名稱清單（snake_case）
+  // 所有日期欄位
+  final List<String> dateFields = [
+    "birthday",
+    "visit_date",
+    "created_at",
+    "updated_at",
+    // 可依你的資料表增加其他日期欄位
+  ];
+
   final List<String> tableNames = [
     "visits",
     "patient_profiles",
@@ -55,71 +64,110 @@ class SyncService {
     "emergency_records",
   ];
 
-  /// 主同步流程
+  /// 將 snake_case 轉成 camelCase
+  String _camelCase(String name) {
+    if (!name.contains('_')) return name;
+    final parts = name.split('_');
+    return parts[0] +
+        parts
+            .skip(1)
+            .map((p) => p.isNotEmpty ? p[0].toUpperCase() + p.substring(1) : '')
+            .join();
+  }
+
   Future<void> syncAllTables() async {
     for (final originalName in tableNames) {
-      // 取得發送到 API 的 PascalCase tableName
-      final apiTableName = originalName.split('_')
-          .map((word) => word.isNotEmpty ? word[0].toUpperCase() + word.substring(1) : '')
+      final apiTableName = originalName
+          .split('_')
+          .map((e) => e[0].toUpperCase() + e.substring(1))
           .join();
 
-      try {
-        final table = db.getTableByName(originalName); // 查本地 SQLite 用 snake_case
-        if (table == null) continue;
+      final table = db.getTableByName(originalName);
+      if (table == null) continue;
 
-        // 查詢 synced = 0 的資料
+      try {
         final unsyncedRows = await db.customSelect(
           'SELECT * FROM $originalName WHERE synced = 0',
         ).get();
 
         for (final row in unsyncedRows) {
-          final id = row.data.values.first;
+          final Map<String, dynamic> data = {};
 
-          // 將所有欄位值轉成字串，如果是 null 或空字串就用 "null"
-          final values = row.data.entries.map((e) {
-            final v = e.value;
-            if (v == null) return "null";
-            if (v is String && v.isEmpty) return "null";
-            return v.toString();
-          }).toList();
+          for (final c in table.$columns) {
+            final columnName = c.$name;
 
-          // 在第一個欄位前加上 tableName
-          final bodyMap = {"values": [apiTableName, ...values]};
+            // 排除 synced
+            if (columnName == "synced") continue;
+
+            var value = row.data[columnName];
+
+            // id 對應 visitId
+            if (columnName == "id") {
+              data["visitId"] = value?.toString() ?? "null";
+              continue;
+            }
+
+            // 日期欄位轉 ISO 8601
+            if (dateFields.contains(columnName) && value != null) {
+              if (value is int) {
+                value =
+                    DateTime.fromMillisecondsSinceEpoch(value * 1000).toIso8601String();
+              } else if (value is String && int.tryParse(value) != null) {
+                value = DateTime.fromMillisecondsSinceEpoch(int.parse(value) * 1000)
+                    .toIso8601String();
+              }
+            }
+
+            // 空值補 "null"
+            if (value == null || (value is String && value.isEmpty)) {
+              value = "null";
+            }
+
+            // 將 snake_case 轉 camelCase
+            data[_camelCase(columnName)] = value;
+          }
+
+          final bodyMap = {"table": apiTableName, "data": data};
           final body = jsonEncode(bodyMap);
 
           try {
             final response = await http.post(
-              Uri.parse('https://a63d8baf4050.ngrok-free.app/todos/save/'),
+              Uri.parse(
+                  'https://noncatastrophic-marketwise-jame.ngrok-free.dev/todos/save/'),
               headers: {"Content-Type": "application/json"},
               body: body,
             );
 
             if (response.statusCode == 200) {
               final result = jsonDecode(response.body);
-              if (result['status'] == 'ok') {
-                // 更新 synced = 1，本地用 snake_case 表名
+              if (result["status"] == "ok") {
+                final pkColumn = table.$columns.first.$name;
+                final pkValue = row.data[pkColumn];
+
                 await db.customUpdate(
-                  'UPDATE $originalName SET synced = 1 WHERE ${row.data.keys.first} = ?',
-                  variables: [Variable<Object>(id)],
+                  'UPDATE $originalName SET synced = 1 WHERE $pkColumn = ?',
+                  variables: [Variable.withString(pkValue.toString())],
                 );
-                print("⚠️ [$apiTableName] ID=$id 同步完成，HTTP ${response.statusCode}");
+
+                final prettyJson =
+                    const JsonEncoder.withIndent('  ').convert(bodyMap);
+                print("✅ [$apiTableName] ID=$pkValue 同步完成\n📤 JSON:\n$prettyJson");
               }
             } else {
-              print("⚠️ [$apiTableName] ID=$id 同步失敗，HTTP ${response.statusCode}");
+              print("❌ [$apiTableName] HTTP 錯誤: ${response.statusCode}");
             }
           } catch (e) {
-            print("⚠️ [$apiTableName] ID=$id 同步失敗: $e");
+            print("❌ [$apiTableName] 同步失敗: $e");
           }
         }
       } catch (e) {
-        print("❌ 處理 $apiTableName 發生錯誤: $e");
+        print("❌ [$apiTableName] 處理錯誤: $e");
       }
     }
   }
 }
 
 extension on AppDatabase {
-  /// 用名字取得 table 實體
   TableInfo<Table, dynamic>? getTableByName(String name) {
     final tables = <String, TableInfo<Table, dynamic>>{
       'visits': visits,

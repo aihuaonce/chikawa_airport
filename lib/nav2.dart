@@ -6,6 +6,7 @@ import 'data/db/daos.dart';
 import 'providers/routes_config.dart';
 import 'widgets/nav_common.dart';
 import 'l10n/app_translations.dart';
+import 'data/db/app_database.dart';
 
 mixin SavableStateMixin<T extends StatefulWidget> on State<T> {
   Future<void> saveData();
@@ -122,6 +123,7 @@ class _Nav2PageState extends State<Nav2Page> with WidgetsBindingObserver {
 
   Future<void> _saveAllPages() async {
     final t = AppTranslations.of(context);
+    final AppDatabase db = context.read<AppDatabase>();
 
     if (_isSaving) return;
 
@@ -171,7 +173,10 @@ class _Nav2PageState extends State<Nav2Page> with WidgetsBindingObserver {
         errorMessages.add('${t.commonData}: ${e.toString()}');
       }
 
-      // 儲存完成後，清除快取並重建所有頁面
+      // 儲存完成後重置所有 synced
+      await db.resetAllSynced();
+
+      // 再清除快取並重建
       debugPrint("🔄 清除頁面快取並重建...");
       _cachedPages.clear();
       _pageKeys.clear();
