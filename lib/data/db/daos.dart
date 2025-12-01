@@ -1,4 +1,4 @@
-//daos.dart
+// daos.dart
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:chikawa_airport/data/models/AmbulanceView_Data.dart';
@@ -19,7 +19,6 @@ class EmergencyRecordView {
     this.accidentRecord,
   });
 }
-
 
 @DriftAccessor(tables: [Visits])
 class VisitsDao extends DatabaseAccessor<AppDatabase> with _$VisitsDaoMixin {
@@ -63,9 +62,13 @@ class VisitsDao extends DatabaseAccessor<AppDatabase> with _$VisitsDaoMixin {
     return (delete(visits)..where((t) => t.visitId.equals(visitId))).go();
   }
 
+  // 原有的方法
   Future<Visit?> getById(int visitId) => (select(
     visits,
   )..where((t) => t.visitId.equals(visitId))).getSingleOrNull();
+
+  // --- 新增的方法 (為了解決 getVisit 未定義的錯誤) ---
+  Future<Visit?> getVisit(int visitId) => getById(visitId);
 }
 
 @DriftAccessor(tables: [PatientProfiles, Visits])
@@ -355,7 +358,6 @@ class AmbulanceRecordsDao extends DatabaseAccessor<AppDatabase>
   }
 }
 
-
 @DriftAccessor(tables: [MedicationRecords])
 class MedicationRecordsDao extends DatabaseAccessor<AppDatabase>
     with _$MedicationRecordsDaoMixin {
@@ -462,7 +464,6 @@ class EmergencyRecordsDao extends DatabaseAccessor<AppDatabase>
     }
 
     query.orderBy([OrderingTerm.desc(accidentRecords.incidentDate)]);
-
 
     return query.watch().map((rows) {
       return rows.map((row) {
