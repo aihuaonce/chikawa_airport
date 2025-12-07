@@ -1,8 +1,14 @@
-//referralform.dart
+// lib/ReferralFormPage.dart
+import 'dart:convert';
 import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:signature/signature.dart';
+// import 'package:signature/signature.dart'; // 暫時不需要簽名板功能
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
+
 import '../data/db/daos.dart';
 import '../data/models/referral_data.dart';
 import 'nav2.dart';
@@ -21,9 +27,6 @@ class _ReferralFormPageState extends State<ReferralFormPage>
     with
         AutomaticKeepAliveClientMixin<ReferralFormPage>,
         SavableStateMixin<ReferralFormPage> {
-  // ===============================================
-  // 實作 SavablePage 的 saveData() 方法
-  // ===============================================
   @override
   Future<void> saveData() async {
     try {
@@ -34,15 +37,9 @@ class _ReferralFormPageState extends State<ReferralFormPage>
     }
   }
 
-  // ===============================================
-  // 保持頁面存活
-  // ===============================================
   @override
   bool get wantKeepAlive => true;
 
-  // ===============================================
-  // 狀態變數
-  // ===============================================
   bool _isLoading = true;
 
   // 選項列表
@@ -57,7 +54,6 @@ class _ReferralFormPageState extends State<ReferralFormPage>
     "康曉妤",
     "其他",
   ];
-
   final List<String> deptList = const [
     "急診醫學科",
     "不分科",
@@ -70,7 +66,6 @@ class _ReferralFormPageState extends State<ReferralFormPage>
     "眼科",
     "其他",
   ];
-
   final List<String> referralPurposes = const [
     "急診治療",
     "住院治療",
@@ -80,40 +75,16 @@ class _ReferralFormPageState extends State<ReferralFormPage>
     "其他",
   ];
 
-  // 簽名控制器
-  final SignatureController _doctorSignController = SignatureController(
-    penStrokeWidth: 2,
-    penColor: Colors.black,
-    exportBackgroundColor: Colors.white,
-  );
-  final SignatureController _consentSignController = SignatureController(
-    penStrokeWidth: 2,
-    penColor: Colors.black,
-    exportBackgroundColor: Colors.white,
-  );
-
   // 文字欄位控制器
   final TextEditingController contactNameCtrl = TextEditingController();
   final TextEditingController contactPhoneCtrl = TextEditingController();
-  final Map<String, TextEditingController> _controllers = {};
   final TextEditingController contactAddressCtrl = TextEditingController();
-  final ButtonStyle actionButtonStyle = ElevatedButton.styleFrom(
-    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-    textStyle: const TextStyle(fontSize: 14),
-  );
-  final MaterialStateProperty<Color?> radioColor =
-      MaterialStateProperty.resolveWith<Color?>(
-        (states) => states.contains(MaterialState.selected)
-            ? const Color(0xFF83ACA9)
-            : Colors.grey,
-      );
   final TextEditingController mainDiagnosisCtrl = TextEditingController();
   final TextEditingController subDiagnosis1Ctrl = TextEditingController();
   final TextEditingController subDiagnosis2Ctrl = TextEditingController();
   final TextEditingController furtherExamCtrl = TextEditingController();
   final TextEditingController otherPurposeCtrl = TextEditingController();
-  final TextEditingController handoverNotesCtrl =
-      TextEditingController(); // ✅ 新增
+  final TextEditingController handoverNotesCtrl = TextEditingController();
   final TextEditingController otherDoctorCtrl = TextEditingController();
   final TextEditingController otherDeptCtrl = TextEditingController();
   final TextEditingController appointmentDeptCtrl = TextEditingController();
@@ -126,10 +97,14 @@ class _ReferralFormPageState extends State<ReferralFormPage>
   final TextEditingController referralPhoneCtrl = TextEditingController();
   final TextEditingController relationCtrl = TextEditingController();
 
+  final ButtonStyle actionButtonStyle = ElevatedButton.styleFrom(
+    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+    textStyle: const TextStyle(fontSize: 14),
+  );
+
   @override
   void initState() {
     super.initState();
-    _controllers['initialDiagnosis'] = TextEditingController();
     _loadData();
   }
 
@@ -143,7 +118,7 @@ class _ReferralFormPageState extends State<ReferralFormPage>
     subDiagnosis2Ctrl.dispose();
     furtherExamCtrl.dispose();
     otherPurposeCtrl.dispose();
-    handoverNotesCtrl.dispose(); // ✅ 新增
+    handoverNotesCtrl.dispose();
     otherDoctorCtrl.dispose();
     otherDeptCtrl.dispose();
     appointmentDeptCtrl.dispose();
@@ -155,11 +130,6 @@ class _ReferralFormPageState extends State<ReferralFormPage>
     referralAddressCtrl.dispose();
     referralPhoneCtrl.dispose();
     relationCtrl.dispose();
-    _doctorSignController.dispose();
-    _consentSignController.dispose();
-    for (final c in _controllers.values) {
-      c.dispose();
-    }
     super.dispose();
   }
 
@@ -172,7 +142,6 @@ class _ReferralFormPageState extends State<ReferralFormPage>
       if (!mounted) return;
 
       if (record != null) {
-        // 從資料庫載入到 ReferralData
         referralData.contactName = record.contactName;
         referralData.contactPhone = record.contactPhone;
         referralData.contactAddress = record.contactAddress;
@@ -184,7 +153,7 @@ class _ReferralFormPageState extends State<ReferralFormPage>
         referralData.referralPurposeIdx = record.referralPurposeIdx;
         referralData.furtherExamDetail = record.furtherExamDetail;
         referralData.otherPurposeDetail = record.otherPurposeDetail;
-        referralData.handoverNotes = record.handoverNotes; // ✅ 新增
+        referralData.handoverNotes = record.handoverNotes;
         referralData.doctorIdx = record.doctorIdx;
         referralData.otherDoctorName = record.otherDoctorName;
         referralData.deptIdx = record.deptIdx;
@@ -204,9 +173,15 @@ class _ReferralFormPageState extends State<ReferralFormPage>
         referralData.consentSignature = record.consentSignature;
         referralData.relationToPatient = record.relationToPatient;
         referralData.consentDateTime = record.consentDateTime;
+
+        // [修正] 移除從資料庫讀取 selectedICD10 的部分，避免 getter 錯誤
+        // 這些資料如果資料庫還沒開欄位，就暫時不從 DB 讀取
+        // referralData.selectedICD10Main = record.selectedICD10Main;
+        // referralData.selectedICD10Sub1 = record.selectedICD10Sub1;
+        // referralData.selectedICD10Sub2 = record.selectedICD10Sub2;
+
         referralData.update();
       } else {
-        // 新記錄的預設值
         final now = DateTime.now();
         referralData.issueDate = now;
         referralData.appointmentDate = now;
@@ -215,16 +190,11 @@ class _ReferralFormPageState extends State<ReferralFormPage>
         referralData.consentDateTime = now;
         referralData.update();
       }
-
       _syncControllersFromData(referralData);
     } catch (e) {
-      debugPrint('載入轉診表單資料錯誤: $e');
+      debugPrint('Error loading: $e');
     } finally {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
@@ -237,7 +207,7 @@ class _ReferralFormPageState extends State<ReferralFormPage>
     subDiagnosis2Ctrl.text = data.subDiagnosis2 ?? '';
     furtherExamCtrl.text = data.furtherExamDetail ?? '';
     otherPurposeCtrl.text = data.otherPurposeDetail ?? '';
-    handoverNotesCtrl.text = data.handoverNotes ?? ''; // ✅ 新增
+    handoverNotesCtrl.text = data.handoverNotes ?? '';
     otherDoctorCtrl.text = data.otherDoctorName ?? '';
     otherDeptCtrl.text = data.otherDeptName ?? '';
     appointmentDeptCtrl.text = data.appointmentDept ?? '';
@@ -253,125 +223,800 @@ class _ReferralFormPageState extends State<ReferralFormPage>
 
   void _syncControllersToData() {
     final data = context.read<ReferralData>();
-
-    data.contactName = contactNameCtrl.text.trim().isEmpty
-        ? null
-        : contactNameCtrl.text.trim();
-    data.contactPhone = contactPhoneCtrl.text.trim().isEmpty
-        ? null
-        : contactPhoneCtrl.text.trim();
-    data.contactAddress = contactAddressCtrl.text.trim().isEmpty
-        ? null
-        : contactAddressCtrl.text.trim();
-    data.mainDiagnosis = mainDiagnosisCtrl.text.trim().isEmpty
-        ? null
-        : mainDiagnosisCtrl.text.trim();
-    data.subDiagnosis1 = subDiagnosis1Ctrl.text.trim().isEmpty
-        ? null
-        : subDiagnosis1Ctrl.text.trim();
-    data.subDiagnosis2 = subDiagnosis2Ctrl.text.trim().isEmpty
-        ? null
-        : subDiagnosis2Ctrl.text.trim();
-    data.furtherExamDetail = furtherExamCtrl.text.trim().isEmpty
-        ? null
-        : furtherExamCtrl.text.trim();
-    data.otherPurposeDetail = otherPurposeCtrl.text.trim().isEmpty
-        ? null
-        : otherPurposeCtrl.text.trim();
-    data.handoverNotes = handoverNotesCtrl.text.trim().isEmpty
-        ? null
-        : handoverNotesCtrl.text.trim(); // ✅ 新增
-    data.otherDoctorName = otherDoctorCtrl.text.trim().isEmpty
-        ? null
-        : otherDoctorCtrl.text.trim();
-    data.otherDeptName = otherDeptCtrl.text.trim().isEmpty
-        ? null
-        : otherDeptCtrl.text.trim();
-    data.appointmentDept = appointmentDeptCtrl.text.trim().isEmpty
-        ? null
-        : appointmentDeptCtrl.text.trim();
-    data.appointmentRoom = appointmentRoomCtrl.text.trim().isEmpty
-        ? null
-        : appointmentRoomCtrl.text.trim();
-    data.appointmentNumber = appointmentNumberCtrl.text.trim().isEmpty
-        ? null
-        : appointmentNumberCtrl.text.trim();
-    data.referralHospitalName = referralHospitalCtrl.text.trim().isEmpty
-        ? null
-        : referralHospitalCtrl.text.trim();
-    data.otherReferralDept = otherReferralDeptCtrl.text.trim().isEmpty
-        ? null
-        : otherReferralDeptCtrl.text.trim();
-    data.referralDoctorName = referralDoctorCtrl.text.trim().isEmpty
-        ? null
-        : referralDoctorCtrl.text.trim();
-    data.referralAddress = referralAddressCtrl.text.trim().isEmpty
-        ? null
-        : referralAddressCtrl.text.trim();
-    data.referralPhone = referralPhoneCtrl.text.trim().isEmpty
-        ? null
-        : referralPhoneCtrl.text.trim();
-    data.relationToPatient = relationCtrl.text.trim().isEmpty
-        ? null
-        : relationCtrl.text.trim();
+    data.contactName = contactNameCtrl.text;
+    data.contactPhone = contactPhoneCtrl.text;
+    data.contactAddress = contactAddressCtrl.text;
+    data.mainDiagnosis = mainDiagnosisCtrl.text;
+    data.subDiagnosis1 = subDiagnosis1Ctrl.text;
+    data.subDiagnosis2 = subDiagnosis2Ctrl.text;
+    data.furtherExamDetail = furtherExamCtrl.text;
+    data.otherPurposeDetail = otherPurposeCtrl.text;
+    data.handoverNotes = handoverNotesCtrl.text;
+    data.otherDoctorName = otherDoctorCtrl.text;
+    data.otherDeptName = otherDeptCtrl.text;
+    data.appointmentDept = appointmentDeptCtrl.text;
+    data.appointmentRoom = appointmentRoomCtrl.text;
+    data.appointmentNumber = appointmentNumberCtrl.text;
+    data.referralHospitalName = referralHospitalCtrl.text;
+    data.otherReferralDept = otherReferralDeptCtrl.text;
+    data.referralDoctorName = referralDoctorCtrl.text;
+    data.referralAddress = referralAddressCtrl.text;
+    data.referralPhone = referralPhoneCtrl.text;
+    data.relationToPatient = relationCtrl.text;
   }
 
   Future<void> _saveData() async {
-    try {
-      // 1. 取得所有需要的 DAO 和 Data Model
-      final referralDao = context.read<ReferralFormsDao>();
-      final visitsDao = context.read<VisitsDao>();
-      final referralData = context.read<ReferralData>();
-
-      await referralData.saveToDatabase(widget.visitId, referralDao, visitsDao);
-    } catch (e) {
-      rethrow;
-    }
+    final referralDao = context.read<ReferralFormsDao>();
+    final visitsDao = context.read<VisitsDao>();
+    final referralData = context.read<ReferralData>();
+    await referralData.saveToDatabase(widget.visitId, referralDao, visitsDao);
   }
 
-  void _openSignaturePad(
-    SignatureController controller,
-    Function(Uint8List) onSaved,
-  ) {
-    final t = AppTranslations.of(context);
-    showDialog(
-      context: context,
-      builder: (context) => Dialog(
-        child: SizedBox(
-          width: MediaQuery.of(context).size.width * 0.7,
-          height: MediaQuery.of(context).size.height * 0.7,
-          child: Column(
-            children: [
-              Expanded(
-                child: Signature(
-                  controller: controller,
-                  backgroundColor: Colors.white,
-                ),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton(
-                    onPressed: controller.clear,
-                    child: Text(t.redraw),
-                  ),
-                  TextButton(
-                    onPressed: () async {
-                      if (controller.isNotEmpty) {
-                        final data = await controller.toPngBytes();
-                        if (data != null) {
-                          onSaved(data);
-                        }
-                        Navigator.pop(context);
-                      }
-                    },
-                    child: Text(t.save),
-                  ),
-                ],
-              ),
-            ],
+  // ===========================================================================
+  // PDF 列印與生成邏輯
+  // ===========================================================================
+  Future<void> _printPdf() async {
+    _syncControllersToData();
+    await _saveData();
+
+    final refData = context.read<ReferralData>();
+
+    String patientName = "";
+    String gender = "";
+    DateTime? dob;
+    String idNo = "";
+
+    try {
+      final visitsDao = context.read<VisitsDao>();
+      final profileDao = context.read<PatientProfilesDao>();
+      final visit = await visitsDao.getVisit(widget.visitId);
+      if (visit != null) patientName = visit.patientName ?? "";
+      final profile = await profileDao.getByVisitId(widget.visitId);
+      if (profile != null) {
+        dob = profile.birthday;
+        gender = profile.gender ?? "";
+        idNo = (profile.idNumber != null && profile.idNumber!.isNotEmpty)
+            ? profile.idNumber!
+            : (profile.passportNumber ?? "");
+      }
+    } catch (e) {
+      debugPrint("Error fetching data for PDF: $e");
+    }
+
+    final font = await PdfGoogleFonts.notoSansTCRegular();
+    final fontBold = await PdfGoogleFonts.notoSansTCBold();
+
+    await Printing.layoutPdf(
+      onLayout: (PdfPageFormat format) async {
+        final doc = pw.Document();
+        doc.addPage(
+          pw.Page(
+            pageFormat: PdfPageFormat.a4,
+            margin: const pw.EdgeInsets.all(30),
+            build: (pw.Context context) {
+              return _buildPdfContent(
+                font: font,
+                fontBold: fontBold,
+                refData: refData,
+                patientName: patientName,
+                gender: gender,
+                dob: dob,
+                idNo: idNo,
+              );
+            },
+          ),
+        );
+        return doc.save();
+      },
+    );
+  }
+
+  pw.Widget _buildPdfContent({
+    required pw.Font font,
+    required pw.Font fontBold,
+    required ReferralData refData,
+    required String patientName,
+    required String gender,
+    required DateTime? dob,
+    required String idNo,
+  }) {
+    final titleStyle = pw.TextStyle(font: fontBold, fontSize: 18);
+    final subTitleStyle = pw.TextStyle(font: fontBold, fontSize: 14);
+    final bodyStyle = pw.TextStyle(font: font, fontSize: 10);
+    final smallStyle = pw.TextStyle(font: font, fontSize: 8);
+    final border = pw.TableBorder.all(width: 0.5, color: PdfColors.black);
+
+    // Helpers
+    String fmtDate(DateTime? dt) =>
+        dt == null ? "" : "${dt.year}年${dt.month}月${dt.day}日";
+    String fmtDateShort(DateTime? dt) =>
+        dt == null ? "" : "${dt.year}/${dt.month}/${dt.day}";
+    String check(bool cond) => cond ? "■" : "□";
+
+    String physicianName =
+        (refData.doctorIdx != null && refData.doctorIdx! < doctorList.length)
+        ? (doctorList[refData.doctorIdx!] == "其他"
+              ? (refData.otherDoctorName ?? "")
+              : doctorList[refData.doctorIdx!])
+        : "";
+    String deptName =
+        (refData.deptIdx != null && refData.deptIdx! < deptList.length)
+        ? (deptList[refData.deptIdx!] == "其他"
+              ? (refData.otherDeptName ?? "")
+              : deptList[refData.deptIdx!])
+        : "";
+    String refDeptName =
+        (refData.referralDeptIdx != null &&
+            refData.referralDeptIdx! < deptList.length)
+        ? (deptList[refData.referralDeptIdx!] == "其他"
+              ? (refData.otherReferralDept ?? "")
+              : deptList[refData.referralDeptIdx!])
+        : "";
+
+    return pw.Column(
+      children: [
+        pw.Text("全民健康保險聯新國際醫院桃園國際機場醫療中心轉診單", style: titleStyle),
+        pw.SizedBox(height: 2),
+        pw.Row(
+          mainAxisAlignment: pw.MainAxisAlignment.center,
+          children: [
+            pw.Text("(轉診至", style: subTitleStyle),
+            pw.SizedBox(width: 150),
+            pw.Text("院所)", style: subTitleStyle),
+          ],
+        ),
+        pw.SizedBox(height: 5),
+        pw.Align(
+          alignment: pw.Alignment.centerLeft,
+          child: pw.Text(
+            "保險醫事服務機構代碼：3432060513",
+            style: pw.TextStyle(font: fontBold, fontSize: 12),
           ),
         ),
+        pw.SizedBox(height: 5),
+
+        // ================== MAIN TABLE ==================
+        pw.Table(
+          border: border,
+          columnWidths: {
+            0: const pw.FixedColumnWidth(25),
+            1: const pw.FlexColumnWidth(1),
+          },
+          children: [
+            // Row 1: Basic Info
+            pw.TableRow(
+              children: [
+                _verticalTextCell("基本資料", font, height: 60),
+                pw.Column(
+                  children: [
+                    pw.Table(
+                      border: border,
+                      columnWidths: {
+                        0: const pw.FixedColumnWidth(60),
+                        1: const pw.FlexColumnWidth(1),
+                        2: const pw.FixedColumnWidth(40),
+                        3: const pw.FixedColumnWidth(60),
+                        4: const pw.FixedColumnWidth(60),
+                        5: const pw.FlexColumnWidth(1),
+                        6: const pw.FixedColumnWidth(70),
+                        7: const pw.FlexColumnWidth(1),
+                      },
+                      children: [
+                        pw.TableRow(
+                          children: [
+                            _labelCell("姓名", font),
+                            _textCell(patientName, font),
+                            _labelCell("性別", font),
+                            _textCell(
+                              "${check(gender == '男')}男 ${check(gender == '女')}女",
+                              font,
+                            ),
+                            _labelCell("出生日期", font),
+                            _textCell(fmtDate(dob), font),
+                            _labelCell("身分證字號", font),
+                            _textCell(idNo, font),
+                          ],
+                        ),
+                        pw.TableRow(
+                          children: [
+                            _labelCell("聯絡人", font),
+                            _textCell(refData.contactName ?? "", font),
+                            _labelCell("聯絡電話", font, colSpan: 2),
+                            _textCell(refData.contactPhone ?? "", font),
+                            _labelCell("聯絡地址", font),
+                            _textCell(
+                              refData.contactAddress ?? "",
+                              font,
+                              colSpan: 2,
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+
+            // Row 2: Origin Hospital
+            pw.TableRow(
+              children: [
+                _verticalTextCell("原\n診\n治\n醫\n院", font, height: 350),
+                pw.Column(
+                  children: [
+                    pw.Row(
+                      crossAxisAlignment: pw.CrossAxisAlignment.start,
+                      children: [
+                        pw.Expanded(
+                          flex: 5,
+                          child: pw.Container(
+                            padding: const pw.EdgeInsets.all(4),
+                            decoration: const pw.BoxDecoration(
+                              border: pw.Border(
+                                right: pw.BorderSide(width: 0.5),
+                              ),
+                            ),
+                            child: pw.Column(
+                              crossAxisAlignment: pw.CrossAxisAlignment.start,
+                              children: [
+                                pw.Text(
+                                  "A.病情摘要(主訴、簡短病史)",
+                                  style: pw.TextStyle(
+                                    font: fontBold,
+                                    fontSize: 10,
+                                  ),
+                                ),
+                                pw.Text(
+                                  refData.handoverNotes ?? "",
+                                  style: bodyStyle,
+                                  maxLines: 4,
+                                ),
+                                pw.SizedBox(height: 10),
+                                pw.Text(
+                                  "B.診斷 ICD-10-CM/PCS 病名",
+                                  style: pw.TextStyle(
+                                    font: fontBold,
+                                    fontSize: 10,
+                                  ),
+                                ),
+                                pw.Text(
+                                  "1.(主診斷): ${refData.mainDiagnosis ?? ''} ${refData.selectedICD10Main ?? ''}",
+                                  style: bodyStyle,
+                                ),
+                                pw.Text(
+                                  "2. ${refData.subDiagnosis1 ?? ''} ${refData.selectedICD10Sub1 ?? ''}",
+                                  style: bodyStyle,
+                                ),
+                                pw.Text(
+                                  "3. ${refData.subDiagnosis2 ?? ''} ${refData.selectedICD10Sub2 ?? ''}",
+                                  style: bodyStyle,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        pw.Expanded(
+                          flex: 5,
+                          child: pw.Container(
+                            padding: const pw.EdgeInsets.all(4),
+                            child: pw.Column(
+                              crossAxisAlignment: pw.CrossAxisAlignment.start,
+                              children: [
+                                pw.Text(
+                                  "D.藥物過敏史",
+                                  style: pw.TextStyle(
+                                    font: fontBold,
+                                    fontSize: 10,
+                                  ),
+                                ),
+                                pw.Text(
+                                  "□無, □有(請詳述)_______________",
+                                  style: bodyStyle,
+                                ),
+                                pw.SizedBox(height: 20),
+                                pw.Text(
+                                  "E.醫師交班注意事項",
+                                  style: pw.TextStyle(
+                                    font: fontBold,
+                                    fontSize: 10,
+                                  ),
+                                ),
+                                pw.Text(
+                                  refData.handoverNotes ?? "",
+                                  style: bodyStyle,
+                                  maxLines: 5,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    pw.Divider(height: 1, thickness: 0.5),
+
+                    pw.Container(
+                      padding: const pw.EdgeInsets.all(4),
+                      child: pw.Column(
+                        crossAxisAlignment: pw.CrossAxisAlignment.start,
+                        children: [
+                          pw.Text(
+                            "C. 檢查及治療摘要",
+                            style: pw.TextStyle(font: fontBold, fontSize: 10),
+                          ),
+                          pw.Row(
+                            children: [
+                              pw.Expanded(
+                                child: pw.Text(
+                                  "1.最近一次檢查結果  日期: ${fmtDateShort(refData.lastExamDate)}",
+                                  style: bodyStyle,
+                                ),
+                              ),
+                              pw.Expanded(
+                                child: pw.Text(
+                                  "2.最近一次用藥或手術名稱  日期: ${fmtDateShort(refData.lastMedicationDate)}",
+                                  style: bodyStyle,
+                                ),
+                              ),
+                            ],
+                          ),
+                          pw.Text(
+                            "報告：${refData.furtherExamDetail ?? ''}",
+                            style: bodyStyle,
+                          ),
+                        ],
+                      ),
+                    ),
+                    pw.Divider(height: 1, thickness: 0.5),
+
+                    pw.Container(
+                      padding: const pw.EdgeInsets.all(4),
+                      child: pw.Row(
+                        crossAxisAlignment: pw.CrossAxisAlignment.start,
+                        children: [
+                          pw.Text("轉\n診\n目\n的", style: smallStyle),
+                          pw.SizedBox(width: 8),
+                          pw.Expanded(
+                            child: pw.Wrap(
+                              spacing: 8,
+                              runSpacing: 4,
+                              children: [
+                                pw.Text(
+                                  "${check(refData.referralPurposeIdx == 0)}1.急診治療",
+                                  style: bodyStyle,
+                                ),
+                                pw.Text(
+                                  "${check(refData.referralPurposeIdx == 1)}2.住院治療",
+                                  style: bodyStyle,
+                                ),
+                                pw.Text(
+                                  "${check(refData.referralPurposeIdx == 2)}3.門診治療",
+                                  style: bodyStyle,
+                                ),
+                                pw.Text(
+                                  "${check(refData.referralPurposeIdx == 3)}4.進一步檢查",
+                                  style: bodyStyle,
+                                ),
+                                pw.Text(
+                                  "${check(refData.referralPurposeIdx == 4)}5.轉回轉出或適當之院所繼續追蹤",
+                                  style: bodyStyle,
+                                ),
+                                pw.Text(
+                                  "${check(refData.referralPurposeIdx == 5)}6.其他 ${refData.otherPurposeDetail ?? ''}",
+                                  style: bodyStyle,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    pw.Divider(height: 1, thickness: 0.5),
+
+                    pw.Container(
+                      padding: const pw.EdgeInsets.all(4),
+                      child: pw.Column(
+                        children: [
+                          pw.Text(
+                            "經醫師解釋病情及轉診目的後同意轉院。",
+                            style: pw.TextStyle(
+                              font: fontBold,
+                              fontSize: 10,
+                              color: PdfColors.red,
+                            ),
+                          ),
+                          pw.Row(
+                            mainAxisAlignment:
+                                pw.MainAxisAlignment.spaceBetween,
+                            children: [
+                              pw.Row(
+                                children: [
+                                  pw.Text(
+                                    "同意人簽名: ",
+                                    style: pw.TextStyle(
+                                      font: fontBold,
+                                      fontSize: 10,
+                                      color: PdfColors.red,
+                                    ),
+                                  ),
+                                  if (refData.consentSignature != null)
+                                    pw.Image(
+                                      pw.MemoryImage(refData.consentSignature!),
+                                      height: 20,
+                                    ),
+                                ],
+                              ),
+                              pw.Text(
+                                "與病人關係: ${refData.relationToPatient ?? ''}",
+                                style: pw.TextStyle(
+                                  font: fontBold,
+                                  fontSize: 10,
+                                  color: PdfColors.red,
+                                ),
+                              ),
+                              pw.Text(
+                                "日期: ${fmtDate(refData.consentDateTime)}",
+                                style: pw.TextStyle(
+                                  font: fontBold,
+                                  fontSize: 10,
+                                  color: PdfColors.red,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    pw.Divider(height: 1, thickness: 0.5),
+
+                    pw.Table(
+                      border: border,
+                      columnWidths: {
+                        0: const pw.FixedColumnWidth(40),
+                        1: const pw.FlexColumnWidth(1),
+                        2: const pw.FixedColumnWidth(40),
+                        3: const pw.FixedColumnWidth(80),
+                        4: const pw.FixedColumnWidth(40),
+                        5: const pw.FixedColumnWidth(100),
+                      },
+                      children: [
+                        pw.TableRow(
+                          children: [
+                            _labelCell("院所地址", font),
+                            _textCell("337桃園市大園區航站南路9號及15號", font),
+                            _labelCell("聯絡\n電話", font),
+                            _textCell(
+                              "03-3983456",
+                              font,
+                              align: pw.Alignment.center,
+                            ),
+                            _labelCell("醫師簽章", font),
+                            pw.Container(
+                              height: 30,
+                              alignment: pw.Alignment.center,
+                              padding: const pw.EdgeInsets.all(2),
+                              child: refData.doctorSignature != null
+                                  ? pw.Image(
+                                      pw.MemoryImage(refData.doctorSignature!),
+                                      height: 25,
+                                    )
+                                  : null,
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+
+                    pw.Table(
+                      border: border,
+                      columnWidths: {
+                        0: const pw.FixedColumnWidth(30),
+                        1: const pw.FixedColumnWidth(30),
+                        2: const pw.FlexColumnWidth(1),
+                        3: const pw.FixedColumnWidth(30),
+                        4: const pw.FlexColumnWidth(1),
+                        5: const pw.FixedColumnWidth(30),
+                        6: const pw.FixedColumnWidth(80),
+                        7: const pw.FixedColumnWidth(30),
+                        8: const pw.FlexColumnWidth(1),
+                        9: const pw.FixedColumnWidth(40),
+                      },
+                      children: [
+                        pw.TableRow(
+                          children: [
+                            _labelCell("診治", font, rowSpan: 2),
+                            _labelCell("醫師", font),
+                            _textCell(physicianName, font),
+                            _labelCell("科別", font),
+                            _textCell(deptName, font),
+                            _labelCell("聯絡\n電話", font),
+                            _textCell("03-3983456", font),
+                            _labelCell("西元", font),
+                            _textCell(fmtDate(refData.appointmentDate), font),
+                            _labelCell("科\n診\n號", font, rowSpan: 2),
+                          ],
+                        ),
+                        pw.TableRow(
+                          children: [
+                            _labelCell("開單\n日期", font),
+                            _textCell(
+                              fmtDate(refData.issueDate),
+                              font,
+                              colSpan: 2,
+                            ),
+                            _labelCell("安排就醫日期", font, colSpan: 2),
+                            _textCell(
+                              fmtDate(refData.appointmentDate),
+                              font,
+                              colSpan: 3,
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+
+                    pw.Table(
+                      border: border,
+                      columnWidths: {
+                        0: const pw.FixedColumnWidth(60),
+                        1: const pw.FlexColumnWidth(1),
+                        2: const pw.FixedColumnWidth(40),
+                        3: const pw.FlexColumnWidth(0.5),
+                        4: const pw.FixedColumnWidth(40),
+                        5: const pw.FlexColumnWidth(0.5),
+                        6: const pw.FixedColumnWidth(70),
+                        7: const pw.FlexColumnWidth(1),
+                        8: const pw.FixedColumnWidth(30),
+                        9: const pw.FlexColumnWidth(0.8),
+                      },
+                      children: [
+                        pw.TableRow(
+                          children: [
+                            _labelCell("建議轉診\n院所科別", font, rowSpan: 1),
+                            _labelCell("醫院", font),
+                            _textCell(refData.referralHospitalName ?? "", font),
+                            _labelCell("科", font),
+                            _textCell(refDeptName, font),
+                            _labelCell("醫師", font),
+                            _textCell(refData.referralDoctorName ?? "", font),
+                            _labelCell("轉診所地址\n及專線電話", font),
+                            _labelCell("地址:\n電話:", font, fontSize: 8),
+                            pw.Column(
+                              crossAxisAlignment: pw.CrossAxisAlignment.start,
+                              children: [
+                                pw.Text(
+                                  refData.referralAddress ?? "",
+                                  style: smallStyle,
+                                ),
+                                pw.Text(
+                                  refData.referralPhone ?? "",
+                                  style: smallStyle,
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+
+            // Row 3: Receiving Hospital
+            pw.TableRow(
+              children: [
+                _verticalTextCell("接\n受\n轉\n診\n醫\n院", font, height: 150),
+                pw.Column(
+                  children: [
+                    pw.Row(
+                      children: [
+                        _pCell(
+                          "處\n理\n情\n形",
+                          font,
+                          width: 25,
+                          align: pw.Alignment.center,
+                        ),
+                        pw.Expanded(
+                          child: pw.Container(
+                            padding: const pw.EdgeInsets.all(4),
+                            decoration: const pw.BoxDecoration(
+                              border: pw.Border(
+                                left: pw.BorderSide(width: 0.5),
+                              ),
+                            ),
+                            child: pw.Column(
+                              crossAxisAlignment: pw.CrossAxisAlignment.start,
+                              children: [
+                                pw.Text(
+                                  "1.□已予急診處置並轉診至__________醫院",
+                                  style: bodyStyle,
+                                ),
+                                pw.Text(
+                                  "2.□已予急診處置，並住本院________病房治療中",
+                                  style: bodyStyle,
+                                ),
+                                pw.Text(
+                                  "3.□已安排住本院______________病房治療中",
+                                  style: bodyStyle,
+                                ),
+                                pw.Text(
+                                  "4.□已安排本院________________科門診治療中",
+                                  style: bodyStyle,
+                                ),
+                                pw.Text(
+                                  "5.□已予適當處置並轉回原院所，建議事項如下  6.□其他",
+                                  style: bodyStyle,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    pw.Divider(height: 1, thickness: 0.5),
+
+                    pw.Row(
+                      children: [
+                        _pCell(
+                          "診\n斷\n醫\n療\n摘\n要",
+                          font,
+                          width: 25,
+                          align: pw.Alignment.center,
+                        ),
+                        pw.Expanded(
+                          child: pw.Container(
+                            height: 60,
+                            padding: const pw.EdgeInsets.all(4),
+                            decoration: const pw.BoxDecoration(
+                              border: pw.Border(
+                                left: pw.BorderSide(width: 0.5),
+                              ),
+                            ),
+                            child: pw.Column(
+                              crossAxisAlignment: pw.CrossAxisAlignment.start,
+                              children: [
+                                pw.Row(
+                                  mainAxisAlignment:
+                                      pw.MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    pw.Text("1.主診斷", style: bodyStyle),
+                                    pw.Text("2.治療藥物或手術名稱", style: bodyStyle),
+                                    pw.Text("3.輔助診斷之檢查結果", style: bodyStyle),
+                                  ],
+                                ),
+                                pw.SizedBox(height: 5),
+                                pw.Text(
+                                  "ICD-10-CM/PCS: ______________   病名: ______________",
+                                  style: bodyStyle,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    pw.Divider(height: 1, thickness: 0.5),
+
+                    pw.Table(
+                      border: border,
+                      columnWidths: {
+                        0: const pw.FixedColumnWidth(25),
+                        1: const pw.FlexColumnWidth(1),
+                        2: const pw.FlexColumnWidth(1.5),
+                        3: const pw.FixedColumnWidth(30),
+                        4: const pw.FixedColumnWidth(40),
+                        5: const pw.FixedColumnWidth(30),
+                        6: const pw.FlexColumnWidth(1),
+                      },
+                      children: [
+                        pw.TableRow(
+                          children: [
+                            _labelCell("院所\n名稱", font),
+                            _textCell("", font),
+                            _pCell("電話或傳真:\n電子信箱:", font),
+                            _labelCell("科\n別", font),
+                            _textCell("", font),
+                            _labelCell("回覆\n日期", font),
+                            _pCell(
+                              "    年    月    日",
+                              font,
+                              align: pw.Alignment.center,
+                            ),
+                          ],
+                        ),
+                        pw.TableRow(
+                          children: [
+                            _labelCell("診治\n醫師", font),
+                            _textCell("", font),
+                            _pCell("", font),
+                            _labelCell("醫師\n簽章", font),
+                            _textCell("", font, colSpan: 3),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ],
+        ),
+
+        pw.SizedBox(height: 2),
+        pw.Row(
+          mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+          children: [
+            pw.Text("62-P-004-R15", style: smallStyle),
+            pw.Text("聯新(R905)2020/09x500 張", style: smallStyle),
+          ],
+        ),
+      ],
+    );
+  }
+
+  // --- PDF Helper Widgets ---
+  pw.Widget _labelCell(
+    String text,
+    pw.Font font, {
+    int colSpan = 1,
+    int rowSpan = 1,
+    double? fontSize,
+  }) {
+    return pw.Container(
+      padding: const pw.EdgeInsets.all(2),
+      alignment: pw.Alignment.center,
+      child: pw.Text(
+        text,
+        style: pw.TextStyle(font: font, fontSize: fontSize ?? 10),
+        textAlign: pw.TextAlign.center,
+      ),
+    );
+  }
+
+  pw.Widget _textCell(
+    String text,
+    pw.Font font, {
+    int colSpan = 1,
+    pw.Alignment align = pw.Alignment.centerLeft,
+  }) {
+    return pw.Container(
+      padding: const pw.EdgeInsets.all(2),
+      alignment: align,
+      child: pw.Text(text, style: pw.TextStyle(font: font, fontSize: 10)),
+    );
+  }
+
+  pw.Widget _verticalTextCell(String text, pw.Font font, {double? height}) {
+    return pw.Container(
+      height: height,
+      padding: const pw.EdgeInsets.symmetric(horizontal: 2),
+      alignment: pw.Alignment.center,
+      child: pw.Text(
+        text,
+        style: pw.TextStyle(font: font, fontSize: 10),
+        textAlign: pw.TextAlign.center,
+      ),
+    );
+  }
+
+  pw.Widget _pCell(
+    String text,
+    pw.Font font, {
+    pw.Alignment align = pw.Alignment.centerLeft,
+    int colSpan = 1,
+    int rowSpan = 1,
+    double? width,
+    double? height,
+    double fontSize = 10,
+  }) {
+    return pw.Container(
+      width: width,
+      height: height,
+      padding: const pw.EdgeInsets.all(2),
+      alignment: align,
+      child: pw.Text(
+        text,
+        style: pw.TextStyle(font: font, fontSize: fontSize),
       ),
     );
   }
@@ -408,9 +1053,9 @@ class _ReferralFormPageState extends State<ReferralFormPage>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // 第一部分 - 聯絡人資料
+                  // --- 第一部分：聯絡人 ---
                   Text(
-                    t.isZh ? "聯絡人資料" : "Contact Information",
+                    t.contactPersonInfo,
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
@@ -419,8 +1064,8 @@ class _ReferralFormPageState extends State<ReferralFormPage>
                   const SizedBox(height: 8),
                   _buildInputRow(
                     t,
-                    "${t.name}",
-                    t.isZh ? "請填寫聯絡人姓名" : "Enter contact name",
+                    t.contactName,
+                    t.enterContactName,
                     contactNameCtrl,
                     style: "outline",
                     width: 450,
@@ -428,8 +1073,8 @@ class _ReferralFormPageState extends State<ReferralFormPage>
                   const SizedBox(height: 8),
                   _buildInputRow(
                     t,
-                    "${t.phone}",
-                    t.isZh ? "請填寫聯絡人電話" : "Enter contact phone",
+                    t.contactPhoneNumber,
+                    t.enterContactPhone,
                     contactPhoneCtrl,
                     style: "outline",
                     width: 450,
@@ -437,24 +1082,22 @@ class _ReferralFormPageState extends State<ReferralFormPage>
                   const SizedBox(height: 8),
                   _buildInputRow(
                     t,
-                    "${t.address}",
-                    t.isZh ? "請填寫聯絡人地址" : "Enter contact address",
+                    t.contactAddressLabel,
+                    t.enterContactAddress,
                     contactAddressCtrl,
                     style: "outline",
                     width: 450,
                   ),
-
                   const Divider(thickness: 1, height: 32),
 
-                  // 第二部分 - 診斷
+                  // --- 第二部分：診斷 ---
                   Text(
-                    t.isZh ? "診斷ICD-10-CM/PCS病名" : "Diagnosis ICD-10-CM/PCS",
+                    t.diagnosisIcd10,
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
                     ),
                   ),
-
                   const SizedBox(height: 24),
                   _SectionTitle('主診斷的ICD-10'),
                   _buildICD10Selector("主診斷", data.selectedICD10Main, (v) {
@@ -473,8 +1116,9 @@ class _ReferralFormPageState extends State<ReferralFormPage>
                     data.selectedICD10Sub2 = v;
                     data.update();
                   }, actionButtonStyle),
-
                   const SizedBox(height: 16),
+
+                  // 左卡：摘要日期 / 右卡：轉診目的
                   Row(
                     children: [
                       Expanded(child: _buildLeftCard(t, data)),
@@ -483,21 +1127,20 @@ class _ReferralFormPageState extends State<ReferralFormPage>
                     ],
                   ),
 
-                  // ✅ 新增：醫師交班注意事項（獨立卡片）
+                  // 醫師交班
                   const SizedBox(height: 16),
                   _buildHandoverNotesCard(t, data),
-
                   const Divider(thickness: 1, height: 32),
 
-                  // 第三部分 - 醫師資訊
+                  // --- 第三部分：醫師資訊 ---
                   Text(
-                    t.isZh ? "診治醫生姓名" : "Attending Physician Name",
+                    t.treatingPhysicianName,
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
                   _buildDropdown(
                     t,
-                    t.isZh ? "醫師姓名：" : "Physician Name:",
+                    t.physicianName,
                     doctorList,
                     data.doctorIdx,
                     (idx) {
@@ -513,60 +1156,47 @@ class _ReferralFormPageState extends State<ReferralFormPage>
                       otherDoctorCtrl,
                       style: "outline",
                     ),
-
                   const SizedBox(height: 12),
                   Text(
-                    t.isZh ? "診治醫生科別" : "Physician Department",
+                    t.treatingPhysicianDept,
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
-                  _buildDropdown(
-                    t,
-                    t.isZh ? "醫師科別：" : "Physician Dept:",
-                    deptList,
-                    data.deptIdx,
-                    (idx) {
-                      data.deptIdx = idx;
-                      data.update();
-                    },
-                  ),
+                  _buildDropdown(t, t.physicianDept, deptList, data.deptIdx, (
+                    idx,
+                  ) {
+                    data.deptIdx = idx;
+                    data.update();
+                  }),
                   if (data.deptIdx == deptList.indexOf("其他"))
                     _buildInputRow(
                       t,
                       "${t.other}：",
-                      t.isZh ? "請輸入科別" : "Enter department",
+                      t.enterDeptName,
                       otherDeptCtrl,
                     ),
-
                   const SizedBox(height: 12),
                   Text(
-                    t.isZh ? "診治醫師簽名" : "Physician Signature",
+                    t.treatingPhysicianSignature,
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
-                  GestureDetector(
-                    onTap: () =>
-                        _openSignaturePad(_doctorSignController, (signData) {
-                          setState(() => data.doctorSignature = signData);
-                          data.update();
-                        }),
-                    child: Container(
-                      height: 150,
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.black54),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      alignment: Alignment.center,
-                      child: data.doctorSignature == null
-                          ? Text(
-                              t.tapToSign,
-                              style: const TextStyle(color: Colors.grey),
-                            )
-                          : Image.memory(data.doctorSignature!),
+                  // 簽名板 (已改為純顯示框，無 onTap)
+                  Container(
+                    height: 150,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.black54),
+                      borderRadius: BorderRadius.circular(8),
                     ),
+                    alignment: Alignment.center,
+                    child: data.doctorSignature == null
+                        ? Text(
+                            t.tapToSign + " (停用)",
+                            style: const TextStyle(color: Colors.grey),
+                          )
+                        : Image.memory(data.doctorSignature!),
                   ),
-
                   const Divider(thickness: 1, height: 32),
 
-                  // 第四部分 - 轉診院所
+                  // --- 第四部分：轉診院所 ---
                   Row(
                     children: [
                       Expanded(child: _buildLeftCard4(t, data)),
@@ -574,47 +1204,38 @@ class _ReferralFormPageState extends State<ReferralFormPage>
                       Expanded(child: _buildRightCard4(t, data)),
                     ],
                   ),
-
                   const Divider(thickness: 1, height: 32),
 
-                  // 同意區塊
+                  // --- 同意書 ---
                   Text(
-                    t.isZh
-                        ? "經醫師解釋病情及轉診目的後同意轉院。"
-                        : "After explanation by physician, agree to referral.",
+                    t.consentStatement,
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    t.isZh ? "同意人簽名" : "Consent Signature",
+                    t.consentPersonSignature,
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
-                  GestureDetector(
-                    onTap: () =>
-                        _openSignaturePad(_consentSignController, (signData) {
-                          setState(() => data.consentSignature = signData);
-                          data.update();
-                        }),
-                    child: Container(
-                      height: 150,
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.black54),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      alignment: Alignment.center,
-                      child: data.consentSignature == null
-                          ? Text(
-                              t.tapToSign,
-                              style: const TextStyle(color: Colors.grey),
-                            )
-                          : Image.memory(data.consentSignature!),
+                  // 簽名板 (已改為純顯示框，無 onTap)
+                  Container(
+                    height: 150,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.black54),
+                      borderRadius: BorderRadius.circular(8),
                     ),
+                    alignment: Alignment.center,
+                    child: data.consentSignature == null
+                        ? Text(
+                            t.tapToSign + " (停用)",
+                            style: const TextStyle(color: Colors.grey),
+                          )
+                        : Image.memory(data.consentSignature!),
                   ),
                   const SizedBox(height: 12),
                   _buildInputRow(
                     t,
-                    t.isZh ? "與病人關係：" : "Relation to Patient:",
-                    t.isZh ? "請填寫同意人與病人關係" : "Enter relation",
+                    t.relationToPatientLabel,
+                    t.enterRelation,
                     relationCtrl,
                     style: "underline",
                   ),
@@ -622,7 +1243,7 @@ class _ReferralFormPageState extends State<ReferralFormPage>
                   Row(
                     children: [
                       Text(
-                        "${t.isZh ? '簽名日期：' : 'Signature Date: '}${_formatDateTime(t, data.consentDateTime ?? DateTime.now())}",
+                        "${t.signatureDateTime}${_formatDateTime(t, data.consentDateTime ?? DateTime.now())}",
                       ),
                       const SizedBox(width: 12),
                       ElevatedButton(
@@ -630,13 +1251,40 @@ class _ReferralFormPageState extends State<ReferralFormPage>
                           data.consentDateTime = DateTime.now();
                           data.update();
                         },
-                        child: Text(t.isZh ? "更新時間" : "Update Time"),
+                        child: Text(t.updateTimeButton),
                         style: TextButton.styleFrom(
                           backgroundColor: const Color(0xFF83ACA9),
                           foregroundColor: Colors.white,
                         ),
                       ),
                     ],
+                  ),
+
+                  const SizedBox(height: 40),
+                  // --- 列印按鈕 ---
+                  Center(
+                    child: ElevatedButton.icon(
+                      onPressed: _printPdf,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF83ACA9),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 12,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      icon: const Icon(Icons.print, color: Colors.white),
+                      label: const Text(
+                        "列印 / Print",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -657,38 +1305,16 @@ class _ReferralFormPageState extends State<ReferralFormPage>
     String style = "underline",
     double? width,
   }) {
-    InputBorder getBorder() {
-      if (style == "outline") {
-        return OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Colors.grey),
-        );
-      } else if (style == "none") {
-        return InputBorder.none;
-      } else {
-        // underline
-        return const UnderlineInputBorder(
-          borderSide: BorderSide(color: Colors.grey),
-        );
-      }
-    }
-
-    InputBorder getFocusedBorder() {
-      if (style == "outline") {
-        return OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Colors.blue),
-        );
-      } else if (style == "none") {
-        return InputBorder.none;
-      } else {
-        // underline
-        return const UnderlineInputBorder(
-          borderSide: BorderSide(color: Colors.blue),
-        );
-      }
-    }
-
+    InputBorder getBorder() => style == "outline"
+        ? OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: const BorderSide(color: Colors.grey),
+          )
+        : style == "none"
+        ? InputBorder.none
+        : const UnderlineInputBorder(
+            borderSide: BorderSide(color: Colors.grey),
+          );
     return Row(
       children: [
         Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
@@ -706,7 +1332,7 @@ class _ReferralFormPageState extends State<ReferralFormPage>
                 horizontal: 8,
               ),
               enabledBorder: getBorder(),
-              focusedBorder: getFocusedBorder(),
+              focusedBorder: getBorder(),
             ),
             onChanged: (_) => _syncControllersToData(),
           ),
@@ -743,9 +1369,6 @@ class _ReferralFormPageState extends State<ReferralFormPage>
               enabledBorder: UnderlineInputBorder(
                 borderSide: BorderSide(color: Colors.grey),
               ),
-              focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: Colors.blue),
-              ),
             ),
           ),
         ),
@@ -754,16 +1377,16 @@ class _ReferralFormPageState extends State<ReferralFormPage>
   }
 
   Widget _buildLeftCard(AppTranslations t, ReferralData data) => Padding(
-    padding: const EdgeInsets.all(12), // 保留原本 Card 的內距
+    padding: const EdgeInsets.all(12),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          t.isZh ? "檢查及治療摘要" : "Exam & Treatment Summary",
+          t.examTreatmentSummary,
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 8),
-        Text(t.isZh ? "1. 最近一次檢查結果日期" : "1. Last Exam Date"),
+        Text(t.lastExamResultDate),
         TextButton(
           onPressed: () => _pickDate(context, (d) {
             data.lastExamDate = d;
@@ -772,7 +1395,7 @@ class _ReferralFormPageState extends State<ReferralFormPage>
           child: Text(_formatDate(t, data.lastExamDate ?? DateTime.now())),
         ),
         const SizedBox(height: 8),
-        Text(t.isZh ? "2. 最近一次用藥或手術名稱日期" : "2. Last Medication/Surgery Date"),
+        Text(t.lastMedicationSurgeryDate),
         TextButton(
           onPressed: () => _pickDate(context, (d) {
             data.lastMedicationDate = d;
@@ -787,18 +1410,19 @@ class _ReferralFormPageState extends State<ReferralFormPage>
   );
 
   Widget _buildRightCard(AppTranslations t, ReferralData data) => Padding(
-    padding: const EdgeInsets.all(12), // 保留原本 Card 的內距
+    padding: const EdgeInsets.all(12),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          t.isZh ? "轉診目的" : "Referral Purpose",
+          t.referralPurpose,
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 8),
         Column(
-          children: List.generate(referralPurposes.length, (index) {
-            return RadioListTile<int>(
+          children: List.generate(
+            referralPurposes.length,
+            (index) => RadioListTile<int>(
               title: Text(referralPurposes[index]),
               value: index,
               groupValue: data.referralPurposeIdx,
@@ -811,21 +1435,21 @@ class _ReferralFormPageState extends State<ReferralFormPage>
               activeColor: const Color(0xFF83ACA9),
               contentPadding: EdgeInsets.zero,
               dense: true,
-            );
-          }),
+            ),
+          ),
         ),
         if (data.referralPurposeIdx == referralPurposes.indexOf("其他"))
           _buildInputRow(
             t,
             "${t.other}：",
-            t.isZh ? "請填寫其他轉診目的" : "Enter other purpose",
+            t.enterOtherPurpose,
             otherPurposeCtrl,
           ),
         const SizedBox(height: 8),
         _buildInputRow(
           t,
-          t.isZh ? "進一步檢查詳情：" : "Further Exam Details:",
-          t.isZh ? "請填寫進一步檢查詳情" : "Enter further exam details",
+          t.furtherExamination,
+          t.enterExamItem,
           furtherExamCtrl,
         ),
       ],
@@ -842,27 +1466,22 @@ class _ReferralFormPageState extends State<ReferralFormPage>
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              t.isZh
-                  ? "醫師交班注意事項\n(生命徵象會自動帶入轉診單)"
-                  : "Physician Handover Notes\n(Vital signs are automatically pre-filled in the referral form.)",
+              t.isZh ? "醫師交班注意事項\n(生命徵象會自動帶入轉診單)" : "Physician Handover Notes",
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
             const SizedBox(height: 12),
             TextField(
               controller: handoverNotesCtrl,
-              maxLines: 5, // 允許多行輸入
+              maxLines: 5,
               decoration: InputDecoration(
-                hintText: t.isZh
-                    ? "請填寫交班注意事項..."
-                    : "Please enter handover notes...",
+                hintText: t.isZh ? "請填寫交班注意事項..." : "Enter notes...",
                 border: const OutlineInputBorder(),
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: 10,
                   vertical: 10,
                 ),
               ),
-              onChanged: (_) =>
-                  _syncControllersToData(), // 當文字改變時，同步資料到 ReferralData
+              onChanged: (_) => _syncControllersToData(),
             ),
           ],
         ),
@@ -871,26 +1490,23 @@ class _ReferralFormPageState extends State<ReferralFormPage>
   }
 
   Widget _buildLeftCard4(AppTranslations t, ReferralData data) => Padding(
-    padding: const EdgeInsets.all(12), // 保留內距，移除 Card 背景
+    padding: const EdgeInsets.all(12),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          t.isZh ? "開單日期" : "Issue Date",
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
+        Text(t.issueDate, style: const TextStyle(fontWeight: FontWeight.bold)),
         TextButton(
           onPressed: () => _pickDate(context, (d) {
             data.issueDate = d;
             data.update();
           }),
           child: Text(
-            "${t.date}：${_formatDate(t, data.issueDate ?? DateTime.now())}",
+            "${t.dateLabel}${_formatDate(t, data.issueDate ?? DateTime.now())}",
           ),
         ),
         const SizedBox(height: 8),
         Text(
-          t.isZh ? "安排就醫日期" : "Appointment Date",
+          t.appointmentDate,
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         TextButton(
@@ -899,30 +1515,30 @@ class _ReferralFormPageState extends State<ReferralFormPage>
             data.update();
           }),
           child: Text(
-            "${t.date}：${_formatDate(t, data.appointmentDate ?? DateTime.now())}",
+            "${t.dateLabel}${_formatDate(t, data.appointmentDate ?? DateTime.now())}",
           ),
         ),
         const SizedBox(height: 8),
         _buildInputRow(
           t,
-          t.isZh ? "安排就醫科別：" : "Appointment Dept:",
-          t.isZh ? "選填就醫科別" : "Optional dept",
+          t.appointmentDepartment,
+          t.enterAppointmentDept,
           appointmentDeptCtrl,
           style: "none",
         ),
         const SizedBox(height: 8),
         _buildInputRow(
           t,
-          t.isZh ? "安排就醫診間：" : "Appointment Room:",
-          t.isZh ? "選填就醫診間" : "Optional room",
+          t.appointmentRoom,
+          t.enterAppointmentRoom,
           appointmentRoomCtrl,
           style: "none",
         ),
         const SizedBox(height: 8),
         _buildInputRow(
           t,
-          t.isZh ? "安排就醫號碼：" : "Appointment No:",
-          t.isZh ? "選填就醫號碼" : "Optional number",
+          t.appointmentNumberLabel,
+          t.enterAppointmentNumber,
           appointmentNumberCtrl,
           style: "none",
         ),
@@ -931,21 +1547,21 @@ class _ReferralFormPageState extends State<ReferralFormPage>
   );
 
   Widget _buildRightCard4(AppTranslations t, ReferralData data) => Padding(
-    padding: const EdgeInsets.all(12), // 保留內距，移除 Card 背景
+    padding: const EdgeInsets.all(12),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildInputRow(
           t,
-          t.isZh ? "轉診院所名稱：" : "Referral Hospital:",
-          t.isZh ? "請填寫轉診院所名稱" : "Enter hospital name",
+          t.recommendedReferralHospital,
+          t.enterPrimaryDiagnosis,
           referralHospitalCtrl,
           style: "none",
         ),
         const SizedBox(height: 8),
         _buildDropdown(
           t,
-          t.isZh ? "轉診科別：" : "Referral Dept:",
+          t.recommendedHospitalDept,
           deptList,
           data.referralDeptIdx,
           (idx) {
@@ -957,98 +1573,36 @@ class _ReferralFormPageState extends State<ReferralFormPage>
           _buildInputRow(
             t,
             "${t.other}：",
-            t.isZh ? "請輸入科別" : "Enter department",
+            t.enterDeptName,
             otherReferralDeptCtrl,
           ),
         const SizedBox(height: 8),
         _buildInputRow(
           t,
-          t.isZh ? "轉診醫生姓名：" : "Referral Doctor:",
-          t.isZh ? "請填寫轉診醫生姓名" : "Enter doctor name",
+          t.recommendedHospitalPhysician,
+          t.enterHospitalPhysician,
           referralDoctorCtrl,
           style: "none",
         ),
         const SizedBox(height: 8),
         _buildInputRow(
           t,
-          t.isZh ? "轉診院所地址：" : "Referral Address:",
-          t.isZh ? "請填寫轉診院所地址" : "Enter address",
+          t.recommendedHospitalAddress,
+          t.enterHospitalAddress,
           referralAddressCtrl,
           style: "none",
         ),
         const SizedBox(height: 8),
         _buildInputRow(
           t,
-          t.isZh ? "轉診院所電話：" : "Referral Phone:",
-          t.isZh ? "請填寫轉診院所電話" : "Enter phone",
+          t.recommendedHospitalPhone,
+          t.enterHospitalPhone,
           referralPhoneCtrl,
           style: "none",
         ),
       ],
     ),
   );
-
-  Widget _buildRadio(
-    AppTranslations t,
-    int value,
-    String text,
-    ReferralData data,
-  ) {
-    final radioColor = MaterialStateProperty.resolveWith<Color?>(
-      (states) => states.contains(MaterialState.selected)
-          ? const Color(0xFF83ACA9)
-          : Colors.grey,
-    );
-    return Row(
-      children: [
-        Radio<int>(
-          value: value,
-          groupValue: data.referralPurposeIdx,
-          onChanged: (val) {
-            data.referralPurposeIdx = val;
-            data.update();
-          },
-          fillColor: radioColor,
-        ),
-        Text(text),
-      ],
-    );
-  }
-
-  Widget _buildRadioWithInput(
-    AppTranslations t,
-    int value,
-    String text,
-    String label,
-    String hint,
-    TextEditingController ctrl,
-    ReferralData data,
-  ) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Radio<int>(
-              value: value,
-              groupValue: data.referralPurposeIdx,
-              onChanged: (val) {
-                data.referralPurposeIdx = val;
-                data.update();
-              },
-              fillColor: radioColor,
-            ),
-            Text(text),
-          ],
-        ),
-        if (data.referralPurposeIdx == value)
-          Padding(
-            padding: const EdgeInsets.only(left: 36),
-            child: _buildInputRow(t, label, hint, ctrl),
-          ),
-      ],
-    );
-  }
 
   Future<void> _pickDate(
     BuildContext context,
@@ -1060,18 +1614,11 @@ class _ReferralFormPageState extends State<ReferralFormPage>
       firstDate: DateTime(2000),
       lastDate: DateTime(2100),
     );
-    if (picked != null) {
-      onPicked(picked);
-    }
+    if (picked != null) onPicked(picked);
   }
 
-  String _formatDate(AppTranslations t, DateTime dt) {
-    return t.formatDate(dt);
-  }
-
-  String _formatDateTime(AppTranslations t, DateTime dt) {
-    return t.formatDate(dt);
-  }
+  String _formatDate(AppTranslations t, DateTime dt) => t.formatDate(dt);
+  String _formatDateTime(AppTranslations t, DateTime dt) => t.formatDate(dt);
 
   Widget _buildICD10Selector(
     String label,
@@ -1082,32 +1629,31 @@ class _ReferralFormPageState extends State<ReferralFormPage>
     final t = AppTranslations.of(context);
     Future<String?> _openDialog(String initial) async {
       final controller = TextEditingController(text: initial);
-      final result = await showDialog<String?>(
+      return showDialog<String?>(
         context: context,
         builder: (context) => AlertDialog(
-          title: Text(t.isZh ? '選擇 ICD-10' : 'Select ICD-10'),
+          title: Text(t.selectIcd10),
           content: TextField(
             controller: controller,
             decoration: InputDecoration(
-              hintText: t.isZh ? '輸入代碼或名稱' : 'Enter code or name',
+              hintText: t.isZh ? '輸入代碼或名稱' : 'Enter code/name',
             ),
             autofocus: true,
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: Text(t.isZh ? '取消' : 'Cancel'),
+              child: Text(t.cancel),
             ),
             TextButton(
               onPressed: () => Navigator.of(context).pop(
                 controller.text.trim().isEmpty ? null : controller.text.trim(),
               ),
-              child: Text(t.isZh ? '確認' : 'OK'),
+              child: Text(t.confirm),
             ),
           ],
         ),
       );
-      return result;
     }
 
     return Row(
@@ -1151,63 +1697,17 @@ class _ReferralFormPageState extends State<ReferralFormPage>
       ],
     );
   }
-
-  // 若要顯示診斷類別的選項（簡單實作，接受 planData 動態物件）
-  Widget _buildDiagnosisCategory(dynamic planData) {
-    final categories = ['急性', '慢性', '其他'];
-    int? selected;
-    try {
-      final v = planData?.diagnosisCategoryIndex;
-      if (v is int) selected = v;
-    } catch (_) {}
-
-    return Row(
-      children: List.generate(categories.length, (i) {
-        return Expanded(
-          child: RadioListTile<int>(
-            title: Text(categories[i]),
-            value: i,
-            groupValue: selected,
-            onChanged: (val) {
-              // 試著更新 planData（包在 try/catch 以避免 runtime error）
-              try {
-                if (planData != null) {
-                  planData.diagnosisCategoryIndex = val;
-                  // 如果有 update 方法就呼叫它
-                  if (planData.update != null) {
-                    planData.update();
-                  }
-                }
-              } catch (_) {}
-              // 更新 UI
-              (this as State).setState(() {});
-            },
-            fillColor: MaterialStateProperty.resolveWith<Color?>(
-              (states) => states.contains(MaterialState.selected)
-                  ? const Color(0xFF83ACA9)
-                  : null,
-            ),
-            dense: true,
-            contentPadding: EdgeInsets.zero,
-          ),
-        );
-      }),
-    );
-  }
 }
 
 class _SectionTitle extends StatelessWidget {
   final String title;
   const _SectionTitle(this.title, {Key? key}) : super(key: key);
-
   @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8.0),
-      child: Text(
-        title,
-        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-      ),
-    );
-  }
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.only(bottom: 8.0),
+    child: Text(
+      title,
+      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+    ),
+  );
 }
