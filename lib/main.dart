@@ -11,7 +11,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Chikawa Airport',
       theme: ThemeData(primarySwatch: Colors.blue),
-      home: const MyHomePage(title: 'Chikawa Airport Home Page'),
+      // home: const MyHomePage(title: 'Chikawa Airport Home Page'),
     );
   }
 }
