@@ -12,7 +12,6 @@ class _FilterBarState extends State<FilterBar> {
 
   // 顏色定義
   static const Color primaryColor = Color(0xFF007A8A);
-  static const Color textDark = Color(0xFF1E293B);
   static const Color textMuted = Color(0xFF64748B);
   static const Color borderColor = Color(0xFFE2E8F0);
 
@@ -66,7 +65,7 @@ class _FilterBarState extends State<FilterBar> {
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: primaryColor.withOpacity(0.2),
+                    color: primaryColor.withValues(alpha: 0.2),
                     blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),

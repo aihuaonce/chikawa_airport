@@ -65,7 +65,7 @@ class PaginationBar extends StatelessWidget {
         backgroundColor: Colors.white,
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
         side: BorderSide(
-          color: isDisabled ? borderColor.withOpacity(0.5) : borderColor,
+          color: isDisabled ? borderColor.withValues(alpha: 0.5) : borderColor,
         ),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
         elevation: 0,
@@ -75,7 +75,7 @@ class PaginationBar extends StatelessWidget {
         style: TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.w800,
-          color: isDisabled ? textMuted.withOpacity(0.5) : textDark,
+          color: isDisabled ? textMuted.withValues(alpha: 0.5) : textDark,
         ),
       ),
     );

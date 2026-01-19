@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import '../models/record_page.dart';
 
 class HeaderBar extends StatefulWidget {
-  const HeaderBar({super.key});
+  final RecordPage currentPage;
+
+  const HeaderBar({super.key, required this.currentPage});
 
   @override
   State<HeaderBar> createState() => _HeaderBarState();
@@ -17,6 +20,18 @@ class _HeaderBarState extends State<HeaderBar> {
   static const Color bgLight = Color(0xFFF8FAFC);
   static const Color borderColor = Color(0xFFE2E8F0);
 
+  // 根據頁面返回標題
+  String _getPageTitle() {
+    switch (widget.currentPage) {
+      case RecordPage.primary:
+        return '主診記錄';
+      case RecordPage.ambulance:
+        return '救護車記錄';
+      case RecordPage.firstAid:
+        return '急救記錄';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -28,9 +43,9 @@ class _HeaderBarState extends State<HeaderBar> {
       ),
       child: Row(
         children: [
-          const Text(
-            '機場出診單概覽',
-            style: TextStyle(
+          Text(
+            _getPageTitle(),
+            style: const TextStyle(
               color: textDark,
               fontSize: 20,
               fontWeight: FontWeight.w800,
@@ -97,7 +112,7 @@ class _HeaderBarState extends State<HeaderBar> {
             decoration: BoxDecoration(
               boxShadow: [
                 BoxShadow(
-                  color: primaryColor.withOpacity(0.2),
+                  color: primaryColor.withValues(alpha: 0.2),
                   blurRadius: 10,
                   offset: const Offset(0, 4),
                 ),
@@ -153,7 +168,7 @@ class _HeaderBarState extends State<HeaderBar> {
                 borderRadius: BorderRadius.circular(6),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
+                    color: Colors.black.withValues(alpha: 0.05),
                     blurRadius: 2,
                     offset: const Offset(0, 1),
                   ),

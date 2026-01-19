@@ -5,7 +5,6 @@ import 'pagination_bar.dart';
 
 class RecordsTable extends StatelessWidget {
   const RecordsTable({super.key});
-
   // 顏色定義
   static const Color borderColor = Color(0xFFE2E8F0);
   static const Color headerBg = Color(0xFFF8FAFC);
@@ -22,7 +21,7 @@ class RecordsTable extends StatelessWidget {
           border: Border.all(color: borderColor, width: 1),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.03),
+              color: Colors.black.withValues(alpha: 0.03),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),

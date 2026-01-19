@@ -1,18 +1,25 @@
 import 'package:flutter/material.dart';
+import '../models/record_page.dart';
 
-class SideBar extends StatefulWidget {
-  const SideBar({super.key});
+class Sidebar extends StatefulWidget {
+  final RecordPage currentPage;
+  final ValueChanged<RecordPage> onPageChanged;
+
+  const Sidebar({
+    super.key,
+    required this.currentPage,
+    required this.onPageChanged,
+  });
 
   @override
-  State<SideBar> createState() => _SideBarState();
+  State<Sidebar> createState() => _SidebarState();
 }
 
-class _SideBarState extends State<SideBar> {
+class _SidebarState extends State<Sidebar> {
   bool _isExpanded = true;
 
   // 顏色定義
   static const Color primaryColor = Color(0xFF007A8A);
-  static const Color textDark = Color(0xFF1E293B);
   static const Color textMuted = Color(0xFF64748B);
   static const Color borderColor = Color(0xFFE2E8F0);
 
@@ -26,65 +33,75 @@ class _SideBarState extends State<SideBar> {
         color: Colors.white,
         border: Border(right: BorderSide(color: borderColor, width: 1)),
       ),
-      child: Column(
-        children: [
-          _buildHeader(),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final showText = constraints.maxWidth > 150;
 
-          const SizedBox(height: 20),
-
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              child: Column(
-                children: [
-                  _SidebarItem(
-                    icon: Icons.assignment,
-                    label: '主診記錄',
-                    isActive: true,
-                    isExpanded: _isExpanded,
+          return Column(
+            children: [
+              _buildHeader(showText),
+              const SizedBox(height: 20),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: Column(
+                    children: [
+                      _SidebarItem(
+                        icon: Icons.assignment,
+                        label: '主診記錄',
+                        isActive: widget.currentPage == RecordPage.primary,
+                        showText: showText,
+                        onTap: () => widget.onPageChanged(RecordPage.primary),
+                      ),
+                      _SidebarItem(
+                        icon: Icons.emergency,
+                        label: '救護車記錄',
+                        isActive: widget.currentPage == RecordPage.ambulance,
+                        showText: showText,
+                        onTap: () => widget.onPageChanged(RecordPage.ambulance),
+                      ),
+                      _SidebarItem(
+                        icon: Icons.medical_information,
+                        label: '急救記錄',
+                        isActive: widget.currentPage == RecordPage.firstAid,
+                        showText: showText,
+                        onTap: () => widget.onPageChanged(RecordPage.firstAid),
+                      ),
+                    ],
                   ),
-                  _SidebarItem(
-                    icon: Icons.emergency,
-                    label: '救護車記錄',
-                    isActive: false,
-                    isExpanded: _isExpanded,
-                  ),
-                  _SidebarItem(
-                    icon: Icons.medical_information,
-                    label: '急救記錄',
-                    isActive: false,
-                    isExpanded: _isExpanded,
-                  ),
-                ],
+                ),
               ),
-            ),
-          ),
-
-          _buildFooter(),
-        ],
+              _buildFooter(),
+            ],
+          );
+        },
       ),
     );
   }
 
   // 頂部 Logo
-  Widget _buildHeader() {
+  Widget _buildHeader(bool showText) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 20),
       child: Row(
-        mainAxisAlignment: _isExpanded
+        mainAxisAlignment: showText
             ? MainAxisAlignment.start
             : MainAxisAlignment.center,
         children: [
           const Icon(Icons.medical_services, color: primaryColor, size: 32),
-          if (_isExpanded) ...[
+          if (showText) ...[
             const SizedBox(width: 12),
-            const Text(
-              '聯新機場醫療中心',
-              style: TextStyle(
-                color: primaryColor,
-                fontSize: 18,
-                fontWeight: FontWeight.w900,
-                letterSpacing: -0.5,
+            const Expanded(
+              child: Text(
+                '聯新機場醫療中心',
+                style: TextStyle(
+                  color: primaryColor,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: -0.5,
+                ),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
               ),
             ),
           ],
@@ -112,13 +129,15 @@ class _SidebarItem extends StatelessWidget {
   final IconData icon;
   final String label;
   final bool isActive;
-  final bool isExpanded;
+  final bool showText;
+  final VoidCallback onTap;
 
   const _SidebarItem({
     required this.icon,
     required this.label,
     required this.isActive,
-    required this.isExpanded,
+    required this.showText,
+    required this.onTap,
   });
 
   @override
@@ -126,7 +145,7 @@ class _SidebarItem extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: InkWell(
-        onTap: () {},
+        onTap: onTap,
         borderRadius: BorderRadius.circular(12),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 300),
@@ -138,7 +157,7 @@ class _SidebarItem extends StatelessWidget {
             boxShadow: isActive
                 ? [
                     BoxShadow(
-                      color: const Color(0xFF007A8A).withOpacity(0.2),
+                      color: const Color(0xFF007A8A).withValues(alpha: .2),
                       blurRadius: 8,
                       offset: const Offset(0, 4),
                     ),
@@ -146,7 +165,7 @@ class _SidebarItem extends StatelessWidget {
                 : [],
           ),
           child: Row(
-            mainAxisAlignment: isExpanded
+            mainAxisAlignment: showText
                 ? MainAxisAlignment.start
                 : MainAxisAlignment.center,
             children: [
@@ -155,14 +174,18 @@ class _SidebarItem extends StatelessWidget {
                 color: isActive ? Colors.white : const Color(0xFF64748B),
                 size: 22,
               ),
-              if (isExpanded) ...[
+              if (showText) ...[
                 const SizedBox(width: 16),
-                Text(
-                  label,
-                  style: TextStyle(
-                    color: isActive ? Colors.white : const Color(0xFF64748B),
-                    fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
-                    fontSize: 14,
+                Expanded(
+                  child: Text(
+                    label,
+                    style: TextStyle(
+                      color: isActive ? Colors.white : const Color(0xFF64748B),
+                      fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
+                      fontSize: 14,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
                   ),
                 ),
               ],
