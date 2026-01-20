@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../models/medical_record.dart';
+import '../../data/models/medical_record.dart';
 
 class RecordRow extends StatelessWidget {
   final MedicalRecord record;

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../models/record_page.dart';
+import '../../data/models/record_page.dart';
 
 class HeaderBar extends StatefulWidget {
   final RecordPage currentPage;

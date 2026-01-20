@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../models/medical_record.dart';
+import '../../data/models/medical_record.dart';
 import 'record_row.dart';
 import 'pagination_bar.dart';
 

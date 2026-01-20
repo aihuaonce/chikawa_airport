@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-import '../widgets/sidebar.dart';
-import '../widgets/header_bar.dart';
-import '../widgets/filter_bar.dart';
-import '../widgets/records_table.dart';
-import '../models/record_page.dart';
+import 'widgets/sidebar.dart';
+import 'widgets/header_bar.dart';
+import 'widgets/filter_bar.dart';
+import 'widgets/records_table.dart';
+import '../data/models/record_page.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
