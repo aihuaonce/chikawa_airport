@@ -54,14 +54,14 @@ class _SidebarState extends State<Sidebar> {
                         onTap: () => widget.onPageChanged(RecordPage.primary),
                       ),
                       _SidebarItem(
-                        icon: Icons.emergency,
+                        icon: Icons.local_hospital,
                         label: '救護車記錄',
                         isActive: widget.currentPage == RecordPage.ambulance,
                         showText: showText,
                         onTap: () => widget.onPageChanged(RecordPage.ambulance),
                       ),
                       _SidebarItem(
-                        icon: Icons.medical_information,
+                        icon: Icons.emergency,
                         label: '急救記錄',
                         isActive: widget.currentPage == RecordPage.firstAid,
                         showText: showText,

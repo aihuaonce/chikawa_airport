@@ -16,7 +16,7 @@ class _MedicalPageState extends State<MedicalPage> {
 
   final List<Map<String, dynamic>> _sections = [
     {'title': '個人資料 (Personal Info)', 'icon': Icons.account_circle_outlined},
-    {'title': '飛航記錄 (Flight Log)', 'icon': Icons.medical_information_outlined},
+    {'title': '飛航記錄 (Flight Log)', 'icon': Icons.airplanemode_active_outlined},
   ];
 
   Widget _getCurrentPage() {
