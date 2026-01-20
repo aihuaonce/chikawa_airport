@@ -2,10 +2,33 @@ import 'package:flutter/material.dart';
 import 'widgets/medical_header.dart';
 import 'pages/personal_info.dart';
 
-class MedicalPage extends StatelessWidget {
+class MedicalPage extends StatefulWidget {
   const MedicalPage({super.key});
 
+  @override
+  State<MedicalPage> createState() => _MedicalPageState();
+}
+
+class _MedicalPageState extends State<MedicalPage> {
   static const Color bgLight = Color(0xFFF6F8FA);
+
+  int _currentSectionIndex = 0;
+
+  final List<Map<String, dynamic>> _sections = [
+    {'title': '個人資料 (Personal Info)', 'icon': Icons.account_circle_outlined},
+    {'title': '飛航記錄 (Flight Log)', 'icon': Icons.medical_information_outlined},
+  ];
+
+  Widget _getCurrentPage() {
+    switch (_currentSectionIndex) {
+      case 0:
+        return const PersonalInfo();
+      case 1:
+        return const Center(child: Text('飛航記錄頁面'));
+      default:
+        return const PersonalInfo();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +37,15 @@ class MedicalPage extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            const MedicalHeader(),
+            MedicalHeader(
+              sections: _sections,
+              currentIndex: _currentSectionIndex,
+              onSectionChanged: (index) {
+                setState(() {
+                  _currentSectionIndex = index;
+                });
+              },
+            ),
 
             Expanded(
               child: SingleChildScrollView(
@@ -22,11 +53,7 @@ class MedicalPage extends StatelessWidget {
                   horizontal: 24,
                   vertical: 32,
                 ),
-                child: Column(
-                  children: const [
-                    PersonalInfo(), // 直接呼叫此組件
-                  ],
-                ),
+                child: _getCurrentPage(),
               ),
             ),
           ],

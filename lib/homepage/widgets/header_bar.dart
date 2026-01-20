@@ -113,7 +113,7 @@ class _HeaderBarState extends State<HeaderBar> {
             decoration: BoxDecoration(
               boxShadow: [
                 BoxShadow(
-                  color: primaryColor.withOpacity(0.2),
+                  color: primaryColor.withValues(alpha: 0.2),
                   blurRadius: 10,
                   offset: const Offset(0, 4),
                 ),
@@ -174,7 +174,7 @@ class _HeaderBarState extends State<HeaderBar> {
                 borderRadius: BorderRadius.circular(6),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
+                    color: Colors.black.withValues(alpha: 0.05),
                     blurRadius: 2,
                     offset: const Offset(0, 1),
                   ),

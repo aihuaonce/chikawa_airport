@@ -1,7 +1,16 @@
 import 'package:flutter/material.dart';
 
 class MedicalHeader extends StatelessWidget {
-  const MedicalHeader({super.key});
+  final List<Map<String, dynamic>> sections;
+  final int currentIndex;
+  final Function(int) onSectionChanged;
+
+  const MedicalHeader({
+    super.key,
+    required this.sections,
+    required this.currentIndex,
+    required this.onSectionChanged,
+  });
 
   static const Color primaryColor = Color(0xFF007A8A);
   static const Color textDark = Color(0xFF1E293B);
@@ -66,7 +75,7 @@ class MedicalHeader extends StatelessWidget {
           ),
           const SizedBox(height: 8),
 
-          _buildSectionSelector(),
+          _buildSectionSelector(context),
         ],
       ),
     );
@@ -105,14 +114,19 @@ class MedicalHeader extends StatelessWidget {
             decoration: BoxDecoration(
               boxShadow: [
                 BoxShadow(
-                  color: primaryColor.withOpacity(0.2),
+                  color: primaryColor.withValues(alpha: 0.2),
                   blurRadius: 6,
                   offset: const Offset(0, 2),
                 ),
               ],
             ),
             child: ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                // 點擊「下一部分」時切換到下一個section
+                if (currentIndex < sections.length - 1) {
+                  onSectionChanged(currentIndex + 1);
+                }
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: primaryColor,
                 foregroundColor: Colors.white,
@@ -142,37 +156,134 @@ class MedicalHeader extends StatelessWidget {
     );
   }
 
-  Widget _buildSectionSelector() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: primaryColor.withOpacity(0.3)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.02),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: const Row(
-        children: [
-          Icon(Icons.account_circle_outlined, color: primaryColor, size: 22),
-          SizedBox(width: 12),
-          Text(
-            '個人資料 (Personal Info)',
-            style: TextStyle(
-              color: textDark,
-              fontSize: 14,
-              fontWeight: FontWeight.w700,
+  Widget _buildSectionSelector(BuildContext context) {
+    return GestureDetector(
+      onTap: () => _showSectionMenu(context),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: primaryColor.withValues(alpha: 0.3)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.02),
+              blurRadius: 10,
+              offset: const Offset(0, 2),
             ),
-          ),
-          Spacer(),
-          Icon(Icons.keyboard_arrow_down, color: textMuted, size: 20),
-        ],
+          ],
+        ),
+        child: Row(
+          children: [
+            Icon(
+              sections[currentIndex]['icon'] as IconData,
+              color: primaryColor,
+              size: 22,
+            ),
+            const SizedBox(width: 12),
+            Text(
+              sections[currentIndex]['title'] as String,
+              style: const TextStyle(
+                color: textDark,
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            const Spacer(),
+            const Icon(Icons.keyboard_arrow_down, color: textMuted, size: 20),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showSectionMenu(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => Container(
+        padding: const EdgeInsets.symmetric(vertical: 20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              margin: const EdgeInsets.only(bottom: 20),
+              decoration: BoxDecoration(
+                color: borderColor,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'SELECT SECTION',
+                  style: TextStyle(
+                    color: textMuted,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            ...List.generate(sections.length, (index) {
+              final isSelected = index == currentIndex;
+              return InkWell(
+                onTap: () {
+                  onSectionChanged(index);
+                  Navigator.pop(context);
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 16,
+                  ),
+                  color: isSelected
+                      ? primaryColor.withValues(alpha: 0.05)
+                      : Colors.transparent,
+                  child: Row(
+                    children: [
+                      Icon(
+                        sections[index]['icon'] as IconData,
+                        color: isSelected ? primaryColor : textMuted,
+                        size: 22,
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Text(
+                          sections[index]['title'] as String,
+                          style: TextStyle(
+                            color: isSelected ? primaryColor : textDark,
+                            fontSize: 14,
+                            fontWeight: isSelected
+                                ? FontWeight.w700
+                                : FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                      if (isSelected)
+                        const Icon(
+                          Icons.check_circle,
+                          color: primaryColor,
+                          size: 20,
+                        ),
+                    ],
+                  ),
+                ),
+              );
+            }),
+            const SizedBox(height: 10),
+          ],
+        ),
       ),
     );
   }

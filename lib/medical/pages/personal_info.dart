@@ -242,7 +242,7 @@ class PersonalInfo extends StatelessWidget {
       maxLines: maxLines,
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: TextStyle(color: textMuted.withOpacity(0.5), fontSize: 14),
+        hintStyle: TextStyle(color: textMuted.withValues(alpha: 0.5), fontSize: 14),
         filled: true,
         fillColor: Colors.white,
         suffixIcon: suffixIcon != null
@@ -278,7 +278,7 @@ class PersonalInfo extends StatelessWidget {
           const SizedBox(width: 8),
           Text(
             hint,
-            style: TextStyle(color: textMuted.withOpacity(0.5), fontSize: 14),
+            style: TextStyle(color: textMuted.withValues(alpha: 0.5), fontSize: 14),
           ),
           const Spacer(),
           const Icon(Icons.keyboard_arrow_down, size: 20, color: textMuted),
@@ -323,7 +323,7 @@ class _SlidingGenderToggleState extends State<SlidingGenderToggle> {
                     borderRadius: BorderRadius.circular(6),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
+                        color: Colors.black.withValues(alpha: 0.05),
                         blurRadius: 4,
                         offset: const Offset(0, 2),
                       ),
