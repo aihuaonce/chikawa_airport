@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../data/models/record_page.dart';
+import '../../medical/medical.dart';
 
 class HeaderBar extends StatefulWidget {
   final RecordPage currentPage;
@@ -112,14 +113,19 @@ class _HeaderBarState extends State<HeaderBar> {
             decoration: BoxDecoration(
               boxShadow: [
                 BoxShadow(
-                  color: primaryColor.withValues(alpha: 0.2),
+                  color: primaryColor.withOpacity(0.2),
                   blurRadius: 10,
                   offset: const Offset(0, 4),
                 ),
               ],
             ),
             child: ElevatedButton.icon(
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const MedicalPage()),
+                );
+              },
               icon: const Icon(Icons.person_add, size: 20, color: Colors.white),
               label: const Text('新增病患'),
               style: ElevatedButton.styleFrom(
@@ -168,7 +174,7 @@ class _HeaderBarState extends State<HeaderBar> {
                 borderRadius: BorderRadius.circular(6),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.05),
+                    color: Colors.black.withOpacity(0.05),
                     blurRadius: 2,
                     offset: const Offset(0, 1),
                   ),
