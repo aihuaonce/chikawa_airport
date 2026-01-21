@@ -1,15 +1,14 @@
 import 'package:drift/drift.dart';
-import '../database.dart'; // 導入你的資料庫定義
+import '../database.dart';
 import '../tables/medical_tables.dart';
 
-part 'medical_dao.g.dart'; // Drift 會自動生成
+part 'medical_dao.g.dart';
 
 @DriftAccessor(tables: [MedicalRecord, Patient])
 class MedicalDao extends DatabaseAccessor<AppDatabase> with _$MedicalDaoMixin {
-  // 建構子
-  MedicalDao(AppDatabase db) : super(db);
+  MedicalDao(super.db);
 
-  // 將剛才的新增邏輯搬到這裡
+  // 建立新的病患記錄，並回傳 medicalId
   Future<int> createNewPatientRecord() async {
     return transaction(() async {
       // 1. 建立醫療主表記錄
@@ -25,5 +24,31 @@ class MedicalDao extends DatabaseAccessor<AppDatabase> with _$MedicalDaoMixin {
 
       return medicalId;
     });
+  }
+
+  // 根據 medicalId 獲取病患資料
+  Future<PatientData?> getPatientByMedicalId(int medicalId) {
+    return (select(
+      patient,
+    )..where((tbl) => tbl.medicalId.equals(medicalId))).getSingleOrNull();
+  }
+
+  // 更新病患資料
+  Future<bool> updatePatient(PatientData data) {
+    return update(patient).replace(data);
+  }
+
+  // 更新病患資料的特定欄位
+  Future<int> updatePatientColumn(int medicalId, PatientCompanion companion) {
+    return (update(
+      patient,
+    )..where((tbl) => tbl.medicalId.equals(medicalId))).write(companion);
+  }
+
+  // 根據 medicalId 獲取醫療主表記錄
+  Future<MedicalRecordData?> getMedicalById(int medicalId) {
+    return (select(
+      medicalRecord,
+    )..where((tbl) => tbl.medicalId.equals(medicalId))).getSingleOrNull();
   }
 }

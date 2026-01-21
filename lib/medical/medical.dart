@@ -3,7 +3,9 @@ import 'widgets/medical_header.dart';
 import 'pages/personal_info.dart';
 
 class MedicalPage extends StatefulWidget {
-  const MedicalPage({super.key});
+  final int medicalId;
+
+  const MedicalPage({super.key, required this.medicalId});
 
   @override
   State<MedicalPage> createState() => _MedicalPageState();
@@ -22,11 +24,11 @@ class _MedicalPageState extends State<MedicalPage> {
   Widget _getCurrentPage() {
     switch (_currentSectionIndex) {
       case 0:
-        return const PersonalInfo();
+        return PersonalInfo(medicalId: widget.medicalId);
       case 1:
         return const Center(child: Text('飛航記錄頁面'));
       default:
-        return const PersonalInfo();
+        return PersonalInfo(medicalId: widget.medicalId);
     }
   }
 

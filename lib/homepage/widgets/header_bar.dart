@@ -1,4 +1,7 @@
+import 'package:chikawa_airport/data/db/database.dart';
+import 'package:chikawa_airport/data/models/medical_view.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../data/models/record_page.dart';
 import '../../medical/medical.dart';
 
@@ -120,11 +123,24 @@ class _HeaderBarState extends State<HeaderBar> {
               ],
             ),
             child: ElevatedButton.icon(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const MedicalPage()),
-                );
+              onPressed: () async {
+                final database = context.read<AppDatabase>();
+
+                final newId = await database.medicalDao
+                    .createNewPatientRecord();
+
+                if (context.mounted) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ChangeNotifierProvider(
+                        create: (_) =>
+                            MedicalViewModel(database, newId)..init(),
+                        child: MedicalPage(medicalId: newId),
+                      ),
+                    ),
+                  );
+                }
               },
               icon: const Icon(Icons.person_add, size: 20, color: Colors.white),
               label: const Text('新增病患'),
