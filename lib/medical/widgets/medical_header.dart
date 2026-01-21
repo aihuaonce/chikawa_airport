@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../../data/models/medical_view.dart';
 
 class MedicalHeader extends StatelessWidget {
   final List<Map<String, dynamic>> sections;
@@ -19,6 +22,9 @@ class MedicalHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final viewModel = context.watch<MedicalViewModel>();
+    final status = viewModel.saveStatus;
+
     return Container(
       padding: const EdgeInsets.fromLTRB(24, 16, 24, 20),
       decoration: const BoxDecoration(
@@ -58,7 +64,7 @@ class MedicalHeader extends StatelessWidget {
 
               const SizedBox(width: 16),
 
-              _buildHeaderActions(),
+              _buildHeaderActions(status),
             ],
           ),
 
@@ -81,77 +87,120 @@ class MedicalHeader extends StatelessWidget {
     );
   }
 
-  Widget _buildHeaderActions() {
-    const Size buttonSize = Size(130, 40);
+  Widget _buildHeaderActions(SaveStatus status) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // 狀態指示器
+        _buildSaveStatusIndicator(status),
 
-    return Padding(
-      padding: const EdgeInsets.only(right: 4),
+        const SizedBox(width: 24),
+
+        // 下一部分按鈕 (原本的按鈕)
+        _buildNextButton(),
+      ],
+    );
+  }
+
+  Widget _buildSaveStatusIndicator(SaveStatus status) {
+    Widget icon;
+    String text;
+    Color color;
+
+    switch (status) {
+      case SaveStatus.saving:
+        icon = const SizedBox(
+          width: 14,
+          height: 14,
+          child: CircularProgressIndicator(
+            strokeWidth: 2,
+            color: Color(0xFF007A8A),
+          ),
+        );
+        text = '正在儲存...';
+        color = textMuted;
+        break;
+      case SaveStatus.success:
+        icon = const Icon(
+          Icons.check_circle_rounded,
+          size: 16,
+          color: Colors.green,
+        );
+        text = '已儲存至本地';
+        color = Colors.green;
+        break;
+      case SaveStatus.idle:
+        icon = const Icon(
+          Icons.cloud_done_rounded,
+          size: 16,
+          color: Color(0xFF007A8A),
+        );
+        text = '所有變更已同步';
+        color = textMuted;
+        break;
+    }
+
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 300),
       child: Row(
+        key: ValueKey(status), // 讓切換時有動畫效果
         mainAxisSize: MainAxisSize.min,
         children: [
-          OutlinedButton.icon(
-            onPressed: () {},
-            icon: const Icon(Icons.save_as_outlined, size: 16),
-            label: const Text('暫存 Save'),
-            style: OutlinedButton.styleFrom(
-              foregroundColor: primaryColor,
-              fixedSize: buttonSize,
-              side: const BorderSide(color: primaryColor, width: 1.5),
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-              textStyle: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ),
-
-          const SizedBox(width: 12),
-
-          Container(
-            decoration: BoxDecoration(
-              boxShadow: [
-                BoxShadow(
-                  color: primaryColor.withValues(alpha: 0.2),
-                  blurRadius: 6,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: ElevatedButton(
-              onPressed: () {
-                // 點擊「下一部分」時切換到下一個section
-                if (currentIndex < sections.length - 1) {
-                  onSectionChanged(currentIndex + 1);
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: primaryColor,
-                foregroundColor: Colors.white,
-                fixedSize: buttonSize,
-                elevation: 0,
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
-                children: const [
-                  Text(
-                    '下一部分 Next',
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
-                  ),
-                  SizedBox(width: 4),
-                  Icon(Icons.arrow_forward, size: 16),
-                ],
-              ),
+          icon,
+          const SizedBox(width: 8),
+          Text(
+            text,
+            style: TextStyle(
+              color: color,
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildNextButton() {
+    const Size buttonSize = Size(130, 40);
+
+    return Container(
+      decoration: BoxDecoration(
+        boxShadow: [
+          BoxShadow(
+            color: primaryColor.withValues(alpha: 0.2),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: ElevatedButton(
+        onPressed: () {
+          // 點擊「下一部分」時切換到下一個section
+          if (currentIndex < sections.length - 1) {
+            onSectionChanged(currentIndex + 1);
+          }
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: primaryColor,
+          foregroundColor: Colors.white,
+          fixedSize: buttonSize,
+          elevation: 0,
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: const [
+            Text(
+              '下一部分 Next',
+              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+            ),
+            SizedBox(width: 4),
+            Icon(Icons.arrow_forward, size: 16),
+          ],
+        ),
       ),
     );
   }
