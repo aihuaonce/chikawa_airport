@@ -83,8 +83,6 @@ class _PersonalInfoState extends State<PersonalInfo> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionHeader(),
-        const SizedBox(height: 32),
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -223,40 +221,6 @@ class _PersonalInfoState extends State<PersonalInfo> {
       viewModel.updateBirthday(picked);
       _birthdayController.text = DateFormat('yyyy/MM/dd').format(picked);
     }
-  }
-
-  // 區塊標題
-  Widget _buildSectionHeader() {
-    return Row(
-      children: [
-        Container(
-          width: 4,
-          height: 24,
-          decoration: BoxDecoration(
-            color: primaryColor,
-            borderRadius: BorderRadius.circular(2),
-          ),
-        ),
-        const SizedBox(width: 12),
-        const Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              '個人資料 Personal Info',
-              style: TextStyle(
-                color: textDark,
-                fontSize: 18,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-            Text(
-              'Please ensure patient details match their travel documents.',
-              style: TextStyle(color: textMuted, fontSize: 12),
-            ),
-          ],
-        ),
-      ],
-    );
   }
 
   // 單一輸入框元件

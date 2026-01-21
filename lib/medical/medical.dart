@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'widgets/medical_header.dart';
 import 'pages/personal_info.dart';
+import 'pages/flight_log.dart';
 
 class MedicalPage extends StatefulWidget {
   final int medicalId;
@@ -19,6 +20,17 @@ class _MedicalPageState extends State<MedicalPage> {
   final List<Map<String, dynamic>> _sections = [
     {'title': '個人資料 (Personal Info)', 'icon': Icons.account_circle_outlined},
     {'title': '飛航記錄 (Flight Log)', 'icon': Icons.airplanemode_active_outlined},
+    {'title': '事故記錄 (Incident Records)', 'icon': Icons.report_problem_outlined},
+    {
+      'title': '處置記錄 (Treatment Records)',
+      'icon': Icons.medical_services_outlined,
+    },
+    {'title': '醫療費用 (Medical Fees)', 'icon': Icons.payments_outlined},
+    {'title': '診斷書 (Medical Certificate)', 'icon': Icons.assignment_outlined},
+    {'title': '拒絕轉診切結書 (Refusal of Referral)', 'icon': Icons.gavel_outlined},
+    {'title': '轉診單 (Referral Form)', 'icon': Icons.shortcut_outlined},
+    {'title': '電傳文件 (Telex Documents)', 'icon': Icons.print_outlined},
+    {'title': '護理記錄表 (Nursing Records)', 'icon': Icons.history_edu_outlined},
   ];
 
   Widget _getCurrentPage() {
@@ -26,7 +38,15 @@ class _MedicalPageState extends State<MedicalPage> {
       case 0:
         return PersonalInfo(medicalId: widget.medicalId);
       case 1:
-        return const Center(child: Text('飛航記錄頁面'));
+        return FlightLog(medicalId: widget.medicalId);
+      case 2:
+      case 3:
+      case 4:
+      case 5:
+      case 6:
+      case 7:
+      case 8:
+      case 9:
       default:
         return PersonalInfo(medicalId: widget.medicalId);
     }
