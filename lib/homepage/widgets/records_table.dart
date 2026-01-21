@@ -1,5 +1,7 @@
+import 'package:chikawa_airport/data/db/dao/medical_dao.dart';
+import 'package:chikawa_airport/data/db/database.dart';
 import 'package:flutter/material.dart';
-import '../../data/models/medical_record.dart';
+import 'package:provider/provider.dart';
 import 'record_row.dart';
 import 'pagination_bar.dart';
 
@@ -12,6 +14,8 @@ class RecordsTable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final database = context.read<AppDatabase>();
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(32, 0, 32, 32),
       child: Container(
@@ -36,17 +40,30 @@ class RecordsTable extends StatelessWidget {
               const Divider(height: 1, color: borderColor),
 
               Expanded(
-                child: ListView.separated(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  itemCount: demoRecords.length,
-                  separatorBuilder: (_, __) =>
-                      const Divider(height: 1, color: Color(0xFFF1F5F9)),
-                  itemBuilder: (context, index) {
-                    return RecordRow(record: demoRecords[index]);
+                child: StreamBuilder<List<MedicalRecordWithPatient>>(
+                  stream: database.medicalDao.watchAllRecords(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+
+                    final records = snapshot.data ?? [];
+
+                    if (records.isEmpty) {
+                      return const Center(child: Text('目前尚無記錄'));
+                    }
+
+                    return ListView.separated(
+                      itemCount: records.length,
+                      separatorBuilder: (_, __) => const Divider(height: 1),
+                      itemBuilder: (context, index) {
+                        // 傳入資料庫抓到的資料
+                        return RecordRow(data: records[index]);
+                      },
+                    );
                   },
                 ),
               ),
-
               const Divider(height: 1, color: borderColor),
               const PaginationBar(),
             ],

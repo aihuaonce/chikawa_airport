@@ -26,6 +26,24 @@ class MedicalDao extends DatabaseAccessor<AppDatabase> with _$MedicalDaoMixin {
     });
   }
 
+  Stream<List<MedicalRecordWithPatient>> watchAllRecords() {
+    final query = select(medicalRecord).join([
+      leftOuterJoin(
+        patient,
+        patient.medicalId.equalsExp(medicalRecord.medicalId),
+      ),
+    ]);
+
+    return query.watch().map((rows) {
+      return rows.map((row) {
+        return MedicalRecordWithPatient(
+          row.readTable(medicalRecord),
+          row.readTable(patient),
+        );
+      }).toList();
+    });
+  }
+
   // 根據 medicalId 獲取病患資料
   Future<PatientData?> getPatientByMedicalId(int medicalId) {
     return (select(
@@ -51,4 +69,11 @@ class MedicalDao extends DatabaseAccessor<AppDatabase> with _$MedicalDaoMixin {
       medicalRecord,
     )..where((tbl) => tbl.medicalId.equals(medicalId))).getSingleOrNull();
   }
+}
+
+// 首頁清單用
+class MedicalRecordWithPatient {
+  final MedicalRecordData record;
+  final PatientData patient;
+  MedicalRecordWithPatient(this.record, this.patient);
 }

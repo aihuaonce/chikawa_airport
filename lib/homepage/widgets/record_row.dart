@@ -1,30 +1,50 @@
+import 'package:chikawa_airport/data/db/dao/medical_dao.dart';
 import 'package:flutter/material.dart';
-import '../../data/models/medical_record.dart';
+import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
+import '../../data/db/database.dart';
+import '../../data/models/medical_view.dart';
+import '../../medical/medical.dart';
 
 class RecordRow extends StatelessWidget {
-  final MedicalRecord record;
-  const RecordRow({super.key, required this.record});
+  final MedicalRecordWithPatient data;
 
-  // 顏色定義
+  const RecordRow({super.key, required this.data});
+
   static const Color textDark = Color(0xFF1E293B);
   static const Color textMuted = Color(0xFF64748B);
   static const Color primaryColor = Color(0xFF007A8A);
 
   @override
   Widget build(BuildContext context) {
+    final record = data.record;
+    final patient = data.patient;
+
     return InkWell(
-      onTap: () {}, // 點擊查看詳情
+      onTap: () {
+        final database = context.read<AppDatabase>();
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ChangeNotifierProvider(
+              create: (_) =>
+                  MedicalViewModel(database, record.medicalId)..init(),
+              child: MedicalPage(medicalId: record.medicalId),
+            ),
+          ),
+        );
+      },
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
         child: Row(
           children: [
-            // 日期與時間
+            // 1. 日期與時間
             _cell(
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    record.date,
+                    DateFormat('MMM dd, yyyy').format(record.createdAt),
                     style: const TextStyle(
                       color: textDark,
                       fontWeight: FontWeight.bold,
@@ -33,7 +53,7 @@ class RecordRow extends StatelessWidget {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    record.time,
+                    DateFormat('HH:mm a').format(record.createdAt),
                     style: const TextStyle(color: textMuted, fontSize: 12),
                   ),
                 ],
@@ -41,34 +61,18 @@ class RecordRow extends StatelessWidget {
               2,
             ),
 
-            // 病患名稱
+            // 2. 病患名稱 (這裡會呼叫 _buildAvatar)
             _cell(
               Row(
                 children: [
-                  Container(
-                    width: 36,
-                    height: 36,
-                    decoration: BoxDecoration(
-                      color: record.statusColor.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    alignment: Alignment.center,
-                    child: Text(
-                      record.avatar,
-                      style: TextStyle(
-                        color: record.statusColor,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ),
+                  _buildAvatar(patient.name ?? 'U'),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          record.patient,
+                          patient.name ?? '未填寫姓名',
                           style: const TextStyle(
                             color: textDark,
                             fontWeight: FontWeight.bold,
@@ -76,7 +80,7 @@ class RecordRow extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          record.meta,
+                          '${patient.sexId == 1 ? "M" : "F"} / ${patient.age ?? "?"}y',
                           style: const TextStyle(
                             color: textMuted,
                             fontSize: 11,
@@ -90,42 +94,19 @@ class RecordRow extends StatelessWidget {
               3,
             ),
 
-            // 航班/位置
+            // 3. 航班/位置
             _cell(
-              Row(
-                children: [
-                  const Icon(
-                    Icons.flight_takeoff,
-                    size: 16,
-                    color: primaryColor,
-                  ),
-                  const SizedBox(width: 8),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        record.flight,
-                        style: const TextStyle(
-                          color: textDark,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 13,
-                        ),
-                      ),
-                      Text(
-                        record.location,
-                        style: const TextStyle(color: textMuted, fontSize: 11),
-                      ),
-                    ],
-                  ),
-                ],
+              const Text(
+                'CX 881 / Gate A14',
+                style: TextStyle(color: textMuted, fontSize: 13),
               ),
               3,
             ),
 
-            // 主訴症狀
+            // 4. 主訴症狀
             _cell(
               Text(
-                record.complaint,
+                record.isEmergency ? 'Emergency Record' : 'Standard Record',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(color: textMuted, fontSize: 13),
@@ -133,15 +114,18 @@ class RecordRow extends StatelessWidget {
               5,
             ),
 
-            // 狀態
+            // 5. 狀態
             _cell(
               Center(
-                child: _buildStatusChip(record.status, record.statusColor),
+                child: _buildStatusChip(
+                  record.isEmergency ? 'Emergency' : 'Normal',
+                  record.isEmergency ? Colors.red : Colors.green,
+                ),
               ),
               2,
             ),
 
-            // 操作
+            // 6. 操作
             _cell(
               const Align(
                 alignment: Alignment.centerRight,
@@ -159,7 +143,26 @@ class RecordRow extends StatelessWidget {
     );
   }
 
-  // 自定義狀態標籤樣式
+  Widget _buildAvatar(String name) {
+    return Container(
+      width: 36,
+      height: 36,
+      decoration: BoxDecoration(
+        color: primaryColor.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      alignment: Alignment.center,
+      child: Text(
+        name.isNotEmpty ? name[0].toUpperCase() : '?',
+        style: const TextStyle(
+          color: primaryColor,
+          fontWeight: FontWeight.bold,
+          fontSize: 12,
+        ),
+      ),
+    );
+  }
+
   Widget _buildStatusChip(String label, Color color) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
@@ -174,11 +177,12 @@ class RecordRow extends StatelessWidget {
           color: color,
           fontSize: 10,
           fontWeight: FontWeight.w800,
-          letterSpacing: 0.5,
         ),
       ),
     );
   }
 
-  Widget _cell(Widget child, int flex) => Expanded(flex: flex, child: child);
-}
+  Widget _cell(Widget child, int flex) {
+    return Expanded(flex: flex, child: child);
+  }
+} // 這是 RecordRow 的結束大括號
