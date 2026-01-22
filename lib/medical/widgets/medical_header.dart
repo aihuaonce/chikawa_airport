@@ -62,8 +62,7 @@ class MedicalHeader extends StatelessWidget {
                 ),
               ),
 
-              const SizedBox(width: 16),
-
+              const SizedBox(width: 8),
               _buildHeaderActions(status),
             ],
           ),
@@ -91,12 +90,10 @@ class MedicalHeader extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        // 狀態指示器
-        _buildSaveStatusIndicator(status),
+        Flexible(child: _buildSaveStatusIndicator(status)),
 
-        const SizedBox(width: 24),
+        const SizedBox(width: 12),
 
-        // 下一部分按鈕 (原本的按鈕)
         _buildNextButton(),
       ],
     );
@@ -126,7 +123,7 @@ class MedicalHeader extends StatelessWidget {
           size: 16,
           color: Colors.green,
         );
-        text = '已儲存至本地';
+        text = '已本地儲存';
         color = Colors.green;
         break;
       case SaveStatus.idle:
@@ -135,7 +132,7 @@ class MedicalHeader extends StatelessWidget {
           size: 16,
           color: Color(0xFF007A8A),
         );
-        text = '所有變更已同步';
+        text = '已同步';
         color = textMuted;
         break;
     }
@@ -143,17 +140,21 @@ class MedicalHeader extends StatelessWidget {
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 300),
       child: Row(
-        key: ValueKey(status), // 讓切換時有動畫效果
+        key: ValueKey(status),
         mainAxisSize: MainAxisSize.min,
         children: [
           icon,
-          const SizedBox(width: 8),
-          Text(
-            text,
-            style: TextStyle(
-              color: color,
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
+          const SizedBox(width: 6),
+          Flexible(
+            child: Text(
+              text,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: color,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
         ],
@@ -162,7 +163,7 @@ class MedicalHeader extends StatelessWidget {
   }
 
   Widget _buildNextButton() {
-    const Size buttonSize = Size(130, 40);
+    const Size buttonSize = Size(125, 40);
 
     return Container(
       decoration: BoxDecoration(
@@ -176,7 +177,6 @@ class MedicalHeader extends StatelessWidget {
       ),
       child: ElevatedButton(
         onPressed: () {
-          // 點擊「下一部分」時切換到下一個section
           if (currentIndex < sections.length - 1) {
             onSectionChanged(currentIndex + 1);
           }
@@ -186,19 +186,18 @@ class MedicalHeader extends StatelessWidget {
           foregroundColor: Colors.white,
           fixedSize: buttonSize,
           elevation: 0,
-          padding: const EdgeInsets.symmetric(horizontal: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 4),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
-        child: Row(
+        child: const Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: const [
+          children: [
             Text(
-              '下一部分 Next',
+              '下一步',
               style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
             ),
             SizedBox(width: 4),
-            Icon(Icons.arrow_forward, size: 16),
+            Icon(Icons.arrow_forward, size: 14),
           ],
         ),
       ),
@@ -228,18 +227,22 @@ class MedicalHeader extends StatelessWidget {
             Icon(
               sections[currentIndex]['icon'] as IconData,
               color: primaryColor,
-              size: 22,
+              size: 20,
             ),
             const SizedBox(width: 12),
-            Text(
-              sections[currentIndex]['title'] as String,
-              style: const TextStyle(
-                color: textDark,
-                fontSize: 14,
-                fontWeight: FontWeight.w700,
+            Expanded(
+              child: Text(
+                sections[currentIndex]['title'] as String,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  color: textDark,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
             ),
-            const Spacer(),
+            const SizedBox(width: 8),
             const Icon(Icons.keyboard_arrow_down, color: textMuted, size: 20),
           ],
         ),
@@ -250,11 +253,15 @@ class MedicalHeader extends StatelessWidget {
   void _showSectionMenu(BuildContext context) {
     showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
       backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) => Container(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height * 0.8,
+        ),
         padding: const EdgeInsets.symmetric(vertical: 20),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -284,53 +291,59 @@ class MedicalHeader extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 12),
-            ...List.generate(sections.length, (index) {
-              final isSelected = index == currentIndex;
-              return InkWell(
-                onTap: () {
-                  onSectionChanged(index);
-                  Navigator.pop(context);
-                },
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 16,
-                  ),
-                  color: isSelected
-                      ? primaryColor.withValues(alpha: 0.05)
-                      : Colors.transparent,
-                  child: Row(
-                    children: [
-                      Icon(
-                        sections[index]['icon'] as IconData,
-                        color: isSelected ? primaryColor : textMuted,
-                        size: 22,
+
+            Flexible(
+              child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: sections.length,
+                itemBuilder: (context, index) {
+                  final isSelected = index == currentIndex;
+                  return InkWell(
+                    onTap: () {
+                      onSectionChanged(index);
+                      Navigator.pop(context);
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 16,
                       ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Text(
-                          sections[index]['title'] as String,
-                          style: TextStyle(
-                            color: isSelected ? primaryColor : textDark,
-                            fontSize: 14,
-                            fontWeight: isSelected
-                                ? FontWeight.w700
-                                : FontWeight.w500,
+                      color: isSelected
+                          ? primaryColor.withValues(alpha: 0.05)
+                          : Colors.transparent,
+                      child: Row(
+                        children: [
+                          Icon(
+                            sections[index]['icon'] as IconData,
+                            color: isSelected ? primaryColor : textMuted,
+                            size: 22,
                           ),
-                        ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Text(
+                              sections[index]['title'] as String,
+                              style: TextStyle(
+                                color: isSelected ? primaryColor : textDark,
+                                fontSize: 14,
+                                fontWeight: isSelected
+                                    ? FontWeight.w700
+                                    : FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                          if (isSelected)
+                            const Icon(
+                              Icons.check_circle,
+                              color: primaryColor,
+                              size: 20,
+                            ),
+                        ],
                       ),
-                      if (isSelected)
-                        const Icon(
-                          Icons.check_circle,
-                          color: primaryColor,
-                          size: 20,
-                        ),
-                    ],
-                  ),
-                ),
-              );
-            }),
-            const SizedBox(height: 10),
+                    ),
+                  );
+                },
+              ),
+            ),
           ],
         ),
       ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'widgets/medical_header.dart';
 import 'pages/personal_info.dart';
 import 'pages/flight_log.dart';
+import 'pages/incident_record.dart';
 
 class MedicalPage extends StatefulWidget {
   final int medicalId;
@@ -40,6 +41,7 @@ class _MedicalPageState extends State<MedicalPage> {
       case 1:
         return FlightLog(medicalId: widget.medicalId);
       case 2:
+        return IncidentRecord(medicalId: widget.medicalId);
       case 3:
       case 4:
       case 5:
