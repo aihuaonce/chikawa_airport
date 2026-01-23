@@ -44,6 +44,36 @@ class MedicalDao extends DatabaseAccessor<AppDatabase> with _$MedicalDaoMixin {
     });
   }
 
+  // 出診單監聽總筆數
+  Stream<int> watchTotalCount() {
+    return medicalRecord.count().watchSingle();
+  }
+
+  // 出診單分頁監聽記錄與病患資料
+  Stream<List<MedicalRecordWithPatient>> watchRecordsPaginated(
+    int limit,
+    int offset,
+  ) {
+    final query =
+        select(medicalRecord).join([
+            leftOuterJoin(
+              patient,
+              patient.medicalId.equalsExp(medicalRecord.medicalId),
+            ),
+          ])
+          ..limit(limit, offset: offset)
+          ..orderBy([OrderingTerm.desc(medicalRecord.createdAt)]);
+
+    return query.watch().map((rows) {
+      return rows.map((row) {
+        return MedicalRecordWithPatient(
+          row.readTable(medicalRecord),
+          row.readTable(patient),
+        );
+      }).toList();
+    });
+  }
+
   // 根據 medicalId 獲取病患資料
   Future<PatientData?> getPatientByMedicalId(int medicalId) {
     return (select(
@@ -68,6 +98,19 @@ class MedicalDao extends DatabaseAccessor<AppDatabase> with _$MedicalDaoMixin {
     return (select(
       medicalRecord,
     )..where((tbl) => tbl.medicalId.equals(medicalId))).getSingleOrNull();
+  }
+
+  // 取得總筆數
+  Future<int> getTotalRecordsCount() {
+    return medicalRecord.count().getSingle();
+  }
+
+  // 取得特定分頁的資料
+  Future<List<MedicalRecordData>> getRecordsPaged(int limit, int offset) {
+    return (select(medicalRecord)
+          ..limit(limit, offset: offset)
+          ..orderBy([(t) => OrderingTerm.desc(t.createdAt)]))
+        .get();
   }
 }
 

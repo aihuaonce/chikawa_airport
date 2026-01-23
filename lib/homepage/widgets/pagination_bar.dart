@@ -1,7 +1,16 @@
 import 'package:flutter/material.dart';
 
 class PaginationBar extends StatelessWidget {
-  const PaginationBar({super.key});
+  final int currentPage;
+  final int totalPages;
+  final Function(int) onPageChanged;
+
+  const PaginationBar({
+    super.key,
+    required this.currentPage,
+    required this.totalPages,
+    required this.onPageChanged,
+  });
 
   // 顏色定義
   static const Color primaryColor = Color(0xFF007A8A);
@@ -12,6 +21,8 @@ class PaginationBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    List<int> pageNumbers = List.generate(totalPages, (index) => index + 1);
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
       color: bgLight,
@@ -20,13 +31,28 @@ class PaginationBar extends StatelessWidget {
         children: [
           Row(
             children: [
-              _buildNavButton('上一頁', isDisabled: true),
+              _buildNavButton(
+                '上一頁',
+                isDisabled: currentPage <= 1,
+                onTap: () => onPageChanged(currentPage - 1),
+              ),
               const SizedBox(width: 8),
-              _buildPageButton('1', active: true),
-              _buildPageButton('2'),
-              _buildPageButton('3'),
+
+              // 動態產生數字按鈕
+              ...pageNumbers.map(
+                (page) => _buildPageButton(
+                  page.toString(),
+                  active: page == currentPage,
+                  onTap: () => onPageChanged(page),
+                ),
+              ),
+
               const SizedBox(width: 8),
-              _buildNavButton('下一頁'),
+              _buildNavButton(
+                '下一頁',
+                isDisabled: currentPage >= totalPages,
+                onTap: () => onPageChanged(currentPage + 1),
+              ),
             ],
           ),
 
@@ -57,9 +83,13 @@ class PaginationBar extends StatelessWidget {
   }
 
   // 上/下一頁按鈕
-  Widget _buildNavButton(String text, {bool isDisabled = false}) {
+  Widget _buildNavButton(
+    String text, {
+    required bool isDisabled,
+    VoidCallback? onTap,
+  }) {
     return OutlinedButton(
-      onPressed: isDisabled ? null : () {},
+      onPressed: isDisabled ? null : onTap,
       style: OutlinedButton.styleFrom(
         foregroundColor: textDark,
         backgroundColor: Colors.white,
@@ -82,14 +112,18 @@ class PaginationBar extends StatelessWidget {
   }
 
   // 數字頁碼
-  Widget _buildPageButton(String text, {bool active = false}) {
+  Widget _buildPageButton(
+    String text, {
+    required bool active,
+    VoidCallback? onTap,
+  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 2),
       child: SizedBox(
         width: 36,
         height: 36,
         child: TextButton(
-          onPressed: () {},
+          onPressed: onTap,
           style: TextButton.styleFrom(
             padding: EdgeInsets.zero,
             backgroundColor: active ? primaryColor : Colors.white,

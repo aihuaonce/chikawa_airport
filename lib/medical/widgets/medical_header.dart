@@ -121,10 +121,10 @@ class MedicalHeader extends StatelessWidget {
         icon = const Icon(
           Icons.check_circle_rounded,
           size: 16,
-          color: Colors.green,
+          color: Color(0xFF007A8A),
         );
-        text = '已本地儲存';
-        color = Colors.green;
+        text = '欄位已儲存';
+        color = textMuted;
         break;
       case SaveStatus.idle:
         icon = const Icon(

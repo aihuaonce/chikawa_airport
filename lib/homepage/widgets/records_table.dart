@@ -1,5 +1,6 @@
 import 'package:chikawa_airport/data/db/dao/medical_dao.dart';
 import 'package:chikawa_airport/data/db/database.dart';
+import 'package:chikawa_airport/data/models/dashboard_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'record_row.dart';
@@ -15,6 +16,8 @@ class RecordsTable extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final database = context.read<AppDatabase>();
+
+    final viewModel = context.watch<DashboardViewModel>();
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(32, 0, 32, 32),
@@ -36,19 +39,20 @@ class RecordsTable extends StatelessWidget {
           child: Column(
             children: [
               const _TableHeader(),
-
-              const Divider(height: 1, color: borderColor),
+              const Divider(height: 1),
 
               Expanded(
                 child: StreamBuilder<List<MedicalRecordWithPatient>>(
-                  stream: database.medicalDao.watchAllRecords(),
+                  // 根據當前頁碼抓取資料
+                  stream: database.medicalDao.watchRecordsPaginated(
+                    viewModel.pageSize,
+                    viewModel.offset,
+                  ),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const Center(child: CircularProgressIndicator());
                     }
-
                     final records = snapshot.data ?? [];
-
                     if (records.isEmpty) {
                       return const Center(child: Text('目前尚無記錄'));
                     }
@@ -56,16 +60,30 @@ class RecordsTable extends StatelessWidget {
                     return ListView.separated(
                       itemCount: records.length,
                       separatorBuilder: (_, __) => const Divider(height: 1),
-                      itemBuilder: (context, index) {
-                        // 傳入資料庫抓到的資料
-                        return RecordRow(data: records[index]);
-                      },
+                      itemBuilder: (context, index) =>
+                          RecordRow(data: records[index]),
                     );
                   },
                 ),
               ),
-              const Divider(height: 1, color: borderColor),
-              const PaginationBar(),
+
+              const Divider(height: 1),
+
+              // 這裡監聽總筆數，用來畫分頁按鈕
+              StreamBuilder<int>(
+                stream: database.medicalDao.watchTotalCount(),
+                builder: (context, snapshot) {
+                  final totalCount = snapshot.data ?? 0;
+                  // 計算總頁數傳給 PaginationBar
+                  final totalPages = (totalCount / viewModel.pageSize).ceil();
+
+                  return PaginationBar(
+                    currentPage: viewModel.currentPage,
+                    totalPages: totalPages == 0 ? 1 : totalPages,
+                    onPageChanged: (newPage) => viewModel.setPage(newPage),
+                  );
+                },
+              ),
             ],
           ),
         ),
