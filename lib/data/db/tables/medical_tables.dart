@@ -39,3 +39,43 @@ class Patient extends Table {
 
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
 }
+
+//飛航紀錄表
+class FlightRecord extends Table {
+  IntColumn get flightRecordId => integer().autoIncrement()();
+
+  IntColumn get medicalId =>
+      integer().unique().references(MedicalRecord, #medicalId)();
+
+  IntColumn get airlineId => integer().references(Airline, #airlineId)();
+  TextColumn get flightNumber => text()();
+
+  IntColumn get travelStatusId =>
+      integer().references(TravelStatus, #travelStatusId)();
+
+  IntColumn get departureLocationId =>
+      integer().references(Location, #locationId)();
+
+  IntColumn get arrivalLocationId =>
+      integer().references(Location, #locationId)();
+
+  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+}
+
+//飛航-經過點表
+class FlightTransitLocations extends Table {
+  IntColumn get id => integer().autoIncrement()();
+
+  // 關聯到原本的飛航記錄
+  IntColumn get flightRecordId => integer().references(
+    FlightRecord,
+    #flightRecordId,
+    onDelete: KeyAction.cascade,
+  )();
+
+  // 關聯到地點表
+  IntColumn get locationId => integer().references(Location, #locationId)();
+
+  // 排序：例如第一站、第二站
+  IntColumn get stopOrder => integer().withDefault(const Constant(0))();
+}

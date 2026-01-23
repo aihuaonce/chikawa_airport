@@ -19,10 +19,15 @@ part 'database.g.dart';
     //參考表
     Sex,
     Nationality,
+    Airline,
+    TravelStatus,
+    Location,
 
     //醫療表
     MedicalRecord,
     Patient,
+    FlightRecord,
+    FlightTransitLocations,
   ],
   daos: [ReferenceDao, MedicalDao],
 )
