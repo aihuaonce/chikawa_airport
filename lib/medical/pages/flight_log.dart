@@ -15,7 +15,6 @@ class _FlightLogState extends State<FlightLog> {
   static const Color textDark = Color(0xFF1E293B);
   static const Color textMuted = Color(0xFF64748B);
   static const Color borderColor = Color(0xFFE2E8F0);
-  static const Color bgField = Color(0xFFF9FBFC);
 
   int _travelStatusIndex = 0; // 0: Arriving, 1: Departing, 2: Transit
 

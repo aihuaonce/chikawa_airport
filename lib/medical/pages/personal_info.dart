@@ -2,6 +2,7 @@ import 'package:chikawa_airport/data/models/medical_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+import '../../data/db/database.dart';
 
 class PersonalInfo extends StatefulWidget {
   final int medicalId;
@@ -50,18 +51,20 @@ class _PersonalInfoState extends State<PersonalInfo> {
   }
 
   // 當 ViewModel 資料載入後，同步到 Controller
-  void _updateControllers(dynamic patient) {
-    if (patient == null || _isInitialized) return;
+  void _updateControllers(PatientData patient) {
+    final birthday = patient.birthday;
+
+    if (_isInitialized) return;
 
     _nameController.text = patient.name ?? '';
     _passportController.text = patient.passportOrIdNo ?? '';
     _phoneController.text = patient.telephone ?? '';
     _addressController.text = patient.address ?? '';
-    if (patient.birthday != null) {
-      _birthdayController.text = DateFormat(
-        'yyyy/MM/dd',
-      ).format(patient.birthday);
+
+    if (birthday != null) {
+      _birthdayController.text = DateFormat('yyyy/MM/dd').format(birthday);
     }
+
     _isInitialized = true;
   }
 
@@ -131,10 +134,24 @@ class _PersonalInfoState extends State<PersonalInfo> {
                           children: [
                             _buildLabel('年齡 AGE'),
                             const SizedBox(height: 8),
-                            _buildTextField(
-                              hint: '0',
-                              initialValue: patient.age?.toString(),
-                              readOnly: true,
+                            // 年齡自動計算並顯示
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 14,
+                              ),
+                              decoration: BoxDecoration(
+                                color: bgField,
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: borderColor),
+                              ),
+                              child: Text(
+                                patient.age?.toString() ?? '0',
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  color: textDark,
+                                ),
+                              ),
                             ),
                           ],
                         ),
@@ -146,9 +163,7 @@ class _PersonalInfoState extends State<PersonalInfo> {
                   const SizedBox(height: 8),
                   SlidingGenderToggle(
                     selectedIndex: patient.sexId ?? 0,
-                    onChanged: (index) {
-                      viewModel.updateSexId(index);
-                    },
+                    onChanged: (index) => viewModel.updateSexId(index),
                   ),
                 ],
               ),
@@ -161,30 +176,28 @@ class _PersonalInfoState extends State<PersonalInfo> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildLabel('護照/身分證字號 ID/PASSPORT NO.'),
+                  _buildLabel('護照/身份證字號 ID/PASSPORT NO.'),
                   const SizedBox(height: 8),
                   _buildTextField(
                     controller: _passportController,
                     hint: '請輸入證件號碼',
                     suffixIcon: Icons.check_circle_outline,
                     suffixColor: Colors.green,
-                    onChanged: (val) {
-                      viewModel.updatePassport(val);
-                    },
+                    onChanged: (val) => viewModel.updatePassport(val),
                   ),
                   const SizedBox(height: 24),
+
                   _buildLabel('國籍 NATIONALITY'),
                   const SizedBox(height: 8),
-                  _buildDropdownField('請選取國籍'),
+                  _buildNationalityDropdown(viewModel, patient),
+
                   const SizedBox(height: 24),
                   _buildLabel('聯絡電話 CONTACT PHONE'),
                   const SizedBox(height: 8),
                   _buildTextField(
                     controller: _phoneController,
                     hint: '例如: +852 1234 5678',
-                    onChanged: (val) {
-                      viewModel.updatePhone(val);
-                    },
+                    onChanged: (val) => viewModel.updatePhone(val),
                   ),
                   const SizedBox(height: 24),
                   _buildLabel('地址 ADDRESS'),
@@ -193,9 +206,7 @@ class _PersonalInfoState extends State<PersonalInfo> {
                     controller: _addressController,
                     hint: '請輸入詳細居住地址',
                     maxLines: 4,
-                    onChanged: (val) {
-                      viewModel.updateAddress(val);
-                    },
+                    onChanged: (val) => viewModel.updateAddress(val),
                   ),
                 ],
               ),
@@ -267,6 +278,65 @@ class _PersonalInfoState extends State<PersonalInfo> {
           borderSide: const BorderSide(color: primaryColor, width: 1.5),
         ),
       ),
+    );
+  }
+
+  // 國籍下拉選單
+  Widget _buildNationalityDropdown(
+    MedicalViewModel viewModel,
+    PatientData patient,
+  ) {
+    // 從 ViewModel 取得當前選中的國籍
+    final selectedNationality = viewModel.getNationalityById(
+      patient.nationalityId,
+    );
+
+    return DropdownButtonFormField<NationalityData>(
+      value: selectedNationality,
+      decoration: InputDecoration(
+        filled: true,
+        fillColor: Colors.white,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 14,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: borderColor),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: primaryColor, width: 1.5),
+        ),
+      ),
+      hint: Row(
+        children: [
+          const Icon(Icons.search, size: 18, color: textMuted),
+          const SizedBox(width: 8),
+          Text(
+            '請選取國籍',
+            style: TextStyle(
+              color: textMuted.withValues(alpha: 0.5),
+              fontSize: 14,
+            ),
+          ),
+        ],
+      ),
+      icon: const Icon(Icons.keyboard_arrow_down, size: 20, color: textMuted),
+      items: viewModel.nationalityOptions.map((nationality) {
+        return DropdownMenuItem<NationalityData>(
+          value: nationality,
+          child: Text(
+            '${nationality.code ?? ''} ${nationality.name}',
+            style: const TextStyle(fontSize: 14, color: textDark),
+          ),
+        );
+      }).toList(),
+      onChanged: (NationalityData? newValue) {
+        if (newValue != null) {
+          viewModel.updateNationalityId(newValue.nationalityId);
+        }
+      },
     );
   }
 
@@ -362,36 +432,9 @@ class _PersonalInfoState extends State<PersonalInfo> {
       ),
     );
   }
-
-  // 下拉選單元件
-  Widget _buildDropdownField(String hint) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: borderColor),
-      ),
-      child: Row(
-        children: [
-          const Icon(Icons.search, size: 18, color: textMuted),
-          const SizedBox(width: 8),
-          Text(
-            hint,
-            style: TextStyle(
-              color: textMuted.withValues(alpha: 0.5),
-              fontSize: 14,
-            ),
-          ),
-          const Spacer(),
-          const Icon(Icons.keyboard_arrow_down, size: 20, color: textMuted),
-        ],
-      ),
-    );
-  }
 }
 
-// 修改後的 SlidingGenderToggle 應接收外部狀態
+// 性別切換元件
 class SlidingGenderToggle extends StatelessWidget {
   final int selectedIndex;
   final Function(int) onChanged;

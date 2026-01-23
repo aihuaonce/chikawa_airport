@@ -14,6 +14,13 @@ class MedicalViewModel extends ChangeNotifier {
   PatientData? _patientCache;
   PatientData? get patient => _patientCache;
 
+  // 參考資料快取
+  List<NationalityData> _nationalityOptions = [];
+  List<NationalityData> get nationalityOptions => _nationalityOptions;
+
+  List<SexData> _sexOptions = [];
+  List<SexData> get sexOptions => _sexOptions;
+
   // 延遲存檔用的計時器 (Debounce)
   Timer? _debounceTimer;
 
@@ -25,8 +32,29 @@ class MedicalViewModel extends ChangeNotifier {
 
   // 初始化：從資料庫抓到記憶體
   Future<void> init() async {
+    // 載入患者資料
     _patientCache = await db.medicalDao.getPatientByMedicalId(medicalId);
+
+    // 載入參考資料
+    await _loadReferenceData();
+
     notifyListeners();
+  }
+
+  // 載入參考資料（性別、國籍）
+  Future<void> _loadReferenceData() async {
+    try {
+      // 載入性別選項
+      _sexOptions = await db.referenceDao.getAllSex();
+
+      // 載入國籍選項
+      _nationalityOptions = await db.referenceDao.getAllNationality();
+
+      debugPrint('系統：已載入 ${_sexOptions.length} 個性別選項');
+      debugPrint('系統：已載入 ${_nationalityOptions.length} 個國籍選項');
+    } catch (e) {
+      debugPrint('系統：載入參考資料失敗 - $e');
+    }
   }
 
   // 2. 更新快取並觸發自動存檔
@@ -43,9 +71,17 @@ class MedicalViewModel extends ChangeNotifier {
   }
 
   // 更新性別 ID
-  void updateSexId(int index) {
+  void updateSexId(int sexId) {
     if (_patientCache == null) return;
-    _updateCacheAndSave(_patientCache!.copyWith(sexId: Value(index)));
+    _updateCacheAndSave(_patientCache!.copyWith(sexId: Value(sexId)));
+  }
+
+  // 更新國籍 ID
+  void updateNationalityId(int nationalityId) {
+    if (_patientCache == null) return;
+    _updateCacheAndSave(
+      _patientCache!.copyWith(nationalityId: Value(nationalityId)),
+    );
   }
 
   void updatePassport(String idNo) {
@@ -77,6 +113,26 @@ class MedicalViewModel extends ChangeNotifier {
     _updateCacheAndSave(
       _patientCache!.copyWith(birthday: Value(date), age: Value(age)),
     );
+  }
+
+  // 根據 nationalityId 取得國籍物件
+  NationalityData? getNationalityById(int? id) {
+    if (id == null || _nationalityOptions.isEmpty) return null;
+    try {
+      return _nationalityOptions.firstWhere((n) => n.nationalityId == id);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  // 根據 sexId 取得性別物件
+  SexData? getSexById(int? id) {
+    if (id == null || _sexOptions.isEmpty) return null;
+    try {
+      return _sexOptions.firstWhere((s) => s.sexId == id);
+    } catch (e) {
+      return null;
+    }
   }
 
   // 3. 延遲存檔邏輯 (Debounce)

@@ -1,4 +1,7 @@
+import 'package:chikawa_airport/data/db/database.dart';
+import 'package:chikawa_airport/data/models/medical_view.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'widgets/medical_header.dart';
 import 'pages/personal_info.dart';
 import 'pages/flight_log.dart';
@@ -56,31 +59,36 @@ class _MedicalPageState extends State<MedicalPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: bgLight,
-      body: SafeArea(
-        child: Column(
-          children: [
-            MedicalHeader(
-              sections: _sections,
-              currentIndex: _currentSectionIndex,
-              onSectionChanged: (index) {
-                setState(() {
-                  _currentSectionIndex = index;
-                });
-              },
-            ),
-
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 32,
+    return ChangeNotifierProvider(
+      create: (context) => MedicalViewModel(
+        Provider.of<AppDatabase>(context, listen: false),
+        widget.medicalId,
+      )..init(),
+      child: Scaffold(
+        backgroundColor: bgLight,
+        body: SafeArea(
+          child: Column(
+            children: [
+              Consumer<MedicalViewModel>(
+                builder: (context, vm, child) => MedicalHeader(
+                  sections: _sections,
+                  currentIndex: _currentSectionIndex,
+                  onSectionChanged: (index) =>
+                      setState(() => _currentSectionIndex = index),
                 ),
-                child: _getCurrentPage(),
               ),
-            ),
-          ],
+
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 32,
+                  ),
+                  child: _getCurrentPage(),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

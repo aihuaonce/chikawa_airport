@@ -132,7 +132,7 @@ class MedicalHeader extends StatelessWidget {
           size: 16,
           color: Color(0xFF007A8A),
         );
-        text = '已同步';
+        text = '已儲存';
         color = textMuted;
         break;
     }
