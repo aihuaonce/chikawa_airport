@@ -213,10 +213,7 @@ class _FlightLogState extends State<FlightLog> {
       ),
       hint: Text(
         '請選取旅行狀態',
-        style: TextStyle(
-          color: textMuted.withValues(alpha: 0.5),
-          fontSize: 14,
-        ),
+        style: TextStyle(color: textMuted.withValues(alpha: 0.5), fontSize: 14),
       ),
       icon: const Icon(Icons.keyboard_arrow_down, size: 20, color: textMuted),
       items: viewModel.travelStatusOptions.map((status) {
@@ -267,10 +264,7 @@ class _FlightLogState extends State<FlightLog> {
       ),
       hint: Text(
         hint,
-        style: TextStyle(
-          color: textMuted.withValues(alpha: 0.5),
-          fontSize: 14,
-        ),
+        style: TextStyle(color: textMuted.withValues(alpha: 0.5), fontSize: 14),
       ),
       icon: const Icon(Icons.keyboard_arrow_down, size: 20, color: textMuted),
       items: viewModel.locationOptions.map((location) {
@@ -294,50 +288,50 @@ class _FlightLogState extends State<FlightLog> {
   Widget _buildLayoverPoints(MedicalViewModel viewModel) {
     return Column(
       children: [
-        ...viewModel.transitLocations.asMap().entries.map(
-          (entry) {
-            final location = entry.value;
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 8.0),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 14,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: borderColor),
-                      ),
-                      child: Text(
-                        '${location.code} - ${location.name}',
-                        style: const TextStyle(fontSize: 14, color: textDark),
-                      ),
+        ...viewModel.transitLocations.asMap().entries.map((entry) {
+          // 【關鍵修正】：entry.value 現在是 TransitLocationWithData 型別
+          final transitData = entry.value;
+          // 從包裝盒中取出實際的地點詳細資料 (LocationData)
+          final location = transitData.location;
+
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 8.0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 14,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: borderColor),
+                    ),
+                    child: Text(
+                      '${location.code} - ${location.name}',
+                      style: const TextStyle(fontSize: 14, color: textDark),
                     ),
                   ),
-                  IconButton(
-                    icon: const Icon(
-                      Icons.delete_outline,
-                      color: Colors.redAccent,
-                      size: 20,
-                    ),
-                    onPressed: () async {
-                      // 需要透過 transit location 的實際 ID
-                      // 這裡暫時用 location.locationId，
-                      // 實際應該要從 FlightTransitLocations 取得 id
-                      await viewModel.removeTransitLocation(
-                        location.locationId,
-                      );
-                    },
+                ),
+                IconButton(
+                  icon: const Icon(
+                    Icons.delete_outline,
+                    color: Colors.redAccent,
+                    size: 20,
                   ),
-                ],
-              ),
-            );
-          },
-        ),
+                  onPressed: () async {
+                    // 刪除時使用包裝盒裡的 transitId
+                    await viewModel.removeTransitLocation(
+                      transitData.transitId,
+                    );
+                  },
+                ),
+              ],
+            ),
+          );
+        }),
         OutlinedButton.icon(
           onPressed: () => _showAddTransitDialog(viewModel),
           icon: const Icon(Icons.add, size: 16),

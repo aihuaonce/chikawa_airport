@@ -1,5 +1,6 @@
 import 'package:chikawa_airport/data/db/database.dart';
 import 'package:chikawa_airport/data/models/medical_view.dart';
+import 'package:chikawa_airport/data/models/reference_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../data/models/record_page.dart';
@@ -124,8 +125,11 @@ class _HeaderBarState extends State<HeaderBar> {
             ),
             child: ElevatedButton.icon(
               onPressed: () async {
+                // 1. 同時獲取 Database 和 ReferenceService
                 final database = context.read<AppDatabase>();
+                final refService = context.read<ReferenceService>(); // 新增這一行
 
+                // 2. 建立新紀錄
                 final newId = await database.medicalDao
                     .createNewPatientRecord();
 
@@ -135,7 +139,8 @@ class _HeaderBarState extends State<HeaderBar> {
                     MaterialPageRoute(
                       builder: (context) => ChangeNotifierProvider(
                         create: (_) =>
-                            MedicalViewModel(database, newId)..init(),
+                            MedicalViewModel(database, refService, newId)
+                              ..init(),
                         child: MedicalPage(medicalId: newId),
                       ),
                     ),

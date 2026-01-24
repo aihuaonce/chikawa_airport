@@ -1,5 +1,6 @@
 import 'package:chikawa_airport/data/db/database.dart';
 import 'package:chikawa_airport/data/models/medical_view.dart';
+import 'package:chikawa_airport/data/models/reference_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'widgets/medical_header.dart';
@@ -61,7 +62,8 @@ class _MedicalPageState extends State<MedicalPage> {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (context) => MedicalViewModel(
-        Provider.of<AppDatabase>(context, listen: false),
+        context.read<AppDatabase>(),
+        context.read<ReferenceService>(),
         widget.medicalId,
       )..init(),
       child: Scaffold(

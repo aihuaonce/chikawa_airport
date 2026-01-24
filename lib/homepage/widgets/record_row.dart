@@ -2,6 +2,7 @@ import 'package:chikawa_airport/data/db/dao/medical_dao.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+import 'package:chikawa_airport/data/models/reference_service.dart';
 import '../../data/db/database.dart';
 import '../../data/models/medical_view.dart';
 import '../../medical/medical.dart';
@@ -22,13 +23,19 @@ class RecordRow extends StatelessWidget {
 
     return InkWell(
       onTap: () {
+        // 1. 同時獲取 Database 和 ReferenceService
         final database = context.read<AppDatabase>();
+        final refService = context.read<ReferenceService>(); // 新增這一行
+
         Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => ChangeNotifierProvider(
-              create: (_) =>
-                  MedicalViewModel(database, record.medicalId)..init(),
+              create: (_) => MedicalViewModel(
+                database, // 參數 1: db
+                refService, // 參數 2: refService (新增)
+                record.medicalId, // 參數 3: medicalId
+              )..init(),
               child: MedicalPage(medicalId: record.medicalId),
             ),
           ),
