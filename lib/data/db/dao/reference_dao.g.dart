@@ -6,4 +6,7 @@ part of 'reference_dao.dart';
 mixin _$ReferenceDaoMixin on DatabaseAccessor<AppDatabase> {
   $SexTable get sex => attachedDatabase.sex;
   $NationalityTable get nationality => attachedDatabase.nationality;
+  $AirlineTable get airline => attachedDatabase.airline;
+  $TravelStatusTable get travelStatus => attachedDatabase.travelStatus;
+  $LocationTable get location => attachedDatabase.location;
 }
