@@ -23,12 +23,16 @@ part 'database.g.dart';
     Airline,
     TravelStatus,
     Location,
+    IncidentPlaceCategory,
+    IncidentPlaceCategory2,
+    ReportingUnit,
 
     //醫療表
     MedicalRecord,
     Patient,
     FlightRecord,
     FlightTransitLocations,
+    IncidentRecord,
   ],
   daos: [ReferenceDao, MedicalDao, FlightDao],
 )

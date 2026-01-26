@@ -1283,6 +1283,977 @@ class LocationCompanion extends UpdateCompanion<LocationData> {
   }
 }
 
+class $IncidentPlaceCategoryTable extends IncidentPlaceCategory
+    with TableInfo<$IncidentPlaceCategoryTable, IncidentPlaceCategoryData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $IncidentPlaceCategoryTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sortOrderMeta = const VerificationMeta(
+    'sortOrder',
+  );
+  @override
+  late final GeneratedColumn<int> sortOrder = GeneratedColumn<int>(
+    'sort_order',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _isActiveMeta = const VerificationMeta(
+    'isActive',
+  );
+  @override
+  late final GeneratedColumn<bool> isActive = GeneratedColumn<bool>(
+    'is_active',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_active" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, name, sortOrder, isActive];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'incident_place_category';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<IncidentPlaceCategoryData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('sort_order')) {
+      context.handle(
+        _sortOrderMeta,
+        sortOrder.isAcceptableOrUnknown(data['sort_order']!, _sortOrderMeta),
+      );
+    }
+    if (data.containsKey('is_active')) {
+      context.handle(
+        _isActiveMeta,
+        isActive.isAcceptableOrUnknown(data['is_active']!, _isActiveMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  IncidentPlaceCategoryData map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return IncidentPlaceCategoryData(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      sortOrder: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}sort_order'],
+      )!,
+      isActive: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_active'],
+      )!,
+    );
+  }
+
+  @override
+  $IncidentPlaceCategoryTable createAlias(String alias) {
+    return $IncidentPlaceCategoryTable(attachedDatabase, alias);
+  }
+}
+
+class IncidentPlaceCategoryData extends DataClass
+    implements Insertable<IncidentPlaceCategoryData> {
+  final int id;
+  final String name;
+  final int sortOrder;
+  final bool isActive;
+  const IncidentPlaceCategoryData({
+    required this.id,
+    required this.name,
+    required this.sortOrder,
+    required this.isActive,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['name'] = Variable<String>(name);
+    map['sort_order'] = Variable<int>(sortOrder);
+    map['is_active'] = Variable<bool>(isActive);
+    return map;
+  }
+
+  IncidentPlaceCategoryCompanion toCompanion(bool nullToAbsent) {
+    return IncidentPlaceCategoryCompanion(
+      id: Value(id),
+      name: Value(name),
+      sortOrder: Value(sortOrder),
+      isActive: Value(isActive),
+    );
+  }
+
+  factory IncidentPlaceCategoryData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return IncidentPlaceCategoryData(
+      id: serializer.fromJson<int>(json['id']),
+      name: serializer.fromJson<String>(json['name']),
+      sortOrder: serializer.fromJson<int>(json['sortOrder']),
+      isActive: serializer.fromJson<bool>(json['isActive']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'name': serializer.toJson<String>(name),
+      'sortOrder': serializer.toJson<int>(sortOrder),
+      'isActive': serializer.toJson<bool>(isActive),
+    };
+  }
+
+  IncidentPlaceCategoryData copyWith({
+    int? id,
+    String? name,
+    int? sortOrder,
+    bool? isActive,
+  }) => IncidentPlaceCategoryData(
+    id: id ?? this.id,
+    name: name ?? this.name,
+    sortOrder: sortOrder ?? this.sortOrder,
+    isActive: isActive ?? this.isActive,
+  );
+  IncidentPlaceCategoryData copyWithCompanion(
+    IncidentPlaceCategoryCompanion data,
+  ) {
+    return IncidentPlaceCategoryData(
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+      sortOrder: data.sortOrder.present ? data.sortOrder.value : this.sortOrder,
+      isActive: data.isActive.present ? data.isActive.value : this.isActive,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('IncidentPlaceCategoryData(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('sortOrder: $sortOrder, ')
+          ..write('isActive: $isActive')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, name, sortOrder, isActive);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is IncidentPlaceCategoryData &&
+          other.id == this.id &&
+          other.name == this.name &&
+          other.sortOrder == this.sortOrder &&
+          other.isActive == this.isActive);
+}
+
+class IncidentPlaceCategoryCompanion
+    extends UpdateCompanion<IncidentPlaceCategoryData> {
+  final Value<int> id;
+  final Value<String> name;
+  final Value<int> sortOrder;
+  final Value<bool> isActive;
+  const IncidentPlaceCategoryCompanion({
+    this.id = const Value.absent(),
+    this.name = const Value.absent(),
+    this.sortOrder = const Value.absent(),
+    this.isActive = const Value.absent(),
+  });
+  IncidentPlaceCategoryCompanion.insert({
+    this.id = const Value.absent(),
+    required String name,
+    this.sortOrder = const Value.absent(),
+    this.isActive = const Value.absent(),
+  }) : name = Value(name);
+  static Insertable<IncidentPlaceCategoryData> custom({
+    Expression<int>? id,
+    Expression<String>? name,
+    Expression<int>? sortOrder,
+    Expression<bool>? isActive,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (name != null) 'name': name,
+      if (sortOrder != null) 'sort_order': sortOrder,
+      if (isActive != null) 'is_active': isActive,
+    });
+  }
+
+  IncidentPlaceCategoryCompanion copyWith({
+    Value<int>? id,
+    Value<String>? name,
+    Value<int>? sortOrder,
+    Value<bool>? isActive,
+  }) {
+    return IncidentPlaceCategoryCompanion(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      sortOrder: sortOrder ?? this.sortOrder,
+      isActive: isActive ?? this.isActive,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (sortOrder.present) {
+      map['sort_order'] = Variable<int>(sortOrder.value);
+    }
+    if (isActive.present) {
+      map['is_active'] = Variable<bool>(isActive.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('IncidentPlaceCategoryCompanion(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('sortOrder: $sortOrder, ')
+          ..write('isActive: $isActive')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $IncidentPlaceCategory2Table extends IncidentPlaceCategory2
+    with TableInfo<$IncidentPlaceCategory2Table, IncidentPlaceCategory2Data> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $IncidentPlaceCategory2Table(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _categoryIdMeta = const VerificationMeta(
+    'categoryId',
+  );
+  @override
+  late final GeneratedColumn<int> categoryId = GeneratedColumn<int>(
+    'category_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES incident_place_category (id)',
+    ),
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sortOrderMeta = const VerificationMeta(
+    'sortOrder',
+  );
+  @override
+  late final GeneratedColumn<int> sortOrder = GeneratedColumn<int>(
+    'sort_order',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _isActiveMeta = const VerificationMeta(
+    'isActive',
+  );
+  @override
+  late final GeneratedColumn<bool> isActive = GeneratedColumn<bool>(
+    'is_active',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_active" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    categoryId,
+    name,
+    sortOrder,
+    isActive,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'incident_place_category2';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<IncidentPlaceCategory2Data> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('category_id')) {
+      context.handle(
+        _categoryIdMeta,
+        categoryId.isAcceptableOrUnknown(data['category_id']!, _categoryIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_categoryIdMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('sort_order')) {
+      context.handle(
+        _sortOrderMeta,
+        sortOrder.isAcceptableOrUnknown(data['sort_order']!, _sortOrderMeta),
+      );
+    }
+    if (data.containsKey('is_active')) {
+      context.handle(
+        _isActiveMeta,
+        isActive.isAcceptableOrUnknown(data['is_active']!, _isActiveMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  IncidentPlaceCategory2Data map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return IncidentPlaceCategory2Data(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      categoryId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}category_id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      sortOrder: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}sort_order'],
+      )!,
+      isActive: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_active'],
+      )!,
+    );
+  }
+
+  @override
+  $IncidentPlaceCategory2Table createAlias(String alias) {
+    return $IncidentPlaceCategory2Table(attachedDatabase, alias);
+  }
+}
+
+class IncidentPlaceCategory2Data extends DataClass
+    implements Insertable<IncidentPlaceCategory2Data> {
+  final int id;
+  final int categoryId;
+  final String name;
+  final int sortOrder;
+  final bool isActive;
+  const IncidentPlaceCategory2Data({
+    required this.id,
+    required this.categoryId,
+    required this.name,
+    required this.sortOrder,
+    required this.isActive,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['category_id'] = Variable<int>(categoryId);
+    map['name'] = Variable<String>(name);
+    map['sort_order'] = Variable<int>(sortOrder);
+    map['is_active'] = Variable<bool>(isActive);
+    return map;
+  }
+
+  IncidentPlaceCategory2Companion toCompanion(bool nullToAbsent) {
+    return IncidentPlaceCategory2Companion(
+      id: Value(id),
+      categoryId: Value(categoryId),
+      name: Value(name),
+      sortOrder: Value(sortOrder),
+      isActive: Value(isActive),
+    );
+  }
+
+  factory IncidentPlaceCategory2Data.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return IncidentPlaceCategory2Data(
+      id: serializer.fromJson<int>(json['id']),
+      categoryId: serializer.fromJson<int>(json['categoryId']),
+      name: serializer.fromJson<String>(json['name']),
+      sortOrder: serializer.fromJson<int>(json['sortOrder']),
+      isActive: serializer.fromJson<bool>(json['isActive']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'categoryId': serializer.toJson<int>(categoryId),
+      'name': serializer.toJson<String>(name),
+      'sortOrder': serializer.toJson<int>(sortOrder),
+      'isActive': serializer.toJson<bool>(isActive),
+    };
+  }
+
+  IncidentPlaceCategory2Data copyWith({
+    int? id,
+    int? categoryId,
+    String? name,
+    int? sortOrder,
+    bool? isActive,
+  }) => IncidentPlaceCategory2Data(
+    id: id ?? this.id,
+    categoryId: categoryId ?? this.categoryId,
+    name: name ?? this.name,
+    sortOrder: sortOrder ?? this.sortOrder,
+    isActive: isActive ?? this.isActive,
+  );
+  IncidentPlaceCategory2Data copyWithCompanion(
+    IncidentPlaceCategory2Companion data,
+  ) {
+    return IncidentPlaceCategory2Data(
+      id: data.id.present ? data.id.value : this.id,
+      categoryId: data.categoryId.present
+          ? data.categoryId.value
+          : this.categoryId,
+      name: data.name.present ? data.name.value : this.name,
+      sortOrder: data.sortOrder.present ? data.sortOrder.value : this.sortOrder,
+      isActive: data.isActive.present ? data.isActive.value : this.isActive,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('IncidentPlaceCategory2Data(')
+          ..write('id: $id, ')
+          ..write('categoryId: $categoryId, ')
+          ..write('name: $name, ')
+          ..write('sortOrder: $sortOrder, ')
+          ..write('isActive: $isActive')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, categoryId, name, sortOrder, isActive);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is IncidentPlaceCategory2Data &&
+          other.id == this.id &&
+          other.categoryId == this.categoryId &&
+          other.name == this.name &&
+          other.sortOrder == this.sortOrder &&
+          other.isActive == this.isActive);
+}
+
+class IncidentPlaceCategory2Companion
+    extends UpdateCompanion<IncidentPlaceCategory2Data> {
+  final Value<int> id;
+  final Value<int> categoryId;
+  final Value<String> name;
+  final Value<int> sortOrder;
+  final Value<bool> isActive;
+  const IncidentPlaceCategory2Companion({
+    this.id = const Value.absent(),
+    this.categoryId = const Value.absent(),
+    this.name = const Value.absent(),
+    this.sortOrder = const Value.absent(),
+    this.isActive = const Value.absent(),
+  });
+  IncidentPlaceCategory2Companion.insert({
+    this.id = const Value.absent(),
+    required int categoryId,
+    required String name,
+    this.sortOrder = const Value.absent(),
+    this.isActive = const Value.absent(),
+  }) : categoryId = Value(categoryId),
+       name = Value(name);
+  static Insertable<IncidentPlaceCategory2Data> custom({
+    Expression<int>? id,
+    Expression<int>? categoryId,
+    Expression<String>? name,
+    Expression<int>? sortOrder,
+    Expression<bool>? isActive,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (categoryId != null) 'category_id': categoryId,
+      if (name != null) 'name': name,
+      if (sortOrder != null) 'sort_order': sortOrder,
+      if (isActive != null) 'is_active': isActive,
+    });
+  }
+
+  IncidentPlaceCategory2Companion copyWith({
+    Value<int>? id,
+    Value<int>? categoryId,
+    Value<String>? name,
+    Value<int>? sortOrder,
+    Value<bool>? isActive,
+  }) {
+    return IncidentPlaceCategory2Companion(
+      id: id ?? this.id,
+      categoryId: categoryId ?? this.categoryId,
+      name: name ?? this.name,
+      sortOrder: sortOrder ?? this.sortOrder,
+      isActive: isActive ?? this.isActive,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (categoryId.present) {
+      map['category_id'] = Variable<int>(categoryId.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (sortOrder.present) {
+      map['sort_order'] = Variable<int>(sortOrder.value);
+    }
+    if (isActive.present) {
+      map['is_active'] = Variable<bool>(isActive.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('IncidentPlaceCategory2Companion(')
+          ..write('id: $id, ')
+          ..write('categoryId: $categoryId, ')
+          ..write('name: $name, ')
+          ..write('sortOrder: $sortOrder, ')
+          ..write('isActive: $isActive')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $ReportingUnitTable extends ReportingUnit
+    with TableInfo<$ReportingUnitTable, ReportingUnitData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ReportingUnitTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _descriptionMeta = const VerificationMeta(
+    'description',
+  );
+  @override
+  late final GeneratedColumn<String> description = GeneratedColumn<String>(
+    'description',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _isActiveMeta = const VerificationMeta(
+    'isActive',
+  );
+  @override
+  late final GeneratedColumn<bool> isActive = GeneratedColumn<bool>(
+    'is_active',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_active" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, name, description, isActive];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'reporting_unit';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ReportingUnitData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('description')) {
+      context.handle(
+        _descriptionMeta,
+        description.isAcceptableOrUnknown(
+          data['description']!,
+          _descriptionMeta,
+        ),
+      );
+    }
+    if (data.containsKey('is_active')) {
+      context.handle(
+        _isActiveMeta,
+        isActive.isAcceptableOrUnknown(data['is_active']!, _isActiveMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  ReportingUnitData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ReportingUnitData(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      description: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}description'],
+      ),
+      isActive: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_active'],
+      )!,
+    );
+  }
+
+  @override
+  $ReportingUnitTable createAlias(String alias) {
+    return $ReportingUnitTable(attachedDatabase, alias);
+  }
+}
+
+class ReportingUnitData extends DataClass
+    implements Insertable<ReportingUnitData> {
+  final int id;
+  final String name;
+  final String? description;
+  final bool isActive;
+  const ReportingUnitData({
+    required this.id,
+    required this.name,
+    this.description,
+    required this.isActive,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['name'] = Variable<String>(name);
+    if (!nullToAbsent || description != null) {
+      map['description'] = Variable<String>(description);
+    }
+    map['is_active'] = Variable<bool>(isActive);
+    return map;
+  }
+
+  ReportingUnitCompanion toCompanion(bool nullToAbsent) {
+    return ReportingUnitCompanion(
+      id: Value(id),
+      name: Value(name),
+      description: description == null && nullToAbsent
+          ? const Value.absent()
+          : Value(description),
+      isActive: Value(isActive),
+    );
+  }
+
+  factory ReportingUnitData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ReportingUnitData(
+      id: serializer.fromJson<int>(json['id']),
+      name: serializer.fromJson<String>(json['name']),
+      description: serializer.fromJson<String?>(json['description']),
+      isActive: serializer.fromJson<bool>(json['isActive']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'name': serializer.toJson<String>(name),
+      'description': serializer.toJson<String?>(description),
+      'isActive': serializer.toJson<bool>(isActive),
+    };
+  }
+
+  ReportingUnitData copyWith({
+    int? id,
+    String? name,
+    Value<String?> description = const Value.absent(),
+    bool? isActive,
+  }) => ReportingUnitData(
+    id: id ?? this.id,
+    name: name ?? this.name,
+    description: description.present ? description.value : this.description,
+    isActive: isActive ?? this.isActive,
+  );
+  ReportingUnitData copyWithCompanion(ReportingUnitCompanion data) {
+    return ReportingUnitData(
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+      description: data.description.present
+          ? data.description.value
+          : this.description,
+      isActive: data.isActive.present ? data.isActive.value : this.isActive,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ReportingUnitData(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('description: $description, ')
+          ..write('isActive: $isActive')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, name, description, isActive);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ReportingUnitData &&
+          other.id == this.id &&
+          other.name == this.name &&
+          other.description == this.description &&
+          other.isActive == this.isActive);
+}
+
+class ReportingUnitCompanion extends UpdateCompanion<ReportingUnitData> {
+  final Value<int> id;
+  final Value<String> name;
+  final Value<String?> description;
+  final Value<bool> isActive;
+  const ReportingUnitCompanion({
+    this.id = const Value.absent(),
+    this.name = const Value.absent(),
+    this.description = const Value.absent(),
+    this.isActive = const Value.absent(),
+  });
+  ReportingUnitCompanion.insert({
+    this.id = const Value.absent(),
+    required String name,
+    this.description = const Value.absent(),
+    this.isActive = const Value.absent(),
+  }) : name = Value(name);
+  static Insertable<ReportingUnitData> custom({
+    Expression<int>? id,
+    Expression<String>? name,
+    Expression<String>? description,
+    Expression<bool>? isActive,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (name != null) 'name': name,
+      if (description != null) 'description': description,
+      if (isActive != null) 'is_active': isActive,
+    });
+  }
+
+  ReportingUnitCompanion copyWith({
+    Value<int>? id,
+    Value<String>? name,
+    Value<String?>? description,
+    Value<bool>? isActive,
+  }) {
+    return ReportingUnitCompanion(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      description: description ?? this.description,
+      isActive: isActive ?? this.isActive,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (description.present) {
+      map['description'] = Variable<String>(description.value);
+    }
+    if (isActive.present) {
+      map['is_active'] = Variable<bool>(isActive.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ReportingUnitCompanion(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('description: $description, ')
+          ..write('isActive: $isActive')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $MedicalRecordTable extends MedicalRecord
     with TableInfo<$MedicalRecordTable, MedicalRecordData> {
   @override
@@ -3247,6 +4218,758 @@ class FlightTransitLocationsCompanion
   }
 }
 
+class $IncidentRecordTable extends IncidentRecord
+    with TableInfo<$IncidentRecordTable, IncidentRecordData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $IncidentRecordTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _incidentIdMeta = const VerificationMeta(
+    'incidentId',
+  );
+  @override
+  late final GeneratedColumn<int> incidentId = GeneratedColumn<int>(
+    'incident_id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _medicalIdMeta = const VerificationMeta(
+    'medicalId',
+  );
+  @override
+  late final GeneratedColumn<int> medicalId = GeneratedColumn<int>(
+    'medical_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES medical_record (medical_id)',
+    ),
+  );
+  static const VerificationMeta _incidentDateMeta = const VerificationMeta(
+    'incidentDate',
+  );
+  @override
+  late final GeneratedColumn<DateTime> incidentDate = GeneratedColumn<DateTime>(
+    'incident_date',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _incidentPlaceCategoryIdMeta =
+      const VerificationMeta('incidentPlaceCategoryId');
+  @override
+  late final GeneratedColumn<int> incidentPlaceCategoryId =
+      GeneratedColumn<int>(
+        'incident_place_category_id',
+        aliasedName,
+        false,
+        type: DriftSqlType.int,
+        requiredDuringInsert: true,
+        defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'REFERENCES incident_place_category (id)',
+        ),
+      );
+  static const VerificationMeta _incidentPlaceCategory2IdMeta =
+      const VerificationMeta('incidentPlaceCategory2Id');
+  @override
+  late final GeneratedColumn<int> incidentPlaceCategory2Id =
+      GeneratedColumn<int>(
+        'incident_place_category2_id',
+        aliasedName,
+        true,
+        type: DriftSqlType.int,
+        requiredDuringInsert: false,
+        defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'REFERENCES incident_place_category2 (id)',
+        ),
+      );
+  static const VerificationMeta _incidentPlaceFinalMeta =
+      const VerificationMeta('incidentPlaceFinal');
+  @override
+  late final GeneratedColumn<String> incidentPlaceFinal =
+      GeneratedColumn<String>(
+        'incident_place_final',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _notificationTimeMeta = const VerificationMeta(
+    'notificationTime',
+  );
+  @override
+  late final GeneratedColumn<DateTime> notificationTime =
+      GeneratedColumn<DateTime>(
+        'notification_time',
+        aliasedName,
+        true,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _notificationPersonMeta =
+      const VerificationMeta('notificationPerson');
+  @override
+  late final GeneratedColumn<String> notificationPerson =
+      GeneratedColumn<String>(
+        'notification_person',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _reportingUnitIdMeta = const VerificationMeta(
+    'reportingUnitId',
+  );
+  @override
+  late final GeneratedColumn<int> reportingUnitId = GeneratedColumn<int>(
+    'reporting_unit_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES reporting_unit (id)',
+    ),
+  );
+  static const VerificationMeta _beforeLandingMeta = const VerificationMeta(
+    'beforeLanding',
+  );
+  @override
+  late final GeneratedColumn<bool> beforeLanding = GeneratedColumn<bool>(
+    'before_landing',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("before_landing" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _landingTimeMeta = const VerificationMeta(
+    'landingTime',
+  );
+  @override
+  late final GeneratedColumn<DateTime> landingTime = GeneratedColumn<DateTime>(
+    'landing_time',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    incidentId,
+    medicalId,
+    incidentDate,
+    incidentPlaceCategoryId,
+    incidentPlaceCategory2Id,
+    incidentPlaceFinal,
+    notificationTime,
+    notificationPerson,
+    reportingUnitId,
+    beforeLanding,
+    landingTime,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'incident_record';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<IncidentRecordData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('incident_id')) {
+      context.handle(
+        _incidentIdMeta,
+        incidentId.isAcceptableOrUnknown(data['incident_id']!, _incidentIdMeta),
+      );
+    }
+    if (data.containsKey('medical_id')) {
+      context.handle(
+        _medicalIdMeta,
+        medicalId.isAcceptableOrUnknown(data['medical_id']!, _medicalIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_medicalIdMeta);
+    }
+    if (data.containsKey('incident_date')) {
+      context.handle(
+        _incidentDateMeta,
+        incidentDate.isAcceptableOrUnknown(
+          data['incident_date']!,
+          _incidentDateMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_incidentDateMeta);
+    }
+    if (data.containsKey('incident_place_category_id')) {
+      context.handle(
+        _incidentPlaceCategoryIdMeta,
+        incidentPlaceCategoryId.isAcceptableOrUnknown(
+          data['incident_place_category_id']!,
+          _incidentPlaceCategoryIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_incidentPlaceCategoryIdMeta);
+    }
+    if (data.containsKey('incident_place_category2_id')) {
+      context.handle(
+        _incidentPlaceCategory2IdMeta,
+        incidentPlaceCategory2Id.isAcceptableOrUnknown(
+          data['incident_place_category2_id']!,
+          _incidentPlaceCategory2IdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('incident_place_final')) {
+      context.handle(
+        _incidentPlaceFinalMeta,
+        incidentPlaceFinal.isAcceptableOrUnknown(
+          data['incident_place_final']!,
+          _incidentPlaceFinalMeta,
+        ),
+      );
+    }
+    if (data.containsKey('notification_time')) {
+      context.handle(
+        _notificationTimeMeta,
+        notificationTime.isAcceptableOrUnknown(
+          data['notification_time']!,
+          _notificationTimeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('notification_person')) {
+      context.handle(
+        _notificationPersonMeta,
+        notificationPerson.isAcceptableOrUnknown(
+          data['notification_person']!,
+          _notificationPersonMeta,
+        ),
+      );
+    }
+    if (data.containsKey('reporting_unit_id')) {
+      context.handle(
+        _reportingUnitIdMeta,
+        reportingUnitId.isAcceptableOrUnknown(
+          data['reporting_unit_id']!,
+          _reportingUnitIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_reportingUnitIdMeta);
+    }
+    if (data.containsKey('before_landing')) {
+      context.handle(
+        _beforeLandingMeta,
+        beforeLanding.isAcceptableOrUnknown(
+          data['before_landing']!,
+          _beforeLandingMeta,
+        ),
+      );
+    }
+    if (data.containsKey('landing_time')) {
+      context.handle(
+        _landingTimeMeta,
+        landingTime.isAcceptableOrUnknown(
+          data['landing_time']!,
+          _landingTimeMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {incidentId};
+  @override
+  IncidentRecordData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return IncidentRecordData(
+      incidentId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}incident_id'],
+      )!,
+      medicalId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}medical_id'],
+      )!,
+      incidentDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}incident_date'],
+      )!,
+      incidentPlaceCategoryId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}incident_place_category_id'],
+      )!,
+      incidentPlaceCategory2Id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}incident_place_category2_id'],
+      ),
+      incidentPlaceFinal: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}incident_place_final'],
+      ),
+      notificationTime: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}notification_time'],
+      ),
+      notificationPerson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}notification_person'],
+      ),
+      reportingUnitId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}reporting_unit_id'],
+      )!,
+      beforeLanding: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}before_landing'],
+      )!,
+      landingTime: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}landing_time'],
+      ),
+    );
+  }
+
+  @override
+  $IncidentRecordTable createAlias(String alias) {
+    return $IncidentRecordTable(attachedDatabase, alias);
+  }
+}
+
+class IncidentRecordData extends DataClass
+    implements Insertable<IncidentRecordData> {
+  final int incidentId;
+  final int medicalId;
+  final DateTime incidentDate;
+  final int incidentPlaceCategoryId;
+  final int? incidentPlaceCategory2Id;
+  final String? incidentPlaceFinal;
+  final DateTime? notificationTime;
+  final String? notificationPerson;
+  final int reportingUnitId;
+  final bool beforeLanding;
+  final DateTime? landingTime;
+  const IncidentRecordData({
+    required this.incidentId,
+    required this.medicalId,
+    required this.incidentDate,
+    required this.incidentPlaceCategoryId,
+    this.incidentPlaceCategory2Id,
+    this.incidentPlaceFinal,
+    this.notificationTime,
+    this.notificationPerson,
+    required this.reportingUnitId,
+    required this.beforeLanding,
+    this.landingTime,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['incident_id'] = Variable<int>(incidentId);
+    map['medical_id'] = Variable<int>(medicalId);
+    map['incident_date'] = Variable<DateTime>(incidentDate);
+    map['incident_place_category_id'] = Variable<int>(incidentPlaceCategoryId);
+    if (!nullToAbsent || incidentPlaceCategory2Id != null) {
+      map['incident_place_category2_id'] = Variable<int>(
+        incidentPlaceCategory2Id,
+      );
+    }
+    if (!nullToAbsent || incidentPlaceFinal != null) {
+      map['incident_place_final'] = Variable<String>(incidentPlaceFinal);
+    }
+    if (!nullToAbsent || notificationTime != null) {
+      map['notification_time'] = Variable<DateTime>(notificationTime);
+    }
+    if (!nullToAbsent || notificationPerson != null) {
+      map['notification_person'] = Variable<String>(notificationPerson);
+    }
+    map['reporting_unit_id'] = Variable<int>(reportingUnitId);
+    map['before_landing'] = Variable<bool>(beforeLanding);
+    if (!nullToAbsent || landingTime != null) {
+      map['landing_time'] = Variable<DateTime>(landingTime);
+    }
+    return map;
+  }
+
+  IncidentRecordCompanion toCompanion(bool nullToAbsent) {
+    return IncidentRecordCompanion(
+      incidentId: Value(incidentId),
+      medicalId: Value(medicalId),
+      incidentDate: Value(incidentDate),
+      incidentPlaceCategoryId: Value(incidentPlaceCategoryId),
+      incidentPlaceCategory2Id: incidentPlaceCategory2Id == null && nullToAbsent
+          ? const Value.absent()
+          : Value(incidentPlaceCategory2Id),
+      incidentPlaceFinal: incidentPlaceFinal == null && nullToAbsent
+          ? const Value.absent()
+          : Value(incidentPlaceFinal),
+      notificationTime: notificationTime == null && nullToAbsent
+          ? const Value.absent()
+          : Value(notificationTime),
+      notificationPerson: notificationPerson == null && nullToAbsent
+          ? const Value.absent()
+          : Value(notificationPerson),
+      reportingUnitId: Value(reportingUnitId),
+      beforeLanding: Value(beforeLanding),
+      landingTime: landingTime == null && nullToAbsent
+          ? const Value.absent()
+          : Value(landingTime),
+    );
+  }
+
+  factory IncidentRecordData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return IncidentRecordData(
+      incidentId: serializer.fromJson<int>(json['incidentId']),
+      medicalId: serializer.fromJson<int>(json['medicalId']),
+      incidentDate: serializer.fromJson<DateTime>(json['incidentDate']),
+      incidentPlaceCategoryId: serializer.fromJson<int>(
+        json['incidentPlaceCategoryId'],
+      ),
+      incidentPlaceCategory2Id: serializer.fromJson<int?>(
+        json['incidentPlaceCategory2Id'],
+      ),
+      incidentPlaceFinal: serializer.fromJson<String?>(
+        json['incidentPlaceFinal'],
+      ),
+      notificationTime: serializer.fromJson<DateTime?>(
+        json['notificationTime'],
+      ),
+      notificationPerson: serializer.fromJson<String?>(
+        json['notificationPerson'],
+      ),
+      reportingUnitId: serializer.fromJson<int>(json['reportingUnitId']),
+      beforeLanding: serializer.fromJson<bool>(json['beforeLanding']),
+      landingTime: serializer.fromJson<DateTime?>(json['landingTime']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'incidentId': serializer.toJson<int>(incidentId),
+      'medicalId': serializer.toJson<int>(medicalId),
+      'incidentDate': serializer.toJson<DateTime>(incidentDate),
+      'incidentPlaceCategoryId': serializer.toJson<int>(
+        incidentPlaceCategoryId,
+      ),
+      'incidentPlaceCategory2Id': serializer.toJson<int?>(
+        incidentPlaceCategory2Id,
+      ),
+      'incidentPlaceFinal': serializer.toJson<String?>(incidentPlaceFinal),
+      'notificationTime': serializer.toJson<DateTime?>(notificationTime),
+      'notificationPerson': serializer.toJson<String?>(notificationPerson),
+      'reportingUnitId': serializer.toJson<int>(reportingUnitId),
+      'beforeLanding': serializer.toJson<bool>(beforeLanding),
+      'landingTime': serializer.toJson<DateTime?>(landingTime),
+    };
+  }
+
+  IncidentRecordData copyWith({
+    int? incidentId,
+    int? medicalId,
+    DateTime? incidentDate,
+    int? incidentPlaceCategoryId,
+    Value<int?> incidentPlaceCategory2Id = const Value.absent(),
+    Value<String?> incidentPlaceFinal = const Value.absent(),
+    Value<DateTime?> notificationTime = const Value.absent(),
+    Value<String?> notificationPerson = const Value.absent(),
+    int? reportingUnitId,
+    bool? beforeLanding,
+    Value<DateTime?> landingTime = const Value.absent(),
+  }) => IncidentRecordData(
+    incidentId: incidentId ?? this.incidentId,
+    medicalId: medicalId ?? this.medicalId,
+    incidentDate: incidentDate ?? this.incidentDate,
+    incidentPlaceCategoryId:
+        incidentPlaceCategoryId ?? this.incidentPlaceCategoryId,
+    incidentPlaceCategory2Id: incidentPlaceCategory2Id.present
+        ? incidentPlaceCategory2Id.value
+        : this.incidentPlaceCategory2Id,
+    incidentPlaceFinal: incidentPlaceFinal.present
+        ? incidentPlaceFinal.value
+        : this.incidentPlaceFinal,
+    notificationTime: notificationTime.present
+        ? notificationTime.value
+        : this.notificationTime,
+    notificationPerson: notificationPerson.present
+        ? notificationPerson.value
+        : this.notificationPerson,
+    reportingUnitId: reportingUnitId ?? this.reportingUnitId,
+    beforeLanding: beforeLanding ?? this.beforeLanding,
+    landingTime: landingTime.present ? landingTime.value : this.landingTime,
+  );
+  IncidentRecordData copyWithCompanion(IncidentRecordCompanion data) {
+    return IncidentRecordData(
+      incidentId: data.incidentId.present
+          ? data.incidentId.value
+          : this.incidentId,
+      medicalId: data.medicalId.present ? data.medicalId.value : this.medicalId,
+      incidentDate: data.incidentDate.present
+          ? data.incidentDate.value
+          : this.incidentDate,
+      incidentPlaceCategoryId: data.incidentPlaceCategoryId.present
+          ? data.incidentPlaceCategoryId.value
+          : this.incidentPlaceCategoryId,
+      incidentPlaceCategory2Id: data.incidentPlaceCategory2Id.present
+          ? data.incidentPlaceCategory2Id.value
+          : this.incidentPlaceCategory2Id,
+      incidentPlaceFinal: data.incidentPlaceFinal.present
+          ? data.incidentPlaceFinal.value
+          : this.incidentPlaceFinal,
+      notificationTime: data.notificationTime.present
+          ? data.notificationTime.value
+          : this.notificationTime,
+      notificationPerson: data.notificationPerson.present
+          ? data.notificationPerson.value
+          : this.notificationPerson,
+      reportingUnitId: data.reportingUnitId.present
+          ? data.reportingUnitId.value
+          : this.reportingUnitId,
+      beforeLanding: data.beforeLanding.present
+          ? data.beforeLanding.value
+          : this.beforeLanding,
+      landingTime: data.landingTime.present
+          ? data.landingTime.value
+          : this.landingTime,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('IncidentRecordData(')
+          ..write('incidentId: $incidentId, ')
+          ..write('medicalId: $medicalId, ')
+          ..write('incidentDate: $incidentDate, ')
+          ..write('incidentPlaceCategoryId: $incidentPlaceCategoryId, ')
+          ..write('incidentPlaceCategory2Id: $incidentPlaceCategory2Id, ')
+          ..write('incidentPlaceFinal: $incidentPlaceFinal, ')
+          ..write('notificationTime: $notificationTime, ')
+          ..write('notificationPerson: $notificationPerson, ')
+          ..write('reportingUnitId: $reportingUnitId, ')
+          ..write('beforeLanding: $beforeLanding, ')
+          ..write('landingTime: $landingTime')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    incidentId,
+    medicalId,
+    incidentDate,
+    incidentPlaceCategoryId,
+    incidentPlaceCategory2Id,
+    incidentPlaceFinal,
+    notificationTime,
+    notificationPerson,
+    reportingUnitId,
+    beforeLanding,
+    landingTime,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is IncidentRecordData &&
+          other.incidentId == this.incidentId &&
+          other.medicalId == this.medicalId &&
+          other.incidentDate == this.incidentDate &&
+          other.incidentPlaceCategoryId == this.incidentPlaceCategoryId &&
+          other.incidentPlaceCategory2Id == this.incidentPlaceCategory2Id &&
+          other.incidentPlaceFinal == this.incidentPlaceFinal &&
+          other.notificationTime == this.notificationTime &&
+          other.notificationPerson == this.notificationPerson &&
+          other.reportingUnitId == this.reportingUnitId &&
+          other.beforeLanding == this.beforeLanding &&
+          other.landingTime == this.landingTime);
+}
+
+class IncidentRecordCompanion extends UpdateCompanion<IncidentRecordData> {
+  final Value<int> incidentId;
+  final Value<int> medicalId;
+  final Value<DateTime> incidentDate;
+  final Value<int> incidentPlaceCategoryId;
+  final Value<int?> incidentPlaceCategory2Id;
+  final Value<String?> incidentPlaceFinal;
+  final Value<DateTime?> notificationTime;
+  final Value<String?> notificationPerson;
+  final Value<int> reportingUnitId;
+  final Value<bool> beforeLanding;
+  final Value<DateTime?> landingTime;
+  const IncidentRecordCompanion({
+    this.incidentId = const Value.absent(),
+    this.medicalId = const Value.absent(),
+    this.incidentDate = const Value.absent(),
+    this.incidentPlaceCategoryId = const Value.absent(),
+    this.incidentPlaceCategory2Id = const Value.absent(),
+    this.incidentPlaceFinal = const Value.absent(),
+    this.notificationTime = const Value.absent(),
+    this.notificationPerson = const Value.absent(),
+    this.reportingUnitId = const Value.absent(),
+    this.beforeLanding = const Value.absent(),
+    this.landingTime = const Value.absent(),
+  });
+  IncidentRecordCompanion.insert({
+    this.incidentId = const Value.absent(),
+    required int medicalId,
+    required DateTime incidentDate,
+    required int incidentPlaceCategoryId,
+    this.incidentPlaceCategory2Id = const Value.absent(),
+    this.incidentPlaceFinal = const Value.absent(),
+    this.notificationTime = const Value.absent(),
+    this.notificationPerson = const Value.absent(),
+    required int reportingUnitId,
+    this.beforeLanding = const Value.absent(),
+    this.landingTime = const Value.absent(),
+  }) : medicalId = Value(medicalId),
+       incidentDate = Value(incidentDate),
+       incidentPlaceCategoryId = Value(incidentPlaceCategoryId),
+       reportingUnitId = Value(reportingUnitId);
+  static Insertable<IncidentRecordData> custom({
+    Expression<int>? incidentId,
+    Expression<int>? medicalId,
+    Expression<DateTime>? incidentDate,
+    Expression<int>? incidentPlaceCategoryId,
+    Expression<int>? incidentPlaceCategory2Id,
+    Expression<String>? incidentPlaceFinal,
+    Expression<DateTime>? notificationTime,
+    Expression<String>? notificationPerson,
+    Expression<int>? reportingUnitId,
+    Expression<bool>? beforeLanding,
+    Expression<DateTime>? landingTime,
+  }) {
+    return RawValuesInsertable({
+      if (incidentId != null) 'incident_id': incidentId,
+      if (medicalId != null) 'medical_id': medicalId,
+      if (incidentDate != null) 'incident_date': incidentDate,
+      if (incidentPlaceCategoryId != null)
+        'incident_place_category_id': incidentPlaceCategoryId,
+      if (incidentPlaceCategory2Id != null)
+        'incident_place_category2_id': incidentPlaceCategory2Id,
+      if (incidentPlaceFinal != null)
+        'incident_place_final': incidentPlaceFinal,
+      if (notificationTime != null) 'notification_time': notificationTime,
+      if (notificationPerson != null) 'notification_person': notificationPerson,
+      if (reportingUnitId != null) 'reporting_unit_id': reportingUnitId,
+      if (beforeLanding != null) 'before_landing': beforeLanding,
+      if (landingTime != null) 'landing_time': landingTime,
+    });
+  }
+
+  IncidentRecordCompanion copyWith({
+    Value<int>? incidentId,
+    Value<int>? medicalId,
+    Value<DateTime>? incidentDate,
+    Value<int>? incidentPlaceCategoryId,
+    Value<int?>? incidentPlaceCategory2Id,
+    Value<String?>? incidentPlaceFinal,
+    Value<DateTime?>? notificationTime,
+    Value<String?>? notificationPerson,
+    Value<int>? reportingUnitId,
+    Value<bool>? beforeLanding,
+    Value<DateTime?>? landingTime,
+  }) {
+    return IncidentRecordCompanion(
+      incidentId: incidentId ?? this.incidentId,
+      medicalId: medicalId ?? this.medicalId,
+      incidentDate: incidentDate ?? this.incidentDate,
+      incidentPlaceCategoryId:
+          incidentPlaceCategoryId ?? this.incidentPlaceCategoryId,
+      incidentPlaceCategory2Id:
+          incidentPlaceCategory2Id ?? this.incidentPlaceCategory2Id,
+      incidentPlaceFinal: incidentPlaceFinal ?? this.incidentPlaceFinal,
+      notificationTime: notificationTime ?? this.notificationTime,
+      notificationPerson: notificationPerson ?? this.notificationPerson,
+      reportingUnitId: reportingUnitId ?? this.reportingUnitId,
+      beforeLanding: beforeLanding ?? this.beforeLanding,
+      landingTime: landingTime ?? this.landingTime,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (incidentId.present) {
+      map['incident_id'] = Variable<int>(incidentId.value);
+    }
+    if (medicalId.present) {
+      map['medical_id'] = Variable<int>(medicalId.value);
+    }
+    if (incidentDate.present) {
+      map['incident_date'] = Variable<DateTime>(incidentDate.value);
+    }
+    if (incidentPlaceCategoryId.present) {
+      map['incident_place_category_id'] = Variable<int>(
+        incidentPlaceCategoryId.value,
+      );
+    }
+    if (incidentPlaceCategory2Id.present) {
+      map['incident_place_category2_id'] = Variable<int>(
+        incidentPlaceCategory2Id.value,
+      );
+    }
+    if (incidentPlaceFinal.present) {
+      map['incident_place_final'] = Variable<String>(incidentPlaceFinal.value);
+    }
+    if (notificationTime.present) {
+      map['notification_time'] = Variable<DateTime>(notificationTime.value);
+    }
+    if (notificationPerson.present) {
+      map['notification_person'] = Variable<String>(notificationPerson.value);
+    }
+    if (reportingUnitId.present) {
+      map['reporting_unit_id'] = Variable<int>(reportingUnitId.value);
+    }
+    if (beforeLanding.present) {
+      map['before_landing'] = Variable<bool>(beforeLanding.value);
+    }
+    if (landingTime.present) {
+      map['landing_time'] = Variable<DateTime>(landingTime.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('IncidentRecordCompanion(')
+          ..write('incidentId: $incidentId, ')
+          ..write('medicalId: $medicalId, ')
+          ..write('incidentDate: $incidentDate, ')
+          ..write('incidentPlaceCategoryId: $incidentPlaceCategoryId, ')
+          ..write('incidentPlaceCategory2Id: $incidentPlaceCategory2Id, ')
+          ..write('incidentPlaceFinal: $incidentPlaceFinal, ')
+          ..write('notificationTime: $notificationTime, ')
+          ..write('notificationPerson: $notificationPerson, ')
+          ..write('reportingUnitId: $reportingUnitId, ')
+          ..write('beforeLanding: $beforeLanding, ')
+          ..write('landingTime: $landingTime')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -3255,11 +4978,17 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $AirlineTable airline = $AirlineTable(this);
   late final $TravelStatusTable travelStatus = $TravelStatusTable(this);
   late final $LocationTable location = $LocationTable(this);
+  late final $IncidentPlaceCategoryTable incidentPlaceCategory =
+      $IncidentPlaceCategoryTable(this);
+  late final $IncidentPlaceCategory2Table incidentPlaceCategory2 =
+      $IncidentPlaceCategory2Table(this);
+  late final $ReportingUnitTable reportingUnit = $ReportingUnitTable(this);
   late final $MedicalRecordTable medicalRecord = $MedicalRecordTable(this);
   late final $PatientTable patient = $PatientTable(this);
   late final $FlightRecordTable flightRecord = $FlightRecordTable(this);
   late final $FlightTransitLocationsTable flightTransitLocations =
       $FlightTransitLocationsTable(this);
+  late final $IncidentRecordTable incidentRecord = $IncidentRecordTable(this);
   late final ReferenceDao referenceDao = ReferenceDao(this as AppDatabase);
   late final MedicalDao medicalDao = MedicalDao(this as AppDatabase);
   late final FlightDao flightDao = FlightDao(this as AppDatabase);
@@ -3273,10 +5002,14 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     airline,
     travelStatus,
     location,
+    incidentPlaceCategory,
+    incidentPlaceCategory2,
+    reportingUnit,
     medicalRecord,
     patient,
     flightRecord,
     flightTransitLocations,
+    incidentRecord,
   ];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
@@ -4599,6 +6332,1153 @@ typedef $$LocationTableProcessedTableManager =
       LocationData,
       PrefetchHooks Function({bool flightTransitLocationsRefs})
     >;
+typedef $$IncidentPlaceCategoryTableCreateCompanionBuilder =
+    IncidentPlaceCategoryCompanion Function({
+      Value<int> id,
+      required String name,
+      Value<int> sortOrder,
+      Value<bool> isActive,
+    });
+typedef $$IncidentPlaceCategoryTableUpdateCompanionBuilder =
+    IncidentPlaceCategoryCompanion Function({
+      Value<int> id,
+      Value<String> name,
+      Value<int> sortOrder,
+      Value<bool> isActive,
+    });
+
+final class $$IncidentPlaceCategoryTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $IncidentPlaceCategoryTable,
+          IncidentPlaceCategoryData
+        > {
+  $$IncidentPlaceCategoryTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static MultiTypedResultKey<
+    $IncidentPlaceCategory2Table,
+    List<IncidentPlaceCategory2Data>
+  >
+  _incidentPlaceCategory2RefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.incidentPlaceCategory2,
+        aliasName: $_aliasNameGenerator(
+          db.incidentPlaceCategory.id,
+          db.incidentPlaceCategory2.categoryId,
+        ),
+      );
+
+  $$IncidentPlaceCategory2TableProcessedTableManager
+  get incidentPlaceCategory2Refs {
+    final manager = $$IncidentPlaceCategory2TableTableManager(
+      $_db,
+      $_db.incidentPlaceCategory2,
+    ).filter((f) => f.categoryId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _incidentPlaceCategory2RefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$IncidentRecordTable, List<IncidentRecordData>>
+  _incidentRecordRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.incidentRecord,
+    aliasName: $_aliasNameGenerator(
+      db.incidentPlaceCategory.id,
+      db.incidentRecord.incidentPlaceCategoryId,
+    ),
+  );
+
+  $$IncidentRecordTableProcessedTableManager get incidentRecordRefs {
+    final manager = $$IncidentRecordTableTableManager($_db, $_db.incidentRecord)
+        .filter(
+          (f) =>
+              f.incidentPlaceCategoryId.id.sqlEquals($_itemColumn<int>('id')!),
+        );
+
+    final cache = $_typedResult.readTableOrNull(_incidentRecordRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$IncidentPlaceCategoryTableFilterComposer
+    extends Composer<_$AppDatabase, $IncidentPlaceCategoryTable> {
+  $$IncidentPlaceCategoryTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get sortOrder => $composableBuilder(
+    column: $table.sortOrder,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isActive => $composableBuilder(
+    column: $table.isActive,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  Expression<bool> incidentPlaceCategory2Refs(
+    Expression<bool> Function($$IncidentPlaceCategory2TableFilterComposer f) f,
+  ) {
+    final $$IncidentPlaceCategory2TableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.incidentPlaceCategory2,
+          getReferencedColumn: (t) => t.categoryId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$IncidentPlaceCategory2TableFilterComposer(
+                $db: $db,
+                $table: $db.incidentPlaceCategory2,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<bool> incidentRecordRefs(
+    Expression<bool> Function($$IncidentRecordTableFilterComposer f) f,
+  ) {
+    final $$IncidentRecordTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.incidentRecord,
+      getReferencedColumn: (t) => t.incidentPlaceCategoryId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$IncidentRecordTableFilterComposer(
+            $db: $db,
+            $table: $db.incidentRecord,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$IncidentPlaceCategoryTableOrderingComposer
+    extends Composer<_$AppDatabase, $IncidentPlaceCategoryTable> {
+  $$IncidentPlaceCategoryTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get sortOrder => $composableBuilder(
+    column: $table.sortOrder,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isActive => $composableBuilder(
+    column: $table.isActive,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$IncidentPlaceCategoryTableAnnotationComposer
+    extends Composer<_$AppDatabase, $IncidentPlaceCategoryTable> {
+  $$IncidentPlaceCategoryTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<int> get sortOrder =>
+      $composableBuilder(column: $table.sortOrder, builder: (column) => column);
+
+  GeneratedColumn<bool> get isActive =>
+      $composableBuilder(column: $table.isActive, builder: (column) => column);
+
+  Expression<T> incidentPlaceCategory2Refs<T extends Object>(
+    Expression<T> Function($$IncidentPlaceCategory2TableAnnotationComposer a) f,
+  ) {
+    final $$IncidentPlaceCategory2TableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.incidentPlaceCategory2,
+          getReferencedColumn: (t) => t.categoryId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$IncidentPlaceCategory2TableAnnotationComposer(
+                $db: $db,
+                $table: $db.incidentPlaceCategory2,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<T> incidentRecordRefs<T extends Object>(
+    Expression<T> Function($$IncidentRecordTableAnnotationComposer a) f,
+  ) {
+    final $$IncidentRecordTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.incidentRecord,
+      getReferencedColumn: (t) => t.incidentPlaceCategoryId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$IncidentRecordTableAnnotationComposer(
+            $db: $db,
+            $table: $db.incidentRecord,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$IncidentPlaceCategoryTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $IncidentPlaceCategoryTable,
+          IncidentPlaceCategoryData,
+          $$IncidentPlaceCategoryTableFilterComposer,
+          $$IncidentPlaceCategoryTableOrderingComposer,
+          $$IncidentPlaceCategoryTableAnnotationComposer,
+          $$IncidentPlaceCategoryTableCreateCompanionBuilder,
+          $$IncidentPlaceCategoryTableUpdateCompanionBuilder,
+          (IncidentPlaceCategoryData, $$IncidentPlaceCategoryTableReferences),
+          IncidentPlaceCategoryData,
+          PrefetchHooks Function({
+            bool incidentPlaceCategory2Refs,
+            bool incidentRecordRefs,
+          })
+        > {
+  $$IncidentPlaceCategoryTableTableManager(
+    _$AppDatabase db,
+    $IncidentPlaceCategoryTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$IncidentPlaceCategoryTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$IncidentPlaceCategoryTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$IncidentPlaceCategoryTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<int> sortOrder = const Value.absent(),
+                Value<bool> isActive = const Value.absent(),
+              }) => IncidentPlaceCategoryCompanion(
+                id: id,
+                name: name,
+                sortOrder: sortOrder,
+                isActive: isActive,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String name,
+                Value<int> sortOrder = const Value.absent(),
+                Value<bool> isActive = const Value.absent(),
+              }) => IncidentPlaceCategoryCompanion.insert(
+                id: id,
+                name: name,
+                sortOrder: sortOrder,
+                isActive: isActive,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$IncidentPlaceCategoryTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({
+                incidentPlaceCategory2Refs = false,
+                incidentRecordRefs = false,
+              }) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (incidentPlaceCategory2Refs) db.incidentPlaceCategory2,
+                    if (incidentRecordRefs) db.incidentRecord,
+                  ],
+                  addJoins: null,
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (incidentPlaceCategory2Refs)
+                        await $_getPrefetchedData<
+                          IncidentPlaceCategoryData,
+                          $IncidentPlaceCategoryTable,
+                          IncidentPlaceCategory2Data
+                        >(
+                          currentTable: table,
+                          referencedTable:
+                              $$IncidentPlaceCategoryTableReferences
+                                  ._incidentPlaceCategory2RefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$IncidentPlaceCategoryTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).incidentPlaceCategory2Refs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.categoryId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (incidentRecordRefs)
+                        await $_getPrefetchedData<
+                          IncidentPlaceCategoryData,
+                          $IncidentPlaceCategoryTable,
+                          IncidentRecordData
+                        >(
+                          currentTable: table,
+                          referencedTable:
+                              $$IncidentPlaceCategoryTableReferences
+                                  ._incidentRecordRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$IncidentPlaceCategoryTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).incidentRecordRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.incidentPlaceCategoryId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$IncidentPlaceCategoryTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $IncidentPlaceCategoryTable,
+      IncidentPlaceCategoryData,
+      $$IncidentPlaceCategoryTableFilterComposer,
+      $$IncidentPlaceCategoryTableOrderingComposer,
+      $$IncidentPlaceCategoryTableAnnotationComposer,
+      $$IncidentPlaceCategoryTableCreateCompanionBuilder,
+      $$IncidentPlaceCategoryTableUpdateCompanionBuilder,
+      (IncidentPlaceCategoryData, $$IncidentPlaceCategoryTableReferences),
+      IncidentPlaceCategoryData,
+      PrefetchHooks Function({
+        bool incidentPlaceCategory2Refs,
+        bool incidentRecordRefs,
+      })
+    >;
+typedef $$IncidentPlaceCategory2TableCreateCompanionBuilder =
+    IncidentPlaceCategory2Companion Function({
+      Value<int> id,
+      required int categoryId,
+      required String name,
+      Value<int> sortOrder,
+      Value<bool> isActive,
+    });
+typedef $$IncidentPlaceCategory2TableUpdateCompanionBuilder =
+    IncidentPlaceCategory2Companion Function({
+      Value<int> id,
+      Value<int> categoryId,
+      Value<String> name,
+      Value<int> sortOrder,
+      Value<bool> isActive,
+    });
+
+final class $$IncidentPlaceCategory2TableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $IncidentPlaceCategory2Table,
+          IncidentPlaceCategory2Data
+        > {
+  $$IncidentPlaceCategory2TableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $IncidentPlaceCategoryTable _categoryIdTable(_$AppDatabase db) =>
+      db.incidentPlaceCategory.createAlias(
+        $_aliasNameGenerator(
+          db.incidentPlaceCategory2.categoryId,
+          db.incidentPlaceCategory.id,
+        ),
+      );
+
+  $$IncidentPlaceCategoryTableProcessedTableManager get categoryId {
+    final $_column = $_itemColumn<int>('category_id')!;
+
+    final manager = $$IncidentPlaceCategoryTableTableManager(
+      $_db,
+      $_db.incidentPlaceCategory,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_categoryIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static MultiTypedResultKey<$IncidentRecordTable, List<IncidentRecordData>>
+  _incidentRecordRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.incidentRecord,
+    aliasName: $_aliasNameGenerator(
+      db.incidentPlaceCategory2.id,
+      db.incidentRecord.incidentPlaceCategory2Id,
+    ),
+  );
+
+  $$IncidentRecordTableProcessedTableManager get incidentRecordRefs {
+    final manager = $$IncidentRecordTableTableManager($_db, $_db.incidentRecord)
+        .filter(
+          (f) =>
+              f.incidentPlaceCategory2Id.id.sqlEquals($_itemColumn<int>('id')!),
+        );
+
+    final cache = $_typedResult.readTableOrNull(_incidentRecordRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$IncidentPlaceCategory2TableFilterComposer
+    extends Composer<_$AppDatabase, $IncidentPlaceCategory2Table> {
+  $$IncidentPlaceCategory2TableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get sortOrder => $composableBuilder(
+    column: $table.sortOrder,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isActive => $composableBuilder(
+    column: $table.isActive,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$IncidentPlaceCategoryTableFilterComposer get categoryId {
+    final $$IncidentPlaceCategoryTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.categoryId,
+          referencedTable: $db.incidentPlaceCategory,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$IncidentPlaceCategoryTableFilterComposer(
+                $db: $db,
+                $table: $db.incidentPlaceCategory,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+
+  Expression<bool> incidentRecordRefs(
+    Expression<bool> Function($$IncidentRecordTableFilterComposer f) f,
+  ) {
+    final $$IncidentRecordTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.incidentRecord,
+      getReferencedColumn: (t) => t.incidentPlaceCategory2Id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$IncidentRecordTableFilterComposer(
+            $db: $db,
+            $table: $db.incidentRecord,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$IncidentPlaceCategory2TableOrderingComposer
+    extends Composer<_$AppDatabase, $IncidentPlaceCategory2Table> {
+  $$IncidentPlaceCategory2TableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get sortOrder => $composableBuilder(
+    column: $table.sortOrder,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isActive => $composableBuilder(
+    column: $table.isActive,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$IncidentPlaceCategoryTableOrderingComposer get categoryId {
+    final $$IncidentPlaceCategoryTableOrderingComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.categoryId,
+          referencedTable: $db.incidentPlaceCategory,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$IncidentPlaceCategoryTableOrderingComposer(
+                $db: $db,
+                $table: $db.incidentPlaceCategory,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+}
+
+class $$IncidentPlaceCategory2TableAnnotationComposer
+    extends Composer<_$AppDatabase, $IncidentPlaceCategory2Table> {
+  $$IncidentPlaceCategory2TableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<int> get sortOrder =>
+      $composableBuilder(column: $table.sortOrder, builder: (column) => column);
+
+  GeneratedColumn<bool> get isActive =>
+      $composableBuilder(column: $table.isActive, builder: (column) => column);
+
+  $$IncidentPlaceCategoryTableAnnotationComposer get categoryId {
+    final $$IncidentPlaceCategoryTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.categoryId,
+          referencedTable: $db.incidentPlaceCategory,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$IncidentPlaceCategoryTableAnnotationComposer(
+                $db: $db,
+                $table: $db.incidentPlaceCategory,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+
+  Expression<T> incidentRecordRefs<T extends Object>(
+    Expression<T> Function($$IncidentRecordTableAnnotationComposer a) f,
+  ) {
+    final $$IncidentRecordTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.incidentRecord,
+      getReferencedColumn: (t) => t.incidentPlaceCategory2Id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$IncidentRecordTableAnnotationComposer(
+            $db: $db,
+            $table: $db.incidentRecord,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$IncidentPlaceCategory2TableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $IncidentPlaceCategory2Table,
+          IncidentPlaceCategory2Data,
+          $$IncidentPlaceCategory2TableFilterComposer,
+          $$IncidentPlaceCategory2TableOrderingComposer,
+          $$IncidentPlaceCategory2TableAnnotationComposer,
+          $$IncidentPlaceCategory2TableCreateCompanionBuilder,
+          $$IncidentPlaceCategory2TableUpdateCompanionBuilder,
+          (IncidentPlaceCategory2Data, $$IncidentPlaceCategory2TableReferences),
+          IncidentPlaceCategory2Data,
+          PrefetchHooks Function({bool categoryId, bool incidentRecordRefs})
+        > {
+  $$IncidentPlaceCategory2TableTableManager(
+    _$AppDatabase db,
+    $IncidentPlaceCategory2Table table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$IncidentPlaceCategory2TableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$IncidentPlaceCategory2TableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$IncidentPlaceCategory2TableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> categoryId = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<int> sortOrder = const Value.absent(),
+                Value<bool> isActive = const Value.absent(),
+              }) => IncidentPlaceCategory2Companion(
+                id: id,
+                categoryId: categoryId,
+                name: name,
+                sortOrder: sortOrder,
+                isActive: isActive,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int categoryId,
+                required String name,
+                Value<int> sortOrder = const Value.absent(),
+                Value<bool> isActive = const Value.absent(),
+              }) => IncidentPlaceCategory2Companion.insert(
+                id: id,
+                categoryId: categoryId,
+                name: name,
+                sortOrder: sortOrder,
+                isActive: isActive,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$IncidentPlaceCategory2TableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({categoryId = false, incidentRecordRefs = false}) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (incidentRecordRefs) db.incidentRecord,
+                  ],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (categoryId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.categoryId,
+                                    referencedTable:
+                                        $$IncidentPlaceCategory2TableReferences
+                                            ._categoryIdTable(db),
+                                    referencedColumn:
+                                        $$IncidentPlaceCategory2TableReferences
+                                            ._categoryIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (incidentRecordRefs)
+                        await $_getPrefetchedData<
+                          IncidentPlaceCategory2Data,
+                          $IncidentPlaceCategory2Table,
+                          IncidentRecordData
+                        >(
+                          currentTable: table,
+                          referencedTable:
+                              $$IncidentPlaceCategory2TableReferences
+                                  ._incidentRecordRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$IncidentPlaceCategory2TableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).incidentRecordRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.incidentPlaceCategory2Id == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$IncidentPlaceCategory2TableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $IncidentPlaceCategory2Table,
+      IncidentPlaceCategory2Data,
+      $$IncidentPlaceCategory2TableFilterComposer,
+      $$IncidentPlaceCategory2TableOrderingComposer,
+      $$IncidentPlaceCategory2TableAnnotationComposer,
+      $$IncidentPlaceCategory2TableCreateCompanionBuilder,
+      $$IncidentPlaceCategory2TableUpdateCompanionBuilder,
+      (IncidentPlaceCategory2Data, $$IncidentPlaceCategory2TableReferences),
+      IncidentPlaceCategory2Data,
+      PrefetchHooks Function({bool categoryId, bool incidentRecordRefs})
+    >;
+typedef $$ReportingUnitTableCreateCompanionBuilder =
+    ReportingUnitCompanion Function({
+      Value<int> id,
+      required String name,
+      Value<String?> description,
+      Value<bool> isActive,
+    });
+typedef $$ReportingUnitTableUpdateCompanionBuilder =
+    ReportingUnitCompanion Function({
+      Value<int> id,
+      Value<String> name,
+      Value<String?> description,
+      Value<bool> isActive,
+    });
+
+final class $$ReportingUnitTableReferences
+    extends
+        BaseReferences<_$AppDatabase, $ReportingUnitTable, ReportingUnitData> {
+  $$ReportingUnitTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static MultiTypedResultKey<$IncidentRecordTable, List<IncidentRecordData>>
+  _incidentRecordRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.incidentRecord,
+    aliasName: $_aliasNameGenerator(
+      db.reportingUnit.id,
+      db.incidentRecord.reportingUnitId,
+    ),
+  );
+
+  $$IncidentRecordTableProcessedTableManager get incidentRecordRefs {
+    final manager = $$IncidentRecordTableTableManager(
+      $_db,
+      $_db.incidentRecord,
+    ).filter((f) => f.reportingUnitId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_incidentRecordRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$ReportingUnitTableFilterComposer
+    extends Composer<_$AppDatabase, $ReportingUnitTable> {
+  $$ReportingUnitTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isActive => $composableBuilder(
+    column: $table.isActive,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  Expression<bool> incidentRecordRefs(
+    Expression<bool> Function($$IncidentRecordTableFilterComposer f) f,
+  ) {
+    final $$IncidentRecordTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.incidentRecord,
+      getReferencedColumn: (t) => t.reportingUnitId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$IncidentRecordTableFilterComposer(
+            $db: $db,
+            $table: $db.incidentRecord,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$ReportingUnitTableOrderingComposer
+    extends Composer<_$AppDatabase, $ReportingUnitTable> {
+  $$ReportingUnitTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isActive => $composableBuilder(
+    column: $table.isActive,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$ReportingUnitTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ReportingUnitTable> {
+  $$ReportingUnitTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get isActive =>
+      $composableBuilder(column: $table.isActive, builder: (column) => column);
+
+  Expression<T> incidentRecordRefs<T extends Object>(
+    Expression<T> Function($$IncidentRecordTableAnnotationComposer a) f,
+  ) {
+    final $$IncidentRecordTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.incidentRecord,
+      getReferencedColumn: (t) => t.reportingUnitId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$IncidentRecordTableAnnotationComposer(
+            $db: $db,
+            $table: $db.incidentRecord,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$ReportingUnitTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $ReportingUnitTable,
+          ReportingUnitData,
+          $$ReportingUnitTableFilterComposer,
+          $$ReportingUnitTableOrderingComposer,
+          $$ReportingUnitTableAnnotationComposer,
+          $$ReportingUnitTableCreateCompanionBuilder,
+          $$ReportingUnitTableUpdateCompanionBuilder,
+          (ReportingUnitData, $$ReportingUnitTableReferences),
+          ReportingUnitData,
+          PrefetchHooks Function({bool incidentRecordRefs})
+        > {
+  $$ReportingUnitTableTableManager(_$AppDatabase db, $ReportingUnitTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ReportingUnitTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ReportingUnitTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ReportingUnitTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<String?> description = const Value.absent(),
+                Value<bool> isActive = const Value.absent(),
+              }) => ReportingUnitCompanion(
+                id: id,
+                name: name,
+                description: description,
+                isActive: isActive,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String name,
+                Value<String?> description = const Value.absent(),
+                Value<bool> isActive = const Value.absent(),
+              }) => ReportingUnitCompanion.insert(
+                id: id,
+                name: name,
+                description: description,
+                isActive: isActive,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$ReportingUnitTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({incidentRecordRefs = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [
+                if (incidentRecordRefs) db.incidentRecord,
+              ],
+              addJoins: null,
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (incidentRecordRefs)
+                    await $_getPrefetchedData<
+                      ReportingUnitData,
+                      $ReportingUnitTable,
+                      IncidentRecordData
+                    >(
+                      currentTable: table,
+                      referencedTable: $$ReportingUnitTableReferences
+                          ._incidentRecordRefsTable(db),
+                      managerFromTypedResult: (p0) =>
+                          $$ReportingUnitTableReferences(
+                            db,
+                            table,
+                            p0,
+                          ).incidentRecordRefs,
+                      referencedItemsForCurrentItem: (item, referencedItems) =>
+                          referencedItems.where(
+                            (e) => e.reportingUnitId == item.id,
+                          ),
+                      typedResults: items,
+                    ),
+                ];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$ReportingUnitTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $ReportingUnitTable,
+      ReportingUnitData,
+      $$ReportingUnitTableFilterComposer,
+      $$ReportingUnitTableOrderingComposer,
+      $$ReportingUnitTableAnnotationComposer,
+      $$ReportingUnitTableCreateCompanionBuilder,
+      $$ReportingUnitTableUpdateCompanionBuilder,
+      (ReportingUnitData, $$ReportingUnitTableReferences),
+      ReportingUnitData,
+      PrefetchHooks Function({bool incidentRecordRefs})
+    >;
 typedef $$MedicalRecordTableCreateCompanionBuilder =
     MedicalRecordCompanion Function({
       Value<int> medicalId,
@@ -4662,6 +7542,28 @@ final class $$MedicalRecordTableReferences
         );
 
     final cache = $_typedResult.readTableOrNull(_flightRecordRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$IncidentRecordTable, List<IncidentRecordData>>
+  _incidentRecordRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.incidentRecord,
+    aliasName: $_aliasNameGenerator(
+      db.medicalRecord.medicalId,
+      db.incidentRecord.medicalId,
+    ),
+  );
+
+  $$IncidentRecordTableProcessedTableManager get incidentRecordRefs {
+    final manager = $$IncidentRecordTableTableManager($_db, $_db.incidentRecord)
+        .filter(
+          (f) =>
+              f.medicalId.medicalId.sqlEquals($_itemColumn<int>('medical_id')!),
+        );
+
+    final cache = $_typedResult.readTableOrNull(_incidentRecordRefsTable($_db));
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
@@ -4743,6 +7645,31 @@ class $$MedicalRecordTableFilterComposer
           }) => $$FlightRecordTableFilterComposer(
             $db: $db,
             $table: $db.flightRecord,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> incidentRecordRefs(
+    Expression<bool> Function($$IncidentRecordTableFilterComposer f) f,
+  ) {
+    final $$IncidentRecordTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.medicalId,
+      referencedTable: $db.incidentRecord,
+      getReferencedColumn: (t) => t.medicalId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$IncidentRecordTableFilterComposer(
+            $db: $db,
+            $table: $db.incidentRecord,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -4865,6 +7792,31 @@ class $$MedicalRecordTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> incidentRecordRefs<T extends Object>(
+    Expression<T> Function($$IncidentRecordTableAnnotationComposer a) f,
+  ) {
+    final $$IncidentRecordTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.medicalId,
+      referencedTable: $db.incidentRecord,
+      getReferencedColumn: (t) => t.medicalId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$IncidentRecordTableAnnotationComposer(
+            $db: $db,
+            $table: $db.incidentRecord,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$MedicalRecordTableTableManager
@@ -4880,7 +7832,11 @@ class $$MedicalRecordTableTableManager
           $$MedicalRecordTableUpdateCompanionBuilder,
           (MedicalRecordData, $$MedicalRecordTableReferences),
           MedicalRecordData,
-          PrefetchHooks Function({bool patientRefs, bool flightRecordRefs})
+          PrefetchHooks Function({
+            bool patientRefs,
+            bool flightRecordRefs,
+            bool incidentRecordRefs,
+          })
         > {
   $$MedicalRecordTableTableManager(_$AppDatabase db, $MedicalRecordTable table)
     : super(
@@ -4930,12 +7886,17 @@ class $$MedicalRecordTableTableManager
               )
               .toList(),
           prefetchHooksCallback:
-              ({patientRefs = false, flightRecordRefs = false}) {
+              ({
+                patientRefs = false,
+                flightRecordRefs = false,
+                incidentRecordRefs = false,
+              }) {
                 return PrefetchHooks(
                   db: db,
                   explicitlyWatchedTables: [
                     if (patientRefs) db.patient,
                     if (flightRecordRefs) db.flightRecord,
+                    if (incidentRecordRefs) db.incidentRecord,
                   ],
                   addJoins: null,
                   getPrefetchedDataCallback: (items) async {
@@ -4982,6 +7943,27 @@ class $$MedicalRecordTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (incidentRecordRefs)
+                        await $_getPrefetchedData<
+                          MedicalRecordData,
+                          $MedicalRecordTable,
+                          IncidentRecordData
+                        >(
+                          currentTable: table,
+                          referencedTable: $$MedicalRecordTableReferences
+                              ._incidentRecordRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$MedicalRecordTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).incidentRecordRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.medicalId == item.medicalId,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -5002,7 +7984,11 @@ typedef $$MedicalRecordTableProcessedTableManager =
       $$MedicalRecordTableUpdateCompanionBuilder,
       (MedicalRecordData, $$MedicalRecordTableReferences),
       MedicalRecordData,
-      PrefetchHooks Function({bool patientRefs, bool flightRecordRefs})
+      PrefetchHooks Function({
+        bool patientRefs,
+        bool flightRecordRefs,
+        bool incidentRecordRefs,
+      })
     >;
 typedef $$PatientTableCreateCompanionBuilder =
     PatientCompanion Function({
@@ -6929,6 +9915,774 @@ typedef $$FlightTransitLocationsTableProcessedTableManager =
       FlightTransitLocation,
       PrefetchHooks Function({bool flightRecordId, bool locationId})
     >;
+typedef $$IncidentRecordTableCreateCompanionBuilder =
+    IncidentRecordCompanion Function({
+      Value<int> incidentId,
+      required int medicalId,
+      required DateTime incidentDate,
+      required int incidentPlaceCategoryId,
+      Value<int?> incidentPlaceCategory2Id,
+      Value<String?> incidentPlaceFinal,
+      Value<DateTime?> notificationTime,
+      Value<String?> notificationPerson,
+      required int reportingUnitId,
+      Value<bool> beforeLanding,
+      Value<DateTime?> landingTime,
+    });
+typedef $$IncidentRecordTableUpdateCompanionBuilder =
+    IncidentRecordCompanion Function({
+      Value<int> incidentId,
+      Value<int> medicalId,
+      Value<DateTime> incidentDate,
+      Value<int> incidentPlaceCategoryId,
+      Value<int?> incidentPlaceCategory2Id,
+      Value<String?> incidentPlaceFinal,
+      Value<DateTime?> notificationTime,
+      Value<String?> notificationPerson,
+      Value<int> reportingUnitId,
+      Value<bool> beforeLanding,
+      Value<DateTime?> landingTime,
+    });
+
+final class $$IncidentRecordTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $IncidentRecordTable,
+          IncidentRecordData
+        > {
+  $$IncidentRecordTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $MedicalRecordTable _medicalIdTable(_$AppDatabase db) =>
+      db.medicalRecord.createAlias(
+        $_aliasNameGenerator(
+          db.incidentRecord.medicalId,
+          db.medicalRecord.medicalId,
+        ),
+      );
+
+  $$MedicalRecordTableProcessedTableManager get medicalId {
+    final $_column = $_itemColumn<int>('medical_id')!;
+
+    final manager = $$MedicalRecordTableTableManager(
+      $_db,
+      $_db.medicalRecord,
+    ).filter((f) => f.medicalId.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_medicalIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $IncidentPlaceCategoryTable _incidentPlaceCategoryIdTable(
+    _$AppDatabase db,
+  ) => db.incidentPlaceCategory.createAlias(
+    $_aliasNameGenerator(
+      db.incidentRecord.incidentPlaceCategoryId,
+      db.incidentPlaceCategory.id,
+    ),
+  );
+
+  $$IncidentPlaceCategoryTableProcessedTableManager
+  get incidentPlaceCategoryId {
+    final $_column = $_itemColumn<int>('incident_place_category_id')!;
+
+    final manager = $$IncidentPlaceCategoryTableTableManager(
+      $_db,
+      $_db.incidentPlaceCategory,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(
+      _incidentPlaceCategoryIdTable($_db),
+    );
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $IncidentPlaceCategory2Table _incidentPlaceCategory2IdTable(
+    _$AppDatabase db,
+  ) => db.incidentPlaceCategory2.createAlias(
+    $_aliasNameGenerator(
+      db.incidentRecord.incidentPlaceCategory2Id,
+      db.incidentPlaceCategory2.id,
+    ),
+  );
+
+  $$IncidentPlaceCategory2TableProcessedTableManager?
+  get incidentPlaceCategory2Id {
+    final $_column = $_itemColumn<int>('incident_place_category2_id');
+    if ($_column == null) return null;
+    final manager = $$IncidentPlaceCategory2TableTableManager(
+      $_db,
+      $_db.incidentPlaceCategory2,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(
+      _incidentPlaceCategory2IdTable($_db),
+    );
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $ReportingUnitTable _reportingUnitIdTable(_$AppDatabase db) =>
+      db.reportingUnit.createAlias(
+        $_aliasNameGenerator(
+          db.incidentRecord.reportingUnitId,
+          db.reportingUnit.id,
+        ),
+      );
+
+  $$ReportingUnitTableProcessedTableManager get reportingUnitId {
+    final $_column = $_itemColumn<int>('reporting_unit_id')!;
+
+    final manager = $$ReportingUnitTableTableManager(
+      $_db,
+      $_db.reportingUnit,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_reportingUnitIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$IncidentRecordTableFilterComposer
+    extends Composer<_$AppDatabase, $IncidentRecordTable> {
+  $$IncidentRecordTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get incidentId => $composableBuilder(
+    column: $table.incidentId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get incidentDate => $composableBuilder(
+    column: $table.incidentDate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get incidentPlaceFinal => $composableBuilder(
+    column: $table.incidentPlaceFinal,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get notificationTime => $composableBuilder(
+    column: $table.notificationTime,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get notificationPerson => $composableBuilder(
+    column: $table.notificationPerson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get beforeLanding => $composableBuilder(
+    column: $table.beforeLanding,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get landingTime => $composableBuilder(
+    column: $table.landingTime,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$MedicalRecordTableFilterComposer get medicalId {
+    final $$MedicalRecordTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.medicalId,
+      referencedTable: $db.medicalRecord,
+      getReferencedColumn: (t) => t.medicalId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MedicalRecordTableFilterComposer(
+            $db: $db,
+            $table: $db.medicalRecord,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$IncidentPlaceCategoryTableFilterComposer get incidentPlaceCategoryId {
+    final $$IncidentPlaceCategoryTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.incidentPlaceCategoryId,
+          referencedTable: $db.incidentPlaceCategory,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$IncidentPlaceCategoryTableFilterComposer(
+                $db: $db,
+                $table: $db.incidentPlaceCategory,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+
+  $$IncidentPlaceCategory2TableFilterComposer get incidentPlaceCategory2Id {
+    final $$IncidentPlaceCategory2TableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.incidentPlaceCategory2Id,
+          referencedTable: $db.incidentPlaceCategory2,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$IncidentPlaceCategory2TableFilterComposer(
+                $db: $db,
+                $table: $db.incidentPlaceCategory2,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+
+  $$ReportingUnitTableFilterComposer get reportingUnitId {
+    final $$ReportingUnitTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.reportingUnitId,
+      referencedTable: $db.reportingUnit,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ReportingUnitTableFilterComposer(
+            $db: $db,
+            $table: $db.reportingUnit,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$IncidentRecordTableOrderingComposer
+    extends Composer<_$AppDatabase, $IncidentRecordTable> {
+  $$IncidentRecordTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get incidentId => $composableBuilder(
+    column: $table.incidentId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get incidentDate => $composableBuilder(
+    column: $table.incidentDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get incidentPlaceFinal => $composableBuilder(
+    column: $table.incidentPlaceFinal,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get notificationTime => $composableBuilder(
+    column: $table.notificationTime,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get notificationPerson => $composableBuilder(
+    column: $table.notificationPerson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get beforeLanding => $composableBuilder(
+    column: $table.beforeLanding,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get landingTime => $composableBuilder(
+    column: $table.landingTime,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$MedicalRecordTableOrderingComposer get medicalId {
+    final $$MedicalRecordTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.medicalId,
+      referencedTable: $db.medicalRecord,
+      getReferencedColumn: (t) => t.medicalId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MedicalRecordTableOrderingComposer(
+            $db: $db,
+            $table: $db.medicalRecord,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$IncidentPlaceCategoryTableOrderingComposer get incidentPlaceCategoryId {
+    final $$IncidentPlaceCategoryTableOrderingComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.incidentPlaceCategoryId,
+          referencedTable: $db.incidentPlaceCategory,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$IncidentPlaceCategoryTableOrderingComposer(
+                $db: $db,
+                $table: $db.incidentPlaceCategory,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+
+  $$IncidentPlaceCategory2TableOrderingComposer get incidentPlaceCategory2Id {
+    final $$IncidentPlaceCategory2TableOrderingComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.incidentPlaceCategory2Id,
+          referencedTable: $db.incidentPlaceCategory2,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$IncidentPlaceCategory2TableOrderingComposer(
+                $db: $db,
+                $table: $db.incidentPlaceCategory2,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+
+  $$ReportingUnitTableOrderingComposer get reportingUnitId {
+    final $$ReportingUnitTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.reportingUnitId,
+      referencedTable: $db.reportingUnit,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ReportingUnitTableOrderingComposer(
+            $db: $db,
+            $table: $db.reportingUnit,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$IncidentRecordTableAnnotationComposer
+    extends Composer<_$AppDatabase, $IncidentRecordTable> {
+  $$IncidentRecordTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get incidentId => $composableBuilder(
+    column: $table.incidentId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get incidentDate => $composableBuilder(
+    column: $table.incidentDate,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get incidentPlaceFinal => $composableBuilder(
+    column: $table.incidentPlaceFinal,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get notificationTime => $composableBuilder(
+    column: $table.notificationTime,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get notificationPerson => $composableBuilder(
+    column: $table.notificationPerson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get beforeLanding => $composableBuilder(
+    column: $table.beforeLanding,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get landingTime => $composableBuilder(
+    column: $table.landingTime,
+    builder: (column) => column,
+  );
+
+  $$MedicalRecordTableAnnotationComposer get medicalId {
+    final $$MedicalRecordTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.medicalId,
+      referencedTable: $db.medicalRecord,
+      getReferencedColumn: (t) => t.medicalId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MedicalRecordTableAnnotationComposer(
+            $db: $db,
+            $table: $db.medicalRecord,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$IncidentPlaceCategoryTableAnnotationComposer get incidentPlaceCategoryId {
+    final $$IncidentPlaceCategoryTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.incidentPlaceCategoryId,
+          referencedTable: $db.incidentPlaceCategory,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$IncidentPlaceCategoryTableAnnotationComposer(
+                $db: $db,
+                $table: $db.incidentPlaceCategory,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+
+  $$IncidentPlaceCategory2TableAnnotationComposer get incidentPlaceCategory2Id {
+    final $$IncidentPlaceCategory2TableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.incidentPlaceCategory2Id,
+          referencedTable: $db.incidentPlaceCategory2,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$IncidentPlaceCategory2TableAnnotationComposer(
+                $db: $db,
+                $table: $db.incidentPlaceCategory2,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+
+  $$ReportingUnitTableAnnotationComposer get reportingUnitId {
+    final $$ReportingUnitTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.reportingUnitId,
+      referencedTable: $db.reportingUnit,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ReportingUnitTableAnnotationComposer(
+            $db: $db,
+            $table: $db.reportingUnit,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$IncidentRecordTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $IncidentRecordTable,
+          IncidentRecordData,
+          $$IncidentRecordTableFilterComposer,
+          $$IncidentRecordTableOrderingComposer,
+          $$IncidentRecordTableAnnotationComposer,
+          $$IncidentRecordTableCreateCompanionBuilder,
+          $$IncidentRecordTableUpdateCompanionBuilder,
+          (IncidentRecordData, $$IncidentRecordTableReferences),
+          IncidentRecordData,
+          PrefetchHooks Function({
+            bool medicalId,
+            bool incidentPlaceCategoryId,
+            bool incidentPlaceCategory2Id,
+            bool reportingUnitId,
+          })
+        > {
+  $$IncidentRecordTableTableManager(
+    _$AppDatabase db,
+    $IncidentRecordTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$IncidentRecordTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$IncidentRecordTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$IncidentRecordTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> incidentId = const Value.absent(),
+                Value<int> medicalId = const Value.absent(),
+                Value<DateTime> incidentDate = const Value.absent(),
+                Value<int> incidentPlaceCategoryId = const Value.absent(),
+                Value<int?> incidentPlaceCategory2Id = const Value.absent(),
+                Value<String?> incidentPlaceFinal = const Value.absent(),
+                Value<DateTime?> notificationTime = const Value.absent(),
+                Value<String?> notificationPerson = const Value.absent(),
+                Value<int> reportingUnitId = const Value.absent(),
+                Value<bool> beforeLanding = const Value.absent(),
+                Value<DateTime?> landingTime = const Value.absent(),
+              }) => IncidentRecordCompanion(
+                incidentId: incidentId,
+                medicalId: medicalId,
+                incidentDate: incidentDate,
+                incidentPlaceCategoryId: incidentPlaceCategoryId,
+                incidentPlaceCategory2Id: incidentPlaceCategory2Id,
+                incidentPlaceFinal: incidentPlaceFinal,
+                notificationTime: notificationTime,
+                notificationPerson: notificationPerson,
+                reportingUnitId: reportingUnitId,
+                beforeLanding: beforeLanding,
+                landingTime: landingTime,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> incidentId = const Value.absent(),
+                required int medicalId,
+                required DateTime incidentDate,
+                required int incidentPlaceCategoryId,
+                Value<int?> incidentPlaceCategory2Id = const Value.absent(),
+                Value<String?> incidentPlaceFinal = const Value.absent(),
+                Value<DateTime?> notificationTime = const Value.absent(),
+                Value<String?> notificationPerson = const Value.absent(),
+                required int reportingUnitId,
+                Value<bool> beforeLanding = const Value.absent(),
+                Value<DateTime?> landingTime = const Value.absent(),
+              }) => IncidentRecordCompanion.insert(
+                incidentId: incidentId,
+                medicalId: medicalId,
+                incidentDate: incidentDate,
+                incidentPlaceCategoryId: incidentPlaceCategoryId,
+                incidentPlaceCategory2Id: incidentPlaceCategory2Id,
+                incidentPlaceFinal: incidentPlaceFinal,
+                notificationTime: notificationTime,
+                notificationPerson: notificationPerson,
+                reportingUnitId: reportingUnitId,
+                beforeLanding: beforeLanding,
+                landingTime: landingTime,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$IncidentRecordTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({
+                medicalId = false,
+                incidentPlaceCategoryId = false,
+                incidentPlaceCategory2Id = false,
+                reportingUnitId = false,
+              }) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (medicalId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.medicalId,
+                                    referencedTable:
+                                        $$IncidentRecordTableReferences
+                                            ._medicalIdTable(db),
+                                    referencedColumn:
+                                        $$IncidentRecordTableReferences
+                                            ._medicalIdTable(db)
+                                            .medicalId,
+                                  )
+                                  as T;
+                        }
+                        if (incidentPlaceCategoryId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn:
+                                        table.incidentPlaceCategoryId,
+                                    referencedTable:
+                                        $$IncidentRecordTableReferences
+                                            ._incidentPlaceCategoryIdTable(db),
+                                    referencedColumn:
+                                        $$IncidentRecordTableReferences
+                                            ._incidentPlaceCategoryIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+                        if (incidentPlaceCategory2Id) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn:
+                                        table.incidentPlaceCategory2Id,
+                                    referencedTable:
+                                        $$IncidentRecordTableReferences
+                                            ._incidentPlaceCategory2IdTable(db),
+                                    referencedColumn:
+                                        $$IncidentRecordTableReferences
+                                            ._incidentPlaceCategory2IdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+                        if (reportingUnitId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.reportingUnitId,
+                                    referencedTable:
+                                        $$IncidentRecordTableReferences
+                                            ._reportingUnitIdTable(db),
+                                    referencedColumn:
+                                        $$IncidentRecordTableReferences
+                                            ._reportingUnitIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$IncidentRecordTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $IncidentRecordTable,
+      IncidentRecordData,
+      $$IncidentRecordTableFilterComposer,
+      $$IncidentRecordTableOrderingComposer,
+      $$IncidentRecordTableAnnotationComposer,
+      $$IncidentRecordTableCreateCompanionBuilder,
+      $$IncidentRecordTableUpdateCompanionBuilder,
+      (IncidentRecordData, $$IncidentRecordTableReferences),
+      IncidentRecordData,
+      PrefetchHooks Function({
+        bool medicalId,
+        bool incidentPlaceCategoryId,
+        bool incidentPlaceCategory2Id,
+        bool reportingUnitId,
+      })
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -6942,6 +10696,15 @@ class $AppDatabaseManager {
       $$TravelStatusTableTableManager(_db, _db.travelStatus);
   $$LocationTableTableManager get location =>
       $$LocationTableTableManager(_db, _db.location);
+  $$IncidentPlaceCategoryTableTableManager get incidentPlaceCategory =>
+      $$IncidentPlaceCategoryTableTableManager(_db, _db.incidentPlaceCategory);
+  $$IncidentPlaceCategory2TableTableManager get incidentPlaceCategory2 =>
+      $$IncidentPlaceCategory2TableTableManager(
+        _db,
+        _db.incidentPlaceCategory2,
+      );
+  $$ReportingUnitTableTableManager get reportingUnit =>
+      $$ReportingUnitTableTableManager(_db, _db.reportingUnit);
   $$MedicalRecordTableTableManager get medicalRecord =>
       $$MedicalRecordTableTableManager(_db, _db.medicalRecord);
   $$PatientTableTableManager get patient =>
@@ -6953,4 +10716,6 @@ class $AppDatabaseManager {
         _db,
         _db.flightTransitLocations,
       );
+  $$IncidentRecordTableTableManager get incidentRecord =>
+      $$IncidentRecordTableTableManager(_db, _db.incidentRecord);
 }

@@ -9,4 +9,9 @@ mixin _$ReferenceDaoMixin on DatabaseAccessor<AppDatabase> {
   $AirlineTable get airline => attachedDatabase.airline;
   $TravelStatusTable get travelStatus => attachedDatabase.travelStatus;
   $LocationTable get location => attachedDatabase.location;
+  $IncidentPlaceCategoryTable get incidentPlaceCategory =>
+      attachedDatabase.incidentPlaceCategory;
+  $IncidentPlaceCategory2Table get incidentPlaceCategory2 =>
+      attachedDatabase.incidentPlaceCategory2;
+  $ReportingUnitTable get reportingUnit => attachedDatabase.reportingUnit;
 }
