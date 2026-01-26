@@ -28,7 +28,7 @@ class _DashboardPageState extends State<DashboardPage> {
         body: SafeArea(
           child: Row(
             children: [
-              // ===== 左側欄 =====
+              //  左側欄
               Sidebar(
                 currentPage: _currentPage,
                 onPageChanged: (page) {
@@ -38,7 +38,7 @@ class _DashboardPageState extends State<DashboardPage> {
                 },
               ),
 
-              // ===== 右側內容 =====
+              //  右側內容
               Expanded(
                 child: Column(
                   children: [

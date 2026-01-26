@@ -5,7 +5,7 @@ import '../tables/reference_tables.dart';
 
 part 'flight_dao.g.dart';
 
-// ========== 資料模型 ==========
+//資料模型
 
 /// 經過點與其詳細資料的包裝類別
 class TransitLocationWithData {
@@ -22,7 +22,6 @@ class FlightRecordWithDetails {
   final TravelStatusData? travelStatus;
   final LocationData? departureLocation;
   final LocationData? arrivalLocation;
-  // 這裡修正為使用 TransitLocationWithData
   final List<TransitLocationWithData> transitLocations;
 
   FlightRecordWithDetails({
@@ -35,13 +34,13 @@ class FlightRecordWithDetails {
   });
 }
 
-// ========== DAO ==========
+// DAO 
 
 @DriftAccessor(tables: [FlightRecord, FlightTransitLocations, Location])
 class FlightDao extends DatabaseAccessor<AppDatabase> with _$FlightDaoMixin {
   FlightDao(super.db);
 
-  // ========== 飛航記錄相關 ==========
+  //  飛航記錄相關 
 
   /// 根據 medicalId 取得飛航記錄
   Future<FlightRecordData?> getFlightByMedicalId(int medicalId) {
@@ -81,7 +80,7 @@ class FlightDao extends DatabaseAccessor<AppDatabase> with _$FlightDaoMixin {
         .go();
   }
 
-  // ========== 經過點相關 ==========
+  //  經過點相關 
 
   /// 取得飛航記錄的所有經過點（含地點資料與中間表 ID）
   Future<List<TransitLocationWithData>> getTransitLocations(int flightRecordId) async {
@@ -138,7 +137,7 @@ class FlightDao extends DatabaseAccessor<AppDatabase> with _$FlightDaoMixin {
         .write(FlightTransitLocationsCompanion(stopOrder: Value(newOrder)));
   }
 
-  // ========== 查詢相關 ==========
+  //  查詢相關 
 
   /// 取得完整的飛航記錄（含關聯資料）
   Future<FlightRecordWithDetails?> getFlightWithDetails(int flightRecordId) async {

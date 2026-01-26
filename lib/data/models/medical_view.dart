@@ -13,11 +13,11 @@ class MedicalViewModel extends ChangeNotifier {
   final ReferenceService refService;
   final int medicalId;
 
-  // ========== 病患資料快取 ==========
+  //  病患資料快取
   PatientData? _patientCache;
   PatientData? get patient => _patientCache;
 
-  // ========== 飛航記錄快取 ==========
+  //  飛航記錄快取
   FlightRecordData? _flightCache;
   FlightRecordData? get flightRecord => _flightCache;
 
@@ -31,7 +31,7 @@ class MedicalViewModel extends ChangeNotifier {
   List<TravelStatusData> get travelStatusOptions => refService.travelStatuses;
   List<LocationData> get locationOptions => refService.locations;
 
-  // ========== 延遲存檔與狀態 ==========
+  //  延遲存檔與狀態
   Timer? _debounceTimer;
   SaveStatus _saveStatus = SaveStatus.idle;
   SaveStatus get saveStatus => _saveStatus;
@@ -100,7 +100,7 @@ class MedicalViewModel extends ChangeNotifier {
     }
   }
 
-  // ========== 病患資料更新 ==========
+  //  病患資料更新
   void _updatePatientCacheAndSave(PatientData newData) {
     _patientCache = newData;
     notifyListeners();
@@ -160,7 +160,7 @@ class MedicalViewModel extends ChangeNotifier {
     );
   }
 
-  // ========== 飛航記錄更新 ==========
+  //  飛航記錄更新
   void _updateFlightCacheAndSave(FlightRecordData newData) {
     _flightCache = newData;
     notifyListeners();
@@ -231,7 +231,7 @@ class MedicalViewModel extends ChangeNotifier {
     }
   }
 
-  // ========== 查詢輔助方法 (優化後直接對 refService 進行查詢) ==========
+  //  查詢輔助方法 (優化後直接對 refService 進行查詢)
   NationalityData? getNationalityById(int? id) {
     if (id == null) return null;
     try {
@@ -290,7 +290,7 @@ class MedicalViewModel extends ChangeNotifier {
     }
   }
 
-  // ========== 延遲存檔邏輯 ==========
+  //  延遲存檔邏輯
   void _autoSave() {
     if (_debounceTimer?.isActive ?? false) _debounceTimer!.cancel();
     _saveStatus = SaveStatus.saving;
