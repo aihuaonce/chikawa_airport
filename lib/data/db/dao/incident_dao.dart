@@ -4,7 +4,7 @@ import '../tables/medical_tables.dart';
 
 part 'incident_dao.g.dart';
 
-/// 完整事故紀錄（含參考表資料）
+// 完整事故紀錄（含參考表資料）
 class IncidentRecordWithDetails {
   final IncidentRecordData incident;
   final IncidentPlaceCategoryData? category;
@@ -19,14 +19,14 @@ class IncidentRecordWithDetails {
   });
 }
 
-//  DAO 
+//  DAO
 
 @DriftAccessor(tables: [IncidentRecord])
 class IncidentDao extends DatabaseAccessor<AppDatabase>
     with _$IncidentDaoMixin {
   IncidentDao(super.db);
 
-  /// 依 medicalId 取得事故紀錄
+  // 依 medicalId 取得事故紀錄
   Future<IncidentRecordData?> getByMedicalId(int medicalId) {
     return (select(
       incidentRecord,

@@ -22,57 +22,57 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
 
   //  性別相關
 
-  /// 取得所有性別選項
+  // 取得所有性別選項
   Future<List<SexData>> getAllSex() {
     return select(sex).get();
   }
 
-  /// 根據 ID 取得性別
+  // 根據 ID 取得性別
   Future<SexData?> getSexById(int id) {
     return (select(sex)..where((s) => s.sexId.equals(id))).getSingleOrNull();
   }
 
-  /// 新增性別
+  // 新增性別
   Future<int> addSex(String name) {
     return into(sex).insert(SexCompanion.insert(name: name));
   }
 
-  /// 更新性別
+  // 更新性別
   Future<int> updateSex(int id, String name) {
     return (update(
       sex,
     )..where((s) => s.sexId.equals(id))).write(SexCompanion(name: Value(name)));
   }
 
-  /// 刪除性別
+  // 刪除性別
   Future<int> deleteSex(int id) {
     return (delete(sex)..where((s) => s.sexId.equals(id))).go();
   }
 
   //  國籍相關
 
-  /// 取得所有國籍選項
+  // 取得所有國籍選項
   Future<List<NationalityData>> getAllNationality() {
     return (select(
       nationality,
     )..orderBy([(n) => OrderingTerm.asc(n.name)])).get();
   }
 
-  /// 根據 ID 取得國籍
+  // 根據 ID 取得國籍
   Future<NationalityData?> getNationalityById(int id) {
     return (select(
       nationality,
     )..where((n) => n.nationalityId.equals(id))).getSingleOrNull();
   }
 
-  /// 根據代碼取得國籍
+  // 根據代碼取得國籍
   Future<NationalityData?> getNationalityByCode(String code) {
     return (select(
       nationality,
     )..where((n) => n.code.equals(code))).getSingleOrNull();
   }
 
-  /// 搜尋國籍 (模糊搜尋名稱)
+  // 搜尋國籍 (模糊搜尋名稱)
   Future<List<NationalityData>> searchNationality(String keyword) {
     return (select(nationality)
           ..where((n) => n.name.like('%$keyword%'))
@@ -80,14 +80,14 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
         .get();
   }
 
-  /// 新增國籍
+  // 新增國籍
   Future<int> addNationality({required String name, String? code}) {
     return into(
       nationality,
     ).insert(NationalityCompanion.insert(name: name, code: Value(code)));
   }
 
-  /// 批次新增國籍
+  // 批次新增國籍
   Future<void> addNationalityBatch(List<Map<String, String>> nationalityList) {
     return batch((batch) {
       batch.insertAll(
@@ -102,7 +102,7 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
     });
   }
 
-  /// 更新國籍
+  // 更新國籍
   Future<int> updateNationality({required int id, String? name, String? code}) {
     return (update(
       nationality,
@@ -114,33 +114,33 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
     );
   }
 
-  /// 刪除國籍
+  // 刪除國籍
   Future<int> deleteNationality(int id) {
     return (delete(nationality)..where((n) => n.nationalityId.equals(id))).go();
   }
 
   //  航空公司相關
 
-  /// 取得所有航空公司選項
+  // 取得所有航空公司選項
   Future<List<AirlineData>> getAllAirline() {
     return (select(airline)..orderBy([(a) => OrderingTerm.asc(a.code)])).get();
   }
 
-  /// 根據 ID 取得航空公司
+  // 根據 ID 取得航空公司
   Future<AirlineData?> getAirlineById(int id) {
     return (select(
       airline,
     )..where((a) => a.airlineId.equals(id))).getSingleOrNull();
   }
 
-  /// 根據代碼取得航空公司
+  // 根據代碼取得航空公司
   Future<AirlineData?> getAirlineByCode(String code) {
     return (select(
       airline,
     )..where((a) => a.code.equals(code))).getSingleOrNull();
   }
 
-  /// 搜尋航空公司 (模糊搜尋名稱或代碼)
+  // 搜尋航空公司 (模糊搜尋名稱或代碼)
   Future<List<AirlineData>> searchAirline(String keyword) {
     return (select(airline)
           ..where((a) => a.name.like('%$keyword%') | a.code.like('%$keyword%'))
@@ -148,14 +148,14 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
         .get();
   }
 
-  /// 新增航空公司
+  // 新增航空公司
   Future<int> addAirline({required String code, required String name}) {
     return into(
       airline,
     ).insert(AirlineCompanion.insert(code: code, name: name));
   }
 
-  /// 批次新增航空公司
+  // 批次新增航空公司
   Future<void> addAirlineBatch(List<Map<String, String>> airlineList) {
     return batch((batch) {
       batch.insertAll(
@@ -168,7 +168,7 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
     });
   }
 
-  /// 更新航空公司
+  // 更新航空公司
   Future<int> updateAirline({required int id, String? code, String? name}) {
     return (update(airline)..where((a) => a.airlineId.equals(id))).write(
       AirlineCompanion(
@@ -178,40 +178,40 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
     );
   }
 
-  /// 刪除航空公司
+  // 刪除航空公司
   Future<int> deleteAirline(int id) {
     return (delete(airline)..where((a) => a.airlineId.equals(id))).go();
   }
 
   //  旅行狀態相關
 
-  /// 取得所有旅行狀態選項
+  // 取得所有旅行狀態選項
   Future<List<TravelStatusData>> getAllTravelStatus() {
     return select(travelStatus).get();
   }
 
-  /// 根據 ID 取得旅行狀態
+  // 根據 ID 取得旅行狀態
   Future<TravelStatusData?> getTravelStatusById(int id) {
     return (select(
       travelStatus,
     )..where((t) => t.travelStatusId.equals(id))).getSingleOrNull();
   }
 
-  /// 根據代碼取得旅行狀態
+  // 根據代碼取得旅行狀態
   Future<TravelStatusData?> getTravelStatusByCode(String code) {
     return (select(
       travelStatus,
     )..where((t) => t.code.equals(code))).getSingleOrNull();
   }
 
-  /// 新增旅行狀態
+  // 新增旅行狀態
   Future<int> addTravelStatus({required String code, required String name}) {
     return into(
       travelStatus,
     ).insert(TravelStatusCompanion.insert(code: code, name: name));
   }
 
-  /// 批次新增旅行狀態
+  // 批次新增旅行狀態
   Future<void> addTravelStatusBatch(List<Map<String, String>> statusList) {
     return batch((batch) {
       batch.insertAll(
@@ -226,7 +226,7 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
     });
   }
 
-  /// 更新旅行狀態
+  // 更新旅行狀態
   Future<int> updateTravelStatus({
     required int id,
     String? code,
@@ -242,7 +242,7 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
     );
   }
 
-  /// 刪除旅行狀態
+  // 刪除旅行狀態
   Future<int> deleteTravelStatus(int id) {
     return (delete(
       travelStatus,
@@ -251,26 +251,26 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
 
   //  地點相關
 
-  /// 取得所有地點選項
+  // 取得所有地點選項
   Future<List<LocationData>> getAllLocation() {
     return (select(location)..orderBy([(l) => OrderingTerm.asc(l.code)])).get();
   }
 
-  /// 根據 ID 取得地點
+  // 根據 ID 取得地點
   Future<LocationData?> getLocationById(int id) {
     return (select(
       location,
     )..where((l) => l.locationId.equals(id))).getSingleOrNull();
   }
 
-  /// 根據代碼取得地點
+  // 根據代碼取得地點
   Future<LocationData?> getLocationByCode(String code) {
     return (select(
       location,
     )..where((l) => l.code.equals(code))).getSingleOrNull();
   }
 
-  /// 根據國家代碼取得地點列表
+  // 根據國家代碼取得地點列表
   Future<List<LocationData>> getLocationsByCountryCode(String countryCode) {
     return (select(location)
           ..where((l) => l.countryCode.equals(countryCode))
@@ -278,7 +278,7 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
         .get();
   }
 
-  /// 搜尋地點 (模糊搜尋名稱或代碼)
+  // 搜尋地點 (模糊搜尋名稱或代碼)
   Future<List<LocationData>> searchLocation(String keyword) {
     return (select(location)
           ..where((l) => l.name.like('%$keyword%') | l.code.like('%$keyword%'))
@@ -286,7 +286,7 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
         .get();
   }
 
-  /// 新增地點
+  // 新增地點
   Future<int> addLocation({
     required String code,
     required String name,
@@ -301,7 +301,7 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
     );
   }
 
-  /// 批次新增地點
+  // 批次新增地點
   Future<void> addLocationBatch(List<Map<String, String>> locationList) {
     return batch((batch) {
       batch.insertAll(
@@ -317,7 +317,7 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
     });
   }
 
-  /// 更新地點
+  // 更新地點
   Future<int> updateLocation({
     required int id,
     String? code,
@@ -335,14 +335,14 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
     );
   }
 
-  /// 刪除地點
+  // 刪除地點
   Future<int> deleteLocation(int id) {
     return (delete(location)..where((l) => l.locationId.equals(id))).go();
   }
 
   //  事故-一級地點分類相關 (IncidentPlaceCategory)
 
-  /// 取得所有一級地點分類 (依排序號碼)
+  // 取得所有一級地點分類 (依排序號碼)
   Future<List<IncidentPlaceCategoryData>> getAllIncidentPlaceCategories({
     bool onlyActive = false,
   }) {
@@ -353,14 +353,14 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
     return (query..orderBy([(t) => OrderingTerm.asc(t.sortOrder)])).get();
   }
 
-  /// 根據 ID 取得一級地點分類
+  // 根據 ID 取得一級地點分類
   Future<IncidentPlaceCategoryData?> getIncidentPlaceCategoryById(int id) {
     return (select(
       incidentPlaceCategory,
     )..where((t) => t.id.equals(id))).getSingleOrNull();
   }
 
-  /// 新增一級地點
+  // 新增一級地點
   Future<int> addIncidentPlaceCategory(String name, {int sortOrder = 0}) {
     return into(incidentPlaceCategory).insert(
       IncidentPlaceCategoryCompanion.insert(
@@ -370,19 +370,19 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
     );
   }
 
-  /// 更新一級地點
+  // 更新一級地點
   Future<bool> updateIncidentPlaceCategory(IncidentPlaceCategoryData data) {
     return update(incidentPlaceCategory).replace(data);
   }
 
-  /// 刪除一級地點
+  // 刪除一級地點
   Future<int> deleteIncidentPlaceCategory(int id) {
     return (delete(incidentPlaceCategory)..where((t) => t.id.equals(id))).go();
   }
 
   //  事故-二級地點分類相關 (IncidentPlaceCategory2)
 
-  /// 根據一級地點 ID 取得所屬的二級地點
+  // 根據一級地點 ID 取得所屬的二級地點
   Future<List<IncidentPlaceCategory2Data>> getIncidentPlaceCategory2ByParent(
     int categoryId, {
     bool onlyActive = false,
@@ -395,14 +395,14 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
     return (query..orderBy([(t) => OrderingTerm.asc(t.sortOrder)])).get();
   }
 
-  /// 根據 ID 取得二級地點分類
+  // 根據 ID 取得二級地點分類
   Future<IncidentPlaceCategory2Data?> getIncidentPlaceCategory2ById(int id) {
     return (select(
       incidentPlaceCategory2,
     )..where((t) => t.id.equals(id))).getSingleOrNull();
   }
 
-  /// 新增二級地點
+  // 新增二級地點
   Future<int> addIncidentPlaceCategory2(
     int categoryId,
     String name, {
@@ -419,7 +419,7 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
 
   //  事故通報單位相關 (ReportingUnit)
 
-  /// 取得所有通報單位
+  // 取得所有通報單位
   Future<List<ReportingUnitData>> getAllReportingUnits({
     bool onlyActive = false,
   }) {
@@ -437,7 +437,7 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
     )..where((t) => t.id.equals(id))).getSingleOrNull();
   }
 
-  /// 新增通報單位
+  // 新增通報單位
   Future<int> addReportingUnit(String name, {String? description}) {
     return into(reportingUnit).insert(
       ReportingUnitCompanion.insert(
@@ -448,8 +448,7 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
   }
 
   //  初始化參考資料
-
-  /// 初始化所有參考資料
+  // 初始化所有參考資料
   Future<void> initializeAllReferenceData() async {
     await initializeSex();
     await initializeNationality();
@@ -460,7 +459,7 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
     await initializeReportingUnits();
   }
 
-  /// 初始化性別資料
+  // 初始化性別資料
   Future<void> initializeSex() async {
     final count = await (select(sex).get()).then((list) => list.length);
     if (count == 0) {
@@ -474,7 +473,7 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
     }
   }
 
-  /// 初始化國籍資料
+  // 初始化國籍資料
   Future<void> initializeNationality() async {
     final count = await (select(nationality).get()).then((list) => list.length);
     if (count == 0) {
@@ -508,7 +507,7 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
     }
   }
 
-  /// 初始化航空公司資料
+  // 初始化航空公司資料
   Future<void> initializeAirline() async {
     final count = await (select(airline).get()).then((list) => list.length);
     if (count == 0) {
@@ -526,7 +525,7 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
     }
   }
 
-  /// 初始化旅行狀態資料
+  // 初始化旅行狀態資料
   Future<void> initializeTravelStatus() async {
     final count = await (select(
       travelStatus,
@@ -546,7 +545,7 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
     }
   }
 
-  /// 初始化地點資料
+  // 初始化地點資料
   Future<void> initializeLocation() async {
     final count = await (select(location).get()).then((list) => list.length);
     if (count == 0) {
@@ -618,7 +617,7 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
         // 登機門 A
         for (var i = 1; i <= 9; i++)
           {'name': '登機門A$i', 'parent': '第一航廈', 'sortOrder': 17 + i},
-        // A、B 区转机柜台/安检
+        // A、B 轉機櫃檯/安檢
         {'name': 'A區轉機櫃檯', 'parent': '第一航廈', 'sortOrder': 27},
         {'name': 'B區轉機櫃檯', 'parent': '第一航廈', 'sortOrder': 28},
         {'name': 'A區轉機安檢', 'parent': '第一航廈', 'sortOrder': 29},

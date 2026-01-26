@@ -9,6 +9,8 @@ class ReferenceService extends ChangeNotifier {
   List<AirlineData> airlines = [];
   List<TravelStatusData> travelStatuses = [];
   List<LocationData> locations = [];
+  List<IncidentPlaceCategoryData> incidentPlaceCategories = [];
+  List<ReportingUnitData> reportingUnits = [];
 
   bool _isLoaded = false;
   bool get isLoaded => _isLoaded;
@@ -29,6 +31,8 @@ class ReferenceService extends ChangeNotifier {
         db.referenceDao.getAllAirline(),
         db.referenceDao.getAllTravelStatus(),
         db.referenceDao.getAllLocation(),
+        db.referenceDao.getAllIncidentPlaceCategories(),
+        db.referenceDao.getAllReportingUnits(),
       ]);
 
       sexOptions = results[0] as List<SexData>;
@@ -36,6 +40,8 @@ class ReferenceService extends ChangeNotifier {
       airlines = results[2] as List<AirlineData>;
       travelStatuses = results[3] as List<TravelStatusData>;
       locations = results[4] as List<LocationData>;
+      incidentPlaceCategories = results[5] as List<IncidentPlaceCategoryData>;
+      reportingUnits = results[6] as List<ReportingUnitData>;
 
       _isLoaded = true;
       notifyListeners();
@@ -43,5 +49,12 @@ class ReferenceService extends ChangeNotifier {
     } catch (e) {
       debugPrint('系統：全域參考資料載入失敗 - $e');
     }
+  }
+
+  // 根據父類別 ID 取得次類別
+  Future<List<IncidentPlaceCategory2Data>> getCategory2ByParent(
+    int parentId,
+  ) async {
+    return await db.referenceDao.getIncidentPlaceCategory2ByParent(parentId);
   }
 }
