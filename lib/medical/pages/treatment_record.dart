@@ -10,7 +10,7 @@ class TreatmentRecord extends StatefulWidget {
 }
 
 class _TreatmentRecordState extends State<TreatmentRecord> {
-  // --- 樣式定義 ---
+  // 顏色定義
   static const Color primaryColor = Color(0xFF007A8A);
   static const Color textDark = Color(0xFF1E293B);
   static const Color textMuted = Color(0xFF64748B);
@@ -62,6 +62,30 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
   String? _selectedSiteTreatment;
   String? _selectedOutcome;
   final List<String> _summaryOfAction = [];
+
+  String? _selectedPhysician;
+  String? _selectedNurse;
+  final List<String> _assistStaffList = [];
+  final TextEditingController _assistStaffController = TextEditingController();
+
+  final List<String> _physicians = ['醫師 A', '醫師 B', '醫師 C', '醫師 D'];
+  final List<String> _nurses = ['護理師 A', '護理師 B', '護理師 C', '護理師 D'];
+
+  final List<String> _selectedSpecialNotes = [];
+  final List<String> _specialNoteOptions = [
+    'OHCA醫護到達前有CPR',
+    'OHCA醫護到達前有使用AED但無電擊',
+    'OHCA醫護到達前有使用AED有電擊',
+    '現場恢復脈搏',
+    '使用自動心肺復甦機',
+    '空跑',
+  ];
+
+  @override
+  void dispose() {
+    _assistStaffController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -140,6 +164,18 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
           title: '檢傷與處置 Outcome & Treatment',
           icon: Icons.emergency_outlined,
           child: _buildOutcomeTreatmentSection(),
+        ),
+        const SizedBox(height: 20),
+        _buildCard(
+          title: '醫護人員與簽章 Staff & Signs',
+          icon: Icons.app_registration_rounded,
+          child: _buildStaffSignsSection(),
+        ),
+        const SizedBox(height: 20),
+        _buildCard(
+          title: '特別註記 Special Notes',
+          icon: Icons.note_alt_outlined,
+          child: _buildSpecialNotesSection(),
         ),
         const SizedBox(height: 40),
       ],
@@ -458,7 +494,7 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
           ],
         ),
         const SizedBox(height: 10),
-        _buildLabeledField('其它理學觀察 Other Observations...', ''),
+        _buildLabeledField('其它理學檢查 Other Observations...', ''),
       ],
     );
   }
@@ -522,14 +558,12 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // 第一列：檢傷分類 (獨佔一排，按鈕加寬加描述)
         _buildLabel('檢傷分類 Triage Level'),
         const SizedBox(height: 8),
         _buildTriageSelector(),
 
         const SizedBox(height: 24),
 
-        // 第二列：現場處置 & 後續結果 (並排)
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -571,7 +605,6 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
                     ],
                     onChanged: (v) => setState(() => _selectedOutcome = v),
                   ),
-                  // 若選取轉其它醫院，動態出現輸入框
                   if (_selectedOutcome == '轉其它醫院') ...[
                     const SizedBox(height: 8),
                     _buildTextField(hint: '請註明醫院名稱'),
@@ -584,7 +617,6 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
 
         const SizedBox(height: 24),
 
-        // 第三列：處理摘要 (複選)
         _buildLabel('處理摘要 Summary of Action (可複選)'),
         const SizedBox(height: 8),
         _buildActionSummaryGrid(),
@@ -612,7 +644,7 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
           child: GestureDetector(
             onTap: () => setState(() => _triageLevel = l['val']),
             child: Container(
-              height: 60, // 增加高度以容納兩行文字
+              height: 60,
               margin: const EdgeInsets.symmetric(horizontal: 4),
               decoration: BoxDecoration(
                 color: isSel ? l['color'] : l['color'].withValues(alpha: 0.05),
@@ -695,6 +727,218 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
     );
   }
 
+  Widget _buildStaffSignsSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildLabel('院長/負責人 Director Name'),
+        const SizedBox(height: 4),
+        _buildTextField(hint: ''),
+
+        const SizedBox(height: 20),
+
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              flex: 3,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildLabel('主責醫師 Lead Physician'),
+                  const SizedBox(height: 4),
+                  _buildDropdownField(
+                    hint: '請選擇主責醫師',
+                    value: _selectedPhysician,
+                    items: _physicians,
+                    onChanged: (v) => setState(() => _selectedPhysician = v),
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildLabel('主責護理師 Lead Nurse'),
+                            const SizedBox(height: 4),
+                            _buildDropdownField(
+                              hint: '請選擇主責護理師',
+                              value: _selectedNurse,
+                              items: _nurses,
+                              onChanged: (v) =>
+                                  setState(() => _selectedNurse = v),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildLabel('護理師簽章 Nurse Sign'),
+                            const SizedBox(height: 4),
+                            _buildSignaturePad('點擊開啟簽名板'),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+
+        const SizedBox(height: 20),
+
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  RichText(
+                    text: TextSpan(
+                      text: 'EMT 姓名 EMT Name ',
+                      style: const TextStyle(
+                        color: textMuted,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      children: const [
+                        TextSpan(
+                          text: '(備註：EMT 有到現場協助出診才需填寫)',
+                          style: TextStyle(
+                            color: primaryColor,
+                            fontWeight: FontWeight.normal,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  _buildTextField(hint: '姓名 / 員工編號'),
+                ],
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildLabel('EMT 簽章 EMT Sign'),
+                  const SizedBox(height: 4),
+                  _buildSignaturePad('點擊開啟簽名板'),
+                ],
+              ),
+            ),
+          ],
+        ),
+
+        const SizedBox(height: 20),
+
+        _buildLabel('輔助人員 Assist Staff'),
+        const SizedBox(height: 4),
+        Row(
+          children: [
+            Expanded(
+              child: _buildTextField(
+                hint: '輸入人員姓名...',
+                controller: _assistStaffController,
+              ),
+            ),
+            const SizedBox(width: 8),
+            _buildActionIconBtn(
+              Icons.person_add_alt_1,
+              primaryColor.withValues(alpha: 0.1),
+              primaryColor.withValues(alpha: 0.2),
+              onTap: () {
+                if (_assistStaffController.text.isNotEmpty) {
+                  setState(() {
+                    _assistStaffList.add(_assistStaffController.text);
+                    _assistStaffController.clear();
+                  });
+                }
+              },
+            ),
+          ],
+        ),
+        if (_assistStaffList.isNotEmpty) ...[
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 8,
+            children: _assistStaffList
+                .map(
+                  (staff) => Chip(
+                    label: Text(staff, style: const TextStyle(fontSize: 12)),
+                    deleteIcon: const Icon(Icons.close, size: 14),
+                    onDeleted: () =>
+                        setState(() => _assistStaffList.remove(staff)),
+                    backgroundColor: bgField,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                )
+                .toList(),
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildSpecialNotesSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Wrap(
+          spacing: 10,
+          runSpacing: 10,
+          children: _specialNoteOptions.map((note) {
+            final bool isSelected = _selectedSpecialNotes.contains(note);
+            return FilterChip(
+              label: Text(note),
+              selected: isSelected,
+              onSelected: (selected) {
+                setState(() {
+                  selected
+                      ? _selectedSpecialNotes.add(note)
+                      : _selectedSpecialNotes.remove(note);
+                });
+              },
+              selectedColor: primaryColor.withValues(alpha: 0.1),
+              checkmarkColor: primaryColor,
+              labelStyle: TextStyle(
+                color: isSelected ? primaryColor : textDark,
+                fontSize: 13,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+              ),
+              backgroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+                side: BorderSide(
+                  color: isSelected ? primaryColor : borderColor,
+                  width: isSelected ? 1.5 : 1,
+                ),
+              ),
+            );
+          }).toList(),
+        ),
+
+        const SizedBox(height: 24),
+
+        _buildLabel('其他特別註記 Other Notes'),
+        const SizedBox(height: 8),
+        _buildTextField(hint: '請輸入其他需要補充的特殊狀況...', maxLines: 3),
+      ],
+    );
+  }
+
   // --- 輔助組件 ---
 
   Widget _buildCard({
@@ -745,15 +989,39 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
     );
   }
 
+  Widget _buildSignaturePad(String placeholder) {
+    return Container(
+      height: 44,
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: bgField,
+        border: Border.all(color: borderColor, style: BorderStyle.solid),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Center(
+        child: Text(
+          placeholder,
+          style: TextStyle(
+            color: textMuted.withValues(alpha: 0.5),
+            fontSize: 12,
+            fontStyle: FontStyle.italic,
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildTextField({
     required String hint,
     int maxLines = 1,
     TextAlign textAlign = TextAlign.start,
     Color? fillColor,
+    TextEditingController? controller,
   }) {
     return SizedBox(
       height: maxLines == 1 ? 40 : null,
       child: TextField(
+        controller: controller,
         maxLines: maxLines,
         textAlign: textAlign,
         style: const TextStyle(fontSize: 13),
@@ -805,16 +1073,25 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
     );
   }
 
-  Widget _buildActionIconBtn(IconData icon, Color bg, Color border) {
-    return Container(
-      height: 40,
-      width: 40,
-      decoration: BoxDecoration(
-        color: bg,
-        border: Border.all(color: border),
-        borderRadius: BorderRadius.circular(8),
+  Widget _buildActionIconBtn(
+    IconData icon,
+    Color bg,
+    Color border, {
+    VoidCallback? onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        height: 40,
+        width: 40,
+        decoration: BoxDecoration(
+          color: bg,
+          border: Border.all(color: border),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Icon(icon, color: primaryColor, size: 18),
       ),
-      child: Icon(icon, color: primaryColor, size: 18),
     );
   }
 
