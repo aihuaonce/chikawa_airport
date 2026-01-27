@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+import '../../data/models/medical/incident_view.dart';
+import '../../data/db/database.dart';
 
 class IncidentRecord extends StatefulWidget {
   final int medicalId;
@@ -18,18 +21,10 @@ class _IncidentRecordState extends State<IncidentRecord> {
   static const Color borderColor = Color(0xFFE2E8F0);
 
   // 控制器
-  final TextEditingController _dateController = TextEditingController();
-  final TextEditingController _notifTimeController = TextEditingController();
-  final TextEditingController _occTimeController = TextEditingController();
-  final TextEditingController _departureTimeController =
-      TextEditingController();
-  final TextEditingController _arrivalTimeController = TextEditingController();
-  final TextEditingController _examTimeController = TextEditingController();
+  late TextEditingController _notificationPersonController;
+  late TextEditingController _incidentPlaceFinalController;
 
-  // 下拉選單狀態
-  String? _selectedUnit;
-  String? _selectedLocation;
-  bool _occArrived = false;
+  bool _isInitialized = false;
 
   // 自動計算邏輯狀態
   String _timeSpentDisplay = "0.00";
@@ -37,42 +32,43 @@ class _IncidentRecordState extends State<IncidentRecord> {
   bool _hasCalculated = false;
 
   @override
+  void initState() {
+    super.initState();
+    _notificationPersonController = TextEditingController();
+    _incidentPlaceFinalController = TextEditingController();
+  }
+
+  @override
   void dispose() {
-    _dateController.dispose();
-    _notifTimeController.dispose();
-    _occTimeController.dispose();
-    _departureTimeController.dispose();
-    _arrivalTimeController.dispose();
-    _examTimeController.dispose();
+    _notificationPersonController.dispose();
+    _incidentPlaceFinalController.dispose();
     super.dispose();
   }
 
-  // 更新時間並計算
-  void _updateNow(TextEditingController controller) {
-    setState(() {
-      controller.text = DateFormat('HH:mm:ss').format(DateTime.now());
-    });
-    _calculateTimeDifference();
+  // 當 ViewModel 資料載入後,同步到 Controller
+  void _updateControllers(IncidentRecordData incident) {
+    if (_isInitialized) return;
+    _notificationPersonController.text = incident.notificationPerson ?? '';
+    _incidentPlaceFinalController.text = incident.incidentPlaceFinal ?? '';
+    _isInitialized = true;
   }
 
-  // 計算邏輯
-  void _calculateTimeDifference() {
-    if (_notifTimeController.text.isEmpty ||
-        _arrivalTimeController.text.isEmpty) {
+  // 計算時間差異
+  void _calculateTimeDifference(IncidentViewModel viewModel) {
+    final incident = viewModel.incidentRecord;
+    if (incident == null ||
+        incident.notificationTime == null ||
+        incident.landingTime == null) {
+      setState(() {
+        _hasCalculated = false;
+        _timeSpentDisplay = "0.00";
+      });
       return;
     }
 
     try {
-      DateFormat format = DateFormat("HH:mm:ss");
-      DateTime start = format.parse(_notifTimeController.text);
-      DateTime end = format.parse(_arrivalTimeController.text);
-
-      if (end.isBefore(start)) {
-        end = end.add(const Duration(days: 1));
-      }
-
-      Duration diff = end.difference(start);
-      double minutes = diff.inSeconds / 60.0;
+      final diff = incident.landingTime!.difference(incident.notificationTime!);
+      final minutes = diff.inSeconds / 60.0;
 
       setState(() {
         _timeSpentDisplay = minutes.toStringAsFixed(2);
@@ -80,14 +76,14 @@ class _IncidentRecordState extends State<IncidentRecord> {
         _hasCalculated = true;
       });
     } catch (e) {
-      debugPrint("時間格式解析錯誤");
+      debugPrint("時間計算錯誤: $e");
     }
   }
 
-  Future<void> _selectDate() async {
+  Future<void> _selectDate(IncidentViewModel viewModel) async {
     DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(),
+      initialDate: viewModel.incidentRecord?.incidentDate ?? DateTime.now(),
       firstDate: DateTime(2020),
       lastDate: DateTime(2030),
       builder: (context, child) {
@@ -107,182 +103,187 @@ class _IncidentRecordState extends State<IncidentRecord> {
       },
     );
     if (picked != null) {
-      setState(() {
-        _dateController.text = DateFormat('yyyy-MM-dd').format(picked);
-      });
+      viewModel.updateIncidentDate(picked);
+    }
+  }
+
+  Future<void> _selectTime(
+    BuildContext context,
+    DateTime? initialTime,
+    Function(DateTime?) onTimeSelected,
+  ) async {
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: initialTime != null
+          ? TimeOfDay.fromDateTime(initialTime)
+          : TimeOfDay.now(),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: const ColorScheme.light(
+              primary: primaryColor,
+              onPrimary: Colors.white,
+              onSurface: textDark,
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(foregroundColor: primaryColor),
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (picked != null) {
+      final now = DateTime.now();
+      final selectedDateTime = DateTime(
+        now.year,
+        now.month,
+        now.day,
+        picked.hour,
+        picked.minute,
+      );
+      onTimeSelected(selectedDateTime);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
+    final viewModel = context.watch<IncidentViewModel>();
+    final incident = viewModel.incidentRecord;
+
+    if (incident != null) {
+      _updateControllers(incident);
+      // 每次重建時重新計算時間
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _calculateTimeDifference(viewModel);
+      });
+    }
+
+    if (incident == null) {
+      return const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Expanded(
-              child: _buildFieldWrapper(
-                '事發日期 Incident Date',
-                _buildTextField(
-                  hint: '請選擇日期',
-                  controller: _dateController,
-                  suffixIcon: Icons.calendar_today,
-                  readOnly: true,
-                  onTap: _selectDate,
-                ),
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: _buildFieldWrapper(
-                '通報時間 Notification Time',
-                _buildTimeFieldWithButton(
-                  'NOW',
-                  controller: _notifTimeController,
-                ),
-              ),
-            ),
+            CircularProgressIndicator(),
+            SizedBox(height: 16),
+            Text('載入事故記錄中...'),
           ],
         ),
-        const SizedBox(height: 20),
+      );
+    }
 
-        _buildFieldWrapper(
-          '通報單位 Notification Unit',
-          _buildDropdownField(
-            hint: '請選取通報單位',
-            value: _selectedUnit,
-            items: const [
-              'T1-OCC',
-              'T2-OCC',
-              '華航',
-              '長榮',
-              '虎航',
-              '星宇',
-              '采盟',
-              '昇恆昌',
-              '病人或家屬',
-              '其它',
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: _buildFieldWrapper(
+                  '事發日期 Incident Date',
+                  _buildDateField(viewModel, incident),
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: _buildFieldWrapper(
+                  '通報時間 Notification Time',
+                  _buildTimeField(
+                    viewModel,
+                    incident.notificationTime,
+                    'NOW',
+                    (time) => viewModel.updateNotificationTime(time),
+                  ),
+                ),
+              ),
             ],
-            onChanged: (val) => setState(() => _selectedUnit = val),
           ),
-        ),
+          const SizedBox(height: 20),
+          _buildFieldWrapper(
+            '通報單位 Notification Unit',
+            _buildReportingUnitDropdown(viewModel, incident),
+          ),
+          const SizedBox(height: 20),
+          Row(
+            children: [
+              Expanded(
+                child: _buildFieldWrapper(
+                  '通報人員 Notification Person',
+                  _buildTextField(
+                    hint: '請輸入姓名',
+                    controller: _notificationPersonController,
+                    onChanged: (val) => viewModel.updateNotificationPerson(val),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 40),
+          _buildFieldWrapper(
+            '事故地點 (一級) Location Category',
+            _buildPlaceCategoryDropdown(viewModel, incident),
+          ),
+          const SizedBox(height: 20),
 
-        if (_selectedUnit == '其它') ...[
-          const SizedBox(height: 12),
-          _buildTextField(hint: '請註明其它通報單位'),
+          // 🔧 修正：二級地點選單，使用動態載入的選項
+          _buildFieldWrapper(
+            '事故地點 (二級) Location Sub-Category',
+            _buildPlaceCategory2Dropdown(viewModel, incident),
+          ),
+          const SizedBox(height: 20),
+          _buildFieldWrapper(
+            '地點備註 Location Remarks',
+            _buildTextField(
+              hint: '鄰近店家、柱號、登機口等詳細資訊...',
+              controller: _incidentPlaceFinalController,
+              onChanged: (val) => viewModel.updateIncidentPlaceFinal(val),
+            ),
+          ),
+          const SizedBox(height: 40),
+          _buildCheckboxRow(
+            '落地前發生 Before Landing',
+            incident.beforeLanding,
+            (v) => viewModel.updateBeforeLanding(v!),
+          ),
+          const SizedBox(height: 20),
+          Row(
+            children: [
+              Expanded(
+                child: _buildFieldWrapper(
+                  '落地時間 Landing Time',
+                  _buildTimeField(
+                    viewModel,
+                    incident.landingTime,
+                    'SET TIME',
+                    (time) => viewModel.updateLandingTime(time),
+                    isArrival: true,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          Row(
+            children: [
+              Expanded(flex: 2, child: _buildTimeSpentBadge(_timeSpentDisplay)),
+              const SizedBox(width: 16),
+              Expanded(
+                flex: 3,
+                child: _buildPerformanceIndicator(
+                  _within10Mins,
+                  _hasCalculated,
+                ),
+              ),
+            ],
+          ),
         ],
-
-        const SizedBox(height: 20),
-        Row(
-          children: [
-            Expanded(
-              child: _buildFieldWrapper(
-                '通報人員 Notification Person',
-                _buildTextField(hint: '請輸入姓名'),
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: _buildFieldWrapper(
-                '接獲電話 Incoming Phone',
-                _buildTextField(hint: '分機或手機號碼'),
-              ),
-            ),
-          ],
-        ),
-
-        const SizedBox(height: 40),
-
-        Row(
-          children: [
-            Expanded(
-              child: _buildFieldWrapper(
-                '通報 OCC 時間 Notification to OCC',
-                _buildTimeFieldWithButton(
-                  'NOW',
-                  controller: _occTimeController,
-                ),
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: _buildFieldWrapper(
-                '醫護出發時間 Team Departure',
-                _buildTimeFieldWithButton(
-                  'NOW',
-                  controller: _departureTimeController,
-                ),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 16),
-        _buildCheckboxRow(
-          '營運控制 (OCC) 已到達現場 OCC Arrived at Scene',
-          _occArrived,
-          (v) => setState(() => _occArrived = v!),
-        ),
-
-        const SizedBox(height: 40),
-
-        _buildFieldWrapper(
-          '事故地點 Location',
-          _buildDropdownField(
-            hint: '請選取事故地點',
-            value: _selectedLocation,
-            items: const ['第一航廈', '第二航廈', '遠端機坪', '貨運站&機坪其它', '諾富特飯店', '飛機機艙內'],
-            onChanged: (val) => setState(() => _selectedLocation = val),
-          ),
-        ),
-        const SizedBox(height: 20),
-        _buildFieldWrapper(
-          '地點備註 Location Remarks',
-          _buildTextField(hint: '鄰近店家、柱號、登機口等詳細資訊...'),
-        ),
-
-        const SizedBox(height: 40),
-
-        Row(
-          children: [
-            Expanded(
-              child: _buildFieldWrapper(
-                '醫護到達時間 Medical Arrival',
-                _buildTimeFieldWithButton(
-                  'ARRIVED',
-                  controller: _arrivalTimeController,
-                  isArrival: true,
-                ),
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: _buildFieldWrapper(
-                '檢查時間 Examination Time',
-                _buildTimeFieldWithButton(
-                  'NOW',
-                  controller: _examTimeController,
-                ),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 20),
-
-        Row(
-          children: [
-            Expanded(flex: 2, child: _buildTimeSpentBadge(_timeSpentDisplay)),
-            const SizedBox(width: 16),
-            Expanded(
-              child: _buildPerformanceIndicator(_within10Mins, _hasCalculated),
-            ),
-          ],
-        ),
-        const SizedBox(height: 60),
-      ],
+      ),
     );
   }
 
-  // --- UI 元件 ---
+  // === UI 元件 ===
 
   Widget _buildFieldWrapper(String label, Widget field) {
     return Column(
@@ -303,21 +304,81 @@ class _IncidentRecordState extends State<IncidentRecord> {
     );
   }
 
-  Widget _buildTimeFieldWithButton(
-    String btnText, {
-    required TextEditingController controller,
+  // 日期選擇欄位
+  Widget _buildDateField(
+    IncidentViewModel viewModel,
+    IncidentRecordData incident,
+  ) {
+    final dateStr = DateFormat('yyyy-MM-dd').format(incident.incidentDate);
+    return InkWell(
+      onTap: () => _selectDate(viewModel),
+      child: Container(
+        height: 44,
+        padding: const EdgeInsets.symmetric(horizontal: 14),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(6),
+          border: Border.all(color: borderColor),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              dateStr,
+              style: const TextStyle(fontSize: 14, color: textDark),
+            ),
+            const Icon(Icons.calendar_today, color: textMuted, size: 18),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // 時間選擇欄位
+  Widget _buildTimeField(
+    IncidentViewModel viewModel,
+    DateTime? currentTime,
+    String btnText,
+    Function(DateTime?) onTimeSelected, {
     bool isArrival = false,
   }) {
+    final timeStr = currentTime != null
+        ? DateFormat('HH:mm:ss').format(currentTime)
+        : '';
+
     return Row(
       children: [
         Expanded(
-          child: _buildTextField(hint: 'HH:mm:ss', controller: controller),
+          child: InkWell(
+            onTap: () => _selectTime(context, currentTime, onTimeSelected),
+            child: Container(
+              height: 44,
+              padding: const EdgeInsets.symmetric(horizontal: 14),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(6),
+                border: Border.all(color: borderColor),
+              ),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  timeStr.isEmpty ? 'HH:mm:ss' : timeStr,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: timeStr.isEmpty
+                        ? textMuted.withValues(alpha: 0.4)
+                        : textDark,
+                  ),
+                ),
+              ),
+            ),
+          ),
         ),
         const SizedBox(width: 8),
         SizedBox(
           height: 44,
           child: OutlinedButton(
-            onPressed: () => _updateNow(controller),
+            onPressed: () => onTimeSelected(DateTime.now()),
             style: OutlinedButton.styleFrom(
               backgroundColor: isArrival
                   ? primaryColor.withValues(alpha: 0.05)
@@ -343,19 +404,189 @@ class _IncidentRecordState extends State<IncidentRecord> {
     );
   }
 
+  // 通報單位下拉選單
+  Widget _buildReportingUnitDropdown(
+    IncidentViewModel viewModel,
+    IncidentRecordData incident,
+  ) {
+    final selectedUnit = viewModel.getReportingUnitById(
+      incident.reportingUnitId,
+    );
+
+    return DropdownButtonFormField<ReportingUnitData>(
+      value: selectedUnit,
+      decoration: InputDecoration(
+        filled: true,
+        fillColor: Colors.white,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 14,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: borderColor),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: primaryColor, width: 1.5),
+        ),
+      ),
+      hint: Text(
+        '請選取通報單位',
+        style: TextStyle(color: textMuted.withValues(alpha: 0.5), fontSize: 14),
+      ),
+      icon: const Icon(Icons.keyboard_arrow_down, size: 20, color: textMuted),
+      items: viewModel.reportingUnitOptions.map((unit) {
+        return DropdownMenuItem<ReportingUnitData>(
+          value: unit,
+          child: Text(
+            unit.name,
+            style: const TextStyle(fontSize: 14, color: textDark),
+          ),
+        );
+      }).toList(),
+      onChanged: (ReportingUnitData? newValue) {
+        if (newValue != null) {
+          viewModel.updateReportingUnitId(newValue.id);
+        }
+      },
+    );
+  }
+
+  // 一級地點下拉選單
+  Widget _buildPlaceCategoryDropdown(
+    IncidentViewModel viewModel,
+    IncidentRecordData incident,
+  ) {
+    final selectedCategory = viewModel.getPlaceCategoryById(
+      incident.incidentPlaceCategoryId,
+    );
+
+    return DropdownButtonFormField<IncidentPlaceCategoryData>(
+      value: selectedCategory,
+      decoration: InputDecoration(
+        filled: true,
+        fillColor: Colors.white,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 14,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: borderColor),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: primaryColor, width: 1.5),
+        ),
+      ),
+      hint: Text(
+        '請選取事故地點',
+        style: TextStyle(color: textMuted.withValues(alpha: 0.5), fontSize: 14),
+      ),
+      icon: const Icon(Icons.keyboard_arrow_down, size: 20, color: textMuted),
+      items: viewModel.placeCategoryOptions.map((category) {
+        return DropdownMenuItem<IncidentPlaceCategoryData>(
+          value: category,
+          child: Text(
+            category.name,
+            style: const TextStyle(fontSize: 14, color: textDark),
+          ),
+        );
+      }).toList(),
+      onChanged: (IncidentPlaceCategoryData? newValue) {
+        if (newValue != null) {
+          // 🔧 修正：使用 async 方法更新，會自動載入新的二級選項
+          viewModel.updateIncidentPlaceCategoryId(newValue.id);
+        }
+      },
+    );
+  }
+
+  // 🔧 修正：二級地點下拉選單 - 使用動態載入的選項
+  Widget _buildPlaceCategory2Dropdown(
+    IncidentViewModel viewModel,
+    IncidentRecordData incident,
+  ) {
+    // 使用 ViewModel 中動態載入的二級選項
+    final category2Options = viewModel.currentCategory2Options;
+
+    final selectedCategory2 = viewModel.getPlaceCategory2ById(
+      incident.incidentPlaceCategory2Id,
+    );
+
+    // 如果沒有二級選項，顯示提示
+    if (category2Options.isEmpty) {
+      return Container(
+        height: 44,
+        padding: const EdgeInsets.symmetric(horizontal: 14),
+        decoration: BoxDecoration(
+          color: Colors.grey.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(6),
+          border: Border.all(color: borderColor),
+        ),
+        child: const Align(
+          alignment: Alignment.centerLeft,
+          child: Text(
+            '請先選擇一級地點',
+            style: TextStyle(
+              fontSize: 14,
+              color: textMuted,
+              fontStyle: FontStyle.italic,
+            ),
+          ),
+        ),
+      );
+    }
+
+    return DropdownButtonFormField<IncidentPlaceCategory2Data>(
+      value: selectedCategory2,
+      decoration: InputDecoration(
+        filled: true,
+        fillColor: Colors.white,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 14,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: borderColor),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: primaryColor, width: 1.5),
+        ),
+      ),
+      hint: Text(
+        '請選取二級地點',
+        style: TextStyle(color: textMuted.withValues(alpha: 0.5), fontSize: 14),
+      ),
+      icon: const Icon(Icons.keyboard_arrow_down, size: 20, color: textMuted),
+      items: category2Options.map((category2) {
+        return DropdownMenuItem<IncidentPlaceCategory2Data>(
+          value: category2,
+          child: Text(
+            category2.name,
+            style: const TextStyle(fontSize: 14, color: textDark),
+          ),
+        );
+      }).toList(),
+      onChanged: (IncidentPlaceCategory2Data? newValue) {
+        viewModel.updateIncidentPlaceCategory2Id(newValue?.id);
+      },
+    );
+  }
+
   Widget _buildTextField({
     required String hint,
-    IconData? suffixIcon,
     TextEditingController? controller,
-    bool readOnly = false,
-    VoidCallback? onTap,
+    Function(String)? onChanged,
   }) {
     return SizedBox(
       height: 44,
       child: TextFormField(
         controller: controller,
-        readOnly: readOnly,
-        onTap: onTap,
+        onChanged: onChanged,
         style: const TextStyle(fontSize: 14, color: textDark),
         decoration: InputDecoration(
           hintText: hint,
@@ -365,9 +596,6 @@ class _IncidentRecordState extends State<IncidentRecord> {
           ),
           filled: true,
           fillColor: Colors.white,
-          suffixIcon: suffixIcon != null
-              ? Icon(suffixIcon, color: textMuted, size: 18)
-              : null,
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 14,
             vertical: 12,
@@ -380,49 +608,6 @@ class _IncidentRecordState extends State<IncidentRecord> {
             borderRadius: BorderRadius.circular(6),
             borderSide: const BorderSide(color: primaryColor, width: 1.5),
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDropdownField({
-    required String hint,
-    required String? value,
-    required List<String> items,
-    required Function(String?) onChanged,
-  }) {
-    return Container(
-      height: 44,
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: borderColor),
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<String>(
-          value: value,
-          hint: Text(
-            hint,
-            style: TextStyle(
-              color: textMuted.withValues(alpha: 0.4),
-              fontSize: 14,
-            ),
-          ),
-          isExpanded: true,
-          icon: const Icon(Icons.expand_more, size: 20, color: textMuted),
-          items: items
-              .map(
-                (String item) => DropdownMenuItem<String>(
-                  value: item,
-                  child: Text(
-                    item,
-                    style: const TextStyle(fontSize: 14, color: textDark),
-                  ),
-                ),
-              )
-              .toList(),
-          onChanged: onChanged,
         ),
       ),
     );
@@ -511,7 +696,6 @@ class _IncidentRecordState extends State<IncidentRecord> {
     );
   }
 
-  // 是否在10分鐘內到達
   Widget _buildPerformanceIndicator(bool isSuccess, bool hasCalculated) {
     Color mainColor;
     Color bgColor;
@@ -544,12 +728,14 @@ class _IncidentRecordState extends State<IncidentRecord> {
         children: [
           Icon(icon, color: mainColor, size: 20),
           const SizedBox(width: 8),
-          Text(
-            label,
-            style: TextStyle(
-              color: mainColor,
-              fontSize: 12,
-              fontWeight: FontWeight.w800,
+          Expanded(
+            child: Text(
+              label,
+              style: TextStyle(
+                color: mainColor,
+                fontSize: 12,
+                fontWeight: FontWeight.w800,
+              ),
             ),
           ),
         ],

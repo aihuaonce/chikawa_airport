@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../data/models/medical_view.dart';
+import '../../data/models/medical/medical_view.dart';
 
 class MedicalHeader extends StatelessWidget {
   final List<Map<String, dynamic>> sections;

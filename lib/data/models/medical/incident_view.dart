@@ -1,0 +1,253 @@
+import 'dart:async';
+import 'package:flutter/material.dart';
+import 'package:drift/drift.dart';
+import 'package:flutter/foundation.dart';
+import '../../db/database.dart';
+import '../reference_service.dart';
+
+enum SaveStatus { idle, saving, success }
+
+class IncidentViewModel extends ChangeNotifier {
+  final AppDatabase db;
+  final ReferenceService refService;
+  final int medicalId;
+
+  // 事故記錄快取
+  IncidentRecordData? _incidentCache;
+  IncidentRecordData? get incidentRecord => _incidentCache;
+
+  // 🔧 修正：二級地點改為動態載入，不從 refService 快取
+  List<IncidentPlaceCategory2Data> _currentCategory2Options = [];
+  List<IncidentPlaceCategory2Data> get currentCategory2Options =>
+      _currentCategory2Options;
+
+  // 使用 refService 取得參考資料（一級地點和通報單位是預載的）
+  List<IncidentPlaceCategoryData> get placeCategoryOptions =>
+      refService.incidentPlaceCategories;
+  List<ReportingUnitData> get reportingUnitOptions => refService.reportingUnits;
+
+  // 延遲存檔與狀態
+  Timer? _debounceTimer;
+  SaveStatus _saveStatus = SaveStatus.idle;
+  SaveStatus get saveStatus => _saveStatus;
+
+  IncidentViewModel(this.db, this.refService, this.medicalId);
+
+  // 初始化
+  Future<void> init() async {
+    _incidentCache = await db.incidentDao.getByMedicalId(medicalId);
+
+    if (_incidentCache == null) {
+      debugPrint('系統:事故記錄不存在,建立預設記錄');
+      await _createDefaultIncidentRecord();
+      _incidentCache = await db.incidentDao.getByMedicalId(medicalId);
+    }
+
+    // 🔧 新增：如果已有一級地點，載入對應的二級地點
+    if (_incidentCache != null) {
+      await _loadCategory2Options(_incidentCache!.incidentPlaceCategoryId);
+    }
+
+    notifyListeners();
+  }
+
+  // 🔧 新增：載入二級地點選項的方法
+  Future<void> _loadCategory2Options(int categoryId) async {
+    try {
+      _currentCategory2Options = await refService.getCategory2ByParent(
+        categoryId,
+      );
+      debugPrint('系統:已載入 ${_currentCategory2Options.length} 個二級地點選項');
+    } catch (e) {
+      debugPrint('系統:載入二級地點失敗 - $e');
+      _currentCategory2Options = [];
+    }
+  }
+
+  // 建立預設事故記錄
+  Future<void> _createDefaultIncidentRecord() async {
+    try {
+      if (refService.incidentPlaceCategories.isEmpty ||
+          refService.reportingUnits.isEmpty) {
+        debugPrint('系統:參考資料未初始化,無法建立事故記錄');
+        return;
+      }
+
+      await db.incidentDao.createIncidentRecord(
+        medicalId: medicalId,
+        incidentDate: DateTime.now(),
+        incidentPlaceCategoryId: refService.incidentPlaceCategories.first.id,
+        reportingUnitId: refService.reportingUnits.first.id,
+        beforeLanding: false, // ✅ 修正：直接傳 bool
+      );
+
+      debugPrint('系統:已建立預設事故記錄');
+    } catch (e) {
+      debugPrint('系統:建立預設事故記錄失敗 - $e');
+    }
+  }
+
+  // 事故記錄更新
+  void _updateIncidentCacheAndSave(IncidentRecordData newData) {
+    _incidentCache = newData;
+    notifyListeners();
+    _autoSave();
+  }
+
+  // === 基本資訊更新 ===
+  void updateIncidentDate(DateTime date) {
+    if (_incidentCache == null) return;
+    _updateIncidentCacheAndSave(_incidentCache!.copyWith(incidentDate: date));
+  }
+
+  void updateNotificationTime(DateTime? time) {
+    if (_incidentCache == null) return;
+    _updateIncidentCacheAndSave(
+      _incidentCache!.copyWith(notificationTime: Value(time)),
+    );
+  }
+
+  void updateNotificationPerson(String? person) {
+    if (_incidentCache == null) return;
+    _updateIncidentCacheAndSave(
+      _incidentCache!.copyWith(notificationPerson: Value(person)),
+    );
+  }
+
+  void updateReportingUnitId(int unitId) {
+    if (_incidentCache == null) return;
+    _updateIncidentCacheAndSave(
+      _incidentCache!.copyWith(reportingUnitId: unitId),
+    );
+  }
+
+  // === 地點資訊更新 ===
+
+  // 🔧 修正：更新一級地點時，同時載入對應的二級地點選項
+  Future<void> updateIncidentPlaceCategoryId(int categoryId) async {
+    if (_incidentCache == null) return;
+
+    // 先清空二級地點
+    _updateIncidentCacheAndSave(
+      _incidentCache!.copyWith(
+        incidentPlaceCategoryId: categoryId,
+        incidentPlaceCategory2Id: const Value(null),
+        incidentPlaceFinal: const Value(null),
+      ),
+    );
+
+    // 載入新的二級地點選項
+    await _loadCategory2Options(categoryId);
+    notifyListeners(); // 確保 UI 更新
+  }
+
+  void updateIncidentPlaceCategory2Id(int? category2Id) {
+    if (_incidentCache == null) return;
+    _updateIncidentCacheAndSave(
+      _incidentCache!.copyWith(incidentPlaceCategory2Id: Value(category2Id)),
+    );
+  }
+
+  void updateIncidentPlaceFinal(String? finalPlace) {
+    if (_incidentCache == null) return;
+    _updateIncidentCacheAndSave(
+      _incidentCache!.copyWith(incidentPlaceFinal: Value(finalPlace)),
+    );
+  }
+
+  // === 落地資訊更新 ===
+  void updateBeforeLanding(bool beforeLanding) {
+    if (_incidentCache == null) return;
+    _updateIncidentCacheAndSave(
+      _incidentCache!.copyWith(beforeLanding: beforeLanding),
+    );
+  }
+
+  void updateLandingTime(DateTime? time) {
+    if (_incidentCache == null) return;
+    _updateIncidentCacheAndSave(
+      _incidentCache!.copyWith(landingTime: Value(time)),
+    );
+  }
+
+  // === 查詢輔助方法 ===
+  IncidentPlaceCategoryData? getPlaceCategoryById(int? id) {
+    if (id == null) return null;
+    try {
+      return refService.incidentPlaceCategories.firstWhere((c) => c.id == id);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  // 🔧 修正：從當前載入的二級選項中查詢
+  IncidentPlaceCategory2Data? getPlaceCategory2ById(int? id) {
+    if (id == null) return null;
+    try {
+      return _currentCategory2Options.firstWhere((c) => c.id == id);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  ReportingUnitData? getReportingUnitById(int? id) {
+    if (id == null) return null;
+    try {
+      return refService.reportingUnits.firstWhere((u) => u.id == id);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  // 🔧 移除：不再需要這個方法，因為二級選項已經在 _currentCategory2Options 中
+  // List<IncidentPlaceCategory2Data> getCategory2OptionsForCategory(int categoryId) {
+  //   return _currentCategory2Options;
+  // }
+
+  // === 延遲存檔邏輯 ===
+  void _autoSave() {
+    if (_debounceTimer?.isActive ?? false) _debounceTimer!.cancel();
+    _saveStatus = SaveStatus.saving;
+
+    _debounceTimer = Timer(const Duration(seconds: 2), () async {
+      debugPrint('系統:正在自動存檔至資料庫...');
+      unawaited(_saveToDatabase());
+    });
+  }
+
+  Future<void> _saveToDatabase() async {
+    try {
+      if (_incidentCache != null) {
+        await db.incidentDao.updateIncident(_incidentCache!);
+      }
+
+      debugPrint('系統:事故記錄已儲存');
+
+      if (!hasListeners) return;
+
+      _saveStatus = SaveStatus.success;
+      notifyListeners();
+
+      await Future.delayed(const Duration(seconds: 3));
+
+      if (!hasListeners) return;
+
+      _saveStatus = SaveStatus.idle;
+      notifyListeners();
+    } catch (e) {
+      debugPrint('系統:自動存檔失敗 - $e');
+      if (!hasListeners) return;
+      _saveStatus = SaveStatus.idle;
+      notifyListeners();
+    }
+  }
+
+  @override
+  void dispose() {
+    if (_debounceTimer?.isActive ?? false) {
+      _debounceTimer!.cancel();
+      _saveToDatabase();
+    }
+    super.dispose();
+  }
+}

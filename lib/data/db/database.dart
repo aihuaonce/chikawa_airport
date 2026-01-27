@@ -12,6 +12,7 @@ import 'tables/medical_tables.dart';
 import 'dao/reference_dao.dart';
 import 'dao/medical_dao.dart';
 import 'dao/flight_dao.dart';
+import 'dao/incident_dao.dart';
 
 part 'database.g.dart';
 
@@ -34,7 +35,7 @@ part 'database.g.dart';
     FlightTransitLocations,
     IncidentRecord,
   ],
-  daos: [ReferenceDao, MedicalDao, FlightDao],
+  daos: [ReferenceDao, MedicalDao, FlightDao, IncidentDao],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());

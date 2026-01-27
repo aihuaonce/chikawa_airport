@@ -1,5 +1,5 @@
 import 'package:chikawa_airport/data/db/database.dart';
-import 'package:chikawa_airport/data/models/medical_view.dart';
+import 'package:chikawa_airport/data/models/medical/medical_view.dart';
 import 'package:chikawa_airport/data/models/reference_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

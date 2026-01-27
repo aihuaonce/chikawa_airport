@@ -1,5 +1,6 @@
 import 'package:chikawa_airport/data/db/database.dart';
-import 'package:chikawa_airport/data/models/medical_view.dart';
+import 'package:chikawa_airport/data/models/medical/medical_view.dart';
+import 'package:chikawa_airport/data/models/medical/incident_view.dart'; // 🔧 新增
 import 'package:chikawa_airport/data/models/reference_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -62,12 +63,25 @@ class _MedicalPageState extends State<MedicalPage> {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => MedicalViewModel(
-        context.read<AppDatabase>(),
-        context.read<ReferenceService>(),
-        widget.medicalId,
-      )..init(),
+    return MultiProvider(
+      providers: [
+        // MedicalViewModel：管理 Patient + Flight
+        ChangeNotifierProvider(
+          create: (context) => MedicalViewModel(
+            context.read<AppDatabase>(),
+            context.read<ReferenceService>(),
+            widget.medicalId,
+          )..init(),
+        ),
+        // IncidentViewModel：管理 Incident
+        ChangeNotifierProvider(
+          create: (context) => IncidentViewModel(
+            context.read<AppDatabase>(),
+            context.read<ReferenceService>(),
+            widget.medicalId,
+          )..init(),
+        ),
+      ],
       child: Scaffold(
         backgroundColor: bgLight,
         body: SafeArea(
@@ -81,7 +95,6 @@ class _MedicalPageState extends State<MedicalPage> {
                       setState(() => _currentSectionIndex = index),
                 ),
               ),
-
               Expanded(
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.symmetric(

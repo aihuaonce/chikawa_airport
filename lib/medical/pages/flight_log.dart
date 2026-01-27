@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../data/models/medical_view.dart';
+import '../../data/models/medical/medical_view.dart';
 import '../../data/db/database.dart';
 
 class FlightLog extends StatefulWidget {

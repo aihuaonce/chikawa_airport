@@ -3,8 +3,8 @@ import 'package:chikawa_airport/data/db/dao/flight_dao.dart';
 import 'package:flutter/material.dart';
 import 'package:drift/drift.dart';
 import 'package:flutter/foundation.dart';
-import '../db/database.dart';
-import 'reference_service.dart';
+import '../../db/database.dart';
+import '../reference_service.dart';
 
 enum SaveStatus { idle, saving, success }
 

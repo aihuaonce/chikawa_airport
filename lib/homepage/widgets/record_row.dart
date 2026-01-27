@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:chikawa_airport/data/models/reference_service.dart';
 import '../../data/db/database.dart';
-import '../../data/models/medical_view.dart';
+import '../../data/models/medical/medical_view.dart';
 import '../../medical/medical.dart';
 
 class RecordRow extends StatelessWidget {
