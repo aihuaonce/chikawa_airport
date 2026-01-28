@@ -14,4 +14,15 @@ mixin _$ReferenceDaoMixin on DatabaseAccessor<AppDatabase> {
   $IncidentPlaceCategory2Table get incidentPlaceCategory2 =>
       attachedDatabase.incidentPlaceCategory2;
   $ReportingUnitTable get reportingUnit => attachedDatabase.reportingUnit;
+  $ChiefComplaintTypeTable get chiefComplaintType =>
+      attachedDatabase.chiefComplaintType;
+  $DiagnosisCategoryTable get diagnosisCategory =>
+      attachedDatabase.diagnosisCategory;
+  $TriageLevelTable get triageLevel => attachedDatabase.triageLevel;
+  $TreatmentOnSiteTable get treatmentOnSite => attachedDatabase.treatmentOnSite;
+  $TreatmentResultTable get treatmentResult => attachedDatabase.treatmentResult;
+  $ReferralHospitalTable get referralHospital =>
+      attachedDatabase.referralHospital;
+  $ActionItemTable get actionItem => attachedDatabase.actionItem;
+  $MedicalStaffTable get medicalStaff => attachedDatabase.medicalStaff;
 }

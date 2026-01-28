@@ -14,7 +14,6 @@ class _MedicalFeesState extends State<MedicalFees> {
   static const Color textDark = Color(0xFF1E293B);
   static const Color textMuted = Color(0xFF64748B);
   static const Color borderColor = Color(0xFFE2E8F0);
-  static const Color bgField = Color(0xFFF9FBFC);
 
   String _paymentMethod = '自付';
   double _consultFee = 0;

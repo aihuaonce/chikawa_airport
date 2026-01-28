@@ -13,6 +13,7 @@ import 'dao/reference_dao.dart';
 import 'dao/medical_dao.dart';
 import 'dao/flight_dao.dart';
 import 'dao/incident_dao.dart';
+import 'dao/treatment_dao.dart';
 
 part 'database.g.dart';
 
@@ -27,6 +28,14 @@ part 'database.g.dart';
     IncidentPlaceCategory,
     IncidentPlaceCategory2,
     ReportingUnit,
+    ChiefComplaintType,
+    DiagnosisCategory,
+    TriageLevel,
+    TreatmentOnSite,
+    TreatmentResult,
+    ReferralHospital,
+    ActionItem,
+    MedicalStaff,
 
     //醫療表
     MedicalRecord,
@@ -34,8 +43,16 @@ part 'database.g.dart';
     FlightRecord,
     FlightTransitLocations,
     IncidentRecord,
+    ChiefComplaint,
+    HealthAssessmentForm,
+    MedicalMedia,
+    MedicalAssessment,
+    MedicalHistory,
+    Treatment,
+    MedicalStaffAssignment,
+    SpecialNotes,
   ],
-  daos: [ReferenceDao, MedicalDao, FlightDao, IncidentDao],
+  daos: [ReferenceDao, MedicalDao, FlightDao, IncidentDao, TreatmentDao],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
