@@ -10,25 +10,20 @@ class MedicalFees extends StatefulWidget {
 }
 
 class _MedicalFeesState extends State<MedicalFees> {
-  // 樣式顏色定義
   static const Color primaryColor = Color(0xFF007A8A);
   static const Color textDark = Color(0xFF1E293B);
   static const Color textMuted = Color(0xFF64748B);
   static const Color borderColor = Color(0xFFE2E8F0);
   static const Color bgField = Color(0xFFF9FBFC);
 
-  // --- 狀態變數 ---
-  String _paymentMethod = '自付'; // 自付, 統一請款, 總院會核代收, 收費異常
-
-  // 費用相關 (預設皆為 0)
+  String _paymentMethod = '自付';
   double _consultFee = 0;
   double _ambulanceFee = 0;
-
-  // 動態欄位狀態
   String _selfPayType = '現金';
   String _collectionStatus = '尚未收款';
   String _currency = '台幣';
   bool _receiptIssued = false;
+  bool _userAgreed = false;
 
   @override
   Widget build(BuildContext context) {
@@ -37,19 +32,20 @@ class _MedicalFeesState extends State<MedicalFees> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // 1. 付款方式主切換
         _buildLabel('付款方式 Payment Method'),
         const SizedBox(height: 8),
         _buildMainPaymentMethodSelector(),
-
         const SizedBox(height: 16),
 
-        // 2. 條件欄位 (收款狀態或自付方式) - 依需求移至此處
+        // 狀態/類型切換
         _buildDynamicConditionSection(),
+
+        // 根據付款方式出現的額外資訊 (修正：若無內容則不佔空間)
+        _buildExtraInfoFields(),
 
         const SizedBox(height: 24),
 
-        // 3. 費用輸入區域
+        // 費用輸入
         Row(
           children: [
             Expanded(
@@ -71,57 +67,36 @@ class _MedicalFeesState extends State<MedicalFees> {
             ),
           ],
         ),
-
         const SizedBox(height: 24),
 
-        // 4. 總費用顯示
         _buildLabel('總費用 Total Amount'),
         const SizedBox(height: 8),
         _buildTotalAmountBadge(totalAmount),
-
         const SizedBox(height: 24),
 
-        // 5. 根據付款方式出現的額外資訊欄位 (申請人、收據、異常原因等)
-        if (_paymentMethod != '自付') _buildExtraInfoFields(),
-
-        const SizedBox(height: 24),
-
-        // 6. 收費備註
         _buildFieldWrapper(
           '收費備註 Fee Remarks',
           _buildTextField(hint: '請輸入收費相關備註...', maxLines: 3),
         ),
-
         const SizedBox(height: 24),
 
-        // 7. 同意聲明
         _buildConsentBox(),
-
         const SizedBox(height: 32),
 
-        // 8. 雙簽名區域
         Row(
           children: [
             Expanded(
-              child: _buildSignatureSection(
-                '同意人簽名/身分 Consenter Signature/Identity',
-              ),
+              child: _buildSignatureSection('同意人簽名 Consenter Signature'),
             ),
             const SizedBox(width: 24),
-            Expanded(
-              child: _buildSignatureSection(
-                '見證人簽名/身分 Witness Signature/Identity',
-              ),
-            ),
+            Expanded(child: _buildSignatureSection('見證人簽名 Witness Signature')),
           ],
         ),
-
         const SizedBox(height: 60),
       ],
     );
   }
 
-  // --- 動態區塊處理 ---
   Widget _buildDynamicConditionSection() {
     switch (_paymentMethod) {
       case '自付':
@@ -158,76 +133,258 @@ class _MedicalFeesState extends State<MedicalFees> {
   }
 
   Widget _buildExtraInfoFields() {
-    return Column(
-      children: [
-        Row(
-          children: [
-            Expanded(
-              child: _buildFieldWrapper(
-                '選擇貨幣 Currency',
-                _buildDropdownField(_currency, [
-                  '台幣',
-                  '美金',
-                  '人民幣',
-                  '日幣',
-                  '加幣',
-                ], (v) => setState(() => _currency = v!)),
-              ),
-            ),
-            const SizedBox(width: 16),
-            if (_paymentMethod == '統一請款') ...[
-              Expanded(
-                child: _buildFieldWrapper(
-                  '申請人 Applicant',
-                  _buildTextField(hint: '輸入姓名'),
-                ),
-              ),
-            ] else if (_paymentMethod == '總院會核代收') ...[
-              Expanded(child: _buildReceiptIssuedToggle()),
-            ] else ...[
-              Expanded(child: const SizedBox()),
-            ],
-          ],
-        ),
-        if (_paymentMethod == '統一請款') ...[
-          const SizedBox(height: 16),
+    bool showCurrency =
+        (_paymentMethod == '自付' && _selfPayType == '現金') ||
+        (_paymentMethod != '自付');
+
+    // 如果沒有任何額外資訊要顯示，直接回傳空元件，避免產生 SizedBox 的間距
+    if (!showCurrency && _paymentMethod == '自付') return const SizedBox();
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 24), // 統一在此處處理與上方動態區塊的間距
+      child: Column(
+        children: [
           Row(
+            crossAxisAlignment: CrossAxisAlignment.end, // 確保底部對齊
             children: [
-              Expanded(
-                child: _buildFieldWrapper(
-                  '申請單位 Unit',
-                  _buildTextField(hint: '輸入單位名稱'),
+              if (showCurrency)
+                Expanded(
+                  child: _buildFieldWrapper(
+                    '選擇貨幣 Currency',
+                    _buildDropdownField(_currency, [
+                      '台幣',
+                      '美金',
+                      '人民幣',
+                      '日幣',
+                      '加幣',
+                    ], (v) => setState(() => _currency = v!)),
+                  ),
                 ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _buildFieldWrapper(
-                  '聯絡電話 Phone',
-                  _buildTextField(hint: '輸入聯絡電話'),
-                ),
-              ),
+              if (showCurrency &&
+                  (_paymentMethod == '統一請款' || _paymentMethod == '總院會核代收'))
+                const SizedBox(width: 16),
+
+              if (_paymentMethod == '統一請款')
+                Expanded(
+                  child: _buildFieldWrapper(
+                    '申請人 Applicant',
+                    _buildTextField(hint: '輸入姓名'),
+                  ),
+                )
+              else if (_paymentMethod == '總院會核代收')
+                Expanded(child: _buildReceiptIssuedToggle()) // 這裡已修正對齊
+              else if (showCurrency && _paymentMethod != '自付')
+                Expanded(child: const SizedBox()),
             ],
           ),
+          if (_paymentMethod == '統一請款') ...[
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: _buildFieldWrapper(
+                    '申請單位 Unit',
+                    _buildTextField(hint: '輸入單位名稱'),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: _buildFieldWrapper(
+                    '聯絡電話 Phone',
+                    _buildTextField(hint: '輸入聯絡電話'),
+                  ),
+                ),
+              ],
+            ),
+          ],
+          if (_paymentMethod == '總院會核代收') ...[
+            const SizedBox(height: 16),
+            _buildFieldWrapper(
+              '急診櫃檯簽收框 Counter Receipt',
+              _buildSignaturePad('Emergency Counter Signature Area'),
+            ),
+          ],
+          if (_paymentMethod == '收費異常') ...[
+            const SizedBox(height: 16),
+            _buildFieldWrapper(
+              '收費異常原因 Reason',
+              _buildTextField(hint: '請說明收費異常原因...', maxLines: 2),
+            ),
+          ],
         ],
-        if (_paymentMethod == '總院會核代收') ...[
-          const SizedBox(height: 16),
-          _buildFieldWrapper(
-            '急診櫃檯簽收框 Counter Receipt',
-            _buildSignaturePad('Emergency Counter Signature Area'),
-          ),
-        ],
-        if (_paymentMethod == '收費異常') ...[
-          const SizedBox(height: 16),
-          _buildFieldWrapper(
-            '收費異常原因 Reason',
-            _buildTextField(hint: '請說明收費異常原因...', maxLines: 2),
-          ),
-        ],
-      ],
+      ),
     );
   }
 
-  // --- UI 組件實作 ---
+  // 修正對齊問題的收據勾選組件
+  Widget _buildReceiptIssuedToggle() {
+    return InkWell(
+      onTap: () => setState(() => _receiptIssued = !_receiptIssued),
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        height: 44, // 固定的 44px
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        decoration: BoxDecoration(
+          color: _receiptIssued
+              ? primaryColor.withValues(alpha: 0.05)
+              : Colors.white,
+          border: Border.all(
+            color: _receiptIssued ? primaryColor : borderColor,
+          ),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center, // 核心修正：垂直置中
+          children: [
+            Icon(
+              _receiptIssued ? Icons.check_box : Icons.check_box_outline_blank,
+              color: primaryColor,
+              size: 20,
+            ),
+            const SizedBox(width: 8),
+            const Text(
+              '已開立收據並轉交',
+              style: TextStyle(
+                color: textDark,
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTotalAmountBadge(double amount) {
+    return Container(
+      height: 54,
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      decoration: BoxDecoration(
+        color: primaryColor.withValues(alpha: 0.05),
+        border: Border.all(color: primaryColor.withValues(alpha: 0.2)),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          const Text(
+            'TWD\$',
+            style: TextStyle(
+              color: primaryColor,
+              fontSize: 14,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            amount.toStringAsFixed(0),
+            style: const TextStyle(
+              color: primaryColor,
+              fontSize: 28,
+              fontWeight: FontWeight.w900,
+              fontFamily: 'monospace',
+              height: 1.0,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // --- 其餘輔助組件保持不變 ---
+  Widget _buildLabel(String text) => Text(
+    text,
+    style: const TextStyle(
+      color: textMuted,
+      fontSize: 11,
+      fontWeight: FontWeight.bold,
+      letterSpacing: 0.5,
+    ),
+  );
+
+  Widget _buildTextField({required String hint, int maxLines = 1}) {
+    return TextField(
+      maxLines: maxLines,
+      style: const TextStyle(fontSize: 14),
+      decoration: InputDecoration(
+        hintText: hint,
+        hintStyle: TextStyle(
+          color: textMuted.withValues(alpha: 0.4),
+          fontSize: 13,
+        ),
+        filled: true,
+        fillColor: Colors.white,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 12,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: borderColor),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: primaryColor, width: 1.5),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMainPaymentMethodSelector() {
+    final List<String> methods = ['自付', '統一請款', '總院會核代收', '收費異常'];
+    return Container(
+      height: 48,
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF1F5F9), // 淺灰色背景軌道
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: methods.map((m) {
+          bool isSel = _paymentMethod == m;
+          return Expanded(
+            child: GestureDetector(
+              onTap: () => setState(() {
+                _paymentMethod = m;
+                // 安全檢查：若切換到總院代收，收款狀態不能是「不需要」
+                if (m == '總院會核代收' && _collectionStatus == '不需要') {
+                  _collectionStatus = '尚未收款';
+                }
+              }),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: isSel ? primaryColor : Colors.transparent,
+                  borderRadius: BorderRadius.circular(8),
+                  boxShadow: isSel
+                      ? [
+                          BoxShadow(
+                            color: primaryColor.withValues(alpha: 0.2),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
+                        ]
+                      : [],
+                ),
+                child: Text(
+                  m,
+                  style: TextStyle(
+                    color: isSel ? Colors.white : textMuted,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
 
   Widget _buildNumberField({required Function(double) onChanged}) {
     return SizedBox(
@@ -266,84 +423,69 @@ class _MedicalFeesState extends State<MedicalFees> {
     );
   }
 
-  // 總計 Badge 修正
-  Widget _buildTotalAmountBadge(double amount) {
+  Widget _buildDropdownField(
+    String value,
+    List<String> items,
+    Function(String?) onChanged,
+  ) {
     return Container(
-      height: 54,
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      height: 44,
+      padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
-        color: primaryColor.withValues(alpha: 0.05),
-        border: Border.all(color: primaryColor.withValues(alpha: 0.2)),
+        color: Colors.white,
+        border: Border.all(color: borderColor),
         borderRadius: BorderRadius.circular(8),
       ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center, // 改為 center 解決跑版
-        children: [
-          const Text(
-            'TWD\$',
-            style: TextStyle(
-              color: primaryColor,
-              fontSize: 14,
-              fontWeight: FontWeight.w900,
-            ),
-          ),
-          const SizedBox(width: 8),
-          Text(
-            amount.toStringAsFixed(0),
-            style: const TextStyle(
-              color: primaryColor,
-              fontSize: 28,
-              fontWeight: FontWeight.w900,
-              fontFamily: 'monospace',
-              height: 1.0, // 強制行高 1.0 防止文字內部溢出偏上
-            ),
-          ),
-        ],
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<String>(
+          value: value,
+          isExpanded: true,
+          items: items
+              .map(
+                (s) => DropdownMenuItem(
+                  value: s,
+                  child: Text(
+                    s,
+                    style: const TextStyle(fontSize: 14, color: textDark),
+                  ),
+                ),
+              )
+              .toList(),
+          onChanged: onChanged,
+        ),
       ),
     );
   }
 
-  Widget _buildMainPaymentMethodSelector() {
-    final List<String> methods = ['自付', '統一請款', '總院會核代收', '收費異常'];
+  Widget _buildSegmentedControl(
+    List<String> options,
+    String current,
+    Function(String) onSelect,
+  ) {
     return Container(
-      height: 48,
+      height: 44,
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
         color: const Color(0xFFF1F5F9),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
-        children: methods.map((m) {
-          bool isSel = _paymentMethod == m;
+        children: options.map((opt) {
+          bool isSel = current == opt;
           return Expanded(
             child: GestureDetector(
-              onTap: () => setState(() {
-                _paymentMethod = m;
-                if (m == '總院會核代收' && _collectionStatus == '不需要')
-                  _collectionStatus = '尚未收款';
-              }),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
+              onTap: () => onSelect(opt),
+              child: Container(
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
                   color: isSel ? primaryColor : Colors.transparent,
-                  borderRadius: BorderRadius.circular(8),
-                  boxShadow: isSel
-                      ? [
-                          BoxShadow(
-                            color: primaryColor.withValues(alpha: 0.2),
-                            blurRadius: 4,
-                            offset: const Offset(0, 2),
-                          ),
-                        ]
-                      : [],
+                  borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
-                  m,
+                  opt,
                   style: TextStyle(
                     color: isSel ? Colors.white : textMuted,
-                    fontSize: 12,
+                    fontSize: 11,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -409,180 +551,53 @@ class _MedicalFeesState extends State<MedicalFees> {
     );
   }
 
-  Widget _buildReceiptIssuedToggle() {
+  Widget _buildConsentBox() {
+    Color activeCol = _userAgreed ? primaryColor : Colors.grey;
     return InkWell(
-      onTap: () => setState(() => _receiptIssued = !_receiptIssued),
-      child: Container(
-        height: 44,
-        padding: const EdgeInsets.symmetric(horizontal: 12),
+      onTap: () => setState(() => _userAgreed = !_userAgreed),
+      borderRadius: BorderRadius.circular(12),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: _receiptIssued
-              ? primaryColor.withValues(alpha: 0.05)
-              : Colors.white,
-          border: Border.all(
-            color: _receiptIssued ? primaryColor : borderColor,
-          ),
-          borderRadius: BorderRadius.circular(8),
+          color: activeCol.withValues(alpha: 0.05),
+          border: Border.all(color: activeCol.withValues(alpha: 0.2)),
+          borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
           children: [
             Icon(
-              _receiptIssued ? Icons.check_box : Icons.check_box_outline_blank,
-              color: primaryColor,
-              size: 20,
+              _userAgreed ? Icons.check_circle : Icons.radio_button_unchecked,
+              color: activeCol,
+              size: 24,
             ),
-            const SizedBox(width: 8),
-            const Text(
-              '已開立收據並轉交',
-              style: TextStyle(
-                color: textDark,
-                fontSize: 13,
-                fontWeight: FontWeight.bold,
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '了解醫護人員說明需醫療收費之緣由且同意',
+                    style: TextStyle(
+                      color: activeCol,
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    'I understand the explanation of the medical charges and agree to them.',
+                    style: TextStyle(
+                      color: activeCol.withValues(alpha: 0.7),
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  // --- 輔助共用件 ---
-
-  Widget _buildLabel(String text) => Text(
-    text,
-    style: const TextStyle(
-      color: textMuted,
-      fontSize: 11,
-      fontWeight: FontWeight.bold,
-      letterSpacing: 0.5,
-    ),
-  );
-
-  Widget _buildTextField({required String hint, int maxLines = 1}) {
-    return TextField(
-      maxLines: maxLines,
-      style: const TextStyle(fontSize: 14),
-      decoration: InputDecoration(
-        hintText: hint,
-        hintStyle: TextStyle(
-          color: textMuted.withValues(alpha: 0.4),
-          fontSize: 13,
-        ),
-        filled: true,
-        fillColor: Colors.white,
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 12,
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: borderColor),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: primaryColor, width: 1.5),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDropdownField(
-    String value,
-    List<String> items,
-    Function(String?) onChanged,
-  ) {
-    return Container(
-      height: 44,
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: borderColor),
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<String>(
-          value: value,
-          isExpanded: true,
-          items: items
-              .map(
-                (s) => DropdownMenuItem(
-                  value: s,
-                  child: Text(
-                    s,
-                    style: const TextStyle(fontSize: 14, color: textDark),
-                  ),
-                ),
-              )
-              .toList(),
-          onChanged: onChanged,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSegmentedControl(
-    List<String> options,
-    String current,
-    Function(String) onSelect,
-  ) {
-    return Container(
-      height: 44,
-      padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF1F5F9),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Row(
-        children: options.map((opt) {
-          bool isSel = current == opt;
-          return Expanded(
-            child: GestureDetector(
-              onTap: () => onSelect(opt),
-              child: Container(
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: isSel ? primaryColor : Colors.transparent,
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Text(
-                  opt,
-                  style: TextStyle(
-                    color: isSel ? Colors.white : textMuted,
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
-          );
-        }).toList(),
-      ),
-    );
-  }
-
-  Widget _buildConsentBox() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: primaryColor.withValues(alpha: 0.05),
-        border: Border.all(color: primaryColor.withValues(alpha: 0.1)),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        children: [
-          const Icon(Icons.check_circle, color: primaryColor, size: 24),
-          const SizedBox(width: 12),
-          const Expanded(
-            child: Text(
-              '了解醫護人員說明需醫療收費之緣由且同意',
-              style: TextStyle(
-                color: primaryColor,
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -594,8 +609,6 @@ class _MedicalFeesState extends State<MedicalFees> {
         _buildLabel(label),
         const SizedBox(height: 8),
         _buildSignaturePad('Digital Signature Area'),
-        const SizedBox(height: 8),
-        _buildTextField(hint: '請輸入身分 / 關係'),
       ],
     );
   }
