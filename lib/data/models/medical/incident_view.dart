@@ -16,7 +16,7 @@ class IncidentViewModel extends ChangeNotifier {
   IncidentRecordData? _incidentCache;
   IncidentRecordData? get incidentRecord => _incidentCache;
 
-  // 🔧 修正：二級地點改為動態載入，不從 refService 快取
+  // 二級地點動態載入
   List<IncidentPlaceCategory2Data> _currentCategory2Options = [];
   List<IncidentPlaceCategory2Data> get currentCategory2Options =>
       _currentCategory2Options;
@@ -43,7 +43,7 @@ class IncidentViewModel extends ChangeNotifier {
       _incidentCache = await db.incidentDao.getByMedicalId(medicalId);
     }
 
-    // 🔧 新增：如果已有一級地點，載入對應的二級地點
+    // 如果已有一級地點，載入對應的二級地點
     if (_incidentCache != null) {
       await _loadCategory2Options(_incidentCache!.incidentPlaceCategoryId);
     }
@@ -51,7 +51,7 @@ class IncidentViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  // 🔧 新增：載入二級地點選項的方法
+  // 載入二級地點選項
   Future<void> _loadCategory2Options(int categoryId) async {
     try {
       _currentCategory2Options = await refService.getCategory2ByParent(
@@ -78,7 +78,8 @@ class IncidentViewModel extends ChangeNotifier {
         incidentDate: DateTime.now(),
         incidentPlaceCategoryId: refService.incidentPlaceCategories.first.id,
         reportingUnitId: refService.reportingUnits.first.id,
-        beforeLanding: false, // ✅ 修正：直接傳 bool
+        beforeLanding: false,
+        occArrived: false,
       );
 
       debugPrint('系統:已建立預設事故記錄');
@@ -121,9 +122,39 @@ class IncidentViewModel extends ChangeNotifier {
     );
   }
 
+  // 接獲電話
+  void updateIncomingPhone(String? phone) {
+    if (_incidentCache == null) return;
+    _updateIncidentCacheAndSave(
+      _incidentCache!.copyWith(incomingPhone: Value(phone)),
+    );
+  }
+
+  // 通報 OCC 時間
+  void updateNotificationToOccTime(DateTime? time) {
+    if (_incidentCache == null) return;
+    _updateIncidentCacheAndSave(
+      _incidentCache!.copyWith(notificationToOccTime: Value(time)),
+    );
+  }
+
+  // 醫護出發時間
+  void updateTeamDepartureTime(DateTime? time) {
+    if (_incidentCache == null) return;
+    _updateIncidentCacheAndSave(
+      _incidentCache!.copyWith(teamDepartureTime: Value(time)),
+    );
+  }
+
+  // OCC 已到達
+  void updateOccArrived(bool arrived) {
+    if (_incidentCache == null) return;
+    _updateIncidentCacheAndSave(_incidentCache!.copyWith(occArrived: arrived));
+  }
+
   // === 地點資訊更新 ===
 
-  // 🔧 修正：更新一級地點時，同時載入對應的二級地點選項
+  // 更新一級地點時，同時載入對應的二級地點選項
   Future<void> updateIncidentPlaceCategoryId(int categoryId) async {
     if (_incidentCache == null) return;
 
@@ -170,6 +201,22 @@ class IncidentViewModel extends ChangeNotifier {
     );
   }
 
+  // 🆕 新增：醫護到達時間
+  void updateMedicalArrivalTime(DateTime? time) {
+    if (_incidentCache == null) return;
+    _updateIncidentCacheAndSave(
+      _incidentCache!.copyWith(medicalArrivalTime: Value(time)),
+    );
+  }
+
+  // 🆕 新增：檢查時間
+  void updateExaminationTime(DateTime? time) {
+    if (_incidentCache == null) return;
+    _updateIncidentCacheAndSave(
+      _incidentCache!.copyWith(examinationTime: Value(time)),
+    );
+  }
+
   // === 查詢輔助方法 ===
   IncidentPlaceCategoryData? getPlaceCategoryById(int? id) {
     if (id == null) return null;
@@ -180,7 +227,7 @@ class IncidentViewModel extends ChangeNotifier {
     }
   }
 
-  // 🔧 修正：從當前載入的二級選項中查詢
+  // 從當前載入的二級選項中查詢
   IncidentPlaceCategory2Data? getPlaceCategory2ById(int? id) {
     if (id == null) return null;
     try {
@@ -198,11 +245,6 @@ class IncidentViewModel extends ChangeNotifier {
       return null;
     }
   }
-
-  // 🔧 移除：不再需要這個方法，因為二級選項已經在 _currentCategory2Options 中
-  // List<IncidentPlaceCategory2Data> getCategory2OptionsForCategory(int categoryId) {
-  //   return _currentCategory2Options;
-  // }
 
   // === 延遲存檔邏輯 ===
   void _autoSave() {

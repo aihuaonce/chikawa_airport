@@ -47,6 +47,7 @@ class IncidentDao extends DatabaseAccessor<AppDatabase>
     required int reportingUnitId,
 
     required bool beforeLanding,
+    required bool occArrived,
     DateTime? landingTime,
   }) {
     return into(incidentRecord).insert(
@@ -61,6 +62,7 @@ class IncidentDao extends DatabaseAccessor<AppDatabase>
         reportingUnitId: reportingUnitId,
         beforeLanding: Value(beforeLanding),
         landingTime: Value(landingTime),
+        occArrived: Value(occArrived),
       ),
     );
   }

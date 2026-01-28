@@ -82,40 +82,26 @@ class FlightTransitLocations extends Table {
 
 //事件紀錄表
 class IncidentRecord extends Table {
-  IntColumn get incidentId =>
-      integer().autoIncrement()();
-
-  IntColumn get medicalId =>
-      integer()
-          .references(MedicalRecord, #medicalId)();
-  DateTimeColumn get incidentDate =>
-      dateTime()();
-
+  IntColumn get incidentId => integer().autoIncrement()();
+  IntColumn get medicalId => integer().references(MedicalRecord, #medicalId)();
+  DateTimeColumn get incidentDate => dateTime()();
   IntColumn get incidentPlaceCategoryId =>
-      integer()
-          .references(IncidentPlaceCategory, #id)();
-
+      integer().references(IncidentPlaceCategory, #id)();
   IntColumn get incidentPlaceCategory2Id =>
-      integer()
-          .references(IncidentPlaceCategory2, #id)
-          .nullable()();
+      integer().references(IncidentPlaceCategory2, #id).nullable()();
+  TextColumn get incidentPlaceFinal => text().nullable()();
+  DateTimeColumn get notificationTime => dateTime().nullable()();
+  TextColumn get notificationPerson => text().nullable()();
+  IntColumn get reportingUnitId => integer().references(ReportingUnit, #id)();
 
-  TextColumn get incidentPlaceFinal =>
-      text().nullable()();
-
-  DateTimeColumn get notificationTime =>
-      dateTime().nullable()();
-
-  TextColumn get notificationPerson =>
-      text().nullable()();
-
-  IntColumn get reportingUnitId =>
-      integer()
-          .references(ReportingUnit, #id)();
+  TextColumn get incomingPhone => text().nullable()();
+  DateTimeColumn get notificationToOccTime => dateTime().nullable()();
+  DateTimeColumn get teamDepartureTime => dateTime().nullable()();
+  BoolColumn get occArrived => boolean().withDefault(const Constant(false))();
 
   BoolColumn get beforeLanding =>
       boolean().withDefault(const Constant(false))();
-
-  DateTimeColumn get landingTime =>
-      dateTime().nullable()();
+  DateTimeColumn get landingTime => dateTime().nullable()();
+  DateTimeColumn get medicalArrivalTime => dateTime().nullable()();
+  DateTimeColumn get examinationTime => dateTime().nullable()();
 }

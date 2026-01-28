@@ -4340,6 +4340,55 @@ class $IncidentRecordTable extends IncidentRecord
       'REFERENCES reporting_unit (id)',
     ),
   );
+  static const VerificationMeta _incomingPhoneMeta = const VerificationMeta(
+    'incomingPhone',
+  );
+  @override
+  late final GeneratedColumn<String> incomingPhone = GeneratedColumn<String>(
+    'incoming_phone',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _notificationToOccTimeMeta =
+      const VerificationMeta('notificationToOccTime');
+  @override
+  late final GeneratedColumn<DateTime> notificationToOccTime =
+      GeneratedColumn<DateTime>(
+        'notification_to_occ_time',
+        aliasedName,
+        true,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _teamDepartureTimeMeta = const VerificationMeta(
+    'teamDepartureTime',
+  );
+  @override
+  late final GeneratedColumn<DateTime> teamDepartureTime =
+      GeneratedColumn<DateTime>(
+        'team_departure_time',
+        aliasedName,
+        true,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _occArrivedMeta = const VerificationMeta(
+    'occArrived',
+  );
+  @override
+  late final GeneratedColumn<bool> occArrived = GeneratedColumn<bool>(
+    'occ_arrived',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("occ_arrived" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
   static const VerificationMeta _beforeLandingMeta = const VerificationMeta(
     'beforeLanding',
   );
@@ -4366,6 +4415,29 @@ class $IncidentRecordTable extends IncidentRecord
     type: DriftSqlType.dateTime,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _medicalArrivalTimeMeta =
+      const VerificationMeta('medicalArrivalTime');
+  @override
+  late final GeneratedColumn<DateTime> medicalArrivalTime =
+      GeneratedColumn<DateTime>(
+        'medical_arrival_time',
+        aliasedName,
+        true,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _examinationTimeMeta = const VerificationMeta(
+    'examinationTime',
+  );
+  @override
+  late final GeneratedColumn<DateTime> examinationTime =
+      GeneratedColumn<DateTime>(
+        'examination_time',
+        aliasedName,
+        true,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+      );
   @override
   List<GeneratedColumn> get $columns => [
     incidentId,
@@ -4377,8 +4449,14 @@ class $IncidentRecordTable extends IncidentRecord
     notificationTime,
     notificationPerson,
     reportingUnitId,
+    incomingPhone,
+    notificationToOccTime,
+    teamDepartureTime,
+    occArrived,
     beforeLanding,
     landingTime,
+    medicalArrivalTime,
+    examinationTime,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -4475,6 +4553,39 @@ class $IncidentRecordTable extends IncidentRecord
     } else if (isInserting) {
       context.missing(_reportingUnitIdMeta);
     }
+    if (data.containsKey('incoming_phone')) {
+      context.handle(
+        _incomingPhoneMeta,
+        incomingPhone.isAcceptableOrUnknown(
+          data['incoming_phone']!,
+          _incomingPhoneMeta,
+        ),
+      );
+    }
+    if (data.containsKey('notification_to_occ_time')) {
+      context.handle(
+        _notificationToOccTimeMeta,
+        notificationToOccTime.isAcceptableOrUnknown(
+          data['notification_to_occ_time']!,
+          _notificationToOccTimeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('team_departure_time')) {
+      context.handle(
+        _teamDepartureTimeMeta,
+        teamDepartureTime.isAcceptableOrUnknown(
+          data['team_departure_time']!,
+          _teamDepartureTimeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('occ_arrived')) {
+      context.handle(
+        _occArrivedMeta,
+        occArrived.isAcceptableOrUnknown(data['occ_arrived']!, _occArrivedMeta),
+      );
+    }
     if (data.containsKey('before_landing')) {
       context.handle(
         _beforeLandingMeta,
@@ -4490,6 +4601,24 @@ class $IncidentRecordTable extends IncidentRecord
         landingTime.isAcceptableOrUnknown(
           data['landing_time']!,
           _landingTimeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('medical_arrival_time')) {
+      context.handle(
+        _medicalArrivalTimeMeta,
+        medicalArrivalTime.isAcceptableOrUnknown(
+          data['medical_arrival_time']!,
+          _medicalArrivalTimeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('examination_time')) {
+      context.handle(
+        _examinationTimeMeta,
+        examinationTime.isAcceptableOrUnknown(
+          data['examination_time']!,
+          _examinationTimeMeta,
         ),
       );
     }
@@ -4538,6 +4667,22 @@ class $IncidentRecordTable extends IncidentRecord
         DriftSqlType.int,
         data['${effectivePrefix}reporting_unit_id'],
       )!,
+      incomingPhone: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}incoming_phone'],
+      ),
+      notificationToOccTime: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}notification_to_occ_time'],
+      ),
+      teamDepartureTime: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}team_departure_time'],
+      ),
+      occArrived: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}occ_arrived'],
+      )!,
       beforeLanding: attachedDatabase.typeMapping.read(
         DriftSqlType.bool,
         data['${effectivePrefix}before_landing'],
@@ -4545,6 +4690,14 @@ class $IncidentRecordTable extends IncidentRecord
       landingTime: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}landing_time'],
+      ),
+      medicalArrivalTime: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}medical_arrival_time'],
+      ),
+      examinationTime: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}examination_time'],
       ),
     );
   }
@@ -4566,8 +4719,14 @@ class IncidentRecordData extends DataClass
   final DateTime? notificationTime;
   final String? notificationPerson;
   final int reportingUnitId;
+  final String? incomingPhone;
+  final DateTime? notificationToOccTime;
+  final DateTime? teamDepartureTime;
+  final bool occArrived;
   final bool beforeLanding;
   final DateTime? landingTime;
+  final DateTime? medicalArrivalTime;
+  final DateTime? examinationTime;
   const IncidentRecordData({
     required this.incidentId,
     required this.medicalId,
@@ -4578,8 +4737,14 @@ class IncidentRecordData extends DataClass
     this.notificationTime,
     this.notificationPerson,
     required this.reportingUnitId,
+    this.incomingPhone,
+    this.notificationToOccTime,
+    this.teamDepartureTime,
+    required this.occArrived,
     required this.beforeLanding,
     this.landingTime,
+    this.medicalArrivalTime,
+    this.examinationTime,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -4603,9 +4768,27 @@ class IncidentRecordData extends DataClass
       map['notification_person'] = Variable<String>(notificationPerson);
     }
     map['reporting_unit_id'] = Variable<int>(reportingUnitId);
+    if (!nullToAbsent || incomingPhone != null) {
+      map['incoming_phone'] = Variable<String>(incomingPhone);
+    }
+    if (!nullToAbsent || notificationToOccTime != null) {
+      map['notification_to_occ_time'] = Variable<DateTime>(
+        notificationToOccTime,
+      );
+    }
+    if (!nullToAbsent || teamDepartureTime != null) {
+      map['team_departure_time'] = Variable<DateTime>(teamDepartureTime);
+    }
+    map['occ_arrived'] = Variable<bool>(occArrived);
     map['before_landing'] = Variable<bool>(beforeLanding);
     if (!nullToAbsent || landingTime != null) {
       map['landing_time'] = Variable<DateTime>(landingTime);
+    }
+    if (!nullToAbsent || medicalArrivalTime != null) {
+      map['medical_arrival_time'] = Variable<DateTime>(medicalArrivalTime);
+    }
+    if (!nullToAbsent || examinationTime != null) {
+      map['examination_time'] = Variable<DateTime>(examinationTime);
     }
     return map;
   }
@@ -4629,10 +4812,26 @@ class IncidentRecordData extends DataClass
           ? const Value.absent()
           : Value(notificationPerson),
       reportingUnitId: Value(reportingUnitId),
+      incomingPhone: incomingPhone == null && nullToAbsent
+          ? const Value.absent()
+          : Value(incomingPhone),
+      notificationToOccTime: notificationToOccTime == null && nullToAbsent
+          ? const Value.absent()
+          : Value(notificationToOccTime),
+      teamDepartureTime: teamDepartureTime == null && nullToAbsent
+          ? const Value.absent()
+          : Value(teamDepartureTime),
+      occArrived: Value(occArrived),
       beforeLanding: Value(beforeLanding),
       landingTime: landingTime == null && nullToAbsent
           ? const Value.absent()
           : Value(landingTime),
+      medicalArrivalTime: medicalArrivalTime == null && nullToAbsent
+          ? const Value.absent()
+          : Value(medicalArrivalTime),
+      examinationTime: examinationTime == null && nullToAbsent
+          ? const Value.absent()
+          : Value(examinationTime),
     );
   }
 
@@ -4661,8 +4860,20 @@ class IncidentRecordData extends DataClass
         json['notificationPerson'],
       ),
       reportingUnitId: serializer.fromJson<int>(json['reportingUnitId']),
+      incomingPhone: serializer.fromJson<String?>(json['incomingPhone']),
+      notificationToOccTime: serializer.fromJson<DateTime?>(
+        json['notificationToOccTime'],
+      ),
+      teamDepartureTime: serializer.fromJson<DateTime?>(
+        json['teamDepartureTime'],
+      ),
+      occArrived: serializer.fromJson<bool>(json['occArrived']),
       beforeLanding: serializer.fromJson<bool>(json['beforeLanding']),
       landingTime: serializer.fromJson<DateTime?>(json['landingTime']),
+      medicalArrivalTime: serializer.fromJson<DateTime?>(
+        json['medicalArrivalTime'],
+      ),
+      examinationTime: serializer.fromJson<DateTime?>(json['examinationTime']),
     );
   }
   @override
@@ -4682,8 +4893,16 @@ class IncidentRecordData extends DataClass
       'notificationTime': serializer.toJson<DateTime?>(notificationTime),
       'notificationPerson': serializer.toJson<String?>(notificationPerson),
       'reportingUnitId': serializer.toJson<int>(reportingUnitId),
+      'incomingPhone': serializer.toJson<String?>(incomingPhone),
+      'notificationToOccTime': serializer.toJson<DateTime?>(
+        notificationToOccTime,
+      ),
+      'teamDepartureTime': serializer.toJson<DateTime?>(teamDepartureTime),
+      'occArrived': serializer.toJson<bool>(occArrived),
       'beforeLanding': serializer.toJson<bool>(beforeLanding),
       'landingTime': serializer.toJson<DateTime?>(landingTime),
+      'medicalArrivalTime': serializer.toJson<DateTime?>(medicalArrivalTime),
+      'examinationTime': serializer.toJson<DateTime?>(examinationTime),
     };
   }
 
@@ -4697,8 +4916,14 @@ class IncidentRecordData extends DataClass
     Value<DateTime?> notificationTime = const Value.absent(),
     Value<String?> notificationPerson = const Value.absent(),
     int? reportingUnitId,
+    Value<String?> incomingPhone = const Value.absent(),
+    Value<DateTime?> notificationToOccTime = const Value.absent(),
+    Value<DateTime?> teamDepartureTime = const Value.absent(),
+    bool? occArrived,
     bool? beforeLanding,
     Value<DateTime?> landingTime = const Value.absent(),
+    Value<DateTime?> medicalArrivalTime = const Value.absent(),
+    Value<DateTime?> examinationTime = const Value.absent(),
   }) => IncidentRecordData(
     incidentId: incidentId ?? this.incidentId,
     medicalId: medicalId ?? this.medicalId,
@@ -4718,8 +4943,24 @@ class IncidentRecordData extends DataClass
         ? notificationPerson.value
         : this.notificationPerson,
     reportingUnitId: reportingUnitId ?? this.reportingUnitId,
+    incomingPhone: incomingPhone.present
+        ? incomingPhone.value
+        : this.incomingPhone,
+    notificationToOccTime: notificationToOccTime.present
+        ? notificationToOccTime.value
+        : this.notificationToOccTime,
+    teamDepartureTime: teamDepartureTime.present
+        ? teamDepartureTime.value
+        : this.teamDepartureTime,
+    occArrived: occArrived ?? this.occArrived,
     beforeLanding: beforeLanding ?? this.beforeLanding,
     landingTime: landingTime.present ? landingTime.value : this.landingTime,
+    medicalArrivalTime: medicalArrivalTime.present
+        ? medicalArrivalTime.value
+        : this.medicalArrivalTime,
+    examinationTime: examinationTime.present
+        ? examinationTime.value
+        : this.examinationTime,
   );
   IncidentRecordData copyWithCompanion(IncidentRecordCompanion data) {
     return IncidentRecordData(
@@ -4748,12 +4989,30 @@ class IncidentRecordData extends DataClass
       reportingUnitId: data.reportingUnitId.present
           ? data.reportingUnitId.value
           : this.reportingUnitId,
+      incomingPhone: data.incomingPhone.present
+          ? data.incomingPhone.value
+          : this.incomingPhone,
+      notificationToOccTime: data.notificationToOccTime.present
+          ? data.notificationToOccTime.value
+          : this.notificationToOccTime,
+      teamDepartureTime: data.teamDepartureTime.present
+          ? data.teamDepartureTime.value
+          : this.teamDepartureTime,
+      occArrived: data.occArrived.present
+          ? data.occArrived.value
+          : this.occArrived,
       beforeLanding: data.beforeLanding.present
           ? data.beforeLanding.value
           : this.beforeLanding,
       landingTime: data.landingTime.present
           ? data.landingTime.value
           : this.landingTime,
+      medicalArrivalTime: data.medicalArrivalTime.present
+          ? data.medicalArrivalTime.value
+          : this.medicalArrivalTime,
+      examinationTime: data.examinationTime.present
+          ? data.examinationTime.value
+          : this.examinationTime,
     );
   }
 
@@ -4769,8 +5028,14 @@ class IncidentRecordData extends DataClass
           ..write('notificationTime: $notificationTime, ')
           ..write('notificationPerson: $notificationPerson, ')
           ..write('reportingUnitId: $reportingUnitId, ')
+          ..write('incomingPhone: $incomingPhone, ')
+          ..write('notificationToOccTime: $notificationToOccTime, ')
+          ..write('teamDepartureTime: $teamDepartureTime, ')
+          ..write('occArrived: $occArrived, ')
           ..write('beforeLanding: $beforeLanding, ')
-          ..write('landingTime: $landingTime')
+          ..write('landingTime: $landingTime, ')
+          ..write('medicalArrivalTime: $medicalArrivalTime, ')
+          ..write('examinationTime: $examinationTime')
           ..write(')'))
         .toString();
   }
@@ -4786,8 +5051,14 @@ class IncidentRecordData extends DataClass
     notificationTime,
     notificationPerson,
     reportingUnitId,
+    incomingPhone,
+    notificationToOccTime,
+    teamDepartureTime,
+    occArrived,
     beforeLanding,
     landingTime,
+    medicalArrivalTime,
+    examinationTime,
   );
   @override
   bool operator ==(Object other) =>
@@ -4802,8 +5073,14 @@ class IncidentRecordData extends DataClass
           other.notificationTime == this.notificationTime &&
           other.notificationPerson == this.notificationPerson &&
           other.reportingUnitId == this.reportingUnitId &&
+          other.incomingPhone == this.incomingPhone &&
+          other.notificationToOccTime == this.notificationToOccTime &&
+          other.teamDepartureTime == this.teamDepartureTime &&
+          other.occArrived == this.occArrived &&
           other.beforeLanding == this.beforeLanding &&
-          other.landingTime == this.landingTime);
+          other.landingTime == this.landingTime &&
+          other.medicalArrivalTime == this.medicalArrivalTime &&
+          other.examinationTime == this.examinationTime);
 }
 
 class IncidentRecordCompanion extends UpdateCompanion<IncidentRecordData> {
@@ -4816,8 +5093,14 @@ class IncidentRecordCompanion extends UpdateCompanion<IncidentRecordData> {
   final Value<DateTime?> notificationTime;
   final Value<String?> notificationPerson;
   final Value<int> reportingUnitId;
+  final Value<String?> incomingPhone;
+  final Value<DateTime?> notificationToOccTime;
+  final Value<DateTime?> teamDepartureTime;
+  final Value<bool> occArrived;
   final Value<bool> beforeLanding;
   final Value<DateTime?> landingTime;
+  final Value<DateTime?> medicalArrivalTime;
+  final Value<DateTime?> examinationTime;
   const IncidentRecordCompanion({
     this.incidentId = const Value.absent(),
     this.medicalId = const Value.absent(),
@@ -4828,8 +5111,14 @@ class IncidentRecordCompanion extends UpdateCompanion<IncidentRecordData> {
     this.notificationTime = const Value.absent(),
     this.notificationPerson = const Value.absent(),
     this.reportingUnitId = const Value.absent(),
+    this.incomingPhone = const Value.absent(),
+    this.notificationToOccTime = const Value.absent(),
+    this.teamDepartureTime = const Value.absent(),
+    this.occArrived = const Value.absent(),
     this.beforeLanding = const Value.absent(),
     this.landingTime = const Value.absent(),
+    this.medicalArrivalTime = const Value.absent(),
+    this.examinationTime = const Value.absent(),
   });
   IncidentRecordCompanion.insert({
     this.incidentId = const Value.absent(),
@@ -4841,8 +5130,14 @@ class IncidentRecordCompanion extends UpdateCompanion<IncidentRecordData> {
     this.notificationTime = const Value.absent(),
     this.notificationPerson = const Value.absent(),
     required int reportingUnitId,
+    this.incomingPhone = const Value.absent(),
+    this.notificationToOccTime = const Value.absent(),
+    this.teamDepartureTime = const Value.absent(),
+    this.occArrived = const Value.absent(),
     this.beforeLanding = const Value.absent(),
     this.landingTime = const Value.absent(),
+    this.medicalArrivalTime = const Value.absent(),
+    this.examinationTime = const Value.absent(),
   }) : medicalId = Value(medicalId),
        incidentDate = Value(incidentDate),
        incidentPlaceCategoryId = Value(incidentPlaceCategoryId),
@@ -4857,8 +5152,14 @@ class IncidentRecordCompanion extends UpdateCompanion<IncidentRecordData> {
     Expression<DateTime>? notificationTime,
     Expression<String>? notificationPerson,
     Expression<int>? reportingUnitId,
+    Expression<String>? incomingPhone,
+    Expression<DateTime>? notificationToOccTime,
+    Expression<DateTime>? teamDepartureTime,
+    Expression<bool>? occArrived,
     Expression<bool>? beforeLanding,
     Expression<DateTime>? landingTime,
+    Expression<DateTime>? medicalArrivalTime,
+    Expression<DateTime>? examinationTime,
   }) {
     return RawValuesInsertable({
       if (incidentId != null) 'incident_id': incidentId,
@@ -4873,8 +5174,16 @@ class IncidentRecordCompanion extends UpdateCompanion<IncidentRecordData> {
       if (notificationTime != null) 'notification_time': notificationTime,
       if (notificationPerson != null) 'notification_person': notificationPerson,
       if (reportingUnitId != null) 'reporting_unit_id': reportingUnitId,
+      if (incomingPhone != null) 'incoming_phone': incomingPhone,
+      if (notificationToOccTime != null)
+        'notification_to_occ_time': notificationToOccTime,
+      if (teamDepartureTime != null) 'team_departure_time': teamDepartureTime,
+      if (occArrived != null) 'occ_arrived': occArrived,
       if (beforeLanding != null) 'before_landing': beforeLanding,
       if (landingTime != null) 'landing_time': landingTime,
+      if (medicalArrivalTime != null)
+        'medical_arrival_time': medicalArrivalTime,
+      if (examinationTime != null) 'examination_time': examinationTime,
     });
   }
 
@@ -4888,8 +5197,14 @@ class IncidentRecordCompanion extends UpdateCompanion<IncidentRecordData> {
     Value<DateTime?>? notificationTime,
     Value<String?>? notificationPerson,
     Value<int>? reportingUnitId,
+    Value<String?>? incomingPhone,
+    Value<DateTime?>? notificationToOccTime,
+    Value<DateTime?>? teamDepartureTime,
+    Value<bool>? occArrived,
     Value<bool>? beforeLanding,
     Value<DateTime?>? landingTime,
+    Value<DateTime?>? medicalArrivalTime,
+    Value<DateTime?>? examinationTime,
   }) {
     return IncidentRecordCompanion(
       incidentId: incidentId ?? this.incidentId,
@@ -4903,8 +5218,15 @@ class IncidentRecordCompanion extends UpdateCompanion<IncidentRecordData> {
       notificationTime: notificationTime ?? this.notificationTime,
       notificationPerson: notificationPerson ?? this.notificationPerson,
       reportingUnitId: reportingUnitId ?? this.reportingUnitId,
+      incomingPhone: incomingPhone ?? this.incomingPhone,
+      notificationToOccTime:
+          notificationToOccTime ?? this.notificationToOccTime,
+      teamDepartureTime: teamDepartureTime ?? this.teamDepartureTime,
+      occArrived: occArrived ?? this.occArrived,
       beforeLanding: beforeLanding ?? this.beforeLanding,
       landingTime: landingTime ?? this.landingTime,
+      medicalArrivalTime: medicalArrivalTime ?? this.medicalArrivalTime,
+      examinationTime: examinationTime ?? this.examinationTime,
     );
   }
 
@@ -4942,11 +5264,33 @@ class IncidentRecordCompanion extends UpdateCompanion<IncidentRecordData> {
     if (reportingUnitId.present) {
       map['reporting_unit_id'] = Variable<int>(reportingUnitId.value);
     }
+    if (incomingPhone.present) {
+      map['incoming_phone'] = Variable<String>(incomingPhone.value);
+    }
+    if (notificationToOccTime.present) {
+      map['notification_to_occ_time'] = Variable<DateTime>(
+        notificationToOccTime.value,
+      );
+    }
+    if (teamDepartureTime.present) {
+      map['team_departure_time'] = Variable<DateTime>(teamDepartureTime.value);
+    }
+    if (occArrived.present) {
+      map['occ_arrived'] = Variable<bool>(occArrived.value);
+    }
     if (beforeLanding.present) {
       map['before_landing'] = Variable<bool>(beforeLanding.value);
     }
     if (landingTime.present) {
       map['landing_time'] = Variable<DateTime>(landingTime.value);
+    }
+    if (medicalArrivalTime.present) {
+      map['medical_arrival_time'] = Variable<DateTime>(
+        medicalArrivalTime.value,
+      );
+    }
+    if (examinationTime.present) {
+      map['examination_time'] = Variable<DateTime>(examinationTime.value);
     }
     return map;
   }
@@ -4963,8 +5307,14 @@ class IncidentRecordCompanion extends UpdateCompanion<IncidentRecordData> {
           ..write('notificationTime: $notificationTime, ')
           ..write('notificationPerson: $notificationPerson, ')
           ..write('reportingUnitId: $reportingUnitId, ')
+          ..write('incomingPhone: $incomingPhone, ')
+          ..write('notificationToOccTime: $notificationToOccTime, ')
+          ..write('teamDepartureTime: $teamDepartureTime, ')
+          ..write('occArrived: $occArrived, ')
           ..write('beforeLanding: $beforeLanding, ')
-          ..write('landingTime: $landingTime')
+          ..write('landingTime: $landingTime, ')
+          ..write('medicalArrivalTime: $medicalArrivalTime, ')
+          ..write('examinationTime: $examinationTime')
           ..write(')'))
         .toString();
   }
@@ -9927,8 +10277,14 @@ typedef $$IncidentRecordTableCreateCompanionBuilder =
       Value<DateTime?> notificationTime,
       Value<String?> notificationPerson,
       required int reportingUnitId,
+      Value<String?> incomingPhone,
+      Value<DateTime?> notificationToOccTime,
+      Value<DateTime?> teamDepartureTime,
+      Value<bool> occArrived,
       Value<bool> beforeLanding,
       Value<DateTime?> landingTime,
+      Value<DateTime?> medicalArrivalTime,
+      Value<DateTime?> examinationTime,
     });
 typedef $$IncidentRecordTableUpdateCompanionBuilder =
     IncidentRecordCompanion Function({
@@ -9941,8 +10297,14 @@ typedef $$IncidentRecordTableUpdateCompanionBuilder =
       Value<DateTime?> notificationTime,
       Value<String?> notificationPerson,
       Value<int> reportingUnitId,
+      Value<String?> incomingPhone,
+      Value<DateTime?> notificationToOccTime,
+      Value<DateTime?> teamDepartureTime,
+      Value<bool> occArrived,
       Value<bool> beforeLanding,
       Value<DateTime?> landingTime,
+      Value<DateTime?> medicalArrivalTime,
+      Value<DateTime?> examinationTime,
     });
 
 final class $$IncidentRecordTableReferences
@@ -10089,6 +10451,26 @@ class $$IncidentRecordTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<String> get incomingPhone => $composableBuilder(
+    column: $table.incomingPhone,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get notificationToOccTime => $composableBuilder(
+    column: $table.notificationToOccTime,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get teamDepartureTime => $composableBuilder(
+    column: $table.teamDepartureTime,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get occArrived => $composableBuilder(
+    column: $table.occArrived,
+    builder: (column) => ColumnFilters(column),
+  );
+
   ColumnFilters<bool> get beforeLanding => $composableBuilder(
     column: $table.beforeLanding,
     builder: (column) => ColumnFilters(column),
@@ -10096,6 +10478,16 @@ class $$IncidentRecordTableFilterComposer
 
   ColumnFilters<DateTime> get landingTime => $composableBuilder(
     column: $table.landingTime,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get medicalArrivalTime => $composableBuilder(
+    column: $table.medicalArrivalTime,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get examinationTime => $composableBuilder(
+    column: $table.examinationTime,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -10228,6 +10620,26 @@ class $$IncidentRecordTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get incomingPhone => $composableBuilder(
+    column: $table.incomingPhone,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get notificationToOccTime => $composableBuilder(
+    column: $table.notificationToOccTime,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get teamDepartureTime => $composableBuilder(
+    column: $table.teamDepartureTime,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get occArrived => $composableBuilder(
+    column: $table.occArrived,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<bool> get beforeLanding => $composableBuilder(
     column: $table.beforeLanding,
     builder: (column) => ColumnOrderings(column),
@@ -10235,6 +10647,16 @@ class $$IncidentRecordTableOrderingComposer
 
   ColumnOrderings<DateTime> get landingTime => $composableBuilder(
     column: $table.landingTime,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get medicalArrivalTime => $composableBuilder(
+    column: $table.medicalArrivalTime,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get examinationTime => $composableBuilder(
+    column: $table.examinationTime,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -10367,6 +10789,26 @@ class $$IncidentRecordTableAnnotationComposer
     builder: (column) => column,
   );
 
+  GeneratedColumn<String> get incomingPhone => $composableBuilder(
+    column: $table.incomingPhone,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get notificationToOccTime => $composableBuilder(
+    column: $table.notificationToOccTime,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get teamDepartureTime => $composableBuilder(
+    column: $table.teamDepartureTime,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get occArrived => $composableBuilder(
+    column: $table.occArrived,
+    builder: (column) => column,
+  );
+
   GeneratedColumn<bool> get beforeLanding => $composableBuilder(
     column: $table.beforeLanding,
     builder: (column) => column,
@@ -10374,6 +10816,16 @@ class $$IncidentRecordTableAnnotationComposer
 
   GeneratedColumn<DateTime> get landingTime => $composableBuilder(
     column: $table.landingTime,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get medicalArrivalTime => $composableBuilder(
+    column: $table.medicalArrivalTime,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get examinationTime => $composableBuilder(
+    column: $table.examinationTime,
     builder: (column) => column,
   );
 
@@ -10516,8 +10968,14 @@ class $$IncidentRecordTableTableManager
                 Value<DateTime?> notificationTime = const Value.absent(),
                 Value<String?> notificationPerson = const Value.absent(),
                 Value<int> reportingUnitId = const Value.absent(),
+                Value<String?> incomingPhone = const Value.absent(),
+                Value<DateTime?> notificationToOccTime = const Value.absent(),
+                Value<DateTime?> teamDepartureTime = const Value.absent(),
+                Value<bool> occArrived = const Value.absent(),
                 Value<bool> beforeLanding = const Value.absent(),
                 Value<DateTime?> landingTime = const Value.absent(),
+                Value<DateTime?> medicalArrivalTime = const Value.absent(),
+                Value<DateTime?> examinationTime = const Value.absent(),
               }) => IncidentRecordCompanion(
                 incidentId: incidentId,
                 medicalId: medicalId,
@@ -10528,8 +10986,14 @@ class $$IncidentRecordTableTableManager
                 notificationTime: notificationTime,
                 notificationPerson: notificationPerson,
                 reportingUnitId: reportingUnitId,
+                incomingPhone: incomingPhone,
+                notificationToOccTime: notificationToOccTime,
+                teamDepartureTime: teamDepartureTime,
+                occArrived: occArrived,
                 beforeLanding: beforeLanding,
                 landingTime: landingTime,
+                medicalArrivalTime: medicalArrivalTime,
+                examinationTime: examinationTime,
               ),
           createCompanionCallback:
               ({
@@ -10542,8 +11006,14 @@ class $$IncidentRecordTableTableManager
                 Value<DateTime?> notificationTime = const Value.absent(),
                 Value<String?> notificationPerson = const Value.absent(),
                 required int reportingUnitId,
+                Value<String?> incomingPhone = const Value.absent(),
+                Value<DateTime?> notificationToOccTime = const Value.absent(),
+                Value<DateTime?> teamDepartureTime = const Value.absent(),
+                Value<bool> occArrived = const Value.absent(),
                 Value<bool> beforeLanding = const Value.absent(),
                 Value<DateTime?> landingTime = const Value.absent(),
+                Value<DateTime?> medicalArrivalTime = const Value.absent(),
+                Value<DateTime?> examinationTime = const Value.absent(),
               }) => IncidentRecordCompanion.insert(
                 incidentId: incidentId,
                 medicalId: medicalId,
@@ -10554,8 +11024,14 @@ class $$IncidentRecordTableTableManager
                 notificationTime: notificationTime,
                 notificationPerson: notificationPerson,
                 reportingUnitId: reportingUnitId,
+                incomingPhone: incomingPhone,
+                notificationToOccTime: notificationToOccTime,
+                teamDepartureTime: teamDepartureTime,
+                occArrived: occArrived,
                 beforeLanding: beforeLanding,
                 landingTime: landingTime,
+                medicalArrivalTime: medicalArrivalTime,
+                examinationTime: examinationTime,
               ),
           withReferenceMapper: (p0) => p0
               .map(
