@@ -1,6 +1,7 @@
 import 'package:chikawa_airport/data/db/database.dart';
 import 'package:chikawa_airport/data/models/medical/medical_view.dart';
-import 'package:chikawa_airport/data/models/medical/incident_view.dart'; // 🔧 新增
+import 'package:chikawa_airport/data/models/medical/incident_view.dart';
+import 'package:chikawa_airport/data/models/medical/treatment_view.dart';
 import 'package:chikawa_airport/data/models/reference_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -10,8 +11,8 @@ import 'pages/flight_log.dart';
 import 'pages/incident_record.dart';
 import 'pages/treatment_record.dart';
 import 'pages/medical_fees.dart';
-import 'pages/medical_cetificate.dart';
-import 'pages/refusal_of_refferal.dart';
+import 'pages/medical_certificate.dart';
+import 'pages/refusal_of_referral.dart';
 import 'pages/telex_document.dart';
 
 class MedicalPage extends StatefulWidget {
@@ -84,6 +85,13 @@ class _MedicalPageState extends State<MedicalPage> {
         // IncidentViewModel：管理 Incident
         ChangeNotifierProvider(
           create: (context) => IncidentViewModel(
+            context.read<AppDatabase>(),
+            context.read<ReferenceService>(),
+            widget.medicalId,
+          )..init(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => TreatmentViewModel(
             context.read<AppDatabase>(),
             context.read<ReferenceService>(),
             widget.medicalId,

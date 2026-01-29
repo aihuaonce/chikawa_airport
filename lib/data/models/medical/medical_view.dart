@@ -25,12 +25,11 @@ class MedicalViewModel extends ChangeNotifier {
   List<TransitLocationWithData> get transitLocations => _transitLocations;
 
   //使用 refService
-  List<NationalityData> get nationalityOptions => refService.nationalities;
-  List<SexData> get sexOptions => refService.sexOptions;
-  List<AirlineData> get airlineOptions => refService.airlines;
-  List<TravelStatusData> get travelStatusOptions => refService.travelStatuses;
-  List<LocationData> get locationOptions => refService.locations;
-
+  List<NationalityData> get nationalityOptions => refService.nationalityList;
+  List<SexData> get sexOptions => refService.sexList;
+  List<AirlineData> get airlineOptions => refService.airlineList;
+  List<TravelStatusData> get travelStatusOptions => refService.travelStatusList;
+  List<LocationData> get locationOptions => refService.locationList;
   //  延遲存檔與狀態
   Timer? _debounceTimer;
   SaveStatus _saveStatus = SaveStatus.idle;
@@ -78,20 +77,20 @@ class MedicalViewModel extends ChangeNotifier {
   Future<void> _createDefaultFlightRecord() async {
     try {
       // 【優化】直接從 refService 拿預設值，不再查資料庫
-      if (refService.airlines.isEmpty ||
-          refService.travelStatuses.isEmpty ||
-          refService.locations.isEmpty) {
+      if (refService.airlineList.isEmpty ||
+          refService.travelStatusList.isEmpty ||
+          refService.locationList.isEmpty) {
         debugPrint('系統：參考資料未初始化，無法建立飛航記錄');
         return;
       }
 
       await db.flightDao.createFlightRecord(
         medicalId: medicalId,
-        airlineId: refService.airlines.first.airlineId,
+        airlineId: refService.airlineList.first.airlineId,
         flightNumber: '',
-        travelStatusId: refService.travelStatuses.first.travelStatusId,
-        departureLocationId: refService.locations.first.locationId,
-        arrivalLocationId: refService.locations.first.locationId,
+        travelStatusId: refService.travelStatusList.first.travelStatusId,
+        departureLocationId: refService.locationList.first.locationId,
+        arrivalLocationId: refService.locationList.first.locationId,
       );
 
       debugPrint('系統：已建立預設飛航記錄');
@@ -235,7 +234,7 @@ class MedicalViewModel extends ChangeNotifier {
   NationalityData? getNationalityById(int? id) {
     if (id == null) return null;
     try {
-      return refService.nationalities.firstWhere((n) => n.nationalityId == id);
+      return refService.nationalityList.firstWhere((n) => n.nationalityId == id);
     } catch (e) {
       return null;
     }
@@ -244,7 +243,7 @@ class MedicalViewModel extends ChangeNotifier {
   SexData? getSexById(int? id) {
     if (id == null) return null;
     try {
-      return refService.sexOptions.firstWhere((s) => s.sexId == id);
+      return refService.sexList.firstWhere((s) => s.sexId == id);
     } catch (e) {
       return null;
     }
@@ -253,7 +252,7 @@ class MedicalViewModel extends ChangeNotifier {
   AirlineData? getAirlineById(int? id) {
     if (id == null) return null;
     try {
-      return refService.airlines.firstWhere((a) => a.airlineId == id);
+      return refService.airlineList.firstWhere((a) => a.airlineId == id);
     } catch (e) {
       return null;
     }
@@ -262,7 +261,7 @@ class MedicalViewModel extends ChangeNotifier {
   TravelStatusData? getTravelStatusById(int? id) {
     if (id == null) return null;
     try {
-      return refService.travelStatuses.firstWhere(
+      return refService.travelStatusList.firstWhere(
         (t) => t.travelStatusId == id,
       );
     } catch (e) {
@@ -273,7 +272,7 @@ class MedicalViewModel extends ChangeNotifier {
   LocationData? getLocationById(int? id) {
     if (id == null) return null;
     try {
-      return refService.locations.firstWhere((l) => l.locationId == id);
+      return refService.locationList.firstWhere((l) => l.locationId == id);
     } catch (e) {
       return null;
     }
@@ -281,7 +280,7 @@ class MedicalViewModel extends ChangeNotifier {
 
   Future<List<LocationData>> searchLocations(String keyword) async {
     // 【優化】搜尋時如果沒有關鍵字，直接回傳快取的地點列表
-    if (keyword.isEmpty) return refService.locations;
+    if (keyword.isEmpty) return refService.locationList;
     try {
       return await db.referenceDao.searchLocation(keyword);
     } catch (e) {

@@ -10,7 +10,7 @@ void main() async {
   final database = AppDatabase();
   final refService = ReferenceService(database);
 
-  await refService.ensureLoaded();
+  await refService.init();
 
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.landscapeLeft,

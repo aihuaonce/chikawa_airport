@@ -695,6 +695,14 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
     await initializeLocation();
     await initializeIncidentPlaces();
     await initializeReportingUnits();
+    await initializeChiefComplaintTypes();
+    await initializeDiagnosisCategories();
+    await initializeTriageLevels();
+    await initializeTreatmentOnSiteData();
+    await initializeTreatmentResults();
+    await initializeReferralHospitals();
+    await initializeActionItems();
+    await initializeMedicalStaff();
   }
 
   // 初始化性別資料

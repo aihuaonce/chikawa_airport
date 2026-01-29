@@ -20,9 +20,7 @@ class TreatmentDao extends DatabaseAccessor<AppDatabase>
     with _$TreatmentDaoMixin {
   TreatmentDao(super.db);
 
-  // =========================
   // CDC 健康評估
-  // =========================
 
   Future<int> insertHealthAssessment(HealthAssessmentFormCompanion data) {
     return into(healthAssessmentForm).insert(data);
@@ -34,9 +32,13 @@ class TreatmentDao extends DatabaseAccessor<AppDatabase>
     )..where((t) => t.medicalId.equals(medicalId))).get();
   }
 
-  // =========================
+  Future<int> deleteHealthAssessment(int assessmentId) {
+    return (delete(
+      healthAssessmentForm,
+    )..where((t) => t.assessmentFormId.equals(assessmentId))).go();
+  }
+
   // 主訴
-  // =========================
 
   Future<int> insertChiefComplaint(ChiefComplaintCompanion data) {
     return into(chiefComplaint).insert(data);
@@ -48,9 +50,11 @@ class TreatmentDao extends DatabaseAccessor<AppDatabase>
     )..where((t) => t.medicalId.equals(medicalId))).getSingleOrNull();
   }
 
-  // =========================
+  Future<bool> updateChiefComplaint(ChiefComplaintCompanion data) {
+    return update(chiefComplaint).replace(data);
+  }
+
   // 醫療影像
-  // =========================
 
   Future<int> insertMedicalMedia(MedicalMediaCompanion data) {
     return into(medicalMedia).insert(data);
@@ -62,9 +66,11 @@ class TreatmentDao extends DatabaseAccessor<AppDatabase>
     )..where((t) => t.medicalId.equals(medicalId))).get();
   }
 
-  // =========================
+  Future<int> deleteMedicalMedia(int mediaId) {
+    return (delete(medicalMedia)..where((t) => t.mediaId.equals(mediaId))).go();
+  }
+
   // 醫療評估（可多筆）
-  // =========================
 
   Future<int> insertMedicalAssessment(MedicalAssessmentCompanion data) {
     return into(medicalAssessment).insert(data);
@@ -82,9 +88,7 @@ class TreatmentDao extends DatabaseAccessor<AppDatabase>
         .get();
   }
 
-  // =========================
   // 病史
-  // =========================
 
   Future<int> insertMedicalHistory(MedicalHistoryCompanion data) {
     return into(medicalHistory).insert(data);
@@ -96,9 +100,11 @@ class TreatmentDao extends DatabaseAccessor<AppDatabase>
     )..where((t) => t.medicalId.equals(medicalId))).getSingleOrNull();
   }
 
-  // =========================
+  Future<bool> updateMedicalHistory(MedicalHistoryCompanion data) {
+    return update(medicalHistory).replace(data);
+  }
+
   // 處置 / 診斷
-  // =========================
 
   Future<int> insertTreatment(TreatmentCompanion data) {
     return into(treatment).insert(data);
@@ -114,9 +120,7 @@ class TreatmentDao extends DatabaseAccessor<AppDatabase>
     return update(treatment).replace(data);
   }
 
-  // =========================
   // 醫療人員指派
-  // =========================
 
   Future<int> insertStaffAssignment(MedicalStaffAssignmentCompanion data) {
     return into(medicalStaffAssignment).insert(data);
@@ -128,9 +132,13 @@ class TreatmentDao extends DatabaseAccessor<AppDatabase>
     )..where((t) => t.medicalId.equals(medicalId))).get();
   }
 
-  // =========================
+  Future<int> deleteStaffAssignment(int staffAssignmentId) {
+    return (delete(
+      medicalStaffAssignment,
+    )..where((t) => t.staffAssignmentId.equals(staffAssignmentId))).go();
+  }
+
   // 特別註記
-  // =========================
 
   Future<int> insertSpecialNotes(SpecialNotesCompanion data) {
     return into(specialNotes).insert(data);
@@ -142,9 +150,11 @@ class TreatmentDao extends DatabaseAccessor<AppDatabase>
     )..where((t) => t.medicalId.equals(medicalId))).getSingleOrNull();
   }
 
-  // =========================
+  Future<bool> updateSpecialNotes(SpecialNotesCompanion data) {
+    return update(specialNotes).replace(data);
+  }
+
   // 整包刪除（某次醫療紀錄的全部處置）
-  // =========================
 
   Future<void> deleteAllTreatmentData(int medicalId) async {
     await (delete(
