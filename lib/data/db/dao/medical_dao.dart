@@ -112,6 +112,25 @@ class MedicalDao extends DatabaseAccessor<AppDatabase> with _$MedicalDaoMixin {
           ..orderBy([(t) => OrderingTerm.desc(t.createdAt)]))
         .get();
   }
+
+  // 更新 CDC 篩檢狀態和篩檢方法（在 Medical 表中）
+  Future<bool> updateCDCStatus({
+    required int medicalId,
+    required bool? cdcPassed,
+    String? screeningMethod,
+  }) {
+    return (update(medicalRecord)
+          ..where((tbl) => tbl.medicalId.equals(medicalId)))
+        .write(
+          MedicalRecordCompanion(
+            cdcPassed: Value(cdcPassed),
+            screeningMethod: Value(
+              screeningMethod?.isEmpty ?? true ? null : screeningMethod,
+            ),
+          ),
+        )
+        .then((count) => count > 0);
+  }
 }
 
 // 首頁清單用

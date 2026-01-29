@@ -36,6 +36,7 @@ part 'database.g.dart';
     ReferralHospital,
     ActionItem,
     MedicalStaff,
+    SpecialNoteRef,
 
     //醫療表
     MedicalRecord,

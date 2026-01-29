@@ -47,6 +47,14 @@ class IncidentPlaceCategory extends Table {
   BoolColumn get isActive => boolean().withDefault(const Constant(true))();
 }
 
+//特別註記選項表
+class SpecialNoteRef extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get name => text()();
+  IntColumn get sortOrder => integer().withDefault(const Constant(0))();
+  BoolColumn get isActive => boolean().withDefault(const Constant(true))();
+}
+
 //事故-二級地點表
 class IncidentPlaceCategory2 extends Table {
   IntColumn get id => integer().autoIncrement()();

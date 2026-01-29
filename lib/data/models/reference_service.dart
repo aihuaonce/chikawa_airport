@@ -26,6 +26,7 @@ class ReferenceService extends ChangeNotifier {
   List<ReferralHospitalData> _referralHospitals = [];
   List<ActionItemData> _actionItems = [];
   List<MedicalStaffData> _medicalStaffList = [];
+  List<SpecialNoteRefData> _specialNoteRefs = [];
 
   // === Getters ===
   List<SexData> get sexList => _sexList;
@@ -44,6 +45,7 @@ class ReferenceService extends ChangeNotifier {
   List<ReferralHospitalData> get referralHospitals => _referralHospitals;
   List<ActionItemData> get actionItems => _actionItems;
   List<MedicalStaffData> get medicalStaffList => _medicalStaffList;
+  List<SpecialNoteRefData> get specialNoteRefs => _specialNoteRefs;
 
   ReferenceService(this.db);
 
@@ -88,6 +90,7 @@ class ReferenceService extends ChangeNotifier {
       _referralHospitals = await db.referenceDao.getAllReferralHospitals();
       _actionItems = await db.referenceDao.getAllActionItems();
       _medicalStaffList = await db.referenceDao.getAllMedicalStaff();
+      _specialNoteRefs = await db.referenceDao.getAllSpecialNoteRefs();
 
       debugPrint('系統:處置參考資料載入完成');
       debugPrint('  - 主訴類型: ${_chiefComplaintTypes.length}');
@@ -98,6 +101,7 @@ class ReferenceService extends ChangeNotifier {
       debugPrint('  - 轉診醫院: ${_referralHospitals.length}');
       debugPrint('  - 處置項目: ${_actionItems.length}');
       debugPrint('  - 醫療人員: ${_medicalStaffList.length}');
+      debugPrint('  - 特別註記: ${_specialNoteRefs.length}');
     } catch (e) {
       debugPrint('系統:載入處置參考資料失敗 - $e');
     }

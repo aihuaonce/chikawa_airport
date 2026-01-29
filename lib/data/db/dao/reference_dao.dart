@@ -22,6 +22,7 @@ part 'reference_dao.g.dart';
     ReferralHospital,
     ActionItem,
     MedicalStaff,
+    SpecialNoteRef,
   ],
 )
 class ReferenceDao extends DatabaseAccessor<AppDatabase>
@@ -703,6 +704,7 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
     await initializeReferralHospitals();
     await initializeActionItems();
     await initializeMedicalStaff();
+    await initializeSpecialNoteRefs();
   }
 
   // 初始化性別資料
@@ -1373,6 +1375,51 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
         stats.locationCount > 0 &&
         stats.incidentPlaceCount > 0 &&
         stats.reportingUnitCount > 0;
+  }
+
+  // 特別註記
+  Future<List<SpecialNoteRefData>> getAllSpecialNoteRefs({
+    bool onlyActive = true,
+  }) {
+    final query = select(specialNoteRef);
+    if (onlyActive) {
+      query.where((s) => s.isActive.equals(true));
+    }
+    return (query..orderBy([(s) => OrderingTerm.asc(s.sortOrder)])).get();
+  }
+
+  // 初始化特別註記
+  Future<void> initializeSpecialNoteRefs() async {
+    final count = await (select(
+      specialNoteRef,
+    ).get()).then((list) => list.length);
+    if (count == 0) {
+      await batch((batch) {
+        batch.insertAll(specialNoteRef, [
+          SpecialNoteRefCompanion.insert(
+            name: 'OHCA醫護到達前有CPR',
+            sortOrder: const Value(1),
+          ),
+          SpecialNoteRefCompanion.insert(
+            name: 'OHCA醫護到達前有使用AED但無電擊',
+            sortOrder: const Value(2),
+          ),
+          SpecialNoteRefCompanion.insert(
+            name: 'OHCA醫護到達前有使用AED有電擊',
+            sortOrder: const Value(3),
+          ),
+          SpecialNoteRefCompanion.insert(
+            name: '現場恢復脈搏',
+            sortOrder: const Value(4),
+          ),
+          SpecialNoteRefCompanion.insert(
+            name: '使用自動心肺復甦機',
+            sortOrder: const Value(5),
+          ),
+          SpecialNoteRefCompanion.insert(name: '空跑', sortOrder: const Value(6)),
+        ]);
+      });
+    }
   }
 }
 

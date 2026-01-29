@@ -38,6 +38,10 @@ class TreatmentDao extends DatabaseAccessor<AppDatabase>
     )..where((t) => t.assessmentFormId.equals(assessmentId))).go();
   }
 
+  Future<bool> updateHealthAssessment(HealthAssessmentFormCompanion data) {
+    return update(healthAssessmentForm).replace(data);
+  }
+
   // 主訴
 
   Future<int> insertChiefComplaint(ChiefComplaintCompanion data) {

@@ -26,11 +26,6 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
   late TextEditingController _pastHistoryDetailController;
   late TextEditingController _allergyDetailController;
   late TextEditingController _actionSummaryOtherController;
-  late TextEditingController _directorNameController;
-  late TextEditingController _emtNameController;
-  late TextEditingController _otherHospitalController;
-  late TextEditingController _assistStaffController;
-  late TextEditingController _otherNotesController;
 
   bool _isInitialized = false;
 
@@ -50,29 +45,24 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
   bool _isAlert = true;
   String _leftPupilReaction = '+';
   String _rightPupilReaction = '+';
-  late TextEditingController _leftPupilSizeController;
-  late TextEditingController _rightPupilSizeController;
 
   // 病史
   String _pastHistoryStatus = '無';
   String _allergyStatus = '無';
 
   // 處置項目選擇
-  final List<String> _summaryOfAction = [];
+  final List<int> _selectedActionItemIds = [];
 
   // 協助人員
   final List<String> _assistStaffList = [];
+  late TextEditingController _assistStaffController;
+
+  // 健康評估表 controller（數據來自 ViewModel）
+  final Map<int, Map<String, TextEditingController>>
+  _healthAssessmentControllers = {};
 
   // 特別註記
   final List<String> _selectedSpecialNotes = [];
-  final List<String> _specialNoteOptions = [
-    'OHCA醫護到達前有CPR',
-    'OHCA醫護到達前有使用AED但無電擊',
-    'OHCA醫護到達前有使用AED有電擊',
-    '現場恢復脈搏',
-    '使用自動心肺復甦機',
-    '空跑',
-  ];
 
   @override
   void initState() {
@@ -82,13 +72,7 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
     _pastHistoryDetailController = TextEditingController();
     _allergyDetailController = TextEditingController();
     _actionSummaryOtherController = TextEditingController();
-    _directorNameController = TextEditingController();
-    _emtNameController = TextEditingController();
-    _otherHospitalController = TextEditingController();
     _assistStaffController = TextEditingController();
-    _otherNotesController = TextEditingController();
-    _leftPupilSizeController = TextEditingController();
-    _rightPupilSizeController = TextEditingController();
   }
 
   @override
@@ -98,19 +82,26 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
     _pastHistoryDetailController.dispose();
     _allergyDetailController.dispose();
     _actionSummaryOtherController.dispose();
-    _directorNameController.dispose();
-    _emtNameController.dispose();
-    _otherHospitalController.dispose();
     _assistStaffController.dispose();
-    _otherNotesController.dispose();
-    _leftPupilSizeController.dispose();
-    _rightPupilSizeController.dispose();
+    // 清理健康評估表的 controller
+    for (var controllers in _healthAssessmentControllers.values) {
+      controllers['name']?.dispose();
+      controllers['relation']?.dispose();
+      controllers['temp']?.dispose();
+    }
     super.dispose();
   }
 
   // 當 ViewModel 資料載入後,同步到 Controller
   void _updateControllers(TreatmentViewModel viewModel) {
     if (_isInitialized) return;
+
+    // 從 Medical 表讀取 CDC 狀態
+    final medicalRecord = viewModel.medicalRecord;
+    if (medicalRecord != null) {
+      _cdcPassed = medicalRecord.cdcPassed ?? false;
+      _screeningMethod = medicalRecord.screeningMethod ?? '';
+    }
 
     final complaint = viewModel.chiefComplaint;
     if (complaint != null) {
@@ -127,11 +118,12 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
     final treatment = viewModel.treatment;
     if (treatment != null) {
       _actionSummaryOtherController.text = treatment.actionSummaryOther ?? '';
-      _directorNameController.text = treatment.directorName ?? '';
     }
 
     _isInitialized = true;
   }
+
+  // 同步健康評估表編輯的值到資料庫
 
   @override
   Widget build(BuildContext context) {
@@ -155,96 +147,99 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
       );
     }
 
-    return Column(
-      children: [
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: _buildCard(
-                title: '篩檢與評估 CDC Screening',
-                icon: Icons.assignment_ind_outlined,
-                child: _buildCdcSection(viewModel),
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: _buildCard(
+                  title: '篩檢與評估 CDC Screening',
+                  icon: Icons.assignment_ind_outlined,
+                  child: _buildCdcSection(viewModel),
+                ),
               ),
-            ),
-            const SizedBox(width: 20),
-            Expanded(
-              child: _buildCard(
-                title: '主訴類別 Chief Complaint',
-                icon: Icons.medical_information_outlined,
-                child: _buildComplaintSection(viewModel),
+              const SizedBox(width: 20),
+              Expanded(
+                child: _buildCard(
+                  title: '主訴類別 Chief Complaint',
+                  icon: Icons.medical_information_outlined,
+                  child: _buildComplaintSection(viewModel),
+                ),
               ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 20),
-        _buildCard(
-          title: '影像記錄 Photo Records',
-          icon: Icons.photo_camera,
-          child: _buildPhotoSection(viewModel),
-        ),
-        const SizedBox(height: 20),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: _buildCard(
-                title: '生命徵象 Vital Signs',
-                icon: Icons.monitor_heart,
-                child: _buildVitalSignsSection(viewModel),
+            ],
+          ),
+          const SizedBox(height: 20),
+          _buildCard(
+            title: '影像記錄 Photo Records',
+            icon: Icons.photo_camera,
+            child: _buildPhotoSection(viewModel),
+          ),
+          const SizedBox(height: 20),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: _buildCard(
+                  title: '生命徵象 Vital Signs',
+                  icon: Icons.monitor_heart,
+                  child: _buildVitalSignsSection(viewModel),
+                ),
               ),
-            ),
-            const SizedBox(width: 20),
-            Expanded(
-              child: _buildCard(
-                title: '意識與理學檢查 Consciousness & Exam',
-                icon: Icons.psychology,
-                child: _buildConsciousnessSection(viewModel),
+              const SizedBox(width: 20),
+              Expanded(
+                child: _buildCard(
+                  title: '意識與理學檢查 Consciousness & Exam',
+                  icon: Icons.psychology,
+                  child: _buildConsciousnessSection(viewModel),
+                ),
               ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 20),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: _buildCard(
-                title: '病史與過敏 History',
-                icon: Icons.history_edu,
-                child: _buildHistorySection(viewModel),
+            ],
+          ),
+          const SizedBox(height: 20),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: _buildCard(
+                  title: '病史與過敏 History',
+                  icon: Icons.history_edu,
+                  child: _buildHistorySection(viewModel),
+                ),
               ),
-            ),
-            const SizedBox(width: 20),
-            Expanded(
-              child: _buildCard(
-                title: '診斷與代碼 Diagnosis & ICD-10',
-                icon: Icons.medical_information,
-                child: _buildDiagnosisSection(viewModel),
+              const SizedBox(width: 20),
+              Expanded(
+                child: _buildCard(
+                  title: '診斷與代碼 Diagnosis & ICD-10',
+                  icon: Icons.medical_information,
+                  child: _buildDiagnosisSection(viewModel),
+                ),
               ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 20),
-        _buildCard(
-          title: '檢傷與處置 Outcome & Treatment',
-          icon: Icons.emergency_outlined,
-          child: _buildOutcomeTreatmentSection(viewModel),
-        ),
-        const SizedBox(height: 20),
-        _buildCard(
-          title: '醫護人員與簽章 Staff & Signs',
-          icon: Icons.app_registration_rounded,
-          child: _buildStaffSignsSection(viewModel),
-        ),
-        const SizedBox(height: 20),
-        _buildCard(
-          title: '特別註記 Special Notes',
-          icon: Icons.note_alt_outlined,
-          child: _buildSpecialNotesSection(viewModel),
-        ),
-        const SizedBox(height: 40),
-      ],
+            ],
+          ),
+          const SizedBox(height: 20),
+          _buildCard(
+            title: '檢傷與處置 Outcome & Treatment',
+            icon: Icons.emergency_outlined,
+            child: _buildOutcomeTreatmentSection(viewModel),
+          ),
+          const SizedBox(height: 20),
+          _buildCard(
+            title: '醫護人員與簽章 Staff & Signs',
+            icon: Icons.app_registration_rounded,
+            child: _buildStaffSignsSection(viewModel),
+          ),
+          const SizedBox(height: 20),
+          _buildCard(
+            title: '特別註記 Special Notes',
+            icon: Icons.note_alt_outlined,
+            child: _buildSpecialNotesSection(viewModel),
+          ),
+          const SizedBox(height: 40),
+        ],
+      ),
     );
   }
 
@@ -257,17 +252,29 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
         _buildCheckboxTile(
           label: '疾病管制署篩檢項目 Passed',
           value: _cdcPassed,
-          onChanged: (v) => setState(() => _cdcPassed = v!),
+          onChanged: (v) async {
+            setState(() => _cdcPassed = v!);
+            // 保存到資料庫
+            await viewModel.updateCDCStatus(
+              cdcPassed: v!,
+              screeningMethod: _screeningMethod,
+            );
+          },
         ),
         if (_cdcPassed) ...[
           const SizedBox(height: 16),
           _buildLabel('篩檢方式 Screening Method'),
           const SizedBox(height: 4),
-          _buildSegmentedControl(
-            ['喉頭採檢', '抽血檢驗', '其它'],
-            _screeningMethod,
-            (v) => setState(() => _screeningMethod = v),
-          ),
+          _buildSegmentedControl(['喉頭採檢', '抽血檢驗', '其它'], _screeningMethod, (
+            v,
+          ) async {
+            setState(() => _screeningMethod = v);
+            // 保存到資料庫
+            await viewModel.updateCDCStatus(
+              cdcPassed: true,
+              screeningMethod: v,
+            );
+          }),
           if (_screeningMethod == '其它') ...[
             const SizedBox(height: 8),
             _buildTextField(hint: '請輸入其它方式'),
@@ -278,8 +285,10 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
             children: [
               _buildLabel('健康評估表'),
               TextButton(
-                onPressed: () =>
-                    _showAddHealthAssessmentDialog(context, viewModel),
+                onPressed: () async {
+                  // 直接添加到資料庫
+                  await viewModel.addHealthAssessment(name: '', relation: '');
+                },
                 child: const Text(
                   '+ 新增',
                   style: TextStyle(
@@ -298,35 +307,16 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
 
   Widget _buildComplaintSection(TreatmentViewModel viewModel) {
     final complaint = viewModel.chiefComplaint;
-    final selectedType = complaint?.chiefComplaintTypeId != null
-        ? viewModel.getComplaintTypeById(complaint!.chiefComplaintTypeId)
-        : null;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildLabel('主訴類別 Type'),
         const SizedBox(height: 4),
-        Row(
-          children: viewModel.complaintTypes.map((type) {
-            bool isSel = complaint?.chiefComplaintTypeId == type.id;
-            IconData icon = type.code == 'TRAUMA'
-                ? Icons.healing
-                : Icons.medical_services;
-            return Expanded(
-              child: Padding(
-                padding: const EdgeInsets.only(right: 8),
-                child: _buildTypeButton(type.name, icon, isSel, () {
-                  viewModel.updateChiefComplaint(chiefComplaintTypeId: type.id);
-                  _selectedSymptoms.clear();
-                }),
-              ),
-            );
-          }).toList(),
-        ),
-        if (selectedType != null) ...[
+        _buildComplaintTypeDropdown(viewModel, complaint),
+        if (complaint?.chiefComplaintTypeId != null) ...[
           const SizedBox(height: 12),
-          _buildSymptomGrid(viewModel, selectedType),
+          _buildSymptomGrid(viewModel, complaint!),
           if (_selectedSymptoms.contains('其它')) ...[
             const SizedBox(height: 8),
             _buildTextField(
@@ -357,19 +347,19 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
       children: [
         Row(
           children: [
-            _buildSmallCheckbox(
+            _buildCheckboxRow(
               '外傷 Trauma',
               _photoTrauma,
               (v) => setState(() => _photoTrauma = v!),
             ),
-            const SizedBox(width: 12),
-            _buildSmallCheckbox(
-              'ECG心電圖',
+            const SizedBox(width: 24),
+            _buildCheckboxRow(
+              '心電圖 ECG',
               _photoEcg,
               (v) => setState(() => _photoEcg = v!),
             ),
-            const SizedBox(width: 12),
-            _buildSmallCheckbox(
+            const SizedBox(width: 24),
+            _buildCheckboxRow(
               '其它 Other',
               _photoOther,
               (v) => setState(() => _photoOther = v!),
@@ -377,32 +367,93 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
           ],
         ),
         const SizedBox(height: 12),
-        Container(
-          height: 120,
-          decoration: BoxDecoration(
-            color: bgField,
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: borderColor),
+        // 6個照片上傳欄位
+        GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 3,
+            crossAxisSpacing: 12,
+            mainAxisSpacing: 12,
+            childAspectRatio: 4 / 3,
           ),
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.add_photo_alternate, color: textMuted, size: 32),
-                const SizedBox(height: 6),
-                Text(
-                  '點擊或拖曳上傳影像',
-                  style: TextStyle(color: textMuted, fontSize: 12),
-                ),
-              ],
-            ),
-          ),
+          itemCount: 6,
+          itemBuilder: (context, index) {
+            return _buildPhotoUploadBox(index);
+          },
         ),
+        if (viewModel.medicalMediaList.isNotEmpty) ...[
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: viewModel.medicalMediaList.map((media) {
+              return Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  color: bgField,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: borderColor),
+                ),
+                child: Center(
+                  child: Text(
+                    media.mediaType,
+                    style: const TextStyle(fontSize: 10, color: textMuted),
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+        ],
       ],
     );
   }
 
+  Widget _buildPhotoUploadBox(int index) {
+    return GestureDetector(
+      onTap: () {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('上傳照片 ${index + 1}')));
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: bgField,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(
+            color: borderColor,
+            width: 1,
+            style: BorderStyle.solid,
+          ),
+        ),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.add_photo_alternate,
+                color: textMuted.withValues(alpha: 0.5),
+                size: 32,
+              ),
+              const SizedBox(height: 6),
+              Text(
+                '照片 ${index + 1}',
+                style: const TextStyle(
+                  fontSize: 11,
+                  color: textMuted,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildVitalSignsSection(TreatmentViewModel viewModel) {
+    // 取得最新的醫療評估
     final latestAssessment = viewModel.medicalAssessments.isNotEmpty
         ? viewModel.medicalAssessments.last
         : null;
@@ -413,7 +464,7 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
           children: [
             Expanded(
               child: _buildVitalField(
-                '體溫 Temp(°C)',
+                '體溫 Temp (°C)',
                 '36.5',
                 latestAssessment?.temperature?.toString(),
               ),
@@ -421,7 +472,7 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
             const SizedBox(width: 8),
             Expanded(
               child: _buildVitalField(
-                '脈搏 Pulse(/min)',
+                '脈搏 Pulse (bpm)',
                 '80',
                 latestAssessment?.pulse?.toString(),
               ),
@@ -433,7 +484,7 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
           children: [
             Expanded(
               child: _buildVitalField(
-                '呼吸 Breath(/min)',
+                '呼吸 RR (/min)',
                 '18',
                 latestAssessment?.breath?.toString(),
               ),
@@ -441,8 +492,8 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
             const SizedBox(width: 8),
             Expanded(
               child: _buildVitalField(
-                '血氧 SpO2(%)',
-                '98',
+                '血壓 BP (mmHg)',
+                '120/80',
                 latestAssessment?.spo2?.toString(),
               ),
             ),
@@ -453,26 +504,20 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
           children: [
             Expanded(
               child: _buildVitalField(
-                '收縮壓 Sys(mmHg)',
-                '120',
-                latestAssessment?.systolic?.toString(),
+                '血氧 SpO2 (%)',
+                '98',
+                latestAssessment?.spo2?.toString(),
               ),
             ),
             const SizedBox(width: 8),
             Expanded(
               child: _buildVitalField(
-                '舒張壓 Dia(mmHg)',
-                '80',
-                latestAssessment?.diastolic?.toString(),
+                '疼痛指數 Pain(0-10)',
+                '0',
+                latestAssessment?.painScore?.toString(),
               ),
             ),
           ],
-        ),
-        const SizedBox(height: 12),
-        _buildVitalField(
-          '疼痛指數 Pain(0-10)',
-          '0',
-          latestAssessment?.painScore?.toString(),
         ),
       ],
     );
@@ -482,39 +527,75 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildLabel('意識狀態 Consciousness'),
-        const SizedBox(height: 4),
-        Row(
-          children: [
-            _buildSmallCheckbox(
-              'Alert',
-              _isAlert,
-              (v) => setState(() => _isAlert = v!),
-            ),
-          ],
+        _buildCheckboxTile(
+          label: '意識清晰 Alert & Oriented',
+          value: _isAlert,
+          onChanged: (v) => setState(() => _isAlert = v!),
         ),
+        if (!_isAlert) ...[
+          const SizedBox(height: 12),
+          _buildLabel('GCS 指數評估'),
+          const SizedBox(height: 4),
+          Row(
+            children: [
+              Expanded(
+                child: _buildTextField(hint: 'E', textAlign: TextAlign.center),
+              ),
+              const SizedBox(width: 6),
+              Expanded(
+                child: _buildTextField(hint: 'V', textAlign: TextAlign.center),
+              ),
+              const SizedBox(width: 6),
+              Expanded(
+                child: _buildTextField(hint: 'M', textAlign: TextAlign.center),
+              ),
+              const SizedBox(width: 6),
+              Expanded(
+                child: _buildTextField(
+                  hint: 'Total',
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: _buildPupilSection(
+                  '左瞳孔 Left Pupil',
+                  (v) => _leftPupilReaction = v,
+                  _leftPupilReaction,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildPupilSection(
+                  '右瞳孔 Right Pupil',
+                  (v) => _rightPupilReaction = v,
+                  _rightPupilReaction,
+                ),
+              ),
+            ],
+          ),
+        ],
         const SizedBox(height: 12),
-        Row(
+        GridView.count(
+          crossAxisCount: 2,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          mainAxisSpacing: 10,
+          crossAxisSpacing: 12,
+          childAspectRatio: 4,
           children: [
-            Expanded(
-              child: _buildPupilSection(
-                'Left Pupil',
-                (v) => _leftPupilReaction = v,
-                _leftPupilReaction,
-                _leftPupilSizeController,
-              ),
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: _buildPupilSection(
-                'Right Pupil',
-                (v) => _rightPupilReaction = v,
-                _rightPupilReaction,
-                _rightPupilSizeController,
-              ),
-            ),
+            _buildLabeledField('頭頸部 Head/Neck', ''),
+            _buildLabeledField('胸部 Chest', ''),
+            _buildLabeledField('腹部 Abdomen', ''),
+            _buildLabeledField('四肢 Extremities', ''),
           ],
         ),
+        const SizedBox(height: 10),
+        _buildLabeledField('其它理學檢查 Other Observations...', ''),
       ],
     );
   }
@@ -523,34 +604,35 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildLabel('過去病史 Past History'),
+        _buildLabel('過去病史 Past Medical History'),
         const SizedBox(height: 4),
         _buildSegmentedControl(
-          ['無', '有', '不詳'],
+          ['無', '不詳', '有'],
           _pastHistoryStatus,
           (v) => setState(() => _pastHistoryStatus = v),
         ),
         if (_pastHistoryStatus == '有') ...[
           const SizedBox(height: 8),
           _buildTextField(
-            hint: '請輸入病史詳情',
+            hint: '列出慢性病或手術史...',
+            maxLines: 2,
             controller: _pastHistoryDetailController,
             onChanged: (val) =>
                 viewModel.updateMedicalHistory(pastHistoryDetail: val),
           ),
         ],
         const SizedBox(height: 16),
-        _buildLabel('過敏史 Allergy'),
+        _buildLabel('過敏史 Allergy History'),
         const SizedBox(height: 4),
         _buildSegmentedControl(
-          ['無', '有', '不詳'],
+          ['無', '不詳', '有'],
           _allergyStatus,
           (v) => setState(() => _allergyStatus = v),
         ),
         if (_allergyStatus == '有') ...[
           const SizedBox(height: 8),
           _buildTextField(
-            hint: '請輸入過敏物質',
+            hint: '註明藥物或食物過敏狀況...',
             controller: _allergyDetailController,
             onChanged: (val) =>
                 viewModel.updateMedicalHistory(allergyDetail: val),
@@ -562,26 +644,19 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
 
   Widget _buildDiagnosisSection(TreatmentViewModel viewModel) {
     final treatment = viewModel.treatment;
-    final selectedCategory = treatment?.tentativeCategoryId != null
-        ? viewModel.getDiagnosisCategoryById(treatment!.tentativeCategoryId)
-        : null;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildLabel('診斷分類 Diagnosis Category'),
+        _buildLabel('診斷類別 Category'),
         const SizedBox(height: 4),
-        _buildDropdownField(
-          hint: '請選取診斷分類',
-          value: selectedCategory?.name,
-          items: viewModel.diagnosisCategories.map((cat) => cat.name).toList(),
-          onChanged: (val) {
-            final category = viewModel.diagnosisCategories.firstWhere(
-              (cat) => cat.name == val,
-            );
-            viewModel.updateTentativeCategoryId(category.id);
-          },
-        ),
+        _buildDiagnosisCategoryDropdown(viewModel, treatment),
+        const SizedBox(height: 16),
+        _buildIcdRow('初步診斷 Preliminary (ICD-10)', '例如: I10'),
+        const SizedBox(height: 12),
+        _buildIcdRow('副診斷 1 Secondary ICD-10 #1', '代碼'),
+        const SizedBox(height: 12),
+        _buildIcdRow('副診斷 2 Secondary ICD-10 #2', '代碼'),
       ],
     );
   }
@@ -592,11 +667,12 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildLabel('檢傷分級 Triage Level'),
+        _buildLabel('檢傷分類 Triage Level'),
         const SizedBox(height: 8),
-        _buildTriageSelector(viewModel, treatment),
+        _buildTriageSelector(viewModel),
         const SizedBox(height: 24),
         Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
               child: Column(
@@ -604,25 +680,7 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
                 children: [
                   _buildLabel('現場處置 Scene Treatment'),
                   const SizedBox(height: 4),
-                  _buildDropdownField(
-                    hint: '請選取現場主要處置',
-                    value: treatment?.treatmentOnSiteId != null
-                        ? viewModel
-                              .getTreatmentOnSiteById(
-                                treatment!.treatmentOnSiteId,
-                              )
-                              ?.name
-                        : null,
-                    items: viewModel.treatmentOnSites
-                        .map((t) => t.name)
-                        .toList(),
-                    onChanged: (val) {
-                      final onSite = viewModel.treatmentOnSites.firstWhere(
-                        (t) => t.name == val,
-                      );
-                      viewModel.updateTreatmentOnSiteId(onSite.id);
-                    },
-                  ),
+                  _buildTreatmentOnSiteDropdown(viewModel, treatment),
                 ],
               ),
             ),
@@ -633,35 +691,14 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
                 children: [
                   _buildLabel('後續結果 Outcome'),
                   const SizedBox(height: 4),
-                  _buildDropdownField(
-                    hint: '請選取處理結果',
-                    value: treatment?.resultId != null
-                        ? viewModel
-                              .getTreatmentResultById(treatment!.resultId)
-                              ?.name
-                        : null,
-                    items: viewModel.treatmentResults
-                        .map((r) => r.name)
-                        .toList(),
-                    onChanged: (val) {
-                      final result = viewModel.treatmentResults.firstWhere(
-                        (r) => r.name == val,
-                      );
-                      viewModel.updateResultId(result.id);
-                    },
-                  ),
+                  _buildTreatmentResultDropdown(viewModel, treatment),
                   if (treatment?.resultId != null &&
                       viewModel
                               .getTreatmentResultById(treatment!.resultId)
                               ?.name ==
                           '轉其它醫院') ...[
                     const SizedBox(height: 8),
-                    _buildTextField(
-                      hint: '請註明醫院名稱',
-                      controller: _otherHospitalController,
-                      onChanged: (val) =>
-                          viewModel.updateReferralHospitalFinal(val),
-                    ),
+                    _buildTextField(hint: '請註明醫院名稱'),
                   ],
                 ],
               ),
@@ -672,7 +709,14 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
         _buildLabel('處理摘要 Summary of Action (可複選)'),
         const SizedBox(height: 8),
         _buildActionSummaryGrid(viewModel),
-        if (_summaryOfAction.contains('其它')) ...[
+        if (_selectedActionItemIds.contains(
+          viewModel.actionItems
+              .firstWhere(
+                (item) => item.name == '其他',
+                orElse: () => viewModel.actionItems.first,
+              )
+              .id,
+        )) ...[
           const SizedBox(height: 12),
           _buildTextField(
             hint: '請詳述其它處理項目...',
@@ -685,7 +729,131 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
     );
   }
 
+  Widget _buildTriageSelector(TreatmentViewModel viewModel) {
+    final treatment = viewModel.treatment;
+
+    return Row(
+      children: viewModel.triageLevels.map((triageLevel) {
+        bool isSel = treatment?.triageId == triageLevel.id;
+
+        // 解析顏色
+        Color color = Colors.grey;
+        if (triageLevel.colorCode.startsWith('#')) {
+          try {
+            String hex = triageLevel.colorCode.replaceAll('#', '');
+            if (hex.length == 6) hex = 'FF$hex';
+            color = Color(int.parse('0x$hex'));
+          } catch (e) {
+            // ignore
+          }
+        } else {
+          switch (triageLevel.colorCode.toLowerCase()) {
+            case 'red':
+              color = Colors.red;
+              break;
+            case 'orange':
+              color = Colors.orange;
+              break;
+            case 'yellow':
+              color = Colors.yellow.shade700;
+              break;
+            case 'green':
+              color = Colors.green;
+              break;
+            case 'blue':
+              color = Colors.blue;
+              break;
+          }
+        }
+
+        return Expanded(
+          child: GestureDetector(
+            onTap: () {
+              viewModel.updateTriageId(triageLevel.id);
+            },
+            child: Container(
+              height: 60,
+              margin: const EdgeInsets.symmetric(horizontal: 4),
+              decoration: BoxDecoration(
+                color: isSel ? color : color.withValues(alpha: 0.05),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: isSel ? color : color.withValues(alpha: 0.2),
+                  width: isSel ? 2 : 1,
+                ),
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    triageLevel.level.toString(),
+                    style: TextStyle(
+                      color: isSel ? Colors.white : color,
+                      fontWeight: FontWeight.w900,
+                      fontSize: 16,
+                    ),
+                  ),
+                  Text(
+                    triageLevel.name,
+                    style: TextStyle(
+                      color: isSel ? Colors.white : color,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 10,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _buildActionSummaryGrid(TreatmentViewModel viewModel) {
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: viewModel.actionItems.map((item) {
+        bool isSelected = _selectedActionItemIds.contains(item.id);
+        return FilterChip(
+          label: Text(item.name, style: const TextStyle(fontSize: 12)),
+          selected: isSelected,
+          onSelected: (sel) {
+            setState(() {
+              if (sel) {
+                _selectedActionItemIds.add(item.id);
+              } else {
+                _selectedActionItemIds.remove(item.id);
+              }
+            });
+            // 更新到 ViewModel - 將選中的 ID 列表轉為逗號分隔的字串
+            final actionSummary = _selectedActionItemIds
+                .map((id) {
+                  final item = viewModel.actionItems.firstWhere(
+                    (a) => a.id == id,
+                    orElse: () => viewModel.actionItems.first,
+                  );
+                  return item.name;
+                })
+                .join(',');
+            viewModel.updateActionSummary(actionSummary);
+          },
+          selectedColor: primaryColor.withValues(alpha: 0.1),
+          checkmarkColor: primaryColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(6),
+            side: BorderSide(color: isSelected ? primaryColor : borderColor),
+          ),
+          backgroundColor: Colors.white,
+          padding: const EdgeInsets.symmetric(horizontal: 4),
+        );
+      }).toList(),
+    );
+  }
+
   Widget _buildStaffSignsSection(TreatmentViewModel viewModel) {
+    // 取得醫師和護理師列表
     final doctors = viewModel.medicalStaffList
         .where((staff) => staff.role == 'Doctor')
         .toList();
@@ -693,6 +861,7 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
         .where((staff) => staff.role == 'Nurse')
         .toList();
 
+    // 取得已指派的主要醫師和護理師
     final primaryDoctor = viewModel.staffAssignments
         .where((a) => a.staffRole == 'Doctor' && a.isPrimary)
         .firstOrNull;
@@ -705,11 +874,7 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
       children: [
         _buildLabel('院長/負責人 Director Name'),
         const SizedBox(height: 4),
-        _buildTextField(
-          hint: '',
-          controller: _directorNameController,
-          onChanged: (val) => viewModel.updateDirectorName(val),
-        ),
+        _buildTextField(hint: ''),
         const SizedBox(height: 20),
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -721,21 +886,19 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
                 children: [
                   _buildLabel('主責醫師 Lead Physician'),
                   const SizedBox(height: 4),
-                  _buildDropdownField(
-                    hint: '請選擇主責醫師',
-                    value: primaryDoctor?.staffId != null
-                        ? viewModel
-                              .getMedicalStaffById(primaryDoctor!.staffId)
-                              ?.name
-                        : null,
-                    items: doctors.map((d) => d.name).toList(),
-                    onChanged: (val) {
-                      final doctor = doctors.firstWhere((d) => d.name == val);
-                      viewModel.addStaffAssignment(
-                        staffRole: 'Doctor',
-                        staffId: doctor.id,
-                        isPrimary: true,
-                      );
+                  _buildStaffDropdown(
+                    viewModel,
+                    doctors,
+                    primaryDoctor?.staffId,
+                    '請選擇主責醫師',
+                    (staffId) {
+                      if (staffId != null) {
+                        viewModel.addStaffAssignment(
+                          staffRole: 'Doctor',
+                          staffId: staffId,
+                          isPrimary: true,
+                        );
+                      }
                     },
                   ),
                   const SizedBox(height: 20),
@@ -748,25 +911,19 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
                           children: [
                             _buildLabel('主責護理師 Lead Nurse'),
                             const SizedBox(height: 4),
-                            _buildDropdownField(
-                              hint: '請選擇主責護理師',
-                              value: primaryNurse?.staffId != null
-                                  ? viewModel
-                                        .getMedicalStaffById(
-                                          primaryNurse!.staffId,
-                                        )
-                                        ?.name
-                                  : null,
-                              items: nurses.map((n) => n.name).toList(),
-                              onChanged: (val) {
-                                final nurse = nurses.firstWhere(
-                                  (n) => n.name == val,
-                                );
-                                viewModel.addStaffAssignment(
-                                  staffRole: 'Nurse',
-                                  staffId: nurse.id,
-                                  isPrimary: true,
-                                );
+                            _buildStaffDropdown(
+                              viewModel,
+                              nurses,
+                              primaryNurse?.staffId,
+                              '請選擇主責護理師',
+                              (staffId) {
+                                if (staffId != null) {
+                                  viewModel.addStaffAssignment(
+                                    staffRole: 'Nurse',
+                                    staffId: staffId,
+                                    isPrimary: true,
+                                  );
+                                }
                               },
                             ),
                           ],
@@ -799,14 +956,14 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   RichText(
-                    text: const TextSpan(
+                    text: TextSpan(
                       text: 'EMT 姓名 EMT Name ',
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: textMuted,
                         fontSize: 10,
                         fontWeight: FontWeight.bold,
                       ),
-                      children: [
+                      children: const [
                         TextSpan(
                           text: '(備註：EMT 有到現場協助出診才需填寫)',
                           style: TextStyle(
@@ -818,10 +975,7 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
                     ),
                   ),
                   const SizedBox(height: 4),
-                  _buildTextField(
-                    hint: '姓名 / 員工編號',
-                    controller: _emtNameController,
-                  ),
+                  _buildTextField(hint: '姓名 / 員工編號'),
                 ],
               ),
             ),
@@ -850,8 +1004,11 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
               ),
             ),
             const SizedBox(width: 8),
-            IconButton(
-              onPressed: () {
+            _buildActionIconBtn(
+              Icons.person_add_alt_1,
+              primaryColor.withValues(alpha: 0.1),
+              primaryColor.withValues(alpha: 0.2),
+              onTap: () {
                 if (_assistStaffController.text.isNotEmpty) {
                   setState(() {
                     _assistStaffList.add(_assistStaffController.text);
@@ -859,28 +1016,52 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
                   });
                 }
               },
-              icon: const Icon(Icons.add_circle, color: primaryColor),
             ),
           ],
         ),
         if (_assistStaffList.isNotEmpty) ...[
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
           Wrap(
-            spacing: 6,
-            runSpacing: 6,
+            spacing: 8,
             children: _assistStaffList
                 .map(
-                  (name) => Chip(
-                    label: Text(name, style: const TextStyle(fontSize: 12)),
-                    deleteIcon: const Icon(Icons.close, size: 16),
+                  (staff) => Chip(
+                    label: Text(staff, style: const TextStyle(fontSize: 12)),
+                    deleteIcon: const Icon(Icons.close, size: 14),
                     onDeleted: () =>
-                        setState(() => _assistStaffList.remove(name)),
+                        setState(() => _assistStaffList.remove(staff)),
+                    backgroundColor: bgField,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                   ),
                 )
                 .toList(),
           ),
         ],
       ],
+    );
+  }
+
+  Widget _buildSignaturePad(String placeholder) {
+    return Container(
+      height: 44,
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: bgField,
+        border: Border.all(color: borderColor, style: BorderStyle.solid),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Center(
+        child: Text(
+          placeholder,
+          style: TextStyle(
+            color: textMuted.withValues(alpha: 0.5),
+            fontSize: 12,
+            fontStyle: FontStyle.italic,
+          ),
+        ),
+      ),
     );
   }
 
@@ -891,19 +1072,21 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
         Wrap(
           spacing: 10,
           runSpacing: 10,
-          children: _specialNoteOptions.map((note) {
+          children: viewModel.specialNoteRefs.map((ref) {
+            final note = ref.name;
             final bool isSelected = _selectedSpecialNotes.contains(note);
             return FilterChip(
               label: Text(note),
               selected: isSelected,
-              onSelected: (selected) {
+              onSelected: (sel) {
                 setState(() {
-                  if (selected) {
+                  if (sel) {
                     _selectedSpecialNotes.add(note);
                   } else {
                     _selectedSpecialNotes.remove(note);
                   }
                 });
+                // 更新到資料庫
                 viewModel.updateSpecialNotes(
                   selectedNotes: _selectedSpecialNotes.join(','),
                 );
@@ -930,238 +1113,255 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
         const SizedBox(height: 24),
         _buildLabel('其他特別註記 Other Notes'),
         const SizedBox(height: 8),
-        _buildTextField(
-          hint: '請輸入其他需要補充的特殊狀況...',
-          maxLines: 3,
-          controller: _otherNotesController,
-        ),
+        _buildTextField(hint: '請輸入其他需要補充的特殊狀況...', maxLines: 3),
       ],
     );
   }
 
-  // --- 特殊 UI 組件 ---
+  // --- Dropdown 元件 ---
 
-  Widget _buildTriageSelector(
+  Widget _buildComplaintTypeDropdown(
     TreatmentViewModel viewModel,
-    TreatmentData? treatment,
+    ChiefComplaintData? complaint,
   ) {
-    final List<Map<String, dynamic>> levels = [
-      {'val': 1, 'color': Colors.red, 'num': '1', 'desc': '復甦急救'},
-      {'val': 2, 'color': Colors.orange, 'num': '2', 'desc': '危急'},
-      {'val': 3, 'color': Colors.yellow.shade700, 'num': '3', 'desc': '緊急'},
-      {'val': 4, 'color': Colors.green, 'num': '4', 'desc': '次緊急'},
-      {'val': 5, 'color': Colors.blue, 'num': '5', 'desc': '非緊急'},
-    ];
+    final selectedType = complaint?.chiefComplaintTypeId != null
+        ? viewModel.getComplaintTypeById(complaint!.chiefComplaintTypeId)
+        : null;
 
-    return Row(
-      children: levels.map((l) {
-        final triageLevel = viewModel.triageLevels
-            .where((t) => t.level == l['val'])
-            .firstOrNull;
-        bool isSel = treatment?.triageId == triageLevel?.id;
-
-        return Expanded(
-          child: GestureDetector(
-            onTap: () {
-              if (triageLevel != null) {
-                viewModel.updateTriageId(triageLevel.id);
-              }
-            },
-            child: Container(
-              height: 60,
-              margin: const EdgeInsets.symmetric(horizontal: 4),
-              decoration: BoxDecoration(
-                color: isSel ? l['color'] : l['color'].withValues(alpha: 0.05),
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(
-                  color: isSel ? l['color'] : l['color'].withValues(alpha: 0.2),
-                  width: isSel ? 2 : 1,
+    return Container(
+      height: 44,
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: borderColor),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<ChiefComplaintTypeData>(
+          value: selectedType,
+          hint: Text(
+            '請選取主訴類別',
+            style: TextStyle(
+              color: textMuted.withValues(alpha: 0.4),
+              fontSize: 14,
+            ),
+          ),
+          isExpanded: true,
+          icon: const Icon(Icons.expand_more, size: 20, color: textMuted),
+          items: viewModel.complaintTypes
+              .map(
+                (type) => DropdownMenuItem<ChiefComplaintTypeData>(
+                  value: type,
+                  child: Text(
+                    type.name,
+                    style: const TextStyle(fontSize: 14, color: textDark),
+                  ),
                 ),
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    l['num'],
-                    style: TextStyle(
-                      color: isSel ? Colors.white : l['color'],
-                      fontWeight: FontWeight.w900,
-                      fontSize: 16,
-                    ),
-                  ),
-                  Text(
-                    l['desc'],
-                    style: TextStyle(
-                      color: isSel ? Colors.white : l['color'],
-                      fontWeight: FontWeight.bold,
-                      fontSize: 10,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
-      }).toList(),
-    );
-  }
-
-  Widget _buildActionSummaryGrid(TreatmentViewModel viewModel) {
-    return Wrap(
-      spacing: 8,
-      runSpacing: 8,
-      children: viewModel.actionItems.map((item) {
-        final bool isSelected = _summaryOfAction.contains(item.name);
-        return FilterChip(
-          label: Text(item.name, style: const TextStyle(fontSize: 12)),
-          selected: isSelected,
-          onSelected: (selected) {
-            setState(() {
-              if (selected) {
-                _summaryOfAction.add(item.name);
-              } else {
-                _summaryOfAction.remove(item.name);
-              }
-            });
-            viewModel.updateActionSummary(_summaryOfAction.join(','));
+              )
+              .toList(),
+          onChanged: (val) {
+            if (val != null) {
+              viewModel.updateChiefComplaint(chiefComplaintTypeId: val.id);
+              _selectedSymptoms.clear();
+            }
           },
-          selectedColor: primaryColor.withValues(alpha: 0.1),
-          checkmarkColor: primaryColor,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(6),
-            side: BorderSide(color: isSelected ? primaryColor : borderColor),
-          ),
-          backgroundColor: Colors.white,
-          padding: const EdgeInsets.symmetric(horizontal: 4),
-        );
-      }).toList(),
-    );
-  }
-
-  Widget _buildTypeButton(
-    String label,
-    IconData icon,
-    bool isSelected,
-    VoidCallback onTap,
-  ) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 10),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? primaryColor.withValues(alpha: 0.05)
-              : Colors.white,
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(
-            color: isSelected ? primaryColor : borderColor,
-            width: isSelected ? 1.5 : 1,
-          ),
-        ),
-        child: Column(
-          children: [
-            Icon(icon, color: isSelected ? primaryColor : textMuted, size: 18),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: TextStyle(
-                color: isSelected ? textDark : textMuted,
-                fontSize: 11,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
         ),
       ),
     );
   }
 
-  Widget _buildSymptomGrid(
+  Widget _buildDiagnosisCategoryDropdown(
     TreatmentViewModel viewModel,
-    ChiefComplaintTypeData selectedType,
+    TreatmentData? treatment,
   ) {
-    final options = selectedType.code == 'TRAUMA'
-        ? ['鈍挫傷', '扭傷', '撕裂傷', '擦傷', '肢體變形', '其它']
-        : ['頭頸部', '胸部', '腹部', '四肢', '其它'];
+    final selectedCategory = treatment?.tentativeCategoryId != null
+        ? viewModel.getDiagnosisCategoryById(treatment!.tentativeCategoryId)
+        : null;
 
-    return Wrap(
-      spacing: 6,
-      runSpacing: 6,
-      children: options
-          .map(
-            (s) => FilterChip(
-              label: Text(s, style: const TextStyle(fontSize: 12)),
-              selected: _selectedSymptoms.contains(s),
-              onSelected: (sel) {
-                setState(() {
-                  if (sel) {
-                    _selectedSymptoms.add(s);
-                  } else {
-                    _selectedSymptoms.remove(s);
-                  }
-                });
-                viewModel.updateChiefComplaint(
-                  selectedSymptoms: _selectedSymptoms.join(','),
-                );
-              },
-              selectedColor: primaryColor.withValues(alpha: 0.1),
-              checkmarkColor: primaryColor,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(6),
-                side: BorderSide(color: borderColor),
-              ),
+    return Container(
+      height: 44,
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: borderColor),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<DiagnosisCategoryData>(
+          value: selectedCategory,
+          hint: Text(
+            '請選取診斷分類',
+            style: TextStyle(
+              color: textMuted.withValues(alpha: 0.4),
+              fontSize: 14,
             ),
-          )
-          .toList(),
+          ),
+          isExpanded: true,
+          icon: const Icon(Icons.expand_more, size: 20, color: textMuted),
+          items: viewModel.diagnosisCategories
+              .map(
+                (cat) => DropdownMenuItem<DiagnosisCategoryData>(
+                  value: cat,
+                  child: Text(
+                    cat.name,
+                    style: const TextStyle(fontSize: 14, color: textDark),
+                  ),
+                ),
+              )
+              .toList(),
+          onChanged: (val) {
+            if (val != null) {
+              viewModel.updateTentativeCategoryId(val.id);
+            }
+          },
+        ),
+      ),
     );
   }
 
-  Widget _buildHealthAssessmentList(TreatmentViewModel viewModel) {
-    return Column(
-      children: viewModel.healthAssessments
-          .map(
-            (assessment) => Padding(
-              padding: const EdgeInsets.only(top: 8),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      assessment.name,
-                      style: const TextStyle(fontSize: 12),
-                    ),
-                  ),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: Text(
-                      assessment.relation,
-                      style: const TextStyle(fontSize: 12),
-                    ),
-                  ),
-                  const SizedBox(width: 6),
-                  SizedBox(
-                    width: 60,
-                    child: Text(
-                      '${assessment.temperature}°C',
-                      style: const TextStyle(fontSize: 12),
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(
-                      Icons.close,
-                      color: Colors.redAccent,
-                      size: 18,
-                    ),
-                    onPressed: () => _showDeleteHealthAssessmentDialog(
-                      context,
-                      viewModel,
-                      assessment,
-                    ),
-                  ),
-                ],
-              ),
+  Widget _buildTreatmentOnSiteDropdown(
+    TreatmentViewModel viewModel,
+    TreatmentData? treatment,
+  ) {
+    final selectedTreatment = treatment?.treatmentOnSiteId != null
+        ? viewModel.getTreatmentOnSiteById(treatment!.treatmentOnSiteId)
+        : null;
+
+    return Container(
+      height: 44,
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: borderColor),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<TreatmentOnSiteData>(
+          value: selectedTreatment,
+          hint: Text(
+            '請選取現場處置',
+            style: TextStyle(
+              color: textMuted.withValues(alpha: 0.4),
+              fontSize: 14,
             ),
-          )
-          .toList(),
+          ),
+          isExpanded: true,
+          icon: const Icon(Icons.expand_more, size: 20, color: textMuted),
+          items: viewModel.treatmentOnSites
+              .map(
+                (treatment) => DropdownMenuItem<TreatmentOnSiteData>(
+                  value: treatment,
+                  child: Text(
+                    treatment.name,
+                    style: const TextStyle(fontSize: 14, color: textDark),
+                  ),
+                ),
+              )
+              .toList(),
+          onChanged: (val) {
+            if (val != null) {
+              viewModel.updateTreatmentOnSiteId(val.id);
+            }
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTreatmentResultDropdown(
+    TreatmentViewModel viewModel,
+    TreatmentData? treatment,
+  ) {
+    final selectedResult = treatment?.resultId != null
+        ? viewModel.getTreatmentResultById(treatment!.resultId)
+        : null;
+
+    return Container(
+      height: 44,
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: borderColor),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<TreatmentResultData>(
+          value: selectedResult,
+          hint: Text(
+            '請選取處置結果',
+            style: TextStyle(
+              color: textMuted.withValues(alpha: 0.4),
+              fontSize: 14,
+            ),
+          ),
+          isExpanded: true,
+          icon: const Icon(Icons.expand_more, size: 20, color: textMuted),
+          items: viewModel.treatmentResults
+              .map(
+                (result) => DropdownMenuItem<TreatmentResultData>(
+                  value: result,
+                  child: Text(
+                    result.name,
+                    style: const TextStyle(fontSize: 14, color: textDark),
+                  ),
+                ),
+              )
+              .toList(),
+          onChanged: (val) {
+            if (val != null) {
+              viewModel.updateResultId(val.id);
+            }
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStaffDropdown(
+    TreatmentViewModel viewModel,
+    List<MedicalStaffData> staffList,
+    int? selectedStaffId,
+    String hint,
+    Function(int?) onChanged,
+  ) {
+    final selectedStaff = selectedStaffId != null
+        ? viewModel.getMedicalStaffById(selectedStaffId)
+        : null;
+
+    return Container(
+      height: 44,
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: borderColor),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<MedicalStaffData>(
+          value: selectedStaff,
+          hint: Text(
+            hint,
+            style: TextStyle(
+              color: textMuted.withValues(alpha: 0.4),
+              fontSize: 14,
+            ),
+          ),
+          isExpanded: true,
+          icon: const Icon(Icons.expand_more, size: 20, color: textMuted),
+          items: staffList
+              .map(
+                (staff) => DropdownMenuItem<MedicalStaffData>(
+                  value: staff,
+                  child: Text(
+                    staff.name,
+                    style: const TextStyle(fontSize: 14, color: textDark),
+                  ),
+                ),
+              )
+              .toList(),
+          onChanged: (val) => onChanged(val?.id),
+        ),
+      ),
     );
   }
 
@@ -1173,81 +1373,32 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
     required Widget child,
   }) {
     return Container(
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: borderColor),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            decoration: const BoxDecoration(
-              border: Border(bottom: BorderSide(color: borderColor)),
-            ),
-            child: Row(
-              children: [
-                Icon(icon, color: primaryColor, size: 18),
-                const SizedBox(width: 8),
-                Text(
-                  title.toUpperCase(),
-                  style: const TextStyle(
-                    color: textDark,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 0.5,
-                  ),
+          Row(
+            children: [
+              Icon(icon, color: primaryColor, size: 20),
+              const SizedBox(width: 8),
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: textDark,
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-          Padding(padding: const EdgeInsets.all(16), child: child),
+          const SizedBox(height: 16),
+          child,
         ],
-      ),
-    );
-  }
-
-  Widget _buildSignaturePad(String placeholder) {
-    return Container(
-      height: 44,
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: bgField,
-        border: Border.all(color: borderColor),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () {
-            // TODO: 開啟簽名板
-          },
-          borderRadius: BorderRadius.circular(8),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  placeholder,
-                  style: TextStyle(
-                    color: textMuted.withValues(alpha: 0.4),
-                    fontSize: 13,
-                  ),
-                ),
-                const Icon(Icons.edit, size: 16, color: textMuted),
-              ],
-            ),
-          ),
-        ),
       ),
     );
   }
@@ -1283,11 +1434,11 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: borderColor),
+          borderSide: const BorderSide(color: borderColor),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: borderColor),
+          borderSide: const BorderSide(color: borderColor),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
@@ -1297,55 +1448,49 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
     );
   }
 
-  Widget _buildDropdownField({
-    required String hint,
-    String? value,
-    required List<String> items,
-    required Function(String?) onChanged,
+  Widget _buildCheckboxTile({
+    required String label,
+    required bool value,
+    required Function(bool?) onChanged,
   }) {
-    return Container(
-      height: 44,
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      decoration: BoxDecoration(
-        color: bgField,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: borderColor),
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<String>(
-          value: value,
-          hint: Text(
-            hint,
-            style: TextStyle(
-              color: textMuted.withValues(alpha: 0.4),
-              fontSize: 13,
-            ),
+    return InkWell(
+      onTap: () => onChanged(!value),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        decoration: BoxDecoration(
+          color: value ? primaryColor.withValues(alpha: 0.05) : bgField,
+          border: Border.all(
+            color: value ? primaryColor.withValues(alpha: 0.2) : borderColor,
           ),
-          isExpanded: true,
-          icon: const Icon(Icons.expand_more, size: 18, color: textMuted),
-          items: items
-              .map(
-                (item) => DropdownMenuItem<String>(
-                  value: item,
-                  child: Text(
-                    item,
-                    style: const TextStyle(fontSize: 13, color: textDark),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              )
-              .toList(),
-          onChanged: onChanged,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Row(
+          children: [
+            SizedBox(
+              width: 24,
+              height: 24,
+              child: Checkbox(
+                value: value,
+                onChanged: onChanged,
+                activeColor: primaryColor,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              label,
+              style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+                color: textDark,
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildSmallCheckbox(
-    String label,
-    bool val,
-    Function(bool?) onChanged,
-  ) {
+  Widget _buildCheckboxRow(String label, bool val, Function(bool?) onChanged) {
     return InkWell(
       onTap: () => onChanged(!val),
       child: Row(
@@ -1434,53 +1579,10 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
     );
   }
 
-  Widget _buildCheckboxTile({
-    required String label,
-    required bool value,
-    required Function(bool?) onChanged,
-  }) {
-    return InkWell(
-      onTap: () => onChanged(!value),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-        decoration: BoxDecoration(
-          color: value ? primaryColor.withValues(alpha: 0.05) : bgField,
-          border: Border.all(
-            color: value ? primaryColor.withValues(alpha: 0.2) : borderColor,
-          ),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Row(
-          children: [
-            SizedBox(
-              width: 24,
-              height: 24,
-              child: Checkbox(
-                value: value,
-                onChanged: onChanged,
-                activeColor: primaryColor,
-              ),
-            ),
-            const SizedBox(width: 8),
-            Text(
-              label,
-              style: const TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.bold,
-                color: textDark,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget _buildPupilSection(
     String side,
     Function(String) onReact,
     String currentReact,
-    TextEditingController controller,
   ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1499,11 +1601,189 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
             ),
             const SizedBox(width: 6),
             Expanded(
-              child: _buildTextField(
-                hint: 'mm',
-                textAlign: TextAlign.center,
-                controller: controller,
+              child: _buildTextField(hint: 'mm', textAlign: TextAlign.center),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildHealthAssessmentList(TreatmentViewModel viewModel) {
+    return Column(
+      children: viewModel.healthAssessments.asMap().entries.map((entry) {
+        final index = entry.key;
+        final assessment = entry.value;
+
+        // 確保 controller 存在
+        if (!_healthAssessmentControllers.containsKey(index)) {
+          _healthAssessmentControllers[index] = {
+            'name': TextEditingController(text: assessment.name),
+            'relation': TextEditingController(text: assessment.relation),
+            'temp': TextEditingController(
+              text: assessment.temperature.toString(),
+            ),
+          };
+        }
+
+        final controllers = _healthAssessmentControllers[index]!;
+
+        return Padding(
+          padding: const EdgeInsets.only(top: 8),
+          child: Row(
+            children: [
+              Expanded(
+                child: _buildTextField(
+                  hint: '姓名',
+                  controller: controllers['name'],
+                  onChanged: (val) async {
+                    setState(() {
+                      controllers['name']?.text = val;
+                    });
+                    // 保存到資料庫
+                    final temp =
+                        double.tryParse(controllers['temp']?.text ?? '0') ??
+                        0.0;
+                    await viewModel.updateHealthAssessment(
+                      assessmentFormId: assessment.assessmentFormId,
+                      name: val,
+                      relation: controllers['relation']?.text ?? '',
+                      temperature: temp,
+                    );
+                  },
+                ),
               ),
+              const SizedBox(width: 6),
+              Expanded(
+                child: _buildTextField(
+                  hint: '關係',
+                  controller: controllers['relation'],
+                  onChanged: (val) async {
+                    setState(() {
+                      controllers['relation']?.text = val;
+                    });
+                    // 保存到資料庫
+                    final temp =
+                        double.tryParse(controllers['temp']?.text ?? '0') ??
+                        0.0;
+                    await viewModel.updateHealthAssessment(
+                      assessmentFormId: assessment.assessmentFormId,
+                      name: controllers['name']?.text ?? '',
+                      relation: val,
+                      temperature: temp,
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(width: 6),
+              SizedBox(
+                width: 60,
+                child: _buildTextField(
+                  hint: '體溫',
+                  controller: controllers['temp'],
+                  onChanged: (val) async {
+                    setState(() {
+                      controllers['temp']?.text = val;
+                    });
+                    // 保存到資料庫
+                    final temp = double.tryParse(val) ?? 0.0;
+                    await viewModel.updateHealthAssessment(
+                      assessmentFormId: assessment.assessmentFormId,
+                      name: controllers['name']?.text ?? '',
+                      relation: controllers['relation']?.text ?? '',
+                      temperature: temp,
+                    );
+                  },
+                ),
+              ),
+              IconButton(
+                icon: const Icon(
+                  Icons.close,
+                  color: Colors.redAccent,
+                  size: 18,
+                ),
+                onPressed: () async {
+                  // 從資料庫中刪除
+                  await viewModel.deleteHealthAssessment(
+                    assessment.assessmentFormId,
+                  );
+
+                  // 清理 controller
+                  _healthAssessmentControllers[index]?['name']?.dispose();
+                  _healthAssessmentControllers[index]?['relation']?.dispose();
+                  _healthAssessmentControllers[index]?['temp']?.dispose();
+                  _healthAssessmentControllers.remove(index);
+                },
+              ),
+            ],
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _buildSymptomGrid(
+    TreatmentViewModel viewModel,
+    ChiefComplaintData complaint,
+  ) {
+    final selectedType = viewModel.getComplaintTypeById(
+      complaint.chiefComplaintTypeId,
+    );
+
+    // 根據主訴類型顯示不同的症狀選項
+    final options = selectedType?.code == 'TRAUMA'
+        ? ['鈍挫傷', '扭傷', '撕裂傷', '擦傷', '肢體變形', '其它']
+        : ['頭頸部', '胸部', '腹部', '四肢', '其它'];
+
+    return Wrap(
+      spacing: 6,
+      runSpacing: 6,
+      children: options
+          .map(
+            (s) => FilterChip(
+              label: Text(s, style: const TextStyle(fontSize: 12)),
+              selected: _selectedSymptoms.contains(s),
+              onSelected: (sel) {
+                setState(() {
+                  if (sel) {
+                    _selectedSymptoms.add(s);
+                  } else {
+                    _selectedSymptoms.remove(s);
+                  }
+                });
+                // 更新到資料庫
+                viewModel.updateChiefComplaint(
+                  selectedSymptoms: _selectedSymptoms.join(','),
+                );
+              },
+              selectedColor: primaryColor.withValues(alpha: 0.1),
+              checkmarkColor: primaryColor,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(6),
+                side: const BorderSide(color: borderColor),
+              ),
+            ),
+          )
+          .toList(),
+    );
+  }
+
+  Widget _buildIcdRow(String label, String hint) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildLabel(label),
+        const SizedBox(height: 4),
+        Row(
+          children: [
+            Expanded(child: _buildTextField(hint: hint)),
+            const SizedBox(width: 8),
+            _buildActionIconBtn(Icons.search, Colors.white, borderColor),
+            const SizedBox(width: 8),
+            _buildActionIconBtn(
+              Icons.language,
+              const Color(0xFFEFF6FF),
+              const Color(0xFFDBEAFE),
             ),
           ],
         ),
@@ -1521,123 +1801,37 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
     ),
   );
 
-  // --- 對話框方法 ---
+  Widget _buildLabeledField(String label, String hint) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildLabel(label),
+        const SizedBox(height: 4),
+        _buildTextField(hint: hint),
+      ],
+    );
+  }
 
-  Future<void> _showAddHealthAssessmentDialog(
-    BuildContext context,
-    TreatmentViewModel viewModel,
-  ) async {
-    final nameController = TextEditingController();
-    final relationController = TextEditingController();
-    final temperatureController = TextEditingController();
-
-    return showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('新增健康評估表'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: nameController,
-              decoration: const InputDecoration(
-                labelText: '姓名',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: relationController,
-              decoration: const InputDecoration(
-                labelText: '關係',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: temperatureController,
-              decoration: const InputDecoration(
-                labelText: '體溫 (°C)',
-                border: OutlineInputBorder(),
-              ),
-              keyboardType: const TextInputType.numberWithOptions(
-                decimal: true,
-              ),
-            ),
-          ],
+  Widget _buildActionIconBtn(
+    IconData icon,
+    Color bgColor,
+    Color borderColor, {
+    VoidCallback? onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 44,
+        height: 44,
+        decoration: BoxDecoration(
+          color: bgColor,
+          borderRadius: BorderRadius.circular(6),
+          border: Border.all(color: borderColor),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('取消'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              final name = nameController.text.trim();
-              final relation = relationController.text.trim();
-              final temperatureText = temperatureController.text.trim();
-
-              if (name.isEmpty || relation.isEmpty || temperatureText.isEmpty) {
-                ScaffoldMessenger.of(
-                  context,
-                ).showSnackBar(const SnackBar(content: Text('請填寫所有欄位')));
-                return;
-              }
-
-              final temperature = double.tryParse(temperatureText);
-              if (temperature == null) {
-                ScaffoldMessenger.of(
-                  context,
-                ).showSnackBar(const SnackBar(content: Text('體溫格式不正確')));
-                return;
-              }
-
-              viewModel.addHealthAssessment(
-                name: name,
-                relation: relation,
-                temperature: temperature,
-              );
-
-              Navigator.of(context).pop();
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(const SnackBar(content: Text('已新增健康評估表')));
-            },
-            child: const Text('新增'),
-          ),
-        ],
+        child: Center(child: Icon(icon, size: 18, color: primaryColor)),
       ),
     );
   }
 
-  Future<void> _showDeleteHealthAssessmentDialog(
-    BuildContext context,
-    TreatmentViewModel viewModel,
-    HealthAssessmentFormData assessment,
-  ) async {
-    return showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('刪除健康評估表'),
-        content: Text('確定要刪除 ${assessment.name} 的健康評估表嗎?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('取消'),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            onPressed: () {
-              viewModel.deleteHealthAssessment(assessment.medicalId);
-              Navigator.of(context).pop();
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(const SnackBar(content: Text('已刪除健康評估表')));
-            },
-            child: const Text('刪除'),
-          ),
-        ],
-      ),
-    );
-  }
+  // --- 對話框方法 ---
 }

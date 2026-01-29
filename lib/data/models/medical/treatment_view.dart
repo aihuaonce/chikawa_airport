@@ -14,6 +14,10 @@ class TreatmentViewModel extends ChangeNotifier {
 
   // === 各種資料快取 ===
 
+  // 醫療主表記錄
+  MedicalRecordData? _medicalRecord;
+  MedicalRecordData? get medicalRecord => _medicalRecord;
+
   // 健康評估表列表
   List<HealthAssessmentFormData> _healthAssessments = [];
   List<HealthAssessmentFormData> get healthAssessments => _healthAssessments;
@@ -59,6 +63,7 @@ class TreatmentViewModel extends ChangeNotifier {
       refService.referralHospitals;
   List<ActionItemData> get actionItems => refService.actionItems;
   List<MedicalStaffData> get medicalStaffList => refService.medicalStaffList;
+  List<SpecialNoteRefData> get specialNoteRefs => refService.specialNoteRefs;
 
   // === 延遲存檔與狀態 ===
   Timer? _debounceTimer;
@@ -74,6 +79,9 @@ class TreatmentViewModel extends ChangeNotifier {
   }
 
   Future<void> _loadAllData() async {
+    // 載入醫療主表記錄
+    _medicalRecord = await db.medicalDao.getMedicalById(medicalId);
+
     // 載入健康評估表
     _healthAssessments = await db.treatmentDao.getHealthAssessments(medicalId);
 
@@ -127,7 +135,7 @@ class TreatmentViewModel extends ChangeNotifier {
   Future<void> addHealthAssessment({
     required String name,
     required String relation,
-    required double temperature,
+    double? temperature,
   }) async {
     try {
       await db.treatmentDao.insertHealthAssessment(
@@ -135,7 +143,7 @@ class TreatmentViewModel extends ChangeNotifier {
           medicalId: medicalId,
           name: name,
           relation: relation,
-          temperature: temperature,
+          temperature: temperature ?? 0.0,
         ),
       );
       await _reloadHealthAssessments();
@@ -155,8 +163,58 @@ class TreatmentViewModel extends ChangeNotifier {
     }
   }
 
+  Future<void> updateHealthAssessment({
+    required int assessmentFormId,
+    required String name,
+    required String relation,
+    required double temperature,
+  }) async {
+    try {
+      await db.treatmentDao.updateHealthAssessment(
+        HealthAssessmentFormCompanion(
+          assessmentFormId: Value(assessmentFormId),
+          medicalId: Value(medicalId),
+          name: Value(name),
+          relation: Value(relation),
+          temperature: Value(temperature),
+        ),
+      );
+      await _reloadHealthAssessments();
+      debugPrint('系統:更新健康評估表成功');
+    } catch (e) {
+      debugPrint('系統:更新健康評估表失敗 - $e');
+    }
+  }
+
+  // ===================================================================
+  // CDC 篩檢相關
+  // ===================================================================
+
+  Future<void> updateCDCStatus({
+    required bool cdcPassed,
+    required String screeningMethod,
+  }) async {
+    try {
+      // 更新 Medical 表中的 CDC 篩檢狀態（不是 Treatment 表）
+      await db.medicalDao.updateCDCStatus(
+        medicalId: medicalId,
+        cdcPassed: cdcPassed,
+        screeningMethod: screeningMethod,
+      );
+      await _reloadMedicalRecord();
+      debugPrint('系統:CDC 篩檢狀態已更新（Medical 表）');
+    } catch (e) {
+      debugPrint('系統:更新 CDC 篩檢狀態失敗 - $e');
+    }
+  }
+
   Future<void> _reloadHealthAssessments() async {
     _healthAssessments = await db.treatmentDao.getHealthAssessments(medicalId);
+    notifyListeners();
+  }
+
+  Future<void> _reloadMedicalRecord() async {
+    _medicalRecord = await db.medicalDao.getMedicalById(medicalId);
     notifyListeners();
   }
 
@@ -495,6 +553,18 @@ class TreatmentViewModel extends ChangeNotifier {
     bool isPrimary = false,
   }) async {
     try {
+      // 防止重複的主責人員：若新增的是主責，先刪除舊的主責
+      if (isPrimary) {
+        final existingPrimary = _staffAssignments.where(
+          (a) => a.staffRole == staffRole && a.isPrimary,
+        );
+        for (var assignment in existingPrimary) {
+          await db.treatmentDao.deleteStaffAssignment(
+            assignment.staffAssignmentId,
+          );
+        }
+      }
+
       await db.treatmentDao.insertStaffAssignment(
         MedicalStaffAssignmentCompanion.insert(
           medicalId: medicalId,
