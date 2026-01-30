@@ -1155,6 +1155,19 @@ class TreatmentViewModel extends ChangeNotifier {
             otherNotes: Value(otherNotes),
           ),
         );
+      } else {
+        await db.treatmentDao.updateSpecialNotes(
+          SpecialNotesCompanion(
+            noteId: Value(_specialNotes!.noteId),
+            medicalId: Value(_specialNotes!.medicalId),
+            selectedNotes: selectedNotes != null
+                ? Value(selectedNotes)
+                : const Value.absent(),
+            otherNotes: otherNotes != null
+                ? Value(otherNotes)
+                : const Value.absent(),
+          ),
+        );
       }
       _specialNotes = await db.treatmentDao.getSpecialNotes(medicalId);
       notifyListeners();

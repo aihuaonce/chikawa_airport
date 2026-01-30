@@ -91,6 +91,7 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
 
   // 負責人與 EMT
   late TextEditingController _directorNameController;
+  late TextEditingController _otherSpecialNoteController;
 
   // 健康評估表 controller（數據來自 ViewModel）
   final Map<int, Map<String, TextEditingController>>
@@ -109,6 +110,7 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
     _actionSummaryOtherController = TextEditingController();
     _assistStaffController = TextEditingController();
     _directorNameController = TextEditingController();
+    _otherSpecialNoteController = TextEditingController();
 
     // 生命徵象 Controllers
     _tempController = TextEditingController();
@@ -145,6 +147,7 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
     _actionSummaryOtherController.dispose();
     _assistStaffController.dispose();
     _directorNameController.dispose();
+    _otherSpecialNoteController.dispose();
 
     // 清理生命徵象 Controllers
     _tempController.dispose();
@@ -240,6 +243,17 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
         _assistStaffList.clear();
         _assistStaffList.addAll(treatment.assistStaff!.split(','));
       }
+    }
+
+    // 載入特別註記
+    final specialNotes = viewModel.specialNotes;
+    if (specialNotes != null) {
+      if (specialNotes.selectedNotes != null &&
+          specialNotes.selectedNotes!.isNotEmpty) {
+        _selectedSpecialNotes.clear();
+        _selectedSpecialNotes.addAll(specialNotes.selectedNotes!.split(','));
+      }
+      _otherSpecialNoteController.text = specialNotes.otherNotes ?? '';
     }
 
     // 檢查已有影像，自動勾選對應類型
@@ -1810,7 +1824,12 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
         const SizedBox(height: 24),
         _buildLabel('其他特別註記 Other Notes'),
         const SizedBox(height: 8),
-        _buildTextField(hint: '請輸入其他需要補充的特殊狀況...', maxLines: 3),
+        _buildTextField(
+          hint: '請輸入其他需要補充的特殊狀況...',
+          maxLines: 3,
+          controller: _otherSpecialNoteController,
+          onChanged: (val) => viewModel.updateSpecialNotes(otherNotes: val),
+        ),
       ],
     );
   }
