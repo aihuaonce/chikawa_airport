@@ -239,21 +239,8 @@ class $NationalityTable extends Nationality
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
-  static const VerificationMeta _codeMeta = const VerificationMeta('code');
   @override
-  late final GeneratedColumn<String> code = GeneratedColumn<String>(
-    'code',
-    aliasedName,
-    true,
-    additionalChecks: GeneratedColumn.checkTextLength(
-      minTextLength: 1,
-      maxTextLength: 10,
-    ),
-    type: DriftSqlType.string,
-    requiredDuringInsert: false,
-  );
-  @override
-  List<GeneratedColumn> get $columns => [nationalityId, name, nameEn, code];
+  List<GeneratedColumn> get $columns => [nationalityId, name, nameEn];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -289,12 +276,6 @@ class $NationalityTable extends Nationality
         nameEn.isAcceptableOrUnknown(data['name_en']!, _nameEnMeta),
       );
     }
-    if (data.containsKey('code')) {
-      context.handle(
-        _codeMeta,
-        code.isAcceptableOrUnknown(data['code']!, _codeMeta),
-      );
-    }
     return context;
   }
 
@@ -316,10 +297,6 @@ class $NationalityTable extends Nationality
         DriftSqlType.string,
         data['${effectivePrefix}name_en'],
       ),
-      code: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}code'],
-      ),
     );
   }
 
@@ -333,12 +310,10 @@ class NationalityData extends DataClass implements Insertable<NationalityData> {
   final int nationalityId;
   final String name;
   final String? nameEn;
-  final String? code;
   const NationalityData({
     required this.nationalityId,
     required this.name,
     this.nameEn,
-    this.code,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -347,9 +322,6 @@ class NationalityData extends DataClass implements Insertable<NationalityData> {
     map['name'] = Variable<String>(name);
     if (!nullToAbsent || nameEn != null) {
       map['name_en'] = Variable<String>(nameEn);
-    }
-    if (!nullToAbsent || code != null) {
-      map['code'] = Variable<String>(code);
     }
     return map;
   }
@@ -361,7 +333,6 @@ class NationalityData extends DataClass implements Insertable<NationalityData> {
       nameEn: nameEn == null && nullToAbsent
           ? const Value.absent()
           : Value(nameEn),
-      code: code == null && nullToAbsent ? const Value.absent() : Value(code),
     );
   }
 
@@ -374,7 +345,6 @@ class NationalityData extends DataClass implements Insertable<NationalityData> {
       nationalityId: serializer.fromJson<int>(json['nationalityId']),
       name: serializer.fromJson<String>(json['name']),
       nameEn: serializer.fromJson<String?>(json['nameEn']),
-      code: serializer.fromJson<String?>(json['code']),
     );
   }
   @override
@@ -384,7 +354,6 @@ class NationalityData extends DataClass implements Insertable<NationalityData> {
       'nationalityId': serializer.toJson<int>(nationalityId),
       'name': serializer.toJson<String>(name),
       'nameEn': serializer.toJson<String?>(nameEn),
-      'code': serializer.toJson<String?>(code),
     };
   }
 
@@ -392,12 +361,10 @@ class NationalityData extends DataClass implements Insertable<NationalityData> {
     int? nationalityId,
     String? name,
     Value<String?> nameEn = const Value.absent(),
-    Value<String?> code = const Value.absent(),
   }) => NationalityData(
     nationalityId: nationalityId ?? this.nationalityId,
     name: name ?? this.name,
     nameEn: nameEn.present ? nameEn.value : this.nameEn,
-    code: code.present ? code.value : this.code,
   );
   NationalityData copyWithCompanion(NationalityCompanion data) {
     return NationalityData(
@@ -406,7 +373,6 @@ class NationalityData extends DataClass implements Insertable<NationalityData> {
           : this.nationalityId,
       name: data.name.present ? data.name.value : this.name,
       nameEn: data.nameEn.present ? data.nameEn.value : this.nameEn,
-      code: data.code.present ? data.code.value : this.code,
     );
   }
 
@@ -415,52 +381,45 @@ class NationalityData extends DataClass implements Insertable<NationalityData> {
     return (StringBuffer('NationalityData(')
           ..write('nationalityId: $nationalityId, ')
           ..write('name: $name, ')
-          ..write('nameEn: $nameEn, ')
-          ..write('code: $code')
+          ..write('nameEn: $nameEn')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(nationalityId, name, nameEn, code);
+  int get hashCode => Object.hash(nationalityId, name, nameEn);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is NationalityData &&
           other.nationalityId == this.nationalityId &&
           other.name == this.name &&
-          other.nameEn == this.nameEn &&
-          other.code == this.code);
+          other.nameEn == this.nameEn);
 }
 
 class NationalityCompanion extends UpdateCompanion<NationalityData> {
   final Value<int> nationalityId;
   final Value<String> name;
   final Value<String?> nameEn;
-  final Value<String?> code;
   const NationalityCompanion({
     this.nationalityId = const Value.absent(),
     this.name = const Value.absent(),
     this.nameEn = const Value.absent(),
-    this.code = const Value.absent(),
   });
   NationalityCompanion.insert({
     this.nationalityId = const Value.absent(),
     required String name,
     this.nameEn = const Value.absent(),
-    this.code = const Value.absent(),
   }) : name = Value(name);
   static Insertable<NationalityData> custom({
     Expression<int>? nationalityId,
     Expression<String>? name,
     Expression<String>? nameEn,
-    Expression<String>? code,
   }) {
     return RawValuesInsertable({
       if (nationalityId != null) 'nationality_id': nationalityId,
       if (name != null) 'name': name,
       if (nameEn != null) 'name_en': nameEn,
-      if (code != null) 'code': code,
     });
   }
 
@@ -468,13 +427,11 @@ class NationalityCompanion extends UpdateCompanion<NationalityData> {
     Value<int>? nationalityId,
     Value<String>? name,
     Value<String?>? nameEn,
-    Value<String?>? code,
   }) {
     return NationalityCompanion(
       nationalityId: nationalityId ?? this.nationalityId,
       name: name ?? this.name,
       nameEn: nameEn ?? this.nameEn,
-      code: code ?? this.code,
     );
   }
 
@@ -490,9 +447,6 @@ class NationalityCompanion extends UpdateCompanion<NationalityData> {
     if (nameEn.present) {
       map['name_en'] = Variable<String>(nameEn.value);
     }
-    if (code.present) {
-      map['code'] = Variable<String>(code.value);
-    }
     return map;
   }
 
@@ -501,8 +455,7 @@ class NationalityCompanion extends UpdateCompanion<NationalityData> {
     return (StringBuffer('NationalityCompanion(')
           ..write('nationalityId: $nationalityId, ')
           ..write('name: $name, ')
-          ..write('nameEn: $nameEn, ')
-          ..write('code: $code')
+          ..write('nameEn: $nameEn')
           ..write(')'))
         .toString();
   }
@@ -15947,14 +15900,12 @@ typedef $$NationalityTableCreateCompanionBuilder =
       Value<int> nationalityId,
       required String name,
       Value<String?> nameEn,
-      Value<String?> code,
     });
 typedef $$NationalityTableUpdateCompanionBuilder =
     NationalityCompanion Function({
       Value<int> nationalityId,
       Value<String> name,
       Value<String?> nameEn,
-      Value<String?> code,
     });
 
 final class $$NationalityTableReferences
@@ -16008,11 +15959,6 @@ class $$NationalityTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get code => $composableBuilder(
-    column: $table.code,
-    builder: (column) => ColumnFilters(column),
-  );
-
   Expression<bool> patientRefs(
     Expression<bool> Function($$PatientTableFilterComposer f) f,
   ) {
@@ -16062,11 +16008,6 @@ class $$NationalityTableOrderingComposer
     column: $table.nameEn,
     builder: (column) => ColumnOrderings(column),
   );
-
-  ColumnOrderings<String> get code => $composableBuilder(
-    column: $table.code,
-    builder: (column) => ColumnOrderings(column),
-  );
 }
 
 class $$NationalityTableAnnotationComposer
@@ -16088,9 +16029,6 @@ class $$NationalityTableAnnotationComposer
 
   GeneratedColumn<String> get nameEn =>
       $composableBuilder(column: $table.nameEn, builder: (column) => column);
-
-  GeneratedColumn<String> get code =>
-      $composableBuilder(column: $table.code, builder: (column) => column);
 
   Expression<T> patientRefs<T extends Object>(
     Expression<T> Function($$PatientTableAnnotationComposer a) f,
@@ -16149,24 +16087,20 @@ class $$NationalityTableTableManager
                 Value<int> nationalityId = const Value.absent(),
                 Value<String> name = const Value.absent(),
                 Value<String?> nameEn = const Value.absent(),
-                Value<String?> code = const Value.absent(),
               }) => NationalityCompanion(
                 nationalityId: nationalityId,
                 name: name,
                 nameEn: nameEn,
-                code: code,
               ),
           createCompanionCallback:
               ({
                 Value<int> nationalityId = const Value.absent(),
                 required String name,
                 Value<String?> nameEn = const Value.absent(),
-                Value<String?> code = const Value.absent(),
               }) => NationalityCompanion.insert(
                 nationalityId: nationalityId,
                 name: name,
                 nameEn: nameEn,
-                code: code,
               ),
           withReferenceMapper: (p0) => p0
               .map(

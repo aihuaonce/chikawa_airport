@@ -104,39 +104,21 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
     )..where((n) => n.nationalityId.equals(id))).getSingleOrNull();
   }
 
-  // 根據代碼取得國籍
-  Future<NationalityData?> getNationalityByCode(String code) {
-    return (select(
-      nationality,
-    )..where((n) => n.code.equals(code))).getSingleOrNull();
-  }
-
   // 搜尋國籍 (模糊搜尋名稱)
   Future<List<NationalityData>> searchNationality(String keyword) {
     return (select(nationality)
           ..where(
-            (n) =>
-                n.name.like('%$keyword%') |
-                n.nameEn.like('%$keyword%') |
-                n.code.like('%$keyword%'),
+            (n) => n.name.like('%$keyword%') | n.nameEn.like('%$keyword%'),
           )
           ..orderBy([(n) => OrderingTerm.asc(n.name)]))
         .get();
   }
 
   // 新增國籍
-  Future<int> addNationality({
-    required String name,
-    String? nameEn,
-    String? code,
-  }) {
-    return into(nationality).insert(
-      NationalityCompanion.insert(
-        name: name,
-        nameEn: Value(nameEn),
-        code: Value(code),
-      ),
-    );
+  Future<int> addNationality({required String name, String? nameEn}) {
+    return into(
+      nationality,
+    ).insert(NationalityCompanion.insert(name: name, nameEn: Value(nameEn)));
   }
 
   // 批次新增國籍
@@ -148,7 +130,6 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
           (item) => NationalityCompanion.insert(
             name: item['name']!,
             nameEn: Value(item['nameEn']),
-            code: Value(item['code']),
           ),
         ),
       );
@@ -160,7 +141,6 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
     required int id,
     String? name,
     String? nameEn,
-    String? code,
   }) {
     return (update(
       nationality,
@@ -168,7 +148,6 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
       NationalityCompanion(
         name: name != null ? Value(name) : const Value.absent(),
         nameEn: nameEn != null ? Value(nameEn) : const Value.absent(),
-        code: code != null ? Value(code) : const Value.absent(),
       ),
     );
   }
@@ -766,14 +745,11 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
   //  初始化參考資料
   Future<void> initializeAllReferenceData() async {
     await initializeSex();
-    await initializeNationality();
-    await initializeAirline();
     await initializeTravelStatus();
-    await initializeLocation();
     await initializeIncidentPlaces();
     await initializeReportingUnits();
     await initializeChiefComplaintTypes();
-    await initializeChiefComplaintDetails(); // New
+    await initializeChiefComplaintDetails();
     await initializeDiagnosisCategories();
     await initializeTriageLevels();
     await initializeTreatmentOnSiteData();
@@ -798,58 +774,6 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
     }
   }
 
-  // 初始化國籍資料
-  Future<void> initializeNationality() async {
-    final count = await (select(nationality).get()).then((list) => list.length);
-    if (count == 0) {
-      await addNationalityBatch([
-        {'name': 'Taiwan', 'nameEn': 'Taiwan', 'code': 'TW'},
-        {'name': 'China', 'nameEn': 'China', 'code': 'CN'},
-        {'name': 'Hong Kong', 'nameEn': 'Hong Kong', 'code': 'HK'},
-        {'name': 'Macau', 'nameEn': 'Macau', 'code': 'MO'},
-        {'name': 'Japan', 'nameEn': 'Japan', 'code': 'JP'},
-        {'name': 'South Korea', 'nameEn': 'South Korea', 'code': 'KR'},
-        {'name': 'United States', 'nameEn': 'United States', 'code': 'US'},
-        {'name': 'United Kingdom', 'nameEn': 'United Kingdom', 'code': 'GB'},
-        {'name': 'Canada', 'nameEn': 'Canada', 'code': 'CA'},
-        {'name': 'Australia', 'nameEn': 'Australia', 'code': 'AU'},
-        {'name': 'Singapore', 'nameEn': 'Singapore', 'code': 'SG'},
-        {'name': 'Malaysia', 'nameEn': 'Malaysia', 'code': 'MY'},
-        {'name': 'Thailand', 'nameEn': 'Thailand', 'code': 'TH'},
-        {'name': 'Vietnam', 'nameEn': 'Vietnam', 'code': 'VN'},
-        {'name': 'Philippines', 'nameEn': 'Philippines', 'code': 'PH'},
-        {'name': 'Indonesia', 'nameEn': 'Indonesia', 'code': 'ID'},
-        {'name': 'India', 'nameEn': 'India', 'code': 'IN'},
-        {'name': 'France', 'nameEn': 'France', 'code': 'FR'},
-        {'name': 'Germany', 'nameEn': 'Germany', 'code': 'DE'},
-        {'name': 'Italy', 'nameEn': 'Italy', 'code': 'IT'},
-        {'name': 'Spain', 'nameEn': 'Spain', 'code': 'ES'},
-        {'name': 'Netherlands', 'nameEn': 'Netherlands', 'code': 'NL'},
-        {'name': 'Switzerland', 'nameEn': 'Switzerland', 'code': 'CH'},
-        {'name': 'New Zealand', 'nameEn': 'New Zealand', 'code': 'NZ'},
-        {'name': 'Brazil', 'nameEn': 'Brazil', 'code': 'BR'},
-      ]);
-    }
-  }
-
-  // 初始化航空公司資料
-  Future<void> initializeAirline() async {
-    final count = await (select(airline).get()).then((list) => list.length);
-    if (count == 0) {
-      await addAirlineBatch([
-        {'code': 'BR', 'name': 'BR長榮航空'},
-        {'code': 'CI', 'name': 'CI中華航空'},
-        {'code': 'CX', 'name': 'CX國泰航空'},
-        {'code': 'UA', 'name': 'UA聯合航空'},
-        {'code': 'KL', 'name': 'KL荷蘭皇家航空'},
-        {'code': 'CZ', 'name': 'CZ中國南方航空'},
-        {'code': 'IT', 'name': 'IT台灣虎航'},
-        {'code': 'EK', 'name': 'EK阿聯酋航空'},
-        {'code': 'CA', 'name': 'CA中國國際航空'},
-      ]);
-    }
-  }
-
   // 初始化旅行狀態資料
   Future<void> initializeTravelStatus() async {
     final count = await (select(
@@ -870,36 +794,10 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
     }
   }
 
-  // 初始化地點資料
-  Future<void> initializeLocation() async {
-    final count = await (select(location).get()).then((list) => list.length);
-    if (count == 0) {
-      await addLocationBatch([
-        {'code': 'TPE', 'name': '台北桃園', 'countryCode': 'TW'},
-        {'code': 'TSA', 'name': '台北松山', 'countryCode': 'TW'},
-        {'code': 'KHH', 'name': '高雄小港', 'countryCode': 'TW'},
-        {'code': 'RMQ', 'name': '台中清泉崗', 'countryCode': 'TW'},
-        {'code': 'NRT', 'name': '東京成田', 'countryCode': 'JP'},
-        {'code': 'HND', 'name': '東京羽田', 'countryCode': 'JP'},
-        {'code': 'KIX', 'name': '大阪關西', 'countryCode': 'JP'},
-        {'code': 'ICN', 'name': '首爾仁川', 'countryCode': 'KR'},
-        {'code': 'HKG', 'name': '香港', 'countryCode': 'HK'},
-        {'code': 'SIN', 'name': '新加坡', 'countryCode': 'SG'},
-        {'code': 'BKK', 'name': '曼谷', 'countryCode': 'TH'},
-        {'code': 'SFO', 'name': '舊金山', 'countryCode': 'US'},
-        {'code': 'LAX', 'name': '洛杉磯', 'countryCode': 'US'},
-        {'code': 'LHR', 'name': '倫敦希斯洛', 'countryCode': 'GB'},
-        {'code': 'CDG', 'name': '巴黎戴高樂', 'countryCode': 'FR'},
-      ]);
-    }
-  }
-
   Future<void> initializeIncidentPlaces() async {
-    // 先检查是否已有资料
     final existingCategories = await select(incidentPlaceCategory).get();
 
     if (existingCategories.isEmpty) {
-      // 定义主分类
       const mainCategories = [
         '第一航廈',
         '第二航廈',
@@ -919,7 +817,6 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
         categoryIds[mainCategories[i]] = id;
       }
 
-      // 定义子分类数据
       final subCategories = <Map<String, dynamic>>[
         //  第一航廈
         {'name': '出境查驗台', 'parent': '第一航廈', 'sortOrder': 1},
@@ -1069,8 +966,6 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
     if (count == 0) {
       // 取得類型 ID
       final types = await select(chiefComplaintType).get();
-      // 假設已執行過 initializeChiefComplaintTypes，如果還沒，這裡可能會出錯
-      // 建議在外部順序調用，或者在這裡重新查詢
       ChiefComplaintTypeData? traumaType;
       ChiefComplaintTypeData? nonTraumaType;
 
@@ -1078,8 +973,6 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
         traumaType = types.firstWhere((t) => t.code == 'TRAUMA');
         nonTraumaType = types.firstWhere((t) => t.code == 'NON_TRAUMA');
       } catch (e) {
-        // 如果找不到 (例如舊資料是小寫 'trauma')，嘗試找舊的或忽略
-        // 這裡簡單處理：如果找不到就不初始化細項
         return;
       }
 

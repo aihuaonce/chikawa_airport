@@ -314,7 +314,7 @@ class MedicalViewModel extends ChangeNotifier {
       debugPrint('系統：搜尋國籍失敗 - $e');
       final lower = keyword.toLowerCase();
       return refService.nationalityList.where((n) =>
-        n.name.toLowerCase().contains(lower) || (n.code?.toLowerCase().contains(lower) ?? false)
+        n.name.toLowerCase().contains(lower) || (n.nameEn?.toLowerCase().contains(lower) ?? false)
       ).toList();
     }
   }

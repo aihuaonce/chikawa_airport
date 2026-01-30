@@ -13,8 +13,6 @@ class Nationality extends Table {
   TextColumn get name => text().withLength(min: 1, max: 100)();
   // 英文名稱
   TextColumn get nameEn => text().nullable()();
-  // ISO 代碼 (保留欄位，可選)
-  TextColumn get code => text().withLength(min: 1, max: 10).nullable()();
 }
 
 //飛航-航空公司表

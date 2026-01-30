@@ -140,24 +140,14 @@ class CsvReferenceImporter {
 
           String nameCh = raw;
           String nameEn = '';
-          String code = '';
 
-          // 嘗試分割中文與英文
-          // 例如: "台灣(中華民國)TAIWAN" -> Ch: 台灣(中華民國), En: TAIWAN
           final match = englishPattern.firstMatch(raw);
           if (match != null) {
             nameEn = match.group(1)!.trim();
             nameCh = raw.substring(0, match.start).trim();
           }
 
-          // 簡單的 Code 映射 (如果有的話)
-          code = _mapCountryToCode(nameCh);
-
-          nationalities.add({
-            'name': nameCh,
-            'nameEn': nameEn,
-            'code': code,
-          });
+          nationalities.add({'name': nameCh, 'nameEn': nameEn});
         }
       } catch (e) {
         debugPrint('匯入國籍 CSV 失敗 ($file): $e');

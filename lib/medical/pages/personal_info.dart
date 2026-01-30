@@ -292,7 +292,7 @@ class _PersonalInfoState extends State<PersonalInfo> {
       patient.nationalityId,
     );
     final text = selectedNationality != null
-        ? '${selectedNationality.code ?? ''} ${selectedNationality.name}'
+        ? '${selectedNationality.name} ${selectedNationality.nameEn ?? ''}'
         : '';
 
     return _buildSelectionField(
@@ -309,7 +309,7 @@ class _PersonalInfoState extends State<PersonalInfo> {
           itemBuilder: (context, item, isSelected) {
             return ListTile(
               title: Text(
-                '${item.code ?? ''} ${item.name}',
+                '${item.name} ${item.nameEn ?? ''}',
                 style: TextStyle(
                   color: isSelected ? primaryColor : textDark,
                   fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
