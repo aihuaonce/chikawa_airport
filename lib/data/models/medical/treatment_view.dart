@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:flutter/material.dart';
 import 'package:drift/drift.dart';
 import 'package:flutter/foundation.dart';
 import '../../db/database.dart';
@@ -1030,6 +1029,13 @@ class TreatmentViewModel extends ChangeNotifier {
     );
   }
 
+  void updateAssistStaff(String? staffList) {
+    if (_treatment == null) return;
+    _updateTreatmentCacheAndSave(
+      _treatment!.copyWith(assistStaff: Value(staffList)),
+    );
+  }
+
   void updateTreatmentTime(DateTime? time) {
     if (_treatment == null) return;
     _updateTreatmentCacheAndSave(_treatment!.copyWith(treatmentTime: time));
@@ -1058,6 +1064,15 @@ class TreatmentViewModel extends ChangeNotifier {
         }
       }
 
+      // 如果是新增，檢查該人員是否有全域簽名，若有則自動帶入
+      Uint8List? signature;
+      if (staffId != null) {
+        final staff = refService.getMedicalStaffById(staffId);
+        if (staff != null && staff.signature != null) {
+          signature = staff.signature;
+        }
+      }
+
       await db.treatmentDao.insertStaffAssignment(
         MedicalStaffAssignmentCompanion.insert(
           medicalId: medicalId,
@@ -1065,6 +1080,7 @@ class TreatmentViewModel extends ChangeNotifier {
           staffId: Value(staffId),
           staffName: Value(staffName),
           isPrimary: Value(isPrimary),
+          signature: Value(signature),
         ),
       );
       await _reloadStaffAssignments();
@@ -1077,6 +1093,49 @@ class TreatmentViewModel extends ChangeNotifier {
   Future<void> _reloadStaffAssignments() async {
     _staffAssignments = await db.treatmentDao.getStaffAssignments(medicalId);
     notifyListeners();
+  }
+
+  Future<void> updateStaffSignature(
+    int staffAssignmentId,
+    Uint8List signature,
+  ) async {
+    try {
+      final assignment = _staffAssignments.firstWhere(
+        (a) => a.staffAssignmentId == staffAssignmentId,
+      );
+
+      await db.treatmentDao.updateStaffAssignment(
+        assignment
+            .toCompanion(true)
+            .copyWith(
+              signature: Value(signature),
+              signedAt: Value(DateTime.now()),
+            ),
+      );
+
+      // 同步更新全域簽名到 MedicalStaff 表
+      if (assignment.staffId != null) {
+        await db.referenceDao.updateMedicalStaffSignature(
+          assignment.staffId!,
+          signature,
+        );
+        // 重新載入參考資料中的醫療人員列表，以確保快取更新
+        await refService.initialize();
+      }
+
+      await _reloadStaffAssignments();
+      debugPrint('系統:簽名更新成功');
+    } catch (e) {
+      debugPrint('系統:簽名更新失敗 - $e');
+    }
+  }
+
+  Future<void> updateEmtName(String name) async {
+    // Legacy method for text input (deprecated but kept for compatibility)
+    // Should use addStaffAssignment with staffId instead
+    debugPrint(
+      'Warning: updateEmtName is deprecated. Use addStaffAssignment instead.',
+    );
   }
 
   // ===================================================================

@@ -5156,6 +5156,17 @@ class $MedicalStaffTable extends MedicalStaff
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _signatureMeta = const VerificationMeta(
+    'signature',
+  );
+  @override
+  late final GeneratedColumn<Uint8List> signature = GeneratedColumn<Uint8List>(
+    'signature',
+    aliasedName,
+    true,
+    type: DriftSqlType.blob,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _isActiveMeta = const VerificationMeta(
     'isActive',
   );
@@ -5179,6 +5190,7 @@ class $MedicalStaffTable extends MedicalStaff
     role,
     department,
     phone,
+    signature,
     isActive,
   ];
   @override
@@ -5230,6 +5242,12 @@ class $MedicalStaffTable extends MedicalStaff
         phone.isAcceptableOrUnknown(data['phone']!, _phoneMeta),
       );
     }
+    if (data.containsKey('signature')) {
+      context.handle(
+        _signatureMeta,
+        signature.isAcceptableOrUnknown(data['signature']!, _signatureMeta),
+      );
+    }
     if (data.containsKey('is_active')) {
       context.handle(
         _isActiveMeta,
@@ -5269,6 +5287,10 @@ class $MedicalStaffTable extends MedicalStaff
         DriftSqlType.string,
         data['${effectivePrefix}phone'],
       ),
+      signature: attachedDatabase.typeMapping.read(
+        DriftSqlType.blob,
+        data['${effectivePrefix}signature'],
+      ),
       isActive: attachedDatabase.typeMapping.read(
         DriftSqlType.bool,
         data['${effectivePrefix}is_active'],
@@ -5290,6 +5312,7 @@ class MedicalStaffData extends DataClass
   final String role;
   final String? department;
   final String? phone;
+  final Uint8List? signature;
   final bool isActive;
   const MedicalStaffData({
     required this.id,
@@ -5298,6 +5321,7 @@ class MedicalStaffData extends DataClass
     required this.role,
     this.department,
     this.phone,
+    this.signature,
     required this.isActive,
   });
   @override
@@ -5314,6 +5338,9 @@ class MedicalStaffData extends DataClass
     }
     if (!nullToAbsent || phone != null) {
       map['phone'] = Variable<String>(phone);
+    }
+    if (!nullToAbsent || signature != null) {
+      map['signature'] = Variable<Uint8List>(signature);
     }
     map['is_active'] = Variable<bool>(isActive);
     return map;
@@ -5333,6 +5360,9 @@ class MedicalStaffData extends DataClass
       phone: phone == null && nullToAbsent
           ? const Value.absent()
           : Value(phone),
+      signature: signature == null && nullToAbsent
+          ? const Value.absent()
+          : Value(signature),
       isActive: Value(isActive),
     );
   }
@@ -5349,6 +5379,7 @@ class MedicalStaffData extends DataClass
       role: serializer.fromJson<String>(json['role']),
       department: serializer.fromJson<String?>(json['department']),
       phone: serializer.fromJson<String?>(json['phone']),
+      signature: serializer.fromJson<Uint8List?>(json['signature']),
       isActive: serializer.fromJson<bool>(json['isActive']),
     );
   }
@@ -5362,6 +5393,7 @@ class MedicalStaffData extends DataClass
       'role': serializer.toJson<String>(role),
       'department': serializer.toJson<String?>(department),
       'phone': serializer.toJson<String?>(phone),
+      'signature': serializer.toJson<Uint8List?>(signature),
       'isActive': serializer.toJson<bool>(isActive),
     };
   }
@@ -5373,6 +5405,7 @@ class MedicalStaffData extends DataClass
     String? role,
     Value<String?> department = const Value.absent(),
     Value<String?> phone = const Value.absent(),
+    Value<Uint8List?> signature = const Value.absent(),
     bool? isActive,
   }) => MedicalStaffData(
     id: id ?? this.id,
@@ -5381,6 +5414,7 @@ class MedicalStaffData extends DataClass
     role: role ?? this.role,
     department: department.present ? department.value : this.department,
     phone: phone.present ? phone.value : this.phone,
+    signature: signature.present ? signature.value : this.signature,
     isActive: isActive ?? this.isActive,
   );
   MedicalStaffData copyWithCompanion(MedicalStaffCompanion data) {
@@ -5395,6 +5429,7 @@ class MedicalStaffData extends DataClass
           ? data.department.value
           : this.department,
       phone: data.phone.present ? data.phone.value : this.phone,
+      signature: data.signature.present ? data.signature.value : this.signature,
       isActive: data.isActive.present ? data.isActive.value : this.isActive,
     );
   }
@@ -5408,14 +5443,23 @@ class MedicalStaffData extends DataClass
           ..write('role: $role, ')
           ..write('department: $department, ')
           ..write('phone: $phone, ')
+          ..write('signature: $signature, ')
           ..write('isActive: $isActive')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode =>
-      Object.hash(id, name, employeeId, role, department, phone, isActive);
+  int get hashCode => Object.hash(
+    id,
+    name,
+    employeeId,
+    role,
+    department,
+    phone,
+    $driftBlobEquality.hash(signature),
+    isActive,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -5426,6 +5470,7 @@ class MedicalStaffData extends DataClass
           other.role == this.role &&
           other.department == this.department &&
           other.phone == this.phone &&
+          $driftBlobEquality.equals(other.signature, this.signature) &&
           other.isActive == this.isActive);
 }
 
@@ -5436,6 +5481,7 @@ class MedicalStaffCompanion extends UpdateCompanion<MedicalStaffData> {
   final Value<String> role;
   final Value<String?> department;
   final Value<String?> phone;
+  final Value<Uint8List?> signature;
   final Value<bool> isActive;
   const MedicalStaffCompanion({
     this.id = const Value.absent(),
@@ -5444,6 +5490,7 @@ class MedicalStaffCompanion extends UpdateCompanion<MedicalStaffData> {
     this.role = const Value.absent(),
     this.department = const Value.absent(),
     this.phone = const Value.absent(),
+    this.signature = const Value.absent(),
     this.isActive = const Value.absent(),
   });
   MedicalStaffCompanion.insert({
@@ -5453,6 +5500,7 @@ class MedicalStaffCompanion extends UpdateCompanion<MedicalStaffData> {
     required String role,
     this.department = const Value.absent(),
     this.phone = const Value.absent(),
+    this.signature = const Value.absent(),
     this.isActive = const Value.absent(),
   }) : name = Value(name),
        role = Value(role);
@@ -5463,6 +5511,7 @@ class MedicalStaffCompanion extends UpdateCompanion<MedicalStaffData> {
     Expression<String>? role,
     Expression<String>? department,
     Expression<String>? phone,
+    Expression<Uint8List>? signature,
     Expression<bool>? isActive,
   }) {
     return RawValuesInsertable({
@@ -5472,6 +5521,7 @@ class MedicalStaffCompanion extends UpdateCompanion<MedicalStaffData> {
       if (role != null) 'role': role,
       if (department != null) 'department': department,
       if (phone != null) 'phone': phone,
+      if (signature != null) 'signature': signature,
       if (isActive != null) 'is_active': isActive,
     });
   }
@@ -5483,6 +5533,7 @@ class MedicalStaffCompanion extends UpdateCompanion<MedicalStaffData> {
     Value<String>? role,
     Value<String?>? department,
     Value<String?>? phone,
+    Value<Uint8List?>? signature,
     Value<bool>? isActive,
   }) {
     return MedicalStaffCompanion(
@@ -5492,6 +5543,7 @@ class MedicalStaffCompanion extends UpdateCompanion<MedicalStaffData> {
       role: role ?? this.role,
       department: department ?? this.department,
       phone: phone ?? this.phone,
+      signature: signature ?? this.signature,
       isActive: isActive ?? this.isActive,
     );
   }
@@ -5517,6 +5569,9 @@ class MedicalStaffCompanion extends UpdateCompanion<MedicalStaffData> {
     if (phone.present) {
       map['phone'] = Variable<String>(phone.value);
     }
+    if (signature.present) {
+      map['signature'] = Variable<Uint8List>(signature.value);
+    }
     if (isActive.present) {
       map['is_active'] = Variable<bool>(isActive.value);
     }
@@ -5532,6 +5587,7 @@ class MedicalStaffCompanion extends UpdateCompanion<MedicalStaffData> {
           ..write('role: $role, ')
           ..write('department: $department, ')
           ..write('phone: $phone, ')
+          ..write('signature: $signature, ')
           ..write('isActive: $isActive')
           ..write(')'))
         .toString();
@@ -19565,6 +19621,7 @@ typedef $$MedicalStaffTableCreateCompanionBuilder =
       required String role,
       Value<String?> department,
       Value<String?> phone,
+      Value<Uint8List?> signature,
       Value<bool> isActive,
     });
 typedef $$MedicalStaffTableUpdateCompanionBuilder =
@@ -19575,6 +19632,7 @@ typedef $$MedicalStaffTableUpdateCompanionBuilder =
       Value<String> role,
       Value<String?> department,
       Value<String?> phone,
+      Value<Uint8List?> signature,
       Value<bool> isActive,
     });
 
@@ -19614,6 +19672,11 @@ class $$MedicalStaffTableFilterComposer
 
   ColumnFilters<String> get phone => $composableBuilder(
     column: $table.phone,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<Uint8List> get signature => $composableBuilder(
+    column: $table.signature,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -19662,6 +19725,11 @@ class $$MedicalStaffTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<Uint8List> get signature => $composableBuilder(
+    column: $table.signature,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<bool> get isActive => $composableBuilder(
     column: $table.isActive,
     builder: (column) => ColumnOrderings(column),
@@ -19698,6 +19766,9 @@ class $$MedicalStaffTableAnnotationComposer
 
   GeneratedColumn<String> get phone =>
       $composableBuilder(column: $table.phone, builder: (column) => column);
+
+  GeneratedColumn<Uint8List> get signature =>
+      $composableBuilder(column: $table.signature, builder: (column) => column);
 
   GeneratedColumn<bool> get isActive =>
       $composableBuilder(column: $table.isActive, builder: (column) => column);
@@ -19740,6 +19811,7 @@ class $$MedicalStaffTableTableManager
                 Value<String> role = const Value.absent(),
                 Value<String?> department = const Value.absent(),
                 Value<String?> phone = const Value.absent(),
+                Value<Uint8List?> signature = const Value.absent(),
                 Value<bool> isActive = const Value.absent(),
               }) => MedicalStaffCompanion(
                 id: id,
@@ -19748,6 +19820,7 @@ class $$MedicalStaffTableTableManager
                 role: role,
                 department: department,
                 phone: phone,
+                signature: signature,
                 isActive: isActive,
               ),
           createCompanionCallback:
@@ -19758,6 +19831,7 @@ class $$MedicalStaffTableTableManager
                 required String role,
                 Value<String?> department = const Value.absent(),
                 Value<String?> phone = const Value.absent(),
+                Value<Uint8List?> signature = const Value.absent(),
                 Value<bool> isActive = const Value.absent(),
               }) => MedicalStaffCompanion.insert(
                 id: id,
@@ -19766,6 +19840,7 @@ class $$MedicalStaffTableTableManager
                 role: role,
                 department: department,
                 phone: phone,
+                signature: signature,
                 isActive: isActive,
               ),
           withReferenceMapper: (p0) => p0

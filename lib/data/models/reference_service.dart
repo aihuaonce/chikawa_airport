@@ -54,6 +54,10 @@ class ReferenceService extends ChangeNotifier {
   ReferenceService(this.db);
 
   /// 初始化所有參考資料
+  Future<void> initialize() async {
+    await init();
+  }
+
   Future<void> init() async {
     await _loadBasicReferences();
     await _loadTreatmentReferences();

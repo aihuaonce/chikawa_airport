@@ -142,6 +142,10 @@ class TreatmentDao extends DatabaseAccessor<AppDatabase>
     )..where((t) => t.staffAssignmentId.equals(staffAssignmentId))).go();
   }
 
+  Future<bool> updateStaffAssignment(MedicalStaffAssignmentCompanion data) {
+    return update(medicalStaffAssignment).replace(data);
+  }
+
   // 特別註記
 
   Future<int> insertSpecialNotes(SpecialNotesCompanion data) {

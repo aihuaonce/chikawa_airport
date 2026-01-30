@@ -707,6 +707,13 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
     );
   }
 
+  // 更新醫療人員簽名
+  Future<int> updateMedicalStaffSignature(int id, Uint8List signature) {
+    return (update(medicalStaff)..where((s) => s.id.equals(id))).write(
+      MedicalStaffCompanion(signature: Value(signature)),
+    );
+  }
+
   //  初始化參考資料
   Future<void> initializeAllReferenceData() async {
     await initializeSex();
@@ -1370,13 +1377,45 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
             employeeId: const Value('ADMIN001'),
           ),
           MedicalStaffCompanion.insert(
-            name: '值班醫師A',
+            name: '王小明',
             role: 'Doctor',
+            employeeId: const Value('DOC001'),
             department: const Value('急診科'),
           ),
           MedicalStaffCompanion.insert(
-            name: '護理師B',
+            name: '陳大文',
+            role: 'Doctor',
+            employeeId: const Value('DOC002'),
+            department: const Value('急診科'),
+          ),
+          MedicalStaffCompanion.insert(
+            name: '李小美',
             role: 'Nurse',
+            employeeId: const Value('NUR001'),
+            department: const Value('急診科'),
+          ),
+          MedicalStaffCompanion.insert(
+            name: '張雅婷',
+            role: 'Nurse',
+            employeeId: const Value('NUR002'),
+            department: const Value('急診科'),
+          ),
+          MedicalStaffCompanion.insert(
+            name: '林志豪',
+            role: 'Nurse',
+            employeeId: const Value('NUR003'),
+            department: const Value('急診科'),
+          ),
+          MedicalStaffCompanion.insert(
+            name: '陳志明',
+            role: 'EMT',
+            employeeId: const Value('EMT001'),
+            department: const Value('急診科'),
+          ),
+          MedicalStaffCompanion.insert(
+            name: '林美華',
+            role: 'EMT',
+            employeeId: const Value('EMT002'),
             department: const Value('急診科'),
           ),
         ]);

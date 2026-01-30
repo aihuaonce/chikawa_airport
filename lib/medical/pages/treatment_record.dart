@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:signature/signature.dart';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 import '../../data/models/medical/treatment_view.dart';
 import '../../data/db/database.dart';
 import '../widgets/icd10_search_sheet.dart';
@@ -87,6 +89,9 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
   final List<String> _assistStaffList = [];
   late TextEditingController _assistStaffController;
 
+  // 負責人與 EMT
+  late TextEditingController _directorNameController;
+
   // 健康評估表 controller（數據來自 ViewModel）
   final Map<int, Map<String, TextEditingController>>
   _healthAssessmentControllers = {};
@@ -103,6 +108,7 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
     _allergyDetailController = TextEditingController();
     _actionSummaryOtherController = TextEditingController();
     _assistStaffController = TextEditingController();
+    _directorNameController = TextEditingController();
 
     // 生命徵象 Controllers
     _tempController = TextEditingController();
@@ -138,6 +144,7 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
     _allergyDetailController.dispose();
     _actionSummaryOtherController.dispose();
     _assistStaffController.dispose();
+    _directorNameController.dispose();
 
     // 清理生命徵象 Controllers
     _tempController.dispose();
@@ -224,6 +231,15 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
       _tentativeController.text = treatment.tentative ?? '';
       _secondaryDiagnosis1Controller.text = treatment.secondaryDiagnosis1 ?? '';
       _secondaryDiagnosis2Controller.text = treatment.secondaryDiagnosis2 ?? '';
+
+      // 載入負責人姓名
+      _directorNameController.text = treatment.directorName ?? '';
+
+      // 載入輔助人員
+      if (treatment.assistStaff != null && treatment.assistStaff!.isNotEmpty) {
+        _assistStaffList.clear();
+        _assistStaffList.addAll(treatment.assistStaff!.split(','));
+      }
     }
 
     // 檢查已有影像，自動勾選對應類型
@@ -1400,6 +1416,9 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
     final nurses = viewModel.medicalStaffList
         .where((staff) => staff.role == 'Nurse')
         .toList();
+    final emts = viewModel.medicalStaffList
+        .where((staff) => staff.role == 'EMT')
+        .toList();
 
     // 取得已指派的主要醫師和護理師
     final primaryDoctor = viewModel.staffAssignments
@@ -1409,12 +1428,21 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
         .where((a) => a.staffRole == 'Nurse' && a.isPrimary)
         .firstOrNull;
 
+    // 取得 EMT 指派
+    final emtAssignment = viewModel.staffAssignments
+        .where((a) => a.staffRole == 'EMT')
+        .firstOrNull;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildLabel('院長/負責人 Director Name'),
         const SizedBox(height: 4),
-        _buildTextField(hint: ''),
+        _buildTextField(
+          hint: '請輸入負責人姓名',
+          controller: _directorNameController,
+          onChanged: (val) => viewModel.updateDirectorName(val),
+        ),
         const SizedBox(height: 20),
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -1476,7 +1504,27 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
                           children: [
                             _buildLabel('護理師簽章 Nurse Sign'),
                             const SizedBox(height: 4),
-                            _buildSignaturePad('點擊開啟簽名板'),
+                            _buildSignatureArea(
+                              context: context,
+                              placeholder: '點擊簽名',
+                              signatureData: primaryNurse?.signature,
+                              onTap: () {
+                                if (primaryNurse == null) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text('請先選擇主責護理師')),
+                                  );
+                                  return;
+                                }
+                                _showSignatureDialog(context, '護理師簽章', (
+                                  data,
+                                ) async {
+                                  await viewModel.updateStaffSignature(
+                                    primaryNurse.staffAssignmentId,
+                                    data,
+                                  );
+                                });
+                              },
+                            ),
                           ],
                         ),
                       ),
@@ -1515,7 +1563,20 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
                     ),
                   ),
                   const SizedBox(height: 4),
-                  _buildTextField(hint: '姓名 / 員工編號'),
+                  _buildStaffDropdown(
+                    viewModel,
+                    emts,
+                    emtAssignment?.staffId,
+                    '請選擇 EMT',
+                    (staffId) {
+                      if (staffId != null) {
+                        viewModel.addStaffAssignment(
+                          staffRole: 'EMT',
+                          staffId: staffId,
+                        );
+                      }
+                    },
+                  ),
                 ],
               ),
             ),
@@ -1526,7 +1587,26 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
                 children: [
                   _buildLabel('EMT 簽章 EMT Sign'),
                   const SizedBox(height: 4),
-                  _buildSignaturePad('點擊開啟簽名板'),
+                  _buildSignatureArea(
+                    context: context,
+                    placeholder: '點擊簽名',
+                    signatureData: emtAssignment?.signature,
+                    onTap: () {
+                      if (emtAssignment == null) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('請先選擇 EMT')),
+                        );
+                        return;
+                      }
+
+                      _showSignatureDialog(context, 'EMT 簽章', (data) async {
+                        await viewModel.updateStaffSignature(
+                          emtAssignment.staffAssignmentId,
+                          data,
+                        );
+                      });
+                    },
+                  ),
                 ],
               ),
             ),
@@ -1583,26 +1663,100 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
     );
   }
 
-  Widget _buildSignaturePad(String placeholder) {
-    return Container(
-      height: 44,
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: bgField,
-        border: Border.all(color: borderColor, style: BorderStyle.solid),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Center(
-        child: Text(
-          placeholder,
-          style: TextStyle(
-            color: textMuted.withValues(alpha: 0.5),
-            fontSize: 12,
-            fontStyle: FontStyle.italic,
-          ),
+  Widget _buildSignatureArea({
+    required BuildContext context,
+    required String placeholder,
+    required VoidCallback onTap,
+    Uint8List? signatureData,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: 80, // 增加高度以顯示簽名
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: bgField,
+          border: Border.all(color: borderColor, style: BorderStyle.solid),
+          borderRadius: BorderRadius.circular(8),
         ),
+        child: signatureData != null
+            ? ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: Image.memory(
+                  signatureData,
+                  fit: BoxFit.contain,
+                  width: double.infinity,
+                ),
+              )
+            : Center(
+                child: Text(
+                  placeholder,
+                  style: TextStyle(
+                    color: textMuted.withValues(alpha: 0.5),
+                    fontSize: 12,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+              ),
       ),
     );
+  }
+
+  Future<void> _showSignatureDialog(
+    BuildContext context,
+    String title,
+    Function(Uint8List) onConfirm,
+  ) async {
+    final SignatureController controller = SignatureController(
+      penStrokeWidth: 3,
+      penColor: Colors.black,
+      exportBackgroundColor: Colors.transparent,
+    );
+
+    await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(title),
+        content: Container(
+          width: 500,
+          height: 300,
+          decoration: BoxDecoration(border: Border.all(color: Colors.grey)),
+          child: Signature(
+            controller: controller,
+            backgroundColor: Colors.white,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => controller.clear(),
+            child: const Text('清除', style: TextStyle(color: Colors.red)),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('取消'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              if (controller.isNotEmpty) {
+                final Uint8List? data = await controller.toPngBytes();
+                if (data != null) {
+                  onConfirm(data);
+                }
+              }
+              if (context.mounted) {
+                Navigator.of(context).pop();
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: primaryColor,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('確認'),
+          ),
+        ],
+      ),
+    );
+    controller.dispose();
   }
 
   Widget _buildSpecialNotesSection(TreatmentViewModel viewModel) {

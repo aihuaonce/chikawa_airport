@@ -161,5 +161,6 @@ class MedicalStaff extends Table {
   TextColumn get role => text()(); // physician / nurse / emt
   TextColumn get department => text().nullable()();
   TextColumn get phone => text().nullable()();
+  BlobColumn get signature => blob().nullable()();
   BoolColumn get isActive => boolean().withDefault(const Constant(true))();
 }

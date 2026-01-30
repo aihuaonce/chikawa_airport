@@ -45,10 +45,7 @@ class MedicalDao extends DatabaseAccessor<AppDatabase> with _$MedicalDaoMixin {
   }
 
   // 出診單監聽總筆數
-  Stream<int> watchTotalCount({
-    bool? hasAmbulance,
-    bool? isEmergency,
-  }) {
+  Stream<int> watchTotalCount({bool? hasAmbulance, bool? isEmergency}) {
     var query = select(medicalRecord);
     if (hasAmbulance != null) {
       query.where((t) => t.hasAmbulance.equals(hasAmbulance));
@@ -174,10 +171,12 @@ class MedicalDao extends DatabaseAccessor<AppDatabase> with _$MedicalDaoMixin {
           ..where((tbl) => tbl.medicalId.equals(medicalId)))
         .write(
           MedicalRecordCompanion(
-            hasAmbulance:
-                hasAmbulance != null ? Value(hasAmbulance) : const Value.absent(),
-            isEmergency:
-                isEmergency != null ? Value(isEmergency) : const Value.absent(),
+            hasAmbulance: hasAmbulance != null
+                ? Value(hasAmbulance)
+                : const Value.absent(),
+            isEmergency: isEmergency != null
+                ? Value(isEmergency)
+                : const Value.absent(),
           ),
         )
         .then((count) => count > 0);
