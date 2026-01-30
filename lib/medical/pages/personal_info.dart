@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../../data/db/database.dart';
+import '../widgets/reference_search_sheet.dart';
 
 class PersonalInfo extends StatefulWidget {
   final int medicalId;
@@ -281,7 +282,7 @@ class _PersonalInfoState extends State<PersonalInfo> {
     );
   }
 
-  // 國籍下拉選單
+  // 國籍選單 (改用 SearchSheet)
   Widget _buildNationalityDropdown(
     MedicalViewModel viewModel,
     PatientData patient,
@@ -290,53 +291,82 @@ class _PersonalInfoState extends State<PersonalInfo> {
     final selectedNationality = viewModel.getNationalityById(
       patient.nationalityId,
     );
+    final text = selectedNationality != null
+        ? '${selectedNationality.name} ${selectedNationality.nameEn ?? ''}'
+        : '';
 
-    return DropdownButtonFormField<NationalityData>(
-      value: selectedNationality,
-      decoration: InputDecoration(
-        filled: true,
-        fillColor: Colors.white,
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 14,
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: borderColor),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: primaryColor, width: 1.5),
-        ),
-      ),
-      hint: Row(
-        children: [
-          const Icon(Icons.search, size: 18, color: textMuted),
-          const SizedBox(width: 8),
-          Text(
-            '請選取國籍',
-            style: TextStyle(
-              color: textMuted.withValues(alpha: 0.5),
-              fontSize: 14,
-            ),
-          ),
-        ],
-      ),
-      icon: const Icon(Icons.keyboard_arrow_down, size: 20, color: textMuted),
-      items: viewModel.nationalityOptions.map((nationality) {
-        return DropdownMenuItem<NationalityData>(
-          value: nationality,
-          child: Text(
-            '${nationality.code ?? ''} ${nationality.name}',
-            style: const TextStyle(fontSize: 14, color: textDark),
-          ),
+    return _buildSelectionField(
+      text: text,
+      hint: '請選取國籍',
+      icon: Icons.public,
+      onTap: () async {
+        final result = await ReferenceSearchSheet.show<NationalityData>(
+          context,
+          title: '選擇國籍',
+          searchFunction: viewModel.searchNationalities,
+          initialSelection: selectedNationality,
+          isSelectedComparator: (a, b) => a.nationalityId == b?.nationalityId,
+          itemBuilder: (context, item, isSelected) {
+            return ListTile(
+              title: Text(
+                '${item.name} ${item.nameEn ?? ''}',
+                style: TextStyle(
+                  color: isSelected ? primaryColor : textDark,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                ),
+              ),
+              trailing: isSelected
+                  ? const Icon(Icons.check, color: primaryColor)
+                  : null,
+            );
+          },
         );
-      }).toList(),
-      onChanged: (NationalityData? newValue) {
-        if (newValue != null) {
-          viewModel.updateNationalityId(newValue.nationalityId);
+
+        if (result != null) {
+          viewModel.updateNationalityId(result.nationalityId);
         }
       },
+    );
+  }
+
+  // 通用選擇欄位元件
+  Widget _buildSelectionField({
+    required String text,
+    required String hint,
+    required IconData icon,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: borderColor),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, size: 18, color: textMuted),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                text.isNotEmpty ? text : hint,
+                style: TextStyle(
+                  color: text.isNotEmpty
+                      ? textDark
+                      : textMuted.withValues(alpha: 0.5),
+                  fontSize: 14,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            const Icon(Icons.arrow_drop_down, color: textMuted),
+          ],
+        ),
+      ),
     );
   }
 

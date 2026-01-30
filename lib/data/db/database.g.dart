@@ -230,21 +230,17 @@ class $NationalityTable extends Nationality
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
-  static const VerificationMeta _codeMeta = const VerificationMeta('code');
+  static const VerificationMeta _nameEnMeta = const VerificationMeta('nameEn');
   @override
-  late final GeneratedColumn<String> code = GeneratedColumn<String>(
-    'code',
+  late final GeneratedColumn<String> nameEn = GeneratedColumn<String>(
+    'name_en',
     aliasedName,
     true,
-    additionalChecks: GeneratedColumn.checkTextLength(
-      minTextLength: 1,
-      maxTextLength: 10,
-    ),
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
   @override
-  List<GeneratedColumn> get $columns => [nationalityId, name, code];
+  List<GeneratedColumn> get $columns => [nationalityId, name, nameEn];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -274,10 +270,10 @@ class $NationalityTable extends Nationality
     } else if (isInserting) {
       context.missing(_nameMeta);
     }
-    if (data.containsKey('code')) {
+    if (data.containsKey('name_en')) {
       context.handle(
-        _codeMeta,
-        code.isAcceptableOrUnknown(data['code']!, _codeMeta),
+        _nameEnMeta,
+        nameEn.isAcceptableOrUnknown(data['name_en']!, _nameEnMeta),
       );
     }
     return context;
@@ -297,9 +293,9 @@ class $NationalityTable extends Nationality
         DriftSqlType.string,
         data['${effectivePrefix}name'],
       )!,
-      code: attachedDatabase.typeMapping.read(
+      nameEn: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
-        data['${effectivePrefix}code'],
+        data['${effectivePrefix}name_en'],
       ),
     );
   }
@@ -313,19 +309,19 @@ class $NationalityTable extends Nationality
 class NationalityData extends DataClass implements Insertable<NationalityData> {
   final int nationalityId;
   final String name;
-  final String? code;
+  final String? nameEn;
   const NationalityData({
     required this.nationalityId,
     required this.name,
-    this.code,
+    this.nameEn,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['nationality_id'] = Variable<int>(nationalityId);
     map['name'] = Variable<String>(name);
-    if (!nullToAbsent || code != null) {
-      map['code'] = Variable<String>(code);
+    if (!nullToAbsent || nameEn != null) {
+      map['name_en'] = Variable<String>(nameEn);
     }
     return map;
   }
@@ -334,7 +330,9 @@ class NationalityData extends DataClass implements Insertable<NationalityData> {
     return NationalityCompanion(
       nationalityId: Value(nationalityId),
       name: Value(name),
-      code: code == null && nullToAbsent ? const Value.absent() : Value(code),
+      nameEn: nameEn == null && nullToAbsent
+          ? const Value.absent()
+          : Value(nameEn),
     );
   }
 
@@ -346,7 +344,7 @@ class NationalityData extends DataClass implements Insertable<NationalityData> {
     return NationalityData(
       nationalityId: serializer.fromJson<int>(json['nationalityId']),
       name: serializer.fromJson<String>(json['name']),
-      code: serializer.fromJson<String?>(json['code']),
+      nameEn: serializer.fromJson<String?>(json['nameEn']),
     );
   }
   @override
@@ -355,18 +353,18 @@ class NationalityData extends DataClass implements Insertable<NationalityData> {
     return <String, dynamic>{
       'nationalityId': serializer.toJson<int>(nationalityId),
       'name': serializer.toJson<String>(name),
-      'code': serializer.toJson<String?>(code),
+      'nameEn': serializer.toJson<String?>(nameEn),
     };
   }
 
   NationalityData copyWith({
     int? nationalityId,
     String? name,
-    Value<String?> code = const Value.absent(),
+    Value<String?> nameEn = const Value.absent(),
   }) => NationalityData(
     nationalityId: nationalityId ?? this.nationalityId,
     name: name ?? this.name,
-    code: code.present ? code.value : this.code,
+    nameEn: nameEn.present ? nameEn.value : this.nameEn,
   );
   NationalityData copyWithCompanion(NationalityCompanion data) {
     return NationalityData(
@@ -374,7 +372,7 @@ class NationalityData extends DataClass implements Insertable<NationalityData> {
           ? data.nationalityId.value
           : this.nationalityId,
       name: data.name.present ? data.name.value : this.name,
-      code: data.code.present ? data.code.value : this.code,
+      nameEn: data.nameEn.present ? data.nameEn.value : this.nameEn,
     );
   }
 
@@ -383,57 +381,57 @@ class NationalityData extends DataClass implements Insertable<NationalityData> {
     return (StringBuffer('NationalityData(')
           ..write('nationalityId: $nationalityId, ')
           ..write('name: $name, ')
-          ..write('code: $code')
+          ..write('nameEn: $nameEn')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(nationalityId, name, code);
+  int get hashCode => Object.hash(nationalityId, name, nameEn);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is NationalityData &&
           other.nationalityId == this.nationalityId &&
           other.name == this.name &&
-          other.code == this.code);
+          other.nameEn == this.nameEn);
 }
 
 class NationalityCompanion extends UpdateCompanion<NationalityData> {
   final Value<int> nationalityId;
   final Value<String> name;
-  final Value<String?> code;
+  final Value<String?> nameEn;
   const NationalityCompanion({
     this.nationalityId = const Value.absent(),
     this.name = const Value.absent(),
-    this.code = const Value.absent(),
+    this.nameEn = const Value.absent(),
   });
   NationalityCompanion.insert({
     this.nationalityId = const Value.absent(),
     required String name,
-    this.code = const Value.absent(),
+    this.nameEn = const Value.absent(),
   }) : name = Value(name);
   static Insertable<NationalityData> custom({
     Expression<int>? nationalityId,
     Expression<String>? name,
-    Expression<String>? code,
+    Expression<String>? nameEn,
   }) {
     return RawValuesInsertable({
       if (nationalityId != null) 'nationality_id': nationalityId,
       if (name != null) 'name': name,
-      if (code != null) 'code': code,
+      if (nameEn != null) 'name_en': nameEn,
     });
   }
 
   NationalityCompanion copyWith({
     Value<int>? nationalityId,
     Value<String>? name,
-    Value<String?>? code,
+    Value<String?>? nameEn,
   }) {
     return NationalityCompanion(
       nationalityId: nationalityId ?? this.nationalityId,
       name: name ?? this.name,
-      code: code ?? this.code,
+      nameEn: nameEn ?? this.nameEn,
     );
   }
 
@@ -446,8 +444,8 @@ class NationalityCompanion extends UpdateCompanion<NationalityData> {
     if (name.present) {
       map['name'] = Variable<String>(name.value);
     }
-    if (code.present) {
-      map['code'] = Variable<String>(code.value);
+    if (nameEn.present) {
+      map['name_en'] = Variable<String>(nameEn.value);
     }
     return map;
   }
@@ -457,7 +455,7 @@ class NationalityCompanion extends UpdateCompanion<NationalityData> {
     return (StringBuffer('NationalityCompanion(')
           ..write('nationalityId: $nationalityId, ')
           ..write('name: $name, ')
-          ..write('code: $code')
+          ..write('nameEn: $nameEn')
           ..write(')'))
         .toString();
   }
@@ -1014,19 +1012,8 @@ class $LocationTable extends Location
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
-  static const VerificationMeta _countryCodeMeta = const VerificationMeta(
-    'countryCode',
-  );
   @override
-  late final GeneratedColumn<String> countryCode = GeneratedColumn<String>(
-    'country_code',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-  );
-  @override
-  List<GeneratedColumn> get $columns => [locationId, code, name, countryCode];
+  List<GeneratedColumn> get $columns => [locationId, code, name];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -1061,17 +1048,6 @@ class $LocationTable extends Location
     } else if (isInserting) {
       context.missing(_nameMeta);
     }
-    if (data.containsKey('country_code')) {
-      context.handle(
-        _countryCodeMeta,
-        countryCode.isAcceptableOrUnknown(
-          data['country_code']!,
-          _countryCodeMeta,
-        ),
-      );
-    } else if (isInserting) {
-      context.missing(_countryCodeMeta);
-    }
     return context;
   }
 
@@ -1093,10 +1069,6 @@ class $LocationTable extends Location
         DriftSqlType.string,
         data['${effectivePrefix}name'],
       )!,
-      countryCode: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}country_code'],
-      )!,
     );
   }
 
@@ -1110,12 +1082,10 @@ class LocationData extends DataClass implements Insertable<LocationData> {
   final int locationId;
   final String code;
   final String name;
-  final String countryCode;
   const LocationData({
     required this.locationId,
     required this.code,
     required this.name,
-    required this.countryCode,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -1123,7 +1093,6 @@ class LocationData extends DataClass implements Insertable<LocationData> {
     map['location_id'] = Variable<int>(locationId);
     map['code'] = Variable<String>(code);
     map['name'] = Variable<String>(name);
-    map['country_code'] = Variable<String>(countryCode);
     return map;
   }
 
@@ -1132,7 +1101,6 @@ class LocationData extends DataClass implements Insertable<LocationData> {
       locationId: Value(locationId),
       code: Value(code),
       name: Value(name),
-      countryCode: Value(countryCode),
     );
   }
 
@@ -1145,7 +1113,6 @@ class LocationData extends DataClass implements Insertable<LocationData> {
       locationId: serializer.fromJson<int>(json['locationId']),
       code: serializer.fromJson<String>(json['code']),
       name: serializer.fromJson<String>(json['name']),
-      countryCode: serializer.fromJson<String>(json['countryCode']),
     );
   }
   @override
@@ -1155,21 +1122,15 @@ class LocationData extends DataClass implements Insertable<LocationData> {
       'locationId': serializer.toJson<int>(locationId),
       'code': serializer.toJson<String>(code),
       'name': serializer.toJson<String>(name),
-      'countryCode': serializer.toJson<String>(countryCode),
     };
   }
 
-  LocationData copyWith({
-    int? locationId,
-    String? code,
-    String? name,
-    String? countryCode,
-  }) => LocationData(
-    locationId: locationId ?? this.locationId,
-    code: code ?? this.code,
-    name: name ?? this.name,
-    countryCode: countryCode ?? this.countryCode,
-  );
+  LocationData copyWith({int? locationId, String? code, String? name}) =>
+      LocationData(
+        locationId: locationId ?? this.locationId,
+        code: code ?? this.code,
+        name: name ?? this.name,
+      );
   LocationData copyWithCompanion(LocationCompanion data) {
     return LocationData(
       locationId: data.locationId.present
@@ -1177,9 +1138,6 @@ class LocationData extends DataClass implements Insertable<LocationData> {
           : this.locationId,
       code: data.code.present ? data.code.value : this.code,
       name: data.name.present ? data.name.value : this.name,
-      countryCode: data.countryCode.present
-          ? data.countryCode.value
-          : this.countryCode,
     );
   }
 
@@ -1188,54 +1146,46 @@ class LocationData extends DataClass implements Insertable<LocationData> {
     return (StringBuffer('LocationData(')
           ..write('locationId: $locationId, ')
           ..write('code: $code, ')
-          ..write('name: $name, ')
-          ..write('countryCode: $countryCode')
+          ..write('name: $name')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(locationId, code, name, countryCode);
+  int get hashCode => Object.hash(locationId, code, name);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is LocationData &&
           other.locationId == this.locationId &&
           other.code == this.code &&
-          other.name == this.name &&
-          other.countryCode == this.countryCode);
+          other.name == this.name);
 }
 
 class LocationCompanion extends UpdateCompanion<LocationData> {
   final Value<int> locationId;
   final Value<String> code;
   final Value<String> name;
-  final Value<String> countryCode;
   const LocationCompanion({
     this.locationId = const Value.absent(),
     this.code = const Value.absent(),
     this.name = const Value.absent(),
-    this.countryCode = const Value.absent(),
   });
   LocationCompanion.insert({
     this.locationId = const Value.absent(),
     required String code,
     required String name,
-    required String countryCode,
   }) : code = Value(code),
-       name = Value(name),
-       countryCode = Value(countryCode);
+       name = Value(name);
   static Insertable<LocationData> custom({
     Expression<int>? locationId,
     Expression<String>? code,
     Expression<String>? name,
-    Expression<String>? countryCode,
   }) {
     return RawValuesInsertable({
       if (locationId != null) 'location_id': locationId,
       if (code != null) 'code': code,
       if (name != null) 'name': name,
-      if (countryCode != null) 'country_code': countryCode,
     });
   }
 
@@ -1243,13 +1193,11 @@ class LocationCompanion extends UpdateCompanion<LocationData> {
     Value<int>? locationId,
     Value<String>? code,
     Value<String>? name,
-    Value<String>? countryCode,
   }) {
     return LocationCompanion(
       locationId: locationId ?? this.locationId,
       code: code ?? this.code,
       name: name ?? this.name,
-      countryCode: countryCode ?? this.countryCode,
     );
   }
 
@@ -1265,9 +1213,6 @@ class LocationCompanion extends UpdateCompanion<LocationData> {
     if (name.present) {
       map['name'] = Variable<String>(name.value);
     }
-    if (countryCode.present) {
-      map['country_code'] = Variable<String>(countryCode.value);
-    }
     return map;
   }
 
@@ -1276,8 +1221,7 @@ class LocationCompanion extends UpdateCompanion<LocationData> {
     return (StringBuffer('LocationCompanion(')
           ..write('locationId: $locationId, ')
           ..write('code: $code, ')
-          ..write('name: $name, ')
-          ..write('countryCode: $countryCode')
+          ..write('name: $name')
           ..write(')'))
         .toString();
   }
@@ -5885,6 +5829,356 @@ class SpecialNoteRefCompanion extends UpdateCompanion<SpecialNoteRefData> {
     return (StringBuffer('SpecialNoteRefCompanion(')
           ..write('id: $id, ')
           ..write('name: $name, ')
+          ..write('sortOrder: $sortOrder, ')
+          ..write('isActive: $isActive')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $NursingPhraseTable extends NursingPhrase
+    with TableInfo<$NursingPhraseTable, NursingPhraseData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $NursingPhraseTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _titleMeta = const VerificationMeta('title');
+  @override
+  late final GeneratedColumn<String> title = GeneratedColumn<String>(
+    'title',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _contentMeta = const VerificationMeta(
+    'content',
+  );
+  @override
+  late final GeneratedColumn<String> content = GeneratedColumn<String>(
+    'content',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sortOrderMeta = const VerificationMeta(
+    'sortOrder',
+  );
+  @override
+  late final GeneratedColumn<int> sortOrder = GeneratedColumn<int>(
+    'sort_order',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _isActiveMeta = const VerificationMeta(
+    'isActive',
+  );
+  @override
+  late final GeneratedColumn<bool> isActive = GeneratedColumn<bool>(
+    'is_active',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_active" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    title,
+    content,
+    sortOrder,
+    isActive,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'nursing_phrase';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<NursingPhraseData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('title')) {
+      context.handle(
+        _titleMeta,
+        title.isAcceptableOrUnknown(data['title']!, _titleMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_titleMeta);
+    }
+    if (data.containsKey('content')) {
+      context.handle(
+        _contentMeta,
+        content.isAcceptableOrUnknown(data['content']!, _contentMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_contentMeta);
+    }
+    if (data.containsKey('sort_order')) {
+      context.handle(
+        _sortOrderMeta,
+        sortOrder.isAcceptableOrUnknown(data['sort_order']!, _sortOrderMeta),
+      );
+    }
+    if (data.containsKey('is_active')) {
+      context.handle(
+        _isActiveMeta,
+        isActive.isAcceptableOrUnknown(data['is_active']!, _isActiveMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  NursingPhraseData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return NursingPhraseData(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      title: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}title'],
+      )!,
+      content: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}content'],
+      )!,
+      sortOrder: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}sort_order'],
+      )!,
+      isActive: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_active'],
+      )!,
+    );
+  }
+
+  @override
+  $NursingPhraseTable createAlias(String alias) {
+    return $NursingPhraseTable(attachedDatabase, alias);
+  }
+}
+
+class NursingPhraseData extends DataClass
+    implements Insertable<NursingPhraseData> {
+  final int id;
+  final String title;
+  final String content;
+  final int sortOrder;
+  final bool isActive;
+  const NursingPhraseData({
+    required this.id,
+    required this.title,
+    required this.content,
+    required this.sortOrder,
+    required this.isActive,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['title'] = Variable<String>(title);
+    map['content'] = Variable<String>(content);
+    map['sort_order'] = Variable<int>(sortOrder);
+    map['is_active'] = Variable<bool>(isActive);
+    return map;
+  }
+
+  NursingPhraseCompanion toCompanion(bool nullToAbsent) {
+    return NursingPhraseCompanion(
+      id: Value(id),
+      title: Value(title),
+      content: Value(content),
+      sortOrder: Value(sortOrder),
+      isActive: Value(isActive),
+    );
+  }
+
+  factory NursingPhraseData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return NursingPhraseData(
+      id: serializer.fromJson<int>(json['id']),
+      title: serializer.fromJson<String>(json['title']),
+      content: serializer.fromJson<String>(json['content']),
+      sortOrder: serializer.fromJson<int>(json['sortOrder']),
+      isActive: serializer.fromJson<bool>(json['isActive']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'title': serializer.toJson<String>(title),
+      'content': serializer.toJson<String>(content),
+      'sortOrder': serializer.toJson<int>(sortOrder),
+      'isActive': serializer.toJson<bool>(isActive),
+    };
+  }
+
+  NursingPhraseData copyWith({
+    int? id,
+    String? title,
+    String? content,
+    int? sortOrder,
+    bool? isActive,
+  }) => NursingPhraseData(
+    id: id ?? this.id,
+    title: title ?? this.title,
+    content: content ?? this.content,
+    sortOrder: sortOrder ?? this.sortOrder,
+    isActive: isActive ?? this.isActive,
+  );
+  NursingPhraseData copyWithCompanion(NursingPhraseCompanion data) {
+    return NursingPhraseData(
+      id: data.id.present ? data.id.value : this.id,
+      title: data.title.present ? data.title.value : this.title,
+      content: data.content.present ? data.content.value : this.content,
+      sortOrder: data.sortOrder.present ? data.sortOrder.value : this.sortOrder,
+      isActive: data.isActive.present ? data.isActive.value : this.isActive,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('NursingPhraseData(')
+          ..write('id: $id, ')
+          ..write('title: $title, ')
+          ..write('content: $content, ')
+          ..write('sortOrder: $sortOrder, ')
+          ..write('isActive: $isActive')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, title, content, sortOrder, isActive);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is NursingPhraseData &&
+          other.id == this.id &&
+          other.title == this.title &&
+          other.content == this.content &&
+          other.sortOrder == this.sortOrder &&
+          other.isActive == this.isActive);
+}
+
+class NursingPhraseCompanion extends UpdateCompanion<NursingPhraseData> {
+  final Value<int> id;
+  final Value<String> title;
+  final Value<String> content;
+  final Value<int> sortOrder;
+  final Value<bool> isActive;
+  const NursingPhraseCompanion({
+    this.id = const Value.absent(),
+    this.title = const Value.absent(),
+    this.content = const Value.absent(),
+    this.sortOrder = const Value.absent(),
+    this.isActive = const Value.absent(),
+  });
+  NursingPhraseCompanion.insert({
+    this.id = const Value.absent(),
+    required String title,
+    required String content,
+    this.sortOrder = const Value.absent(),
+    this.isActive = const Value.absent(),
+  }) : title = Value(title),
+       content = Value(content);
+  static Insertable<NursingPhraseData> custom({
+    Expression<int>? id,
+    Expression<String>? title,
+    Expression<String>? content,
+    Expression<int>? sortOrder,
+    Expression<bool>? isActive,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (title != null) 'title': title,
+      if (content != null) 'content': content,
+      if (sortOrder != null) 'sort_order': sortOrder,
+      if (isActive != null) 'is_active': isActive,
+    });
+  }
+
+  NursingPhraseCompanion copyWith({
+    Value<int>? id,
+    Value<String>? title,
+    Value<String>? content,
+    Value<int>? sortOrder,
+    Value<bool>? isActive,
+  }) {
+    return NursingPhraseCompanion(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      content: content ?? this.content,
+      sortOrder: sortOrder ?? this.sortOrder,
+      isActive: isActive ?? this.isActive,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (title.present) {
+      map['title'] = Variable<String>(title.value);
+    }
+    if (content.present) {
+      map['content'] = Variable<String>(content.value);
+    }
+    if (sortOrder.present) {
+      map['sort_order'] = Variable<int>(sortOrder.value);
+    }
+    if (isActive.present) {
+      map['is_active'] = Variable<bool>(isActive.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('NursingPhraseCompanion(')
+          ..write('id: $id, ')
+          ..write('title: $title, ')
+          ..write('content: $content, ')
           ..write('sortOrder: $sortOrder, ')
           ..write('isActive: $isActive')
           ..write(')'))
@@ -15256,6 +15550,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $ActionItemTable actionItem = $ActionItemTable(this);
   late final $MedicalStaffTable medicalStaff = $MedicalStaffTable(this);
   late final $SpecialNoteRefTable specialNoteRef = $SpecialNoteRefTable(this);
+  late final $NursingPhraseTable nursingPhrase = $NursingPhraseTable(this);
   late final $MedicalRecordTable medicalRecord = $MedicalRecordTable(this);
   late final $PatientTable patient = $PatientTable(this);
   late final $FlightRecordTable flightRecord = $FlightRecordTable(this);
@@ -15303,6 +15598,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     actionItem,
     medicalStaff,
     specialNoteRef,
+    nursingPhrase,
     medicalRecord,
     patient,
     flightRecord,
@@ -15549,13 +15845,13 @@ typedef $$NationalityTableCreateCompanionBuilder =
     NationalityCompanion Function({
       Value<int> nationalityId,
       required String name,
-      Value<String?> code,
+      Value<String?> nameEn,
     });
 typedef $$NationalityTableUpdateCompanionBuilder =
     NationalityCompanion Function({
       Value<int> nationalityId,
       Value<String> name,
-      Value<String?> code,
+      Value<String?> nameEn,
     });
 
 final class $$NationalityTableReferences
@@ -15604,8 +15900,8 @@ class $$NationalityTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get code => $composableBuilder(
-    column: $table.code,
+  ColumnFilters<String> get nameEn => $composableBuilder(
+    column: $table.nameEn,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -15654,8 +15950,8 @@ class $$NationalityTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get code => $composableBuilder(
-    column: $table.code,
+  ColumnOrderings<String> get nameEn => $composableBuilder(
+    column: $table.nameEn,
     builder: (column) => ColumnOrderings(column),
   );
 }
@@ -15677,8 +15973,8 @@ class $$NationalityTableAnnotationComposer
   GeneratedColumn<String> get name =>
       $composableBuilder(column: $table.name, builder: (column) => column);
 
-  GeneratedColumn<String> get code =>
-      $composableBuilder(column: $table.code, builder: (column) => column);
+  GeneratedColumn<String> get nameEn =>
+      $composableBuilder(column: $table.nameEn, builder: (column) => column);
 
   Expression<T> patientRefs<T extends Object>(
     Expression<T> Function($$PatientTableAnnotationComposer a) f,
@@ -15736,21 +16032,21 @@ class $$NationalityTableTableManager
               ({
                 Value<int> nationalityId = const Value.absent(),
                 Value<String> name = const Value.absent(),
-                Value<String?> code = const Value.absent(),
+                Value<String?> nameEn = const Value.absent(),
               }) => NationalityCompanion(
                 nationalityId: nationalityId,
                 name: name,
-                code: code,
+                nameEn: nameEn,
               ),
           createCompanionCallback:
               ({
                 Value<int> nationalityId = const Value.absent(),
                 required String name,
-                Value<String?> code = const Value.absent(),
+                Value<String?> nameEn = const Value.absent(),
               }) => NationalityCompanion.insert(
                 nationalityId: nationalityId,
                 name: name,
-                code: code,
+                nameEn: nameEn,
               ),
           withReferenceMapper: (p0) => p0
               .map(
@@ -16344,14 +16640,12 @@ typedef $$LocationTableCreateCompanionBuilder =
       Value<int> locationId,
       required String code,
       required String name,
-      required String countryCode,
     });
 typedef $$LocationTableUpdateCompanionBuilder =
     LocationCompanion Function({
       Value<int> locationId,
       Value<String> code,
       Value<String> name,
-      Value<String> countryCode,
     });
 
 final class $$LocationTableReferences
@@ -16416,11 +16710,6 @@ class $$LocationTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get countryCode => $composableBuilder(
-    column: $table.countryCode,
-    builder: (column) => ColumnFilters(column),
-  );
-
   Expression<bool> flightTransitLocationsRefs(
     Expression<bool> Function($$FlightTransitLocationsTableFilterComposer f) f,
   ) {
@@ -16471,11 +16760,6 @@ class $$LocationTableOrderingComposer
     column: $table.name,
     builder: (column) => ColumnOrderings(column),
   );
-
-  ColumnOrderings<String> get countryCode => $composableBuilder(
-    column: $table.countryCode,
-    builder: (column) => ColumnOrderings(column),
-  );
 }
 
 class $$LocationTableAnnotationComposer
@@ -16497,11 +16781,6 @@ class $$LocationTableAnnotationComposer
 
   GeneratedColumn<String> get name =>
       $composableBuilder(column: $table.name, builder: (column) => column);
-
-  GeneratedColumn<String> get countryCode => $composableBuilder(
-    column: $table.countryCode,
-    builder: (column) => column,
-  );
 
   Expression<T> flightTransitLocationsRefs<T extends Object>(
     Expression<T> Function($$FlightTransitLocationsTableAnnotationComposer a) f,
@@ -16561,24 +16840,20 @@ class $$LocationTableTableManager
                 Value<int> locationId = const Value.absent(),
                 Value<String> code = const Value.absent(),
                 Value<String> name = const Value.absent(),
-                Value<String> countryCode = const Value.absent(),
               }) => LocationCompanion(
                 locationId: locationId,
                 code: code,
                 name: name,
-                countryCode: countryCode,
               ),
           createCompanionCallback:
               ({
                 Value<int> locationId = const Value.absent(),
                 required String code,
                 required String name,
-                required String countryCode,
               }) => LocationCompanion.insert(
                 locationId: locationId,
                 code: code,
                 name: name,
-                countryCode: countryCode,
               ),
           withReferenceMapper: (p0) => p0
               .map(
@@ -20101,6 +20376,204 @@ typedef $$SpecialNoteRefTableProcessedTableManager =
         BaseReferences<_$AppDatabase, $SpecialNoteRefTable, SpecialNoteRefData>,
       ),
       SpecialNoteRefData,
+      PrefetchHooks Function()
+    >;
+typedef $$NursingPhraseTableCreateCompanionBuilder =
+    NursingPhraseCompanion Function({
+      Value<int> id,
+      required String title,
+      required String content,
+      Value<int> sortOrder,
+      Value<bool> isActive,
+    });
+typedef $$NursingPhraseTableUpdateCompanionBuilder =
+    NursingPhraseCompanion Function({
+      Value<int> id,
+      Value<String> title,
+      Value<String> content,
+      Value<int> sortOrder,
+      Value<bool> isActive,
+    });
+
+class $$NursingPhraseTableFilterComposer
+    extends Composer<_$AppDatabase, $NursingPhraseTable> {
+  $$NursingPhraseTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get content => $composableBuilder(
+    column: $table.content,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get sortOrder => $composableBuilder(
+    column: $table.sortOrder,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isActive => $composableBuilder(
+    column: $table.isActive,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$NursingPhraseTableOrderingComposer
+    extends Composer<_$AppDatabase, $NursingPhraseTable> {
+  $$NursingPhraseTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get content => $composableBuilder(
+    column: $table.content,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get sortOrder => $composableBuilder(
+    column: $table.sortOrder,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isActive => $composableBuilder(
+    column: $table.isActive,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$NursingPhraseTableAnnotationComposer
+    extends Composer<_$AppDatabase, $NursingPhraseTable> {
+  $$NursingPhraseTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get title =>
+      $composableBuilder(column: $table.title, builder: (column) => column);
+
+  GeneratedColumn<String> get content =>
+      $composableBuilder(column: $table.content, builder: (column) => column);
+
+  GeneratedColumn<int> get sortOrder =>
+      $composableBuilder(column: $table.sortOrder, builder: (column) => column);
+
+  GeneratedColumn<bool> get isActive =>
+      $composableBuilder(column: $table.isActive, builder: (column) => column);
+}
+
+class $$NursingPhraseTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $NursingPhraseTable,
+          NursingPhraseData,
+          $$NursingPhraseTableFilterComposer,
+          $$NursingPhraseTableOrderingComposer,
+          $$NursingPhraseTableAnnotationComposer,
+          $$NursingPhraseTableCreateCompanionBuilder,
+          $$NursingPhraseTableUpdateCompanionBuilder,
+          (
+            NursingPhraseData,
+            BaseReferences<
+              _$AppDatabase,
+              $NursingPhraseTable,
+              NursingPhraseData
+            >,
+          ),
+          NursingPhraseData,
+          PrefetchHooks Function()
+        > {
+  $$NursingPhraseTableTableManager(_$AppDatabase db, $NursingPhraseTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$NursingPhraseTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$NursingPhraseTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$NursingPhraseTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> title = const Value.absent(),
+                Value<String> content = const Value.absent(),
+                Value<int> sortOrder = const Value.absent(),
+                Value<bool> isActive = const Value.absent(),
+              }) => NursingPhraseCompanion(
+                id: id,
+                title: title,
+                content: content,
+                sortOrder: sortOrder,
+                isActive: isActive,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String title,
+                required String content,
+                Value<int> sortOrder = const Value.absent(),
+                Value<bool> isActive = const Value.absent(),
+              }) => NursingPhraseCompanion.insert(
+                id: id,
+                title: title,
+                content: content,
+                sortOrder: sortOrder,
+                isActive: isActive,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$NursingPhraseTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $NursingPhraseTable,
+      NursingPhraseData,
+      $$NursingPhraseTableFilterComposer,
+      $$NursingPhraseTableOrderingComposer,
+      $$NursingPhraseTableAnnotationComposer,
+      $$NursingPhraseTableCreateCompanionBuilder,
+      $$NursingPhraseTableUpdateCompanionBuilder,
+      (
+        NursingPhraseData,
+        BaseReferences<_$AppDatabase, $NursingPhraseTable, NursingPhraseData>,
+      ),
+      NursingPhraseData,
       PrefetchHooks Function()
     >;
 typedef $$MedicalRecordTableCreateCompanionBuilder =
@@ -28217,6 +28690,8 @@ class $AppDatabaseManager {
       $$MedicalStaffTableTableManager(_db, _db.medicalStaff);
   $$SpecialNoteRefTableTableManager get specialNoteRef =>
       $$SpecialNoteRefTableTableManager(_db, _db.specialNoteRef);
+  $$NursingPhraseTableTableManager get nursingPhrase =>
+      $$NursingPhraseTableTableManager(_db, _db.nursingPhrase);
   $$MedicalRecordTableTableManager get medicalRecord =>
       $$MedicalRecordTableTableManager(_db, _db.medicalRecord);
   $$PatientTableTableManager get patient =>

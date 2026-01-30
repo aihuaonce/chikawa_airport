@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../data/models/medical/medical_view.dart';
 import '../../data/db/database.dart';
+import '../widgets/reference_search_sheet.dart';
 
 class FlightLog extends StatefulWidget {
   final int medicalId;
@@ -130,110 +131,95 @@ class _FlightLogState extends State<FlightLog> {
     );
   }
 
-  // 航空公司下拉選單
+  // 航空公司選單 (改用 SearchSheet)
   Widget _buildAirlineDropdown(
     MedicalViewModel viewModel,
     FlightRecordData flight,
   ) {
     final selectedAirline = viewModel.getAirlineById(flight.airlineId);
+    final text = selectedAirline != null
+        ? '${selectedAirline.code} - ${selectedAirline.name}'
+        : '';
 
-    return DropdownButtonFormField<AirlineData>(
-      value: selectedAirline,
-      decoration: InputDecoration(
-        filled: true,
-        fillColor: Colors.white,
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 14,
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: borderColor),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: primaryColor, width: 1.5),
-        ),
-      ),
-      hint: Row(
-        children: [
-          const Icon(Icons.corporate_fare, size: 18, color: textMuted),
-          const SizedBox(width: 8),
-          Text(
-            '請選取航空公司',
-            style: TextStyle(
-              color: textMuted.withValues(alpha: 0.5),
-              fontSize: 14,
-            ),
-          ),
-        ],
-      ),
-      icon: const Icon(Icons.keyboard_arrow_down, size: 20, color: textMuted),
-      items: viewModel.airlineOptions.map((airline) {
-        return DropdownMenuItem<AirlineData>(
-          value: airline,
-          child: Text(
-            '${airline.code} - ${airline.name}',
-            style: const TextStyle(fontSize: 14, color: textDark),
-          ),
+    return _buildSelectionField(
+      text: text,
+      hint: '請選取航空公司',
+      icon: Icons.corporate_fare,
+      onTap: () async {
+        final result = await ReferenceSearchSheet.show<AirlineData>(
+          context,
+          title: '選擇航空公司',
+          searchFunction: viewModel.searchAirlines,
+          initialSelection: selectedAirline,
+          isSelectedComparator: (a, b) => a.airlineId == b?.airlineId,
+          itemBuilder: (context, item, isSelected) {
+            return ListTile(
+              title: Text(
+                '${item.code} - ${item.name}',
+                style: TextStyle(
+                  color: isSelected ? primaryColor : textDark,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                ),
+              ),
+              trailing: isSelected
+                  ? const Icon(Icons.check, color: primaryColor)
+                  : null,
+            );
+          },
         );
-      }).toList(),
-      onChanged: (AirlineData? newValue) {
-        if (newValue != null) {
-          viewModel.updateAirlineId(newValue.airlineId);
+
+        if (result != null) {
+          viewModel.updateAirlineId(result.airlineId);
         }
       },
     );
   }
 
-  // 旅行狀態下拉選單
+  // 旅行狀態選單 (改用 SearchSheet)
   Widget _buildTravelStatusDropdown(
     MedicalViewModel viewModel,
     FlightRecordData flight,
   ) {
     final selectedStatus = viewModel.getTravelStatusById(flight.travelStatusId);
+    final text = selectedStatus != null
+        ? '${selectedStatus.code} - ${selectedStatus.name}'
+        : '';
 
-    return DropdownButtonFormField<TravelStatusData>(
-      value: selectedStatus,
-      decoration: InputDecoration(
-        filled: true,
-        fillColor: Colors.white,
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 14,
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: borderColor),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: primaryColor, width: 1.5),
-        ),
-      ),
-      hint: Text(
-        '請選取旅行狀態',
-        style: TextStyle(color: textMuted.withValues(alpha: 0.5), fontSize: 14),
-      ),
-      icon: const Icon(Icons.keyboard_arrow_down, size: 20, color: textMuted),
-      items: viewModel.travelStatusOptions.map((status) {
-        return DropdownMenuItem<TravelStatusData>(
-          value: status,
-          child: Text(
-            '${status.code} - ${status.name}',
-            style: const TextStyle(fontSize: 14, color: textDark),
-          ),
+    return _buildSelectionField(
+      text: text,
+      hint: '請選取旅行狀態',
+      icon: Icons.flight_takeoff,
+      onTap: () async {
+        final result = await ReferenceSearchSheet.show<TravelStatusData>(
+          context,
+          title: '選擇旅行狀態',
+          searchFunction: viewModel.searchTravelStatus,
+          initialSelection: selectedStatus,
+          isSelectedComparator: (a, b) => a.travelStatusId == b?.travelStatusId,
+          itemBuilder: (context, item, isSelected) {
+            return ListTile(
+              title: Text(
+                '${item.code} - ${item.name}',
+                style: TextStyle(
+                  color: isSelected ? primaryColor : textDark,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                ),
+              ),
+              trailing: isSelected
+                  ? const Icon(Icons.check, color: primaryColor)
+                  : null,
+            );
+          },
         );
-      }).toList(),
-      onChanged: (TravelStatusData? newValue) {
-        if (newValue != null) {
-          viewModel.updateTravelStatusId(newValue.travelStatusId);
+
+        if (result != null) {
+          viewModel.updateTravelStatusId(result.travelStatusId);
         }
       },
     );
   }
 
-  // 地點下拉選單
+  // 地點選單 (改用 SearchSheet)
   Widget _buildLocationDropdown({
     required MedicalViewModel viewModel,
     required int selectedId,
@@ -242,45 +228,82 @@ class _FlightLogState extends State<FlightLog> {
     required Function(int) onChanged,
   }) {
     final selectedLocation = viewModel.getLocationById(selectedId);
+    final text = selectedLocation != null
+        ? '${selectedLocation.code} - ${selectedLocation.name}'
+        : '';
 
-    return DropdownButtonFormField<LocationData>(
-      value: selectedLocation,
-      decoration: InputDecoration(
-        filled: true,
-        fillColor: Colors.white,
-        prefixIcon: Icon(prefixIcon, color: primaryColor, size: 20),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 14,
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: borderColor),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: primaryColor, width: 1.5),
-        ),
-      ),
-      hint: Text(
-        hint,
-        style: TextStyle(color: textMuted.withValues(alpha: 0.5), fontSize: 14),
-      ),
-      icon: const Icon(Icons.keyboard_arrow_down, size: 20, color: textMuted),
-      items: viewModel.locationOptions.map((location) {
-        return DropdownMenuItem<LocationData>(
-          value: location,
-          child: Text(
-            '${location.code} - ${location.name}',
-            style: const TextStyle(fontSize: 14, color: textDark),
-          ),
+    return _buildSelectionField(
+      text: text,
+      hint: hint,
+      icon: prefixIcon,
+      onTap: () async {
+        final result = await ReferenceSearchSheet.show<LocationData>(
+          context,
+          title: '選擇機場',
+          searchFunction: viewModel.searchLocations,
+          initialSelection: selectedLocation,
+          isSelectedComparator: (a, b) => a.locationId == b?.locationId,
+          itemBuilder: (context, item, isSelected) {
+            return ListTile(
+              title: Text(
+                '${item.code} - ${item.name}',
+                style: TextStyle(
+                  color: isSelected ? primaryColor : textDark,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                ),
+              ),
+              trailing: isSelected
+                  ? const Icon(Icons.check, color: primaryColor)
+                  : null,
+            );
+          },
         );
-      }).toList(),
-      onChanged: (LocationData? newValue) {
-        if (newValue != null) {
-          onChanged(newValue.locationId);
+
+        if (result != null) {
+          onChanged(result.locationId);
         }
       },
+    );
+  }
+
+  // 通用選擇欄位元件
+  Widget _buildSelectionField({
+    required String text,
+    required String hint,
+    required IconData icon,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: borderColor),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, size: 18, color: textMuted),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                text.isNotEmpty ? text : hint,
+                style: TextStyle(
+                  color: text.isNotEmpty
+                      ? textDark
+                      : textMuted.withValues(alpha: 0.5),
+                  fontSize: 14,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            const Icon(Icons.arrow_drop_down, color: textMuted),
+          ],
+        ),
+      ),
     );
   }
 
@@ -349,55 +372,31 @@ class _FlightLogState extends State<FlightLog> {
     );
   }
 
-  // 顯示新增經過地對話框
-  void _showAddTransitDialog(MedicalViewModel viewModel) {
-    LocationData? selectedLocation;
-    showDialog(
-      context: context,
-      builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setState) {
-            return AlertDialog(
-              title: const Text('新增經過地'),
-              content: DropdownButtonFormField<LocationData>(
-                decoration: const InputDecoration(
-                  labelText: '選擇機場',
-                  border: OutlineInputBorder(),
-                ),
-                items: viewModel.locationOptions.map((location) {
-                  return DropdownMenuItem<LocationData>(
-                    value: location,
-                    child: Text('${location.code} - ${location.name}'),
-                  );
-                }).toList(),
-                onChanged: (value) {
-                  setState(() {
-                    selectedLocation = value;
-                  });
-                },
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('取消'),
-                ),
-                TextButton(
-                  onPressed: () async {
-                    if (selectedLocation != null) {
-                      await viewModel.addTransitLocation(
-                        selectedLocation!.locationId,
-                      );
-                      if (context.mounted) Navigator.pop(context);
-                    }
-                  },
-                  child: const Text('確定'),
-                ),
-              ],
-            );
-          },
+  // 顯示新增經過地 (直接開啟搜尋面板)
+  Future<void> _showAddTransitDialog(MedicalViewModel viewModel) async {
+    final result = await ReferenceSearchSheet.show<LocationData>(
+      context,
+      title: '選擇機場',
+      searchFunction: viewModel.searchLocations,
+      itemBuilder: (context, item, isSelected) {
+        return ListTile(
+          title: Text(
+            '${item.code} - ${item.name}',
+            style: TextStyle(
+              color: isSelected ? primaryColor : textDark,
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+            ),
+          ),
+          trailing: isSelected
+              ? const Icon(Icons.check, color: primaryColor)
+              : null,
         );
       },
     );
+
+    if (result != null) {
+      await viewModel.addTransitLocation(result.locationId);
+    }
   }
 
   // 標籤元件

@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import '../db/database.dart';
 import '../utils/icd10_importer.dart';
+import '../utils/csv_reference_importer.dart';
 
 class ReferenceService extends ChangeNotifier {
   final AppDatabase db;
@@ -29,6 +30,7 @@ class ReferenceService extends ChangeNotifier {
   List<ActionItemData> _actionItems = [];
   List<MedicalStaffData> _medicalStaffList = [];
   List<SpecialNoteRefData> _specialNoteRefs = [];
+  List<NursingPhraseData> _nursingPhraseList = [];
 
   // === Getters ===
   List<SexData> get sexList => _sexList;
@@ -50,6 +52,7 @@ class ReferenceService extends ChangeNotifier {
   List<ActionItemData> get actionItems => _actionItems;
   List<MedicalStaffData> get medicalStaffList => _medicalStaffList;
   List<SpecialNoteRefData> get specialNoteRefs => _specialNoteRefs;
+  List<NursingPhraseData> get nursingPhraseList => _nursingPhraseList;
 
   ReferenceService(this.db);
 
@@ -59,10 +62,20 @@ class ReferenceService extends ChangeNotifier {
   }
 
   Future<void> init() async {
+    await _importReferenceData();
     await _loadBasicReferences();
     await _loadTreatmentReferences();
     await _importIcd10Data();
     notifyListeners();
+  }
+
+  /// 匯入參考資料（CSV）
+  Future<void> _importReferenceData() async {
+    try {
+      await CsvReferenceImporter.importAll(db);
+    } catch (e) {
+      debugPrint('系統:參考資料匯入失敗 - $e');
+    }
   }
 
   /// 匯入 ICD-10 資料（首次啟動）
@@ -111,6 +124,7 @@ class ReferenceService extends ChangeNotifier {
       _actionItems = await db.referenceDao.getAllActionItems();
       _medicalStaffList = await db.referenceDao.getAllMedicalStaff();
       _specialNoteRefs = await db.referenceDao.getAllSpecialNoteRefs();
+      _nursingPhraseList = await db.referenceDao.getAllNursingPhrases();
 
       debugPrint('系統:處置參考資料載入完成');
       debugPrint('  - 主訴類型: ${_chiefComplaintTypes.length}');
@@ -123,6 +137,7 @@ class ReferenceService extends ChangeNotifier {
       debugPrint('  - 處置項目: ${_actionItems.length}');
       debugPrint('  - 醫療人員: ${_medicalStaffList.length}');
       debugPrint('  - 特別註記: ${_specialNoteRefs.length}');
+      debugPrint('  - 護理用語: ${_nursingPhraseList.length}');
     } catch (e) {
       debugPrint('系統:載入處置參考資料失敗 - $e');
     }

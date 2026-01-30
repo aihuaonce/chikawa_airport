@@ -16,7 +16,7 @@ class Icd10Importer {
       // 2. 读取 CSV 文件
       debugPrint('开始导入 ICD-10 数据...');
       final csvData = await rootBundle.loadString(
-        'assets/airport.medical.icd10.csv',
+        'assets/csv/airport.medical.icd10.csv',
       );
 
       // 3. 解析 CSV

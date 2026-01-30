@@ -1042,6 +1042,22 @@ class TreatmentViewModel extends ChangeNotifier {
   }
 
   // ===================================================================
+  // 醫療人員搜尋
+  // ===================================================================
+
+  Future<List<MedicalStaffData>> searchMedicalStaff(String query) async {
+    if (query.isEmpty) return medicalStaffList;
+
+    final lowerQuery = query.toLowerCase();
+    return medicalStaffList.where((staff) {
+      final nameMatch = staff.name.toLowerCase().contains(lowerQuery);
+      final idMatch =
+          staff.employeeId?.toLowerCase().contains(lowerQuery) ?? false;
+      return nameMatch || idMatch;
+    }).toList();
+  }
+
+  // ===================================================================
   // 醫療人員指派
   // ===================================================================
 
@@ -1087,6 +1103,16 @@ class TreatmentViewModel extends ChangeNotifier {
       debugPrint('系統:新增醫療人員指派成功');
     } catch (e) {
       debugPrint('系統:新增醫療人員指派失敗 - $e');
+    }
+  }
+
+  Future<void> removeStaffAssignment(int staffAssignmentId) async {
+    try {
+      await db.treatmentDao.deleteStaffAssignment(staffAssignmentId);
+      await _reloadStaffAssignments();
+      debugPrint('系統:刪除醫療人員指派成功');
+    } catch (e) {
+      debugPrint('系統:刪除醫療人員指派失敗 - $e');
     }
   }
 
@@ -1153,6 +1179,19 @@ class TreatmentViewModel extends ChangeNotifier {
             medicalId: medicalId,
             selectedNotes: Value(selectedNotes),
             otherNotes: Value(otherNotes),
+          ),
+        );
+      } else {
+        await db.treatmentDao.updateSpecialNotes(
+          SpecialNotesCompanion(
+            noteId: Value(_specialNotes!.noteId),
+            medicalId: Value(_specialNotes!.medicalId),
+            selectedNotes: selectedNotes != null
+                ? Value(selectedNotes)
+                : const Value.absent(),
+            otherNotes: otherNotes != null
+                ? Value(otherNotes)
+                : const Value.absent(),
           ),
         );
       }
@@ -1238,6 +1277,38 @@ class TreatmentViewModel extends ChangeNotifier {
   Future<List<Icd10CodeData>> searchIcd10(String query) async {
     if (query.isEmpty) return [];
     return await db.icd10Dao.search(query);
+  }
+
+  // === 搜尋輔助方法 (新增) ===
+
+  Future<List<DiagnosisCategoryData>> searchDiagnosisCategories(
+    String keyword,
+  ) async {
+    if (keyword.isEmpty) return refService.diagnosisCategories;
+    final lower = keyword.toLowerCase();
+    return refService.diagnosisCategories
+        .where((d) => d.name.toLowerCase().contains(lower))
+        .toList();
+  }
+
+  Future<List<TreatmentOnSiteData>> searchTreatmentOnSites(
+    String keyword,
+  ) async {
+    if (keyword.isEmpty) return refService.treatmentOnSites;
+    final lower = keyword.toLowerCase();
+    return refService.treatmentOnSites
+        .where((t) => t.name.toLowerCase().contains(lower))
+        .toList();
+  }
+
+  Future<List<TreatmentResultData>> searchTreatmentResults(
+    String keyword,
+  ) async {
+    if (keyword.isEmpty) return refService.treatmentResults;
+    final lower = keyword.toLowerCase();
+    return refService.treatmentResults
+        .where((r) => r.name.toLowerCase().contains(lower))
+        .toList();
   }
 
   // ===================================================================
