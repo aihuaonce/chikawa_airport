@@ -1148,37 +1148,35 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
 
   // 初始化分級資料
   Future<void> initializeTriageLevels() async {
-    final count = await (select(triageLevel).get()).then((list) => list.length);
-    if (count == 0) {
-      await batch((batch) {
-        batch.insertAll(triageLevel, [
-          TriageLevelCompanion.insert(
-            level: 1,
-            name: '復甦急救',
-            colorCode: '#FF0000',
-          ), // 紅
-          TriageLevelCompanion.insert(
-            level: 2,
-            name: '危急',
-            colorCode: '#FF7F00',
-          ), // 橘
-          TriageLevelCompanion.insert(
-            level: 3,
-            name: '急迫',
-            colorCode: '#FBC02D',
-          ), // 黃
-          TriageLevelCompanion.insert(
-            level: 4,
-            name: '次急迫',
-            colorCode: '#00FF00',
-          ), // 綠
-          TriageLevelCompanion.insert(
-            level: 5,
-            name: '非急迫',
-            colorCode: '#0000FF',
-          ), // 藍
-        ]);
-      });
+    // 定義較為舒適的顏色 (Tailwind 500 series)
+    final levels = [
+      (1, '復甦急救', '#EF4444'), // Red
+      (2, '危急', '#F97316'), // Orange
+      (3, '急迫', '#EAB308'), // Yellow
+      (4, '次急迫', '#22C55E'), // Green
+      (5, '非急迫', '#3B82F6'), // Blue
+    ];
+
+    for (final item in levels) {
+      final lvl = item.$1;
+      final name = item.$2;
+      final color = item.$3;
+
+      final exists = await (select(
+        triageLevel,
+      )..where((t) => t.level.equals(lvl))).getSingleOrNull();
+
+      if (exists != null) {
+        // 更新顏色
+        await (update(triageLevel)..where((t) => t.level.equals(lvl))).write(
+          TriageLevelCompanion(colorCode: Value(color)),
+        );
+      } else {
+        // 新增
+        await into(triageLevel).insert(
+          TriageLevelCompanion.insert(level: lvl, name: name, colorCode: color),
+        );
+      }
     }
   }
 
