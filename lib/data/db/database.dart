@@ -40,6 +40,7 @@ part 'database.g.dart';
     ActionItem,
     MedicalStaff,
     SpecialNoteRef,
+    NursingPhrase,
 
     //醫療表
     MedicalRecord,

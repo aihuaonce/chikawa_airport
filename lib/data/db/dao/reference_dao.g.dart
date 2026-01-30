@@ -28,4 +28,5 @@ mixin _$ReferenceDaoMixin on DatabaseAccessor<AppDatabase> {
   $ActionItemTable get actionItem => attachedDatabase.actionItem;
   $MedicalStaffTable get medicalStaff => attachedDatabase.medicalStaff;
   $SpecialNoteRefTable get specialNoteRef => attachedDatabase.specialNoteRef;
+  $NursingPhraseTable get nursingPhrase => attachedDatabase.nursingPhrase;
 }

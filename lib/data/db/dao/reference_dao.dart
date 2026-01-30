@@ -24,11 +24,40 @@ part 'reference_dao.g.dart';
     ActionItem,
     MedicalStaff,
     SpecialNoteRef,
+    NursingPhrase,
   ],
 )
 class ReferenceDao extends DatabaseAccessor<AppDatabase>
     with _$ReferenceDaoMixin {
   ReferenceDao(super.db);
+
+  //  護理常用語相關
+  Future<List<NursingPhraseData>> getAllNursingPhrases({
+    bool onlyActive = true,
+  }) {
+    final query = select(nursingPhrase);
+    if (onlyActive) {
+      query.where((n) => n.isActive.equals(true));
+    }
+    return (query..orderBy([(n) => OrderingTerm.asc(n.sortOrder)])).get();
+  }
+
+  Future<void> addNursingPhraseBatch(
+    List<Map<String, dynamic>> phraseList,
+  ) async {
+    await batch((batch) {
+      batch.insertAll(
+        nursingPhrase,
+        phraseList.map(
+          (item) => NursingPhraseCompanion.insert(
+            title: item['title'] as String,
+            content: item['content'] as String,
+            sortOrder: Value(item['sortOrder'] as int),
+          ),
+        ),
+      );
+    });
+  }
 
   //  性別相關
 
@@ -85,16 +114,29 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
   // 搜尋國籍 (模糊搜尋名稱)
   Future<List<NationalityData>> searchNationality(String keyword) {
     return (select(nationality)
-          ..where((n) => n.name.like('%$keyword%'))
+          ..where(
+            (n) =>
+                n.name.like('%$keyword%') |
+                n.nameEn.like('%$keyword%') |
+                n.code.like('%$keyword%'),
+          )
           ..orderBy([(n) => OrderingTerm.asc(n.name)]))
         .get();
   }
 
   // 新增國籍
-  Future<int> addNationality({required String name, String? code}) {
-    return into(
-      nationality,
-    ).insert(NationalityCompanion.insert(name: name, code: Value(code)));
+  Future<int> addNationality({
+    required String name,
+    String? nameEn,
+    String? code,
+  }) {
+    return into(nationality).insert(
+      NationalityCompanion.insert(
+        name: name,
+        nameEn: Value(nameEn),
+        code: Value(code),
+      ),
+    );
   }
 
   // 批次新增國籍
@@ -105,6 +147,7 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
         nationalityList.map(
           (item) => NationalityCompanion.insert(
             name: item['name']!,
+            nameEn: Value(item['nameEn']),
             code: Value(item['code']),
           ),
         ),
@@ -113,12 +156,18 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
   }
 
   // 更新國籍
-  Future<int> updateNationality({required int id, String? name, String? code}) {
+  Future<int> updateNationality({
+    required int id,
+    String? name,
+    String? nameEn,
+    String? code,
+  }) {
     return (update(
       nationality,
     )..where((n) => n.nationalityId.equals(id))).write(
       NationalityCompanion(
         name: name != null ? Value(name) : const Value.absent(),
+        nameEn: nameEn != null ? Value(nameEn) : const Value.absent(),
         code: code != null ? Value(code) : const Value.absent(),
       ),
     );
@@ -754,31 +803,31 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
     final count = await (select(nationality).get()).then((list) => list.length);
     if (count == 0) {
       await addNationalityBatch([
-        {'name': 'Taiwan', 'code': 'TW'},
-        {'name': 'China', 'code': 'CN'},
-        {'name': 'Hong Kong', 'code': 'HK'},
-        {'name': 'Macau', 'code': 'MO'},
-        {'name': 'Japan', 'code': 'JP'},
-        {'name': 'South Korea', 'code': 'KR'},
-        {'name': 'United States', 'code': 'US'},
-        {'name': 'United Kingdom', 'code': 'GB'},
-        {'name': 'Canada', 'code': 'CA'},
-        {'name': 'Australia', 'code': 'AU'},
-        {'name': 'Singapore', 'code': 'SG'},
-        {'name': 'Malaysia', 'code': 'MY'},
-        {'name': 'Thailand', 'code': 'TH'},
-        {'name': 'Vietnam', 'code': 'VN'},
-        {'name': 'Philippines', 'code': 'PH'},
-        {'name': 'Indonesia', 'code': 'ID'},
-        {'name': 'India', 'code': 'IN'},
-        {'name': 'France', 'code': 'FR'},
-        {'name': 'Germany', 'code': 'DE'},
-        {'name': 'Italy', 'code': 'IT'},
-        {'name': 'Spain', 'code': 'ES'},
-        {'name': 'Netherlands', 'code': 'NL'},
-        {'name': 'Switzerland', 'code': 'CH'},
-        {'name': 'New Zealand', 'code': 'NZ'},
-        {'name': 'Brazil', 'code': 'BR'},
+        {'name': 'Taiwan', 'nameEn': 'Taiwan', 'code': 'TW'},
+        {'name': 'China', 'nameEn': 'China', 'code': 'CN'},
+        {'name': 'Hong Kong', 'nameEn': 'Hong Kong', 'code': 'HK'},
+        {'name': 'Macau', 'nameEn': 'Macau', 'code': 'MO'},
+        {'name': 'Japan', 'nameEn': 'Japan', 'code': 'JP'},
+        {'name': 'South Korea', 'nameEn': 'South Korea', 'code': 'KR'},
+        {'name': 'United States', 'nameEn': 'United States', 'code': 'US'},
+        {'name': 'United Kingdom', 'nameEn': 'United Kingdom', 'code': 'GB'},
+        {'name': 'Canada', 'nameEn': 'Canada', 'code': 'CA'},
+        {'name': 'Australia', 'nameEn': 'Australia', 'code': 'AU'},
+        {'name': 'Singapore', 'nameEn': 'Singapore', 'code': 'SG'},
+        {'name': 'Malaysia', 'nameEn': 'Malaysia', 'code': 'MY'},
+        {'name': 'Thailand', 'nameEn': 'Thailand', 'code': 'TH'},
+        {'name': 'Vietnam', 'nameEn': 'Vietnam', 'code': 'VN'},
+        {'name': 'Philippines', 'nameEn': 'Philippines', 'code': 'PH'},
+        {'name': 'Indonesia', 'nameEn': 'Indonesia', 'code': 'ID'},
+        {'name': 'India', 'nameEn': 'India', 'code': 'IN'},
+        {'name': 'France', 'nameEn': 'France', 'code': 'FR'},
+        {'name': 'Germany', 'nameEn': 'Germany', 'code': 'DE'},
+        {'name': 'Italy', 'nameEn': 'Italy', 'code': 'IT'},
+        {'name': 'Spain', 'nameEn': 'Spain', 'code': 'ES'},
+        {'name': 'Netherlands', 'nameEn': 'Netherlands', 'code': 'NL'},
+        {'name': 'Switzerland', 'nameEn': 'Switzerland', 'code': 'CH'},
+        {'name': 'New Zealand', 'nameEn': 'New Zealand', 'code': 'NZ'},
+        {'name': 'Brazil', 'nameEn': 'Brazil', 'code': 'BR'},
       ]);
     }
   }
