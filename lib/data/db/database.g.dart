@@ -10213,12 +10213,12 @@ class $MedicalMediaTable extends MedicalMedia
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
-  static const VerificationMeta _filePathMeta = const VerificationMeta(
-    'filePath',
+  static const VerificationMeta _base64DataMeta = const VerificationMeta(
+    'base64Data',
   );
   @override
-  late final GeneratedColumn<String> filePath = GeneratedColumn<String>(
-    'file_path',
+  late final GeneratedColumn<String> base64Data = GeneratedColumn<String>(
+    'base64_data',
     aliasedName,
     false,
     type: DriftSqlType.string,
@@ -10252,7 +10252,7 @@ class $MedicalMediaTable extends MedicalMedia
     mediaId,
     medicalId,
     mediaType,
-    filePath,
+    base64Data,
     description,
     createdAt,
   ];
@@ -10290,13 +10290,13 @@ class $MedicalMediaTable extends MedicalMedia
     } else if (isInserting) {
       context.missing(_mediaTypeMeta);
     }
-    if (data.containsKey('file_path')) {
+    if (data.containsKey('base64_data')) {
       context.handle(
-        _filePathMeta,
-        filePath.isAcceptableOrUnknown(data['file_path']!, _filePathMeta),
+        _base64DataMeta,
+        base64Data.isAcceptableOrUnknown(data['base64_data']!, _base64DataMeta),
       );
     } else if (isInserting) {
-      context.missing(_filePathMeta);
+      context.missing(_base64DataMeta);
     }
     if (data.containsKey('description')) {
       context.handle(
@@ -10334,9 +10334,9 @@ class $MedicalMediaTable extends MedicalMedia
         DriftSqlType.string,
         data['${effectivePrefix}media_type'],
       )!,
-      filePath: attachedDatabase.typeMapping.read(
+      base64Data: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
-        data['${effectivePrefix}file_path'],
+        data['${effectivePrefix}base64_data'],
       )!,
       description: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
@@ -10360,14 +10360,14 @@ class MedicalMediaData extends DataClass
   final int mediaId;
   final int medicalId;
   final String mediaType;
-  final String filePath;
+  final String base64Data;
   final String? description;
   final DateTime createdAt;
   const MedicalMediaData({
     required this.mediaId,
     required this.medicalId,
     required this.mediaType,
-    required this.filePath,
+    required this.base64Data,
     this.description,
     required this.createdAt,
   });
@@ -10377,7 +10377,7 @@ class MedicalMediaData extends DataClass
     map['media_id'] = Variable<int>(mediaId);
     map['medical_id'] = Variable<int>(medicalId);
     map['media_type'] = Variable<String>(mediaType);
-    map['file_path'] = Variable<String>(filePath);
+    map['base64_data'] = Variable<String>(base64Data);
     if (!nullToAbsent || description != null) {
       map['description'] = Variable<String>(description);
     }
@@ -10390,7 +10390,7 @@ class MedicalMediaData extends DataClass
       mediaId: Value(mediaId),
       medicalId: Value(medicalId),
       mediaType: Value(mediaType),
-      filePath: Value(filePath),
+      base64Data: Value(base64Data),
       description: description == null && nullToAbsent
           ? const Value.absent()
           : Value(description),
@@ -10407,7 +10407,7 @@ class MedicalMediaData extends DataClass
       mediaId: serializer.fromJson<int>(json['mediaId']),
       medicalId: serializer.fromJson<int>(json['medicalId']),
       mediaType: serializer.fromJson<String>(json['mediaType']),
-      filePath: serializer.fromJson<String>(json['filePath']),
+      base64Data: serializer.fromJson<String>(json['base64Data']),
       description: serializer.fromJson<String?>(json['description']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
     );
@@ -10419,7 +10419,7 @@ class MedicalMediaData extends DataClass
       'mediaId': serializer.toJson<int>(mediaId),
       'medicalId': serializer.toJson<int>(medicalId),
       'mediaType': serializer.toJson<String>(mediaType),
-      'filePath': serializer.toJson<String>(filePath),
+      'base64Data': serializer.toJson<String>(base64Data),
       'description': serializer.toJson<String?>(description),
       'createdAt': serializer.toJson<DateTime>(createdAt),
     };
@@ -10429,14 +10429,14 @@ class MedicalMediaData extends DataClass
     int? mediaId,
     int? medicalId,
     String? mediaType,
-    String? filePath,
+    String? base64Data,
     Value<String?> description = const Value.absent(),
     DateTime? createdAt,
   }) => MedicalMediaData(
     mediaId: mediaId ?? this.mediaId,
     medicalId: medicalId ?? this.medicalId,
     mediaType: mediaType ?? this.mediaType,
-    filePath: filePath ?? this.filePath,
+    base64Data: base64Data ?? this.base64Data,
     description: description.present ? description.value : this.description,
     createdAt: createdAt ?? this.createdAt,
   );
@@ -10445,7 +10445,9 @@ class MedicalMediaData extends DataClass
       mediaId: data.mediaId.present ? data.mediaId.value : this.mediaId,
       medicalId: data.medicalId.present ? data.medicalId.value : this.medicalId,
       mediaType: data.mediaType.present ? data.mediaType.value : this.mediaType,
-      filePath: data.filePath.present ? data.filePath.value : this.filePath,
+      base64Data: data.base64Data.present
+          ? data.base64Data.value
+          : this.base64Data,
       description: data.description.present
           ? data.description.value
           : this.description,
@@ -10459,7 +10461,7 @@ class MedicalMediaData extends DataClass
           ..write('mediaId: $mediaId, ')
           ..write('medicalId: $medicalId, ')
           ..write('mediaType: $mediaType, ')
-          ..write('filePath: $filePath, ')
+          ..write('base64Data: $base64Data, ')
           ..write('description: $description, ')
           ..write('createdAt: $createdAt')
           ..write(')'))
@@ -10471,7 +10473,7 @@ class MedicalMediaData extends DataClass
     mediaId,
     medicalId,
     mediaType,
-    filePath,
+    base64Data,
     description,
     createdAt,
   );
@@ -10482,7 +10484,7 @@ class MedicalMediaData extends DataClass
           other.mediaId == this.mediaId &&
           other.medicalId == this.medicalId &&
           other.mediaType == this.mediaType &&
-          other.filePath == this.filePath &&
+          other.base64Data == this.base64Data &&
           other.description == this.description &&
           other.createdAt == this.createdAt);
 }
@@ -10491,14 +10493,14 @@ class MedicalMediaCompanion extends UpdateCompanion<MedicalMediaData> {
   final Value<int> mediaId;
   final Value<int> medicalId;
   final Value<String> mediaType;
-  final Value<String> filePath;
+  final Value<String> base64Data;
   final Value<String?> description;
   final Value<DateTime> createdAt;
   const MedicalMediaCompanion({
     this.mediaId = const Value.absent(),
     this.medicalId = const Value.absent(),
     this.mediaType = const Value.absent(),
-    this.filePath = const Value.absent(),
+    this.base64Data = const Value.absent(),
     this.description = const Value.absent(),
     this.createdAt = const Value.absent(),
   });
@@ -10506,17 +10508,17 @@ class MedicalMediaCompanion extends UpdateCompanion<MedicalMediaData> {
     this.mediaId = const Value.absent(),
     required int medicalId,
     required String mediaType,
-    required String filePath,
+    required String base64Data,
     this.description = const Value.absent(),
     this.createdAt = const Value.absent(),
   }) : medicalId = Value(medicalId),
        mediaType = Value(mediaType),
-       filePath = Value(filePath);
+       base64Data = Value(base64Data);
   static Insertable<MedicalMediaData> custom({
     Expression<int>? mediaId,
     Expression<int>? medicalId,
     Expression<String>? mediaType,
-    Expression<String>? filePath,
+    Expression<String>? base64Data,
     Expression<String>? description,
     Expression<DateTime>? createdAt,
   }) {
@@ -10524,7 +10526,7 @@ class MedicalMediaCompanion extends UpdateCompanion<MedicalMediaData> {
       if (mediaId != null) 'media_id': mediaId,
       if (medicalId != null) 'medical_id': medicalId,
       if (mediaType != null) 'media_type': mediaType,
-      if (filePath != null) 'file_path': filePath,
+      if (base64Data != null) 'base64_data': base64Data,
       if (description != null) 'description': description,
       if (createdAt != null) 'created_at': createdAt,
     });
@@ -10534,7 +10536,7 @@ class MedicalMediaCompanion extends UpdateCompanion<MedicalMediaData> {
     Value<int>? mediaId,
     Value<int>? medicalId,
     Value<String>? mediaType,
-    Value<String>? filePath,
+    Value<String>? base64Data,
     Value<String?>? description,
     Value<DateTime>? createdAt,
   }) {
@@ -10542,7 +10544,7 @@ class MedicalMediaCompanion extends UpdateCompanion<MedicalMediaData> {
       mediaId: mediaId ?? this.mediaId,
       medicalId: medicalId ?? this.medicalId,
       mediaType: mediaType ?? this.mediaType,
-      filePath: filePath ?? this.filePath,
+      base64Data: base64Data ?? this.base64Data,
       description: description ?? this.description,
       createdAt: createdAt ?? this.createdAt,
     );
@@ -10560,8 +10562,8 @@ class MedicalMediaCompanion extends UpdateCompanion<MedicalMediaData> {
     if (mediaType.present) {
       map['media_type'] = Variable<String>(mediaType.value);
     }
-    if (filePath.present) {
-      map['file_path'] = Variable<String>(filePath.value);
+    if (base64Data.present) {
+      map['base64_data'] = Variable<String>(base64Data.value);
     }
     if (description.present) {
       map['description'] = Variable<String>(description.value);
@@ -10578,7 +10580,7 @@ class MedicalMediaCompanion extends UpdateCompanion<MedicalMediaData> {
           ..write('mediaId: $mediaId, ')
           ..write('medicalId: $medicalId, ')
           ..write('mediaType: $mediaType, ')
-          ..write('filePath: $filePath, ')
+          ..write('base64Data: $base64Data, ')
           ..write('description: $description, ')
           ..write('createdAt: $createdAt')
           ..write(')'))
@@ -24626,7 +24628,7 @@ typedef $$MedicalMediaTableCreateCompanionBuilder =
       Value<int> mediaId,
       required int medicalId,
       required String mediaType,
-      required String filePath,
+      required String base64Data,
       Value<String?> description,
       Value<DateTime> createdAt,
     });
@@ -24635,7 +24637,7 @@ typedef $$MedicalMediaTableUpdateCompanionBuilder =
       Value<int> mediaId,
       Value<int> medicalId,
       Value<String> mediaType,
-      Value<String> filePath,
+      Value<String> base64Data,
       Value<String?> description,
       Value<DateTime> createdAt,
     });
@@ -24687,8 +24689,8 @@ class $$MedicalMediaTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get filePath => $composableBuilder(
-    column: $table.filePath,
+  ColumnFilters<String> get base64Data => $composableBuilder(
+    column: $table.base64Data,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -24745,8 +24747,8 @@ class $$MedicalMediaTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get filePath => $composableBuilder(
-    column: $table.filePath,
+  ColumnOrderings<String> get base64Data => $composableBuilder(
+    column: $table.base64Data,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -24799,8 +24801,10 @@ class $$MedicalMediaTableAnnotationComposer
   GeneratedColumn<String> get mediaType =>
       $composableBuilder(column: $table.mediaType, builder: (column) => column);
 
-  GeneratedColumn<String> get filePath =>
-      $composableBuilder(column: $table.filePath, builder: (column) => column);
+  GeneratedColumn<String> get base64Data => $composableBuilder(
+    column: $table.base64Data,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<String> get description => $composableBuilder(
     column: $table.description,
@@ -24865,14 +24869,14 @@ class $$MedicalMediaTableTableManager
                 Value<int> mediaId = const Value.absent(),
                 Value<int> medicalId = const Value.absent(),
                 Value<String> mediaType = const Value.absent(),
-                Value<String> filePath = const Value.absent(),
+                Value<String> base64Data = const Value.absent(),
                 Value<String?> description = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
               }) => MedicalMediaCompanion(
                 mediaId: mediaId,
                 medicalId: medicalId,
                 mediaType: mediaType,
-                filePath: filePath,
+                base64Data: base64Data,
                 description: description,
                 createdAt: createdAt,
               ),
@@ -24881,14 +24885,14 @@ class $$MedicalMediaTableTableManager
                 Value<int> mediaId = const Value.absent(),
                 required int medicalId,
                 required String mediaType,
-                required String filePath,
+                required String base64Data,
                 Value<String?> description = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
               }) => MedicalMediaCompanion.insert(
                 mediaId: mediaId,
                 medicalId: medicalId,
                 mediaType: mediaType,
-                filePath: filePath,
+                base64Data: base64Data,
                 description: description,
                 createdAt: createdAt,
               ),

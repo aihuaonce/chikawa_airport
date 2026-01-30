@@ -296,7 +296,7 @@ class TreatmentViewModel extends ChangeNotifier {
 
   Future<void> addMedicalMedia({
     required String mediaType,
-    required String filePath,
+    required String base64Data,
     String? description,
   }) async {
     try {
@@ -304,7 +304,7 @@ class TreatmentViewModel extends ChangeNotifier {
         MedicalMediaCompanion.insert(
           medicalId: medicalId,
           mediaType: mediaType,
-          filePath: filePath,
+          base64Data: base64Data,
           description: Value(description),
         ),
       );
@@ -318,6 +318,21 @@ class TreatmentViewModel extends ChangeNotifier {
   Future<void> _reloadMedicalMedia() async {
     _medicalMediaList = await db.treatmentDao.getMedicalMediaList(medicalId);
     notifyListeners();
+  }
+
+  Future<void> deleteMedicalMedia(int mediaId) async {
+    try {
+      await db.treatmentDao.deleteMedicalMedia(mediaId);
+      await _reloadMedicalMedia();
+      debugPrint('系統:刪除醫療影像成功');
+    } catch (e) {
+      debugPrint('系統:刪除醫療影像失敗 - $e');
+    }
+  }
+
+  // 根據類型取得影像列表
+  List<MedicalMediaData> getMediaByType(String mediaType) {
+    return _medicalMediaList.where((media) => media.mediaType == mediaType).toList();
   }
 
   // ===================================================================
@@ -388,6 +403,66 @@ class TreatmentViewModel extends ChangeNotifier {
       medicalId,
     );
     notifyListeners();
+  }
+
+  // ===================================================================
+  // 生命徵象自動儲存
+  // ===================================================================
+
+  Timer? _vitalSignsDebounceTimer;
+
+  Future<void> updateVitalSigns({
+    double? temperature,
+    int? pulse,
+    int? breath,
+    int? systolic,
+    int? diastolic,
+    int? spo2,
+  }) async {
+    // 取消之前的延遲儲存
+    if (_vitalSignsDebounceTimer?.isActive ?? false) {
+      _vitalSignsDebounceTimer!.cancel();
+    }
+
+    // 設定新的延遲儲存（2秒後執行）
+    _vitalSignsDebounceTimer = Timer(const Duration(seconds: 2), () async {
+      await _saveVitalSignsToDatabase(
+        temperature: temperature,
+        pulse: pulse,
+        breath: breath,
+        systolic: systolic,
+        diastolic: diastolic,
+        spo2: spo2,
+      );
+    });
+  }
+
+  Future<void> _saveVitalSignsToDatabase({
+    double? temperature,
+    int? pulse,
+    int? breath,
+    int? systolic,
+    int? diastolic,
+    int? spo2,
+  }) async {
+    try {
+      // 新增新的醫療評估記錄（生命徵象）
+      await db.treatmentDao.insertMedicalAssessment(
+        MedicalAssessmentCompanion.insert(
+          medicalId: medicalId,
+          temperature: Value(temperature),
+          pulse: Value(pulse),
+          breath: Value(breath),
+          systolic: Value(systolic),
+          diastolic: Value(diastolic),
+          spo2: Value(spo2),
+        ),
+      );
+      await _reloadMedicalAssessments();
+      debugPrint('系統:生命徵象自動儲存成功');
+    } catch (e) {
+      debugPrint('系統:生命徵象自動儲存失敗 - $e');
+    }
   }
 
   // ===================================================================

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:convert';
+import 'dart:io';
 import '../../data/models/medical/treatment_view.dart';
 import '../../data/db/database.dart';
 
@@ -41,6 +44,14 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
   bool _photoEcg = false;
   bool _photoOther = false;
 
+  // 生命徵象 Controllers
+  late TextEditingController _tempController;
+  late TextEditingController _pulseController;
+  late TextEditingController _breathController;
+  late TextEditingController _systolicController;
+  late TextEditingController _diastolicController;
+  late TextEditingController _spo2Controller;
+
   // 意識檢查
   bool _isAlert = true;
   String _leftPupilReaction = '+';
@@ -73,6 +84,14 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
     _allergyDetailController = TextEditingController();
     _actionSummaryOtherController = TextEditingController();
     _assistStaffController = TextEditingController();
+
+    // 生命徵象 Controllers
+    _tempController = TextEditingController();
+    _pulseController = TextEditingController();
+    _breathController = TextEditingController();
+    _systolicController = TextEditingController();
+    _diastolicController = TextEditingController();
+    _spo2Controller = TextEditingController();
   }
 
   @override
@@ -83,6 +102,15 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
     _allergyDetailController.dispose();
     _actionSummaryOtherController.dispose();
     _assistStaffController.dispose();
+
+    // 清理生命徵象 Controllers
+    _tempController.dispose();
+    _pulseController.dispose();
+    _breathController.dispose();
+    _systolicController.dispose();
+    _diastolicController.dispose();
+    _spo2Controller.dispose();
+
     // 清理健康評估表的 controller
     for (var controllers in _healthAssessmentControllers.values) {
       controllers['name']?.dispose();
@@ -118,6 +146,32 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
     final treatment = viewModel.treatment;
     if (treatment != null) {
       _actionSummaryOtherController.text = treatment.actionSummaryOther ?? '';
+    }
+
+    // 檢查已有影像，自動勾選對應類型
+    final mediaList = viewModel.medicalMediaList;
+    if (mediaList.isNotEmpty) {
+      _photoTrauma = mediaList.any((media) => media.mediaType == 'trauma');
+      _photoEcg = mediaList.any((media) => media.mediaType == 'ecg');
+      _photoOther = mediaList.any((media) => media.mediaType == 'other');
+    }
+
+    // 載入生命徵象資料到 Controllers
+    final latestAssessment = viewModel.medicalAssessments.isNotEmpty
+        ? viewModel.medicalAssessments.last
+        : null;
+    debugPrint('DEBUG: 載入生命徵象資料 - assessments數量: ${viewModel.medicalAssessments.length}');
+    if (latestAssessment != null) {
+      debugPrint('DEBUG: 最新評估 - 體溫: ${latestAssessment.temperature}, 脈搏: ${latestAssessment.pulse}');
+      _tempController.text = latestAssessment.temperature?.toString() ?? '';
+      _pulseController.text = latestAssessment.pulse?.toString() ?? '';
+      _breathController.text = latestAssessment.breath?.toString() ?? '';
+      _systolicController.text = latestAssessment.systolic?.toString() ?? '';
+      _diastolicController.text = latestAssessment.diastolic?.toString() ?? '';
+      _spo2Controller.text = latestAssessment.spo2?.toString() ?? '';
+      debugPrint('DEBUG: Controller已設定 - 體溫: ${_tempController.text}, 脈搏: ${_pulseController.text}');
+    } else {
+      debugPrint('DEBUG: 無生命徵象資料');
     }
 
     _isInitialized = true;
@@ -364,102 +418,364 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
       children: [
         Row(
           children: [
-            _buildCheckboxRow(
+            _buildSmallCheckbox(
               '外傷 Trauma',
               _photoTrauma,
               (v) => setState(() => _photoTrauma = v!),
             ),
             const SizedBox(width: 24),
-            _buildCheckboxRow(
+            _buildSmallCheckbox(
               '心電圖 ECG',
               _photoEcg,
               (v) => setState(() => _photoEcg = v!),
             ),
             const SizedBox(width: 24),
-            _buildCheckboxRow(
+            _buildSmallCheckbox(
               '其它 Other',
               _photoOther,
               (v) => setState(() => _photoOther = v!),
             ),
           ],
         ),
-        const SizedBox(height: 12),
-        // 6個照片上傳欄位
-        GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 3,
-            crossAxisSpacing: 12,
-            mainAxisSpacing: 12,
-            childAspectRatio: 4 / 3,
-          ),
-          itemCount: 6,
-          itemBuilder: (context, index) {
-            return _buildPhotoUploadBox(index);
-          },
-        ),
-        if (viewModel.medicalMediaList.isNotEmpty) ...[
-          const SizedBox(height: 12),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: viewModel.medicalMediaList.map((media) {
-              return Container(
-                width: 80,
-                height: 80,
-                decoration: BoxDecoration(
-                  color: bgField,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: borderColor),
-                ),
-                child: Center(
-                  child: Text(
-                    media.mediaType,
-                    style: const TextStyle(fontSize: 10, color: textMuted),
-                  ),
-                ),
-              );
-            }).toList(),
+        if (_photoTrauma)
+          _buildPhotoGrid(viewModel, '外傷影像 Trauma Photos', 'trauma'),
+        if (_photoEcg) _buildPhotoGrid(viewModel, '心電圖紀錄 ECG Records', 'ecg'),
+        if (_photoOther) ...[
+          _buildPhotoGrid(viewModel, '其它影像 Other Photos', 'other'),
+          const SizedBox(height: 8),
+          _buildTextField(
+            hint: '請註明影像內容...',
+            onChanged: (val) {
+              // 可選：保存描述到資料庫
+            },
           ),
         ],
       ],
     );
   }
 
-  Widget _buildPhotoUploadBox(int index) {
-    return GestureDetector(
-      onTap: () {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('上傳照片 ${index + 1}')));
-      },
-      child: Container(
-        decoration: BoxDecoration(
-          color: bgField,
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(
-            color: borderColor,
-            width: 1,
-            style: BorderStyle.solid,
+  Widget _buildPhotoGrid(
+    TreatmentViewModel viewModel,
+    String label,
+    String mediaType,
+  ) {
+    // 獲取該類型的已儲存照片
+    final mediaList = viewModel.getMediaByType(mediaType);
+    final storedCount = mediaList.length;
+    final emptySlots = 6 - storedCount;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 16),
+        Text(
+          label,
+          style: const TextStyle(
+            color: primaryColor,
+            fontSize: 11,
+            fontWeight: FontWeight.bold,
           ),
         ),
-        child: Center(
+        const SizedBox(height: 8),
+        GridView.count(
+          crossAxisCount: 6,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          mainAxisSpacing: 8,
+          crossAxisSpacing: 8,
+          childAspectRatio: 0.75,
+          children: [
+            // 顯示已儲存的照片（帶刪除按鈕）
+            ...mediaList.map((media) => _buildPhotoItem(media, viewModel)),
+            // 顯示空的上傳槽
+            if (emptySlots > 0)
+              ...List.generate(
+                emptySlots,
+                (index) => _buildPhotoUploadBox(index, mediaType, viewModel),
+              ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPhotoItem(MedicalMediaData media, TreatmentViewModel viewModel) {
+    return GestureDetector(
+      onTap: () {
+        // 點擊照片顯示大圖預覽
+        showDialog(
+          context: context,
+          builder: (context) {
+            final screenSize = MediaQuery.of(context).size;
+            final maxHeight = screenSize.height * 0.8;
+            final maxWidth = screenSize.width * 0.9;
+
+            return Dialog(
+              backgroundColor: Colors.transparent,
+              insetPadding: const EdgeInsets.all(16),
+              child: GestureDetector(
+                onTap: () => Navigator.pop(context),
+                child: Container(
+                  constraints: BoxConstraints(
+                    maxWidth: maxWidth,
+                    maxHeight: maxHeight,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.black,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // 大圖顯示（限制高度）
+                      Flexible(
+                        child: ClipRRect(
+                          borderRadius: const BorderRadius.vertical(
+                            top: Radius.circular(12),
+                          ),
+                          child: InteractiveViewer(
+                            minScale: 0.5,
+                            maxScale: 4.0,
+                            child: Image.memory(
+                              base64Decode(media.base64Data),
+                              fit: BoxFit.contain,
+                            ),
+                          ),
+                        ),
+                      ),
+                      // 底部資訊欄
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: const BoxDecoration(
+                          color: Colors.black,
+                          borderRadius: BorderRadius.vertical(
+                            bottom: Radius.circular(12),
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                media.description ?? '醫療影像',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 14,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              '點擊關閉',
+                              style: TextStyle(
+                                color: Colors.white.withValues(alpha: 0.6),
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+      child: Stack(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              color: bgField,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: borderColor),
+              image: DecorationImage(
+                image: MemoryImage(base64Decode(media.base64Data)),
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+          // 刪除按鈕
+          Positioned(
+            top: 4,
+            right: 4,
+            child: GestureDetector(
+              onTap: () async {
+                final confirmed = await showDialog<bool>(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: const Text('確認刪除'),
+                    content: const Text('確定要刪除這張照片嗎？'),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context, false),
+                        child: const Text('取消'),
+                      ),
+                      TextButton(
+                        onPressed: () => Navigator.pop(context, true),
+                        style: TextButton.styleFrom(
+                          foregroundColor: Colors.red,
+                        ),
+                        child: const Text('刪除'),
+                      ),
+                    ],
+                  ),
+                );
+                if (confirmed == true) {
+                  await viewModel.deleteMedicalMedia(media.mediaId);
+                  if (mounted) {
+                    ScaffoldMessenger.of(
+                      context,
+                    ).showSnackBar(const SnackBar(content: Text('照片已刪除')));
+                  }
+                }
+              },
+              child: Container(
+                width: 24,
+                height: 24,
+                decoration: BoxDecoration(
+                  color: Colors.red.withValues(alpha: 0.8),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.close, size: 16, color: Colors.white),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSmallCheckbox(
+    String label,
+    bool value,
+    Function(bool?) onChanged,
+  ) {
+    return InkWell(
+      onTap: () => onChanged(!value),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SizedBox(
+            width: 20,
+            height: 20,
+            child: Checkbox(
+              value: value,
+              onChanged: onChanged,
+              activeColor: primaryColor,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.bold,
+              color: textDark,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPhotoUploadBox(
+    int index,
+    String mediaType,
+    TreatmentViewModel viewModel,
+  ) {
+    return Container(
+      decoration: BoxDecoration(
+        color: bgField,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: borderColor, style: BorderStyle.solid),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () async {
+            try {
+              // 顯示選擇相機或相簿的選項
+              final ImageSource? source = await showDialog<ImageSource>(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    title: const Text('選擇照片來源'),
+                    actions: [
+                      TextButton(
+                        onPressed: () =>
+                            Navigator.pop(context, ImageSource.camera),
+                        child: const Text('相機'),
+                      ),
+                      TextButton(
+                        onPressed: () =>
+                            Navigator.pop(context, ImageSource.gallery),
+                        child: const Text('相簿'),
+                      ),
+                    ],
+                  );
+                },
+              );
+
+              if (source == null) return;
+
+              // 選擇圖片（醫療影像需要較高解析度）
+              final ImagePicker picker = ImagePicker();
+              final XFile? pickedFile = await picker.pickImage(
+                source: source,
+                maxWidth: 1920,
+                maxHeight: 1920,
+                imageQuality: 95,
+              );
+
+              if (pickedFile == null) return;
+
+              // 讀取檔案並轉換為 base64
+              final File imageFile = File(pickedFile.path);
+              final List<int> imageBytes = await imageFile.readAsBytes();
+              final String base64String = base64Encode(imageBytes);
+
+              // 儲存到資料庫
+              await viewModel.addMedicalMedia(
+                mediaType: mediaType,
+                base64Data: base64String,
+                description: '$mediaType photo ${index + 1}',
+              );
+
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('已新增 $mediaType 照片 ${index + 1}')),
+                );
+              }
+            } catch (e) {
+              if (mounted) {
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(SnackBar(content: Text('照片儲存失敗: $e')));
+              }
+            }
+          },
+          borderRadius: BorderRadius.circular(8),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(
-                Icons.add_photo_alternate,
+                Icons.add_a_photo_outlined,
                 color: textMuted.withValues(alpha: 0.5),
-                size: 32,
+                size: 20,
               ),
-              const SizedBox(height: 6),
+              const SizedBox(height: 4),
               Text(
-                '照片 ${index + 1}',
-                style: const TextStyle(
-                  fontSize: 11,
-                  color: textMuted,
-                  fontWeight: FontWeight.w600,
+                'TAP TO CAPTURE',
+                style: TextStyle(
+                  color: textMuted.withValues(alpha: 0.5),
+                  fontSize: 9,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ],
@@ -471,71 +787,48 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
 
   Widget _buildVitalSignsSection(TreatmentViewModel viewModel) {
     // 取得最新的醫療評估
-    final latestAssessment = viewModel.medicalAssessments.isNotEmpty
-        ? viewModel.medicalAssessments.last
-        : null;
 
-    return Column(
+    // 注意：使用已初始化的 Controllers，而非每次重建都建立新的
+    return GridView.count(
+      crossAxisCount: 2,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      mainAxisSpacing: 10,
+      crossAxisSpacing: 12,
+      childAspectRatio: 3.5,
       children: [
-        Row(
-          children: [
-            Expanded(
-              child: _buildVitalField(
-                '體溫 Temp (°C)',
-                '36.5',
-                latestAssessment?.temperature?.toString(),
-              ),
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: _buildVitalField(
-                '脈搏 Pulse (bpm)',
-                '80',
-                latestAssessment?.pulse?.toString(),
-              ),
-            ),
-          ],
+        // 體溫 - 使用 _tempController
+        _buildVitalFieldWithController(
+          label: '體溫 Temp (°C)',
+          controller: _tempController,
+          onChanged: () => _onVitalSignChanged(viewModel),
         ),
-        const SizedBox(height: 12),
-        Row(
-          children: [
-            Expanded(
-              child: _buildVitalField(
-                '呼吸 RR (/min)',
-                '18',
-                latestAssessment?.breath?.toString(),
-              ),
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: _buildVitalField(
-                '血壓 BP (mmHg)',
-                '120/80',
-                latestAssessment?.spo2?.toString(),
-              ),
-            ),
-          ],
+        // 脈搏 - 使用 _pulseController
+        _buildVitalFieldWithController(
+          label: '脈搏 Pulse (bpm)',
+          controller: _pulseController,
+          onChanged: () => _onVitalSignChanged(viewModel),
         ),
-        const SizedBox(height: 12),
-        Row(
-          children: [
-            Expanded(
-              child: _buildVitalField(
-                '血氧 SpO2 (%)',
-                '98',
-                latestAssessment?.spo2?.toString(),
-              ),
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: _buildVitalField(
-                '疼痛指數 Pain(0-10)',
-                '0',
-                latestAssessment?.painScore?.toString(),
-              ),
-            ),
-          ],
+        // 呼吸 - 使用 _breathController
+        _buildVitalFieldWithController(
+          label: '呼吸 RR (/min)',
+          controller: _breathController,
+          onChanged: () => _onVitalSignChanged(viewModel),
         ),
+        // 血壓 - 使用 _systolicController 和 _diastolicController
+        _buildBloodPressureWithControllers(
+          systolicController: _systolicController,
+          diastolicController: _diastolicController,
+          onChanged: () => _onVitalSignChanged(viewModel),
+        ),
+        // 血氧 - 使用 _spo2Controller
+        _buildVitalFieldWithController(
+          label: '血氧 SpO2 (%)',
+          controller: _spo2Controller,
+          onChanged: () => _onVitalSignChanged(viewModel),
+        ),
+        // 空位（保持6格佈局）
+        const SizedBox.shrink(),
       ],
     );
   }
@@ -1510,28 +1803,6 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
     );
   }
 
-  Widget _buildCheckboxRow(String label, bool val, Function(bool?) onChanged) {
-    return InkWell(
-      onTap: () => onChanged(!val),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          SizedBox(
-            width: 18,
-            height: 18,
-            child: Checkbox(
-              value: val,
-              onChanged: onChanged,
-              activeColor: primaryColor,
-            ),
-          ),
-          const SizedBox(width: 6),
-          Text(label, style: const TextStyle(fontSize: 11, color: textMuted)),
-        ],
-      ),
-    );
-  }
-
   Widget _buildSegmentedControl(
     List<String> options,
     String current,
@@ -1572,7 +1843,35 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
     );
   }
 
-  Widget _buildVitalField(String label, String hint, String? value) {
+  // 生命徵象變更時觸發自動儲存
+  void _onVitalSignChanged(TreatmentViewModel viewModel) {
+    // 觸發自動儲存（透過 ViewModel）
+    viewModel.updateVitalSigns(
+      temperature: _parseDouble(_tempController.text),
+      pulse: _parseInt(_pulseController.text),
+      breath: _parseInt(_breathController.text),
+      systolic: _parseInt(_systolicController.text),
+      diastolic: _parseInt(_diastolicController.text),
+      spo2: _parseInt(_spo2Controller.text),
+    );
+  }
+
+  double? _parseDouble(String text) {
+    if (text.isEmpty) return null;
+    return double.tryParse(text);
+  }
+
+  int? _parseInt(String text) {
+    if (text.isEmpty) return null;
+    return int.tryParse(text);
+  }
+
+  // 使用外部 Controller 的生命徵象欄位（避免每次重建都建立新 Controller）
+  Widget _buildVitalFieldWithController({
+    required String label,
+    required TextEditingController controller,
+    VoidCallback? onChanged,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -1592,8 +1891,69 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
         ),
         const SizedBox(height: 4),
         _buildTextField(
-          hint: hint,
-          controller: TextEditingController(text: value ?? ''),
+          hint: '',
+          controller: controller,
+          onChanged: (_) => onChanged?.call(),
+        ),
+      ],
+    );
+  }
+
+  // 使用外部 Controllers 的血壓欄位
+  Widget _buildBloodPressureWithControllers({
+    required TextEditingController systolicController,
+    required TextEditingController diastolicController,
+    VoidCallback? onChanged,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text(
+              '血壓 BP (mmHg)',
+              style: TextStyle(
+                color: textMuted,
+                fontSize: 10,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const Icon(Icons.mic, size: 13, color: primaryColor),
+          ],
+        ),
+        const SizedBox(height: 4),
+        Row(
+          children: [
+            // 收縮壓
+            Expanded(
+              child: _buildTextField(
+                hint: '',
+                controller: systolicController,
+                onChanged: (_) => onChanged?.call(),
+              ),
+            ),
+            // 斜線
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 8),
+              child: Text(
+                '/',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: textDark,
+                ),
+              ),
+            ),
+            // 舒張壓
+            Expanded(
+              child: _buildTextField(
+                hint: '',
+                controller: diastolicController,
+                onChanged: (_) => onChanged?.call(),
+              ),
+            ),
+          ],
         ),
       ],
     );

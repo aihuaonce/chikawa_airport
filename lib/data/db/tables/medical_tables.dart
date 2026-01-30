@@ -144,7 +144,7 @@ class MedicalMedia extends Table {
   IntColumn get mediaId => integer().autoIncrement()();
   IntColumn get medicalId => integer().references(MedicalRecord, #medicalId)();
   TextColumn get mediaType => text()(); // trauma / ecg / other
-  TextColumn get filePath => text()();
+  TextColumn get base64Data => text()(); // base64 編碼的影像資料
   TextColumn get description => text().nullable()(); // 影像說明
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
 }
