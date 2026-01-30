@@ -88,6 +88,16 @@ class ChiefComplaintType extends Table {
   BoolColumn get isActive => boolean().withDefault(const Constant(true))();
 }
 
+//主訴細項表 (Symptom Grid)
+class ChiefComplaintDetail extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get chiefComplaintTypeId =>
+      integer().references(ChiefComplaintType, #id)();
+  TextColumn get name => text()(); // 鈍挫傷, 頭頸部...
+  IntColumn get sortOrder => integer().withDefault(const Constant(0))();
+  BoolColumn get isActive => boolean().withDefault(const Constant(true))();
+}
+
 //診斷分類表
 class DiagnosisCategory extends Table {
   IntColumn get id => integer().autoIncrement()();

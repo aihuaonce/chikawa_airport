@@ -2553,6 +2553,375 @@ class ChiefComplaintTypeCompanion
   }
 }
 
+class $ChiefComplaintDetailTable extends ChiefComplaintDetail
+    with TableInfo<$ChiefComplaintDetailTable, ChiefComplaintDetailData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ChiefComplaintDetailTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _chiefComplaintTypeIdMeta =
+      const VerificationMeta('chiefComplaintTypeId');
+  @override
+  late final GeneratedColumn<int> chiefComplaintTypeId = GeneratedColumn<int>(
+    'chief_complaint_type_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES chief_complaint_type (id)',
+    ),
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sortOrderMeta = const VerificationMeta(
+    'sortOrder',
+  );
+  @override
+  late final GeneratedColumn<int> sortOrder = GeneratedColumn<int>(
+    'sort_order',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _isActiveMeta = const VerificationMeta(
+    'isActive',
+  );
+  @override
+  late final GeneratedColumn<bool> isActive = GeneratedColumn<bool>(
+    'is_active',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_active" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    chiefComplaintTypeId,
+    name,
+    sortOrder,
+    isActive,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'chief_complaint_detail';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ChiefComplaintDetailData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('chief_complaint_type_id')) {
+      context.handle(
+        _chiefComplaintTypeIdMeta,
+        chiefComplaintTypeId.isAcceptableOrUnknown(
+          data['chief_complaint_type_id']!,
+          _chiefComplaintTypeIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_chiefComplaintTypeIdMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('sort_order')) {
+      context.handle(
+        _sortOrderMeta,
+        sortOrder.isAcceptableOrUnknown(data['sort_order']!, _sortOrderMeta),
+      );
+    }
+    if (data.containsKey('is_active')) {
+      context.handle(
+        _isActiveMeta,
+        isActive.isAcceptableOrUnknown(data['is_active']!, _isActiveMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  ChiefComplaintDetailData map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ChiefComplaintDetailData(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      chiefComplaintTypeId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}chief_complaint_type_id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      sortOrder: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}sort_order'],
+      )!,
+      isActive: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_active'],
+      )!,
+    );
+  }
+
+  @override
+  $ChiefComplaintDetailTable createAlias(String alias) {
+    return $ChiefComplaintDetailTable(attachedDatabase, alias);
+  }
+}
+
+class ChiefComplaintDetailData extends DataClass
+    implements Insertable<ChiefComplaintDetailData> {
+  final int id;
+  final int chiefComplaintTypeId;
+  final String name;
+  final int sortOrder;
+  final bool isActive;
+  const ChiefComplaintDetailData({
+    required this.id,
+    required this.chiefComplaintTypeId,
+    required this.name,
+    required this.sortOrder,
+    required this.isActive,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['chief_complaint_type_id'] = Variable<int>(chiefComplaintTypeId);
+    map['name'] = Variable<String>(name);
+    map['sort_order'] = Variable<int>(sortOrder);
+    map['is_active'] = Variable<bool>(isActive);
+    return map;
+  }
+
+  ChiefComplaintDetailCompanion toCompanion(bool nullToAbsent) {
+    return ChiefComplaintDetailCompanion(
+      id: Value(id),
+      chiefComplaintTypeId: Value(chiefComplaintTypeId),
+      name: Value(name),
+      sortOrder: Value(sortOrder),
+      isActive: Value(isActive),
+    );
+  }
+
+  factory ChiefComplaintDetailData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ChiefComplaintDetailData(
+      id: serializer.fromJson<int>(json['id']),
+      chiefComplaintTypeId: serializer.fromJson<int>(
+        json['chiefComplaintTypeId'],
+      ),
+      name: serializer.fromJson<String>(json['name']),
+      sortOrder: serializer.fromJson<int>(json['sortOrder']),
+      isActive: serializer.fromJson<bool>(json['isActive']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'chiefComplaintTypeId': serializer.toJson<int>(chiefComplaintTypeId),
+      'name': serializer.toJson<String>(name),
+      'sortOrder': serializer.toJson<int>(sortOrder),
+      'isActive': serializer.toJson<bool>(isActive),
+    };
+  }
+
+  ChiefComplaintDetailData copyWith({
+    int? id,
+    int? chiefComplaintTypeId,
+    String? name,
+    int? sortOrder,
+    bool? isActive,
+  }) => ChiefComplaintDetailData(
+    id: id ?? this.id,
+    chiefComplaintTypeId: chiefComplaintTypeId ?? this.chiefComplaintTypeId,
+    name: name ?? this.name,
+    sortOrder: sortOrder ?? this.sortOrder,
+    isActive: isActive ?? this.isActive,
+  );
+  ChiefComplaintDetailData copyWithCompanion(
+    ChiefComplaintDetailCompanion data,
+  ) {
+    return ChiefComplaintDetailData(
+      id: data.id.present ? data.id.value : this.id,
+      chiefComplaintTypeId: data.chiefComplaintTypeId.present
+          ? data.chiefComplaintTypeId.value
+          : this.chiefComplaintTypeId,
+      name: data.name.present ? data.name.value : this.name,
+      sortOrder: data.sortOrder.present ? data.sortOrder.value : this.sortOrder,
+      isActive: data.isActive.present ? data.isActive.value : this.isActive,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ChiefComplaintDetailData(')
+          ..write('id: $id, ')
+          ..write('chiefComplaintTypeId: $chiefComplaintTypeId, ')
+          ..write('name: $name, ')
+          ..write('sortOrder: $sortOrder, ')
+          ..write('isActive: $isActive')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, chiefComplaintTypeId, name, sortOrder, isActive);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ChiefComplaintDetailData &&
+          other.id == this.id &&
+          other.chiefComplaintTypeId == this.chiefComplaintTypeId &&
+          other.name == this.name &&
+          other.sortOrder == this.sortOrder &&
+          other.isActive == this.isActive);
+}
+
+class ChiefComplaintDetailCompanion
+    extends UpdateCompanion<ChiefComplaintDetailData> {
+  final Value<int> id;
+  final Value<int> chiefComplaintTypeId;
+  final Value<String> name;
+  final Value<int> sortOrder;
+  final Value<bool> isActive;
+  const ChiefComplaintDetailCompanion({
+    this.id = const Value.absent(),
+    this.chiefComplaintTypeId = const Value.absent(),
+    this.name = const Value.absent(),
+    this.sortOrder = const Value.absent(),
+    this.isActive = const Value.absent(),
+  });
+  ChiefComplaintDetailCompanion.insert({
+    this.id = const Value.absent(),
+    required int chiefComplaintTypeId,
+    required String name,
+    this.sortOrder = const Value.absent(),
+    this.isActive = const Value.absent(),
+  }) : chiefComplaintTypeId = Value(chiefComplaintTypeId),
+       name = Value(name);
+  static Insertable<ChiefComplaintDetailData> custom({
+    Expression<int>? id,
+    Expression<int>? chiefComplaintTypeId,
+    Expression<String>? name,
+    Expression<int>? sortOrder,
+    Expression<bool>? isActive,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (chiefComplaintTypeId != null)
+        'chief_complaint_type_id': chiefComplaintTypeId,
+      if (name != null) 'name': name,
+      if (sortOrder != null) 'sort_order': sortOrder,
+      if (isActive != null) 'is_active': isActive,
+    });
+  }
+
+  ChiefComplaintDetailCompanion copyWith({
+    Value<int>? id,
+    Value<int>? chiefComplaintTypeId,
+    Value<String>? name,
+    Value<int>? sortOrder,
+    Value<bool>? isActive,
+  }) {
+    return ChiefComplaintDetailCompanion(
+      id: id ?? this.id,
+      chiefComplaintTypeId: chiefComplaintTypeId ?? this.chiefComplaintTypeId,
+      name: name ?? this.name,
+      sortOrder: sortOrder ?? this.sortOrder,
+      isActive: isActive ?? this.isActive,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (chiefComplaintTypeId.present) {
+      map['chief_complaint_type_id'] = Variable<int>(
+        chiefComplaintTypeId.value,
+      );
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (sortOrder.present) {
+      map['sort_order'] = Variable<int>(sortOrder.value);
+    }
+    if (isActive.present) {
+      map['is_active'] = Variable<bool>(isActive.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ChiefComplaintDetailCompanion(')
+          ..write('id: $id, ')
+          ..write('chiefComplaintTypeId: $chiefComplaintTypeId, ')
+          ..write('name: $name, ')
+          ..write('sortOrder: $sortOrder, ')
+          ..write('isActive: $isActive')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $DiagnosisCategoryTable extends DiagnosisCategory
     with TableInfo<$DiagnosisCategoryTable, DiagnosisCategoryData> {
   @override
@@ -14417,6 +14786,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $ReportingUnitTable reportingUnit = $ReportingUnitTable(this);
   late final $ChiefComplaintTypeTable chiefComplaintType =
       $ChiefComplaintTypeTable(this);
+  late final $ChiefComplaintDetailTable chiefComplaintDetail =
+      $ChiefComplaintDetailTable(this);
   late final $DiagnosisCategoryTable diagnosisCategory =
       $DiagnosisCategoryTable(this);
   late final $TriageLevelTable triageLevel = $TriageLevelTable(this);
@@ -14468,6 +14839,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     incidentPlaceCategory2,
     reportingUnit,
     chiefComplaintType,
+    chiefComplaintDetail,
     diagnosisCategory,
     triageLevel,
     treatmentOnSite,
@@ -16973,6 +17345,51 @@ typedef $$ChiefComplaintTypeTableUpdateCompanionBuilder =
       Value<bool> isActive,
     });
 
+final class $$ChiefComplaintTypeTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $ChiefComplaintTypeTable,
+          ChiefComplaintTypeData
+        > {
+  $$ChiefComplaintTypeTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static MultiTypedResultKey<
+    $ChiefComplaintDetailTable,
+    List<ChiefComplaintDetailData>
+  >
+  _chiefComplaintDetailRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.chiefComplaintDetail,
+        aliasName: $_aliasNameGenerator(
+          db.chiefComplaintType.id,
+          db.chiefComplaintDetail.chiefComplaintTypeId,
+        ),
+      );
+
+  $$ChiefComplaintDetailTableProcessedTableManager
+  get chiefComplaintDetailRefs {
+    final manager =
+        $$ChiefComplaintDetailTableTableManager(
+          $_db,
+          $_db.chiefComplaintDetail,
+        ).filter(
+          (f) => f.chiefComplaintTypeId.id.sqlEquals($_itemColumn<int>('id')!),
+        );
+
+    final cache = $_typedResult.readTableOrNull(
+      _chiefComplaintDetailRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
 class $$ChiefComplaintTypeTableFilterComposer
     extends Composer<_$AppDatabase, $ChiefComplaintTypeTable> {
   $$ChiefComplaintTypeTableFilterComposer({
@@ -17001,6 +17418,31 @@ class $$ChiefComplaintTypeTableFilterComposer
     column: $table.isActive,
     builder: (column) => ColumnFilters(column),
   );
+
+  Expression<bool> chiefComplaintDetailRefs(
+    Expression<bool> Function($$ChiefComplaintDetailTableFilterComposer f) f,
+  ) {
+    final $$ChiefComplaintDetailTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.chiefComplaintDetail,
+      getReferencedColumn: (t) => t.chiefComplaintTypeId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ChiefComplaintDetailTableFilterComposer(
+            $db: $db,
+            $table: $db.chiefComplaintDetail,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$ChiefComplaintTypeTableOrderingComposer
@@ -17053,6 +17495,32 @@ class $$ChiefComplaintTypeTableAnnotationComposer
 
   GeneratedColumn<bool> get isActive =>
       $composableBuilder(column: $table.isActive, builder: (column) => column);
+
+  Expression<T> chiefComplaintDetailRefs<T extends Object>(
+    Expression<T> Function($$ChiefComplaintDetailTableAnnotationComposer a) f,
+  ) {
+    final $$ChiefComplaintDetailTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.chiefComplaintDetail,
+          getReferencedColumn: (t) => t.chiefComplaintTypeId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$ChiefComplaintDetailTableAnnotationComposer(
+                $db: $db,
+                $table: $db.chiefComplaintDetail,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
 }
 
 class $$ChiefComplaintTypeTableTableManager
@@ -17066,16 +17534,9 @@ class $$ChiefComplaintTypeTableTableManager
           $$ChiefComplaintTypeTableAnnotationComposer,
           $$ChiefComplaintTypeTableCreateCompanionBuilder,
           $$ChiefComplaintTypeTableUpdateCompanionBuilder,
-          (
-            ChiefComplaintTypeData,
-            BaseReferences<
-              _$AppDatabase,
-              $ChiefComplaintTypeTable,
-              ChiefComplaintTypeData
-            >,
-          ),
+          (ChiefComplaintTypeData, $$ChiefComplaintTypeTableReferences),
           ChiefComplaintTypeData,
-          PrefetchHooks Function()
+          PrefetchHooks Function({bool chiefComplaintDetailRefs})
         > {
   $$ChiefComplaintTypeTableTableManager(
     _$AppDatabase db,
@@ -17118,9 +17579,47 @@ class $$ChiefComplaintTypeTableTableManager
                 isActive: isActive,
               ),
           withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$ChiefComplaintTypeTableReferences(db, table, e),
+                ),
+              )
               .toList(),
-          prefetchHooksCallback: null,
+          prefetchHooksCallback: ({chiefComplaintDetailRefs = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [
+                if (chiefComplaintDetailRefs) db.chiefComplaintDetail,
+              ],
+              addJoins: null,
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (chiefComplaintDetailRefs)
+                    await $_getPrefetchedData<
+                      ChiefComplaintTypeData,
+                      $ChiefComplaintTypeTable,
+                      ChiefComplaintDetailData
+                    >(
+                      currentTable: table,
+                      referencedTable: $$ChiefComplaintTypeTableReferences
+                          ._chiefComplaintDetailRefsTable(db),
+                      managerFromTypedResult: (p0) =>
+                          $$ChiefComplaintTypeTableReferences(
+                            db,
+                            table,
+                            p0,
+                          ).chiefComplaintDetailRefs,
+                      referencedItemsForCurrentItem: (item, referencedItems) =>
+                          referencedItems.where(
+                            (e) => e.chiefComplaintTypeId == item.id,
+                          ),
+                      typedResults: items,
+                    ),
+                ];
+              },
+            );
+          },
         ),
       );
 }
@@ -17135,16 +17634,348 @@ typedef $$ChiefComplaintTypeTableProcessedTableManager =
       $$ChiefComplaintTypeTableAnnotationComposer,
       $$ChiefComplaintTypeTableCreateCompanionBuilder,
       $$ChiefComplaintTypeTableUpdateCompanionBuilder,
-      (
-        ChiefComplaintTypeData,
+      (ChiefComplaintTypeData, $$ChiefComplaintTypeTableReferences),
+      ChiefComplaintTypeData,
+      PrefetchHooks Function({bool chiefComplaintDetailRefs})
+    >;
+typedef $$ChiefComplaintDetailTableCreateCompanionBuilder =
+    ChiefComplaintDetailCompanion Function({
+      Value<int> id,
+      required int chiefComplaintTypeId,
+      required String name,
+      Value<int> sortOrder,
+      Value<bool> isActive,
+    });
+typedef $$ChiefComplaintDetailTableUpdateCompanionBuilder =
+    ChiefComplaintDetailCompanion Function({
+      Value<int> id,
+      Value<int> chiefComplaintTypeId,
+      Value<String> name,
+      Value<int> sortOrder,
+      Value<bool> isActive,
+    });
+
+final class $$ChiefComplaintDetailTableReferences
+    extends
         BaseReferences<
           _$AppDatabase,
-          $ChiefComplaintTypeTable,
-          ChiefComplaintTypeData
-        >,
-      ),
-      ChiefComplaintTypeData,
-      PrefetchHooks Function()
+          $ChiefComplaintDetailTable,
+          ChiefComplaintDetailData
+        > {
+  $$ChiefComplaintDetailTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $ChiefComplaintTypeTable _chiefComplaintTypeIdTable(
+    _$AppDatabase db,
+  ) => db.chiefComplaintType.createAlias(
+    $_aliasNameGenerator(
+      db.chiefComplaintDetail.chiefComplaintTypeId,
+      db.chiefComplaintType.id,
+    ),
+  );
+
+  $$ChiefComplaintTypeTableProcessedTableManager get chiefComplaintTypeId {
+    final $_column = $_itemColumn<int>('chief_complaint_type_id')!;
+
+    final manager = $$ChiefComplaintTypeTableTableManager(
+      $_db,
+      $_db.chiefComplaintType,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(
+      _chiefComplaintTypeIdTable($_db),
+    );
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$ChiefComplaintDetailTableFilterComposer
+    extends Composer<_$AppDatabase, $ChiefComplaintDetailTable> {
+  $$ChiefComplaintDetailTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get sortOrder => $composableBuilder(
+    column: $table.sortOrder,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isActive => $composableBuilder(
+    column: $table.isActive,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ChiefComplaintTypeTableFilterComposer get chiefComplaintTypeId {
+    final $$ChiefComplaintTypeTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.chiefComplaintTypeId,
+      referencedTable: $db.chiefComplaintType,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ChiefComplaintTypeTableFilterComposer(
+            $db: $db,
+            $table: $db.chiefComplaintType,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ChiefComplaintDetailTableOrderingComposer
+    extends Composer<_$AppDatabase, $ChiefComplaintDetailTable> {
+  $$ChiefComplaintDetailTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get sortOrder => $composableBuilder(
+    column: $table.sortOrder,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isActive => $composableBuilder(
+    column: $table.isActive,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ChiefComplaintTypeTableOrderingComposer get chiefComplaintTypeId {
+    final $$ChiefComplaintTypeTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.chiefComplaintTypeId,
+      referencedTable: $db.chiefComplaintType,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ChiefComplaintTypeTableOrderingComposer(
+            $db: $db,
+            $table: $db.chiefComplaintType,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ChiefComplaintDetailTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ChiefComplaintDetailTable> {
+  $$ChiefComplaintDetailTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<int> get sortOrder =>
+      $composableBuilder(column: $table.sortOrder, builder: (column) => column);
+
+  GeneratedColumn<bool> get isActive =>
+      $composableBuilder(column: $table.isActive, builder: (column) => column);
+
+  $$ChiefComplaintTypeTableAnnotationComposer get chiefComplaintTypeId {
+    final $$ChiefComplaintTypeTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.chiefComplaintTypeId,
+          referencedTable: $db.chiefComplaintType,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$ChiefComplaintTypeTableAnnotationComposer(
+                $db: $db,
+                $table: $db.chiefComplaintType,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+}
+
+class $$ChiefComplaintDetailTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $ChiefComplaintDetailTable,
+          ChiefComplaintDetailData,
+          $$ChiefComplaintDetailTableFilterComposer,
+          $$ChiefComplaintDetailTableOrderingComposer,
+          $$ChiefComplaintDetailTableAnnotationComposer,
+          $$ChiefComplaintDetailTableCreateCompanionBuilder,
+          $$ChiefComplaintDetailTableUpdateCompanionBuilder,
+          (ChiefComplaintDetailData, $$ChiefComplaintDetailTableReferences),
+          ChiefComplaintDetailData,
+          PrefetchHooks Function({bool chiefComplaintTypeId})
+        > {
+  $$ChiefComplaintDetailTableTableManager(
+    _$AppDatabase db,
+    $ChiefComplaintDetailTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ChiefComplaintDetailTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ChiefComplaintDetailTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$ChiefComplaintDetailTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> chiefComplaintTypeId = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<int> sortOrder = const Value.absent(),
+                Value<bool> isActive = const Value.absent(),
+              }) => ChiefComplaintDetailCompanion(
+                id: id,
+                chiefComplaintTypeId: chiefComplaintTypeId,
+                name: name,
+                sortOrder: sortOrder,
+                isActive: isActive,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int chiefComplaintTypeId,
+                required String name,
+                Value<int> sortOrder = const Value.absent(),
+                Value<bool> isActive = const Value.absent(),
+              }) => ChiefComplaintDetailCompanion.insert(
+                id: id,
+                chiefComplaintTypeId: chiefComplaintTypeId,
+                name: name,
+                sortOrder: sortOrder,
+                isActive: isActive,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$ChiefComplaintDetailTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({chiefComplaintTypeId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (chiefComplaintTypeId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.chiefComplaintTypeId,
+                                referencedTable:
+                                    $$ChiefComplaintDetailTableReferences
+                                        ._chiefComplaintTypeIdTable(db),
+                                referencedColumn:
+                                    $$ChiefComplaintDetailTableReferences
+                                        ._chiefComplaintTypeIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$ChiefComplaintDetailTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $ChiefComplaintDetailTable,
+      ChiefComplaintDetailData,
+      $$ChiefComplaintDetailTableFilterComposer,
+      $$ChiefComplaintDetailTableOrderingComposer,
+      $$ChiefComplaintDetailTableAnnotationComposer,
+      $$ChiefComplaintDetailTableCreateCompanionBuilder,
+      $$ChiefComplaintDetailTableUpdateCompanionBuilder,
+      (ChiefComplaintDetailData, $$ChiefComplaintDetailTableReferences),
+      ChiefComplaintDetailData,
+      PrefetchHooks Function({bool chiefComplaintTypeId})
     >;
 typedef $$DiagnosisCategoryTableCreateCompanionBuilder =
     DiagnosisCategoryCompanion Function({
@@ -26676,6 +27507,8 @@ class $AppDatabaseManager {
       $$ReportingUnitTableTableManager(_db, _db.reportingUnit);
   $$ChiefComplaintTypeTableTableManager get chiefComplaintType =>
       $$ChiefComplaintTypeTableTableManager(_db, _db.chiefComplaintType);
+  $$ChiefComplaintDetailTableTableManager get chiefComplaintDetail =>
+      $$ChiefComplaintDetailTableTableManager(_db, _db.chiefComplaintDetail);
   $$DiagnosisCategoryTableTableManager get diagnosisCategory =>
       $$DiagnosisCategoryTableTableManager(_db, _db.diagnosisCategory);
   $$TriageLevelTableTableManager get triageLevel =>

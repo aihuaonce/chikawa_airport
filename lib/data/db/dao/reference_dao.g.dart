@@ -16,6 +16,8 @@ mixin _$ReferenceDaoMixin on DatabaseAccessor<AppDatabase> {
   $ReportingUnitTable get reportingUnit => attachedDatabase.reportingUnit;
   $ChiefComplaintTypeTable get chiefComplaintType =>
       attachedDatabase.chiefComplaintType;
+  $ChiefComplaintDetailTable get chiefComplaintDetail =>
+      attachedDatabase.chiefComplaintDetail;
   $DiagnosisCategoryTable get diagnosisCategory =>
       attachedDatabase.diagnosisCategory;
   $TriageLevelTable get triageLevel => attachedDatabase.triageLevel;

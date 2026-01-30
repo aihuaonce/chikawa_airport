@@ -15,6 +15,7 @@ part 'reference_dao.g.dart';
     IncidentPlaceCategory2,
     ReportingUnit,
     ChiefComplaintType,
+    ChiefComplaintDetail,
     DiagnosisCategory,
     TriageLevel,
     TreatmentOnSite,
@@ -456,7 +457,7 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
     );
   }
 
-  //主訴類別
+  // 主訴類型
   Future<List<ChiefComplaintTypeData>> getAllChiefComplaintTypes({
     bool onlyActive = true,
   }) {
@@ -465,6 +466,25 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
       query.where((t) => t.isActive.equals(true));
     }
     return query.get();
+  }
+
+  // 主訴細項 (根據類型ID)
+  Future<List<ChiefComplaintDetailData>> getChiefComplaintDetailsByType(
+    int typeId,
+  ) {
+    return (select(chiefComplaintDetail)
+          ..where((d) => d.chiefComplaintTypeId.equals(typeId))
+          ..where((d) => d.isActive.equals(true))
+          ..orderBy([(d) => OrderingTerm.asc(d.sortOrder)]))
+        .get();
+  }
+
+  // 取得所有主訴細項
+  Future<List<ChiefComplaintDetailData>> getAllChiefComplaintDetails() {
+    return (select(chiefComplaintDetail)
+          ..where((d) => d.isActive.equals(true))
+          ..orderBy([(d) => OrderingTerm.asc(d.sortOrder)]))
+        .get();
   }
 
   Future<int> addChiefComplaintType({
@@ -697,6 +717,7 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
     await initializeIncidentPlaces();
     await initializeReportingUnits();
     await initializeChiefComplaintTypes();
+    await initializeChiefComplaintDetails(); // New
     await initializeDiagnosisCategories();
     await initializeTriageLevels();
     await initializeTreatmentOnSiteData();
@@ -977,19 +998,61 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
     if (count == 0) {
       await batch((batch) {
         batch.insertAll(chiefComplaintType, [
-          ChiefComplaintTypeCompanion.insert(code: 'trauma', name: '鈍挫傷'),
-          ChiefComplaintTypeCompanion.insert(code: 'trauma', name: '扭傷'),
-          ChiefComplaintTypeCompanion.insert(code: 'trauma', name: '撕裂傷'),
-          ChiefComplaintTypeCompanion.insert(code: 'trauma', name: '擦傷'),
-          ChiefComplaintTypeCompanion.insert(code: 'trauma', name: '肢體變形'),
-          ChiefComplaintTypeCompanion.insert(code: 'trauma', name: '其他'),
-
-          ChiefComplaintTypeCompanion.insert(code: 'non_trauma', name: '頭頸部'),
-          ChiefComplaintTypeCompanion.insert(code: 'non_trauma', name: '胸部'),
-          ChiefComplaintTypeCompanion.insert(code: 'non_trauma', name: '腹部'),
-          ChiefComplaintTypeCompanion.insert(code: 'non_trauma', name: '四肢'),
-          ChiefComplaintTypeCompanion.insert(code: 'non_trauma', name: '其他'),
+          ChiefComplaintTypeCompanion.insert(code: 'TRAUMA', name: '外傷'),
+          ChiefComplaintTypeCompanion.insert(code: 'NON_TRAUMA', name: '非外傷'),
         ]);
+      });
+    }
+  }
+
+  // 初始化主訴細項
+  Future<void> initializeChiefComplaintDetails() async {
+    final count = await (select(
+      chiefComplaintDetail,
+    ).get()).then((list) => list.length);
+    if (count == 0) {
+      // 取得類型 ID
+      final types = await select(chiefComplaintType).get();
+      // 假設已執行過 initializeChiefComplaintTypes，如果還沒，這裡可能會出錯
+      // 建議在外部順序調用，或者在這裡重新查詢
+      ChiefComplaintTypeData? traumaType;
+      ChiefComplaintTypeData? nonTraumaType;
+
+      try {
+        traumaType = types.firstWhere((t) => t.code == 'TRAUMA');
+        nonTraumaType = types.firstWhere((t) => t.code == 'NON_TRAUMA');
+      } catch (e) {
+        // 如果找不到 (例如舊資料是小寫 'trauma')，嘗試找舊的或忽略
+        // 這裡簡單處理：如果找不到就不初始化細項
+        return;
+      }
+
+      await batch((batch) {
+        // 外傷細項
+        final traumaItems = ['鈍挫傷', '扭傷', '撕裂傷', '擦傷', '肢體變形', '其它'];
+        for (var i = 0; i < traumaItems.length; i++) {
+          batch.insert(
+            chiefComplaintDetail,
+            ChiefComplaintDetailCompanion.insert(
+              chiefComplaintTypeId: traumaType!.id,
+              name: traumaItems[i],
+              sortOrder: Value(i + 1),
+            ),
+          );
+        }
+
+        // 非外傷細項
+        final nonTraumaItems = ['頭頸部', '胸部', '腹部', '四肢', '其它'];
+        for (var i = 0; i < nonTraumaItems.length; i++) {
+          batch.insert(
+            chiefComplaintDetail,
+            ChiefComplaintDetailCompanion.insert(
+              chiefComplaintTypeId: nonTraumaType!.id,
+              name: nonTraumaItems[i],
+              sortOrder: Value(i + 1),
+            ),
+          );
+        }
       });
     }
   }

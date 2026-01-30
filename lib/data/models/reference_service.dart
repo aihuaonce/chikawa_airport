@@ -19,6 +19,7 @@ class ReferenceService extends ChangeNotifier {
 
   // === 處置相關參考資料 ===
   List<ChiefComplaintTypeData> _chiefComplaintTypes = [];
+  List<ChiefComplaintDetailData> _chiefComplaintDetails = [];
   List<DiagnosisCategoryData> _diagnosisCategories = [];
   List<TriageLevelData> _triageLevels = [];
   List<TreatmentOnSiteData> _treatmentOnSites = [];
@@ -38,6 +39,8 @@ class ReferenceService extends ChangeNotifier {
       _incidentPlaceCategories;
   List<ReportingUnitData> get reportingUnits => _reportingUnits;
   List<ChiefComplaintTypeData> get chiefComplaintTypes => _chiefComplaintTypes;
+  List<ChiefComplaintDetailData> get chiefComplaintDetails =>
+      _chiefComplaintDetails;
   List<DiagnosisCategoryData> get diagnosisCategories => _diagnosisCategories;
   List<TriageLevelData> get triageLevels => _triageLevels;
   List<TreatmentOnSiteData> get treatmentOnSites => _treatmentOnSites;
@@ -83,6 +86,8 @@ class ReferenceService extends ChangeNotifier {
   Future<void> _loadTreatmentReferences() async {
     try {
       _chiefComplaintTypes = await db.referenceDao.getAllChiefComplaintTypes();
+      _chiefComplaintDetails = await db.referenceDao
+          .getAllChiefComplaintDetails();
       _diagnosisCategories = await db.referenceDao.getAllDiagnosisCategories();
       _triageLevels = await db.referenceDao.getAllTriageLevels();
       _treatmentOnSites = await db.referenceDao.getAllTreatmentOnSite();
@@ -94,6 +99,7 @@ class ReferenceService extends ChangeNotifier {
 
       debugPrint('系統:處置參考資料載入完成');
       debugPrint('  - 主訴類型: ${_chiefComplaintTypes.length}');
+      debugPrint('  - 主訴細項: ${_chiefComplaintDetails.length}');
       debugPrint('  - 診斷分類: ${_diagnosisCategories.length}');
       debugPrint('  - 檢傷級別: ${_triageLevels.length}');
       debugPrint('  - 現場處置: ${_treatmentOnSites.length}');
@@ -208,6 +214,13 @@ class ReferenceService extends ChangeNotifier {
     } catch (e) {
       return null;
     }
+  }
+
+  // 根據類型取得細項
+  List<ChiefComplaintDetailData> getChiefComplaintDetailsByType(int typeId) {
+    return _chiefComplaintDetails
+        .where((d) => d.chiefComplaintTypeId == typeId)
+        .toList();
   }
 
   DiagnosisCategoryData? getDiagnosisCategoryById(int? id) {

@@ -1726,45 +1726,40 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
     TreatmentViewModel viewModel,
     ChiefComplaintData complaint,
   ) {
-    final selectedType = viewModel.getComplaintTypeById(
-      complaint.chiefComplaintTypeId,
-    );
+    final selectedTypeId = complaint.chiefComplaintTypeId;
+    if (selectedTypeId == null) return const SizedBox();
 
-    // 根據主訴類型顯示不同的症狀選項
-    final options = selectedType?.code == 'TRAUMA'
-        ? ['鈍挫傷', '扭傷', '撕裂傷', '擦傷', '肢體變形', '其它']
-        : ['頭頸部', '胸部', '腹部', '四肢', '其它'];
+    final details = viewModel.getChiefComplaintDetails(selectedTypeId);
 
     return Wrap(
       spacing: 6,
       runSpacing: 6,
-      children: options
-          .map(
-            (s) => FilterChip(
-              label: Text(s, style: const TextStyle(fontSize: 12)),
-              selected: _selectedSymptoms.contains(s),
-              onSelected: (sel) {
-                setState(() {
-                  if (sel) {
-                    _selectedSymptoms.add(s);
-                  } else {
-                    _selectedSymptoms.remove(s);
-                  }
-                });
-                // 更新到資料庫
-                viewModel.updateChiefComplaint(
-                  selectedSymptoms: _selectedSymptoms.join(','),
-                );
-              },
-              selectedColor: primaryColor.withValues(alpha: 0.1),
-              checkmarkColor: primaryColor,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(6),
-                side: const BorderSide(color: borderColor),
-              ),
-            ),
-          )
-          .toList(),
+      children: details.map((detail) {
+        final s = detail.name;
+        return FilterChip(
+          label: Text(s, style: const TextStyle(fontSize: 12)),
+          selected: _selectedSymptoms.contains(s),
+          onSelected: (sel) {
+            setState(() {
+              if (sel) {
+                _selectedSymptoms.add(s);
+              } else {
+                _selectedSymptoms.remove(s);
+              }
+            });
+            // 更新到資料庫
+            viewModel.updateChiefComplaint(
+              selectedSymptoms: _selectedSymptoms.join(','),
+            );
+          },
+          selectedColor: primaryColor.withValues(alpha: 0.1),
+          checkmarkColor: primaryColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(6),
+            side: const BorderSide(color: borderColor),
+          ),
+        );
+      }).toList(),
     );
   }
 

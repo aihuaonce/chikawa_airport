@@ -54,6 +54,8 @@ class TreatmentViewModel extends ChangeNotifier {
 
   List<ChiefComplaintTypeData> get complaintTypes =>
       refService.chiefComplaintTypes;
+  List<ChiefComplaintDetailData> getChiefComplaintDetails(int typeId) =>
+      refService.getChiefComplaintDetailsByType(typeId);
   List<DiagnosisCategoryData> get diagnosisCategories =>
       refService.diagnosisCategories;
   List<TriageLevelData> get triageLevels => refService.triageLevels;

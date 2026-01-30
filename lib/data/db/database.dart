@@ -29,6 +29,7 @@ part 'database.g.dart';
     IncidentPlaceCategory2,
     ReportingUnit,
     ChiefComplaintType,
+    ChiefComplaintDetail,
     DiagnosisCategory,
     TriageLevel,
     TreatmentOnSite,
