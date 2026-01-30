@@ -1165,7 +1165,7 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
           TriageLevelCompanion.insert(
             level: 3,
             name: '急迫',
-            colorCode: '#FFFF00',
+            colorCode: '#FBC02D',
           ), // 黃
           TriageLevelCompanion.insert(
             level: 4,

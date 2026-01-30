@@ -202,6 +202,24 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
     final treatment = viewModel.treatment;
     if (treatment != null) {
       _actionSummaryOtherController.text = treatment.actionSummaryOther ?? '';
+
+      // 解析處理摘要 (Names -> IDs)
+      if (treatment.actionSummary != null &&
+          treatment.actionSummary!.isNotEmpty) {
+        final names = treatment.actionSummary!.split(',');
+        _selectedActionItemIds.clear();
+        for (final name in names) {
+          try {
+            final item = viewModel.actionItems.firstWhere(
+              (item) => item.name == name.trim(),
+            );
+            _selectedActionItemIds.add(item.id);
+          } catch (e) {
+            // 忽略找不到的項目
+          }
+        }
+      }
+
       // 載入 ICD-10 資料
       _tentativeController.text = treatment.tentative ?? '';
       _secondaryDiagnosis1Controller.text = treatment.secondaryDiagnosis1 ?? '';
@@ -1708,7 +1726,7 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
       padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(6),
+        borderRadius: BorderRadius.circular(8),
         border: Border.all(color: borderColor),
       ),
       child: DropdownButtonHideUnderline(
@@ -1757,7 +1775,7 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
       padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(6),
+        borderRadius: BorderRadius.circular(8),
         border: Border.all(color: borderColor),
       ),
       child: DropdownButtonHideUnderline(
@@ -1806,7 +1824,7 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
       padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(6),
+        borderRadius: BorderRadius.circular(8),
         border: Border.all(color: borderColor),
       ),
       child: DropdownButtonHideUnderline(
@@ -1858,7 +1876,7 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
       padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(6),
+        borderRadius: BorderRadius.circular(8),
         border: Border.all(color: borderColor),
       ),
       child: DropdownButtonHideUnderline(
@@ -2520,7 +2538,7 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
         height: 44,
         decoration: BoxDecoration(
           color: bgColor,
-          borderRadius: BorderRadius.circular(6),
+          borderRadius: BorderRadius.circular(8),
           border: Border.all(color: borderColor),
         ),
         child: Center(child: Icon(icon, size: 18, color: primaryColor)),
