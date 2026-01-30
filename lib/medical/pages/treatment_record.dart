@@ -178,6 +178,9 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
     if (history != null) {
       _pastHistoryDetailController.text = history.pastHistoryDetail ?? '';
       _allergyDetailController.text = history.allergyDetail ?? '';
+      // 載入狀態值（使用 ?? '無' 確保不會是 null）
+      _pastHistoryStatus = history.pastHistoryStatus;
+      _allergyStatus = history.allergyStatus;
     }
 
     final treatment = viewModel.treatment;
@@ -1077,36 +1080,46 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
       children: [
         _buildLabel('過去病史 Past Medical History'),
         const SizedBox(height: 4),
-        _buildSegmentedControl(
-          ['無', '不詳', '有'],
-          _pastHistoryStatus,
-          (v) => setState(() => _pastHistoryStatus = v),
-        ),
+        _buildSegmentedControl(['無', '不詳', '有'], _pastHistoryStatus, (v) {
+          setState(() {
+            _pastHistoryStatus = v;
+            // 如果切換到「無」或「不詳」，清除詳細資料
+            if (v == '無' || v == '不詳') {
+              _pastHistoryDetailController.clear();
+            }
+          });
+          // 同步到 ViewModel 並觸發 auto-save
+          viewModel.updatePastHistoryStatus(v);
+        }),
         if (_pastHistoryStatus == '有') ...[
           const SizedBox(height: 8),
           _buildTextField(
             hint: '列出慢性病或手術史...',
             maxLines: 2,
             controller: _pastHistoryDetailController,
-            onChanged: (val) =>
-                viewModel.updateMedicalHistory(pastHistoryDetail: val),
+            onChanged: (val) => viewModel.updatePastHistoryDetail(val),
           ),
         ],
         const SizedBox(height: 16),
         _buildLabel('過敏史 Allergy History'),
         const SizedBox(height: 4),
-        _buildSegmentedControl(
-          ['無', '不詳', '有'],
-          _allergyStatus,
-          (v) => setState(() => _allergyStatus = v),
-        ),
+        _buildSegmentedControl(['無', '不詳', '有'], _allergyStatus, (v) {
+          setState(() {
+            _allergyStatus = v;
+            // 如果切換到「無」或「不詳」，清除詳細資料
+            if (v == '無' || v == '不詳') {
+              _allergyDetailController.clear();
+            }
+          });
+          // 同步到 ViewModel 並觸發 auto-save
+          viewModel.updateAllergyStatus(v);
+        }),
         if (_allergyStatus == '有') ...[
           const SizedBox(height: 8),
           _buildTextField(
             hint: '註明藥物或食物過敏狀況...',
             controller: _allergyDetailController,
-            onChanged: (val) =>
-                viewModel.updateMedicalHistory(allergyDetail: val),
+            onChanged: (val) => viewModel.updateAllergyDetail(val),
           ),
         ],
       ],

@@ -120,6 +120,18 @@ class TreatmentViewModel extends ChangeNotifier {
     // 載入病史
     _medicalHistory = await db.treatmentDao.getMedicalHistory(medicalId);
 
+    // 初始化病史快取（確保默認值為 '無'）
+    if (_medicalHistory != null) {
+      _cachedPastHistoryStatus = _medicalHistory!.pastHistoryStatus;
+      _cachedPastHistoryDetail = _medicalHistory!.pastHistoryDetail;
+      _cachedAllergyStatus = _medicalHistory!.allergyStatus;
+      _cachedAllergyDetail = _medicalHistory!.allergyDetail;
+    } else {
+      // 如果沒有病史記錄，初始化默認值
+      _cachedPastHistoryStatus = '無';
+      _cachedAllergyStatus = '無';
+    }
+
     // 載入處置/診斷
     _treatment = await db.treatmentDao.getTreatment(medicalId);
     if (_treatment == null) {
@@ -546,6 +558,20 @@ class TreatmentViewModel extends ChangeNotifier {
   String? _cachedExtremitiesExam;
   String? _cachedOtherPhysicalExam;
 
+  // ===================================================================
+  // 病史與過敏快取（用於自動儲存）
+  // ===================================================================
+
+  Timer? _historyDebounceTimer;
+  SaveStatus _historySaveStatus = SaveStatus.idle;
+  SaveStatus get historySaveStatus => _historySaveStatus;
+
+  // 病史快取變數
+  String? _cachedPastHistoryStatus;
+  String? _cachedPastHistoryDetail;
+  String? _cachedAllergyStatus;
+  String? _cachedAllergyDetail;
+
   // 獲取最新的意識與理學檢查評估
   MedicalAssessmentData? get latestConsciousnessExam {
     try {
@@ -700,6 +726,7 @@ class TreatmentViewModel extends ChangeNotifier {
   }) async {
     try {
       if (_medicalHistory == null) {
+        // 新增記錄
         await db.treatmentDao.insertMedicalHistory(
           MedicalHistoryCompanion.insert(
             medicalId: medicalId,
@@ -709,12 +736,132 @@ class TreatmentViewModel extends ChangeNotifier {
             allergyDetail: Value(allergyDetail),
           ),
         );
+      } else {
+        // 更新現有記錄
+        // 如果狀態切換到「無」或「不詳」，清除詳細資料
+        final Value<String?> effectivePastHistoryDetail;
+        if (pastHistoryStatus == '無' || pastHistoryStatus == '不詳') {
+          effectivePastHistoryDetail = Value<String?>(null);
+        } else if (pastHistoryDetail != null) {
+          effectivePastHistoryDetail = Value(pastHistoryDetail);
+        } else {
+          effectivePastHistoryDetail = const Value.absent();
+        }
+
+        final Value<String?> effectiveAllergyDetail;
+        if (allergyStatus == '無' || allergyStatus == '不詳') {
+          effectiveAllergyDetail = Value<String?>(null);
+        } else if (allergyDetail != null) {
+          effectiveAllergyDetail = Value(allergyDetail);
+        } else {
+          effectiveAllergyDetail = const Value.absent();
+        }
+
+        await db.treatmentDao.updateMedicalHistory(
+          MedicalHistoryCompanion(
+            historyId: Value(_medicalHistory!.historyId),
+            medicalId: Value(_medicalHistory!.medicalId),
+            pastHistoryStatus: pastHistoryStatus != null
+                ? Value(pastHistoryStatus)
+                : const Value.absent(),
+            pastHistoryDetail: effectivePastHistoryDetail,
+            allergyStatus: allergyStatus != null
+                ? Value(allergyStatus)
+                : const Value.absent(),
+            allergyDetail: effectiveAllergyDetail,
+          ),
+        );
       }
       _medicalHistory = await db.treatmentDao.getMedicalHistory(medicalId);
       notifyListeners();
       debugPrint('系統:病史更新成功');
     } catch (e) {
       debugPrint('系統:病史更新失敗 - $e');
+    }
+  }
+
+  // 統一更新病史快取並觸發自動儲存
+  void _updateHistoryCacheAndSave({
+    String? pastHistoryStatus,
+    String? pastHistoryDetail,
+    String? allergyStatus,
+    String? allergyDetail,
+  }) {
+    // 更新快取
+    if (pastHistoryStatus != null) {
+      _cachedPastHistoryStatus = pastHistoryStatus;
+    }
+    if (pastHistoryDetail != null) {
+      _cachedPastHistoryDetail = pastHistoryDetail;
+    }
+    if (allergyStatus != null) {
+      _cachedAllergyStatus = allergyStatus;
+    }
+    if (allergyDetail != null) {
+      _cachedAllergyDetail = allergyDetail;
+    }
+
+    _historySaveStatus = SaveStatus.saving;
+    notifyListeners();
+    _autoSaveHistory();
+  }
+
+  // 公開的病史更新方法（供 UI 呼叫）
+  void updatePastHistoryStatus(String status) {
+    _updateHistoryCacheAndSave(pastHistoryStatus: status);
+  }
+
+  void updatePastHistoryDetail(String detail) {
+    _updateHistoryCacheAndSave(pastHistoryDetail: detail);
+  }
+
+  void updateAllergyStatus(String status) {
+    _updateHistoryCacheAndSave(allergyStatus: status);
+  }
+
+  void updateAllergyDetail(String detail) {
+    _updateHistoryCacheAndSave(allergyDetail: detail);
+  }
+
+  // 病史自動儲存機制
+  void _autoSaveHistory() {
+    if (_historyDebounceTimer?.isActive ?? false) {
+      _historyDebounceTimer!.cancel();
+    }
+
+    _historyDebounceTimer = Timer(const Duration(seconds: 2), () async {
+      debugPrint('系統:正在自動儲存病史資料...');
+      unawaited(_saveHistoryToDatabase());
+    });
+  }
+
+  Future<void> _saveHistoryToDatabase() async {
+    try {
+      await updateMedicalHistory(
+        pastHistoryStatus: _cachedPastHistoryStatus ?? '無',
+        pastHistoryDetail: _cachedPastHistoryDetail,
+        allergyStatus: _cachedAllergyStatus ?? '無',
+        allergyDetail: _cachedAllergyDetail,
+      );
+
+      debugPrint('系統:病史資料已儲存');
+
+      if (!hasListeners) return;
+
+      _historySaveStatus = SaveStatus.success;
+      notifyListeners();
+
+      await Future.delayed(const Duration(seconds: 3));
+
+      if (!hasListeners) return;
+
+      _historySaveStatus = SaveStatus.idle;
+      notifyListeners();
+    } catch (e) {
+      debugPrint('系統:病史自動儲存失敗 - $e');
+      if (!hasListeners) return;
+      _historySaveStatus = SaveStatus.idle;
+      notifyListeners();
     }
   }
 
@@ -1064,6 +1211,11 @@ class TreatmentViewModel extends ChangeNotifier {
     if (_consciousnessExamDebounceTimer?.isActive ?? false) {
       _consciousnessExamDebounceTimer!.cancel();
       _saveConsciousnessAndExamToDatabase();
+    }
+    // 病史與過敏儲存
+    if (_historyDebounceTimer?.isActive ?? false) {
+      _historyDebounceTimer!.cancel();
+      _saveHistoryToDatabase();
     }
     super.dispose();
   }
