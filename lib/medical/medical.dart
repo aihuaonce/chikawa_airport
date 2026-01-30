@@ -14,6 +14,8 @@ import 'pages/medical_fees.dart';
 import 'pages/medical_certificate.dart';
 import 'pages/refusal_of_referral.dart';
 import 'pages/telex_document.dart';
+import 'pages/referral_form.dart';
+import 'pages/nursing_record.dart';
 
 class MedicalPage extends StatefulWidget {
   final int medicalId;
@@ -62,9 +64,11 @@ class _MedicalPageState extends State<MedicalPage> {
       case 6:
         return RefusalOfReferral(medicalId: widget.medicalId);
       case 7:
+        return ReferralForm(medicalId: widget.medicalId);
       case 8:
         return TelexDocument(medicalId: widget.medicalId);
       case 9:
+        return NursingRecord(medicalId: widget.medicalId);
       default:
         return PersonalInfo(medicalId: widget.medicalId);
     }
