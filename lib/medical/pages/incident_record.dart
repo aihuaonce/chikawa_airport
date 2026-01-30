@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../../data/models/medical/incident_view.dart';
 import '../../data/db/database.dart';
+import '../widgets/reference_search_sheet.dart';
 
 class IncidentRecord extends StatefulWidget {
   final int medicalId;
@@ -552,45 +553,39 @@ class _IncidentRecordState extends State<IncidentRecord> {
     final selectedUnit = viewModel.getReportingUnitById(
       incident.reportingUnitId,
     );
+    final text = selectedUnit != null ? selectedUnit.name : '';
 
-    return Container(
-      height: 44,
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: borderColor),
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<ReportingUnitData>(
-          value: selectedUnit,
-          hint: Text(
-            '請選取通報單位',
-            style: TextStyle(
-              color: textMuted.withValues(alpha: 0.4),
-              fontSize: 14,
-            ),
-          ),
-          isExpanded: true,
-          icon: const Icon(Icons.expand_more, size: 20, color: textMuted),
-          items: viewModel.reportingUnitOptions
-              .map(
-                (ReportingUnitData unit) => DropdownMenuItem<ReportingUnitData>(
-                  value: unit,
-                  child: Text(
-                    unit.name,
-                    style: const TextStyle(fontSize: 14, color: textDark),
-                  ),
+    return _buildSelectionField(
+      text: text,
+      hint: '請選取通報單位',
+      icon: Icons.business,
+      onTap: () async {
+        final result = await ReferenceSearchSheet.show<ReportingUnitData>(
+          context,
+          title: '選擇通報單位',
+          searchFunction: viewModel.searchReportingUnits,
+          initialSelection: selectedUnit,
+          isSelectedComparator: (a, b) => a.id == b?.id,
+          itemBuilder: (context, item, isSelected) {
+            return ListTile(
+              title: Text(
+                item.name,
+                style: TextStyle(
+                  color: isSelected ? primaryColor : textDark,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                 ),
-              )
-              .toList(),
-          onChanged: (val) {
-            if (val != null) {
-              viewModel.updateReportingUnitId(val.id);
-            }
+              ),
+              trailing: isSelected
+                  ? const Icon(Icons.check, color: primaryColor)
+                  : null,
+            );
           },
-        ),
-      ),
+        );
+
+        if (result != null) {
+          viewModel.updateReportingUnitId(result.id);
+        }
+      },
     );
   }
 
@@ -601,46 +596,39 @@ class _IncidentRecordState extends State<IncidentRecord> {
     final selectedCategory = viewModel.getPlaceCategoryById(
       incident.incidentPlaceCategoryId,
     );
+    final text = selectedCategory != null ? selectedCategory.name : '';
 
-    return Container(
-      height: 44,
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: borderColor),
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<IncidentPlaceCategoryData>(
-          value: selectedCategory,
-          hint: Text(
-            '請選取事故地點',
-            style: TextStyle(
-              color: textMuted.withValues(alpha: 0.4),
-              fontSize: 14,
-            ),
-          ),
-          isExpanded: true,
-          icon: const Icon(Icons.expand_more, size: 20, color: textMuted),
-          items: viewModel.placeCategoryOptions
-              .map(
-                (IncidentPlaceCategoryData category) =>
-                    DropdownMenuItem<IncidentPlaceCategoryData>(
-                      value: category,
-                      child: Text(
-                        category.name,
-                        style: const TextStyle(fontSize: 14, color: textDark),
-                      ),
-                    ),
-              )
-              .toList(),
-          onChanged: (val) {
-            if (val != null) {
-              viewModel.updateIncidentPlaceCategoryId(val.id);
-            }
+    return _buildSelectionField(
+      text: text,
+      hint: '請選取事故地點',
+      icon: Icons.place,
+      onTap: () async {
+        final result = await ReferenceSearchSheet.show<IncidentPlaceCategoryData>(
+          context,
+          title: '選擇事故地點',
+          searchFunction: viewModel.searchPlaceCategories,
+          initialSelection: selectedCategory,
+          isSelectedComparator: (a, b) => a.id == b?.id,
+          itemBuilder: (context, item, isSelected) {
+            return ListTile(
+              title: Text(
+                item.name,
+                style: TextStyle(
+                  color: isSelected ? primaryColor : textDark,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                ),
+              ),
+              trailing: isSelected
+                  ? const Icon(Icons.check, color: primaryColor)
+                  : null,
+            );
           },
-        ),
-      ),
+        );
+
+        if (result != null) {
+          viewModel.updateIncidentPlaceCategoryId(result.id);
+        }
+      },
     );
   }
 
@@ -648,44 +636,81 @@ class _IncidentRecordState extends State<IncidentRecord> {
     IncidentViewModel viewModel,
     IncidentRecordData incident,
   ) {
-    final category2Options = viewModel.currentCategory2Options;
     final selectedCategory2 = viewModel.getPlaceCategory2ById(
       incident.incidentPlaceCategory2Id,
     );
+    final text = selectedCategory2 != null ? selectedCategory2.name : '';
 
-    return Container(
-      height: 44,
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: borderColor),
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<IncidentPlaceCategory2Data>(
-          value: selectedCategory2,
-          hint: Text(
-            '請選取地點',
-            style: TextStyle(
-              color: textMuted.withValues(alpha: 0.4),
-              fontSize: 14,
+    return _buildSelectionField(
+      text: text,
+      hint: '請選取地點',
+      icon: Icons.location_on_outlined,
+      onTap: () async {
+        final result = await ReferenceSearchSheet.show<IncidentPlaceCategory2Data>(
+          context,
+          title: '選擇地點',
+          searchFunction: viewModel.searchPlaceCategories2,
+          initialSelection: selectedCategory2,
+          isSelectedComparator: (a, b) => a.id == b?.id,
+          itemBuilder: (context, item, isSelected) {
+            return ListTile(
+              title: Text(
+                item.name,
+                style: TextStyle(
+                  color: isSelected ? primaryColor : textDark,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                ),
+              ),
+              trailing: isSelected
+                  ? const Icon(Icons.check, color: primaryColor)
+                  : null,
+            );
+          },
+        );
+
+        if (result != null) {
+          viewModel.updateIncidentPlaceCategory2Id(result.id);
+        }
+      },
+    );
+  }
+
+  // 通用選擇欄位元件
+  Widget _buildSelectionField({
+    required String text,
+    required String hint,
+    required IconData icon,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(6),
+      child: Container(
+        height: 44,
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(6),
+          border: Border.all(color: borderColor),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                text.isNotEmpty ? text : hint,
+                style: TextStyle(
+                  color: text.isNotEmpty
+                      ? textDark
+                      : textMuted.withValues(alpha: 0.4),
+                  fontSize: 14,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
-          ),
-          isExpanded: true,
-          icon: const Icon(Icons.expand_more, size: 20, color: textMuted),
-          items: category2Options
-              .map(
-                (IncidentPlaceCategory2Data category2) =>
-                    DropdownMenuItem<IncidentPlaceCategory2Data>(
-                      value: category2,
-                      child: Text(
-                        category2.name,
-                        style: const TextStyle(fontSize: 14, color: textDark),
-                      ),
-                    ),
-              )
-              .toList(),
-          onChanged: (val) => viewModel.updateIncidentPlaceCategory2Id(val?.id),
+            const SizedBox(width: 8),
+            const Icon(Icons.expand_more, size: 20, color: textMuted),
+          ],
         ),
       ),
     );

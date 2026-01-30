@@ -8,6 +8,8 @@ import 'dart:typed_data';
 import '../../data/models/medical/treatment_view.dart';
 import '../../data/db/database.dart';
 import '../widgets/icd10_search_sheet.dart';
+import '../widgets/staff_search_sheet.dart';
+import '../widgets/reference_search_sheet.dart';
 
 class TreatmentRecord extends StatefulWidget {
   final int medicalId;
@@ -86,8 +88,8 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
   final List<int> _selectedActionItemIds = [];
 
   // 協助人員
-  final List<String> _assistStaffList = [];
-  late TextEditingController _assistStaffController;
+  // final List<String> _assistStaffList = [];
+  // late TextEditingController _assistStaffController;
 
   // 負責人與 EMT
   late TextEditingController _directorNameController;
@@ -108,7 +110,7 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
     _pastHistoryDetailController = TextEditingController();
     _allergyDetailController = TextEditingController();
     _actionSummaryOtherController = TextEditingController();
-    _assistStaffController = TextEditingController();
+    // _assistStaffController = TextEditingController();
     _directorNameController = TextEditingController();
     _otherSpecialNoteController = TextEditingController();
 
@@ -145,7 +147,7 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
     _pastHistoryDetailController.dispose();
     _allergyDetailController.dispose();
     _actionSummaryOtherController.dispose();
-    _assistStaffController.dispose();
+    // _assistStaffController.dispose();
     _directorNameController.dispose();
     _otherSpecialNoteController.dispose();
 
@@ -238,11 +240,13 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
       // 載入負責人姓名
       _directorNameController.text = treatment.directorName ?? '';
 
-      // 載入輔助人員
+      // 載入輔助人員 (改為從 viewModel.staffAssignments 讀取，不再使用 treatment.assistStaff)
+      /*
       if (treatment.assistStaff != null && treatment.assistStaff!.isNotEmpty) {
         _assistStaffList.clear();
         _assistStaffList.addAll(treatment.assistStaff!.split(','));
       }
+      */
     }
 
     // 載入特別註記
@@ -1447,6 +1451,11 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
         .where((a) => a.staffRole == 'EMT')
         .firstOrNull;
 
+    // 取得 Assist Staff 指派
+    final assistAssignments = viewModel.staffAssignments
+        .where((a) => a.staffRole == 'Assist')
+        .toList();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -1632,40 +1641,68 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
         Row(
           children: [
             Expanded(
-              child: _buildTextField(
-                hint: '輸入人員姓名...',
-                controller: _assistStaffController,
+              child: GestureDetector(
+                onTap: () async {
+                  final result = await StaffSearchSheet.show(
+                    context,
+                    title: '選擇輔助人員',
+                    viewModel: viewModel,
+                  );
+                  if (result != null) {
+                    viewModel.addStaffAssignment(
+                      staffRole: 'Assist',
+                      staffId: result.id,
+                      staffName: result.name,
+                    );
+                  }
+                },
+                child: Container(
+                  height: 44,
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  decoration: BoxDecoration(
+                    color: bgField,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: borderColor),
+                  ),
+                  alignment: Alignment.centerLeft,
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.search,
+                        color: textMuted.withValues(alpha: 0.5),
+                        size: 20,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        '點擊搜尋並新增人員...',
+                        style: TextStyle(
+                          color: textMuted.withValues(alpha: 0.5),
+                          fontSize: 13,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
-            ),
-            const SizedBox(width: 8),
-            _buildActionIconBtn(
-              Icons.person_add_alt_1,
-              primaryColor.withValues(alpha: 0.1),
-              primaryColor.withValues(alpha: 0.2),
-              onTap: () {
-                if (_assistStaffController.text.isNotEmpty) {
-                  setState(() {
-                    _assistStaffList.add(_assistStaffController.text);
-                    _assistStaffController.clear();
-                  });
-                  viewModel.updateAssistStaff(_assistStaffList.join(','));
-                }
-              },
             ),
           ],
         ),
-        if (_assistStaffList.isNotEmpty) ...[
+        if (assistAssignments.isNotEmpty) ...[
           const SizedBox(height: 12),
           Wrap(
             spacing: 8,
-            children: _assistStaffList
+            children: assistAssignments
                 .map(
-                  (staff) => Chip(
-                    label: Text(staff, style: const TextStyle(fontSize: 12)),
+                  (assignment) => Chip(
+                    label: Text(
+                      assignment.staffName ?? 'Unknown',
+                      style: const TextStyle(fontSize: 12),
+                    ),
                     deleteIcon: const Icon(Icons.close, size: 14),
                     onDeleted: () {
-                      setState(() => _assistStaffList.remove(staff));
-                      viewModel.updateAssistStaff(_assistStaffList.join(','));
+                      viewModel.removeStaffAssignment(
+                        assignment.staffAssignmentId,
+                      );
                     },
                     backgroundColor: bgField,
                     shape: RoundedRectangleBorder(
@@ -1896,45 +1933,39 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
     final selectedCategory = treatment?.tentativeCategoryId != null
         ? viewModel.getDiagnosisCategoryById(treatment!.tentativeCategoryId)
         : null;
+    final text = selectedCategory != null ? selectedCategory.name : '';
 
-    return Container(
-      height: 44,
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: borderColor),
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<DiagnosisCategoryData>(
-          value: selectedCategory,
-          hint: Text(
-            '請選取診斷分類',
-            style: TextStyle(
-              color: textMuted.withValues(alpha: 0.4),
-              fontSize: 14,
-            ),
-          ),
-          isExpanded: true,
-          icon: const Icon(Icons.expand_more, size: 20, color: textMuted),
-          items: viewModel.diagnosisCategories
-              .map(
-                (cat) => DropdownMenuItem<DiagnosisCategoryData>(
-                  value: cat,
-                  child: Text(
-                    cat.name,
-                    style: const TextStyle(fontSize: 14, color: textDark),
-                  ),
+    return _buildSelectionField(
+      text: text,
+      hint: '請選取診斷分類',
+      icon: Icons.category,
+      onTap: () async {
+        final result = await ReferenceSearchSheet.show<DiagnosisCategoryData>(
+          context,
+          title: '選擇診斷分類',
+          searchFunction: viewModel.searchDiagnosisCategories,
+          initialSelection: selectedCategory,
+          isSelectedComparator: (a, b) => a.id == b?.id,
+          itemBuilder: (context, item, isSelected) {
+            return ListTile(
+              title: Text(
+                item.name,
+                style: TextStyle(
+                  color: isSelected ? primaryColor : textDark,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                 ),
-              )
-              .toList(),
-          onChanged: (val) {
-            if (val != null) {
-              viewModel.updateTentativeCategoryId(val.id);
-            }
+              ),
+              trailing: isSelected
+                  ? const Icon(Icons.check, color: primaryColor)
+                  : null,
+            );
           },
-        ),
-      ),
+        );
+
+        if (result != null) {
+          viewModel.updateTentativeCategoryId(result.id);
+        }
+      },
     );
   }
 
@@ -1945,45 +1976,39 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
     final selectedTreatment = treatment?.treatmentOnSiteId != null
         ? viewModel.getTreatmentOnSiteById(treatment!.treatmentOnSiteId)
         : null;
+    final text = selectedTreatment != null ? selectedTreatment.name : '';
 
-    return Container(
-      height: 44,
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: borderColor),
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<TreatmentOnSiteData>(
-          value: selectedTreatment,
-          hint: Text(
-            '請選取現場處置',
-            style: TextStyle(
-              color: textMuted.withValues(alpha: 0.4),
-              fontSize: 14,
-            ),
-          ),
-          isExpanded: true,
-          icon: const Icon(Icons.expand_more, size: 20, color: textMuted),
-          items: viewModel.treatmentOnSites
-              .map(
-                (treatment) => DropdownMenuItem<TreatmentOnSiteData>(
-                  value: treatment,
-                  child: Text(
-                    treatment.name,
-                    style: const TextStyle(fontSize: 14, color: textDark),
-                  ),
+    return _buildSelectionField(
+      text: text,
+      hint: '請選取現場處置',
+      icon: Icons.medical_services,
+      onTap: () async {
+        final result = await ReferenceSearchSheet.show<TreatmentOnSiteData>(
+          context,
+          title: '選擇現場處置',
+          searchFunction: viewModel.searchTreatmentOnSites,
+          initialSelection: selectedTreatment,
+          isSelectedComparator: (a, b) => a.id == b?.id,
+          itemBuilder: (context, item, isSelected) {
+            return ListTile(
+              title: Text(
+                item.name,
+                style: TextStyle(
+                  color: isSelected ? primaryColor : textDark,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                 ),
-              )
-              .toList(),
-          onChanged: (val) {
-            if (val != null) {
-              viewModel.updateTreatmentOnSiteId(val.id);
-            }
+              ),
+              trailing: isSelected
+                  ? const Icon(Icons.check, color: primaryColor)
+                  : null,
+            );
           },
-        ),
-      ),
+        );
+
+        if (result != null) {
+          viewModel.updateTreatmentOnSiteId(result.id);
+        }
+      },
     );
   }
 
@@ -1994,45 +2019,39 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
     final selectedResult = treatment?.resultId != null
         ? viewModel.getTreatmentResultById(treatment!.resultId)
         : null;
+    final text = selectedResult != null ? selectedResult.name : '';
 
-    return Container(
-      height: 44,
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: borderColor),
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<TreatmentResultData>(
-          value: selectedResult,
-          hint: Text(
-            '請選取處置結果',
-            style: TextStyle(
-              color: textMuted.withValues(alpha: 0.4),
-              fontSize: 14,
-            ),
-          ),
-          isExpanded: true,
-          icon: const Icon(Icons.expand_more, size: 20, color: textMuted),
-          items: viewModel.treatmentResults
-              .map(
-                (result) => DropdownMenuItem<TreatmentResultData>(
-                  value: result,
-                  child: Text(
-                    result.name,
-                    style: const TextStyle(fontSize: 14, color: textDark),
-                  ),
+    return _buildSelectionField(
+      text: text,
+      hint: '請選取處置結果',
+      icon: Icons.assignment_return,
+      onTap: () async {
+        final result = await ReferenceSearchSheet.show<TreatmentResultData>(
+          context,
+          title: '選擇處置結果',
+          searchFunction: viewModel.searchTreatmentResults,
+          initialSelection: selectedResult,
+          isSelectedComparator: (a, b) => a.id == b?.id,
+          itemBuilder: (context, item, isSelected) {
+            return ListTile(
+              title: Text(
+                item.name,
+                style: TextStyle(
+                  color: isSelected ? primaryColor : textDark,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                 ),
-              )
-              .toList(),
-          onChanged: (val) {
-            if (val != null) {
-              viewModel.updateResultId(val.id);
-            }
+              ),
+              trailing: isSelected
+                  ? const Icon(Icons.check, color: primaryColor)
+                  : null,
+            );
           },
-        ),
-      ),
+        );
+
+        if (result != null) {
+          viewModel.updateResultId(result.id);
+        }
+      },
     );
   }
 
@@ -2046,39 +2065,100 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
     final selectedStaff = selectedStaffId != null
         ? viewModel.getMedicalStaffById(selectedStaffId)
         : null;
+    final text = selectedStaff != null ? selectedStaff.name : '';
 
-    return Container(
-      height: 44,
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: borderColor),
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<MedicalStaffData>(
-          value: selectedStaff,
-          hint: Text(
-            hint,
-            style: TextStyle(
-              color: textMuted.withValues(alpha: 0.4),
-              fontSize: 14,
-            ),
-          ),
-          isExpanded: true,
-          icon: const Icon(Icons.expand_more, size: 20, color: textMuted),
-          items: staffList
-              .map(
-                (staff) => DropdownMenuItem<MedicalStaffData>(
-                  value: staff,
-                  child: Text(
-                    staff.name,
-                    style: const TextStyle(fontSize: 14, color: textDark),
+    return _buildSelectionField(
+      text: text,
+      hint: hint,
+      icon: Icons.person,
+      onTap: () async {
+        final result = await ReferenceSearchSheet.show<MedicalStaffData>(
+          context,
+          title: hint,
+          searchFunction: (query) async {
+            if (query.isEmpty) return staffList;
+            final lower = query.toLowerCase();
+            return staffList
+                .where(
+                  (s) =>
+                      s.name.toLowerCase().contains(lower) ||
+                      (s.employeeId?.toLowerCase().contains(lower) ?? false),
+                )
+                .toList();
+          },
+          initialSelection: selectedStaff,
+          isSelectedComparator: (a, b) => a.id == b?.id,
+          itemBuilder: (context, item, isSelected) {
+            return ListTile(
+              leading: CircleAvatar(
+                backgroundColor: primaryColor.withValues(alpha: 0.1),
+                child: Text(
+                  item.role.isNotEmpty ? item.role[0] : '?',
+                  style: const TextStyle(
+                    color: primaryColor,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-              )
-              .toList(),
-          onChanged: (val) => onChanged(val?.id),
+              ),
+              title: Text(
+                item.name,
+                style: TextStyle(
+                  color: isSelected ? primaryColor : textDark,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+                ),
+              ),
+              subtitle: Text(
+                '${item.role} ${item.employeeId != null ? '(${item.employeeId})' : ''}',
+              ),
+              trailing: isSelected
+                  ? const Icon(Icons.check, color: primaryColor)
+                  : null,
+            );
+          },
+        );
+
+        if (result != null) {
+          onChanged(result.id);
+        }
+      },
+    );
+  }
+
+  // 通用選擇欄位元件
+  Widget _buildSelectionField({
+    required String text,
+    required String hint,
+    required IconData icon,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: borderColor),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                text.isNotEmpty ? text : hint,
+                style: TextStyle(
+                  color: text.isNotEmpty
+                      ? textDark
+                      : textMuted.withValues(alpha: 0.4),
+                  fontSize: 14,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            const SizedBox(width: 8),
+            const Icon(Icons.expand_more, size: 20, color: textMuted),
+          ],
         ),
       ),
     );

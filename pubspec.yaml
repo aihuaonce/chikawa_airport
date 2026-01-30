@@ -89,7 +89,7 @@ flutter:
 
   assets:
     - assets/images/
-    - assets/airport.medical.icd10.csv
+    - assets/csv/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

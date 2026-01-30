@@ -246,6 +246,32 @@ class IncidentViewModel extends ChangeNotifier {
     }
   }
 
+  // === 搜尋輔助方法 (新增) ===
+
+  Future<List<ReportingUnitData>> searchReportingUnits(String keyword) async {
+    if (keyword.isEmpty) return refService.reportingUnits;
+    final lower = keyword.toLowerCase();
+    return refService.reportingUnits.where((u) =>
+      u.name.toLowerCase().contains(lower)
+    ).toList();
+  }
+
+  Future<List<IncidentPlaceCategoryData>> searchPlaceCategories(String keyword) async {
+    if (keyword.isEmpty) return refService.incidentPlaceCategories;
+    final lower = keyword.toLowerCase();
+    return refService.incidentPlaceCategories.where((c) =>
+      c.name.toLowerCase().contains(lower)
+    ).toList();
+  }
+
+  Future<List<IncidentPlaceCategory2Data>> searchPlaceCategories2(String keyword) async {
+    if (keyword.isEmpty) return _currentCategory2Options;
+    final lower = keyword.toLowerCase();
+    return _currentCategory2Options.where((c) =>
+      c.name.toLowerCase().contains(lower)
+    ).toList();
+  }
+
   // === 延遲存檔邏輯 ===
   void _autoSave() {
     if (_debounceTimer?.isActive ?? false) _debounceTimer!.cancel();

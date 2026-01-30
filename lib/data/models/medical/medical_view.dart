@@ -289,6 +289,44 @@ class MedicalViewModel extends ChangeNotifier {
     }
   }
 
+  // === 搜尋輔助方法 (新增) ===
+
+  Future<List<AirlineData>> searchAirlines(String keyword) async {
+    if (keyword.isEmpty) return refService.airlineList;
+    try {
+      // 優先使用 DAO 搜尋，或直接過濾快取
+      return await db.referenceDao.searchAirline(keyword);
+    } catch (e) {
+      debugPrint('系統：搜尋航空公司失敗 - $e');
+      // 降級為過濾快取
+      final lower = keyword.toLowerCase();
+      return refService.airlineList.where((a) =>
+        a.name.toLowerCase().contains(lower) || a.code.toLowerCase().contains(lower)
+      ).toList();
+    }
+  }
+
+  Future<List<NationalityData>> searchNationalities(String keyword) async {
+    if (keyword.isEmpty) return refService.nationalityList;
+    try {
+      return await db.referenceDao.searchNationality(keyword);
+    } catch (e) {
+      debugPrint('系統：搜尋國籍失敗 - $e');
+      final lower = keyword.toLowerCase();
+      return refService.nationalityList.where((n) =>
+        n.name.toLowerCase().contains(lower) || (n.code?.toLowerCase().contains(lower) ?? false)
+      ).toList();
+    }
+  }
+
+  Future<List<TravelStatusData>> searchTravelStatus(String keyword) async {
+    if (keyword.isEmpty) return refService.travelStatusList;
+    final lower = keyword.toLowerCase();
+    return refService.travelStatusList.where((t) =>
+      t.name.toLowerCase().contains(lower) || t.code.toLowerCase().contains(lower)
+    ).toList();
+  }
+
   //  延遲存檔邏輯
   void _autoSave() {
     if (_debounceTimer?.isActive ?? false) _debounceTimer!.cancel();
