@@ -245,13 +245,6 @@ class _FlightLogState extends State<FlightLog> {
           isSelectedComparator: (a, b) => a.locationId == b?.locationId,
           itemBuilder: (context, item, isSelected) {
             return ListTile(
-              leading: Text(
-                item.countryCode,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: textMuted,
-                ),
-              ),
               title: Text(
                 '${item.code} - ${item.name}',
                 style: TextStyle(
@@ -387,13 +380,6 @@ class _FlightLogState extends State<FlightLog> {
       searchFunction: viewModel.searchLocations,
       itemBuilder: (context, item, isSelected) {
         return ListTile(
-          leading: Text(
-            item.countryCode,
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              color: textMuted,
-            ),
-          ),
           title: Text(
             '${item.code} - ${item.name}',
             style: TextStyle(

@@ -308,14 +308,6 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
     )..where((l) => l.code.equals(code))).getSingleOrNull();
   }
 
-  // 根據國家代碼取得地點列表
-  Future<List<LocationData>> getLocationsByCountryCode(String countryCode) {
-    return (select(location)
-          ..where((l) => l.countryCode.equals(countryCode))
-          ..orderBy([(l) => OrderingTerm.asc(l.code)]))
-        .get();
-  }
-
   // 搜尋地點 (模糊搜尋名稱或代碼)
   Future<List<LocationData>> searchLocation(String keyword) {
     return (select(location)
@@ -325,18 +317,10 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
   }
 
   // 新增地點
-  Future<int> addLocation({
-    required String code,
-    required String name,
-    required String countryCode,
-  }) {
-    return into(location).insert(
-      LocationCompanion.insert(
-        code: code,
-        name: name,
-        countryCode: countryCode,
-      ),
-    );
+  Future<int> addLocation({required String code, required String name}) {
+    return into(
+      location,
+    ).insert(LocationCompanion.insert(code: code, name: name));
   }
 
   // 批次新增地點
@@ -348,7 +332,6 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
           (item) => LocationCompanion.insert(
             code: item['code']!,
             name: item['name']!,
-            countryCode: item['countryCode']!,
           ),
         ),
       );
@@ -356,19 +339,11 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
   }
 
   // 更新地點
-  Future<int> updateLocation({
-    required int id,
-    String? code,
-    String? name,
-    String? countryCode,
-  }) {
+  Future<int> updateLocation({required int id, String? code, String? name}) {
     return (update(location)..where((l) => l.locationId.equals(id))).write(
       LocationCompanion(
         code: code != null ? Value(code) : const Value.absent(),
         name: name != null ? Value(name) : const Value.absent(),
-        countryCode: countryCode != null
-            ? Value(countryCode)
-            : const Value.absent(),
       ),
     );
   }

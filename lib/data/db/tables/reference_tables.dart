@@ -34,7 +34,6 @@ class Location extends Table {
   IntColumn get locationId => integer().autoIncrement()();
   TextColumn get code => text()(); // TPE / NRT
   TextColumn get name => text()();
-  TextColumn get countryCode => text()(); // TW / JP
 }
 
 //事故-一級地點表

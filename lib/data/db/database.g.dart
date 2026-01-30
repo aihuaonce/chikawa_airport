@@ -1012,19 +1012,8 @@ class $LocationTable extends Location
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
-  static const VerificationMeta _countryCodeMeta = const VerificationMeta(
-    'countryCode',
-  );
   @override
-  late final GeneratedColumn<String> countryCode = GeneratedColumn<String>(
-    'country_code',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-  );
-  @override
-  List<GeneratedColumn> get $columns => [locationId, code, name, countryCode];
+  List<GeneratedColumn> get $columns => [locationId, code, name];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -1059,17 +1048,6 @@ class $LocationTable extends Location
     } else if (isInserting) {
       context.missing(_nameMeta);
     }
-    if (data.containsKey('country_code')) {
-      context.handle(
-        _countryCodeMeta,
-        countryCode.isAcceptableOrUnknown(
-          data['country_code']!,
-          _countryCodeMeta,
-        ),
-      );
-    } else if (isInserting) {
-      context.missing(_countryCodeMeta);
-    }
     return context;
   }
 
@@ -1091,10 +1069,6 @@ class $LocationTable extends Location
         DriftSqlType.string,
         data['${effectivePrefix}name'],
       )!,
-      countryCode: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}country_code'],
-      )!,
     );
   }
 
@@ -1108,12 +1082,10 @@ class LocationData extends DataClass implements Insertable<LocationData> {
   final int locationId;
   final String code;
   final String name;
-  final String countryCode;
   const LocationData({
     required this.locationId,
     required this.code,
     required this.name,
-    required this.countryCode,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -1121,7 +1093,6 @@ class LocationData extends DataClass implements Insertable<LocationData> {
     map['location_id'] = Variable<int>(locationId);
     map['code'] = Variable<String>(code);
     map['name'] = Variable<String>(name);
-    map['country_code'] = Variable<String>(countryCode);
     return map;
   }
 
@@ -1130,7 +1101,6 @@ class LocationData extends DataClass implements Insertable<LocationData> {
       locationId: Value(locationId),
       code: Value(code),
       name: Value(name),
-      countryCode: Value(countryCode),
     );
   }
 
@@ -1143,7 +1113,6 @@ class LocationData extends DataClass implements Insertable<LocationData> {
       locationId: serializer.fromJson<int>(json['locationId']),
       code: serializer.fromJson<String>(json['code']),
       name: serializer.fromJson<String>(json['name']),
-      countryCode: serializer.fromJson<String>(json['countryCode']),
     );
   }
   @override
@@ -1153,21 +1122,15 @@ class LocationData extends DataClass implements Insertable<LocationData> {
       'locationId': serializer.toJson<int>(locationId),
       'code': serializer.toJson<String>(code),
       'name': serializer.toJson<String>(name),
-      'countryCode': serializer.toJson<String>(countryCode),
     };
   }
 
-  LocationData copyWith({
-    int? locationId,
-    String? code,
-    String? name,
-    String? countryCode,
-  }) => LocationData(
-    locationId: locationId ?? this.locationId,
-    code: code ?? this.code,
-    name: name ?? this.name,
-    countryCode: countryCode ?? this.countryCode,
-  );
+  LocationData copyWith({int? locationId, String? code, String? name}) =>
+      LocationData(
+        locationId: locationId ?? this.locationId,
+        code: code ?? this.code,
+        name: name ?? this.name,
+      );
   LocationData copyWithCompanion(LocationCompanion data) {
     return LocationData(
       locationId: data.locationId.present
@@ -1175,9 +1138,6 @@ class LocationData extends DataClass implements Insertable<LocationData> {
           : this.locationId,
       code: data.code.present ? data.code.value : this.code,
       name: data.name.present ? data.name.value : this.name,
-      countryCode: data.countryCode.present
-          ? data.countryCode.value
-          : this.countryCode,
     );
   }
 
@@ -1186,54 +1146,46 @@ class LocationData extends DataClass implements Insertable<LocationData> {
     return (StringBuffer('LocationData(')
           ..write('locationId: $locationId, ')
           ..write('code: $code, ')
-          ..write('name: $name, ')
-          ..write('countryCode: $countryCode')
+          ..write('name: $name')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(locationId, code, name, countryCode);
+  int get hashCode => Object.hash(locationId, code, name);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is LocationData &&
           other.locationId == this.locationId &&
           other.code == this.code &&
-          other.name == this.name &&
-          other.countryCode == this.countryCode);
+          other.name == this.name);
 }
 
 class LocationCompanion extends UpdateCompanion<LocationData> {
   final Value<int> locationId;
   final Value<String> code;
   final Value<String> name;
-  final Value<String> countryCode;
   const LocationCompanion({
     this.locationId = const Value.absent(),
     this.code = const Value.absent(),
     this.name = const Value.absent(),
-    this.countryCode = const Value.absent(),
   });
   LocationCompanion.insert({
     this.locationId = const Value.absent(),
     required String code,
     required String name,
-    required String countryCode,
   }) : code = Value(code),
-       name = Value(name),
-       countryCode = Value(countryCode);
+       name = Value(name);
   static Insertable<LocationData> custom({
     Expression<int>? locationId,
     Expression<String>? code,
     Expression<String>? name,
-    Expression<String>? countryCode,
   }) {
     return RawValuesInsertable({
       if (locationId != null) 'location_id': locationId,
       if (code != null) 'code': code,
       if (name != null) 'name': name,
-      if (countryCode != null) 'country_code': countryCode,
     });
   }
 
@@ -1241,13 +1193,11 @@ class LocationCompanion extends UpdateCompanion<LocationData> {
     Value<int>? locationId,
     Value<String>? code,
     Value<String>? name,
-    Value<String>? countryCode,
   }) {
     return LocationCompanion(
       locationId: locationId ?? this.locationId,
       code: code ?? this.code,
       name: name ?? this.name,
-      countryCode: countryCode ?? this.countryCode,
     );
   }
 
@@ -1263,9 +1213,6 @@ class LocationCompanion extends UpdateCompanion<LocationData> {
     if (name.present) {
       map['name'] = Variable<String>(name.value);
     }
-    if (countryCode.present) {
-      map['country_code'] = Variable<String>(countryCode.value);
-    }
     return map;
   }
 
@@ -1274,8 +1221,7 @@ class LocationCompanion extends UpdateCompanion<LocationData> {
     return (StringBuffer('LocationCompanion(')
           ..write('locationId: $locationId, ')
           ..write('code: $code, ')
-          ..write('name: $name, ')
-          ..write('countryCode: $countryCode')
+          ..write('name: $name')
           ..write(')'))
         .toString();
   }
@@ -16694,14 +16640,12 @@ typedef $$LocationTableCreateCompanionBuilder =
       Value<int> locationId,
       required String code,
       required String name,
-      required String countryCode,
     });
 typedef $$LocationTableUpdateCompanionBuilder =
     LocationCompanion Function({
       Value<int> locationId,
       Value<String> code,
       Value<String> name,
-      Value<String> countryCode,
     });
 
 final class $$LocationTableReferences
@@ -16766,11 +16710,6 @@ class $$LocationTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get countryCode => $composableBuilder(
-    column: $table.countryCode,
-    builder: (column) => ColumnFilters(column),
-  );
-
   Expression<bool> flightTransitLocationsRefs(
     Expression<bool> Function($$FlightTransitLocationsTableFilterComposer f) f,
   ) {
@@ -16821,11 +16760,6 @@ class $$LocationTableOrderingComposer
     column: $table.name,
     builder: (column) => ColumnOrderings(column),
   );
-
-  ColumnOrderings<String> get countryCode => $composableBuilder(
-    column: $table.countryCode,
-    builder: (column) => ColumnOrderings(column),
-  );
 }
 
 class $$LocationTableAnnotationComposer
@@ -16847,11 +16781,6 @@ class $$LocationTableAnnotationComposer
 
   GeneratedColumn<String> get name =>
       $composableBuilder(column: $table.name, builder: (column) => column);
-
-  GeneratedColumn<String> get countryCode => $composableBuilder(
-    column: $table.countryCode,
-    builder: (column) => column,
-  );
 
   Expression<T> flightTransitLocationsRefs<T extends Object>(
     Expression<T> Function($$FlightTransitLocationsTableAnnotationComposer a) f,
@@ -16911,24 +16840,20 @@ class $$LocationTableTableManager
                 Value<int> locationId = const Value.absent(),
                 Value<String> code = const Value.absent(),
                 Value<String> name = const Value.absent(),
-                Value<String> countryCode = const Value.absent(),
               }) => LocationCompanion(
                 locationId: locationId,
                 code: code,
                 name: name,
-                countryCode: countryCode,
               ),
           createCompanionCallback:
               ({
                 Value<int> locationId = const Value.absent(),
                 required String code,
                 required String name,
-                required String countryCode,
               }) => LocationCompanion.insert(
                 locationId: locationId,
                 code: code,
                 name: name,
-                countryCode: countryCode,
               ),
           withReferenceMapper: (p0) => p0
               .map(

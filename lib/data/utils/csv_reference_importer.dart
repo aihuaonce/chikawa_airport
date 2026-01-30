@@ -36,7 +36,7 @@ class CsvReferenceImporter {
           if (row.length < 2) continue;
 
           final rawName = row[0].toString().trim();
-          final country = row[1].toString().trim();
+          row[1].toString().trim();
 
           // 解析 "TPE台北" -> Code: TPE, Name: 台北
           if (rawName.length > 3) {
@@ -47,11 +47,7 @@ class CsvReferenceImporter {
 
               // 使用 code 作為 key 去除重複
               if (!uniqueLocations.containsKey(code)) {
-                uniqueLocations[code] = {
-                  'code': code,
-                  'name': name,
-                  'countryCode': _mapCountryToCode(country),
-                };
+                uniqueLocations[code] = {'code': code, 'name': name};
               }
             }
           }
@@ -119,9 +115,6 @@ class CsvReferenceImporter {
     final Set<String> uniqueNames = {};
     final List<Map<String, String>> nationalities = [];
 
-    // 用來辨識第一個英文字母開始位置的 RegExp (排除括號內的英文)
-    // 策略：從後往前找，直到找到非英文/空格/符號的字元
-    // 或者：找到第一個連續的英文大寫字串
     final englishPattern = RegExp(r'([A-Z][A-Z\s\.\(\)\-\u2019]+)$');
 
     for (final file in files) {
@@ -195,22 +188,5 @@ class CsvReferenceImporter {
     } catch (e) {
       debugPrint('匯入護理常用語 CSV 失敗: $e');
     }
-  }
-
-  /// 簡易國家代碼對應
-  static String _mapCountryToCode(String countryName) {
-    if (countryName.contains('台灣')) return 'TW';
-    if (countryName.contains('香港')) return 'HK';
-    if (countryName.contains('中國')) return 'CN';
-    if (countryName.contains('美國')) return 'US';
-    if (countryName.contains('日本')) return 'JP';
-    if (countryName.contains('韓國')) return 'KR';
-    if (countryName.contains('泰國')) return 'TH';
-    if (countryName.contains('越南')) return 'VN';
-    if (countryName.contains('新加坡')) return 'SG';
-    if (countryName.contains('馬來西亞')) return 'MY';
-    if (countryName.contains('菲律賓')) return 'PH';
-    if (countryName.contains('印尼')) return 'ID';
-    return '';
   }
 }
