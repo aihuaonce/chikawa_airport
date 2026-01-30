@@ -12789,6 +12789,17 @@ class $TreatmentTable extends Treatment
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _assistStaffMeta = const VerificationMeta(
+    'assistStaff',
+  );
+  @override
+  late final GeneratedColumn<String> assistStaff = GeneratedColumn<String>(
+    'assist_staff',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _treatmentTimeMeta = const VerificationMeta(
     'treatmentTime',
   );
@@ -12825,6 +12836,7 @@ class $TreatmentTable extends Treatment
     doctorOrderCh,
     doctorOrderEn,
     directorName,
+    assistStaff,
     treatmentTime,
   ];
   @override
@@ -13018,6 +13030,15 @@ class $TreatmentTable extends Treatment
         ),
       );
     }
+    if (data.containsKey('assist_staff')) {
+      context.handle(
+        _assistStaffMeta,
+        assistStaff.isAcceptableOrUnknown(
+          data['assist_staff']!,
+          _assistStaffMeta,
+        ),
+      );
+    }
     if (data.containsKey('treatment_time')) {
       context.handle(
         _treatmentTimeMeta,
@@ -13120,6 +13141,10 @@ class $TreatmentTable extends Treatment
         DriftSqlType.string,
         data['${effectivePrefix}director_name'],
       ),
+      assistStaff: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}assist_staff'],
+      ),
       treatmentTime: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}treatment_time'],
@@ -13155,6 +13180,7 @@ class TreatmentData extends DataClass implements Insertable<TreatmentData> {
   final String? doctorOrderCh;
   final String? doctorOrderEn;
   final String? directorName;
+  final String? assistStaff;
   final DateTime treatmentTime;
   const TreatmentData({
     required this.treatmentId,
@@ -13178,6 +13204,7 @@ class TreatmentData extends DataClass implements Insertable<TreatmentData> {
     this.doctorOrderCh,
     this.doctorOrderEn,
     this.directorName,
+    this.assistStaff,
     required this.treatmentTime,
   });
   @override
@@ -13241,6 +13268,9 @@ class TreatmentData extends DataClass implements Insertable<TreatmentData> {
     }
     if (!nullToAbsent || directorName != null) {
       map['director_name'] = Variable<String>(directorName);
+    }
+    if (!nullToAbsent || assistStaff != null) {
+      map['assist_staff'] = Variable<String>(assistStaff);
     }
     map['treatment_time'] = Variable<DateTime>(treatmentTime);
     return map;
@@ -13307,6 +13337,9 @@ class TreatmentData extends DataClass implements Insertable<TreatmentData> {
       directorName: directorName == null && nullToAbsent
           ? const Value.absent()
           : Value(directorName),
+      assistStaff: assistStaff == null && nullToAbsent
+          ? const Value.absent()
+          : Value(assistStaff),
       treatmentTime: Value(treatmentTime),
     );
   }
@@ -13350,6 +13383,7 @@ class TreatmentData extends DataClass implements Insertable<TreatmentData> {
       doctorOrderCh: serializer.fromJson<String?>(json['doctorOrderCh']),
       doctorOrderEn: serializer.fromJson<String?>(json['doctorOrderEn']),
       directorName: serializer.fromJson<String?>(json['directorName']),
+      assistStaff: serializer.fromJson<String?>(json['assistStaff']),
       treatmentTime: serializer.fromJson<DateTime>(json['treatmentTime']),
     );
   }
@@ -13380,6 +13414,7 @@ class TreatmentData extends DataClass implements Insertable<TreatmentData> {
       'doctorOrderCh': serializer.toJson<String?>(doctorOrderCh),
       'doctorOrderEn': serializer.toJson<String?>(doctorOrderEn),
       'directorName': serializer.toJson<String?>(directorName),
+      'assistStaff': serializer.toJson<String?>(assistStaff),
       'treatmentTime': serializer.toJson<DateTime>(treatmentTime),
     };
   }
@@ -13406,6 +13441,7 @@ class TreatmentData extends DataClass implements Insertable<TreatmentData> {
     Value<String?> doctorOrderCh = const Value.absent(),
     Value<String?> doctorOrderEn = const Value.absent(),
     Value<String?> directorName = const Value.absent(),
+    Value<String?> assistStaff = const Value.absent(),
     DateTime? treatmentTime,
   }) => TreatmentData(
     treatmentId: treatmentId ?? this.treatmentId,
@@ -13455,6 +13491,7 @@ class TreatmentData extends DataClass implements Insertable<TreatmentData> {
         ? doctorOrderEn.value
         : this.doctorOrderEn,
     directorName: directorName.present ? directorName.value : this.directorName,
+    assistStaff: assistStaff.present ? assistStaff.value : this.assistStaff,
     treatmentTime: treatmentTime ?? this.treatmentTime,
   );
   TreatmentData copyWithCompanion(TreatmentCompanion data) {
@@ -13514,6 +13551,9 @@ class TreatmentData extends DataClass implements Insertable<TreatmentData> {
       directorName: data.directorName.present
           ? data.directorName.value
           : this.directorName,
+      assistStaff: data.assistStaff.present
+          ? data.assistStaff.value
+          : this.assistStaff,
       treatmentTime: data.treatmentTime.present
           ? data.treatmentTime.value
           : this.treatmentTime,
@@ -13544,6 +13584,7 @@ class TreatmentData extends DataClass implements Insertable<TreatmentData> {
           ..write('doctorOrderCh: $doctorOrderCh, ')
           ..write('doctorOrderEn: $doctorOrderEn, ')
           ..write('directorName: $directorName, ')
+          ..write('assistStaff: $assistStaff, ')
           ..write('treatmentTime: $treatmentTime')
           ..write(')'))
         .toString();
@@ -13572,6 +13613,7 @@ class TreatmentData extends DataClass implements Insertable<TreatmentData> {
     doctorOrderCh,
     doctorOrderEn,
     directorName,
+    assistStaff,
     treatmentTime,
   ]);
   @override
@@ -13599,6 +13641,7 @@ class TreatmentData extends DataClass implements Insertable<TreatmentData> {
           other.doctorOrderCh == this.doctorOrderCh &&
           other.doctorOrderEn == this.doctorOrderEn &&
           other.directorName == this.directorName &&
+          other.assistStaff == this.assistStaff &&
           other.treatmentTime == this.treatmentTime);
 }
 
@@ -13624,6 +13667,7 @@ class TreatmentCompanion extends UpdateCompanion<TreatmentData> {
   final Value<String?> doctorOrderCh;
   final Value<String?> doctorOrderEn;
   final Value<String?> directorName;
+  final Value<String?> assistStaff;
   final Value<DateTime> treatmentTime;
   const TreatmentCompanion({
     this.treatmentId = const Value.absent(),
@@ -13647,6 +13691,7 @@ class TreatmentCompanion extends UpdateCompanion<TreatmentData> {
     this.doctorOrderCh = const Value.absent(),
     this.doctorOrderEn = const Value.absent(),
     this.directorName = const Value.absent(),
+    this.assistStaff = const Value.absent(),
     this.treatmentTime = const Value.absent(),
   });
   TreatmentCompanion.insert({
@@ -13671,6 +13716,7 @@ class TreatmentCompanion extends UpdateCompanion<TreatmentData> {
     this.doctorOrderCh = const Value.absent(),
     this.doctorOrderEn = const Value.absent(),
     this.directorName = const Value.absent(),
+    this.assistStaff = const Value.absent(),
     this.treatmentTime = const Value.absent(),
   }) : medicalId = Value(medicalId);
   static Insertable<TreatmentData> custom({
@@ -13695,6 +13741,7 @@ class TreatmentCompanion extends UpdateCompanion<TreatmentData> {
     Expression<String>? doctorOrderCh,
     Expression<String>? doctorOrderEn,
     Expression<String>? directorName,
+    Expression<String>? assistStaff,
     Expression<DateTime>? treatmentTime,
   }) {
     return RawValuesInsertable({
@@ -13726,6 +13773,7 @@ class TreatmentCompanion extends UpdateCompanion<TreatmentData> {
       if (doctorOrderCh != null) 'doctor_order_ch': doctorOrderCh,
       if (doctorOrderEn != null) 'doctor_order_en': doctorOrderEn,
       if (directorName != null) 'director_name': directorName,
+      if (assistStaff != null) 'assist_staff': assistStaff,
       if (treatmentTime != null) 'treatment_time': treatmentTime,
     });
   }
@@ -13752,6 +13800,7 @@ class TreatmentCompanion extends UpdateCompanion<TreatmentData> {
     Value<String?>? doctorOrderCh,
     Value<String?>? doctorOrderEn,
     Value<String?>? directorName,
+    Value<String?>? assistStaff,
     Value<DateTime>? treatmentTime,
   }) {
     return TreatmentCompanion(
@@ -13777,6 +13826,7 @@ class TreatmentCompanion extends UpdateCompanion<TreatmentData> {
       doctorOrderCh: doctorOrderCh ?? this.doctorOrderCh,
       doctorOrderEn: doctorOrderEn ?? this.doctorOrderEn,
       directorName: directorName ?? this.directorName,
+      assistStaff: assistStaff ?? this.assistStaff,
       treatmentTime: treatmentTime ?? this.treatmentTime,
     );
   }
@@ -13849,6 +13899,9 @@ class TreatmentCompanion extends UpdateCompanion<TreatmentData> {
     if (directorName.present) {
       map['director_name'] = Variable<String>(directorName.value);
     }
+    if (assistStaff.present) {
+      map['assist_staff'] = Variable<String>(assistStaff.value);
+    }
     if (treatmentTime.present) {
       map['treatment_time'] = Variable<DateTime>(treatmentTime.value);
     }
@@ -13879,6 +13932,7 @@ class TreatmentCompanion extends UpdateCompanion<TreatmentData> {
           ..write('doctorOrderCh: $doctorOrderCh, ')
           ..write('doctorOrderEn: $doctorOrderEn, ')
           ..write('directorName: $directorName, ')
+          ..write('assistStaff: $assistStaff, ')
           ..write('treatmentTime: $treatmentTime')
           ..write(')'))
         .toString();
@@ -26515,6 +26569,7 @@ typedef $$TreatmentTableCreateCompanionBuilder =
       Value<String?> doctorOrderCh,
       Value<String?> doctorOrderEn,
       Value<String?> directorName,
+      Value<String?> assistStaff,
       Value<DateTime> treatmentTime,
     });
 typedef $$TreatmentTableUpdateCompanionBuilder =
@@ -26540,6 +26595,7 @@ typedef $$TreatmentTableUpdateCompanionBuilder =
       Value<String?> doctorOrderCh,
       Value<String?> doctorOrderEn,
       Value<String?> directorName,
+      Value<String?> assistStaff,
       Value<DateTime> treatmentTime,
     });
 
@@ -26676,6 +26732,11 @@ class $$TreatmentTableFilterComposer
 
   ColumnFilters<String> get directorName => $composableBuilder(
     column: $table.directorName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get assistStaff => $composableBuilder(
+    column: $table.assistStaff,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -26817,6 +26878,11 @@ class $$TreatmentTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get assistStaff => $composableBuilder(
+    column: $table.assistStaff,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get treatmentTime => $composableBuilder(
     column: $table.treatmentTime,
     builder: (column) => ColumnOrderings(column),
@@ -26949,6 +27015,11 @@ class $$TreatmentTableAnnotationComposer
     builder: (column) => column,
   );
 
+  GeneratedColumn<String> get assistStaff => $composableBuilder(
+    column: $table.assistStaff,
+    builder: (column) => column,
+  );
+
   GeneratedColumn<DateTime> get treatmentTime => $composableBuilder(
     column: $table.treatmentTime,
     builder: (column) => column,
@@ -27027,6 +27098,7 @@ class $$TreatmentTableTableManager
                 Value<String?> doctorOrderCh = const Value.absent(),
                 Value<String?> doctorOrderEn = const Value.absent(),
                 Value<String?> directorName = const Value.absent(),
+                Value<String?> assistStaff = const Value.absent(),
                 Value<DateTime> treatmentTime = const Value.absent(),
               }) => TreatmentCompanion(
                 treatmentId: treatmentId,
@@ -27050,6 +27122,7 @@ class $$TreatmentTableTableManager
                 doctorOrderCh: doctorOrderCh,
                 doctorOrderEn: doctorOrderEn,
                 directorName: directorName,
+                assistStaff: assistStaff,
                 treatmentTime: treatmentTime,
               ),
           createCompanionCallback:
@@ -27075,6 +27148,7 @@ class $$TreatmentTableTableManager
                 Value<String?> doctorOrderCh = const Value.absent(),
                 Value<String?> doctorOrderEn = const Value.absent(),
                 Value<String?> directorName = const Value.absent(),
+                Value<String?> assistStaff = const Value.absent(),
                 Value<DateTime> treatmentTime = const Value.absent(),
               }) => TreatmentCompanion.insert(
                 treatmentId: treatmentId,
@@ -27098,6 +27172,7 @@ class $$TreatmentTableTableManager
                 doctorOrderCh: doctorOrderCh,
                 doctorOrderEn: doctorOrderEn,
                 directorName: directorName,
+                assistStaff: assistStaff,
                 treatmentTime: treatmentTime,
               ),
           withReferenceMapper: (p0) => p0

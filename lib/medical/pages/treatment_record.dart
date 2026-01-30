@@ -1634,6 +1634,7 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
                     _assistStaffList.add(_assistStaffController.text);
                     _assistStaffController.clear();
                   });
+                  viewModel.updateAssistStaff(_assistStaffList.join(','));
                 }
               },
             ),
@@ -1648,8 +1649,10 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
                   (staff) => Chip(
                     label: Text(staff, style: const TextStyle(fontSize: 12)),
                     deleteIcon: const Icon(Icons.close, size: 14),
-                    onDeleted: () =>
-                        setState(() => _assistStaffList.remove(staff)),
+                    onDeleted: () {
+                      setState(() => _assistStaffList.remove(staff));
+                      viewModel.updateAssistStaff(_assistStaffList.join(','));
+                    },
                     backgroundColor: bgField,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
