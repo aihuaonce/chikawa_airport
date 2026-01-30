@@ -7,6 +7,7 @@ import 'dart:io';
 //匯入Table
 import 'tables/reference_tables.dart';
 import 'tables/medical_tables.dart';
+import 'tables/icd10_tables.dart';
 
 //匯入DAO
 import 'dao/reference_dao.dart';
@@ -14,6 +15,7 @@ import 'dao/medical_dao.dart';
 import 'dao/flight_dao.dart';
 import 'dao/incident_dao.dart';
 import 'dao/treatment_dao.dart';
+import 'dao/icd10_dao.dart';
 
 part 'database.g.dart';
 
@@ -53,8 +55,18 @@ part 'database.g.dart';
     Treatment,
     MedicalStaffAssignment,
     SpecialNotes,
+
+    //ICD-10
+    Icd10Code,
   ],
-  daos: [ReferenceDao, MedicalDao, FlightDao, IncidentDao, TreatmentDao],
+  daos: [
+    ReferenceDao,
+    MedicalDao,
+    FlightDao,
+    IncidentDao,
+    TreatmentDao,
+    Icd10Dao,
+  ],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
@@ -79,4 +91,7 @@ class AppDatabase extends _$AppDatabase {
       return NativeDatabase(file);
     });
   }
+
+  @override
+  Icd10Dao get icd10Dao => Icd10Dao(this);
 }

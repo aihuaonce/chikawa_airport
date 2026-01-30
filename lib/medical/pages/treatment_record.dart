@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'dart:io';
 import '../../data/models/medical/treatment_view.dart';
 import '../../data/db/database.dart';
+import '../widgets/icd10_search_sheet.dart';
 
 class TreatmentRecord extends StatefulWidget {
   final int medicalId;
@@ -64,6 +65,11 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
   late TextEditingController _extremitiesController;
   late TextEditingController _otherPhysicalExamController;
 
+  // ICD-10 Controllers
+  late TextEditingController _tentativeController;
+  late TextEditingController _secondaryDiagnosis1Controller;
+  late TextEditingController _secondaryDiagnosis2Controller;
+
   // 意識檢查狀態（非 Controller，用於 Checkbox 和 SegmentedControl）
   bool _isAlert = true;
   String _leftPupilReaction = '+';
@@ -117,6 +123,11 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
     _abdomenController = TextEditingController();
     _extremitiesController = TextEditingController();
     _otherPhysicalExamController = TextEditingController();
+
+    // ICD-10 Controllers
+    _tentativeController = TextEditingController();
+    _secondaryDiagnosis1Controller = TextEditingController();
+    _secondaryDiagnosis2Controller = TextEditingController();
   }
 
   @override
@@ -147,6 +158,11 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
     _abdomenController.dispose();
     _extremitiesController.dispose();
     _otherPhysicalExamController.dispose();
+
+    // 清理 ICD-10 Controllers
+    _tentativeController.dispose();
+    _secondaryDiagnosis1Controller.dispose();
+    _secondaryDiagnosis2Controller.dispose();
 
     // 清理健康評估表的 controller
     for (var controllers in _healthAssessmentControllers.values) {
@@ -186,6 +202,10 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
     final treatment = viewModel.treatment;
     if (treatment != null) {
       _actionSummaryOtherController.text = treatment.actionSummaryOther ?? '';
+      // 載入 ICD-10 資料
+      _tentativeController.text = treatment.tentative ?? '';
+      _secondaryDiagnosis1Controller.text = treatment.secondaryDiagnosis1 ?? '';
+      _secondaryDiagnosis2Controller.text = treatment.secondaryDiagnosis2 ?? '';
     }
 
     // 檢查已有影像，自動勾選對應類型
@@ -1136,11 +1156,29 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
         const SizedBox(height: 4),
         _buildDiagnosisCategoryDropdown(viewModel, treatment),
         const SizedBox(height: 16),
-        _buildIcdRow('初步診斷 Preliminary (ICD-10)', '例如: I10'),
+        _buildIcdRow(
+          '初步診斷 Preliminary (ICD-10)',
+          '例如: I10',
+          _tentativeController,
+          viewModel,
+          (code) => viewModel.updateTentative(code),
+        ),
         const SizedBox(height: 12),
-        _buildIcdRow('副診斷 1 Secondary ICD-10 #1', '代碼'),
+        _buildIcdRow(
+          '副診斷 1 Secondary ICD-10 #1',
+          '代碼',
+          _secondaryDiagnosis1Controller,
+          viewModel,
+          (code) => viewModel.updateSecondaryDiagnosis1(code),
+        ),
         const SizedBox(height: 12),
-        _buildIcdRow('副診斷 2 Secondary ICD-10 #2', '代碼'),
+        _buildIcdRow(
+          '副診斷 2 Secondary ICD-10 #2',
+          '代碼',
+          _secondaryDiagnosis2Controller,
+          viewModel,
+          (code) => viewModel.updateSecondaryDiagnosis2(code),
+        ),
       ],
     );
   }
@@ -2408,7 +2446,13 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
     );
   }
 
-  Widget _buildIcdRow(String label, String hint) {
+  Widget _buildIcdRow(
+    String label,
+    String hint,
+    TextEditingController controller,
+    TreatmentViewModel viewModel,
+    Function(String) onCodeSelected,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -2416,9 +2460,31 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
         const SizedBox(height: 4),
         Row(
           children: [
-            Expanded(child: _buildTextField(hint: hint)),
+            Expanded(
+              child: _buildTextField(
+                hint: hint,
+                controller: controller,
+                onChanged: (val) => onCodeSelected(val),
+              ),
+            ),
             const SizedBox(width: 8),
-            _buildActionIconBtn(Icons.search, Colors.white, borderColor),
+            _buildActionIconBtn(
+              Icons.search,
+              Colors.white,
+              borderColor,
+              onTap: () async {
+                final result = await Icd10SearchSheet.show(
+                  context,
+                  title: label,
+                  initialValue: controller.text,
+                  viewModel: viewModel,
+                );
+                if (result != null) {
+                  controller.text = result;
+                  onCodeSelected(result);
+                }
+              },
+            ),
             const SizedBox(width: 8),
             _buildActionIconBtn(
               Icons.language,

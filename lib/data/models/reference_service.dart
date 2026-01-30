@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import '../db/database.dart';
+import '../utils/icd10_importer.dart';
 
 class ReferenceService extends ChangeNotifier {
   final AppDatabase db;
@@ -56,7 +57,17 @@ class ReferenceService extends ChangeNotifier {
   Future<void> init() async {
     await _loadBasicReferences();
     await _loadTreatmentReferences();
+    await _importIcd10Data();
     notifyListeners();
+  }
+
+  /// 匯入 ICD-10 資料（首次啟動）
+  Future<void> _importIcd10Data() async {
+    try {
+      await Icd10Importer.importFromCsv(db);
+    } catch (e) {
+      debugPrint('系統:ICD-10 資料匯入失敗 - $e');
+    }
   }
 
   /// 載入基本參考資料（病患、飛航、事故）

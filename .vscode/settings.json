@@ -3,11 +3,15 @@
         "anonymization",
         "Arrythmia",
         "AUTOINCREMENT",
+        "buildlog",
         "chikawa",
         "Cupertino",
         "Epigas",
         "Insertable",
         "OHCA",
-        "Schyler"
+        "Schyler",
+        "swiftpm",
+        "Symbolication",
+        "trae"
     ]
 }

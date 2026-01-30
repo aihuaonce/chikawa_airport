@@ -14773,6 +14773,347 @@ class SpecialNotesCompanion extends UpdateCompanion<SpecialNotesData> {
   }
 }
 
+class $Icd10CodeTable extends Icd10Code
+    with TableInfo<$Icd10CodeTable, Icd10CodeData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $Icd10CodeTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _codeMeta = const VerificationMeta('code');
+  @override
+  late final GeneratedColumn<String> code = GeneratedColumn<String>(
+    'code',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nameEnMeta = const VerificationMeta('nameEn');
+  @override
+  late final GeneratedColumn<String> nameEn = GeneratedColumn<String>(
+    'name_en',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nameChMeta = const VerificationMeta('nameCh');
+  @override
+  late final GeneratedColumn<String> nameCh = GeneratedColumn<String>(
+    'name_ch',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _isLeafMeta = const VerificationMeta('isLeaf');
+  @override
+  late final GeneratedColumn<bool> isLeaf = GeneratedColumn<bool>(
+    'is_leaf',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_leaf" IN (0, 1))',
+    ),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, code, nameEn, nameCh, isLeaf];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'icd10_code';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Icd10CodeData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('code')) {
+      context.handle(
+        _codeMeta,
+        code.isAcceptableOrUnknown(data['code']!, _codeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_codeMeta);
+    }
+    if (data.containsKey('name_en')) {
+      context.handle(
+        _nameEnMeta,
+        nameEn.isAcceptableOrUnknown(data['name_en']!, _nameEnMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameEnMeta);
+    }
+    if (data.containsKey('name_ch')) {
+      context.handle(
+        _nameChMeta,
+        nameCh.isAcceptableOrUnknown(data['name_ch']!, _nameChMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameChMeta);
+    }
+    if (data.containsKey('is_leaf')) {
+      context.handle(
+        _isLeafMeta,
+        isLeaf.isAcceptableOrUnknown(data['is_leaf']!, _isLeafMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_isLeafMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  Icd10CodeData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Icd10CodeData(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      code: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}code'],
+      )!,
+      nameEn: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name_en'],
+      )!,
+      nameCh: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name_ch'],
+      )!,
+      isLeaf: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_leaf'],
+      )!,
+    );
+  }
+
+  @override
+  $Icd10CodeTable createAlias(String alias) {
+    return $Icd10CodeTable(attachedDatabase, alias);
+  }
+}
+
+class Icd10CodeData extends DataClass implements Insertable<Icd10CodeData> {
+  final int id;
+  final String code;
+  final String nameEn;
+  final String nameCh;
+  final bool isLeaf;
+  const Icd10CodeData({
+    required this.id,
+    required this.code,
+    required this.nameEn,
+    required this.nameCh,
+    required this.isLeaf,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['code'] = Variable<String>(code);
+    map['name_en'] = Variable<String>(nameEn);
+    map['name_ch'] = Variable<String>(nameCh);
+    map['is_leaf'] = Variable<bool>(isLeaf);
+    return map;
+  }
+
+  Icd10CodeCompanion toCompanion(bool nullToAbsent) {
+    return Icd10CodeCompanion(
+      id: Value(id),
+      code: Value(code),
+      nameEn: Value(nameEn),
+      nameCh: Value(nameCh),
+      isLeaf: Value(isLeaf),
+    );
+  }
+
+  factory Icd10CodeData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Icd10CodeData(
+      id: serializer.fromJson<int>(json['id']),
+      code: serializer.fromJson<String>(json['code']),
+      nameEn: serializer.fromJson<String>(json['nameEn']),
+      nameCh: serializer.fromJson<String>(json['nameCh']),
+      isLeaf: serializer.fromJson<bool>(json['isLeaf']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'code': serializer.toJson<String>(code),
+      'nameEn': serializer.toJson<String>(nameEn),
+      'nameCh': serializer.toJson<String>(nameCh),
+      'isLeaf': serializer.toJson<bool>(isLeaf),
+    };
+  }
+
+  Icd10CodeData copyWith({
+    int? id,
+    String? code,
+    String? nameEn,
+    String? nameCh,
+    bool? isLeaf,
+  }) => Icd10CodeData(
+    id: id ?? this.id,
+    code: code ?? this.code,
+    nameEn: nameEn ?? this.nameEn,
+    nameCh: nameCh ?? this.nameCh,
+    isLeaf: isLeaf ?? this.isLeaf,
+  );
+  Icd10CodeData copyWithCompanion(Icd10CodeCompanion data) {
+    return Icd10CodeData(
+      id: data.id.present ? data.id.value : this.id,
+      code: data.code.present ? data.code.value : this.code,
+      nameEn: data.nameEn.present ? data.nameEn.value : this.nameEn,
+      nameCh: data.nameCh.present ? data.nameCh.value : this.nameCh,
+      isLeaf: data.isLeaf.present ? data.isLeaf.value : this.isLeaf,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Icd10CodeData(')
+          ..write('id: $id, ')
+          ..write('code: $code, ')
+          ..write('nameEn: $nameEn, ')
+          ..write('nameCh: $nameCh, ')
+          ..write('isLeaf: $isLeaf')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, code, nameEn, nameCh, isLeaf);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Icd10CodeData &&
+          other.id == this.id &&
+          other.code == this.code &&
+          other.nameEn == this.nameEn &&
+          other.nameCh == this.nameCh &&
+          other.isLeaf == this.isLeaf);
+}
+
+class Icd10CodeCompanion extends UpdateCompanion<Icd10CodeData> {
+  final Value<int> id;
+  final Value<String> code;
+  final Value<String> nameEn;
+  final Value<String> nameCh;
+  final Value<bool> isLeaf;
+  const Icd10CodeCompanion({
+    this.id = const Value.absent(),
+    this.code = const Value.absent(),
+    this.nameEn = const Value.absent(),
+    this.nameCh = const Value.absent(),
+    this.isLeaf = const Value.absent(),
+  });
+  Icd10CodeCompanion.insert({
+    this.id = const Value.absent(),
+    required String code,
+    required String nameEn,
+    required String nameCh,
+    required bool isLeaf,
+  }) : code = Value(code),
+       nameEn = Value(nameEn),
+       nameCh = Value(nameCh),
+       isLeaf = Value(isLeaf);
+  static Insertable<Icd10CodeData> custom({
+    Expression<int>? id,
+    Expression<String>? code,
+    Expression<String>? nameEn,
+    Expression<String>? nameCh,
+    Expression<bool>? isLeaf,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (code != null) 'code': code,
+      if (nameEn != null) 'name_en': nameEn,
+      if (nameCh != null) 'name_ch': nameCh,
+      if (isLeaf != null) 'is_leaf': isLeaf,
+    });
+  }
+
+  Icd10CodeCompanion copyWith({
+    Value<int>? id,
+    Value<String>? code,
+    Value<String>? nameEn,
+    Value<String>? nameCh,
+    Value<bool>? isLeaf,
+  }) {
+    return Icd10CodeCompanion(
+      id: id ?? this.id,
+      code: code ?? this.code,
+      nameEn: nameEn ?? this.nameEn,
+      nameCh: nameCh ?? this.nameCh,
+      isLeaf: isLeaf ?? this.isLeaf,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (code.present) {
+      map['code'] = Variable<String>(code.value);
+    }
+    if (nameEn.present) {
+      map['name_en'] = Variable<String>(nameEn.value);
+    }
+    if (nameCh.present) {
+      map['name_ch'] = Variable<String>(nameCh.value);
+    }
+    if (isLeaf.present) {
+      map['is_leaf'] = Variable<bool>(isLeaf.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Icd10CodeCompanion(')
+          ..write('id: $id, ')
+          ..write('code: $code, ')
+          ..write('nameEn: $nameEn, ')
+          ..write('nameCh: $nameCh, ')
+          ..write('isLeaf: $isLeaf')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -14822,11 +15163,13 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $MedicalStaffAssignmentTable medicalStaffAssignment =
       $MedicalStaffAssignmentTable(this);
   late final $SpecialNotesTable specialNotes = $SpecialNotesTable(this);
+  late final $Icd10CodeTable icd10Code = $Icd10CodeTable(this);
   late final ReferenceDao referenceDao = ReferenceDao(this as AppDatabase);
   late final MedicalDao medicalDao = MedicalDao(this as AppDatabase);
   late final FlightDao flightDao = FlightDao(this as AppDatabase);
   late final IncidentDao incidentDao = IncidentDao(this as AppDatabase);
   late final TreatmentDao treatmentDao = TreatmentDao(this as AppDatabase);
+  late final Icd10Dao icd10Dao = Icd10Dao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -14863,6 +15206,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     treatment,
     medicalStaffAssignment,
     specialNotes,
+    icd10Code,
   ];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
@@ -27487,6 +27831,200 @@ typedef $$SpecialNotesTableProcessedTableManager =
       SpecialNotesData,
       PrefetchHooks Function({bool medicalId})
     >;
+typedef $$Icd10CodeTableCreateCompanionBuilder =
+    Icd10CodeCompanion Function({
+      Value<int> id,
+      required String code,
+      required String nameEn,
+      required String nameCh,
+      required bool isLeaf,
+    });
+typedef $$Icd10CodeTableUpdateCompanionBuilder =
+    Icd10CodeCompanion Function({
+      Value<int> id,
+      Value<String> code,
+      Value<String> nameEn,
+      Value<String> nameCh,
+      Value<bool> isLeaf,
+    });
+
+class $$Icd10CodeTableFilterComposer
+    extends Composer<_$AppDatabase, $Icd10CodeTable> {
+  $$Icd10CodeTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get code => $composableBuilder(
+    column: $table.code,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get nameEn => $composableBuilder(
+    column: $table.nameEn,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get nameCh => $composableBuilder(
+    column: $table.nameCh,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isLeaf => $composableBuilder(
+    column: $table.isLeaf,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$Icd10CodeTableOrderingComposer
+    extends Composer<_$AppDatabase, $Icd10CodeTable> {
+  $$Icd10CodeTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get code => $composableBuilder(
+    column: $table.code,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get nameEn => $composableBuilder(
+    column: $table.nameEn,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get nameCh => $composableBuilder(
+    column: $table.nameCh,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isLeaf => $composableBuilder(
+    column: $table.isLeaf,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$Icd10CodeTableAnnotationComposer
+    extends Composer<_$AppDatabase, $Icd10CodeTable> {
+  $$Icd10CodeTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get code =>
+      $composableBuilder(column: $table.code, builder: (column) => column);
+
+  GeneratedColumn<String> get nameEn =>
+      $composableBuilder(column: $table.nameEn, builder: (column) => column);
+
+  GeneratedColumn<String> get nameCh =>
+      $composableBuilder(column: $table.nameCh, builder: (column) => column);
+
+  GeneratedColumn<bool> get isLeaf =>
+      $composableBuilder(column: $table.isLeaf, builder: (column) => column);
+}
+
+class $$Icd10CodeTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $Icd10CodeTable,
+          Icd10CodeData,
+          $$Icd10CodeTableFilterComposer,
+          $$Icd10CodeTableOrderingComposer,
+          $$Icd10CodeTableAnnotationComposer,
+          $$Icd10CodeTableCreateCompanionBuilder,
+          $$Icd10CodeTableUpdateCompanionBuilder,
+          (
+            Icd10CodeData,
+            BaseReferences<_$AppDatabase, $Icd10CodeTable, Icd10CodeData>,
+          ),
+          Icd10CodeData,
+          PrefetchHooks Function()
+        > {
+  $$Icd10CodeTableTableManager(_$AppDatabase db, $Icd10CodeTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$Icd10CodeTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$Icd10CodeTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$Icd10CodeTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> code = const Value.absent(),
+                Value<String> nameEn = const Value.absent(),
+                Value<String> nameCh = const Value.absent(),
+                Value<bool> isLeaf = const Value.absent(),
+              }) => Icd10CodeCompanion(
+                id: id,
+                code: code,
+                nameEn: nameEn,
+                nameCh: nameCh,
+                isLeaf: isLeaf,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String code,
+                required String nameEn,
+                required String nameCh,
+                required bool isLeaf,
+              }) => Icd10CodeCompanion.insert(
+                id: id,
+                code: code,
+                nameEn: nameEn,
+                nameCh: nameCh,
+                isLeaf: isLeaf,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$Icd10CodeTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $Icd10CodeTable,
+      Icd10CodeData,
+      $$Icd10CodeTableFilterComposer,
+      $$Icd10CodeTableOrderingComposer,
+      $$Icd10CodeTableAnnotationComposer,
+      $$Icd10CodeTableCreateCompanionBuilder,
+      $$Icd10CodeTableUpdateCompanionBuilder,
+      (
+        Icd10CodeData,
+        BaseReferences<_$AppDatabase, $Icd10CodeTable, Icd10CodeData>,
+      ),
+      Icd10CodeData,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -27561,4 +28099,6 @@ class $AppDatabaseManager {
       );
   $$SpecialNotesTableTableManager get specialNotes =>
       $$SpecialNotesTableTableManager(_db, _db.specialNotes);
+  $$Icd10CodeTableTableManager get icd10Code =>
+      $$Icd10CodeTableTableManager(_db, _db.icd10Code);
 }
