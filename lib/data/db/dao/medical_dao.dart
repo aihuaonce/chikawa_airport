@@ -45,24 +45,56 @@ class MedicalDao extends DatabaseAccessor<AppDatabase> with _$MedicalDaoMixin {
   }
 
   // 出診單監聽總筆數
-  Stream<int> watchTotalCount() {
-    return medicalRecord.count().watchSingle();
+  Stream<int> watchTotalCount({
+    bool? hasAmbulance,
+    bool? isEmergency,
+  }) {
+    var query = select(medicalRecord);
+    if (hasAmbulance != null) {
+      query.where((t) => t.hasAmbulance.equals(hasAmbulance));
+    }
+    if (isEmergency != null) {
+      query.where((t) => t.isEmergency.equals(isEmergency));
+    }
+    // count() returns an expression, so we need to select it
+    return (selectOnly(medicalRecord)
+          ..addColumns([medicalRecord.medicalId.count()])
+          ..where(
+            (hasAmbulance != null
+                    ? medicalRecord.hasAmbulance.equals(hasAmbulance)
+                    : const Constant(true)) &
+                (isEmergency != null
+                    ? medicalRecord.isEmergency.equals(isEmergency)
+                    : const Constant(true)),
+          ))
+        .map((row) => row.read(medicalRecord.medicalId.count())!)
+        .watchSingle();
   }
 
   // 出診單分頁監聽記錄與病患資料
   Stream<List<MedicalRecordWithPatient>> watchRecordsPaginated(
     int limit,
-    int offset,
-  ) {
-    final query =
-        select(medicalRecord).join([
-            leftOuterJoin(
-              patient,
-              patient.medicalId.equalsExp(medicalRecord.medicalId),
-            ),
-          ])
-          ..limit(limit, offset: offset)
-          ..orderBy([OrderingTerm.desc(medicalRecord.createdAt)]);
+    int offset, {
+    bool? hasAmbulance,
+    bool? isEmergency,
+  }) {
+    final query = select(medicalRecord).join([
+      leftOuterJoin(
+        patient,
+        patient.medicalId.equalsExp(medicalRecord.medicalId),
+      ),
+    ]);
+
+    if (hasAmbulance != null) {
+      query.where(medicalRecord.hasAmbulance.equals(hasAmbulance));
+    }
+    if (isEmergency != null) {
+      query.where(medicalRecord.isEmergency.equals(isEmergency));
+    }
+
+    query
+      ..limit(limit, offset: offset)
+      ..orderBy([OrderingTerm.desc(medicalRecord.createdAt)]);
 
     return query.watch().map((rows) {
       return rows.map((row) {
@@ -127,6 +159,25 @@ class MedicalDao extends DatabaseAccessor<AppDatabase> with _$MedicalDaoMixin {
             screeningMethod: Value(
               screeningMethod?.isEmpty ?? true ? null : screeningMethod,
             ),
+          ),
+        )
+        .then((count) => count > 0);
+  }
+
+  // 更新 MedicalRecord 的狀態 (Ambulance, Emergency)
+  Future<bool> updateMedicalStatus(
+    int medicalId, {
+    bool? hasAmbulance,
+    bool? isEmergency,
+  }) {
+    return (update(medicalRecord)
+          ..where((tbl) => tbl.medicalId.equals(medicalId)))
+        .write(
+          MedicalRecordCompanion(
+            hasAmbulance:
+                hasAmbulance != null ? Value(hasAmbulance) : const Value.absent(),
+            isEmergency:
+                isEmergency != null ? Value(isEmergency) : const Value.absent(),
           ),
         )
         .then((count) => count > 0);

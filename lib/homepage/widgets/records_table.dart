@@ -1,6 +1,7 @@
 import 'package:chikawa_airport/data/db/dao/medical_dao.dart';
 import 'package:chikawa_airport/data/db/database.dart';
 import 'package:chikawa_airport/data/models/dashboard_view_model.dart';
+import 'package:chikawa_airport/data/models/record_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'record_row.dart';
@@ -18,6 +19,21 @@ class RecordsTable extends StatelessWidget {
     final database = context.read<AppDatabase>();
 
     final viewModel = context.watch<DashboardViewModel>();
+
+    // 根據目前的 Filter 設定查詢條件
+    bool? hasAmbulance;
+    bool? isEmergency;
+
+    switch (viewModel.currentFilter) {
+      case RecordPage.ambulance:
+        hasAmbulance = true;
+        break;
+      case RecordPage.firstAid:
+        isEmergency = true;
+        break;
+      case RecordPage.primary:
+        break;
+    }
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(32, 0, 32, 32),
@@ -47,6 +63,8 @@ class RecordsTable extends StatelessWidget {
                   stream: database.medicalDao.watchRecordsPaginated(
                     viewModel.pageSize,
                     viewModel.offset,
+                    hasAmbulance: hasAmbulance,
+                    isEmergency: isEmergency,
                   ),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
@@ -71,7 +89,10 @@ class RecordsTable extends StatelessWidget {
 
               // 這裡監聽總筆數，用來畫分頁按鈕
               StreamBuilder<int>(
-                stream: database.medicalDao.watchTotalCount(),
+                stream: database.medicalDao.watchTotalCount(
+                  hasAmbulance: hasAmbulance,
+                  isEmergency: isEmergency,
+                ),
                 builder: (context, snapshot) {
                   final totalCount = snapshot.data ?? 0;
                   // 計算總頁數傳給 PaginationBar

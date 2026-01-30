@@ -925,6 +925,24 @@ class TreatmentViewModel extends ChangeNotifier {
     _updateTreatmentCacheAndSave(
       _treatment!.copyWith(actionSummary: Value(actionSummary)),
     );
+
+    // 自動連動 MedicalRecord 狀態
+    final items = actionSummary?.split(',') ?? [];
+    // 根據需求：
+    // 1. 選擇建議轉診 (Suggest Referral) -> hasAmbulance = true
+    // 2. 選擇 CPR -> isEmergency = true
+    // 3. 不勾就是 false (Unchecked means false)
+    final hasReferral = items.contains('建議轉診');
+    final hasCPR = items.contains('CPR');
+
+    // 更新 MedicalRecord
+    db.medicalDao
+        .updateMedicalStatus(
+          medicalId,
+          hasAmbulance: hasReferral,
+          isEmergency: hasCPR,
+        )
+        .then((_) => _reloadMedicalRecord());
   }
 
   void updateActionSummaryOther(String? other) {
