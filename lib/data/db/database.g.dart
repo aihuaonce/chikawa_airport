@@ -10757,11 +10757,11 @@ class $MedicalAssessmentTable extends MedicalAssessment
     'leftPupilSize',
   );
   @override
-  late final GeneratedColumn<int> leftPupilSize = GeneratedColumn<int>(
+  late final GeneratedColumn<double> leftPupilSize = GeneratedColumn<double>(
     'left_pupil_size',
     aliasedName,
     true,
-    type: DriftSqlType.int,
+    type: DriftSqlType.double,
     requiredDuringInsert: false,
   );
   static const VerificationMeta _rightPupilReactionMeta =
@@ -10779,11 +10779,11 @@ class $MedicalAssessmentTable extends MedicalAssessment
     'rightPupilSize',
   );
   @override
-  late final GeneratedColumn<int> rightPupilSize = GeneratedColumn<int>(
+  late final GeneratedColumn<double> rightPupilSize = GeneratedColumn<double>(
     'right_pupil_size',
     aliasedName,
     true,
-    type: DriftSqlType.int,
+    type: DriftSqlType.double,
     requiredDuringInsert: false,
   );
   static const VerificationMeta _headNeckExamMeta = const VerificationMeta(
@@ -11164,7 +11164,7 @@ class $MedicalAssessmentTable extends MedicalAssessment
         data['${effectivePrefix}left_pupil_reaction'],
       ),
       leftPupilSize: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
+        DriftSqlType.double,
         data['${effectivePrefix}left_pupil_size'],
       ),
       rightPupilReaction: attachedDatabase.typeMapping.read(
@@ -11172,7 +11172,7 @@ class $MedicalAssessmentTable extends MedicalAssessment
         data['${effectivePrefix}right_pupil_reaction'],
       ),
       rightPupilSize: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
+        DriftSqlType.double,
         data['${effectivePrefix}right_pupil_size'],
       ),
       headNeckExam: attachedDatabase.typeMapping.read(
@@ -11229,9 +11229,9 @@ class MedicalAssessmentData extends DataClass
   final String? gcsM;
   final String? gcsV;
   final String? leftPupilReaction;
-  final int? leftPupilSize;
+  final double? leftPupilSize;
   final String? rightPupilReaction;
-  final int? rightPupilSize;
+  final double? rightPupilSize;
   final String? headNeckExam;
   final String? chestExam;
   final String? abdomenExam;
@@ -11311,13 +11311,13 @@ class MedicalAssessmentData extends DataClass
       map['left_pupil_reaction'] = Variable<String>(leftPupilReaction);
     }
     if (!nullToAbsent || leftPupilSize != null) {
-      map['left_pupil_size'] = Variable<int>(leftPupilSize);
+      map['left_pupil_size'] = Variable<double>(leftPupilSize);
     }
     if (!nullToAbsent || rightPupilReaction != null) {
       map['right_pupil_reaction'] = Variable<String>(rightPupilReaction);
     }
     if (!nullToAbsent || rightPupilSize != null) {
-      map['right_pupil_size'] = Variable<int>(rightPupilSize);
+      map['right_pupil_size'] = Variable<double>(rightPupilSize);
     }
     if (!nullToAbsent || headNeckExam != null) {
       map['head_neck_exam'] = Variable<String>(headNeckExam);
@@ -11430,11 +11430,11 @@ class MedicalAssessmentData extends DataClass
       leftPupilReaction: serializer.fromJson<String?>(
         json['leftPupilReaction'],
       ),
-      leftPupilSize: serializer.fromJson<int?>(json['leftPupilSize']),
+      leftPupilSize: serializer.fromJson<double?>(json['leftPupilSize']),
       rightPupilReaction: serializer.fromJson<String?>(
         json['rightPupilReaction'],
       ),
-      rightPupilSize: serializer.fromJson<int?>(json['rightPupilSize']),
+      rightPupilSize: serializer.fromJson<double?>(json['rightPupilSize']),
       headNeckExam: serializer.fromJson<String?>(json['headNeckExam']),
       chestExam: serializer.fromJson<String?>(json['chestExam']),
       abdomenExam: serializer.fromJson<String?>(json['abdomenExam']),
@@ -11465,9 +11465,9 @@ class MedicalAssessmentData extends DataClass
       'gcsM': serializer.toJson<String?>(gcsM),
       'gcsV': serializer.toJson<String?>(gcsV),
       'leftPupilReaction': serializer.toJson<String?>(leftPupilReaction),
-      'leftPupilSize': serializer.toJson<int?>(leftPupilSize),
+      'leftPupilSize': serializer.toJson<double?>(leftPupilSize),
       'rightPupilReaction': serializer.toJson<String?>(rightPupilReaction),
-      'rightPupilSize': serializer.toJson<int?>(rightPupilSize),
+      'rightPupilSize': serializer.toJson<double?>(rightPupilSize),
       'headNeckExam': serializer.toJson<String?>(headNeckExam),
       'chestExam': serializer.toJson<String?>(chestExam),
       'abdomenExam': serializer.toJson<String?>(abdomenExam),
@@ -11494,9 +11494,9 @@ class MedicalAssessmentData extends DataClass
     Value<String?> gcsM = const Value.absent(),
     Value<String?> gcsV = const Value.absent(),
     Value<String?> leftPupilReaction = const Value.absent(),
-    Value<int?> leftPupilSize = const Value.absent(),
+    Value<double?> leftPupilSize = const Value.absent(),
     Value<String?> rightPupilReaction = const Value.absent(),
-    Value<int?> rightPupilSize = const Value.absent(),
+    Value<double?> rightPupilSize = const Value.absent(),
     Value<String?> headNeckExam = const Value.absent(),
     Value<String?> chestExam = const Value.absent(),
     Value<String?> abdomenExam = const Value.absent(),
@@ -11707,9 +11707,9 @@ class MedicalAssessmentCompanion
   final Value<String?> gcsM;
   final Value<String?> gcsV;
   final Value<String?> leftPupilReaction;
-  final Value<int?> leftPupilSize;
+  final Value<double?> leftPupilSize;
   final Value<String?> rightPupilReaction;
-  final Value<int?> rightPupilSize;
+  final Value<double?> rightPupilSize;
   final Value<String?> headNeckExam;
   final Value<String?> chestExam;
   final Value<String?> abdomenExam;
@@ -11787,9 +11787,9 @@ class MedicalAssessmentCompanion
     Expression<String>? gcsM,
     Expression<String>? gcsV,
     Expression<String>? leftPupilReaction,
-    Expression<int>? leftPupilSize,
+    Expression<double>? leftPupilSize,
     Expression<String>? rightPupilReaction,
-    Expression<int>? rightPupilSize,
+    Expression<double>? rightPupilSize,
     Expression<String>? headNeckExam,
     Expression<String>? chestExam,
     Expression<String>? abdomenExam,
@@ -11844,9 +11844,9 @@ class MedicalAssessmentCompanion
     Value<String?>? gcsM,
     Value<String?>? gcsV,
     Value<String?>? leftPupilReaction,
-    Value<int?>? leftPupilSize,
+    Value<double?>? leftPupilSize,
     Value<String?>? rightPupilReaction,
-    Value<int?>? rightPupilSize,
+    Value<double?>? rightPupilSize,
     Value<String?>? headNeckExam,
     Value<String?>? chestExam,
     Value<String?>? abdomenExam,
@@ -11933,13 +11933,13 @@ class MedicalAssessmentCompanion
       map['left_pupil_reaction'] = Variable<String>(leftPupilReaction.value);
     }
     if (leftPupilSize.present) {
-      map['left_pupil_size'] = Variable<int>(leftPupilSize.value);
+      map['left_pupil_size'] = Variable<double>(leftPupilSize.value);
     }
     if (rightPupilReaction.present) {
       map['right_pupil_reaction'] = Variable<String>(rightPupilReaction.value);
     }
     if (rightPupilSize.present) {
-      map['right_pupil_size'] = Variable<int>(rightPupilSize.value);
+      map['right_pupil_size'] = Variable<double>(rightPupilSize.value);
     }
     if (headNeckExam.present) {
       map['head_neck_exam'] = Variable<String>(headNeckExam.value);
@@ -24980,9 +24980,9 @@ typedef $$MedicalAssessmentTableCreateCompanionBuilder =
       Value<String?> gcsM,
       Value<String?> gcsV,
       Value<String?> leftPupilReaction,
-      Value<int?> leftPupilSize,
+      Value<double?> leftPupilSize,
       Value<String?> rightPupilReaction,
-      Value<int?> rightPupilSize,
+      Value<double?> rightPupilSize,
       Value<String?> headNeckExam,
       Value<String?> chestExam,
       Value<String?> abdomenExam,
@@ -25008,9 +25008,9 @@ typedef $$MedicalAssessmentTableUpdateCompanionBuilder =
       Value<String?> gcsM,
       Value<String?> gcsV,
       Value<String?> leftPupilReaction,
-      Value<int?> leftPupilSize,
+      Value<double?> leftPupilSize,
       Value<String?> rightPupilReaction,
-      Value<int?> rightPupilSize,
+      Value<double?> rightPupilSize,
       Value<String?> headNeckExam,
       Value<String?> chestExam,
       Value<String?> abdomenExam,
@@ -25135,7 +25135,7 @@ class $$MedicalAssessmentTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<int> get leftPupilSize => $composableBuilder(
+  ColumnFilters<double> get leftPupilSize => $composableBuilder(
     column: $table.leftPupilSize,
     builder: (column) => ColumnFilters(column),
   );
@@ -25145,7 +25145,7 @@ class $$MedicalAssessmentTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<int> get rightPupilSize => $composableBuilder(
+  ColumnFilters<double> get rightPupilSize => $composableBuilder(
     column: $table.rightPupilSize,
     builder: (column) => ColumnFilters(column),
   );
@@ -25288,7 +25288,7 @@ class $$MedicalAssessmentTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<int> get leftPupilSize => $composableBuilder(
+  ColumnOrderings<double> get leftPupilSize => $composableBuilder(
     column: $table.leftPupilSize,
     builder: (column) => ColumnOrderings(column),
   );
@@ -25298,7 +25298,7 @@ class $$MedicalAssessmentTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<int> get rightPupilSize => $composableBuilder(
+  ColumnOrderings<double> get rightPupilSize => $composableBuilder(
     column: $table.rightPupilSize,
     builder: (column) => ColumnOrderings(column),
   );
@@ -25421,7 +25421,7 @@ class $$MedicalAssessmentTableAnnotationComposer
     builder: (column) => column,
   );
 
-  GeneratedColumn<int> get leftPupilSize => $composableBuilder(
+  GeneratedColumn<double> get leftPupilSize => $composableBuilder(
     column: $table.leftPupilSize,
     builder: (column) => column,
   );
@@ -25431,7 +25431,7 @@ class $$MedicalAssessmentTableAnnotationComposer
     builder: (column) => column,
   );
 
-  GeneratedColumn<int> get rightPupilSize => $composableBuilder(
+  GeneratedColumn<double> get rightPupilSize => $composableBuilder(
     column: $table.rightPupilSize,
     builder: (column) => column,
   );
@@ -25539,9 +25539,9 @@ class $$MedicalAssessmentTableTableManager
                 Value<String?> gcsM = const Value.absent(),
                 Value<String?> gcsV = const Value.absent(),
                 Value<String?> leftPupilReaction = const Value.absent(),
-                Value<int?> leftPupilSize = const Value.absent(),
+                Value<double?> leftPupilSize = const Value.absent(),
                 Value<String?> rightPupilReaction = const Value.absent(),
-                Value<int?> rightPupilSize = const Value.absent(),
+                Value<double?> rightPupilSize = const Value.absent(),
                 Value<String?> headNeckExam = const Value.absent(),
                 Value<String?> chestExam = const Value.absent(),
                 Value<String?> abdomenExam = const Value.absent(),
@@ -25593,9 +25593,9 @@ class $$MedicalAssessmentTableTableManager
                 Value<String?> gcsM = const Value.absent(),
                 Value<String?> gcsV = const Value.absent(),
                 Value<String?> leftPupilReaction = const Value.absent(),
-                Value<int?> leftPupilSize = const Value.absent(),
+                Value<double?> leftPupilSize = const Value.absent(),
                 Value<String?> rightPupilReaction = const Value.absent(),
-                Value<int?> rightPupilSize = const Value.absent(),
+                Value<double?> rightPupilSize = const Value.absent(),
                 Value<String?> headNeckExam = const Value.absent(),
                 Value<String?> chestExam = const Value.absent(),
                 Value<String?> abdomenExam = const Value.absent(),

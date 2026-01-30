@@ -34,6 +34,25 @@ class TreatmentViewModel extends ChangeNotifier {
   List<MedicalAssessmentData> _medicalAssessments = [];
   List<MedicalAssessmentData> get medicalAssessments => _medicalAssessments;
 
+  // 獲取最新的生命徵象評估（過濾出有溫度、脈搏等資料的記錄）
+  MedicalAssessmentData? get latestVitalSigns {
+    try {
+      // 找第一個有生命徵象資料的評估
+      return _medicalAssessments.firstWhere(
+        (assessment) =>
+            assessment.temperature != null ||
+            assessment.pulse != null ||
+            assessment.breath != null ||
+            assessment.systolic != null ||
+            assessment.diastolic != null ||
+            assessment.spo2 != null,
+      );
+    } catch (e) {
+      // 找不到時回傳 null
+      return null;
+    }
+  }
+
   // 病史記錄
   MedicalHistoryData? _medicalHistory;
   MedicalHistoryData? get medicalHistory => _medicalHistory;
@@ -332,7 +351,9 @@ class TreatmentViewModel extends ChangeNotifier {
 
   // 根據類型取得影像列表
   List<MedicalMediaData> getMediaByType(String mediaType) {
-    return _medicalMediaList.where((media) => media.mediaType == mediaType).toList();
+    return _medicalMediaList
+        .where((media) => media.mediaType == mediaType)
+        .toList();
   }
 
   // ===================================================================
@@ -353,9 +374,9 @@ class TreatmentViewModel extends ChangeNotifier {
     String? gcsM,
     String? gcsV,
     String? leftPupilReaction,
-    int? leftPupilSize,
+    double? leftPupilSize,
     String? rightPupilReaction,
-    int? rightPupilSize,
+    double? rightPupilSize,
     String? headNeckExam,
     String? chestExam,
     String? abdomenExam,
@@ -406,62 +427,264 @@ class TreatmentViewModel extends ChangeNotifier {
   }
 
   // ===================================================================
-  // 生命徵象自動儲存
+  // 生命徵象自動儲存（參考 incident_view.dart 模式）
   // ===================================================================
 
   Timer? _vitalSignsDebounceTimer;
+  SaveStatus _vitalSignsSaveStatus = SaveStatus.idle;
+  SaveStatus get vitalSignsSaveStatus => _vitalSignsSaveStatus;
 
-  Future<void> updateVitalSigns({
+  // 生命徵象快取（用於自動儲存）
+  double? _cachedTemperature;
+  int? _cachedPulse;
+  int? _cachedBreath;
+  int? _cachedSystolic;
+  int? _cachedDiastolic;
+  int? _cachedSpo2;
+
+  void updateVitalSignsCache({
     double? temperature,
     int? pulse,
     int? breath,
     int? systolic,
     int? diastolic,
     int? spo2,
-  }) async {
-    // 取消之前的延遲儲存
+  }) {
+    _cachedTemperature = temperature;
+    _cachedPulse = pulse;
+    _cachedBreath = breath;
+    _cachedSystolic = systolic;
+    _cachedDiastolic = diastolic;
+    _cachedSpo2 = spo2;
+    _autoSaveVitalSigns();
+  }
+
+  void _autoSaveVitalSigns() {
     if (_vitalSignsDebounceTimer?.isActive ?? false) {
       _vitalSignsDebounceTimer!.cancel();
     }
+    _vitalSignsSaveStatus = SaveStatus.saving;
 
-    // 設定新的延遲儲存（2秒後執行）
     _vitalSignsDebounceTimer = Timer(const Duration(seconds: 2), () async {
-      await _saveVitalSignsToDatabase(
-        temperature: temperature,
-        pulse: pulse,
-        breath: breath,
-        systolic: systolic,
-        diastolic: diastolic,
-        spo2: spo2,
-      );
+      debugPrint('系統:正在自動儲存生命徵象...');
+      unawaited(_saveVitalSignsToDatabase());
     });
   }
 
-  Future<void> _saveVitalSignsToDatabase({
-    double? temperature,
-    int? pulse,
-    int? breath,
-    int? systolic,
-    int? diastolic,
-    int? spo2,
-  }) async {
+  Future<void> _saveVitalSignsToDatabase() async {
     try {
+      // 檢查是否有資料需要儲存
+      final hasData =
+          _cachedTemperature != null ||
+          _cachedPulse != null ||
+          _cachedBreath != null ||
+          _cachedSystolic != null ||
+          _cachedDiastolic != null ||
+          _cachedSpo2 != null;
+
+      if (!hasData) {
+        debugPrint('系統:生命徵象無資料，跳過儲存');
+        return;
+      }
+
       // 新增新的醫療評估記錄（生命徵象）
       await db.treatmentDao.insertMedicalAssessment(
         MedicalAssessmentCompanion.insert(
           medicalId: medicalId,
-          temperature: Value(temperature),
-          pulse: Value(pulse),
-          breath: Value(breath),
-          systolic: Value(systolic),
-          diastolic: Value(diastolic),
-          spo2: Value(spo2),
+          temperature: Value(_cachedTemperature),
+          pulse: Value(_cachedPulse),
+          breath: Value(_cachedBreath),
+          systolic: Value(_cachedSystolic),
+          diastolic: Value(_cachedDiastolic),
+          spo2: Value(_cachedSpo2),
         ),
       );
       await _reloadMedicalAssessments();
       debugPrint('系統:生命徵象自動儲存成功');
+
+      if (!hasListeners) return;
+
+      _vitalSignsSaveStatus = SaveStatus.success;
+      notifyListeners();
+
+      await Future.delayed(const Duration(seconds: 3));
+
+      if (!hasListeners) return;
+
+      _vitalSignsSaveStatus = SaveStatus.idle;
+      notifyListeners();
     } catch (e) {
       debugPrint('系統:生命徵象自動儲存失敗 - $e');
+      if (!hasListeners) return;
+      _vitalSignsSaveStatus = SaveStatus.idle;
+      notifyListeners();
+    }
+  }
+
+  // ===================================================================
+  // 意識與理學檢查自動儲存（獨立於生命徵象）
+  // ===================================================================
+
+  Timer? _consciousnessExamDebounceTimer;
+  SaveStatus _consciousnessExamSaveStatus = SaveStatus.idle;
+  SaveStatus get consciousnessExamSaveStatus => _consciousnessExamSaveStatus;
+
+  // 意識與理學檢查快取（用於自動儲存）
+  bool? _cachedIsAlert;
+  String? _cachedConsciousnessLevel;
+  String? _cachedGcsE;
+  String? _cachedGcsV;
+  String? _cachedGcsM;
+  int? _cachedGcs;
+  String? _cachedLeftPupilReaction;
+  double? _cachedLeftPupilSize;
+  String? _cachedRightPupilReaction;
+  double? _cachedRightPupilSize;
+  String? _cachedHeadNeckExam;
+  String? _cachedChestExam;
+  String? _cachedAbdomenExam;
+  String? _cachedExtremitiesExam;
+  String? _cachedOtherPhysicalExam;
+
+  // 獲取最新的意識與理學檢查評估
+  MedicalAssessmentData? get latestConsciousnessExam {
+    try {
+      // 找第一個有意識或理學檢查資料的評估
+      return _medicalAssessments.firstWhere(
+        (assessment) =>
+            assessment.consciousnessLevel != null ||
+            assessment.gcs != null ||
+            assessment.gcsE != null ||
+            assessment.gcsV != null ||
+            assessment.gcsM != null ||
+            assessment.leftPupilReaction != null ||
+            assessment.leftPupilSize != null ||
+            assessment.rightPupilReaction != null ||
+            assessment.rightPupilSize != null ||
+            assessment.headNeckExam != null ||
+            assessment.chestExam != null ||
+            assessment.abdomenExam != null ||
+            assessment.extremitiesExam != null ||
+            assessment.otherPhysicalExam != null,
+      );
+    } catch (e) {
+      return null;
+    }
+  }
+
+  void updateConsciousnessAndExamCache({
+    bool? isAlert,
+    String? consciousnessLevel,
+    String? gcsE,
+    String? gcsV,
+    String? gcsM,
+    int? gcs,
+    String? leftPupilReaction,
+    double? leftPupilSize,
+    String? rightPupilReaction,
+    double? rightPupilSize,
+    String? headNeckExam,
+    String? chestExam,
+    String? abdomenExam,
+    String? extremitiesExam,
+    String? otherPhysicalExam,
+  }) {
+    _cachedIsAlert = isAlert;
+    _cachedConsciousnessLevel = consciousnessLevel;
+    _cachedGcsE = gcsE;
+    _cachedGcsV = gcsV;
+    _cachedGcsM = gcsM;
+    _cachedGcs = gcs;
+    _cachedLeftPupilReaction = leftPupilReaction;
+    _cachedLeftPupilSize = leftPupilSize;
+    _cachedRightPupilReaction = rightPupilReaction;
+    _cachedRightPupilSize = rightPupilSize;
+    _cachedHeadNeckExam = headNeckExam;
+    _cachedChestExam = chestExam;
+    _cachedAbdomenExam = abdomenExam;
+    _cachedExtremitiesExam = extremitiesExam;
+    _cachedOtherPhysicalExam = otherPhysicalExam;
+    _autoSaveConsciousnessAndExam();
+  }
+
+  void _autoSaveConsciousnessAndExam() {
+    if (_consciousnessExamDebounceTimer?.isActive ?? false) {
+      _consciousnessExamDebounceTimer!.cancel();
+    }
+    _consciousnessExamSaveStatus = SaveStatus.saving;
+
+    _consciousnessExamDebounceTimer = Timer(
+      const Duration(seconds: 2),
+      () async {
+        debugPrint('系統:正在自動儲存意識與理學檢查...');
+        unawaited(_saveConsciousnessAndExamToDatabase());
+      },
+    );
+  }
+
+  Future<void> _saveConsciousnessAndExamToDatabase() async {
+    try {
+      // 檢查是否有資料需要儲存
+      final hasData =
+          _cachedConsciousnessLevel != null ||
+          _cachedGcsE != null ||
+          _cachedGcsV != null ||
+          _cachedGcsM != null ||
+          _cachedGcs != null ||
+          _cachedLeftPupilReaction != null ||
+          _cachedLeftPupilSize != null ||
+          _cachedRightPupilReaction != null ||
+          _cachedRightPupilSize != null ||
+          _cachedHeadNeckExam != null ||
+          _cachedChestExam != null ||
+          _cachedAbdomenExam != null ||
+          _cachedExtremitiesExam != null ||
+          _cachedOtherPhysicalExam != null;
+
+      if (!hasData) {
+        debugPrint('系統:意識與理學檢查無資料，跳過儲存');
+        return;
+      }
+
+      // 新增新的醫療評估記錄（意識與理學檢查）
+      await db.treatmentDao.insertMedicalAssessment(
+        MedicalAssessmentCompanion.insert(
+          medicalId: medicalId,
+          consciousnessLevel: Value(_cachedConsciousnessLevel),
+          gcsE: Value(_cachedGcsE),
+          gcsV: Value(_cachedGcsV),
+          gcsM: Value(_cachedGcsM),
+          gcs: Value(_cachedGcs),
+          leftPupilReaction: Value(_cachedLeftPupilReaction),
+          leftPupilSize: Value(_cachedLeftPupilSize),
+          rightPupilReaction: Value(_cachedRightPupilReaction),
+          rightPupilSize: Value(_cachedRightPupilSize),
+          headNeckExam: Value(_cachedHeadNeckExam),
+          chestExam: Value(_cachedChestExam),
+          abdomenExam: Value(_cachedAbdomenExam),
+          extremitiesExam: Value(_cachedExtremitiesExam),
+          otherPhysicalExam: Value(_cachedOtherPhysicalExam),
+        ),
+      );
+      await _reloadMedicalAssessments();
+      debugPrint('系統:意識與理學檢查自動儲存成功');
+
+      if (!hasListeners) return;
+
+      _consciousnessExamSaveStatus = SaveStatus.success;
+      notifyListeners();
+
+      await Future.delayed(const Duration(seconds: 3));
+
+      if (!hasListeners) return;
+
+      _consciousnessExamSaveStatus = SaveStatus.idle;
+      notifyListeners();
+    } catch (e) {
+      debugPrint('系統:意識與理學檢查自動儲存失敗 - $e');
+      if (!hasListeners) return;
+      _consciousnessExamSaveStatus = SaveStatus.idle;
+      notifyListeners();
     }
   }
 
@@ -827,9 +1050,20 @@ class TreatmentViewModel extends ChangeNotifier {
 
   @override
   void dispose() {
+    // 取消處置記錄的延遲儲存
     if (_debounceTimer?.isActive ?? false) {
       _debounceTimer!.cancel();
       _saveToDatabase();
+    }
+    // 生命徵象儲存（參考 incident_view.dart 模式）
+    if (_vitalSignsDebounceTimer?.isActive ?? false) {
+      _vitalSignsDebounceTimer!.cancel();
+      _saveVitalSignsToDatabase();
+    }
+    // 意識與理學檢查儲存
+    if (_consciousnessExamDebounceTimer?.isActive ?? false) {
+      _consciousnessExamDebounceTimer!.cancel();
+      _saveConsciousnessAndExamToDatabase();
     }
     super.dispose();
   }

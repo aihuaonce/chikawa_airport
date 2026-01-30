@@ -52,10 +52,23 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
   late TextEditingController _diastolicController;
   late TextEditingController _spo2Controller;
 
-  // 意識檢查
+  // 意識與理學檢查 Controllers
+  late TextEditingController _gcsEController;
+  late TextEditingController _gcsVController;
+  late TextEditingController _gcsMController;
+  late TextEditingController _leftPupilSizeController;
+  late TextEditingController _rightPupilSizeController;
+  late TextEditingController _headNeckController;
+  late TextEditingController _chestController;
+  late TextEditingController _abdomenController;
+  late TextEditingController _extremitiesController;
+  late TextEditingController _otherPhysicalExamController;
+
+  // 意識檢查狀態（非 Controller，用於 Checkbox 和 SegmentedControl）
   bool _isAlert = true;
   String _leftPupilReaction = '+';
   String _rightPupilReaction = '+';
+  int? _gcsTotal; // GCS Total 自動計算，不儲存到 Controller
 
   // 病史
   String _pastHistoryStatus = '無';
@@ -92,6 +105,18 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
     _systolicController = TextEditingController();
     _diastolicController = TextEditingController();
     _spo2Controller = TextEditingController();
+
+    // 意識與理學檢查 Controllers
+    _gcsEController = TextEditingController();
+    _gcsVController = TextEditingController();
+    _gcsMController = TextEditingController();
+    _leftPupilSizeController = TextEditingController();
+    _rightPupilSizeController = TextEditingController();
+    _headNeckController = TextEditingController();
+    _chestController = TextEditingController();
+    _abdomenController = TextEditingController();
+    _extremitiesController = TextEditingController();
+    _otherPhysicalExamController = TextEditingController();
   }
 
   @override
@@ -110,6 +135,18 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
     _systolicController.dispose();
     _diastolicController.dispose();
     _spo2Controller.dispose();
+
+    // 清理意識與理學檢查 Controllers
+    _gcsEController.dispose();
+    _gcsVController.dispose();
+    _gcsMController.dispose();
+    _leftPupilSizeController.dispose();
+    _rightPupilSizeController.dispose();
+    _headNeckController.dispose();
+    _chestController.dispose();
+    _abdomenController.dispose();
+    _extremitiesController.dispose();
+    _otherPhysicalExamController.dispose();
 
     // 清理健康評估表的 controller
     for (var controllers in _healthAssessmentControllers.values) {
@@ -157,21 +194,63 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
     }
 
     // 載入生命徵象資料到 Controllers
-    final latestAssessment = viewModel.medicalAssessments.isNotEmpty
-        ? viewModel.medicalAssessments.last
-        : null;
-    debugPrint('DEBUG: 載入生命徵象資料 - assessments數量: ${viewModel.medicalAssessments.length}');
+    final latestAssessment = viewModel.latestVitalSigns;
+    debugPrint(
+      'DEBUG: 載入生命徵象資料 - assessments數量: ${viewModel.medicalAssessments.length}',
+    );
     if (latestAssessment != null) {
-      debugPrint('DEBUG: 最新評估 - 體溫: ${latestAssessment.temperature}, 脈搏: ${latestAssessment.pulse}');
+      debugPrint(
+        'DEBUG: 最新評估 - 體溫: ${latestAssessment.temperature}, 脈搏: ${latestAssessment.pulse}',
+      );
       _tempController.text = latestAssessment.temperature?.toString() ?? '';
       _pulseController.text = latestAssessment.pulse?.toString() ?? '';
       _breathController.text = latestAssessment.breath?.toString() ?? '';
       _systolicController.text = latestAssessment.systolic?.toString() ?? '';
       _diastolicController.text = latestAssessment.diastolic?.toString() ?? '';
       _spo2Controller.text = latestAssessment.spo2?.toString() ?? '';
-      debugPrint('DEBUG: Controller已設定 - 體溫: ${_tempController.text}, 脈搏: ${_pulseController.text}');
+      debugPrint(
+        'DEBUG: Controller已設定 - 體溫: ${_tempController.text}, 脈搏: ${_pulseController.text}',
+      );
     } else {
       debugPrint('DEBUG: 無生命徵象資料');
+    }
+
+    // 載入意識與理學檢查資料
+    final latestConsciousnessExam = viewModel.latestConsciousnessExam;
+    if (latestConsciousnessExam != null) {
+      // GCS
+      _gcsEController.text = latestConsciousnessExam.gcsE ?? '';
+      _gcsVController.text = latestConsciousnessExam.gcsV ?? '';
+      _gcsMController.text = latestConsciousnessExam.gcsM ?? '';
+      // GCS Total 自動計算，不從資料庫載入，而是根據 E+V+M 計算
+      final e = int.tryParse(_gcsEController.text) ?? 0;
+      final v = int.tryParse(_gcsVController.text) ?? 0;
+      final m = int.tryParse(_gcsMController.text) ?? 0;
+      _gcsTotal = e + v + m;
+
+      // 瞳孔
+      _leftPupilSizeController.text =
+          latestConsciousnessExam.leftPupilSize?.toString() ?? '';
+      _rightPupilSizeController.text =
+          latestConsciousnessExam.rightPupilSize?.toString() ?? '';
+      _leftPupilReaction = latestConsciousnessExam.leftPupilReaction ?? '+';
+      _rightPupilReaction = latestConsciousnessExam.rightPupilReaction ?? '+';
+
+      // 理學檢查
+      _headNeckController.text = latestConsciousnessExam.headNeckExam ?? '';
+      _chestController.text = latestConsciousnessExam.chestExam ?? '';
+      _abdomenController.text = latestConsciousnessExam.abdomenExam ?? '';
+      _extremitiesController.text =
+          latestConsciousnessExam.extremitiesExam ?? '';
+      _otherPhysicalExamController.text =
+          latestConsciousnessExam.otherPhysicalExam ?? '';
+
+      // 意識狀態
+      _isAlert = latestConsciousnessExam.consciousnessLevel == 'alert';
+
+      debugPrint('DEBUG: 意識與理學檢查資料已載入 - GCS: $_gcsTotal');
+    } else {
+      debugPrint('DEBUG: 無意識與理學檢查資料');
     }
 
     _isInitialized = true;
@@ -308,10 +387,14 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
           value: _cdcPassed,
           onChanged: (v) async {
             setState(() => _cdcPassed = v!);
+            // 取消勾選時清除篩檢方式資料
+            if (!_cdcPassed) {
+              _screeningMethod = '';
+            }
             // 保存到資料庫
             await viewModel.updateCDCStatus(
               cdcPassed: v!,
-              screeningMethod: _screeningMethod,
+              screeningMethod: _cdcPassed ? _screeningMethod : '',
             );
           },
         ),
@@ -837,59 +920,110 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // 意識清晰 Checkbox（變更時自動儲存，勾選時清除 GCS 資料）
         _buildCheckboxTile(
           label: '意識清晰 Alert & Oriented',
           value: _isAlert,
-          onChanged: (v) => setState(() => _isAlert = v!),
+          onChanged: (v) {
+            setState(() => _isAlert = v!);
+            if (_isAlert) {
+              // 勾選意識清晰時，清除 GCS 資料
+              _gcsEController.clear();
+              _gcsVController.clear();
+              _gcsMController.clear();
+              _gcsTotal = null;
+            }
+            _onConsciousnessAndExamChanged(viewModel);
+          },
         ),
         if (!_isAlert) ...[
           const SizedBox(height: 12),
           _buildLabel('GCS 指數評估'),
           const SizedBox(height: 4),
+          // GCS 輸入框（簡化版，保留自動計算）
           Row(
             children: [
               Expanded(
-                child: _buildTextField(hint: 'E', textAlign: TextAlign.center),
-              ),
-              const SizedBox(width: 6),
-              Expanded(
-                child: _buildTextField(hint: 'V', textAlign: TextAlign.center),
-              ),
-              const SizedBox(width: 6),
-              Expanded(
-                child: _buildTextField(hint: 'M', textAlign: TextAlign.center),
+                child: _buildTextField(
+                  hint: 'E',
+                  controller: _gcsEController,
+                  textAlign: TextAlign.center,
+                  onChanged: (_) => _updateGCSTotalAndValidate(viewModel),
+                ),
               ),
               const SizedBox(width: 6),
               Expanded(
                 child: _buildTextField(
-                  hint: 'Total',
+                  hint: 'V',
+                  controller: _gcsVController,
                   textAlign: TextAlign.center,
+                  onChanged: (_) => _updateGCSTotalAndValidate(viewModel),
+                ),
+              ),
+              const SizedBox(width: 6),
+              Expanded(
+                child: _buildTextField(
+                  hint: 'M',
+                  controller: _gcsMController,
+                  textAlign: TextAlign.center,
+                  onChanged: (_) => _updateGCSTotalAndValidate(viewModel),
+                ),
+              ),
+              const SizedBox(width: 6),
+              // Total（只讀，自動計算）
+              Expanded(
+                child: Container(
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: primaryColor.withValues(alpha: 0.05),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: borderColor),
+                  ),
+                  alignment: Alignment.center,
+                  child: Text(
+                    _gcsTotal != null ? 'Total: $_gcsTotal' : 'Total',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: _gcsTotal != null ? primaryColor : textMuted,
+                    ),
+                  ),
                 ),
               ),
             ],
           ),
           const SizedBox(height: 12),
+          // 瞳孔檢查（簡化版）
           Row(
             children: [
               Expanded(
                 child: _buildPupilSection(
                   '左瞳孔 Left Pupil',
-                  (v) => _leftPupilReaction = v,
+                  (v) {
+                    setState(() => _leftPupilReaction = v);
+                    _onConsciousnessAndExamChanged(viewModel);
+                  },
                   _leftPupilReaction,
+                  _leftPupilSizeController,
                 ),
               ),
               const SizedBox(width: 12),
               Expanded(
                 child: _buildPupilSection(
                   '右瞳孔 Right Pupil',
-                  (v) => _rightPupilReaction = v,
+                  (v) {
+                    setState(() => _rightPupilReaction = v);
+                    _onConsciousnessAndExamChanged(viewModel);
+                  },
                   _rightPupilReaction,
+                  _rightPupilSizeController,
                 ),
               ),
             ],
           ),
         ],
         const SizedBox(height: 12),
+        // 理學檢查（2x2 Grid，簡化版）
         GridView.count(
           crossAxisCount: 2,
           shrinkWrap: true,
@@ -898,14 +1032,41 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
           crossAxisSpacing: 12,
           childAspectRatio: 4,
           children: [
-            _buildLabeledField('頭頸部 Head/Neck', ''),
-            _buildLabeledField('胸部 Chest', ''),
-            _buildLabeledField('腹部 Abdomen', ''),
-            _buildLabeledField('四肢 Extremities', ''),
+            _buildLabeledFieldWithController(
+              '頭頸部 Head/Neck',
+              '',
+              _headNeckController,
+              () => _onConsciousnessAndExamChanged(viewModel),
+            ),
+            _buildLabeledFieldWithController(
+              '胸部 Chest',
+              '',
+              _chestController,
+              () => _onConsciousnessAndExamChanged(viewModel),
+            ),
+            _buildLabeledFieldWithController(
+              '腹部 Abdomen',
+              '',
+              _abdomenController,
+              () => _onConsciousnessAndExamChanged(viewModel),
+            ),
+            _buildLabeledFieldWithController(
+              '四肢 Extremities',
+              '',
+              _extremitiesController,
+              () => _onConsciousnessAndExamChanged(viewModel),
+            ),
           ],
         ),
         const SizedBox(height: 10),
-        _buildLabeledField('其它理學檢查 Other Observations...', ''),
+        // 其它理學檢查
+        _buildLabeledFieldWithController(
+          '其它理學檢查 Other Observations...',
+          '',
+          _otherPhysicalExamController,
+          () => _onConsciousnessAndExamChanged(viewModel),
+          maxLines: 2,
+        ),
       ],
     );
   }
@@ -1724,6 +1885,7 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
     bool readOnly = false,
     VoidCallback? onTap,
     Function(String)? onChanged,
+    TextInputType? keyboardType,
   }) {
     return TextField(
       controller: controller,
@@ -1732,6 +1894,7 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
       readOnly: readOnly,
       onTap: onTap,
       onChanged: onChanged,
+      keyboardType: keyboardType,
       style: const TextStyle(fontSize: 13, color: textDark),
       decoration: InputDecoration(
         hintText: hint,
@@ -1845,8 +2008,8 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
 
   // 生命徵象變更時觸發自動儲存
   void _onVitalSignChanged(TreatmentViewModel viewModel) {
-    // 觸發自動儲存（透過 ViewModel）
-    viewModel.updateVitalSigns(
+    // 更新快取並觸發自動儲存（參考 incident_view.dart 模式）
+    viewModel.updateVitalSignsCache(
       temperature: _parseDouble(_tempController.text),
       pulse: _parseInt(_pulseController.text),
       breath: _parseInt(_breathController.text),
@@ -1864,6 +2027,124 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
   int? _parseInt(String text) {
     if (text.isEmpty) return null;
     return int.tryParse(text);
+  }
+
+  // GCS 驗證：檢查數值是否在有效範圍內
+  String? _validateGCS(String value, int max, String fieldName) {
+    if (value.isEmpty) return null; // 空值不驗證
+    final num = int.tryParse(value);
+    if (num == null) return '$fieldName 必須為數字';
+    if (num < 1 || num > max) {
+      return '$fieldName 必須在 1-$max 之間';
+    }
+    return null; // 驗證通過
+  }
+
+  // GCS 自動計算並驗證
+  void _updateGCSTotalAndValidate(TreatmentViewModel viewModel) {
+    // 驗證各欄位
+    final eError = _validateGCS(_gcsEController.text, 4, 'E');
+    final vError = _validateGCS(_gcsVController.text, 5, 'V');
+    final mError = _validateGCS(_gcsMController.text, 6, 'M');
+
+    // 計算 Total（只有通過驗證的才計入）
+    final e = (eError == null) ? (int.tryParse(_gcsEController.text) ?? 0) : 0;
+    final v = (vError == null) ? (int.tryParse(_gcsVController.text) ?? 0) : 0;
+    final m = (mError == null) ? (int.tryParse(_gcsMController.text) ?? 0) : 0;
+
+    setState(() {
+      _gcsTotal = (e > 0 && v > 0 && m > 0) ? (e + v + m) : null;
+    });
+
+    // 觸發自動儲存
+    _onConsciousnessAndExamChanged(viewModel);
+  }
+
+  // 意識與理學檢查變更時觸發自動儲存
+  void _onConsciousnessAndExamChanged(TreatmentViewModel viewModel) {
+    // 計算 GCS Total
+    final e = int.tryParse(_gcsEController.text) ?? 0;
+    final v = int.tryParse(_gcsVController.text) ?? 0;
+    final m = int.tryParse(_gcsMController.text) ?? 0;
+    final gcsTotal = (e > 0 && v > 0 && m > 0) ? (e + v + m) : null;
+
+    viewModel.updateConsciousnessAndExamCache(
+      isAlert: _isAlert,
+      consciousnessLevel: _isAlert ? 'alert' : 'altered',
+      gcsE: _gcsEController.text,
+      gcsV: _gcsVController.text,
+      gcsM: _gcsMController.text,
+      gcs: gcsTotal,
+      leftPupilReaction: _leftPupilReaction,
+      leftPupilSize: double.tryParse(_leftPupilSizeController.text),
+      rightPupilReaction: _rightPupilReaction,
+      rightPupilSize: double.tryParse(_rightPupilSizeController.text),
+      headNeckExam: _headNeckController.text,
+      chestExam: _chestController.text,
+      abdomenExam: _abdomenController.text,
+      extremitiesExam: _extremitiesController.text,
+      otherPhysicalExam: _otherPhysicalExamController.text,
+    );
+  }
+
+  // 理學檢查欄位
+  Widget _buildLabeledFieldWithController(
+    String label,
+    String hint,
+    TextEditingController controller,
+    VoidCallback onChanged, {
+    int maxLines = 1,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildLabel(label),
+        const SizedBox(height: 4),
+        _buildTextField(
+          hint: hint,
+          controller: controller,
+          onChanged: (_) => onChanged(),
+          maxLines: maxLines,
+        ),
+      ],
+    );
+  }
+
+  // 簡化版瞳孔檢查（參考 treatment.dart 設計）
+  Widget _buildPupilSection(
+    String side,
+    Function(String) onReact,
+    String currentReact,
+    TextEditingController sizeController,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildLabel(side),
+        const SizedBox(height: 4),
+        Row(
+          children: [
+            Expanded(
+              flex: 2,
+              child: _buildSegmentedControl(
+                ['+', '-', '±'],
+                currentReact,
+                (v) => onReact(v),
+              ),
+            ),
+            const SizedBox(width: 6),
+            Expanded(
+              child: _buildTextField(
+                hint: 'mm',
+                textAlign: TextAlign.center,
+                controller: sizeController,
+                onChanged: (_) {},
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
   }
 
   // 使用外部 Controller 的生命徵象欄位（避免每次重建都建立新 Controller）
@@ -1952,36 +2233,6 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
                 controller: diastolicController,
                 onChanged: (_) => onChanged?.call(),
               ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildPupilSection(
-    String side,
-    Function(String) onReact,
-    String currentReact,
-  ) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildLabel(side),
-        const SizedBox(height: 4),
-        Row(
-          children: [
-            Expanded(
-              flex: 2,
-              child: _buildSegmentedControl(
-                ['+', '-', '±'],
-                currentReact,
-                (v) => setState(() => onReact(v)),
-              ),
-            ),
-            const SizedBox(width: 6),
-            Expanded(
-              child: _buildTextField(hint: 'mm', textAlign: TextAlign.center),
             ),
           ],
         ),
@@ -2177,17 +2428,6 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
     ),
   );
 
-  Widget _buildLabeledField(String label, String hint) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildLabel(label),
-        const SizedBox(height: 4),
-        _buildTextField(hint: hint),
-      ],
-    );
-  }
-
   Widget _buildActionIconBtn(
     IconData icon,
     Color bgColor,
@@ -2208,6 +2448,4 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
       ),
     );
   }
-
-  // --- 對話框方法 ---
 }

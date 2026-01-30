@@ -174,9 +174,9 @@ class MedicalAssessment extends Table {
 
   // 瞳孔反應
   TextColumn get leftPupilReaction => text().nullable()(); // + / - / ±
-  IntColumn get leftPupilSize => integer().nullable()(); // mm
+  RealColumn get leftPupilSize => real().nullable()(); // mm（支援小數如 2.5）
   TextColumn get rightPupilReaction => text().nullable()(); // + / - / ±
-  IntColumn get rightPupilSize => integer().nullable()(); // mm
+  RealColumn get rightPupilSize => real().nullable()(); // mm（支援小數如 2.5）
 
   // 理學檢查
   TextColumn get headNeckExam => text().nullable()(); // 頭頸部
