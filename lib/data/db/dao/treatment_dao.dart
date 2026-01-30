@@ -54,8 +54,8 @@ class TreatmentDao extends DatabaseAccessor<AppDatabase>
     )..where((t) => t.medicalId.equals(medicalId))).getSingleOrNull();
   }
 
-  Future<bool> updateChiefComplaint(ChiefComplaintCompanion data) {
-    return update(chiefComplaint).replace(data);
+  Future<int> updateChiefComplaint(ChiefComplaintCompanion data) {
+    return update(chiefComplaint).write(data);
   }
 
   // 醫療影像

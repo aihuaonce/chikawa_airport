@@ -251,8 +251,36 @@ class TreatmentViewModel extends ChangeNotifier {
           ),
         );
       } else {
-        // 更新現有記錄（這裡需要在 DAO 中新增 update 方法）
-        // 暫時先重新載入
+        // 更新現有記錄
+        await db.treatmentDao.updateChiefComplaint(
+          ChiefComplaintCompanion(
+            complaintId: Value(_chiefComplaint!.complaintId),
+            chiefComplaintTypeId: chiefComplaintTypeId != null
+                ? Value(chiefComplaintTypeId)
+                : const Value.absent(),
+            selectedSymptoms: selectedSymptoms != null
+                ? Value(selectedSymptoms)
+                : const Value.absent(),
+            otherSymptomDetail: otherSymptomDetail != null
+                ? Value(otherSymptomDetail)
+                : const Value.absent(),
+            chiefComplaintFinal: chiefComplaintFinal != null
+                ? Value(chiefComplaintFinal)
+                : const Value.absent(),
+            supplementaryNotes: supplementaryNotes != null
+                ? Value(supplementaryNotes)
+                : const Value.absent(),
+            onsetTime: onsetTime != null
+                ? Value(onsetTime)
+                : const Value.absent(),
+            reportedBy: reportedBy != null
+                ? Value(reportedBy)
+                : const Value.absent(),
+            isConfirmed: isConfirmed != null
+                ? Value(isConfirmed)
+                : const Value.absent(),
+          ),
+        );
       }
       _chiefComplaint = await db.treatmentDao.getChiefComplaint(medicalId);
       notifyListeners();

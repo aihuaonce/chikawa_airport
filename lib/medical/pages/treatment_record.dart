@@ -313,7 +313,24 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
       children: [
         _buildLabel('主訴類別 Type'),
         const SizedBox(height: 4),
-        _buildComplaintTypeDropdown(viewModel, complaint),
+        Row(
+          children: [
+            for (var i = 0; i < viewModel.complaintTypes.length; i++) ...[
+              if (i > 0) const SizedBox(width: 8),
+              _buildTypeButton(
+                viewModel.complaintTypes[i],
+                complaint?.chiefComplaintTypeId,
+                (id) {
+                  viewModel.updateChiefComplaint(
+                    chiefComplaintTypeId: id,
+                    selectedSymptoms: '',
+                  );
+                  _selectedSymptoms.clear();
+                },
+              ),
+            ],
+          ],
+        ),
         if (complaint?.chiefComplaintTypeId != null) ...[
           const SizedBox(height: 12),
           _buildSymptomGrid(viewModel, complaint!),
@@ -1120,51 +1137,54 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
 
   // --- Dropdown 元件 ---
 
-  Widget _buildComplaintTypeDropdown(
-    TreatmentViewModel viewModel,
-    ChiefComplaintData? complaint,
+  Widget _buildTypeButton(
+    ChiefComplaintTypeData type,
+    int? currentTypeId,
+    Function(int) onSelect,
   ) {
-    final selectedType = complaint?.chiefComplaintTypeId != null
-        ? viewModel.getComplaintTypeById(complaint!.chiefComplaintTypeId)
-        : null;
+    bool isSel = currentTypeId == type.id;
 
-    return Container(
-      height: 44,
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: borderColor),
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<ChiefComplaintTypeData>(
-          value: selectedType,
-          hint: Text(
-            '請選取主訴類別',
-            style: TextStyle(
-              color: textMuted.withValues(alpha: 0.4),
-              fontSize: 14,
+    // 根據 Code 決定圖示與顯示名稱
+    IconData icon;
+    String label;
+    if (type.code == 'TRAUMA') {
+      icon = Icons.healing;
+      label = '外傷 Trauma';
+    } else if (type.code == 'NON_TRAUMA') {
+      icon = Icons.medical_services;
+      label = '非外傷 Non-trauma';
+    } else {
+      icon = Icons.help_outline;
+      label = type.name;
+    }
+
+    return Expanded(
+      child: GestureDetector(
+        onTap: () => onSelect(type.id),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          decoration: BoxDecoration(
+            color: isSel ? primaryColor.withValues(alpha: 0.05) : Colors.white,
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(
+              color: isSel ? primaryColor : borderColor,
+              width: isSel ? 1.5 : 1,
             ),
           ),
-          isExpanded: true,
-          icon: const Icon(Icons.expand_more, size: 20, color: textMuted),
-          items: viewModel.complaintTypes
-              .map(
-                (type) => DropdownMenuItem<ChiefComplaintTypeData>(
-                  value: type,
-                  child: Text(
-                    type.name,
-                    style: const TextStyle(fontSize: 14, color: textDark),
-                  ),
+          child: Column(
+            children: [
+              Icon(icon, color: isSel ? primaryColor : textMuted, size: 18),
+              const SizedBox(height: 4),
+              Text(
+                label,
+                style: TextStyle(
+                  color: isSel ? textDark : textMuted,
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
                 ),
-              )
-              .toList(),
-          onChanged: (val) {
-            if (val != null) {
-              viewModel.updateChiefComplaint(chiefComplaintTypeId: val.id);
-              _selectedSymptoms.clear();
-            }
-          },
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -1752,6 +1772,7 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
               selectedSymptoms: _selectedSymptoms.join(','),
             );
           },
+          backgroundColor: Colors.white,
           selectedColor: primaryColor.withValues(alpha: 0.1),
           checkmarkColor: primaryColor,
           shape: RoundedRectangleBorder(
