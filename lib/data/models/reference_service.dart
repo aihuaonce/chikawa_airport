@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:drift/drift.dart';
 import '../db/database.dart';
 import '../utils/icd10_importer.dart';
 import '../utils/csv_reference_importer.dart';
@@ -32,6 +33,18 @@ class ReferenceService extends ChangeNotifier {
   List<SpecialNoteRefData> _specialNoteRefs = [];
   List<NursingPhraseData> _nursingPhraseList = [];
 
+  List<PaymentMethodData> _paymentMethodList = [];
+  List<CollectionStatusData> _collectionStatusList = [];
+  List<CurrencyRefData> _currencyList = [];
+  List<ReferralPurposeData> _referralPurposeList = [];
+  List<StationRefData> _stationList = [];
+  List<RelationshipTypeData> _relationshipTypeList = [];
+
+  List<HistoryStatusRefData> _historyStatusList = [];
+  List<MedicalStaffRoleData> _medicalStaffRoleList = [];
+  List<PupilReactionRefData> _pupilReactionList = [];
+  List<ConsciousnessLevelRefData> _consciousnessLevelList = [];
+
   // === Getters ===
   List<SexData> get sexList => _sexList;
   List<NationalityData> get nationalityList => _nationalityList;
@@ -53,6 +66,18 @@ class ReferenceService extends ChangeNotifier {
   List<MedicalStaffData> get medicalStaffList => _medicalStaffList;
   List<SpecialNoteRefData> get specialNoteRefs => _specialNoteRefs;
   List<NursingPhraseData> get nursingPhraseList => _nursingPhraseList;
+
+  List<PaymentMethodData> get paymentMethodList => _paymentMethodList;
+  List<CollectionStatusData> get collectionStatusList => _collectionStatusList;
+  List<CurrencyRefData> get currencyList => _currencyList;
+  List<ReferralPurposeData> get referralPurposeList => _referralPurposeList;
+  List<StationRefData> get stationList => _stationList;
+  List<RelationshipTypeData> get relationshipTypeList => _relationshipTypeList;
+
+  List<HistoryStatusRefData> get historyStatusList => _historyStatusList;
+  List<MedicalStaffRoleData> get medicalStaffRoleList => _medicalStaffRoleList;
+  List<PupilReactionRefData> get pupilReactionList => _pupilReactionList;
+  List<ConsciousnessLevelRefData> get consciousnessLevelList => _consciousnessLevelList;
 
   ReferenceService(this.db);
 
@@ -126,6 +151,19 @@ class ReferenceService extends ChangeNotifier {
       _specialNoteRefs = await db.referenceDao.getAllSpecialNoteRefs();
       _nursingPhraseList = await db.referenceDao.getAllNursingPhrases();
 
+      _paymentMethodList = await (db.select(db.paymentMethod)
+            ..orderBy([(t) => OrderingTerm.asc(t.sortOrder)]))
+          .get();
+      _collectionStatusList = await (db.select(db.collectionStatus)
+            ..orderBy([(t) => OrderingTerm.asc(t.sortOrder)]))
+          .get();
+      _currencyList = await db.select(db.currencyRef).get();
+      _referralPurposeList = await (db.select(db.referralPurpose)
+            ..orderBy([(t) => OrderingTerm.asc(t.sortOrder)]))
+          .get();
+      _stationList = await db.select(db.stationRef).get();
+      _relationshipTypeList = await db.select(db.relationshipType).get();
+
       debugPrint('系統:處置參考資料載入完成');
       debugPrint('  - 主訴類型: ${_chiefComplaintTypes.length}');
       debugPrint('  - 主訴細項: ${_chiefComplaintDetails.length}');
@@ -138,6 +176,55 @@ class ReferenceService extends ChangeNotifier {
       debugPrint('  - 醫療人員: ${_medicalStaffList.length}');
       debugPrint('  - 特別註記: ${_specialNoteRefs.length}');
       debugPrint('  - 護理用語: ${_nursingPhraseList.length}');
+      debugPrint('  - 付款方式: ${_paymentMethodList.length}');
+      debugPrint('  - 收款狀態: ${_collectionStatusList.length}');
+      debugPrint('  - 貨幣種類: ${_currencyList.length}');
+      debugPrint('  - 轉診目的: ${_referralPurposeList.length}');
+      debugPrint('  - 站點資料: ${_stationList.length}');
+      debugPrint('  - 關係類型: ${_relationshipTypeList.length}');
+
+      _historyStatusList = await db.customSelect(
+        'SELECT * FROM history_status_ref ORDER BY sort_order',
+      ).map((row) => HistoryStatusRefData(
+        id: row.read<int>('id'),
+        code: row.read<String>('code'),
+        name: row.read<String>('name'),
+        nameEn: row.readNullable<String>('name_en'),
+        sortOrder: row.read<int>('sort_order'),
+      )).get();
+      
+      _medicalStaffRoleList = await db.customSelect(
+        'SELECT * FROM medical_staff_role ORDER BY sort_order',
+      ).map((row) => MedicalStaffRoleData(
+        id: row.read<int>('id'),
+        code: row.read<String>('code'),
+        name: row.read<String>('name'),
+        nameEn: row.readNullable<String>('name_en'),
+        sortOrder: row.read<int>('sort_order'),
+      )).get();
+      
+      _pupilReactionList = await db.customSelect(
+        'SELECT * FROM pupil_reaction_ref',
+      ).map((row) => PupilReactionRefData(
+        id: row.read<int>('id'),
+        code: row.read<String>('code'),
+        symbol: row.read<String>('symbol'),
+        name: row.read<String>('name'),
+      )).get();
+      
+      _consciousnessLevelList = await db.customSelect(
+        'SELECT * FROM consciousness_level_ref',
+      ).map((row) => ConsciousnessLevelRefData(
+        id: row.read<int>('id'),
+        code: row.read<String>('code'),
+        name: row.read<String>('name'),
+        nameEn: row.readNullable<String>('name_en'),
+      )).get();
+
+      debugPrint('  - 病史狀態: ${_historyStatusList.length}');
+      debugPrint('  - 醫護角色: ${_medicalStaffRoleList.length}');
+      debugPrint('  - 瞳孔反應: ${_pupilReactionList.length}');
+      debugPrint('  - 意識狀態: ${_consciousnessLevelList.length}');
     } catch (e) {
       debugPrint('系統:載入處置參考資料失敗 - $e');
     }

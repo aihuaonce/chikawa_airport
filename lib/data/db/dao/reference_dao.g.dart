@@ -29,4 +29,20 @@ mixin _$ReferenceDaoMixin on DatabaseAccessor<AppDatabase> {
   $MedicalStaffTable get medicalStaff => attachedDatabase.medicalStaff;
   $SpecialNoteRefTable get specialNoteRef => attachedDatabase.specialNoteRef;
   $NursingPhraseTable get nursingPhrase => attachedDatabase.nursingPhrase;
+  $PaymentMethodTable get paymentMethod => attachedDatabase.paymentMethod;
+  $CollectionStatusTable get collectionStatus =>
+      attachedDatabase.collectionStatus;
+  $CurrencyRefTable get currencyRef => attachedDatabase.currencyRef;
+  $ReferralPurposeTable get referralPurpose => attachedDatabase.referralPurpose;
+  $StationRefTable get stationRef => attachedDatabase.stationRef;
+  $RelationshipTypeTable get relationshipType =>
+      attachedDatabase.relationshipType;
+  $HistoryStatusRefTable get historyStatusRef =>
+      attachedDatabase.historyStatusRef;
+  $MedicalStaffRoleTable get medicalStaffRole =>
+      attachedDatabase.medicalStaffRole;
+  $PupilReactionRefTable get pupilReactionRef =>
+      attachedDatabase.pupilReactionRef;
+  $ConsciousnessLevelRefTable get consciousnessLevelRef =>
+      attachedDatabase.consciousnessLevelRef;
 }

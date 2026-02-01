@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart';
 import '../database.dart';
 import '../tables/reference_tables.dart';
+import '../tables/normalization_tables.dart';
 
 part 'reference_dao.g.dart';
 
@@ -25,6 +26,16 @@ part 'reference_dao.g.dart';
     MedicalStaff,
     SpecialNoteRef,
     NursingPhrase,
+    PaymentMethod,
+    CollectionStatus,
+    CurrencyRef,
+    ReferralPurpose,
+    StationRef,
+    RelationshipType,
+    HistoryStatusRef,
+    MedicalStaffRole,
+    PupilReactionRef,
+    ConsciousnessLevelRef,
   ],
 )
 class ReferenceDao extends DatabaseAccessor<AppDatabase>
@@ -733,6 +744,16 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
     await initializeActionItems();
     await initializeMedicalStaff();
     await initializeSpecialNoteRefs();
+    await initializePaymentMethods();
+    await initializeCollectionStatus();
+    await initializeCurrencies();
+    await initializeReferralPurposes();
+    await initializeStations();
+    await initializeRelationshipTypes();
+    await initializeHistoryStatus();
+    await initializeMedicalStaffRoles();
+    await initializePupilReactions();
+    await initializeConsciousnessLevels();
   }
 
   // 初始化性別資料
@@ -1434,6 +1455,199 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
             sortOrder: const Value(5),
           ),
           SpecialNoteRefCompanion.insert(name: '空跑', sortOrder: const Value(6)),
+        ]);
+      });
+    }
+  }
+
+  // 初始化付款方式
+  Future<void> initializePaymentMethods() async {
+    final count = await (select(paymentMethod).get()).then((list) => list.length);
+    if (count == 0) {
+      await batch((batch) {
+        batch.insertAll(paymentMethod, [
+          PaymentMethodCompanion.insert(
+              code: 'self_pay', name: '自付', sortOrder: const Value(1)),
+          PaymentMethodCompanion.insert(
+              code: 'unified_billing', name: '統一請款', sortOrder: const Value(2)),
+          PaymentMethodCompanion.insert(
+              code: 'hospital_collect', name: '總院會核代收', sortOrder: const Value(3)),
+          PaymentMethodCompanion.insert(
+              code: 'abnormal', name: '收費異常', sortOrder: const Value(4)),
+        ]);
+      });
+    }
+  }
+
+  // 初始化收款狀態
+  Future<void> initializeCollectionStatus() async {
+    final count = await (select(collectionStatus).get()).then((list) => list.length);
+    if (count == 0) {
+      await batch((batch) {
+        batch.insertAll(collectionStatus, [
+          CollectionStatusCompanion.insert(
+              code: 'not_collected', name: '尚未收款', sortOrder: const Value(1)),
+          CollectionStatusCompanion.insert(
+              code: 'collected', name: '已收款', sortOrder: const Value(2)),
+          CollectionStatusCompanion.insert(
+              code: 'not_required', name: '不需要', sortOrder: const Value(3)),
+        ]);
+      });
+    }
+  }
+
+  // 初始化貨幣
+  Future<void> initializeCurrencies() async {
+    final count = await (select(currencyRef).get()).then((list) => list.length);
+    if (count == 0) {
+      await batch((batch) {
+        batch.insertAll(currencyRef, [
+          CurrencyRefCompanion.insert(code: 'TWD', name: '台幣', symbol: const Value('NT\$')),
+          CurrencyRefCompanion.insert(code: 'USD', name: '美金', symbol: const Value('\$')),
+          CurrencyRefCompanion.insert(code: 'CNY', name: '人民幣', symbol: const Value('¥')),
+          CurrencyRefCompanion.insert(code: 'JPY', name: '日幣', symbol: const Value('¥')),
+          CurrencyRefCompanion.insert(code: 'CAD', name: '加幣', symbol: const Value('C\$')),
+        ]);
+      });
+    }
+  }
+
+  // 初始化轉診目的
+  Future<void> initializeReferralPurposes() async {
+    final count = await (select(referralPurpose).get()).then((list) => list.length);
+    if (count == 0) {
+      await batch((batch) {
+        batch.insertAll(referralPurpose, [
+          ReferralPurposeCompanion.insert(
+              code: 'emergency', name: '急診治療', sortOrder: const Value(1)),
+          ReferralPurposeCompanion.insert(
+              code: 'inpatient', name: '住院治療', sortOrder: const Value(2)),
+          ReferralPurposeCompanion.insert(
+              code: 'outpatient', name: '門診治療', sortOrder: const Value(3)),
+          ReferralPurposeCompanion.insert(
+              code: 'further_exam', name: '進一步檢查', sortOrder: const Value(4)),
+          ReferralPurposeCompanion.insert(
+              code: 'followup', name: '轉回轉出或適當之院所繼續追蹤', sortOrder: const Value(5)),
+          ReferralPurposeCompanion.insert(
+              code: 'other', name: '其它', sortOrder: const Value(6)),
+        ]);
+      });
+    }
+  }
+
+  // 初始化站點
+  Future<void> initializeStations() async {
+    final count = await (select(stationRef).get()).then((list) => list.length);
+    if (count == 0) {
+      await batch((batch) {
+        batch.insertAll(stationRef, [
+          StationRefCompanion.insert(
+              code: 'T1_OCC',
+              name: 'T1 03-3063578',
+              description: const Value('桃園國際機場股份有限公司營運控制中心 T1')),
+          StationRefCompanion.insert(
+              code: 'T2_OCC',
+              name: 'T2 03-3063367',
+              description: const Value('桃園國際機場股份有限公司營運控制中心 T2')),
+          StationRefCompanion.insert(
+              code: 'T1_MED',
+              name: 'T1 03-3834225',
+              description: const Value('聯新國際醫院桃園國際機場醫療中心 T1')),
+          StationRefCompanion.insert(
+              code: 'T2_MED',
+              name: 'T2 03-3983485',
+              description: const Value('聯新國際醫院桃園國際機場醫療中心 T2')),
+        ]);
+      });
+    }
+  }
+
+  // 初始化關係類型
+  Future<void> initializeRelationshipTypes() async {
+    final count = await (select(relationshipType).get()).then((list) => list.length);
+    if (count == 0) {
+      await batch((batch) {
+        batch.insertAll(relationshipType, [
+          RelationshipTypeCompanion.insert(
+              code: 'self', name: '本人 (Self)', nameEn: const Value('Self')),
+          RelationshipTypeCompanion.insert(
+              code: 'spouse', name: '配偶 (Spouse)', nameEn: const Value('Spouse')),
+          RelationshipTypeCompanion.insert(
+              code: 'parent', name: '父母 (Parent)', nameEn: const Value('Parent')),
+          RelationshipTypeCompanion.insert(
+              code: 'child', name: '子女 (Child)', nameEn: const Value('Child')),
+          RelationshipTypeCompanion.insert(
+              code: 'other', name: '其他 (Other)', nameEn: const Value('Other')),
+        ]);
+      });
+    }
+  }
+
+  // 初始化病史狀態
+  Future<void> initializeHistoryStatus() async {
+    final count = await (select(historyStatusRef).get()).then((list) => list.length);
+    if (count == 0) {
+      await batch((batch) {
+        batch.insertAll(historyStatusRef, [
+          HistoryStatusRefCompanion.insert(
+              code: 'none', name: '無', nameEn: const Value('None'), sortOrder: const Value(1)),
+          HistoryStatusRefCompanion.insert(
+              code: 'unknown', name: '不詳', nameEn: const Value('Unknown'), sortOrder: const Value(2)),
+          HistoryStatusRefCompanion.insert(
+              code: 'yes', name: '有', nameEn: const Value('Yes'), sortOrder: const Value(3)),
+        ]);
+      });
+    }
+  }
+
+  // 初始化醫護人員角色
+  Future<void> initializeMedicalStaffRoles() async {
+    final count = await (select(medicalStaffRole).get()).then((list) => list.length);
+    if (count == 0) {
+      await batch((batch) {
+        batch.insertAll(medicalStaffRole, [
+          MedicalStaffRoleCompanion.insert(
+              code: 'DOCTOR', name: '醫師', nameEn: const Value('Doctor'), sortOrder: const Value(1)),
+          MedicalStaffRoleCompanion.insert(
+              code: 'NURSE', name: '護理師', nameEn: const Value('Nurse'), sortOrder: const Value(2)),
+          MedicalStaffRoleCompanion.insert(
+              code: 'EMT', name: 'EMT', nameEn: const Value('EMT'), sortOrder: const Value(3)),
+          MedicalStaffRoleCompanion.insert(
+              code: 'ASSIST', name: '協助人員', nameEn: const Value('Assistant'), sortOrder: const Value(4)),
+        ]);
+      });
+    }
+  }
+
+  // 初始化瞳孔反應
+  Future<void> initializePupilReactions() async {
+    final count = await (select(pupilReactionRef).get()).then((list) => list.length);
+    if (count == 0) {
+      await batch((batch) {
+        batch.insertAll(pupilReactionRef, [
+          PupilReactionRefCompanion.insert(
+              code: 'positive', symbol: '+', name: '有反應'),
+          PupilReactionRefCompanion.insert(
+              code: 'negative', symbol: '-', name: '無反應'),
+          PupilReactionRefCompanion.insert(
+              code: 'equivocal', symbol: '±', name: '疑似'),
+        ]);
+      });
+    }
+  }
+
+  // 初始化意識狀態
+  Future<void> initializeConsciousnessLevels() async {
+    final count = await (select(consciousnessLevelRef).get()).then((list) => list.length);
+    if (count == 0) {
+      await batch((batch) {
+        batch.insertAll(consciousnessLevelRef, [
+          ConsciousnessLevelRefCompanion.insert(
+              code: 'alert', name: '清醒', nameEn: const Value('Alert')),
+          ConsciousnessLevelRefCompanion.insert(
+              code: 'drowsy', name: '嗜睡', nameEn: const Value('Drowsy')),
+          ConsciousnessLevelRefCompanion.insert(
+              code: 'unconscious', name: '昏迷', nameEn: const Value('Unconscious')),
         ]);
       });
     }

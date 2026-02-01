@@ -123,10 +123,17 @@ class MedicalViewModel extends ChangeNotifier {
     );
   }
 
-  void updatePassport(String idNo) {
+  void updatePassport(String passport) {
     if (_patientCache == null) return;
     _updatePatientCacheAndSave(
-      _patientCache!.copyWith(passportOrIdNo: Value(idNo)),
+      _patientCache!.copyWith(passportOrIdNo: Value(passport)),
+    );
+  }
+
+  void updateIdNo(String idNo) {
+    if (_patientCache == null) return;
+    _updatePatientCacheAndSave(
+      _patientCache!.copyWith(idNo: Value(idNo)),
     );
   }
 
@@ -147,16 +154,7 @@ class MedicalViewModel extends ChangeNotifier {
   void updateBirthday(DateTime date) {
     if (_patientCache == null) return;
 
-    final now = DateTime.now();
-    int age = now.year - date.year;
-    if (now.month < date.month ||
-        (now.month == date.month && now.day < date.day)) {
-      age--;
-    }
-
-    _updatePatientCacheAndSave(
-      _patientCache!.copyWith(birthday: Value(date), age: Value(age)),
-    );
+    _updatePatientCacheAndSave(_patientCache!.copyWith(birthday: Value(date)));
   }
 
   //  飛航記錄更新
@@ -234,7 +232,9 @@ class MedicalViewModel extends ChangeNotifier {
   NationalityData? getNationalityById(int? id) {
     if (id == null) return null;
     try {
-      return refService.nationalityList.firstWhere((n) => n.nationalityId == id);
+      return refService.nationalityList.firstWhere(
+        (n) => n.nationalityId == id,
+      );
     } catch (e) {
       return null;
     }
@@ -300,9 +300,13 @@ class MedicalViewModel extends ChangeNotifier {
       debugPrint('系統：搜尋航空公司失敗 - $e');
       // 降級為過濾快取
       final lower = keyword.toLowerCase();
-      return refService.airlineList.where((a) =>
-        a.name.toLowerCase().contains(lower) || a.code.toLowerCase().contains(lower)
-      ).toList();
+      return refService.airlineList
+          .where(
+            (a) =>
+                a.name.toLowerCase().contains(lower) ||
+                a.code.toLowerCase().contains(lower),
+          )
+          .toList();
     }
   }
 
@@ -313,18 +317,26 @@ class MedicalViewModel extends ChangeNotifier {
     } catch (e) {
       debugPrint('系統：搜尋國籍失敗 - $e');
       final lower = keyword.toLowerCase();
-      return refService.nationalityList.where((n) =>
-        n.name.toLowerCase().contains(lower) || (n.nameEn?.toLowerCase().contains(lower) ?? false)
-      ).toList();
+      return refService.nationalityList
+          .where(
+            (n) =>
+                n.name.toLowerCase().contains(lower) ||
+                (n.nameEn?.toLowerCase().contains(lower) ?? false),
+          )
+          .toList();
     }
   }
 
   Future<List<TravelStatusData>> searchTravelStatus(String keyword) async {
     if (keyword.isEmpty) return refService.travelStatusList;
     final lower = keyword.toLowerCase();
-    return refService.travelStatusList.where((t) =>
-      t.name.toLowerCase().contains(lower) || t.code.toLowerCase().contains(lower)
-    ).toList();
+    return refService.travelStatusList
+        .where(
+          (t) =>
+              t.name.toLowerCase().contains(lower) ||
+              t.code.toLowerCase().contains(lower),
+        )
+        .toList();
   }
 
   //  延遲存檔邏輯

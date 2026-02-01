@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../data/db/database.dart';
+import '../../data/models/medical/medical_fee_view.dart';
+import '../../data/models/reference_service.dart';
 
 class MedicalFees extends StatefulWidget {
   final int medicalId;
@@ -15,18 +19,45 @@ class _MedicalFeesState extends State<MedicalFees> {
   static const Color textMuted = Color(0xFF64748B);
   static const Color borderColor = Color(0xFFE2E8F0);
 
-  String _paymentMethod = '自付';
-  double _consultFee = 0;
-  double _ambulanceFee = 0;
+  // 本地狀態 - 尚未連接到數據庫的欄位
   String _selfPayType = '現金';
-  String _collectionStatus = '尚未收款';
-  String _currency = '台幣';
   bool _receiptIssued = false;
   bool _userAgreed = false;
 
+  // 費用從 ViewModel 取得
+  double get _consultFee =>
+      context.read<MedicalFeeViewModel>().fee?.consultFee ?? 0;
+  double get _ambulanceFee =>
+      context.read<MedicalFeeViewModel>().fee?.ambulanceFee ?? 0;
+
+  // 備註控制器
+  final TextEditingController _remarksController = TextEditingController();
+  bool _isInitialized = false;
+
+  @override
+  void dispose() {
+    _remarksController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    double totalAmount = _consultFee + _ambulanceFee;
+    // 監聽 ViewModel 和 ReferenceService
+    final viewModel = context.watch<MedicalFeeViewModel>();
+    context.watch<ReferenceService>();
+
+    final fee = viewModel.fee;
+    if (fee == null) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    // 同步備註到控制器（只執行一次）
+    if (!_isInitialized) {
+      _remarksController.text = fee.remarks ?? '';
+      _isInitialized = true;
+    }
+
+    final totalAmount = viewModel.totalAmount;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -39,7 +70,7 @@ class _MedicalFeesState extends State<MedicalFees> {
         // 狀態/類型切換
         _buildDynamicConditionSection(),
 
-        // 根據付款方式出現的額外資訊 (修正：若無內容則不佔空間)
+        // 根據付款方式出現的額外資訊
         _buildExtraInfoFields(),
 
         const SizedBox(height: 24),
@@ -51,7 +82,8 @@ class _MedicalFeesState extends State<MedicalFees> {
               child: _buildFieldWrapper(
                 '出診費 Consultation Fee',
                 _buildNumberField(
-                  onChanged: (v) => setState(() => _consultFee = v),
+                  initialValue: _consultFee,
+                  onChanged: (v) => viewModel.updateConsultFee(v),
                 ),
               ),
             ),
@@ -60,7 +92,8 @@ class _MedicalFeesState extends State<MedicalFees> {
               child: _buildFieldWrapper(
                 '救護車費用 Ambulance Fee',
                 _buildNumberField(
-                  onChanged: (v) => setState(() => _ambulanceFee = v),
+                  initialValue: _ambulanceFee,
+                  onChanged: (v) => viewModel.updateAmbulanceFee(v),
                 ),
               ),
             ),
@@ -75,7 +108,12 @@ class _MedicalFeesState extends State<MedicalFees> {
 
         _buildFieldWrapper(
           '收費備註 Fee Remarks',
-          _buildTextField(hint: '請輸入收費相關備註...', maxLines: 3),
+          _buildTextField(
+            hint: '請輸入收費相關備註...',
+            maxLines: 3,
+            controller: _remarksController,
+            onChanged: (v) => viewModel.updateRemarks(v),
+          ),
         ),
         const SizedBox(height: 24),
 
@@ -97,7 +135,10 @@ class _MedicalFeesState extends State<MedicalFees> {
   }
 
   Widget _buildDynamicConditionSection() {
-    switch (_paymentMethod) {
+    final viewModel = context.read<MedicalFeeViewModel>();
+    final paymentMethodName = viewModel.selectedPaymentMethod?.name ?? '';
+
+    switch (paymentMethodName) {
       case '自付':
         return _buildFieldWrapper(
           '自付方式 Payment Type',
@@ -109,22 +150,32 @@ class _MedicalFeesState extends State<MedicalFees> {
         );
       case '統一請款':
       case '收費異常':
+        final statuses = viewModel.collectionStatuses
+            .where(
+              (s) => s.name == '尚未收款' || s.name == '已收款' || s.name == '不需要',
+            )
+            .toList();
+        final currentStatusId = viewModel.selectedCollectionStatus?.id;
+
         return _buildFieldWrapper(
           '收款狀態 Status',
-          _buildSegmentedControl(
-            ['尚未收款', '已收款', '不需要'],
-            _collectionStatus,
-            (v) => setState(() => _collectionStatus = v),
+          _buildIdSegmentedControl(
+            statuses,
+            currentStatusId,
+            (id) => viewModel.updateCollectionStatus(id),
           ),
         );
       case '總院會核代收':
+        final statuses = viewModel.collectionStatuses
+            .where((s) => s.name == '尚未收款' || s.name == '已收款')
+            .toList();
+        final currentStatusId = viewModel.selectedCollectionStatus?.id;
+
         return _buildFieldWrapper(
           '收款狀態 Status',
-          _buildSegmentedControl(
-            ['尚未收款', '已收款'],
-            _collectionStatus,
-            (v) => setState(() => _collectionStatus = v),
-          ),
+          _buildIdSegmentedControl(statuses, currentStatusId, (id) {
+            viewModel.updateCollectionStatus(id);
+          }),
         );
       default:
         return const SizedBox();
@@ -132,51 +183,49 @@ class _MedicalFeesState extends State<MedicalFees> {
   }
 
   Widget _buildExtraInfoFields() {
-    bool showCurrency =
-        (_paymentMethod == '自付' && _selfPayType == '現金') ||
-        (_paymentMethod != '自付');
+    final viewModel = context.read<MedicalFeeViewModel>();
+    final paymentMethodName = viewModel.selectedPaymentMethod?.name ?? '';
 
-    // 如果沒有任何額外資訊要顯示，直接回傳空元件，避免產生 SizedBox 的間距
-    if (!showCurrency && _paymentMethod == '自付') return const SizedBox();
+    bool showCurrency =
+        (paymentMethodName == '自付' && _selfPayType == '現金') ||
+        (paymentMethodName != '自付');
+
+    // 如果沒有任何額外資訊要顯示，直接回傳空元件
+    if (!showCurrency && paymentMethodName == '自付') return const SizedBox();
 
     return Padding(
-      padding: const EdgeInsets.only(top: 24), // 統一在此處處理與上方動態區塊的間距
+      padding: const EdgeInsets.only(top: 24),
       child: Column(
         children: [
           Row(
-            crossAxisAlignment: CrossAxisAlignment.end, // 確保底部對齊
+            crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               if (showCurrency)
                 Expanded(
                   child: _buildFieldWrapper(
                     '選擇貨幣 Currency',
-                    _buildDropdownField(_currency, [
-                      '台幣',
-                      '美金',
-                      '人民幣',
-                      '日幣',
-                      '加幣',
-                    ], (v) => setState(() => _currency = v!)),
+                    _buildCurrencyDropdown(),
                   ),
                 ),
               if (showCurrency &&
-                  (_paymentMethod == '統一請款' || _paymentMethod == '總院會核代收'))
+                  (paymentMethodName == '統一請款' ||
+                      paymentMethodName == '總院會核代收'))
                 const SizedBox(width: 16),
 
-              if (_paymentMethod == '統一請款')
+              if (paymentMethodName == '統一請款')
                 Expanded(
                   child: _buildFieldWrapper(
                     '申請人 Applicant',
                     _buildTextField(hint: '輸入姓名'),
                   ),
                 )
-              else if (_paymentMethod == '總院會核代收')
-                Expanded(child: _buildReceiptIssuedToggle()) // 這裡已修正對齊
-              else if (showCurrency && _paymentMethod != '自付')
+              else if (paymentMethodName == '總院會核代收')
+                Expanded(child: _buildReceiptIssuedToggle())
+              else if (showCurrency && paymentMethodName != '自付')
                 Expanded(child: const SizedBox()),
             ],
           ),
-          if (_paymentMethod == '統一請款') ...[
+          if (paymentMethodName == '統一請款') ...[
             const SizedBox(height: 16),
             Row(
               children: [
@@ -196,14 +245,14 @@ class _MedicalFeesState extends State<MedicalFees> {
               ],
             ),
           ],
-          if (_paymentMethod == '總院會核代收') ...[
+          if (paymentMethodName == '總院會核代收') ...[
             const SizedBox(height: 16),
             _buildFieldWrapper(
               '急診櫃檯簽收框 Counter Receipt',
               _buildSignaturePad('Emergency Counter Signature Area'),
             ),
           ],
-          if (_paymentMethod == '收費異常') ...[
+          if (paymentMethodName == '收費異常') ...[
             const SizedBox(height: 16),
             _buildFieldWrapper(
               '收費異常原因 Reason',
@@ -215,13 +264,52 @@ class _MedicalFeesState extends State<MedicalFees> {
     );
   }
 
+  // 貨幣下拉選單 - 使用 ViewModel 的 currencies
+  Widget _buildCurrencyDropdown() {
+    final viewModel = context.read<MedicalFeeViewModel>();
+    final currencies = viewModel.currencies;
+    final currentCurrencyId = viewModel.selectedCurrency?.id;
+
+    return Container(
+      height: 44,
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: borderColor),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<int?>(
+          value: currentCurrencyId,
+          isExpanded: true,
+          hint: const Text(
+            '選擇貨幣',
+            style: TextStyle(fontSize: 14, color: textMuted),
+          ),
+          items: currencies
+              .map(
+                (c) => DropdownMenuItem<int?>(
+                  value: c.id,
+                  child: Text(
+                    '${c.code} - ${c.name}',
+                    style: const TextStyle(fontSize: 14, color: textDark),
+                  ),
+                ),
+              )
+              .toList(),
+          onChanged: (id) => viewModel.updateCurrency(id),
+        ),
+      ),
+    );
+  }
+
   // 修正對齊問題的收據勾選組件
   Widget _buildReceiptIssuedToggle() {
     return InkWell(
       onTap: () => setState(() => _receiptIssued = !_receiptIssued),
       borderRadius: BorderRadius.circular(8),
       child: Container(
-        height: 44, // 固定的 44px
+        height: 44,
         padding: const EdgeInsets.symmetric(horizontal: 12),
         decoration: BoxDecoration(
           color: _receiptIssued
@@ -234,7 +322,7 @@ class _MedicalFeesState extends State<MedicalFees> {
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center, // 核心修正：垂直置中
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Icon(
               _receiptIssued ? Icons.check_box : Icons.check_box_outline_blank,
@@ -293,7 +381,6 @@ class _MedicalFeesState extends State<MedicalFees> {
     );
   }
 
-  // --- 其餘輔助組件保持不變 ---
   Widget _buildLabel(String text) => Text(
     text,
     style: const TextStyle(
@@ -304,9 +391,16 @@ class _MedicalFeesState extends State<MedicalFees> {
     ),
   );
 
-  Widget _buildTextField({required String hint, int maxLines = 1}) {
+  Widget _buildTextField({
+    required String hint,
+    int maxLines = 1,
+    TextEditingController? controller,
+    Function(String)? onChanged,
+  }) {
     return TextField(
+      controller: controller,
       maxLines: maxLines,
+      onChanged: onChanged,
       style: const TextStyle(fontSize: 14),
       decoration: InputDecoration(
         hintText: hint,
@@ -332,27 +426,38 @@ class _MedicalFeesState extends State<MedicalFees> {
     );
   }
 
+  // 付款方式選擇器 - 使用 ViewModel 的 paymentMethods
   Widget _buildMainPaymentMethodSelector() {
-    final List<String> methods = ['自付', '統一請款', '總院會核代收', '收費異常'];
+    final viewModel = context.read<MedicalFeeViewModel>();
+    final methods = viewModel.paymentMethods;
+    final currentMethodId = viewModel.selectedPaymentMethod?.id;
+
     return Container(
       height: 48,
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: const Color(0xFFF1F5F9), // 淺灰色背景軌道
+        color: const Color(0xFFF1F5F9),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
         children: methods.map((m) {
-          bool isSel = _paymentMethod == m;
+          bool isSel = currentMethodId == m.id;
           return Expanded(
             child: GestureDetector(
-              onTap: () => setState(() {
-                _paymentMethod = m;
+              onTap: () {
+                viewModel.updatePaymentMethod(m.id);
                 // 安全檢查：若切換到總院代收，收款狀態不能是「不需要」
-                if (m == '總院會核代收' && _collectionStatus == '不需要') {
-                  _collectionStatus = '尚未收款';
+                if (m.name == '總院會核代收') {
+                  final currentStatus = viewModel.selectedCollectionStatus;
+                  if (currentStatus?.name == '不需要') {
+                    final newStatus = viewModel.collectionStatuses.firstWhere(
+                      (s) => s.name == '尚未收款',
+                      orElse: () => viewModel.collectionStatuses.first,
+                    );
+                    viewModel.updateCollectionStatus(newStatus.id);
+                  }
                 }
-              }),
+              },
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
                 alignment: Alignment.center,
@@ -370,7 +475,7 @@ class _MedicalFeesState extends State<MedicalFees> {
                       : [],
                 ),
                 child: Text(
-                  m,
+                  m.name,
                   style: TextStyle(
                     color: isSel ? Colors.white : textMuted,
                     fontSize: 12,
@@ -385,11 +490,16 @@ class _MedicalFeesState extends State<MedicalFees> {
     );
   }
 
-  Widget _buildNumberField({required Function(double) onChanged}) {
+  Widget _buildNumberField({
+    required Function(double) onChanged,
+    double initialValue = 0,
+  }) {
     return SizedBox(
       height: 44,
       child: TextFormField(
-        initialValue: '0',
+        initialValue: initialValue % 1 == 0
+            ? initialValue.toInt().toString()
+            : initialValue.toString(),
         keyboardType: const TextInputType.numberWithOptions(decimal: true),
         style: const TextStyle(
           fontSize: 14,
@@ -422,40 +532,6 @@ class _MedicalFeesState extends State<MedicalFees> {
     );
   }
 
-  Widget _buildDropdownField(
-    String value,
-    List<String> items,
-    Function(String?) onChanged,
-  ) {
-    return Container(
-      height: 44,
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(color: borderColor),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<String>(
-          value: value,
-          isExpanded: true,
-          items: items
-              .map(
-                (s) => DropdownMenuItem(
-                  value: s,
-                  child: Text(
-                    s,
-                    style: const TextStyle(fontSize: 14, color: textDark),
-                  ),
-                ),
-              )
-              .toList(),
-          onChanged: onChanged,
-        ),
-      ),
-    );
-  }
-
   Widget _buildSegmentedControl(
     List<String> options,
     String current,
@@ -482,6 +558,47 @@ class _MedicalFeesState extends State<MedicalFees> {
                 ),
                 child: Text(
                   opt,
+                  style: TextStyle(
+                    color: isSel ? Colors.white : textMuted,
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+
+  // ID 版本的 SegmentedControl - 用於收款狀態
+  Widget _buildIdSegmentedControl(
+    List<CollectionStatusData> options,
+    int? currentId,
+    Function(int?) onSelect,
+  ) {
+    return Container(
+      height: 44,
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF1F5F9),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        children: options.map((opt) {
+          bool isSel = currentId == opt.id;
+          return Expanded(
+            child: GestureDetector(
+              onTap: () => onSelect(opt.id),
+              child: Container(
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: isSel ? primaryColor : Colors.transparent,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Text(
+                  opt.name,
                   style: TextStyle(
                     color: isSel ? Colors.white : textMuted,
                     fontSize: 11,

@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart';
 import '../database.dart';
 import '../tables/medical_tables.dart';
+import '../tables/normalization_tables.dart';
 
 part 'treatment_dao.g.dart';
 
@@ -14,6 +15,9 @@ part 'treatment_dao.g.dart';
     Treatment,
     MedicalStaffAssignment,
     SpecialNotes,
+    ChiefComplaintSymptomLinks,
+    TreatmentActionLinks,
+    SpecialNoteLinks,
   ],
 )
 class TreatmentDao extends DatabaseAccessor<AppDatabase>
@@ -104,8 +108,10 @@ class TreatmentDao extends DatabaseAccessor<AppDatabase>
     )..where((t) => t.medicalId.equals(medicalId))).getSingleOrNull();
   }
 
-  Future<bool> updateMedicalHistory(MedicalHistoryCompanion data) {
-    return update(medicalHistory).replace(data);
+  Future<int> updateMedicalHistory(MedicalHistoryCompanion data) {
+    return (update(medicalHistory)
+          ..where((t) => t.historyId.equals(data.historyId.value)))
+        .write(data);
   }
 
   // 處置 / 診斷
@@ -194,5 +200,131 @@ class TreatmentDao extends DatabaseAccessor<AppDatabase>
     await (delete(
       specialNotes,
     )..where((t) => t.medicalId.equals(medicalId))).go();
+  }
+
+  // 主訴症狀關聯方法（取代 JSON 存儲）
+
+  Future<List<int>> getChiefComplaintSymptomIds(int complaintId) async {
+    final links = await (select(chiefComplaintSymptomLinks)
+          ..where((l) => l.complaintId.equals(complaintId)))
+        .get();
+    return links.map((l) => l.symptomId).toList();
+  }
+
+  Future<void> addChiefComplaintSymptom(int complaintId, int symptomId) async {
+    await into(chiefComplaintSymptomLinks).insert(
+      ChiefComplaintSymptomLinksCompanion.insert(
+        complaintId: complaintId,
+        symptomId: symptomId,
+      ),
+      mode: InsertMode.insertOrIgnore,
+    );
+  }
+
+  Future<void> removeChiefComplaintSymptom(int complaintId, int symptomId) async {
+    await (delete(chiefComplaintSymptomLinks)
+          ..where((l) => l.complaintId.equals(complaintId) & l.symptomId.equals(symptomId)))
+        .go();
+  }
+
+  Future<void> toggleChiefComplaintSymptom(int complaintId, int symptomId) async {
+    final exists = await (select(chiefComplaintSymptomLinks)
+          ..where((l) => l.complaintId.equals(complaintId) & l.symptomId.equals(symptomId)))
+        .getSingleOrNull();
+    if (exists != null) {
+      await removeChiefComplaintSymptom(complaintId, symptomId);
+    } else {
+      await addChiefComplaintSymptom(complaintId, symptomId);
+    }
+  }
+
+  Future<void> clearChiefComplaintSymptoms(int complaintId) async {
+    await (delete(chiefComplaintSymptomLinks)
+          ..where((l) => l.complaintId.equals(complaintId)))
+        .go();
+  }
+
+  // 處置項目關聯方法（取代 JSON 存儲）
+
+  Future<List<int>> getTreatmentActionIds(int treatmentId) async {
+    final links = await (select(treatmentActionLinks)
+          ..where((l) => l.treatmentId.equals(treatmentId)))
+        .get();
+    return links.map((l) => l.actionItemId).toList();
+  }
+
+  Future<void> addTreatmentAction(int treatmentId, int actionItemId) async {
+    await into(treatmentActionLinks).insert(
+      TreatmentActionLinksCompanion.insert(
+        treatmentId: treatmentId,
+        actionItemId: actionItemId,
+      ),
+      mode: InsertMode.insertOrIgnore,
+    );
+  }
+
+  Future<void> removeTreatmentAction(int treatmentId, int actionItemId) async {
+    await (delete(treatmentActionLinks)
+          ..where((l) => l.treatmentId.equals(treatmentId) & l.actionItemId.equals(actionItemId)))
+        .go();
+  }
+
+  Future<void> toggleTreatmentAction(int treatmentId, int actionItemId) async {
+    final exists = await (select(treatmentActionLinks)
+          ..where((l) => l.treatmentId.equals(treatmentId) & l.actionItemId.equals(actionItemId)))
+        .getSingleOrNull();
+    if (exists != null) {
+      await removeTreatmentAction(treatmentId, actionItemId);
+    } else {
+      await addTreatmentAction(treatmentId, actionItemId);
+    }
+  }
+
+  Future<void> clearTreatmentActions(int treatmentId) async {
+    await (delete(treatmentActionLinks)
+          ..where((l) => l.treatmentId.equals(treatmentId)))
+        .go();
+  }
+
+  // 特別註記關聯方法（取代 JSON 存儲）
+
+  Future<List<int>> getSpecialNoteIds(int noteId) async {
+    final links = await (select(specialNoteLinks)
+          ..where((l) => l.noteId.equals(noteId)))
+        .get();
+    return links.map((l) => l.noteRefId).toList();
+  }
+
+  Future<void> addSpecialNote(int noteId, int noteRefId) async {
+    await into(specialNoteLinks).insert(
+      SpecialNoteLinksCompanion.insert(
+        noteId: noteId,
+        noteRefId: noteRefId,
+      ),
+      mode: InsertMode.insertOrIgnore,
+    );
+  }
+
+  Future<void> removeSpecialNote(int noteId, int noteRefId) async {
+    await (delete(specialNoteLinks)
+          ..where((l) => l.noteId.equals(noteId) & l.noteRefId.equals(noteRefId)))
+        .go();
+  }
+
+  Future<void> toggleSpecialNote(int noteId, int noteRefId) async {
+    final exists = await (select(specialNoteLinks)
+          ..where((l) => l.noteId.equals(noteId) & l.noteRefId.equals(noteRefId)))
+        .getSingleOrNull();
+    if (exists != null) {
+      await removeSpecialNote(noteId, noteRefId);
+    } else {
+      await addSpecialNote(noteId, noteRefId);
+    }
+  }
+
+  Future<void> clearSpecialNotes(int noteId) async {
+    await (delete(specialNoteLinks)
+          ..where((l) => l.noteId.equals(noteId)))
+        .go();
   }
 }

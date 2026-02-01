@@ -8,6 +8,7 @@ import 'dart:io';
 import 'tables/reference_tables.dart';
 import 'tables/medical_tables.dart';
 import 'tables/icd10_tables.dart';
+import 'tables/normalization_tables.dart';
 
 //匯入DAO
 import 'dao/reference_dao.dart';
@@ -16,6 +17,11 @@ import 'dao/flight_dao.dart';
 import 'dao/incident_dao.dart';
 import 'dao/treatment_dao.dart';
 import 'dao/icd10_dao.dart';
+import 'dao/certificate_dao.dart';
+import 'dao/telex_dao.dart';
+import 'dao/medical_fee_dao.dart';
+import 'dao/nursing_record_dao.dart';
+import 'dao/referral_form_dao.dart';
 
 part 'database.g.dart';
 
@@ -41,6 +47,16 @@ part 'database.g.dart';
     MedicalStaff,
     SpecialNoteRef,
     NursingPhrase,
+    PaymentMethod,
+    CollectionStatus,
+    CurrencyRef,
+    ReferralPurpose,
+    StationRef,
+    RelationshipType,
+    HistoryStatusRef,
+    MedicalStaffRole,
+    PupilReactionRef,
+    ConsciousnessLevelRef,
 
     //醫療表
     MedicalRecord,
@@ -56,6 +72,14 @@ part 'database.g.dart';
     Treatment,
     MedicalStaffAssignment,
     SpecialNotes,
+    MedicalCertificates,
+    MedicalFees,
+    NursingRecords,
+    ReferralForms,
+    TelexDocuments,
+    ChiefComplaintSymptomLinks,
+    TreatmentActionLinks,
+    SpecialNoteLinks,
 
     //ICD-10
     Icd10Code,
@@ -67,6 +91,11 @@ part 'database.g.dart';
     IncidentDao,
     TreatmentDao,
     Icd10Dao,
+    CertificateDao,
+    TelexDao,
+    MedicalFeeDao,
+    NursingRecordDao,
+    ReferralFormDao,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -95,4 +124,16 @@ class AppDatabase extends _$AppDatabase {
 
   @override
   Icd10Dao get icd10Dao => Icd10Dao(this);
+
+  @override
+  CertificateDao get certificateDao => CertificateDao(this);
+  @override
+  TelexDao get telexDao => TelexDao(this);
+
+  @override
+  MedicalFeeDao get medicalFeeDao => MedicalFeeDao(this);
+  @override
+  NursingRecordDao get nursingRecordDao => NursingRecordDao(this);
+  @override
+  ReferralFormDao get referralFormDao => ReferralFormDao(this);
 }

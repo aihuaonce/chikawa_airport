@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import '../../data/models/medical/treatment_view.dart';
 
 class RefusalOfReferral extends StatefulWidget {
   final int medicalId;
@@ -33,7 +35,8 @@ class _RefusalOfReferralState extends State<RefusalOfReferral> {
 
   // 狀態變數
   bool _isSelf = true;
-  String _selectedDoctor = '醫師 A';
+  String? _selectedDoctor; // 改為 nullable 以支援動態載入
+  bool _isInitialized = false;
 
   @override
   void initState() {
@@ -57,8 +60,80 @@ class _RefusalOfReferralState extends State<RefusalOfReferral> {
     super.dispose();
   }
 
+  // 初始化並帶入資料
+  void _updateControllers(TreatmentViewModel viewModel) {
+    if (_isInitialized) return;
+
+    // 檢查關鍵資料是否已載入
+    if (viewModel.patient == null || viewModel.medicalStaffList.isEmpty) {
+      return;
+    }
+
+    final patient = viewModel.patient;
+    if (patient != null) {
+      if (_patientNameController.text.isEmpty) {
+        _patientNameController.text = patient.name ?? '';
+      }
+      if (_patientIdController.text.isEmpty) {
+        _patientIdController.text = patient.passportOrIdNo ?? '';
+      }
+      if (_patientBirthController.text.isEmpty && patient.birthday != null) {
+        _patientBirthController.text = DateFormat(
+          'yyyy/MM/dd',
+        ).format(patient.birthday!);
+      }
+    }
+
+    // 嘗試帶入主責醫師
+    if (_selectedDoctor == null) {
+      try {
+        final primaryDoctor = viewModel.staffAssignments.firstWhere(
+          (a) =>
+              viewModel.getStaffRoleCode(a.staffRoleId) == 'DOCTOR' &&
+              a.isPrimary,
+        );
+        if (primaryDoctor.staffName != null) {
+          _selectedDoctor = primaryDoctor.staffName;
+        }
+      } catch (_) {
+        // 若無主責醫師，嘗試找任一醫師
+        try {
+          final anyDoctor = viewModel.staffAssignments.firstWhere(
+            (a) => viewModel.getStaffRoleCode(a.staffRoleId) == 'DOCTOR',
+          );
+          if (anyDoctor.staffName != null) {
+            _selectedDoctor = anyDoctor.staffName;
+          }
+        } catch (_) {}
+      }
+    }
+
+    _isInitialized = true;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final viewModel = context.watch<TreatmentViewModel>();
+    _updateControllers(viewModel);
+
+    // 檢查處置結果是否為拒絕轉診
+    final treatment = viewModel.treatment;
+    final refusedResult = viewModel.treatmentResults
+        .where((r) => r.name.contains('拒絕') || r.name.contains('Refused'))
+        .firstOrNull;
+
+    if (treatment == null ||
+        refusedResult == null ||
+        treatment.resultId != refusedResult.id) {
+      return const Center(
+        child: Text(
+          '此案件非拒絕轉診，無需填寫此切結書。\n(This form is only for Refusal of Referral)',
+          textAlign: TextAlign.center,
+          style: TextStyle(color: textMuted, fontSize: 16),
+        ),
+      );
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -108,7 +183,7 @@ class _RefusalOfReferralState extends State<RefusalOfReferral> {
           'Bilingual declaration for Against Medical Advice (AMA).',
         ),
         const SizedBox(height: 16),
-        _buildLegalStatementBox(),
+        _buildLegalStatementBox(viewModel),
 
         const SizedBox(height: 32),
 
@@ -122,7 +197,7 @@ class _RefusalOfReferralState extends State<RefusalOfReferral> {
         Row(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            _buildIdentityToggle(),
+            _buildIdentityToggle(viewModel),
             const SizedBox(width: 24),
             if (!_isSelf)
               Expanded(
@@ -225,7 +300,7 @@ class _RefusalOfReferralState extends State<RefusalOfReferral> {
 
   // --- UI 組件實作 ---
 
-  Widget _buildLegalStatementBox() {
+  Widget _buildLegalStatementBox(TreatmentViewModel viewModel) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(24),
@@ -268,7 +343,7 @@ class _RefusalOfReferralState extends State<RefusalOfReferral> {
                 '${_currentDateController.text} 於桃園國際機場接受聯新國際醫院桃園國際機場醫療中心醫師 ',
                 style: const TextStyle(fontSize: 14, color: textDark),
               ),
-              _buildDoctorDropdown(),
+              _buildDoctorDropdown(viewModel),
             ],
           ),
           const SizedBox(height: 12),
@@ -301,7 +376,7 @@ class _RefusalOfReferralState extends State<RefusalOfReferral> {
           ),
           const SizedBox(height: 8),
           Text(
-            "Here by clarified that I / my family patient had been notified by Dr. $_selectedDoctor of Landseed Medical Clinic at Taiwan Taoyuan Int'l Airport, I am /my family patient is now in illness/necessary condition which needed to be transported to an advanced hospital facilities for further test and treatment. But under my our personal status/consideration, I/We decided to handle this situation by myself/ourselves, against any further medical advice I am hereby signing this consent clarified that I am /and my family are willing to take all the risks and hold all the responsibilities of any consequences, even hazardous to my/my family member's health or life integrity unexpectedly.",
+            "Here by clarified that I / my family patient had been notified by Dr. ${_selectedDoctor ?? '_____'} of Landseed Medical Clinic at Taiwan Taoyuan Int'l Airport, I am /my family patient is now in illness/necessary condition which needed to be transported to an advanced hospital facilities for further test and treatment. But under my our personal status/consideration, I/We decided to handle this situation by myself/ourselves, against any further medical advice I am hereby signing this consent clarified that I am /and my family are willing to take all the risks and hold all the responsibilities of any consequences, even hazardous to my/my family member's health or life integrity unexpectedly.",
             style: TextStyle(
               fontSize: 13,
               color: textMuted,
@@ -314,7 +389,7 @@ class _RefusalOfReferralState extends State<RefusalOfReferral> {
     );
   }
 
-  Widget _buildIdentityToggle() {
+  Widget _buildIdentityToggle(TreatmentViewModel viewModel) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -329,8 +404,8 @@ class _RefusalOfReferralState extends State<RefusalOfReferral> {
           ),
           child: Row(
             children: [
-              _buildToggleItem('本人 Self', _isSelf, true),
-              _buildToggleItem('代簽 Proxy', !_isSelf, false),
+              _buildToggleItem('本人 Self', _isSelf, true, viewModel),
+              _buildToggleItem('代簽 Proxy', !_isSelf, false, viewModel),
             ],
           ),
         ),
@@ -338,9 +413,19 @@ class _RefusalOfReferralState extends State<RefusalOfReferral> {
     );
   }
 
-  Widget _buildToggleItem(String label, bool active, bool value) {
+  Widget _buildToggleItem(
+    String label,
+    bool active,
+    bool value,
+    TreatmentViewModel viewModel,
+  ) {
     return GestureDetector(
-      onTap: () => setState(() => _isSelf = value),
+      onTap: () {
+        setState(() {
+          _isSelf = value;
+          _updateSignatoryInfo(viewModel);
+        });
+      },
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         width: 100,
@@ -361,10 +446,47 @@ class _RefusalOfReferralState extends State<RefusalOfReferral> {
     );
   }
 
-  Widget _buildDoctorDropdown() {
+  void _updateSignatoryInfo(TreatmentViewModel viewModel) {
+    if (_isSelf) {
+      final patient = viewModel.patient;
+      if (patient != null) {
+        _signatoryNameController.text = patient.name ?? '';
+        _signatoryIdController.text =
+            patient.idNo ?? patient.passportOrIdNo ?? '';
+        _addressController.text = patient.address ?? '';
+        _phoneController.text = patient.telephone ?? '';
+      }
+    } else {
+      _signatoryNameController.clear();
+      _signatoryIdController.clear();
+      _relationshipController.clear();
+      _addressController.clear();
+      _phoneController.clear();
+    }
+  }
+
+  Widget _buildDoctorDropdown(TreatmentViewModel viewModel) {
+    // 篩選出醫師清單
+    final doctors = viewModel.medicalStaffList
+        .where((s) => s.role == 'Doctor')
+        .map((s) => s.name)
+        .toSet() // 去重
+        .toList();
+
+    // 確保當前選擇的醫師在清單中
+    if (_selectedDoctor != null && !doctors.contains(_selectedDoctor)) {
+      doctors.add(_selectedDoctor!);
+    }
+
+    // 若清單為空，提供預設選項
+    if (doctors.isEmpty) {
+      doctors.add('醫師 A');
+    }
+
     return DropdownButtonHideUnderline(
       child: DropdownButton<String>(
         value: _selectedDoctor,
+        hint: const Text('請選擇醫師'),
         icon: const Icon(Icons.arrow_drop_down, color: primaryColor),
         style: const TextStyle(
           fontSize: 14,
@@ -376,11 +498,9 @@ class _RefusalOfReferralState extends State<RefusalOfReferral> {
             _selectedDoctor = newValue!;
           });
         },
-        items: <String>['醫師 A', '醫師 B', '醫師 C', '醫師 D']
-            .map<DropdownMenuItem<String>>((String value) {
-              return DropdownMenuItem<String>(value: value, child: Text(value));
-            })
-            .toList(),
+        items: doctors.map<DropdownMenuItem<String>>((String value) {
+          return DropdownMenuItem<String>(value: value, child: Text(value));
+        }).toList(),
       ),
     );
   }

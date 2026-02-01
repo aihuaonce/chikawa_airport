@@ -41,9 +41,6 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
   bool _cdcPassed = false;
   String _screeningMethod = '';
 
-  // 主訴相關
-  final List<String> _selectedSymptoms = [];
-
   // 影像記錄
   bool _photoTrauma = false;
   bool _photoEcg = false;
@@ -76,16 +73,12 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
 
   // 意識檢查狀態（非 Controller，用於 Checkbox 和 SegmentedControl）
   bool _isAlert = true;
-  String _leftPupilReaction = '+';
-  String _rightPupilReaction = '+';
+  int? _leftPupilReactionId = 1; // 1 = positive (+)
+  int? _rightPupilReactionId = 1; // 1 = positive (+)
   int? _gcsTotal; // GCS Total 自動計算，不儲存到 Controller
 
-  // 病史
-  String _pastHistoryStatus = '無';
-  String _allergyStatus = '無';
-
-  // 處置項目選擇
-  final List<int> _selectedActionItemIds = [];
+  // 處置項目選擇 (現在由 ViewModel 管理多對多關聯)
+  // 不再需要本地狀態變量
 
   // 協助人員
   // final List<String> _assistStaffList = [];
@@ -98,9 +91,6 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
   // 健康評估表 controller（數據來自 ViewModel）
   final Map<int, Map<String, TextEditingController>>
   _healthAssessmentControllers = {};
-
-  // 特別註記
-  final List<String> _selectedSpecialNotes = [];
 
   @override
   void initState() {
@@ -206,31 +196,16 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
     if (history != null) {
       _pastHistoryDetailController.text = history.pastHistoryDetail ?? '';
       _allergyDetailController.text = history.allergyDetail ?? '';
-      // 載入狀態值（使用 ?? '無' 確保不會是 null）
-      _pastHistoryStatus = history.pastHistoryStatus;
-      _allergyStatus = history.allergyStatus;
+      // 病史狀態現在由 ViewModel 從參考表管理
+      // 不再需要從本地狀態變量載入
     }
 
     final treatment = viewModel.treatment;
     if (treatment != null) {
       _actionSummaryOtherController.text = treatment.actionSummaryOther ?? '';
 
-      // 解析處理摘要 (Names -> IDs)
-      if (treatment.actionSummary != null &&
-          treatment.actionSummary!.isNotEmpty) {
-        final names = treatment.actionSummary!.split(',');
-        _selectedActionItemIds.clear();
-        for (final name in names) {
-          try {
-            final item = viewModel.actionItems.firstWhere(
-              (item) => item.name == name.trim(),
-            );
-            _selectedActionItemIds.add(item.id);
-          } catch (e) {
-            // 忽略找不到的項目
-          }
-        }
-      }
+      // 處置項目現在通過多對多關聯表管理，由 ViewModel 自動載入
+      // 不再需要從 JSON 字串解析
 
       // 載入 ICD-10 資料
       _tentativeController.text = treatment.tentative ?? '';
@@ -239,24 +214,12 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
 
       // 載入負責人姓名
       _directorNameController.text = treatment.directorName ?? '';
-
-      // 載入輔助人員 (改為從 viewModel.staffAssignments 讀取，不再使用 treatment.assistStaff)
-      /*
-      if (treatment.assistStaff != null && treatment.assistStaff!.isNotEmpty) {
-        _assistStaffList.clear();
-        _assistStaffList.addAll(treatment.assistStaff!.split(','));
-      }
-      */
     }
 
-    // 載入特別註記
+    // 載入特別註記的其他說明
     final specialNotes = viewModel.specialNotes;
     if (specialNotes != null) {
-      if (specialNotes.selectedNotes != null &&
-          specialNotes.selectedNotes!.isNotEmpty) {
-        _selectedSpecialNotes.clear();
-        _selectedSpecialNotes.addAll(specialNotes.selectedNotes!.split(','));
-      }
+      // 特別註記現在通過多對多關聯表管理，由 ViewModel 自動載入
       _otherSpecialNoteController.text = specialNotes.otherNotes ?? '';
     }
 
@@ -308,8 +271,8 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
           latestConsciousnessExam.leftPupilSize?.toString() ?? '';
       _rightPupilSizeController.text =
           latestConsciousnessExam.rightPupilSize?.toString() ?? '';
-      _leftPupilReaction = latestConsciousnessExam.leftPupilReaction ?? '+';
-      _rightPupilReaction = latestConsciousnessExam.rightPupilReaction ?? '+';
+      _leftPupilReactionId = latestConsciousnessExam.leftPupilReactionId ?? 1;
+      _rightPupilReactionId = latestConsciousnessExam.rightPupilReactionId ?? 1;
 
       // 理學檢查
       _headNeckController.text = latestConsciousnessExam.headNeckExam ?? '';
@@ -320,8 +283,8 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
       _otherPhysicalExamController.text =
           latestConsciousnessExam.otherPhysicalExam ?? '';
 
-      // 意識狀態
-      _isAlert = latestConsciousnessExam.consciousnessLevel == 'alert';
+      // 意識狀態 - 檢查 consciousnessLevelId 是否對應 'alert' (ID = 1)
+      _isAlert = latestConsciousnessExam.consciousnessLevelId == 1;
 
       debugPrint('DEBUG: 意識與理學檢查資料已載入 - GCS: $_gcsTotal');
     } else {
@@ -533,11 +496,8 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
                 viewModel.complaintTypes[i],
                 complaint?.chiefComplaintTypeId,
                 (id) {
-                  viewModel.updateChiefComplaint(
-                    chiefComplaintTypeId: id,
-                    selectedSymptoms: '',
-                  );
-                  _selectedSymptoms.clear();
+                  // 切換主訴類別時，由 ViewModel 處理關聯表清理
+                  viewModel.updateChiefComplaint(chiefComplaintTypeId: id);
                 },
               ),
             ],
@@ -546,7 +506,7 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
         if (complaint?.chiefComplaintTypeId != null) ...[
           const SizedBox(height: 12),
           _buildSymptomGrid(viewModel, complaint!),
-          if (_selectedSymptoms.contains('其它')) ...[
+          if (viewModel.hasOtherSymptomSelected) ...[
             const SizedBox(height: 8),
             _buildTextField(
               hint: '請註明其它主訴',
@@ -1075,10 +1035,16 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
                 child: _buildPupilSection(
                   '左瞳孔 Left Pupil',
                   (v) {
-                    setState(() => _leftPupilReaction = v);
+                    setState(
+                      () => _leftPupilReactionId = v == '+'
+                          ? 1
+                          : (v == '-' ? 2 : 3),
+                    );
                     _onConsciousnessAndExamChanged(viewModel);
                   },
-                  _leftPupilReaction,
+                  _leftPupilReactionId == 1
+                      ? '+'
+                      : (_leftPupilReactionId == 2 ? '-' : '±'),
                   _leftPupilSizeController,
                 ),
               ),
@@ -1087,10 +1053,16 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
                 child: _buildPupilSection(
                   '右瞳孔 Right Pupil',
                   (v) {
-                    setState(() => _rightPupilReaction = v);
+                    setState(
+                      () => _rightPupilReactionId = v == '+'
+                          ? 1
+                          : (v == '-' ? 2 : 3),
+                    );
                     _onConsciousnessAndExamChanged(viewModel);
                   },
-                  _rightPupilReaction,
+                  _rightPupilReactionId == 1
+                      ? '+'
+                      : (_rightPupilReactionId == 2 ? '-' : '±'),
                   _rightPupilSizeController,
                 ),
               ),
@@ -1147,23 +1119,68 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
   }
 
   Widget _buildHistorySection(TreatmentViewModel viewModel) {
+    // 从参考表获取病史状态选项
+    final historyStatuses = viewModel.historyStatuses;
+    final historyStatusNames = historyStatuses.map((s) => s.name).toList();
+
+    // 获取当前选中的病史状态名称
+    String selectedHistoryStatus = '無';
+    if (viewModel.selectedHistoryStatusId != null &&
+        historyStatuses.isNotEmpty) {
+      final status = historyStatuses
+          .where((s) => s.id == viewModel.selectedHistoryStatusId)
+          .firstOrNull;
+      if (status != null) {
+        selectedHistoryStatus = status.name;
+      }
+    }
+
+    // 过敏史使用同样的参考表或单独的状态
+    final allergyStatuses = viewModel.allergyStatuses;
+    final allergyStatusNames = allergyStatuses.map((s) => s.name).toList();
+
+    String selectedAllergyStatus = '無';
+    if (viewModel.selectedAllergyStatusId != null &&
+        allergyStatuses.isNotEmpty) {
+      final status = allergyStatuses
+          .where((s) => s.id == viewModel.selectedAllergyStatusId)
+          .firstOrNull;
+      if (status != null) {
+        selectedAllergyStatus = status.name;
+      }
+    }
+
+    // 查找"有"（需要详细说明）的状态ID - 通常code为'yes'
+    final hasStatusId = historyStatuses
+        .where((s) => s.code == 'yes')
+        .firstOrNull
+        ?.id;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildLabel('過去病史 Past Medical History'),
         const SizedBox(height: 4),
-        _buildSegmentedControl(['無', '不詳', '有'], _pastHistoryStatus, (v) {
-          setState(() {
-            _pastHistoryStatus = v;
-            // 如果切換到「無」或「不詳」，清除詳細資料
-            if (v == '無' || v == '不詳') {
-              _pastHistoryDetailController.clear();
+        if (historyStatusNames.isNotEmpty)
+          _buildSegmentedControl(historyStatusNames, selectedHistoryStatus, (
+            v,
+          ) {
+            final selectedStatus = historyStatuses
+                .where((s) => s.name == v)
+                .firstOrNull;
+            if (selectedStatus != null) {
+              // 如果切換到不是"有"的状态，清除詳細資料
+              if (selectedStatus.code != 'yes') {
+                _pastHistoryDetailController.clear();
+              }
+              // 同步到 ViewModel 並觸發 auto-save (使用 optimistic update)
+              viewModel.updatePastHistoryStatusId(selectedStatus.id);
             }
-          });
-          // 同步到 ViewModel 並觸發 auto-save
-          viewModel.updatePastHistoryStatus(v);
-        }),
-        if (_pastHistoryStatus == '有') ...[
+          })
+        else
+          // 如果参考表为空，显示加载中
+          const Text('載入中...'),
+        if (viewModel.selectedHistoryStatusId == hasStatusId) ...[
           const SizedBox(height: 8),
           _buildTextField(
             hint: '列出慢性病或手術史...',
@@ -1175,18 +1192,25 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
         const SizedBox(height: 16),
         _buildLabel('過敏史 Allergy History'),
         const SizedBox(height: 4),
-        _buildSegmentedControl(['無', '不詳', '有'], _allergyStatus, (v) {
-          setState(() {
-            _allergyStatus = v;
-            // 如果切換到「無」或「不詳」，清除詳細資料
-            if (v == '無' || v == '不詳') {
-              _allergyDetailController.clear();
+        if (allergyStatusNames.isNotEmpty)
+          _buildSegmentedControl(allergyStatusNames, selectedAllergyStatus, (
+            v,
+          ) {
+            final selectedStatus = allergyStatuses
+                .where((s) => s.name == v)
+                .firstOrNull;
+            if (selectedStatus != null) {
+              // 如果切換到不是"有"的状态，清除詳細資料
+              if (selectedStatus.code != 'yes') {
+                _allergyDetailController.clear();
+              }
+              // 同步到 ViewModel 並觸發 auto-save
+              viewModel.updateAllergyStatusId(selectedStatus.id);
             }
-          });
-          // 同步到 ViewModel 並觸發 auto-save
-          viewModel.updateAllergyStatus(v);
-        }),
-        if (_allergyStatus == '有') ...[
+          })
+        else
+          const Text('載入中...'),
+        if (viewModel.selectedAllergyStatusId == hasStatusId) ...[
           const SizedBox(height: 8),
           _buildTextField(
             hint: '註明藥物或食物過敏狀況...',
@@ -1272,7 +1296,7 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
                               ?.name ==
                           '轉其它醫院') ...[
                     const SizedBox(height: 8),
-                    _buildTextField(hint: '請註明醫院名稱'),
+                    _buildReferralHospitalDropdown(viewModel, treatment),
                   ],
                 ],
               ),
@@ -1283,14 +1307,8 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
         _buildLabel('處理摘要 Summary of Action (可複選)'),
         const SizedBox(height: 8),
         _buildActionSummaryGrid(viewModel),
-        if (_selectedActionItemIds.contains(
-          viewModel.actionItems
-              .firstWhere(
-                (item) => item.name == '其他',
-                orElse: () => viewModel.actionItems.first,
-              )
-              .id,
-        )) ...[
+        // 檢查是否選中了"其他"處置項目
+        if (viewModel.hasOtherActionSelected) ...[
           const SizedBox(height: 12),
           _buildTextField(
             hint: '請詳述其它處理項目...',
@@ -1389,29 +1407,13 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
       spacing: 8,
       runSpacing: 8,
       children: viewModel.actionItems.map((item) {
-        bool isSelected = _selectedActionItemIds.contains(item.id);
+        bool isSelected = viewModel.selectedActionIds.contains(item.id);
         return FilterChip(
           label: Text(item.name, style: const TextStyle(fontSize: 12)),
           selected: isSelected,
           onSelected: (sel) {
-            setState(() {
-              if (sel) {
-                _selectedActionItemIds.add(item.id);
-              } else {
-                _selectedActionItemIds.remove(item.id);
-              }
-            });
-            // 更新到 ViewModel - 將選中的 ID 列表轉為逗號分隔的字串
-            final actionSummary = _selectedActionItemIds
-                .map((id) {
-                  final item = viewModel.actionItems.firstWhere(
-                    (a) => a.id == id,
-                    orElse: () => viewModel.actionItems.first,
-                  );
-                  return item.name;
-                })
-                .join(',');
-            viewModel.updateActionSummary(actionSummary);
+            // 使用 ViewModel 的多对多方法
+            viewModel.toggleActionItem(item.id);
           },
           selectedColor: primaryColor.withValues(alpha: 0.1),
           checkmarkColor: primaryColor,
@@ -1440,20 +1442,28 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
 
     // 取得已指派的主要醫師和護理師
     final primaryDoctor = viewModel.staffAssignments
-        .where((a) => a.staffRole == 'Doctor' && a.isPrimary)
+        .where(
+          (a) =>
+              viewModel.getStaffRoleCode(a.staffRoleId) == 'DOCTOR' &&
+              a.isPrimary,
+        )
         .firstOrNull;
     final primaryNurse = viewModel.staffAssignments
-        .where((a) => a.staffRole == 'Nurse' && a.isPrimary)
+        .where(
+          (a) =>
+              viewModel.getStaffRoleCode(a.staffRoleId) == 'NURSE' &&
+              a.isPrimary,
+        )
         .firstOrNull;
 
     // 取得 EMT 指派
     final emtAssignment = viewModel.staffAssignments
-        .where((a) => a.staffRole == 'EMT')
+        .where((a) => viewModel.getStaffRoleCode(a.staffRoleId) == 'EMT')
         .firstOrNull;
 
     // 取得 Assist Staff 指派
     final assistAssignments = viewModel.staffAssignments
-        .where((a) => a.staffRole == 'Assist')
+        .where((a) => viewModel.getStaffRoleCode(a.staffRoleId) == 'ASSIST')
         .toList();
 
     return Column(
@@ -1485,7 +1495,7 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
                     (staffId) {
                       if (staffId != null) {
                         viewModel.addStaffAssignment(
-                          staffRole: 'Doctor',
+                          staffRoleCode: 'DOCTOR',
                           staffId: staffId,
                           isPrimary: true,
                         );
@@ -1510,7 +1520,7 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
                               (staffId) {
                                 if (staffId != null) {
                                   viewModel.addStaffAssignment(
-                                    staffRole: 'Nurse',
+                                    staffRoleCode: 'NURSE',
                                     staffId: staffId,
                                     isPrimary: true,
                                   );
@@ -1594,7 +1604,7 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
                     (staffId) {
                       if (staffId != null) {
                         viewModel.addStaffAssignment(
-                          staffRole: 'EMT',
+                          staffRoleCode: 'EMT',
                           staffId: staffId,
                         );
                       }
@@ -1650,7 +1660,7 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
                   );
                   if (result != null) {
                     viewModel.addStaffAssignment(
-                      staffRole: 'Assist',
+                      staffRoleCode: 'ASSIST',
                       staffId: result.id,
                       staffName: result.name,
                     );
@@ -1822,22 +1832,15 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
           runSpacing: 10,
           children: viewModel.specialNoteRefs.map((ref) {
             final note = ref.name;
-            final bool isSelected = _selectedSpecialNotes.contains(note);
+            final bool isSelected = viewModel.selectedSpecialNoteIds.contains(
+              ref.id,
+            );
             return FilterChip(
               label: Text(note),
               selected: isSelected,
               onSelected: (sel) {
-                setState(() {
-                  if (sel) {
-                    _selectedSpecialNotes.add(note);
-                  } else {
-                    _selectedSpecialNotes.remove(note);
-                  }
-                });
-                // 更新到資料庫
-                viewModel.updateSpecialNotes(
-                  selectedNotes: _selectedSpecialNotes.join(','),
-                );
+                // 使用 ViewModel 的多对多方法
+                viewModel.toggleSpecialNote(ref.id);
               },
               selectedColor: primaryColor.withValues(alpha: 0.1),
               checkmarkColor: primaryColor,
@@ -2055,6 +2058,52 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
     );
   }
 
+  Widget _buildReferralHospitalDropdown(
+    TreatmentViewModel viewModel,
+    TreatmentData? treatment,
+  ) {
+    final selectedHospital = treatment?.referralHospitalId != null
+        ? viewModel.getReferralHospitalById(treatment!.referralHospitalId)
+        : null;
+    final text = selectedHospital != null
+        ? selectedHospital.name
+        : (treatment?.referralHospitalFinal ?? '');
+
+    return _buildSelectionField(
+      text: text,
+      hint: '請選取轉診醫院',
+      icon: Icons.local_hospital,
+      onTap: () async {
+        final result = await ReferenceSearchSheet.show<ReferralHospitalData>(
+          context,
+          title: '選擇轉診醫院',
+          searchFunction: viewModel.searchReferralHospitals,
+          initialSelection: selectedHospital,
+          isSelectedComparator: (a, b) => a.id == b?.id,
+          itemBuilder: (context, item, isSelected) {
+            return ListTile(
+              title: Text(
+                item.name,
+                style: TextStyle(
+                  color: isSelected ? primaryColor : textDark,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                ),
+              ),
+              trailing: isSelected
+                  ? const Icon(Icons.check, color: primaryColor)
+                  : null,
+            );
+          },
+        );
+
+        if (result != null) {
+          viewModel.updateReferralHospitalId(result.id);
+          viewModel.updateReferralHospitalFinal(result.name);
+        }
+      },
+    );
+  }
+
   Widget _buildStaffDropdown(
     TreatmentViewModel viewModel,
     List<MedicalStaffData> staffList,
@@ -2211,6 +2260,7 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
     VoidCallback? onTap,
     Function(String)? onChanged,
     TextInputType? keyboardType,
+    bool autofocus = false,
   }) {
     return TextField(
       controller: controller,
@@ -2220,6 +2270,7 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
       onTap: onTap,
       onChanged: onChanged,
       keyboardType: keyboardType,
+      autofocus: autofocus,
       style: const TextStyle(fontSize: 13, color: textDark),
       decoration: InputDecoration(
         hintText: hint,
@@ -2395,14 +2446,14 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
 
     viewModel.updateConsciousnessAndExamCache(
       isAlert: _isAlert,
-      consciousnessLevel: _isAlert ? 'alert' : 'altered',
+      consciousnessLevelId: _isAlert ? 1 : 2,
       gcsE: _gcsEController.text,
       gcsV: _gcsVController.text,
       gcsM: _gcsMController.text,
       gcs: gcsTotal,
-      leftPupilReaction: _leftPupilReaction,
+      leftPupilReactionId: _leftPupilReactionId,
       leftPupilSize: double.tryParse(_leftPupilSizeController.text),
-      rightPupilReaction: _rightPupilReaction,
+      rightPupilReactionId: _rightPupilReactionId,
       rightPupilSize: double.tryParse(_rightPupilSizeController.text),
       headNeckExam: _headNeckController.text,
       chestExam: _chestController.text,
@@ -2692,21 +2743,13 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
       runSpacing: 6,
       children: details.map((detail) {
         final s = detail.name;
+        final isSelected = viewModel.selectedSymptomIds.contains(detail.id);
         return FilterChip(
           label: Text(s, style: const TextStyle(fontSize: 12)),
-          selected: _selectedSymptoms.contains(s),
+          selected: isSelected,
           onSelected: (sel) {
-            setState(() {
-              if (sel) {
-                _selectedSymptoms.add(s);
-              } else {
-                _selectedSymptoms.remove(s);
-              }
-            });
-            // 更新到資料庫
-            viewModel.updateChiefComplaint(
-              selectedSymptoms: _selectedSymptoms.join(','),
-            );
+            // 使用 ViewModel 的多对多方法
+            viewModel.toggleSymptom(detail.id);
           },
           backgroundColor: Colors.white,
           selectedColor: primaryColor.withValues(alpha: 0.1),

@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart';
 import 'reference_tables.dart';
+import 'normalization_tables.dart';
 
 //醫療主表
 class MedicalRecord extends Table {
@@ -28,11 +29,11 @@ class Patient extends Table {
   TextColumn get name => text().nullable()();
   TextColumn get anonymizationName => text().nullable()();
   DateTimeColumn get birthday => dateTime().nullable()();
-  IntColumn get age => integer().nullable()();
 
   IntColumn get sexId => integer().nullable().references(Sex, #sexId)();
 
   TextColumn get passportOrIdNo => text().nullable()();
+  TextColumn get idNo => text().nullable()(); // 新增身分證字號欄位
 
   IntColumn get nationalityId =>
       integer().nullable().references(Nationality, #nationalityId)();
@@ -165,17 +166,16 @@ class MedicalAssessment extends Table {
   IntColumn get painScore => integer().nullable()();
 
   // 意識評估
-  TextColumn get consciousnessLevel =>
-      text().nullable()(); // alert / drowsy / unconscious
+  IntColumn get consciousnessLevelId => integer().nullable().references(ConsciousnessLevelRef, #id)();
   IntColumn get gcs => integer().nullable()();
   TextColumn get gcsE => text().nullable()();
   TextColumn get gcsM => text().nullable()();
   TextColumn get gcsV => text().nullable()();
 
   // 瞳孔反應
-  TextColumn get leftPupilReaction => text().nullable()(); // + / - / ±
+  IntColumn get leftPupilReactionId => integer().nullable().references(PupilReactionRef, #id)();
   RealColumn get leftPupilSize => real().nullable()(); // mm（支援小數如 2.5）
-  TextColumn get rightPupilReaction => text().nullable()(); // + / - / ±
+  IntColumn get rightPupilReactionId => integer().nullable().references(PupilReactionRef, #id)();
   RealColumn get rightPupilSize => real().nullable()(); // mm（支援小數如 2.5）
 
   // 理學檢查
@@ -197,11 +197,11 @@ class MedicalHistory extends Table {
   IntColumn get medicalId => integer().references(MedicalRecord, #medicalId)();
 
   // 過去病史
-  TextColumn get pastHistoryStatus => text()(); // 無 / 不詳 / 有
+  IntColumn get pastHistoryStatusId => integer().nullable().references(HistoryStatusRef, #id)();
   TextColumn get pastHistoryDetail => text().nullable()();
 
   // 過敏史
-  TextColumn get allergyStatus => text()(); // 無 / 不詳 / 有
+  IntColumn get allergyStatusId => integer().nullable().references(HistoryStatusRef, #id)();
   TextColumn get allergyDetail => text().nullable()();
 
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
@@ -254,7 +254,7 @@ class Treatment extends Table {
 class MedicalStaffAssignment extends Table {
   IntColumn get staffAssignmentId => integer().autoIncrement()();
   IntColumn get medicalId => integer().references(MedicalRecord, #medicalId)();
-  TextColumn get staffRole => text()(); // physician / nurse / emt / assist
+  IntColumn get staffRoleId => integer().nullable().references(MedicalStaffRole, #id)();
   IntColumn get staffId => integer().nullable()(); // 關聯到員工表
   TextColumn get staffName => text().nullable()(); // 或直接儲存姓名
   BoolColumn get isPrimary => boolean().withDefault(const Constant(false))();
@@ -270,5 +270,128 @@ class SpecialNotes extends Table {
   IntColumn get medicalId => integer().references(MedicalRecord, #medicalId)();
   TextColumn get selectedNotes => text().nullable()(); // JSON 或逗號分隔
   TextColumn get otherNotes => text().nullable()(); // 其他特別註記
+  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+}
+
+// 1. 診斷證明書表 - MedicalCertificate
+@DataClassName('MedicalCertificateData')
+class MedicalCertificates extends Table {
+  IntColumn get certificateId => integer().autoIncrement()();
+  IntColumn get medicalId =>
+      integer().references(MedicalRecord, #medicalId)();
+  IntColumn get diagnosisCategoryId =>
+      integer().nullable().references(DiagnosisCategory, #id)();
+  TextColumn get diagnosisResult => text().nullable()();
+  TextColumn get chineseAdvice => text().nullable()();
+  TextColumn get englishAdvice => text().nullable()();
+  DateTimeColumn get issuanceDate => dateTime().nullable()();
+  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+}
+
+// 2. 醫療費用表 - MedicalFee
+@DataClassName('MedicalFeeData')
+class MedicalFees extends Table {
+  IntColumn get feeId => integer().autoIncrement()();
+  IntColumn get medicalId =>
+      integer().references(MedicalRecord, #medicalId)();
+  IntColumn get paymentMethodId =>
+      integer().nullable().references(PaymentMethod, #id)();
+  RealColumn get consultFee => real().withDefault(const Constant(0))();
+  RealColumn get ambulanceFee => real().withDefault(const Constant(0))();
+  IntColumn get currencyId =>
+      integer().nullable().references(CurrencyRef, #id)();
+  IntColumn get collectionStatusId =>
+      integer().nullable().references(CollectionStatus, #id)();
+  BoolColumn get receiptIssued =>
+      boolean().withDefault(const Constant(false))();
+  TextColumn get applicantName => text().nullable()();
+  TextColumn get applicantUnit => text().nullable()();
+  TextColumn get applicantPhone => text().nullable()();
+  TextColumn get remarks => text().nullable()();
+  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+}
+
+// 3. 護理記錄表 - NursingRecord
+@DataClassName('NursingRecordData')
+class NursingRecords extends Table {
+  IntColumn get recordId => integer().autoIncrement()();
+  IntColumn get medicalId =>
+      integer().references(MedicalRecord, #medicalId)();
+  DateTimeColumn get recordTime => dateTime()();
+  TextColumn get content => text()();
+  IntColumn get nurseId =>
+      integer().nullable().references(MedicalStaff, #id)();
+  BlobColumn get signature => blob().nullable()();
+  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+}
+
+// 4. 轉診單表 - ReferralForm
+@DataClassName('ReferralFormData')
+class ReferralForms extends Table {
+  IntColumn get formId => integer().autoIncrement()();
+  IntColumn get medicalId =>
+      integer().references(MedicalRecord, #medicalId)();
+
+  // 聯絡人資料
+  TextColumn get contactName => text().nullable()();
+  TextColumn get contactPhone => text().nullable()();
+  TextColumn get contactAddress => text().nullable()();
+
+  // 診斷
+  TextColumn get primaryDiagnosis => text().nullable()();
+  TextColumn get secondaryDiagnosis1 => text().nullable()();
+  TextColumn get secondaryDiagnosis2 => text().nullable()();
+
+  // 檢查及治療摘要
+  TextColumn get recentExamResult => text().nullable()();
+  DateTimeColumn get examDate => dateTime().nullable()();
+  TextColumn get recentMedication => text().nullable()();
+  DateTimeColumn get medicationDate => dateTime().nullable()();
+
+  // 轉診目的
+  IntColumn get referralPurposeId =>
+      integer().nullable().references(ReferralPurpose, #id)();
+  TextColumn get otherPurpose => text().nullable()();
+
+  // 醫師交辦與簽署
+  TextColumn get doctorName => text().nullable()();
+  TextColumn get doctorDepartment => text().nullable()();
+  BlobColumn get doctorSignature => blob().nullable()();
+  DateTimeColumn get orderDate => dateTime().nullable()();
+  TextColumn get notes => text().nullable()();
+
+  // 建議轉診院所
+  TextColumn get hospitalName => text().nullable()();
+  TextColumn get hospitalDept => text().nullable()();
+  TextColumn get hospitalDoctor => text().nullable()();
+  TextColumn get hospitalPhone => text().nullable()();
+  TextColumn get hospitalAddress => text().nullable()();
+
+  // 安排就醫
+  DateTimeColumn get scheduledDate => dateTime().nullable()();
+  TextColumn get scheduledDept => text().nullable()();
+  TextColumn get scheduledRoom => text().nullable()();
+  TextColumn get scheduledNumber => text().nullable()();
+
+  // 聲明與同意
+  IntColumn get relationshipId =>
+      integer().nullable().references(RelationshipType, #id)();
+  TextColumn get otherRelationship => text().nullable()();
+  BlobColumn get consentSignature => blob().nullable()();
+  DateTimeColumn get consentDateTime => dateTime().nullable()();
+
+  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+}
+
+// 5. TELEX 文件表 - TelexDocument
+@DataClassName('TelexDocumentData')
+class TelexDocuments extends Table {
+  IntColumn get documentId => integer().autoIncrement()();
+  IntColumn get medicalId =>
+      integer().references(MedicalRecord, #medicalId)();
+  IntColumn get toStationId =>
+      integer().nullable().references(StationRef, #id)();
+  IntColumn get fromStationId =>
+      integer().nullable().references(StationRef, #id)();
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
 }

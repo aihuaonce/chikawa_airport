@@ -1,5 +1,9 @@
+import 'package:chikawa_airport/data/models/reference_service.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import '../../data/models/medical/certificate_view.dart';
+import '../../data/models/medical/treatment_view.dart';
 
 class MedicalCertificate extends StatefulWidget {
   final int medicalId;
@@ -25,11 +29,12 @@ class _MedicalCertificateState extends State<MedicalCertificate> {
       TextEditingController();
   final TextEditingController _dateController = TextEditingController();
 
+  // 初始化標誌
+  bool _isInitialized = false;
+
   @override
   void initState() {
     super.initState();
-    // 預設日期為今天
-    _dateController.text = DateFormat('yyyy-MM-dd').format(DateTime.now());
   }
 
   @override
@@ -41,30 +46,80 @@ class _MedicalCertificateState extends State<MedicalCertificate> {
     super.dispose();
   }
 
-  // --- 功能函數 ---
+  // 同步 ViewModel 資料到 Controllers（只執行一次）
+  void _updateControllers(
+    MedicalCertificateViewModel viewModel,
+    TreatmentViewModel treatmentViewModel,
+  ) {
+    if (_isInitialized) return;
+
+    // 檢查關鍵資料是否已載入
+    if (treatmentViewModel.treatment == null) {
+      return;
+    }
+
+    final certificate = viewModel.certificate;
+    if (certificate != null) {
+      _diagnosisController.text = certificate.diagnosisResult ?? '';
+
+      // 若診斷結果為空，嘗試從處置記錄帶入 (Item 3)
+      if (_diagnosisController.text.isEmpty) {
+        final treatment = treatmentViewModel.treatment;
+        if (treatment != null) {
+          _diagnosisController.text = treatment.tentative ?? '';
+        }
+      }
+
+      // 若診斷分類為空，嘗試從處置記錄帶入 (Item 3)
+      if (viewModel.selectedCategory == null) {
+        final treatment = treatmentViewModel.treatment;
+        if (treatment?.tentativeCategoryId != null) {
+          viewModel.updateDiagnosisCategoryId(treatment!.tentativeCategoryId);
+        }
+      }
+
+      _chineseAdviceController.text = certificate.chineseAdvice ?? '';
+      _englishAdviceController.text = certificate.englishAdvice ?? '';
+      if (certificate.issuanceDate != null) {
+        _dateController.text =
+            DateFormat('yyyy-MM-dd').format(certificate.issuanceDate!);
+      } else {
+        _dateController.text = DateFormat('yyyy-MM-dd').format(DateTime.now());
+      }
+    }
+
+    _isInitialized = true;
+  }
 
   // 帶入囑言範本
   void _applyTemplate(bool isFitToFly) {
+    final viewModel = context.read<MedicalCertificateViewModel>();
+    final diagnosis = _diagnosisController.text; // 取得當前診斷結果
+
     setState(() {
       if (isFitToFly) {
         _chineseAdviceController.text =
-            "病人於今日因上述[請填寫診斷]原因，接受本機場醫療中心緊急醫療出診，目前生命徵象穩定適宜飛行。(以下空白)";
+            "病人於今日因上述$diagnosis原因，接受本機場醫療中心緊急醫療出診，目前生命徵象穩定適宜飛行。(以下空白)";
         _englishAdviceController.text =
-            "Due to above [請填寫診斷] reasons, the patient received an outreach emergency medical. He/She is fit to fly.(Blank Below)";
+            "Due to above $diagnosis reasons, the patient received an outreach emergency medical. He/She is fit to fly.(Blank Below)";
       } else {
         _chineseAdviceController.text =
-            "病人於今日因上述[請填寫診斷]原因，接受本醫療中心緊急醫療出診，建議轉診至醫院進行進一步檢查及治療。(以下空白)";
+            "病人於今日因上述$diagnosis原因，接受本醫療中心緊急醫療出診，建議轉診至醫院進行進一步檢查及治療。(以下空白)";
         _englishAdviceController.text =
-            "Due to above [請填寫診斷] reasons, the patient received an outreach emergency medical. It is suggested to transfer to hospital for further evaluation and management.(Blank Below)";
+            "Due to above $diagnosis reasons, the patient received an outreach emergency medical. It is suggested to transfer to hospital for further evaluation and management.(Blank Below)";
       }
     });
+
+    // 自動儲存到資料庫
+    viewModel.updateChineseAdvice(_chineseAdviceController.text);
+    viewModel.updateEnglishAdvice(_englishAdviceController.text);
   }
 
   // 選擇日期
-  Future<void> _selectDate() async {
+  Future<void> _selectDate(MedicalCertificateViewModel viewModel) async {
     DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(),
+      initialDate: viewModel.certificate?.issuanceDate ?? DateTime.now(),
       firstDate: DateTime(2020),
       lastDate: DateTime(2030),
       builder: (context, child) {
@@ -80,14 +135,30 @@ class _MedicalCertificateState extends State<MedicalCertificate> {
       setState(() {
         _dateController.text = DateFormat('yyyy-MM-dd').format(picked);
       });
+      viewModel.updateIssuanceDate(picked);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    // 監聽 ViewModel
+    final viewModel = context.watch<MedicalCertificateViewModel>();
+    final treatmentViewModel = context.watch<TreatmentViewModel>();
+    final refService = context.watch<ReferenceService>();
+
+    // 同步資料到 Controllers（只執行一次）
+    _updateControllers(viewModel, treatmentViewModel);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // 診斷分類（新增 - 正規化）
+        _buildLabel('診斷分類 Diagnosis Category'),
+        const SizedBox(height: 8),
+        _buildDiagnosisCategoryDropdown(viewModel, refService),
+
+        const SizedBox(height: 24),
+
         // 1. 診斷結果
         _buildFieldWrapper(
           '診斷結果 Diagnosis Result',
@@ -95,6 +166,7 @@ class _MedicalCertificateState extends State<MedicalCertificate> {
             hint: '請輸入診斷結果內容...',
             controller: _diagnosisController,
             maxLines: 4,
+            onChanged: (val) => viewModel.updateDiagnosisResult(val),
           ),
         ),
 
@@ -128,6 +200,7 @@ class _MedicalCertificateState extends State<MedicalCertificate> {
             hint: '請輸入中文囑言內容...',
             controller: _chineseAdviceController,
             maxLines: 4,
+            onChanged: (val) => viewModel.updateChineseAdvice(val),
           ),
         ),
 
@@ -140,6 +213,7 @@ class _MedicalCertificateState extends State<MedicalCertificate> {
             hint: 'Enter English advice content...',
             controller: _englishAdviceController,
             maxLines: 4,
+            onChanged: (val) => viewModel.updateEnglishAdvice(val),
           ),
         ),
 
@@ -147,7 +221,7 @@ class _MedicalCertificateState extends State<MedicalCertificate> {
 
         // 5. 開立日期
         SizedBox(
-          width: 250, // 限制日期欄位寬度
+          width: 250,
           child: _buildFieldWrapper(
             '開立日期 Issuance Date',
             _buildTextField(
@@ -155,13 +229,47 @@ class _MedicalCertificateState extends State<MedicalCertificate> {
               controller: _dateController,
               suffixIcon: Icons.calendar_today,
               readOnly: true,
-              onTap: _selectDate,
+              onTap: () => _selectDate(viewModel),
             ),
           ),
         ),
 
         const SizedBox(height: 60),
       ],
+    );
+  }
+
+  // 診斷分類下拉（從參考表讀取）
+  Widget _buildDiagnosisCategoryDropdown(
+    MedicalCertificateViewModel viewModel,
+    ReferenceService refService,
+  ) {
+    final selectedCategory = viewModel.selectedCategory;
+    final categories = refService.diagnosisCategories;
+
+    return Container(
+      height: 44,
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: borderColor),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<int?>(
+          value: selectedCategory?.id,
+          isExpanded: true,
+          hint: const Text('請選擇診斷分類', style: TextStyle(color: textMuted)),
+          items: [
+            const DropdownMenuItem(value: null, child: Text('無分類')),
+            ...categories.map((cat) => DropdownMenuItem(
+                  value: cat.id,
+                  child: Text(cat.name),
+                )),
+          ],
+          onChanged: (id) => viewModel.updateDiagnosisCategoryId(id),
+        ),
+      ),
     );
   }
 
@@ -191,12 +299,14 @@ class _MedicalCertificateState extends State<MedicalCertificate> {
     bool readOnly = false,
     VoidCallback? onTap,
     IconData? suffixIcon,
+    Function(String)? onChanged,
   }) {
     return TextField(
       controller: controller,
       maxLines: maxLines,
       readOnly: readOnly,
       onTap: onTap,
+      onChanged: onChanged,
       style: const TextStyle(
         fontSize: 14,
         color: textDark,

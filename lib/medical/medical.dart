@@ -1,8 +1,13 @@
 import 'package:chikawa_airport/data/db/database.dart';
 import 'package:chikawa_airport/data/models/medical/medical_view.dart';
 import 'package:chikawa_airport/data/models/medical/incident_view.dart';
-import 'package:chikawa_airport/data/models/medical/treatment_view.dart';
-import 'package:chikawa_airport/data/models/reference_service.dart';
+import '../data/models/medical/treatment_view.dart';
+import '../data/models/medical/medical_fee_view.dart';
+import '../data/models/medical/certificate_view.dart';
+import '../data/models/medical/referral_form_view.dart';
+import '../data/models/medical/telex_view.dart';
+import '../data/models/medical/nursing_record_view.dart';
+import '../data/models/reference_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'widgets/medical_header.dart';
@@ -96,6 +101,41 @@ class _MedicalPageState extends State<MedicalPage> {
         ),
         ChangeNotifierProvider(
           create: (context) => TreatmentViewModel(
+            context.read<AppDatabase>(),
+            context.read<ReferenceService>(),
+            widget.medicalId,
+          )..init(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => MedicalFeeViewModel(
+            context.read<AppDatabase>(),
+            context.read<ReferenceService>(),
+            widget.medicalId,
+          )..init(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => MedicalCertificateViewModel(
+            context.read<AppDatabase>(),
+            context.read<ReferenceService>(),
+            widget.medicalId,
+          )..init(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => ReferralFormViewModel(
+            context.read<AppDatabase>(),
+            context.read<ReferenceService>(),
+            widget.medicalId,
+          )..init(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => TelexDocumentViewModel(
+            context.read<AppDatabase>(),
+            context.read<ReferenceService>(),
+            widget.medicalId,
+          )..init(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => NursingRecordViewModel(
             context.read<AppDatabase>(),
             context.read<ReferenceService>(),
             widget.medicalId,

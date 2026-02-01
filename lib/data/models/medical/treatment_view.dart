@@ -17,6 +17,10 @@ class TreatmentViewModel extends ChangeNotifier {
   MedicalRecordData? _medicalRecord;
   MedicalRecordData? get medicalRecord => _medicalRecord;
 
+  // 病患基本資料
+  PatientData? _patient;
+  PatientData? get patient => _patient;
+
   // 健康評估表列表
   List<HealthAssessmentFormData> _healthAssessments = [];
   List<HealthAssessmentFormData> get healthAssessments => _healthAssessments;
@@ -33,19 +37,27 @@ class TreatmentViewModel extends ChangeNotifier {
   List<MedicalAssessmentData> _medicalAssessments = [];
   List<MedicalAssessmentData> get medicalAssessments => _medicalAssessments;
 
-  // 獲取最新的生命徵象評估（過濾出有溫度、脈搏等資料的記錄）
+  // 獲取最新的生命徵象評估（過濾出有溫度、脈搏等資料的記錄，並按時間倒序排列）
   MedicalAssessmentData? get latestVitalSigns {
     try {
-      // 找第一個有生命徵象資料的評估
-      return _medicalAssessments.firstWhere(
-        (assessment) =>
-            assessment.temperature != null ||
+      // 過濾出有生命徵象資料的評估
+      final validAssessments = _medicalAssessments.where((assessment) {
+        return assessment.temperature != null ||
             assessment.pulse != null ||
             assessment.breath != null ||
             assessment.systolic != null ||
             assessment.diastolic != null ||
-            assessment.spo2 != null,
+            assessment.spo2 != null;
+      }).toList();
+
+      if (validAssessments.isEmpty) return null;
+
+      // 按時間倒序排列（最新的在前面）
+      validAssessments.sort(
+        (a, b) => b.assessmentTime.compareTo(a.assessmentTime),
       );
+
+      return validAssessments.first;
     } catch (e) {
       // 找不到時回傳 null
       return null;
@@ -102,6 +114,9 @@ class TreatmentViewModel extends ChangeNotifier {
     // 載入醫療主表記錄
     _medicalRecord = await db.medicalDao.getMedicalById(medicalId);
 
+    // 載入病患資料
+    _patient = await db.medicalDao.getPatientByMedicalId(medicalId);
+
     // 載入健康評估表
     _healthAssessments = await db.treatmentDao.getHealthAssessments(medicalId);
 
@@ -119,16 +134,15 @@ class TreatmentViewModel extends ChangeNotifier {
     // 載入病史
     _medicalHistory = await db.treatmentDao.getMedicalHistory(medicalId);
 
-    // 初始化病史快取（確保默認值為 '無'）
     if (_medicalHistory != null) {
-      _cachedPastHistoryStatus = _medicalHistory!.pastHistoryStatus;
+      // 從 ID 獲取對應的狀態名稱
+      _cachedPastHistoryStatusId = _medicalHistory!.pastHistoryStatusId;
+      _cachedAllergyStatusId = _medicalHistory!.allergyStatusId;
       _cachedPastHistoryDetail = _medicalHistory!.pastHistoryDetail;
-      _cachedAllergyStatus = _medicalHistory!.allergyStatus;
       _cachedAllergyDetail = _medicalHistory!.allergyDetail;
     } else {
       // 如果沒有病史記錄，初始化默認值
-      _cachedPastHistoryStatus = '無';
-      _cachedAllergyStatus = '無';
+      // 預設為 null 或根據業務邏輯設定
     }
 
     // 載入處置/診斷
@@ -143,6 +157,8 @@ class TreatmentViewModel extends ChangeNotifier {
 
     // 載入特別註記
     _specialNotes = await db.treatmentDao.getSpecialNotes(medicalId);
+
+    await _loadMultiSelectData();
   }
 
   // === 建立預設處置記錄 ===
@@ -247,6 +263,7 @@ class TreatmentViewModel extends ChangeNotifier {
 
   Future<void> _reloadMedicalRecord() async {
     _medicalRecord = await db.medicalDao.getMedicalById(medicalId);
+    _patient = await db.medicalDao.getPatientByMedicalId(medicalId);
     notifyListeners();
   }
 
@@ -379,14 +396,14 @@ class TreatmentViewModel extends ChangeNotifier {
     int? diastolic,
     int? spo2,
     int? painScore,
-    String? consciousnessLevel,
+    int? consciousnessLevelId,
     int? gcs,
     String? gcsE,
     String? gcsM,
     String? gcsV,
-    String? leftPupilReaction,
+    int? leftPupilReactionId,
     double? leftPupilSize,
-    String? rightPupilReaction,
+    int? rightPupilReactionId,
     double? rightPupilSize,
     String? headNeckExam,
     String? chestExam,
@@ -406,14 +423,14 @@ class TreatmentViewModel extends ChangeNotifier {
           diastolic: Value(diastolic),
           spo2: Value(spo2),
           painScore: Value(painScore),
-          consciousnessLevel: Value(consciousnessLevel),
+          consciousnessLevelId: Value(consciousnessLevelId),
           gcs: Value(gcs),
           gcsE: Value(gcsE),
           gcsM: Value(gcsM),
           gcsV: Value(gcsV),
-          leftPupilReaction: Value(leftPupilReaction),
+          leftPupilReactionId: Value(leftPupilReactionId),
           leftPupilSize: Value(leftPupilSize),
-          rightPupilReaction: Value(rightPupilReaction),
+          rightPupilReactionId: Value(rightPupilReactionId),
           rightPupilSize: Value(rightPupilSize),
           headNeckExam: Value(headNeckExam),
           chestExam: Value(chestExam),
@@ -542,14 +559,14 @@ class TreatmentViewModel extends ChangeNotifier {
 
   // 意識與理學檢查快取（用於自動儲存）
   bool? _cachedIsAlert;
-  String? _cachedConsciousnessLevel;
+  int? _cachedConsciousnessLevelId;
   String? _cachedGcsE;
   String? _cachedGcsV;
   String? _cachedGcsM;
   int? _cachedGcs;
-  String? _cachedLeftPupilReaction;
+  int? _cachedLeftPupilReactionId;
   double? _cachedLeftPupilSize;
-  String? _cachedRightPupilReaction;
+  int? _cachedRightPupilReactionId;
   double? _cachedRightPupilSize;
   String? _cachedHeadNeckExam;
   String? _cachedChestExam;
@@ -566,32 +583,40 @@ class TreatmentViewModel extends ChangeNotifier {
   SaveStatus get historySaveStatus => _historySaveStatus;
 
   // 病史快取變數
-  String? _cachedPastHistoryStatus;
+  int? _cachedPastHistoryStatusId;
   String? _cachedPastHistoryDetail;
-  String? _cachedAllergyStatus;
+  int? _cachedAllergyStatusId;
   String? _cachedAllergyDetail;
 
   // 獲取最新的意識與理學檢查評估
   MedicalAssessmentData? get latestConsciousnessExam {
     try {
-      // 找第一個有意識或理學檢查資料的評估
-      return _medicalAssessments.firstWhere(
-        (assessment) =>
-            assessment.consciousnessLevel != null ||
+      // 過濾出有意識或理學檢查資料的評估
+      final validAssessments = _medicalAssessments.where((assessment) {
+        return assessment.consciousnessLevelId != null ||
             assessment.gcs != null ||
             assessment.gcsE != null ||
             assessment.gcsV != null ||
             assessment.gcsM != null ||
-            assessment.leftPupilReaction != null ||
+            assessment.leftPupilReactionId != null ||
             assessment.leftPupilSize != null ||
-            assessment.rightPupilReaction != null ||
+            assessment.rightPupilReactionId != null ||
             assessment.rightPupilSize != null ||
             assessment.headNeckExam != null ||
             assessment.chestExam != null ||
             assessment.abdomenExam != null ||
             assessment.extremitiesExam != null ||
-            assessment.otherPhysicalExam != null,
+            assessment.otherPhysicalExam != null;
+      }).toList();
+
+      if (validAssessments.isEmpty) return null;
+
+      // 按時間倒序排列
+      validAssessments.sort(
+        (a, b) => b.assessmentTime.compareTo(a.assessmentTime),
       );
+
+      return validAssessments.first;
     } catch (e) {
       return null;
     }
@@ -599,14 +624,14 @@ class TreatmentViewModel extends ChangeNotifier {
 
   void updateConsciousnessAndExamCache({
     bool? isAlert,
-    String? consciousnessLevel,
+    int? consciousnessLevelId,
     String? gcsE,
     String? gcsV,
     String? gcsM,
     int? gcs,
-    String? leftPupilReaction,
+    int? leftPupilReactionId,
     double? leftPupilSize,
-    String? rightPupilReaction,
+    int? rightPupilReactionId,
     double? rightPupilSize,
     String? headNeckExam,
     String? chestExam,
@@ -615,14 +640,14 @@ class TreatmentViewModel extends ChangeNotifier {
     String? otherPhysicalExam,
   }) {
     _cachedIsAlert = isAlert;
-    _cachedConsciousnessLevel = consciousnessLevel;
+    _cachedConsciousnessLevelId = consciousnessLevelId;
     _cachedGcsE = gcsE;
     _cachedGcsV = gcsV;
     _cachedGcsM = gcsM;
     _cachedGcs = gcs;
-    _cachedLeftPupilReaction = leftPupilReaction;
+    _cachedLeftPupilReactionId = leftPupilReactionId;
     _cachedLeftPupilSize = leftPupilSize;
-    _cachedRightPupilReaction = rightPupilReaction;
+    _cachedRightPupilReactionId = rightPupilReactionId;
     _cachedRightPupilSize = rightPupilSize;
     _cachedHeadNeckExam = headNeckExam;
     _cachedChestExam = chestExam;
@@ -651,14 +676,14 @@ class TreatmentViewModel extends ChangeNotifier {
     try {
       // 檢查是否有資料需要儲存
       final hasData =
-          _cachedConsciousnessLevel != null ||
+          _cachedConsciousnessLevelId != null ||
           _cachedGcsE != null ||
           _cachedGcsV != null ||
           _cachedGcsM != null ||
           _cachedGcs != null ||
-          _cachedLeftPupilReaction != null ||
+          _cachedLeftPupilReactionId != null ||
           _cachedLeftPupilSize != null ||
-          _cachedRightPupilReaction != null ||
+          _cachedRightPupilReactionId != null ||
           _cachedRightPupilSize != null ||
           _cachedHeadNeckExam != null ||
           _cachedChestExam != null ||
@@ -675,14 +700,14 @@ class TreatmentViewModel extends ChangeNotifier {
       await db.treatmentDao.insertMedicalAssessment(
         MedicalAssessmentCompanion.insert(
           medicalId: medicalId,
-          consciousnessLevel: Value(_cachedConsciousnessLevel),
+          consciousnessLevelId: Value(_cachedConsciousnessLevelId),
           gcsE: Value(_cachedGcsE),
           gcsV: Value(_cachedGcsV),
           gcsM: Value(_cachedGcsM),
           gcs: Value(_cachedGcs),
-          leftPupilReaction: Value(_cachedLeftPupilReaction),
+          leftPupilReactionId: Value(_cachedLeftPupilReactionId),
           leftPupilSize: Value(_cachedLeftPupilSize),
-          rightPupilReaction: Value(_cachedRightPupilReaction),
+          rightPupilReactionId: Value(_cachedRightPupilReactionId),
           rightPupilSize: Value(_cachedRightPupilSize),
           headNeckExam: Value(_cachedHeadNeckExam),
           chestExam: Value(_cachedChestExam),
@@ -718,9 +743,9 @@ class TreatmentViewModel extends ChangeNotifier {
   // ===================================================================
 
   Future<void> updateMedicalHistory({
-    String? pastHistoryStatus,
+    int? pastHistoryStatusId,
     String? pastHistoryDetail,
-    String? allergyStatus,
+    int? allergyStatusId,
     String? allergyDetail,
   }) async {
     try {
@@ -729,17 +754,23 @@ class TreatmentViewModel extends ChangeNotifier {
         await db.treatmentDao.insertMedicalHistory(
           MedicalHistoryCompanion.insert(
             medicalId: medicalId,
-            pastHistoryStatus: pastHistoryStatus ?? '無',
-            allergyStatus: allergyStatus ?? '無',
+            pastHistoryStatusId: Value(pastHistoryStatusId),
+            allergyStatusId: Value(allergyStatusId),
             pastHistoryDetail: Value(pastHistoryDetail),
             allergyDetail: Value(allergyDetail),
           ),
         );
       } else {
         // 更新現有記錄
-        // 如果狀態切換到「無」或「不詳」，清除詳細資料
+        // 檢查狀態是否為 'none' 或 'unknown'，若是則清除詳細資料
         final Value<String?> effectivePastHistoryDetail;
-        if (pastHistoryStatus == '無' || pastHistoryStatus == '不詳') {
+
+        final pastStatus = pastHistoryStatusId != null
+            ? _getHistoryStatusById(pastHistoryStatusId)
+            : null;
+
+        if (pastStatus != null &&
+            (pastStatus.code == 'none' || pastStatus.code == 'unknown')) {
           effectivePastHistoryDetail = Value<String?>(null);
         } else if (pastHistoryDetail != null) {
           effectivePastHistoryDetail = Value(pastHistoryDetail);
@@ -748,7 +779,12 @@ class TreatmentViewModel extends ChangeNotifier {
         }
 
         final Value<String?> effectiveAllergyDetail;
-        if (allergyStatus == '無' || allergyStatus == '不詳') {
+        final allergyStatus = allergyStatusId != null
+            ? _getHistoryStatusById(allergyStatusId)
+            : null;
+
+        if (allergyStatus != null &&
+            (allergyStatus.code == 'none' || allergyStatus.code == 'unknown')) {
           effectiveAllergyDetail = Value<String?>(null);
         } else if (allergyDetail != null) {
           effectiveAllergyDetail = Value(allergyDetail);
@@ -760,12 +796,12 @@ class TreatmentViewModel extends ChangeNotifier {
           MedicalHistoryCompanion(
             historyId: Value(_medicalHistory!.historyId),
             medicalId: Value(_medicalHistory!.medicalId),
-            pastHistoryStatus: pastHistoryStatus != null
-                ? Value(pastHistoryStatus)
+            pastHistoryStatusId: pastHistoryStatusId != null
+                ? Value(pastHistoryStatusId)
                 : const Value.absent(),
             pastHistoryDetail: effectivePastHistoryDetail,
-            allergyStatus: allergyStatus != null
-                ? Value(allergyStatus)
+            allergyStatusId: allergyStatusId != null
+                ? Value(allergyStatusId)
                 : const Value.absent(),
             allergyDetail: effectiveAllergyDetail,
           ),
@@ -781,20 +817,20 @@ class TreatmentViewModel extends ChangeNotifier {
 
   // 統一更新病史快取並觸發自動儲存
   void _updateHistoryCacheAndSave({
-    String? pastHistoryStatus,
+    int? pastHistoryStatusId,
     String? pastHistoryDetail,
-    String? allergyStatus,
+    int? allergyStatusId,
     String? allergyDetail,
   }) {
     // 更新快取
-    if (pastHistoryStatus != null) {
-      _cachedPastHistoryStatus = pastHistoryStatus;
+    if (pastHistoryStatusId != null) {
+      _cachedPastHistoryStatusId = pastHistoryStatusId;
     }
     if (pastHistoryDetail != null) {
       _cachedPastHistoryDetail = pastHistoryDetail;
     }
-    if (allergyStatus != null) {
-      _cachedAllergyStatus = allergyStatus;
+    if (allergyStatusId != null) {
+      _cachedAllergyStatusId = allergyStatusId;
     }
     if (allergyDetail != null) {
       _cachedAllergyDetail = allergyDetail;
@@ -806,16 +842,16 @@ class TreatmentViewModel extends ChangeNotifier {
   }
 
   // 公開的病史更新方法（供 UI 呼叫）
-  void updatePastHistoryStatus(String status) {
-    _updateHistoryCacheAndSave(pastHistoryStatus: status);
+  void updatePastHistoryStatusId(int? id) {
+    _updateHistoryCacheAndSave(pastHistoryStatusId: id);
   }
 
   void updatePastHistoryDetail(String detail) {
     _updateHistoryCacheAndSave(pastHistoryDetail: detail);
   }
 
-  void updateAllergyStatus(String status) {
-    _updateHistoryCacheAndSave(allergyStatus: status);
+  void updateAllergyStatusId(int? id) {
+    _updateHistoryCacheAndSave(allergyStatusId: id);
   }
 
   void updateAllergyDetail(String detail) {
@@ -837,9 +873,9 @@ class TreatmentViewModel extends ChangeNotifier {
   Future<void> _saveHistoryToDatabase() async {
     try {
       await updateMedicalHistory(
-        pastHistoryStatus: _cachedPastHistoryStatus ?? '無',
+        pastHistoryStatusId: _cachedPastHistoryStatusId,
         pastHistoryDetail: _cachedPastHistoryDetail,
-        allergyStatus: _cachedAllergyStatus ?? '無',
+        allergyStatusId: _cachedAllergyStatusId,
         allergyDetail: _cachedAllergyDetail,
       );
 
@@ -1062,16 +1098,22 @@ class TreatmentViewModel extends ChangeNotifier {
   // ===================================================================
 
   Future<void> addStaffAssignment({
-    required String staffRole,
+    required String staffRoleCode,
     int? staffId,
     String? staffName,
     bool isPrimary = false,
   }) async {
     try {
+      final roleId = getRoleIdByCode(staffRoleCode);
+      if (roleId == null) {
+        debugPrint('系統: 找不到醫療人員角色代碼 $staffRoleCode');
+        return;
+      }
+
       // 防止重複的主責人員：若新增的是主責，先刪除舊的主責
       if (isPrimary) {
         final existingPrimary = _staffAssignments.where(
-          (a) => a.staffRole == staffRole && a.isPrimary,
+          (a) => a.staffRoleId == roleId && a.isPrimary,
         );
         for (var assignment in existingPrimary) {
           await db.treatmentDao.deleteStaffAssignment(
@@ -1092,7 +1134,7 @@ class TreatmentViewModel extends ChangeNotifier {
       await db.treatmentDao.insertStaffAssignment(
         MedicalStaffAssignmentCompanion.insert(
           medicalId: medicalId,
-          staffRole: staffRole,
+          staffRoleId: Value(roleId),
           staffId: Value(staffId),
           staffName: Value(staffName),
           isPrimary: Value(isPrimary),
@@ -1207,6 +1249,33 @@ class TreatmentViewModel extends ChangeNotifier {
   // 查詢輔助方法
   // ===================================================================
 
+  HistoryStatusRefData? _getHistoryStatusById(int id) {
+    try {
+      return refService.historyStatusList.firstWhere((s) => s.id == id);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  int? getRoleIdByCode(String code) {
+    try {
+      return refService.medicalStaffRoleList
+          .firstWhere((r) => r.code == code)
+          .id;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  String? getStaffRoleCode(int? id) {
+    if (id == null) return null;
+    try {
+      return refService.medicalStaffRoleList.firstWhere((r) => r.id == id).code;
+    } catch (e) {
+      return null;
+    }
+  }
+
   ChiefComplaintTypeData? getComplaintTypeById(int? id) {
     if (id == null) return null;
     try {
@@ -1309,6 +1378,179 @@ class TreatmentViewModel extends ChangeNotifier {
     return refService.treatmentResults
         .where((r) => r.name.toLowerCase().contains(lower))
         .toList();
+  }
+
+  Future<List<ReferralHospitalData>> searchReferralHospitals(
+    String keyword,
+  ) async {
+    if (keyword.isEmpty) return refService.referralHospitals;
+    final lower = keyword.toLowerCase();
+    return refService.referralHospitals
+        .where((h) => h.name.toLowerCase().contains(lower))
+        .toList();
+  }
+
+  // === 多對多關係資料快取 ===
+  List<int> _selectedSymptomIds = [];
+  List<int> _selectedActionIds = [];
+  List<int> _selectedSpecialNoteIds = [];
+
+  // === 正規化參考表資料 Getters ===
+  List<HistoryStatusRefData> get historyStatuses =>
+      refService.historyStatusList;
+  List<HistoryStatusRefData> get allergyStatuses =>
+      refService.historyStatusList;
+
+  // UI 應優先使用快取值以達到即時更新效果 (Optimistic UI)
+  int? get selectedHistoryStatusId =>
+      _cachedPastHistoryStatusId ?? _medicalHistory?.pastHistoryStatusId;
+
+  int? get selectedAllergyStatusId =>
+      _cachedAllergyStatusId ?? _medicalHistory?.allergyStatusId;
+
+  // === 多對多關係 Getters ===
+  List<int> get selectedSymptomIds => _selectedSymptomIds;
+  List<int> get selectedActionIds => _selectedActionIds;
+  List<int> get selectedSpecialNoteIds => _selectedSpecialNoteIds;
+  bool get hasOtherSymptomSelected =>
+      _selectedSymptomIds.contains(_getOtherSymptomId());
+  bool get hasOtherActionSelected =>
+      _selectedActionIds.contains(_getOtherActionId());
+
+  // 獲取「其它」症狀的 ID
+  int? _getOtherSymptomId() {
+    try {
+      final details = refService.chiefComplaintDetails;
+      return details.firstWhere((d) => d.name == '其它').id;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  // 獲取「其它」處置項目的 ID
+  int? _getOtherActionId() {
+    try {
+      return actionItems.firstWhere((a) => a.name == '其他').id;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  // === 多對多關係操作方法 ===
+
+  // 症狀選擇
+  Future<void> toggleSymptom(int symptomId) async {
+    if (_chiefComplaint == null) return;
+    try {
+      await db.treatmentDao.toggleChiefComplaintSymptom(
+        _chiefComplaint!.complaintId,
+        symptomId,
+      );
+      await _reloadSymptomIds();
+      debugPrint('系統:症狀選擇已切換 ID=$symptomId');
+    } catch (e) {
+      debugPrint('系統:症狀選擇切換失敗 - $e');
+    }
+  }
+
+  Future<void> _reloadSymptomIds() async {
+    if (_chiefComplaint == null) {
+      _selectedSymptomIds = [];
+    } else {
+      _selectedSymptomIds = await db.treatmentDao.getChiefComplaintSymptomIds(
+        _chiefComplaint!.complaintId,
+      );
+    }
+    notifyListeners();
+  }
+
+  // 處置項目選擇
+  Future<void> toggleActionItem(int actionItemId) async {
+    if (_treatment == null) return;
+    try {
+      await db.treatmentDao.toggleTreatmentAction(
+        _treatment!.treatmentId,
+        actionItemId,
+      );
+      await _reloadActionIds();
+      debugPrint('系統:處置項目選擇已切換 ID=$actionItemId');
+    } catch (e) {
+      debugPrint('系統:處置項目選擇切換失敗 - $e');
+    }
+  }
+
+  Future<void> _reloadActionIds() async {
+    if (_treatment == null) {
+      _selectedActionIds = [];
+    } else {
+      _selectedActionIds = await db.treatmentDao.getTreatmentActionIds(
+        _treatment!.treatmentId,
+      );
+    }
+    notifyListeners();
+  }
+
+  // 特別註記選擇
+  Future<void> toggleSpecialNote(int noteRefId) async {
+    try {
+      // 確保 SpecialNotes 記錄存在
+      if (_specialNotes == null) {
+        await db.treatmentDao.insertSpecialNotes(
+          SpecialNotesCompanion.insert(medicalId: medicalId),
+        );
+        _specialNotes = await db.treatmentDao.getSpecialNotes(medicalId);
+      }
+
+      if (_specialNotes != null) {
+        await db.treatmentDao.toggleSpecialNote(
+          _specialNotes!.noteId,
+          noteRefId,
+        );
+        await _reloadSpecialNoteIds();
+        debugPrint('系統:特別註記選擇已切換 ID=$noteRefId');
+      }
+    } catch (e) {
+      debugPrint('系統:特別註記選擇切換失敗 - $e');
+    }
+  }
+
+  Future<void> _reloadSpecialNoteIds() async {
+    if (_specialNotes == null) {
+      _selectedSpecialNoteIds = [];
+    } else {
+      _selectedSpecialNoteIds = await db.treatmentDao.getSpecialNoteIds(
+        _specialNotes!.noteId,
+      );
+    }
+    notifyListeners();
+  }
+
+  // === 正規化參考表更新方法 ===
+
+  // 更新病史狀態
+  Future<void> updateHistoryStatus(int? statusId) async {
+    if (_medicalHistory == null) return;
+    try {
+      await db.treatmentDao.updateMedicalHistory(
+        MedicalHistoryCompanion(
+          historyId: Value(_medicalHistory!.historyId),
+          pastHistoryStatusId: Value(statusId),
+        ),
+      );
+      _medicalHistory = await db.treatmentDao.getMedicalHistory(medicalId);
+      notifyListeners();
+      debugPrint('系統:病史狀態已更新 ID=$statusId');
+    } catch (e) {
+      debugPrint('系統:病史狀態更新失敗 - $e');
+    }
+  }
+
+  // === 多對多關係資料載入 ===
+
+  Future<void> _loadMultiSelectData() async {
+    await _reloadSymptomIds();
+    await _reloadActionIds();
+    await _reloadSpecialNoteIds();
   }
 
   // ===================================================================

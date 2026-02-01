@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import '../../data/models/medical/nursing_record_view.dart';
+import '../../data/models/medical/treatment_view.dart';
+import '../../data/db/database.dart';
+import '../widgets/staff_search_sheet.dart';
 
 class NursingRecord extends StatefulWidget {
   final int medicalId;
@@ -17,25 +22,11 @@ class _NursingRecordState extends State<NursingRecord> {
   static const Color borderColor = Color(0xFFE2E8F0);
   static const Color bgField = Color(0xFFF9FBFC);
 
-  // 資料列表
-  final List<Map<String, dynamic>> _records = [];
-  final List<String> _nurseOptions = ['N1', 'N2', 'N3', 'N4'];
-
-  // 預設片語
-  final Map<String, String> _phraseTemplates = {
-    '接獲通知': '接獲[通報單位][通報人員]通報位於[事故地點]有旅客[主訴]身體不適，需要醫護出診協助。',
-    '通知1': '通知T1-OCC。',
-    '通知2': '通知T2-OCC。',
-    '抵達現場': '抵達現場，病人意識清楚...自述撕裂傷，醫師診療評估中。',
-    '測血糖': '依醫囑執行測血糖,血糖值：[]。',
-    '診斷給藥': '醫師診視後，診斷為[初步診斷]，向病人解釋後開立[藥物]使用並衛教。',
-    '轉診': '醫師診視後，建議轉診至醫院進一步檢查及治療，表示同意，通知航空公司協助退關。',
-    '收費': '向病人及家屬解釋費用[]元，採[方式]支付，開立收據一份。',
-    '返回待命': '返回醫療中心待命。',
-  };
-
   @override
   Widget build(BuildContext context) {
+    final viewModel = context.watch<NursingRecordViewModel>();
+    final treatmentViewModel = context.watch<TreatmentViewModel>();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -43,7 +34,7 @@ class _NursingRecordState extends State<NursingRecord> {
         Align(
           alignment: Alignment.centerRight,
           child: TextButton.icon(
-            onPressed: () => _showAddRecordModal(),
+            onPressed: () => _showAddRecordModal(viewModel, treatmentViewModel),
             icon: const Icon(Icons.add_circle_outline, size: 20),
             label: const Text(
               '新增護理記錄',
@@ -63,7 +54,7 @@ class _NursingRecordState extends State<NursingRecord> {
         const SizedBox(height: 16),
 
         // 內嵌式編輯表格
-        _buildInlineTable(),
+        _buildInlineTable(viewModel, treatmentViewModel, viewModel.records),
 
         const SizedBox(height: 60),
       ],
@@ -71,8 +62,12 @@ class _NursingRecordState extends State<NursingRecord> {
   }
 
   // --- 1. 內嵌式表格 (參考健康評估表樣式) ---
-  Widget _buildInlineTable() {
-    if (_records.isEmpty) {
+  Widget _buildInlineTable(
+    NursingRecordViewModel viewModel,
+    TreatmentViewModel treatmentViewModel,
+    List<NursingRecordData> records,
+  ) {
+    if (records.isEmpty) {
       return Container(
         width: double.infinity,
         padding: const EdgeInsets.all(40),
@@ -106,9 +101,8 @@ class _NursingRecordState extends State<NursingRecord> {
           ),
         ),
         // 資料行
-        ..._records.asMap().entries.map((entry) {
-          int idx = entry.key;
-          var data = entry.value;
+        ...records.asMap().entries.map((entry) {
+          var record = entry.value;
           return Padding(
             padding: const EdgeInsets.only(bottom: 10),
             child: Row(
@@ -118,8 +112,15 @@ class _NursingRecordState extends State<NursingRecord> {
                 Expanded(
                   flex: 2,
                   child: _buildInlineTextField(
-                    initialValue: data['time'],
-                    onChanged: (val) => data['time'] = val,
+                    initialValue: DateFormat(
+                      'yyyy/MM/dd HH:mm:ss',
+                    ).format(record.recordTime),
+                    onChanged: (val) {
+                      final dateTime = DateTime.tryParse(val);
+                      if (dateTime != null) {
+                        viewModel.updateRecordTime(record.recordId, dateTime);
+                      }
+                    },
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -127,18 +128,26 @@ class _NursingRecordState extends State<NursingRecord> {
                 Expanded(
                   flex: 5,
                   child: _buildInlineTextField(
-                    initialValue: data['content'],
+                    initialValue: record.content,
                     maxLines: null,
-                    onChanged: (val) => data['content'] = val,
+                    onChanged: (val) {
+                      viewModel.updateRecordContent(record.recordId, val);
+                    },
                   ),
                 ),
                 const SizedBox(width: 12),
-                // 護理師代號
+                // 護理師選擇
                 SizedBox(
                   width: 100,
-                  child: _buildInlineDropdown(
-                    value: data['nurse'],
-                    onChanged: (val) => setState(() => data['nurse'] = val),
+                  child: _buildInlineStaffSelect(
+                    viewModel: viewModel,
+                    treatmentViewModel: treatmentViewModel,
+                    nurseId: record.nurseId,
+                    onChanged: (val) {
+                      if (val != null) {
+                        viewModel.updateRecordNurse(record.recordId, val);
+                      }
+                    },
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -154,7 +163,7 @@ class _NursingRecordState extends State<NursingRecord> {
                 ),
                 // 刪除按鈕
                 IconButton(
-                  onPressed: () => setState(() => _records.removeAt(idx)),
+                  onPressed: () => viewModel.deleteRecord(record.recordId),
                   icon: Icon(
                     Icons.close_rounded,
                     color: Colors.red.withValues(alpha: 0.5),
@@ -166,15 +175,20 @@ class _NursingRecordState extends State<NursingRecord> {
               ],
             ),
           );
-        }).toList(),
+        }),
       ],
     );
   }
 
   // --- 2. 新增記錄彈窗 ---
-  void _showAddRecordModal() {
-    String? tempSelectedPhrase;
-    String? tempNurse;
+  void _showAddRecordModal(
+    NursingRecordViewModel viewModel,
+    TreatmentViewModel treatmentViewModel,
+  ) {
+    int? tempSelectedPhraseId;
+    int? tempNurseId;
+    String? tempNurseName;
+
     final TextEditingController timeCtrl = TextEditingController(
       text: DateFormat('yyyy/MM/dd HH:mm:ss').format(DateTime.now()),
     );
@@ -219,16 +233,41 @@ class _NursingRecordState extends State<NursingRecord> {
                     Wrap(
                       spacing: 8,
                       runSpacing: 8,
-                      children: _phraseTemplates.keys.map((key) {
-                        bool isSel = tempSelectedPhrase == key;
+                      children: viewModel.phrases.map((phrase) {
+                        bool isSel = tempSelectedPhraseId == phrase.id;
                         return ChoiceChip(
-                          label: Text(key),
+                          label: Text(phrase.title),
                           selected: isSel,
                           onSelected: (selected) {
                             setModalState(() {
-                              tempSelectedPhrase = selected ? key : null;
-                              if (selected)
-                                contentCtrl.text = _phraseTemplates[key]!;
+                              tempSelectedPhraseId = selected
+                                  ? phrase.id
+                                  : null;
+                              if (selected) {
+                                // 處理片語變數替換
+                                String content = phrase.content;
+                                final vital =
+                                    treatmentViewModel.latestVitalSigns;
+                                if (vital != null) {
+                                  content = content.replaceAll(
+                                    '{temp}',
+                                    vital.temperature?.toString() ?? '',
+                                  );
+                                  content = content.replaceAll(
+                                    '{bp}',
+                                    '${vital.systolic}/${vital.diastolic}',
+                                  );
+                                  content = content.replaceAll(
+                                    '{pulse}',
+                                    vital.pulse?.toString() ?? '',
+                                  );
+                                  content = content.replaceAll(
+                                    '{spo2}',
+                                    vital.spo2?.toString() ?? '',
+                                  );
+                                }
+                                contentCtrl.text = content;
+                              }
                             });
                           },
                           selectedColor: primaryColor.withValues(alpha: 0.1),
@@ -260,10 +299,51 @@ class _NursingRecordState extends State<NursingRecord> {
                         Expanded(
                           child: _buildFieldWrapper(
                             '護理師',
-                            _buildInlineDropdown(
-                              value: tempNurse,
-                              onChanged: (v) =>
-                                  setModalState(() => tempNurse = v),
+                            GestureDetector(
+                              onTap: () async {
+                                final result = await StaffSearchSheet.show(
+                                  context,
+                                  title: '選擇護理師',
+                                  viewModel: treatmentViewModel,
+                                );
+                                if (result != null) {
+                                  setModalState(() {
+                                    tempNurseId = result.id;
+                                    tempNurseName = result.name;
+                                  });
+                                }
+                              },
+                              child: Container(
+                                height: 48,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: bgField,
+                                  border: Border.all(color: borderColor),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                alignment: Alignment.centerLeft,
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        tempNurseName ?? '點擊選擇',
+                                        style: TextStyle(
+                                          color: tempNurseName != null
+                                              ? textDark
+                                              : textMuted,
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                    ),
+                                    const Icon(
+                                      Icons.arrow_drop_down,
+                                      color: textMuted,
+                                    ),
+                                  ],
+                                ),
+                              ),
                             ),
                           ),
                         ),
@@ -303,13 +383,14 @@ class _NursingRecordState extends State<NursingRecord> {
                             ),
                             onPressed: () {
                               if (contentCtrl.text.isNotEmpty) {
-                                setState(() {
-                                  _records.add({
-                                    'time': timeCtrl.text,
-                                    'content': contentCtrl.text,
-                                    'nurse': tempNurse,
-                                  });
-                                });
+                                final dateTime = DateTime.tryParse(
+                                  timeCtrl.text,
+                                );
+                                viewModel.addRecord(
+                                  recordTime: dateTime ?? DateTime.now(),
+                                  content: contentCtrl.text,
+                                  nurseId: tempNurseId,
+                                );
                                 Navigator.pop(context);
                               }
                             },
@@ -359,32 +440,37 @@ class _NursingRecordState extends State<NursingRecord> {
     );
   }
 
-  Widget _buildInlineDropdown({
-    required String? value,
-    required Function(String?) onChanged,
+  Widget _buildInlineStaffSelect({
+    required NursingRecordViewModel viewModel,
+    required TreatmentViewModel treatmentViewModel,
+    required int? nurseId,
+    required Function(int?) onChanged,
   }) {
-    return Container(
-      height: 40,
-      padding: const EdgeInsets.symmetric(horizontal: 10),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: borderColor),
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<String>(
-          value: value,
-          isExpanded: true,
-          hint: const Text('代號', style: TextStyle(fontSize: 12)),
-          items: _nurseOptions
-              .map(
-                (s) => DropdownMenuItem(
-                  value: s,
-                  child: Text(s, style: const TextStyle(fontSize: 13)),
-                ),
-              )
-              .toList(),
-          onChanged: onChanged,
+    final nurseName = viewModel.getNurseNameById(nurseId) ?? '點擊選擇';
+
+    return GestureDetector(
+      onTap: () async {
+        final result = await StaffSearchSheet.show(
+          context,
+          title: '選擇護理師',
+          viewModel: treatmentViewModel,
+        );
+        if (result != null) {
+          onChanged(result.id);
+        }
+      },
+      child: Container(
+        height: 40,
+        padding: const EdgeInsets.symmetric(horizontal: 10),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: borderColor),
+        ),
+        alignment: Alignment.centerLeft,
+        child: Text(
+          nurseName,
+          style: const TextStyle(fontSize: 13, overflow: TextOverflow.ellipsis),
         ),
       ),
     );

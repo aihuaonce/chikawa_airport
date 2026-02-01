@@ -1,4 +1,8 @@
+import 'package:chikawa_airport/data/db/database.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../data/models/medical/telex_view.dart';
+import '../../data/models/reference_service.dart';
 
 class TelexDocument extends StatefulWidget {
   final int medicalId;
@@ -17,11 +21,24 @@ class _TelexDocumentState extends State<TelexDocument> {
   static const Color borderColor = Color(0xFFE2E8F0);
   static const Color bgField = Color(0xFFF9FBFC);
 
-  String _toStation = 'T1 03-3063578';
-  String _fromStation = 'T1 03-3834225';
-
   @override
   Widget build(BuildContext context) {
+    // 監聽 ViewModel 和 ReferenceService
+    final viewModel = context.watch<TelexDocumentViewModel>();
+    final refService = context.watch<ReferenceService>();
+
+    final toStation = viewModel.selectedToStation;
+    final fromStation = viewModel.selectedFromStation;
+    final stations = refService.stationList;
+
+    // 分類站點
+    final occStations = stations
+        .where((s) => s.code.startsWith('T') && s.code.endsWith('_OCC'))
+        .toList();
+    final medStations = stations
+        .where((s) => s.code.startsWith('T') && s.code.endsWith('_MED'))
+        .toList();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -31,9 +48,10 @@ class _TelexDocumentState extends State<TelexDocument> {
             Expanded(
               child: _buildStationCard(
                 title: 'TO: 桃園國際機場股份有限公司營運控制中心',
-                options: ['T1 03-3063578', 'T2 03-3063367'],
-                selectedValue: _toStation,
-                onChanged: (val) => setState(() => _toStation = val!),
+                stations: occStations,
+                selectedStation: toStation,
+                onChanged: (StationRefData? station) =>
+                    viewModel.updateToStation(station?.id),
               ),
             ),
 
@@ -42,9 +60,10 @@ class _TelexDocumentState extends State<TelexDocument> {
             Expanded(
               child: _buildStationCard(
                 title: 'FROM: 聯新國際醫院桃園國際機場醫療中心',
-                options: ['T1 03-3834225', 'T2 03-3983485'],
-                selectedValue: _fromStation,
-                onChanged: (val) => setState(() => _fromStation = val!),
+                stations: medStations,
+                selectedStation: fromStation,
+                onChanged: (station) =>
+                    viewModel.updateFromStation(station?.id),
               ),
             ),
           ],
@@ -55,9 +74,9 @@ class _TelexDocumentState extends State<TelexDocument> {
 
   Widget _buildStationCard({
     required String title,
-    required List<String> options,
-    required String selectedValue,
-    required ValueChanged<String?> onChanged,
+    required List<StationRefData> stations,
+    required StationRefData? selectedStation,
+    required ValueChanged<StationRefData?> onChanged,
   }) {
     return Container(
       padding: const EdgeInsets.all(16),
@@ -80,10 +99,10 @@ class _TelexDocumentState extends State<TelexDocument> {
           ),
           const SizedBox(height: 16),
           Column(
-            children: options.map((opt) {
-              final bool isSelected = selectedValue == opt;
+            children: stations.map((station) {
+              final bool isSelected = selectedStation?.id == station.id;
               return InkWell(
-                onTap: () => onChanged(opt),
+                onTap: () => onChanged(station),
                 borderRadius: BorderRadius.circular(8),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 4),
@@ -92,16 +111,16 @@ class _TelexDocumentState extends State<TelexDocument> {
                       SizedBox(
                         width: 24,
                         height: 24,
-                        child: Radio<String>(
-                          value: opt,
-                          groupValue: selectedValue,
-                          onChanged: onChanged,
+                        child: Radio<int>(
+                          value: station.id,
+                          groupValue: selectedStation?.id,
+                          onChanged: (_) => onChanged(station),
                           activeColor: primaryColor,
                         ),
                       ),
                       const SizedBox(width: 12),
                       Text(
-                        opt,
+                        station.name,
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: isSelected

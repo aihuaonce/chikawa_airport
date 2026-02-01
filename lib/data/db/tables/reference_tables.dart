@@ -173,3 +173,56 @@ class NursingPhrase extends Table {
   IntColumn get sortOrder => integer().withDefault(const Constant(0))();
   BoolColumn get isActive => boolean().withDefault(const Constant(true))();
 }
+
+// 6. 付款方式參考表
+class PaymentMethod extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get code => text()(); // self_pay / unified_billing / hospital_collect / abnormal
+  TextColumn get name => text()(); // 自付 / 統一請款 / 總院會核代收 / 收費異常
+  TextColumn get nameEn => text().nullable()();
+  IntColumn get sortOrder => integer().withDefault(const Constant(0))();
+  BoolColumn get isActive => boolean().withDefault(const Constant(true))();
+}
+
+// 7. 收款狀態參考表
+class CollectionStatus extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get code => text()(); // not_collected / collected / not_required
+  TextColumn get name => text()(); // 尚未收款 / 已收款 / 不需要
+  TextColumn get nameEn => text().nullable()();
+  IntColumn get sortOrder => integer().withDefault(const Constant(0))();
+  BoolColumn get isActive => boolean().withDefault(const Constant(true))();
+}
+
+// 8. 貨幣參考表
+class CurrencyRef extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get code => text()(); // TWD / USD / CNY / JPY / CAD
+  TextColumn get name => text()(); // 台幣 / 美金 / 人民幣 / 日幣 / 加幣
+  TextColumn get symbol => text().nullable()(); // $ / ¥ / €
+}
+
+// 9. 轉診目的參考表
+class ReferralPurpose extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get code => text()(); // emergency / inpatient / outpatient / further_exam / followup / other
+  TextColumn get name => text()(); // 急診治療 / 住院治療 / 門診治療 / 進一步檢查 / 繼續追蹤 / 其它
+  IntColumn get sortOrder => integer().withDefault(const Constant(0))();
+  BoolColumn get isActive => boolean().withDefault(const Constant(true))();
+}
+
+// 10. 站點參考表（TELEX用）
+class StationRef extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get code => text()(); // T1_OCC / T2_OCC / T1_MED / T2_MED
+  TextColumn get name => text()(); // T1 03-3063578 / T2 03-3063367 / T1 03-3834225 / T2 03-3983485
+  TextColumn get description => text().nullable()(); // 桃機T1 OCC / 桃機T2 OCC / 機場醫療中心T1 / 機場醫療中心T2
+}
+
+// 11. 關係類型參考表（轉診單用）
+class RelationshipType extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get code => text()(); // self / spouse / parent / child / other
+  TextColumn get name => text()(); // 本人 / 配偶 / 父母 / 子女 / 其他
+  TextColumn get nameEn => text().nullable()();
+}

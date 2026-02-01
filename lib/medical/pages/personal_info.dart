@@ -25,6 +25,7 @@ class _PersonalInfoState extends State<PersonalInfo> {
   // 控制器
   late TextEditingController _nameController;
   late TextEditingController _passportController;
+  late TextEditingController _idNoController;
   late TextEditingController _phoneController;
   late TextEditingController _addressController;
   late TextEditingController _birthdayController;
@@ -36,6 +37,7 @@ class _PersonalInfoState extends State<PersonalInfo> {
     super.initState();
     _nameController = TextEditingController();
     _passportController = TextEditingController();
+    _idNoController = TextEditingController();
     _phoneController = TextEditingController();
     _addressController = TextEditingController();
     _birthdayController = TextEditingController();
@@ -45,10 +47,23 @@ class _PersonalInfoState extends State<PersonalInfo> {
   void dispose() {
     _nameController.dispose();
     _passportController.dispose();
+    _idNoController.dispose();
     _phoneController.dispose();
     _addressController.dispose();
     _birthdayController.dispose();
     super.dispose();
+  }
+
+  // 計算年齡
+  int _calculateAge(DateTime? birthday) {
+    if (birthday == null) return 0;
+    final now = DateTime.now();
+    int age = now.year - birthday.year;
+    if (now.month < birthday.month ||
+        (now.month == birthday.month && now.day < birthday.day)) {
+      age--;
+    }
+    return age;
   }
 
   // 當 ViewModel 資料載入後，同步到 Controller
@@ -59,6 +74,7 @@ class _PersonalInfoState extends State<PersonalInfo> {
 
     _nameController.text = patient.name ?? '';
     _passportController.text = patient.passportOrIdNo ?? '';
+    _idNoController.text = patient.idNo ?? '';
     _phoneController.text = patient.telephone ?? '';
     _addressController.text = patient.address ?? '';
 
@@ -147,7 +163,7 @@ class _PersonalInfoState extends State<PersonalInfo> {
                                 border: Border.all(color: borderColor),
                               ),
                               child: Text(
-                                patient.age?.toString() ?? '0',
+                                _calculateAge(patient.birthday).toString(),
                                 style: const TextStyle(
                                   fontSize: 14,
                                   color: textDark,
@@ -177,14 +193,21 @@ class _PersonalInfoState extends State<PersonalInfo> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildLabel('護照/身份證字號 ID/PASSPORT NO.'),
+                  _buildLabel('護照號碼 PASSPORT NO.'),
                   const SizedBox(height: 8),
                   _buildTextField(
                     controller: _passportController,
-                    hint: '請輸入證件號碼',
-                    suffixIcon: Icons.check_circle_outline,
-                    suffixColor: Colors.green,
+                    hint: '請輸入護照號碼',
                     onChanged: (val) => viewModel.updatePassport(val),
+                  ),
+                  const SizedBox(height: 24),
+
+                  _buildLabel('身分證字號 ID NO.'),
+                  const SizedBox(height: 8),
+                  _buildTextField(
+                    controller: _idNoController,
+                    hint: '請輸入身分證字號',
+                    onChanged: (val) => viewModel.updateIdNo(val),
                   ),
                   const SizedBox(height: 24),
 

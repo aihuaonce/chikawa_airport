@@ -16,6 +16,18 @@ class RecordRow extends StatelessWidget {
   static const Color textMuted = Color(0xFF64748B);
   static const Color primaryColor = Color(0xFF007A8A);
 
+  // 計算年齡
+  int _calculateAge(DateTime? birthday) {
+    if (birthday == null) return 0;
+    final now = DateTime.now();
+    int age = now.year - birthday.year;
+    if (now.month < birthday.month ||
+        (now.month == birthday.month && now.day < birthday.day)) {
+      age--;
+    }
+    return age;
+  }
+
   @override
   Widget build(BuildContext context) {
     final record = data.record;
@@ -87,7 +99,7 @@ class RecordRow extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          '${patient.sexId == 1 ? "M" : "F"} / ${patient.age ?? "?"}y',
+                          '${patient.sexId == 1 ? "M" : "F"} / ${_calculateAge(patient.birthday)}y',
                           style: const TextStyle(
                             color: textMuted,
                             fontSize: 11,
