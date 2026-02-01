@@ -374,6 +374,14 @@ class _RefusalOfReferralState extends State<RefusalOfReferral> {
               color: textDark,
             ),
           ),
+          const Text(
+            'Passport / I.D. No:',
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.bold,
+              color: textDark,
+            ),
+          ),
           const SizedBox(height: 8),
           Text(
             "Here by clarified that I / my family patient had been notified by Dr. ${_selectedDoctor ?? '_____'} of Landseed Medical Clinic at Taiwan Taoyuan Int'l Airport, I am /my family patient is now in illness/necessary condition which needed to be transported to an advanced hospital facilities for further test and treatment. But under my our personal status/consideration, I/We decided to handle this situation by myself/ourselves, against any further medical advice I am hereby signing this consent clarified that I am /and my family are willing to take all the risks and hold all the responsibilities of any consequences, even hazardous to my/my family member's health or life integrity unexpectedly.",

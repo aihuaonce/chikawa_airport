@@ -904,49 +904,61 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
   }
 
   Widget _buildVitalSignsSection(TreatmentViewModel viewModel) {
-    // 取得最新的醫療評估
-
-    // 注意：使用已初始化的 Controllers，而非每次重建都建立新的
-    return GridView.count(
-      crossAxisCount: 2,
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      mainAxisSpacing: 10,
-      crossAxisSpacing: 12,
-      childAspectRatio: 3.5,
+    return Column(
       children: [
-        // 體溫 - 使用 _tempController
-        _buildVitalFieldWithController(
-          label: '體溫 Temp (°C)',
-          controller: _tempController,
-          onChanged: () => _onVitalSignChanged(viewModel),
+        Row(
+          children: [
+            Expanded(
+              child: _buildVitalFieldWithController(
+                label: '體溫 Temp (°C)',
+                controller: _tempController,
+                onChanged: () => _onVitalSignChanged(viewModel),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _buildVitalFieldWithController(
+                label: '脈搏 Pulse (bpm)',
+                controller: _pulseController,
+                onChanged: () => _onVitalSignChanged(viewModel),
+              ),
+            ),
+          ],
         ),
-        // 脈搏 - 使用 _pulseController
-        _buildVitalFieldWithController(
-          label: '脈搏 Pulse (bpm)',
-          controller: _pulseController,
-          onChanged: () => _onVitalSignChanged(viewModel),
+        const SizedBox(height: 10),
+        Row(
+          children: [
+            Expanded(
+              child: _buildVitalFieldWithController(
+                label: '呼吸 RR (/min)',
+                controller: _breathController,
+                onChanged: () => _onVitalSignChanged(viewModel),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _buildBloodPressureWithControllers(
+                systolicController: _systolicController,
+                diastolicController: _diastolicController,
+                onChanged: () => _onVitalSignChanged(viewModel),
+              ),
+            ),
+          ],
         ),
-        // 呼吸 - 使用 _breathController
-        _buildVitalFieldWithController(
-          label: '呼吸 RR (/min)',
-          controller: _breathController,
-          onChanged: () => _onVitalSignChanged(viewModel),
+        const SizedBox(height: 10),
+        Row(
+          children: [
+            Expanded(
+              child: _buildVitalFieldWithController(
+                label: '血氧 SpO2 (%)',
+                controller: _spo2Controller,
+                onChanged: () => _onVitalSignChanged(viewModel),
+              ),
+            ),
+            const SizedBox(width: 12),
+            const Expanded(child: SizedBox()), // 保持對齊的佔位
+          ],
         ),
-        // 血壓 - 使用 _systolicController 和 _diastolicController
-        _buildBloodPressureWithControllers(
-          systolicController: _systolicController,
-          diastolicController: _diastolicController,
-          onChanged: () => _onVitalSignChanged(viewModel),
-        ),
-        // 血氧 - 使用 _spo2Controller
-        _buildVitalFieldWithController(
-          label: '血氧 SpO2 (%)',
-          controller: _spo2Controller,
-          onChanged: () => _onVitalSignChanged(viewModel),
-        ),
-        // 空位（保持6格佈局）
-        const SizedBox.shrink(),
       ],
     );
   }
@@ -955,14 +967,12 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // 意識清晰 Checkbox（變更時自動儲存，勾選時清除 GCS 資料）
         _buildCheckboxTile(
           label: '意識清晰 Alert & Oriented',
           value: _isAlert,
           onChanged: (v) {
             setState(() => _isAlert = v!);
             if (_isAlert) {
-              // 勾選意識清晰時，清除 GCS 資料
               _gcsEController.clear();
               _gcsVController.clear();
               _gcsMController.clear();
@@ -975,7 +985,6 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
           const SizedBox(height: 12),
           _buildLabel('GCS 指數評估'),
           const SizedBox(height: 4),
-          // GCS 輸入框（簡化版，保留自動計算）
           Row(
             children: [
               Expanded(
@@ -1005,7 +1014,6 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
                 ),
               ),
               const SizedBox(width: 6),
-              // Total（只讀，自動計算）
               Expanded(
                 child: Container(
                   height: 40,
@@ -1028,7 +1036,6 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
             ],
           ),
           const SizedBox(height: 12),
-          // 瞳孔檢查（簡化版）
           Row(
             children: [
               Expanded(
@@ -1070,45 +1077,54 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
           ),
         ],
         const SizedBox(height: 12),
-        // 理學檢查（2x2 Grid，簡化版）
-        GridView.count(
-          crossAxisCount: 2,
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          mainAxisSpacing: 10,
-          crossAxisSpacing: 12,
-          childAspectRatio: 4,
+
+        // --- 這裡改用 Row 佈局取代 GridView ---
+        Row(
           children: [
-            _buildLabeledFieldWithController(
-              '頭頸部 Head/Neck',
-              '',
-              _headNeckController,
-              () => _onConsciousnessAndExamChanged(viewModel),
+            Expanded(
+              child: _buildLabeledFieldWithController(
+                '頭頸部 Head/Neck',
+                '',
+                _headNeckController,
+                () => _onConsciousnessAndExamChanged(viewModel),
+              ),
             ),
-            _buildLabeledFieldWithController(
-              '胸部 Chest',
-              '',
-              _chestController,
-              () => _onConsciousnessAndExamChanged(viewModel),
-            ),
-            _buildLabeledFieldWithController(
-              '腹部 Abdomen',
-              '',
-              _abdomenController,
-              () => _onConsciousnessAndExamChanged(viewModel),
-            ),
-            _buildLabeledFieldWithController(
-              '四肢 Extremities',
-              '',
-              _extremitiesController,
-              () => _onConsciousnessAndExamChanged(viewModel),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _buildLabeledFieldWithController(
+                '胸部 Chest',
+                '',
+                _chestController,
+                () => _onConsciousnessAndExamChanged(viewModel),
+              ),
             ),
           ],
         ),
         const SizedBox(height: 10),
-        // 其它理學檢查
+        Row(
+          children: [
+            Expanded(
+              child: _buildLabeledFieldWithController(
+                '腹部 Abdomen',
+                '',
+                _abdomenController,
+                () => _onConsciousnessAndExamChanged(viewModel),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _buildLabeledFieldWithController(
+                '四肢 Extremities',
+                '',
+                _extremitiesController,
+                () => _onConsciousnessAndExamChanged(viewModel),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
         _buildLabeledFieldWithController(
-          '其它理學檢查 Other Observations...',
+          '其它理學觀察 Other Observations...',
           '',
           _otherPhysicalExamController,
           () => _onConsciousnessAndExamChanged(viewModel),
