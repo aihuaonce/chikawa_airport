@@ -21,98 +21,110 @@ class TreatmentRecord extends StatefulWidget {
 }
 
 class _TreatmentRecordState extends State<TreatmentRecord> {
-  // 顏色定義
+  // --- 樣式定義 ---
   static const Color primaryColor = Color(0xFF007A8A);
   static const Color textDark = Color(0xFF1E293B);
   static const Color textMuted = Color(0xFF64748B);
   static const Color borderColor = Color(0xFFE2E8F0);
   static const Color bgField = Color(0xFFF9FBFC);
 
-  // 控制器
+  // --- 狀態控制與標記 ---
+  bool _isInitialized = false;
+  bool _cdcPassed = false;
+  String _screeningMethod = '';
+  bool _photoTrauma = false, _photoEcg = false, _photoOther = false;
+  bool _isAlert = true;
+  int? _leftPupilReactionId = 1, _rightPupilReactionId = 1, _gcsTotal;
+
+  // --- 動態欄位狀態 (前端專用) ---
+  String _intubationMethod = 'Endotracheal tube';
+  String _oxygenMethod = '鼻管';
+  final List<String> _selectedCertTypes = [];
+
+  // --- 控制器：原有項目 ---
   late TextEditingController _otherSymptomController;
   late TextEditingController _supplementaryNotesController;
   late TextEditingController _pastHistoryDetailController;
   late TextEditingController _allergyDetailController;
   late TextEditingController _actionSummaryOtherController;
-
-  bool _isInitialized = false;
-
-  // CDC 篩檢相關
-  bool _cdcPassed = false;
-  String _screeningMethod = '';
-
-  // 影像記錄
-  bool _photoTrauma = false;
-  bool _photoEcg = false;
-  bool _photoOther = false;
-
-  // 生命徵象 Controllers
-  late TextEditingController _tempController;
-  late TextEditingController _pulseController;
-  late TextEditingController _breathController;
-  late TextEditingController _systolicController;
-  late TextEditingController _diastolicController;
-  late TextEditingController _spo2Controller;
-
-  // 意識與理學檢查 Controllers
-  late TextEditingController _gcsEController;
-  late TextEditingController _gcsVController;
-  late TextEditingController _gcsMController;
-  late TextEditingController _leftPupilSizeController;
-  late TextEditingController _rightPupilSizeController;
-  late TextEditingController _headNeckController;
-  late TextEditingController _chestController;
-  late TextEditingController _abdomenController;
-  late TextEditingController _extremitiesController;
-  late TextEditingController _otherPhysicalExamController;
-
-  // ICD-10 Controllers
-  late TextEditingController _tentativeController;
-  late TextEditingController _secondaryDiagnosis1Controller;
-  late TextEditingController _secondaryDiagnosis2Controller;
-
-  // 意識檢查狀態（非 Controller，用於 Checkbox 和 SegmentedControl）
-  bool _isAlert = true;
-  int? _leftPupilReactionId = 1; // 1 = positive (+)
-  int? _rightPupilReactionId = 1; // 1 = positive (+)
-  int? _gcsTotal; // GCS Total 自動計算，不儲存到 Controller
-
-  // 處置項目選擇 (現在由 ViewModel 管理多對多關聯)
-  // 不再需要本地狀態變量
-
-  // 協助人員
-  // final List<String> _assistStaffList = [];
-  // late TextEditingController _assistStaffController;
-
-  // 負責人與 EMT
   late TextEditingController _directorNameController;
   late TextEditingController _otherSpecialNoteController;
 
-  // 健康評估表 controller（數據來自 ViewModel）
+  // --- 控制器：生命徵象與檢查 ---
+  late TextEditingController _tempController,
+      _pulseController,
+      _breathController;
+  late TextEditingController _systolicController,
+      _diastolicController,
+      _spo2Controller;
+  late TextEditingController _gcsEController, _gcsVController, _gcsMController;
+  late TextEditingController _leftPupilSizeController,
+      _rightPupilSizeController;
+  late TextEditingController _headNeckController,
+      _chestController,
+      _abdomenController;
+  late TextEditingController _extremitiesController,
+      _otherPhysicalExamController;
+  late TextEditingController _tentativeController,
+      _secondaryDiagnosis1Controller,
+      _secondaryDiagnosis2Controller;
+
+  // --- 控制器：新增的動態子項 (前端) ---
+  late TextEditingController _ekgInterpretationController;
+  late TextEditingController _glucoseController;
+  late TextEditingController _oxygenFlowController;
+
   final Map<int, Map<String, TextEditingController>>
   _healthAssessmentControllers = {};
+
+  String _clearanceMethod = '一般通關';
+  String _ambulanceSource = '醫療中心';
+  String? _selectedTransferHospital;
+  String? _selectedAccompanyingStaff;
+
+  final List<String> _hospitals = ['林口長庚醫院', '聯新國際醫院', '敏盛綜合醫院', '衛生福利部桃園醫院'];
+  final List<String> _staffs = ['醫護人員 A', '醫護人員 B', '隨車 EMT A', '隨車 EMT B'];
+
+  Widget _buildFieldWrapper(String label, Widget field) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [_buildLabel(label), const SizedBox(height: 6), field],
+    );
+  }
+
+  final List<Map<String, dynamic>> _medicationList = [];
+
+  void _addMedication() {
+    setState(() {
+      _medicationList.add({
+        'name': '',
+        'method': '',
+        'frequency': '',
+        'days': '',
+        'dose': '',
+        'unit': '',
+        'remarks': '',
+      });
+    });
+  }
 
   @override
   void initState() {
     super.initState();
+    // 初始化所有控制器
     _otherSymptomController = TextEditingController();
     _supplementaryNotesController = TextEditingController();
     _pastHistoryDetailController = TextEditingController();
     _allergyDetailController = TextEditingController();
     _actionSummaryOtherController = TextEditingController();
-    // _assistStaffController = TextEditingController();
     _directorNameController = TextEditingController();
     _otherSpecialNoteController = TextEditingController();
-
-    // 生命徵象 Controllers
     _tempController = TextEditingController();
     _pulseController = TextEditingController();
     _breathController = TextEditingController();
     _systolicController = TextEditingController();
     _diastolicController = TextEditingController();
     _spo2Controller = TextEditingController();
-
-    // 意識與理學檢查 Controllers
     _gcsEController = TextEditingController();
     _gcsVController = TextEditingController();
     _gcsMController = TextEditingController();
@@ -123,33 +135,31 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
     _abdomenController = TextEditingController();
     _extremitiesController = TextEditingController();
     _otherPhysicalExamController = TextEditingController();
-
-    // ICD-10 Controllers
     _tentativeController = TextEditingController();
     _secondaryDiagnosis1Controller = TextEditingController();
     _secondaryDiagnosis2Controller = TextEditingController();
+
+    _ekgInterpretationController = TextEditingController();
+    _glucoseController = TextEditingController();
+    _oxygenFlowController = TextEditingController();
   }
 
   @override
   void dispose() {
+    // 釋放所有控制器，避免記憶體洩漏
     _otherSymptomController.dispose();
     _supplementaryNotesController.dispose();
     _pastHistoryDetailController.dispose();
     _allergyDetailController.dispose();
     _actionSummaryOtherController.dispose();
-    // _assistStaffController.dispose();
     _directorNameController.dispose();
     _otherSpecialNoteController.dispose();
-
-    // 清理生命徵象 Controllers
     _tempController.dispose();
     _pulseController.dispose();
     _breathController.dispose();
     _systolicController.dispose();
     _diastolicController.dispose();
     _spo2Controller.dispose();
-
-    // 清理意識與理學檢查 Controllers
     _gcsEController.dispose();
     _gcsVController.dispose();
     _gcsMController.dispose();
@@ -160,13 +170,13 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
     _abdomenController.dispose();
     _extremitiesController.dispose();
     _otherPhysicalExamController.dispose();
-
-    // 清理 ICD-10 Controllers
     _tentativeController.dispose();
     _secondaryDiagnosis1Controller.dispose();
     _secondaryDiagnosis2Controller.dispose();
+    _ekgInterpretationController.dispose();
+    _glucoseController.dispose();
+    _oxygenFlowController.dispose();
 
-    // 清理健康評估表的 controller
     for (var controllers in _healthAssessmentControllers.values) {
       controllers['name']?.dispose();
       controllers['relation']?.dispose();
@@ -175,11 +185,10 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
     super.dispose();
   }
 
-  // 當 ViewModel 資料載入後,同步到 Controller
+  // --- 核心邏輯：ViewModel 同步 ---
   void _updateControllers(TreatmentViewModel viewModel) {
     if (_isInitialized) return;
 
-    // 從 Medical 表讀取 CDC 狀態
     final medicalRecord = viewModel.medicalRecord;
     if (medicalRecord != null) {
       _cdcPassed = medicalRecord.cdcPassed ?? false;
@@ -192,89 +201,36 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
       _supplementaryNotesController.text = complaint.supplementaryNotes ?? '';
     }
 
-    final history = viewModel.medicalHistory;
-    if (history != null) {
-      _pastHistoryDetailController.text = history.pastHistoryDetail ?? '';
-      _allergyDetailController.text = history.allergyDetail ?? '';
-      // 病史狀態現在由 ViewModel 從參考表管理
-      // 不再需要從本地狀態變量載入
-    }
-
     final treatment = viewModel.treatment;
     if (treatment != null) {
       _actionSummaryOtherController.text = treatment.actionSummaryOther ?? '';
-
-      // 處置項目現在通過多對多關聯表管理，由 ViewModel 自動載入
-      // 不再需要從 JSON 字串解析
-
-      // 載入 ICD-10 資料
       _tentativeController.text = treatment.tentative ?? '';
       _secondaryDiagnosis1Controller.text = treatment.secondaryDiagnosis1 ?? '';
       _secondaryDiagnosis2Controller.text = treatment.secondaryDiagnosis2 ?? '';
-
-      // 載入負責人姓名
       _directorNameController.text = treatment.directorName ?? '';
     }
 
-    // 載入特別註記的其他說明
-    final specialNotes = viewModel.specialNotes;
-    if (specialNotes != null) {
-      // 特別註記現在通過多對多關聯表管理，由 ViewModel 自動載入
-      _otherSpecialNoteController.text = specialNotes.otherNotes ?? '';
-    }
-
-    // 檢查已有影像，自動勾選對應類型
-    final mediaList = viewModel.medicalMediaList;
-    if (mediaList.isNotEmpty) {
-      _photoTrauma = mediaList.any((media) => media.mediaType == 'trauma');
-      _photoEcg = mediaList.any((media) => media.mediaType == 'ecg');
-      _photoOther = mediaList.any((media) => media.mediaType == 'other');
-    }
-
-    // 載入生命徵象資料到 Controllers
     final latestAssessment = viewModel.latestVitalSigns;
-    debugPrint(
-      'DEBUG: 載入生命徵象資料 - assessments數量: ${viewModel.medicalAssessments.length}',
-    );
     if (latestAssessment != null) {
-      debugPrint(
-        'DEBUG: 最新評估 - 體溫: ${latestAssessment.temperature}, 脈搏: ${latestAssessment.pulse}',
-      );
       _tempController.text = latestAssessment.temperature?.toString() ?? '';
       _pulseController.text = latestAssessment.pulse?.toString() ?? '';
       _breathController.text = latestAssessment.breath?.toString() ?? '';
       _systolicController.text = latestAssessment.systolic?.toString() ?? '';
       _diastolicController.text = latestAssessment.diastolic?.toString() ?? '';
       _spo2Controller.text = latestAssessment.spo2?.toString() ?? '';
-      debugPrint(
-        'DEBUG: Controller已設定 - 體溫: ${_tempController.text}, 脈搏: ${_pulseController.text}',
-      );
-    } else {
-      debugPrint('DEBUG: 無生命徵象資料');
     }
 
-    // 載入意識與理學檢查資料
     final latestConsciousnessExam = viewModel.latestConsciousnessExam;
     if (latestConsciousnessExam != null) {
-      // GCS
       _gcsEController.text = latestConsciousnessExam.gcsE ?? '';
       _gcsVController.text = latestConsciousnessExam.gcsV ?? '';
       _gcsMController.text = latestConsciousnessExam.gcsM ?? '';
-      // GCS Total 自動計算，不從資料庫載入，而是根據 E+V+M 計算
-      final e = int.tryParse(_gcsEController.text) ?? 0;
-      final v = int.tryParse(_gcsVController.text) ?? 0;
-      final m = int.tryParse(_gcsMController.text) ?? 0;
-      _gcsTotal = e + v + m;
-
-      // 瞳孔
       _leftPupilSizeController.text =
           latestConsciousnessExam.leftPupilSize?.toString() ?? '';
       _rightPupilSizeController.text =
           latestConsciousnessExam.rightPupilSize?.toString() ?? '';
       _leftPupilReactionId = latestConsciousnessExam.leftPupilReactionId ?? 1;
       _rightPupilReactionId = latestConsciousnessExam.rightPupilReactionId ?? 1;
-
-      // 理學檢查
       _headNeckController.text = latestConsciousnessExam.headNeckExam ?? '';
       _chestController.text = latestConsciousnessExam.chestExam ?? '';
       _abdomenController.text = latestConsciousnessExam.abdomenExam ?? '';
@@ -282,13 +238,7 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
           latestConsciousnessExam.extremitiesExam ?? '';
       _otherPhysicalExamController.text =
           latestConsciousnessExam.otherPhysicalExam ?? '';
-
-      // 意識狀態 - 檢查 consciousnessLevelId 是否對應 'alert' (ID = 1)
       _isAlert = latestConsciousnessExam.consciousnessLevelId == 1;
-
-      debugPrint('DEBUG: 意識與理學檢查資料已載入 - GCS: $_gcsTotal');
-    } else {
-      debugPrint('DEBUG: 無意識與理學檢查資料');
     }
 
     _isInitialized = true;
@@ -1278,6 +1228,12 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
   Widget _buildOutcomeTreatmentSection(TreatmentViewModel viewModel) {
     final treatment = viewModel.treatment;
 
+    // 取得目前選中的處置名稱清單
+    final selectedActionNames = viewModel.actionItems
+        .where((item) => viewModel.selectedActionIds.contains(item.id))
+        .map((item) => item.name)
+        .toList();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -1286,7 +1242,6 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
         _buildTriageSelector(viewModel),
         const SizedBox(height: 24),
         Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
               child: Column(
@@ -1323,17 +1278,508 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
         _buildLabel('處理摘要 Summary of Action (可複選)'),
         const SizedBox(height: 8),
         _buildActionSummaryGrid(viewModel),
-        // 檢查是否選中了"其他"處置項目
-        if (viewModel.hasOtherActionSelected) ...[
-          const SizedBox(height: 12),
-          _buildTextField(
-            hint: '請詳述其它處理項目...',
-            maxLines: 2,
-            controller: _actionSummaryOtherController,
-            onChanged: (val) => viewModel.updateActionSummaryOther(val),
+
+        const SizedBox(height: 8),
+        LayoutBuilder(
+          builder: (context, constraints) {
+            double itemWidth = (constraints.maxWidth - 32) / 3;
+
+            return Wrap(
+              spacing: 16,
+              runSpacing: 16,
+              children: [
+                // 1. 心電圖
+                if (selectedActionNames.contains('EKG心電圖'))
+                  _buildDynamicGridItem(
+                    '心電圖判讀',
+                    _buildTextField(
+                      hint: '請輸入判讀結果...',
+                      controller: _ekgInterpretationController,
+                    ),
+                    itemWidth,
+                  ),
+
+                // 2. 血糖
+                if (selectedActionNames.contains('血糖'))
+                  _buildDynamicGridItem(
+                    '血糖值 (mg/dL)',
+                    _buildTextField(
+                      hint: '數值',
+                      controller: _glucoseController,
+                      keyboardType: TextInputType.number,
+                    ),
+                    itemWidth,
+                  ),
+
+                // 3. 插管
+                if (selectedActionNames.contains('插管'))
+                  _buildDynamicGridItem(
+                    '插管方式',
+                    _buildSegmentedControl(
+                      ['Endo', 'LMA'],
+                      _intubationMethod,
+                      (v) => setState(() => _intubationMethod = v),
+                    ),
+                    itemWidth,
+                  ),
+
+                // 4. 氧氣使用
+                if (selectedActionNames.contains('氧氣使用'))
+                  _buildDynamicGridItem(
+                    '氧氣處置',
+                    Column(
+                      children: [
+                        _buildSegmentedControl(
+                          ['鼻管', '面罩', 'NRM', 'Ambu'],
+                          _oxygenMethod,
+                          (v) => setState(() => _oxygenMethod = v),
+                        ),
+                        const SizedBox(height: 12),
+                        Row(
+                          children: [
+                            const Text('流量: ', style: TextStyle(fontSize: 12)),
+                            Expanded(
+                              child: _buildTextField(
+                                hint: '0',
+                                controller: _oxygenFlowController,
+                                keyboardType: TextInputType.number,
+                              ),
+                            ),
+                            const Text(
+                              ' L/M',
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                                color: textMuted,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    itemWidth,
+                  ),
+
+                // 5. 診斷書
+                if (selectedActionNames.contains('診斷書'))
+                  _buildDynamicGridItem(
+                    '診斷書種類',
+                    Column(
+                      children: ['中文診斷書', '英文診斷書', '適航證明'].map((type) {
+                        bool isSel = _selectedCertTypes.contains(type);
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 6),
+                          child: InkWell(
+                            onTap: () => setState(
+                              () => isSel
+                                  ? _selectedCertTypes.remove(type)
+                                  : _selectedCertTypes.add(type),
+                            ),
+                            child: Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 8,
+                                horizontal: 12,
+                              ),
+                              decoration: BoxDecoration(
+                                color: isSel ? primaryColor : Colors.white,
+                                borderRadius: BorderRadius.circular(6),
+                                border: Border.all(
+                                  color: isSel ? primaryColor : borderColor,
+                                ),
+                              ),
+                              child: Text(
+                                type,
+                                style: TextStyle(
+                                  color: isSel ? Colors.white : textDark,
+                                  fontSize: 11,
+                                  fontWeight: isSel
+                                      ? FontWeight.bold
+                                      : FontWeight.normal,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                    itemWidth,
+                  ),
+
+                // 6. 其它
+                if (selectedActionNames.any((name) => name.contains('其')))
+                  _buildDynamicGridItem(
+                    '其它處置說明',
+                    _buildTextField(
+                      hint: '請詳述內容...',
+                      maxLines: 3,
+                      controller: _actionSummaryOtherController,
+                      onChanged: (v) => viewModel.updateActionSummaryOther(v),
+                    ),
+                    itemWidth,
+                  ),
+              ],
+            );
+          },
+        ),
+        if (selectedActionNames.contains('建議轉診')) _buildReferralDetailSection(),
+        if (selectedActionNames.contains('藥物使用')) _buildMedicationSection(),
+      ],
+    );
+  }
+
+  Widget _buildReferralDetailSection() {
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(top: 16),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: bgField,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: primaryColor.withValues(alpha: 0.2),
+          width: 1.5,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.local_shipping_outlined,
+                color: primaryColor,
+                size: 20,
+              ),
+              const SizedBox(width: 8),
+              const Text(
+                '轉診詳細資訊 Referral Details',
+                style: TextStyle(
+                  color: primaryColor,
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 左側：通關與救護車
+              Expanded(
+                child: Column(
+                  children: [
+                    _buildFieldWrapper(
+                      '通關方式 Clearance Method',
+                      _buildSegmentedControl(
+                        ['一般通關', '緊急通關'],
+                        _clearanceMethod,
+                        (v) => setState(() => _clearanceMethod = v),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    _buildFieldWrapper(
+                      '救護車記錄單 Ambulance Record',
+                      _buildSegmentedControl(
+                        ['醫療中心', '民間', '消防隊'],
+                        _ambulanceSource,
+                        (v) => setState(() => _ambulanceSource = v),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 32),
+              // 右側：醫院與人員
+              Expanded(
+                child: Column(
+                  children: [
+                    _buildFieldWrapper(
+                      '轉送醫院 Transfer Hospital',
+                      _buildSimpleDropdown(
+                        hint: '請選擇轉送醫院',
+                        value: _selectedTransferHospital,
+                        items: _hospitals,
+                        onChanged: (v) =>
+                            setState(() => _selectedTransferHospital = v),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    _buildFieldWrapper(
+                      '隨車人員 Accompanying Staff',
+                      _buildSimpleDropdown(
+                        hint: '請選擇隨車人員',
+                        value: _selectedAccompanyingStaff,
+                        items: _staffs,
+                        onChanged: (v) =>
+                            setState(() => _selectedAccompanyingStaff = v),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ],
-      ],
+      ),
+    );
+  }
+
+  // 專為此區塊設計的簡約下拉選單
+  Widget _buildSimpleDropdown({
+    required String hint,
+    required String? value,
+    required List<String> items,
+    required Function(String?) onChanged,
+  }) {
+    return Container(
+      height: 44,
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: borderColor),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<String>(
+          value: value,
+          hint: Text(
+            hint,
+            style: TextStyle(
+              color: textMuted.withValues(alpha: 0.5),
+              fontSize: 13,
+            ),
+          ),
+          isExpanded: true,
+          icon: const Icon(
+            Icons.keyboard_arrow_down,
+            size: 20,
+            color: textMuted,
+          ),
+          items: items
+              .map(
+                (s) => DropdownMenuItem(
+                  value: s,
+                  child: Text(
+                    s,
+                    style: const TextStyle(fontSize: 14, color: textDark),
+                  ),
+                ),
+              )
+              .toList(),
+          onChanged: onChanged,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDynamicGridItem(String label, Widget child, double width) {
+    return Container(
+      width: width,
+      constraints: const BoxConstraints(minHeight: 100),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: bgField,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: primaryColor.withValues(alpha: 0.15)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            label,
+            style: const TextStyle(
+              color: primaryColor,
+              fontSize: 11,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 10),
+          child,
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMedicationSection() {
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(top: 16),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: bgField,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: primaryColor.withValues(alpha: 0.2),
+          width: 1.5,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Icon(
+                    Icons.medication_outlined,
+                    color: primaryColor,
+                    size: 20,
+                  ),
+                  const SizedBox(width: 8),
+                  const Text(
+                    '藥物記錄表 Medication Record',
+                    style: TextStyle(
+                      color: primaryColor,
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+              // 新增藥物按鈕
+              TextButton.icon(
+                onPressed: _addMedication,
+                icon: const Icon(Icons.add_circle_outline, size: 18),
+                label: const Text(
+                  '新增藥物',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                style: TextButton.styleFrom(foregroundColor: primaryColor),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+
+          // 表頭標籤
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            child: Row(
+              children: [
+                Expanded(flex: 3, child: _buildTableLabel('藥品名稱')),
+                const SizedBox(width: 8),
+                Expanded(flex: 2, child: _buildTableLabel('使用方式')),
+                const SizedBox(width: 8),
+                Expanded(flex: 2, child: _buildTableLabel('服用頻率')),
+                const SizedBox(width: 8),
+                Expanded(flex: 1, child: _buildTableLabel('天數')),
+                const SizedBox(width: 8),
+                Expanded(flex: 1, child: _buildTableLabel('劑量')),
+                const SizedBox(width: 8),
+                Expanded(flex: 2, child: _buildTableLabel('單位')),
+                const SizedBox(width: 8),
+                Expanded(flex: 3, child: _buildTableLabel('備註')),
+                const SizedBox(width: 40), // 刪除按鈕空間
+              ],
+            ),
+          ),
+          const SizedBox(height: 8),
+
+          // 藥物列表內容
+          if (_medicationList.isEmpty)
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Text(
+                  '尚未新增藥物資料',
+                  style: TextStyle(
+                    color: textMuted.withValues(alpha: 0.5),
+                    fontSize: 13,
+                  ),
+                ),
+              ),
+            )
+          else
+            ..._medicationList.asMap().entries.map((entry) {
+              int idx = entry.key;
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 8.0),
+                child: Row(
+                  children: [
+                    Expanded(flex: 3, child: _buildCompactField('藥名')),
+                    const SizedBox(width: 8),
+                    Expanded(flex: 2, child: _buildCompactField('方式')),
+                    const SizedBox(width: 8),
+                    Expanded(flex: 2, child: _buildCompactField('頻率')),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      flex: 1,
+                      child: _buildCompactField('0', isNumber: true),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      flex: 1,
+                      child: _buildCompactField('0', isNumber: true),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(flex: 2, child: _buildCompactField('單位')),
+                    const SizedBox(width: 8),
+                    Expanded(flex: 3, child: _buildCompactField('備註')),
+                    const SizedBox(width: 8),
+                    // 刪除按鈕
+                    IconButton(
+                      onPressed: () =>
+                          setState(() => _medicationList.removeAt(idx)),
+                      icon: Icon(
+                        Icons.close_rounded,
+                        color: Colors.red.withValues(alpha: 0.5),
+                        size: 20,
+                      ),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                    ),
+                  ],
+                ),
+              );
+            }).toList(),
+        ],
+      ),
+    );
+  }
+
+  // 輔助組件：表格專用小型輸入框
+  Widget _buildCompactField(String hint, {bool isNumber = false}) {
+    return SizedBox(
+      height: 38,
+      child: TextField(
+        keyboardType: isNumber ? TextInputType.number : TextInputType.text,
+        style: const TextStyle(fontSize: 13),
+        decoration: InputDecoration(
+          hintText: hint,
+          hintStyle: TextStyle(
+            color: textMuted.withValues(alpha: 0.3),
+            fontSize: 12,
+          ),
+          filled: true,
+          fillColor: Colors.white,
+          contentPadding: const EdgeInsets.symmetric(horizontal: 10),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(6),
+            borderSide: const BorderSide(color: borderColor),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(6),
+            borderSide: const BorderSide(color: primaryColor, width: 1.5),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // 輔助組件：表格標籤
+  Widget _buildTableLabel(String text) {
+    return Text(
+      text,
+      style: const TextStyle(
+        color: textMuted,
+        fontSize: 10,
+        fontWeight: FontWeight.bold,
+      ),
+      textAlign: TextAlign.center,
     );
   }
 

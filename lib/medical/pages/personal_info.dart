@@ -15,14 +15,12 @@ class PersonalInfo extends StatefulWidget {
 }
 
 class _PersonalInfoState extends State<PersonalInfo> {
-  // 顏色與樣式定義
   static const Color primaryColor = Color(0xFF007A8A);
   static const Color textDark = Color(0xFF1E293B);
   static const Color textMuted = Color(0xFF64748B);
   static const Color borderColor = Color(0xFFE2E8F0);
   static const Color bgField = Color(0xFFF9FBFC);
 
-  // 控制器
   late TextEditingController _nameController;
   late TextEditingController _passportController;
   late TextEditingController _idNoController;
@@ -30,6 +28,7 @@ class _PersonalInfoState extends State<PersonalInfo> {
   late TextEditingController _addressController;
   late TextEditingController _birthdayController;
 
+  int _localVisitReasonId = 0;
   bool _isInitialized = false;
 
   @override
@@ -54,7 +53,6 @@ class _PersonalInfoState extends State<PersonalInfo> {
     super.dispose();
   }
 
-  // 計算年齡
   int _calculateAge(DateTime? birthday) {
     if (birthday == null) return 0;
     final now = DateTime.now();
@@ -66,10 +64,7 @@ class _PersonalInfoState extends State<PersonalInfo> {
     return age;
   }
 
-  // 當 ViewModel 資料載入後，同步到 Controller
   void _updateControllers(PatientData patient) {
-    final birthday = patient.birthday;
-
     if (_isInitialized) return;
 
     _nameController.text = patient.name ?? '';
@@ -78,8 +73,10 @@ class _PersonalInfoState extends State<PersonalInfo> {
     _phoneController.text = patient.telephone ?? '';
     _addressController.text = patient.address ?? '';
 
-    if (birthday != null) {
-      _birthdayController.text = DateFormat('yyyy/MM/dd').format(birthday);
+    if (patient.birthday != null) {
+      _birthdayController.text = DateFormat(
+        'yyyy/MM/dd',
+      ).format(patient.birthday!);
     }
 
     _isInitialized = true;
@@ -87,11 +84,9 @@ class _PersonalInfoState extends State<PersonalInfo> {
 
   @override
   Widget build(BuildContext context) {
-    // 監聽 ViewModel
     final viewModel = context.watch<MedicalViewModel>();
     final patient = viewModel.patient;
 
-    // 確保資料載入後填入控制器
     if (patient != null) {
       _updateControllers(patient);
     }
@@ -106,7 +101,6 @@ class _PersonalInfoState extends State<PersonalInfo> {
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 左側欄
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -151,12 +145,12 @@ class _PersonalInfoState extends State<PersonalInfo> {
                           children: [
                             _buildLabel('年齡 AGE'),
                             const SizedBox(height: 8),
-                            // 年齡自動計算並顯示
                             Container(
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 16,
                                 vertical: 14,
                               ),
+                              width: double.infinity,
                               decoration: BoxDecoration(
                                 color: bgField,
                                 borderRadius: BorderRadius.circular(8),
@@ -178,9 +172,23 @@ class _PersonalInfoState extends State<PersonalInfo> {
                   const SizedBox(height: 24),
                   _buildLabel('性別 GENDER'),
                   const SizedBox(height: 8),
-                  SlidingGenderToggle(
+                  SlidingToggle(
                     selectedIndex: patient.sexId ?? 0,
+                    options: const ['Male', 'Female', 'Other'],
                     onChanged: (index) => viewModel.updateSexId(index),
+                  ),
+
+                  const SizedBox(height: 24),
+                  _buildLabel('為何至機場 REASON FOR VISIT'),
+                  const SizedBox(height: 8),
+                  SlidingToggle(
+                    selectedIndex: _localVisitReasonId,
+                    options: const ['航空公司機組員', '旅客/民眾', '機場內部員工'],
+                    onChanged: (index) {
+                      setState(() {
+                        _localVisitReasonId = index;
+                      });
+                    },
                   ),
                 ],
               ),
@@ -188,7 +196,6 @@ class _PersonalInfoState extends State<PersonalInfo> {
 
             const SizedBox(width: 48),
 
-            // 右側欄
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -241,7 +248,6 @@ class _PersonalInfoState extends State<PersonalInfo> {
     );
   }
 
-  // 日期選擇器
   Future<void> _selectDate(
     BuildContext context,
     MedicalViewModel viewModel,
@@ -258,7 +264,6 @@ class _PersonalInfoState extends State<PersonalInfo> {
     }
   }
 
-  // 單一輸入框元件
   Widget _buildTextField({
     required String hint,
     TextEditingController? controller,
@@ -305,12 +310,10 @@ class _PersonalInfoState extends State<PersonalInfo> {
     );
   }
 
-  // 國籍選單 (改用 SearchSheet)
   Widget _buildNationalityDropdown(
     MedicalViewModel viewModel,
     PatientData patient,
   ) {
-    // 從 ViewModel 取得當前選中的國籍
     final selectedNationality = viewModel.getNationalityById(
       patient.nationalityId,
     );
@@ -352,7 +355,6 @@ class _PersonalInfoState extends State<PersonalInfo> {
     );
   }
 
-  // 通用選擇欄位元件
   Widget _buildSelectionField({
     required String text,
     required String hint,
@@ -393,7 +395,6 @@ class _PersonalInfoState extends State<PersonalInfo> {
     );
   }
 
-  // 照片上傳區塊
   Widget _buildPhotoUploadSection() {
     return Container(
       padding: const EdgeInsets.all(12),
@@ -446,7 +447,6 @@ class _PersonalInfoState extends State<PersonalInfo> {
     );
   }
 
-  // 小按鈕元件
   Widget _buildSmallButton(IconData icon, String label, bool isPrimary) {
     return Container(
       height: 40,
@@ -474,7 +474,6 @@ class _PersonalInfoState extends State<PersonalInfo> {
     );
   }
 
-  // 標籤元件
   Widget _buildLabel(String text) {
     return Text(
       text,
@@ -487,18 +486,17 @@ class _PersonalInfoState extends State<PersonalInfo> {
   }
 }
 
-// 性別切換元件
-class SlidingGenderToggle extends StatelessWidget {
+class SlidingToggle extends StatelessWidget {
   final int selectedIndex;
+  final List<String> options;
   final Function(int) onChanged;
 
-  const SlidingGenderToggle({
+  const SlidingToggle({
     super.key,
     required this.selectedIndex,
+    required this.options,
     required this.onChanged,
   });
-
-  final List<String> _options = const ['Male', 'Female', 'Other'];
 
   @override
   Widget build(BuildContext context) {
@@ -513,11 +511,11 @@ class SlidingGenderToggle extends StatelessWidget {
           AnimatedAlign(
             duration: const Duration(milliseconds: 250),
             curve: Curves.easeInOut,
-            alignment: _getAlignment(selectedIndex),
+            alignment: _getAlignment(selectedIndex, options.length),
             child: Padding(
               padding: const EdgeInsets.all(4.0),
               child: FractionallySizedBox(
-                widthFactor: 1 / 3,
+                widthFactor: 1 / options.length,
                 child: Container(
                   decoration: BoxDecoration(
                     color: Colors.white,
@@ -535,14 +533,14 @@ class SlidingGenderToggle extends StatelessWidget {
             ),
           ),
           Row(
-            children: List.generate(_options.length, (index) {
+            children: List.generate(options.length, (index) {
               return Expanded(
                 child: GestureDetector(
                   onTap: () => onChanged(index),
                   behavior: HitTestBehavior.opaque,
                   child: Center(
                     child: Text(
-                      _options[index],
+                      options[index],
                       style: TextStyle(
                         color: selectedIndex == index
                             ? const Color(0xFF007A8A)
@@ -563,9 +561,8 @@ class SlidingGenderToggle extends StatelessWidget {
     );
   }
 
-  Alignment _getAlignment(int index) {
-    if (index == 0) return Alignment.centerLeft;
-    if (index == 1) return Alignment.center;
-    return Alignment.centerRight;
+  Alignment _getAlignment(int index, int total) {
+    if (total <= 1) return Alignment.center;
+    return Alignment(-1.0 + (index / (total - 1)) * 2.0, 0);
   }
 }
