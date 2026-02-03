@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'widgets/emergency_header.dart';
 import 'pages/personal_info.dart';
+import 'pages/flight_log.dart';
+import 'pages/incident_record.dart';
+import 'pages/treatment_record.dart';
 
 class EmergencyPage extends StatefulWidget {
   final int emergencyId;
@@ -33,13 +36,13 @@ class _EmergencyPageState extends State<EmergencyPage> {
       case 0:
         return EmergencyPersonalInfo(emergencyId: widget.emergencyId);
       case 1:
-        return _buildPlaceholder("飛航記錄內容 (Emergency Flight Log)");
+        return EmergencyFlightLog(emergencyId: widget.emergencyId);
       case 2:
-        return _buildPlaceholder("事故記錄內容 (Emergency Incident Record)");
+        return EmergencyIncidentRecord(emergencyId: widget.emergencyId);
       case 3:
-        return _buildPlaceholder("處置記錄內容 (Emergency Treatment Record)");
+        return EmergencyTreatmentRecord(emergencyId: widget.emergencyId);
       default:
-        return _buildPlaceholder("個人紀錄內容");
+        return EmergencyPersonalInfo(emergencyId: widget.emergencyId);
     }
   }
 
