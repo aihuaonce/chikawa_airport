@@ -219,22 +219,19 @@ class _ReferralFormState extends State<ReferralForm> {
     _doctorNameController.text = form.doctorName ?? '';
     // 嘗試帶入醫師姓名
     if (_doctorNameController.text.isEmpty) {
-      // 優先從醫療人員指派中尋找主責醫師
-      try {
-        final primaryDoctor = treatmentViewModel.staffAssignments.firstWhere(
-          (a) =>
-              (treatmentViewModel.getStaffRoleCode(a.staffRoleId) == 'DOCTOR' ||
-                  treatmentViewModel.getStaffRoleCode(a.staffRoleId) ==
-                      'doctor') &&
-              a.isPrimary,
-        );
-        _doctorNameController.text = primaryDoctor.staffName ?? '';
-      } catch (_) {
-        // 若找不到主責醫師，嘗試帶入處置記錄的負責人
-        if (_doctorNameController.text.isEmpty) {
-          _doctorNameController.text =
-              treatmentViewModel.treatment?.directorName ?? '';
-        }
+      _doctorNameController.text =
+          treatmentViewModel.treatment?.directorName ?? '';
+      // 若處置記錄無負責人，嘗試帶入主責醫師
+      if (_doctorNameController.text.isEmpty) {
+        try {
+          final primaryDoctor = treatmentViewModel.staffAssignments.firstWhere(
+            (a) =>
+                treatmentViewModel.getStaffRoleCode(a.staffRoleId) ==
+                    'DOCTOR' &&
+                a.isPrimary,
+          );
+          _doctorNameController.text = primaryDoctor.staffName ?? '';
+        } catch (_) {}
       }
     }
 
@@ -252,8 +249,27 @@ class _ReferralFormState extends State<ReferralForm> {
     _hospitalNameController.text = form.hospitalName ?? '';
     // 嘗試帶入轉診醫院
     if (_hospitalNameController.text.isEmpty) {
-      _hospitalNameController.text =
-          treatmentViewModel.treatment?.referralHospitalFinal ?? '';
+      // 優先使用文字欄位
+      if (treatmentViewModel.treatment?.referralHospitalFinal != null &&
+          treatmentViewModel.treatment!.referralHospitalFinal!.isNotEmpty) {
+        _hospitalNameController.text =
+            treatmentViewModel.treatment!.referralHospitalFinal!;
+      } else if (treatmentViewModel.treatment?.referralHospitalId != null) {
+        // 若文字欄位為空，嘗試從 ID 查找
+        final hospital = treatmentViewModel.getReferralHospitalById(
+          treatmentViewModel.treatment!.referralHospitalId,
+        );
+        if (hospital != null) {
+          _hospitalNameController.text = hospital.name;
+          // 若 ReferralForm 的電話/地址為空，順便帶入
+          if (_hospitalPhoneController.text.isEmpty) {
+            _hospitalPhoneController.text = hospital.phone ?? '';
+          }
+          if (_hospitalAddressController.text.isEmpty) {
+            _hospitalAddressController.text = hospital.address ?? '';
+          }
+        }
+      }
     }
 
     _hospitalDeptController.text = form.hospitalDept ?? '';

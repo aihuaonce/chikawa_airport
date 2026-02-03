@@ -27,6 +27,7 @@ class MedicalViewModel extends ChangeNotifier {
   //使用 refService
   List<NationalityData> get nationalityOptions => refService.nationalityList;
   List<SexData> get sexOptions => refService.sexList;
+  List<VisitReasonData> get visitReasonOptions => refService.visitReasonList;
   List<AirlineData> get airlineOptions => refService.airlineList;
   List<TravelStatusData> get travelStatusOptions => refService.travelStatusList;
   List<LocationData> get locationOptions => refService.locationList;
@@ -76,21 +77,13 @@ class MedicalViewModel extends ChangeNotifier {
   //建立預設飛航記錄
   Future<void> _createDefaultFlightRecord() async {
     try {
-      // 【優化】直接從 refService 拿預設值，不再查資料庫
-      if (refService.airlineList.isEmpty ||
-          refService.travelStatusList.isEmpty ||
-          refService.locationList.isEmpty) {
-        debugPrint('系統：參考資料未初始化，無法建立飛航記錄');
-        return;
-      }
-
       await db.flightDao.createFlightRecord(
         medicalId: medicalId,
-        airlineId: refService.airlineList.first.airlineId,
+        airlineId: null,
         flightNumber: '',
-        travelStatusId: refService.travelStatusList.first.travelStatusId,
-        departureLocationId: refService.locationList.first.locationId,
-        arrivalLocationId: refService.locationList.first.locationId,
+        travelStatusId: null,
+        departureLocationId: null,
+        arrivalLocationId: null,
       );
 
       debugPrint('系統：已建立預設飛航記錄');
@@ -116,6 +109,13 @@ class MedicalViewModel extends ChangeNotifier {
     _updatePatientCacheAndSave(_patientCache!.copyWith(sexId: Value(sexId)));
   }
 
+  void updateVisitReasonId(int visitReasonId) {
+    if (_patientCache == null) return;
+    _updatePatientCacheAndSave(
+      _patientCache!.copyWith(visitReasonId: Value(visitReasonId)),
+    );
+  }
+
   void updateNationalityId(int nationalityId) {
     if (_patientCache == null) return;
     _updatePatientCacheAndSave(
@@ -132,9 +132,7 @@ class MedicalViewModel extends ChangeNotifier {
 
   void updateIdNo(String idNo) {
     if (_patientCache == null) return;
-    _updatePatientCacheAndSave(
-      _patientCache!.copyWith(idNo: Value(idNo)),
-    );
+    _updatePatientCacheAndSave(_patientCache!.copyWith(idNo: Value(idNo)));
   }
 
   void updatePhone(String phone) {
@@ -166,7 +164,9 @@ class MedicalViewModel extends ChangeNotifier {
 
   void updateAirlineId(int airlineId) {
     if (_flightCache == null) return;
-    _updateFlightCacheAndSave(_flightCache!.copyWith(airlineId: airlineId));
+    _updateFlightCacheAndSave(
+      _flightCache!.copyWith(airlineId: Value(airlineId)),
+    );
   }
 
   void updateFlightNumber(String flightNumber) {
@@ -179,21 +179,21 @@ class MedicalViewModel extends ChangeNotifier {
   void updateTravelStatusId(int travelStatusId) {
     if (_flightCache == null) return;
     _updateFlightCacheAndSave(
-      _flightCache!.copyWith(travelStatusId: travelStatusId),
+      _flightCache!.copyWith(travelStatusId: Value(travelStatusId)),
     );
   }
 
   void updateDepartureLocationId(int locationId) {
     if (_flightCache == null) return;
     _updateFlightCacheAndSave(
-      _flightCache!.copyWith(departureLocationId: locationId),
+      _flightCache!.copyWith(departureLocationId: Value(locationId)),
     );
   }
 
   void updateArrivalLocationId(int locationId) {
     if (_flightCache == null) return;
     _updateFlightCacheAndSave(
-      _flightCache!.copyWith(arrivalLocationId: locationId),
+      _flightCache!.copyWith(arrivalLocationId: Value(locationId)),
     );
   }
 
@@ -249,6 +249,15 @@ class MedicalViewModel extends ChangeNotifier {
     }
   }
 
+  VisitReasonData? getVisitReasonById(int? id) {
+    if (id == null) return null;
+    try {
+      return refService.visitReasonList.firstWhere((r) => r.id == id);
+    } catch (e) {
+      return null;
+    }
+  }
+
   AirlineData? getAirlineById(int? id) {
     if (id == null) return null;
     try {
@@ -292,14 +301,28 @@ class MedicalViewModel extends ChangeNotifier {
   // === 搜尋輔助方法 (新增) ===
 
   Future<List<AirlineData>> searchAirlines(String keyword) async {
-    if (keyword.isEmpty) return refService.airlineList;
+    // 預設搜尋邏輯：
+    // 1. 若 keyword 為空：回傳常用航空公司 (isOther=false)
+    // 2. 若 keyword 不為空：回傳所有匹配的航空公司 (不分 isOther)
+    // 注意：UI 層可能會手動加入 "其他航空公司" 選項
+
     try {
-      // 優先使用 DAO 搜尋，或直接過濾快取
-      return await db.referenceDao.searchAirline(keyword);
+      if (keyword.isEmpty) {
+        // 只回傳常用
+        return await db.referenceDao.getAllAirline(isOther: false);
+      } else {
+        // 搜尋全部
+        return await db.referenceDao.searchAirline(keyword);
+      }
     } catch (e) {
       debugPrint('系統：搜尋航空公司失敗 - $e');
-      // 降級為過濾快取
+      // 降級：使用快取過濾
+      // 注意：refService.airlineList 目前包含所有資料 (因為 importAirlines 會匯入全部)
+      // 我們需要檢查 isOther
       final lower = keyword.toLowerCase();
+      if (keyword.isEmpty) {
+        return refService.airlineList.where((a) => !a.isOther).toList();
+      }
       return refService.airlineList
           .where(
             (a) =>
@@ -307,6 +330,15 @@ class MedicalViewModel extends ChangeNotifier {
                 a.code.toLowerCase().contains(lower),
           )
           .toList();
+    }
+  }
+
+  // 專門用於取得「其他航空公司」列表
+  Future<List<AirlineData>> getOtherAirlines() async {
+    try {
+      return await db.referenceDao.getAllAirline(isOther: true);
+    } catch (e) {
+      return refService.airlineList.where((a) => a.isOther).toList();
     }
   }
 

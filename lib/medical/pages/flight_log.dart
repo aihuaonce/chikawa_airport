@@ -103,7 +103,7 @@ class _FlightLogState extends State<FlightLog> {
                   const SizedBox(height: 8),
                   _buildLocationDropdown(
                     viewModel: viewModel,
-                    selectedId: flight.departureLocationId,
+                    selectedId: flight.departureLocationId ?? 0,
                     hint: '請輸入或搜尋啟程機場',
                     prefixIcon: Icons.location_on,
                     onChanged: (id) => viewModel.updateDepartureLocationId(id),
@@ -117,7 +117,7 @@ class _FlightLogState extends State<FlightLog> {
                   const SizedBox(height: 8),
                   _buildLocationDropdown(
                     viewModel: viewModel,
-                    selectedId: flight.arrivalLocationId,
+                    selectedId: flight.arrivalLocationId ?? 0,
                     hint: '請輸入或搜尋目的地機場',
                     prefixIcon: Icons.sports_score,
                     onChanged: (id) => viewModel.updateArrivalLocationId(id),
@@ -146,30 +146,153 @@ class _FlightLogState extends State<FlightLog> {
       hint: '請選取航空公司',
       icon: Icons.corporate_fare,
       onTap: () async {
-        final result = await ReferenceSearchSheet.show<AirlineData>(
-          context,
-          title: '選擇航空公司',
-          searchFunction: viewModel.searchAirlines,
-          initialSelection: selectedAirline,
-          isSelectedComparator: (a, b) => a.airlineId == b?.airlineId,
-          itemBuilder: (context, item, isSelected) {
-            return ListTile(
-              title: Text(
-                '${item.code} - ${item.name}',
-                style: TextStyle(
-                  color: isSelected ? primaryColor : textDark,
-                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                ),
-              ),
-              trailing: isSelected
-                  ? const Icon(Icons.check, color: primaryColor)
-                  : null,
-            );
-          },
-        );
+        // 使用迴圈處理導航邏輯
+        bool showMainList = true;
 
-        if (result != null) {
-          viewModel.updateAirlineId(result.airlineId);
+        while (true) {
+          if (!mounted) break;
+
+          if (showMainList) {
+            // ==================== 第一層：常用航空公司 ====================
+            final result = await ReferenceSearchSheet.show<AirlineData>(
+              context,
+              title: '選擇航空公司',
+              searchFunction: (query) async {
+                if (query.isEmpty) {
+                  // 取得常用航空公司
+                  final common = await viewModel.searchAirlines('');
+                  // 加入 "其他航空公司" 選項
+                  return [
+                    ...common,
+                    const AirlineData(
+                      airlineId: -999,
+                      code: 'OTHER',
+                      name: '其他航空公司 (Other Airlines)',
+                      isOther: true,
+                    ),
+                  ];
+                } else {
+                  // 有關鍵字時，搜尋全部
+                  return viewModel.searchAirlines(query);
+                }
+              },
+              initialSelection: selectedAirline,
+              isSelectedComparator: (a, b) => a.airlineId == b?.airlineId,
+              itemBuilder: (context, item, isSelected) {
+                // 特殊樣式：其他航空公司
+                if (item.airlineId == -999) {
+                  return ListTile(
+                    title: Text(
+                      item.name,
+                      style: const TextStyle(
+                        // 改回一般樣式，不使用粗體或斜體
+                        color: textDark,
+                      ),
+                    ),
+                    trailing: const Icon(
+                      Icons.arrow_forward_ios,
+                      size: 16,
+                      color: textMuted,
+                    ),
+                  );
+                }
+
+                return ListTile(
+                  title: Text(
+                    '${item.code} - ${item.name}',
+                    style: TextStyle(
+                      color: isSelected ? primaryColor : textDark,
+                      fontWeight: isSelected
+                          ? FontWeight.bold
+                          : FontWeight.normal,
+                    ),
+                  ),
+                  trailing: isSelected
+                      ? const Icon(Icons.check, color: primaryColor)
+                      : null,
+                );
+              },
+            );
+
+            // 使用者關閉視窗
+            if (result == null) break;
+
+            if (result.airlineId == -999) {
+              // 切換到其他航空公司列表
+              showMainList = false;
+            } else {
+              // 選擇了正常航空公司
+              viewModel.updateAirlineId(result.airlineId);
+              break;
+            }
+          } else {
+            // ==================== 第二層：其他航空公司 ====================
+            final result = await ReferenceSearchSheet.show<AirlineData>(
+              context,
+              title: '其他航空公司',
+              searchFunction: (query) async {
+                final List<AirlineData> results;
+                if (query.isEmpty) {
+                  results = await viewModel.getOtherAirlines();
+                } else {
+                  results = await viewModel.searchAirlines(query);
+                }
+
+                // 加入 "返回" 選項
+                return [
+                  const AirlineData(
+                    airlineId: -998,
+                    code: 'BACK',
+                    name: '返回 (Return)',
+                    isOther: true,
+                  ),
+                  ...results,
+                ];
+              },
+              itemBuilder: (context, item, isSelected) {
+                // 返回按鈕樣式
+                if (item.airlineId == -998) {
+                  return ListTile(
+                    leading: const Icon(Icons.arrow_back, color: primaryColor),
+                    title: Text(
+                      item.name,
+                      style: const TextStyle(
+                        color: primaryColor,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  );
+                }
+
+                return ListTile(
+                  title: Text(
+                    '${item.code} - ${item.name}',
+                    style: TextStyle(
+                      color: isSelected ? primaryColor : textDark,
+                      fontWeight: isSelected
+                          ? FontWeight.bold
+                          : FontWeight.normal,
+                    ),
+                  ),
+                  trailing: isSelected
+                      ? const Icon(Icons.check, color: primaryColor)
+                      : null,
+                );
+              },
+            );
+
+            // 使用者關閉視窗
+            if (result == null) break;
+
+            if (result.airlineId == -998) {
+              // 返回上一頁
+              showMainList = true;
+            } else {
+              // 選擇了正常航空公司
+              viewModel.updateAirlineId(result.airlineId);
+              break;
+            }
+          }
         }
       },
     );

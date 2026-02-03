@@ -52,20 +52,20 @@ class FlightDao extends DatabaseAccessor<AppDatabase> with _$FlightDaoMixin {
   // 建立新的飛航記錄
   Future<int> createFlightRecord({
     required int medicalId,
-    required int airlineId,
+    int? airlineId,
     required String flightNumber,
-    required int travelStatusId,
-    required int departureLocationId,
-    required int arrivalLocationId,
+    int? travelStatusId,
+    int? departureLocationId,
+    int? arrivalLocationId,
   }) {
     return into(flightRecord).insert(
       FlightRecordCompanion.insert(
         medicalId: medicalId,
-        airlineId: airlineId,
+        airlineId: Value(airlineId),
         flightNumber: flightNumber,
-        travelStatusId: travelStatusId,
-        departureLocationId: departureLocationId,
-        arrivalLocationId: arrivalLocationId,
+        travelStatusId: Value(travelStatusId),
+        departureLocationId: Value(departureLocationId),
+        arrivalLocationId: Value(arrivalLocationId),
       ),
     );
   }
@@ -156,16 +156,18 @@ class FlightDao extends DatabaseAccessor<AppDatabase> with _$FlightDaoMixin {
     if (flightData == null) return null;
 
     // 透過 db 呼叫 referenceDao (db 是 DatabaseAccessor 提供的屬性)
-    final airline = await db.referenceDao.getAirlineById(flightData.airlineId);
-    final travelStatus = await db.referenceDao.getTravelStatusById(
-      flightData.travelStatusId,
-    );
-    final departureLocation = await db.referenceDao.getLocationById(
-      flightData.departureLocationId,
-    );
-    final arrivalLocation = await db.referenceDao.getLocationById(
-      flightData.arrivalLocationId,
-    );
+    final airline = flightData.airlineId != null
+        ? await db.referenceDao.getAirlineById(flightData.airlineId!)
+        : null;
+    final travelStatus = flightData.travelStatusId != null
+        ? await db.referenceDao.getTravelStatusById(flightData.travelStatusId!)
+        : null;
+    final departureLocation = flightData.departureLocationId != null
+        ? await db.referenceDao.getLocationById(flightData.departureLocationId!)
+        : null;
+    final arrivalLocation = flightData.arrivalLocationId != null
+        ? await db.referenceDao.getLocationById(flightData.arrivalLocationId!)
+        : null;
 
     // 取得經過點 (使用剛才修正過的 method)
     final transitLocations = await getTransitLocations(flightRecordId);

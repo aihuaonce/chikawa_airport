@@ -28,7 +28,6 @@ class _PersonalInfoState extends State<PersonalInfo> {
   late TextEditingController _addressController;
   late TextEditingController _birthdayController;
 
-  int _localVisitReasonId = 0;
   bool _isInitialized = false;
 
   @override
@@ -181,13 +180,35 @@ class _PersonalInfoState extends State<PersonalInfo> {
                   const SizedBox(height: 24),
                   _buildLabel('為何至機場 REASON FOR VISIT'),
                   const SizedBox(height: 8),
-                  SlidingToggle(
-                    selectedIndex: _localVisitReasonId,
-                    options: const ['航空公司機組員', '旅客/民眾', '機場內部員工'],
-                    onChanged: (index) {
-                      setState(() {
-                        _localVisitReasonId = index;
-                      });
+                  Builder(
+                    builder: (context) {
+                      final options = viewModel.visitReasonOptions;
+                      // 若尚未載入選項，顯示載入中
+                      if (options.isEmpty) {
+                        return const SizedBox(
+                          height: 44,
+                          child: Center(child: Text('Loading...')),
+                        );
+                      }
+
+                      final optionNames = options.map((e) => e.name).toList();
+                      int selectedIndex = 0;
+                      if (patient.visitReasonId != null) {
+                        final index = options.indexWhere(
+                          (e) => e.id == patient.visitReasonId,
+                        );
+                        if (index != -1) selectedIndex = index;
+                      }
+
+                      return SlidingToggle(
+                        selectedIndex: selectedIndex,
+                        options: optionNames,
+                        onChanged: (index) {
+                          if (index >= 0 && index < options.length) {
+                            viewModel.updateVisitReasonId(options[index].id);
+                          }
+                        },
+                      );
                     },
                   ),
                 ],

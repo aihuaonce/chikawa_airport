@@ -20,6 +20,7 @@ class Airline extends Table {
   IntColumn get airlineId => integer().autoIncrement()();
   TextColumn get code => text()();
   TextColumn get name => text()();
+  BoolColumn get isOther => boolean().withDefault(const Constant(false))();
 }
 
 //飛航-旅行狀態表
@@ -225,4 +226,13 @@ class RelationshipType extends Table {
   TextColumn get code => text()(); // self / spouse / parent / child / other
   TextColumn get name => text()(); // 本人 / 配偶 / 父母 / 子女 / 其他
   TextColumn get nameEn => text().nullable()();
+}
+
+// 12. 為何至機場參考表 (VisitReason)
+class VisitReason extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get code => text()(); // crew / passenger / staff
+  TextColumn get name => text()(); // 航空公司機組員 / 旅客/民眾 / 機場內部員工
+  IntColumn get sortOrder => integer().withDefault(const Constant(0))();
+  BoolColumn get isActive => boolean().withDefault(const Constant(true))();
 }

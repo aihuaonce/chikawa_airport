@@ -1735,7 +1735,7 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
                   ],
                 ),
               );
-            }).toList(),
+            }),
         ],
       ),
     );

@@ -35,6 +35,9 @@ class Patient extends Table {
   TextColumn get passportOrIdNo => text().nullable()();
   TextColumn get idNo => text().nullable()(); // 新增身分證字號欄位
 
+  IntColumn get visitReasonId =>
+      integer().nullable().references(VisitReason, #id)(); // 為何至機場
+
   IntColumn get nationalityId =>
       integer().nullable().references(Nationality, #nationalityId)();
 
@@ -52,17 +55,18 @@ class FlightRecord extends Table {
   IntColumn get medicalId =>
       integer().unique().references(MedicalRecord, #medicalId)();
 
-  IntColumn get airlineId => integer().references(Airline, #airlineId)();
+  IntColumn get airlineId =>
+      integer().nullable().references(Airline, #airlineId)();
   TextColumn get flightNumber => text()();
 
   IntColumn get travelStatusId =>
-      integer().references(TravelStatus, #travelStatusId)();
+      integer().nullable().references(TravelStatus, #travelStatusId)();
 
   IntColumn get departureLocationId =>
-      integer().references(Location, #locationId)();
+      integer().nullable().references(Location, #locationId)();
 
   IntColumn get arrivalLocationId =>
-      integer().references(Location, #locationId)();
+      integer().nullable().references(Location, #locationId)();
 
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
 }
@@ -166,16 +170,19 @@ class MedicalAssessment extends Table {
   IntColumn get painScore => integer().nullable()();
 
   // 意識評估
-  IntColumn get consciousnessLevelId => integer().nullable().references(ConsciousnessLevelRef, #id)();
+  IntColumn get consciousnessLevelId =>
+      integer().nullable().references(ConsciousnessLevelRef, #id)();
   IntColumn get gcs => integer().nullable()();
   TextColumn get gcsE => text().nullable()();
   TextColumn get gcsM => text().nullable()();
   TextColumn get gcsV => text().nullable()();
 
   // 瞳孔反應
-  IntColumn get leftPupilReactionId => integer().nullable().references(PupilReactionRef, #id)();
+  IntColumn get leftPupilReactionId =>
+      integer().nullable().references(PupilReactionRef, #id)();
   RealColumn get leftPupilSize => real().nullable()(); // mm（支援小數如 2.5）
-  IntColumn get rightPupilReactionId => integer().nullable().references(PupilReactionRef, #id)();
+  IntColumn get rightPupilReactionId =>
+      integer().nullable().references(PupilReactionRef, #id)();
   RealColumn get rightPupilSize => real().nullable()(); // mm（支援小數如 2.5）
 
   // 理學檢查
@@ -197,11 +204,13 @@ class MedicalHistory extends Table {
   IntColumn get medicalId => integer().references(MedicalRecord, #medicalId)();
 
   // 過去病史
-  IntColumn get pastHistoryStatusId => integer().nullable().references(HistoryStatusRef, #id)();
+  IntColumn get pastHistoryStatusId =>
+      integer().nullable().references(HistoryStatusRef, #id)();
   TextColumn get pastHistoryDetail => text().nullable()();
 
   // 過敏史
-  IntColumn get allergyStatusId => integer().nullable().references(HistoryStatusRef, #id)();
+  IntColumn get allergyStatusId =>
+      integer().nullable().references(HistoryStatusRef, #id)();
   TextColumn get allergyDetail => text().nullable()();
 
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
@@ -254,7 +263,8 @@ class Treatment extends Table {
 class MedicalStaffAssignment extends Table {
   IntColumn get staffAssignmentId => integer().autoIncrement()();
   IntColumn get medicalId => integer().references(MedicalRecord, #medicalId)();
-  IntColumn get staffRoleId => integer().nullable().references(MedicalStaffRole, #id)();
+  IntColumn get staffRoleId =>
+      integer().nullable().references(MedicalStaffRole, #id)();
   IntColumn get staffId => integer().nullable()(); // 關聯到員工表
   TextColumn get staffName => text().nullable()(); // 或直接儲存姓名
   BoolColumn get isPrimary => boolean().withDefault(const Constant(false))();
@@ -277,8 +287,7 @@ class SpecialNotes extends Table {
 @DataClassName('MedicalCertificateData')
 class MedicalCertificates extends Table {
   IntColumn get certificateId => integer().autoIncrement()();
-  IntColumn get medicalId =>
-      integer().references(MedicalRecord, #medicalId)();
+  IntColumn get medicalId => integer().references(MedicalRecord, #medicalId)();
   IntColumn get diagnosisCategoryId =>
       integer().nullable().references(DiagnosisCategory, #id)();
   TextColumn get diagnosisResult => text().nullable()();
@@ -292,8 +301,7 @@ class MedicalCertificates extends Table {
 @DataClassName('MedicalFeeData')
 class MedicalFees extends Table {
   IntColumn get feeId => integer().autoIncrement()();
-  IntColumn get medicalId =>
-      integer().references(MedicalRecord, #medicalId)();
+  IntColumn get medicalId => integer().references(MedicalRecord, #medicalId)();
   IntColumn get paymentMethodId =>
       integer().nullable().references(PaymentMethod, #id)();
   RealColumn get consultFee => real().withDefault(const Constant(0))();
@@ -315,12 +323,10 @@ class MedicalFees extends Table {
 @DataClassName('NursingRecordData')
 class NursingRecords extends Table {
   IntColumn get recordId => integer().autoIncrement()();
-  IntColumn get medicalId =>
-      integer().references(MedicalRecord, #medicalId)();
+  IntColumn get medicalId => integer().references(MedicalRecord, #medicalId)();
   DateTimeColumn get recordTime => dateTime()();
   TextColumn get content => text()();
-  IntColumn get nurseId =>
-      integer().nullable().references(MedicalStaff, #id)();
+  IntColumn get nurseId => integer().nullable().references(MedicalStaff, #id)();
   BlobColumn get signature => blob().nullable()();
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
 }
@@ -329,8 +335,7 @@ class NursingRecords extends Table {
 @DataClassName('ReferralFormData')
 class ReferralForms extends Table {
   IntColumn get formId => integer().autoIncrement()();
-  IntColumn get medicalId =>
-      integer().references(MedicalRecord, #medicalId)();
+  IntColumn get medicalId => integer().references(MedicalRecord, #medicalId)();
 
   // 聯絡人資料
   TextColumn get contactName => text().nullable()();
@@ -387,8 +392,7 @@ class ReferralForms extends Table {
 @DataClassName('TelexDocumentData')
 class TelexDocuments extends Table {
   IntColumn get documentId => integer().autoIncrement()();
-  IntColumn get medicalId =>
-      integer().references(MedicalRecord, #medicalId)();
+  IntColumn get medicalId => integer().references(MedicalRecord, #medicalId)();
   IntColumn get toStationId =>
       integer().nullable().references(StationRef, #id)();
   IntColumn get fromStationId =>

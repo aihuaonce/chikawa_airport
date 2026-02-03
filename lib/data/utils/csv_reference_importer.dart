@@ -1,3 +1,4 @@
+import 'package:drift/drift.dart';
 import 'package:flutter/services.dart';
 import 'package:csv/csv.dart';
 import 'package:flutter/foundation.dart';
@@ -69,35 +70,80 @@ class CsvReferenceImporter {
     if (count > 0) return;
 
     debugPrint('正在匯入航空公司資料...');
+    final List<Map<String, dynamic>> airlines = [];
+
+    // 1. 匯入常用航空公司
     try {
       final data = await rootBundle.loadString(
-        'assets/csv/airport.medical.company.other.csv',
+        'assets/csv/airport.medical.company.csv',
       );
       final rows = _csvConverter.convert(data);
-      final List<Map<String, String>> airlines = [];
 
-      // 跳過標題行 (name)
       for (var i = 1; i < rows.length; i++) {
         final row = rows[i];
         if (row.isEmpty) continue;
 
         final rawName = row[0].toString().trim();
-        // 解析 "JX星宇航空" -> Code: JX, Name: 星宇航空
+        // 略過 "其他航空公司"
+        if (rawName.contains('其他航空公司')) continue;
+
         if (rawName.length > 2) {
           final code = rawName.substring(0, 2).toUpperCase();
           if (RegExp(r'^[A-Z0-9]{2}$').hasMatch(code)) {
             final name = rawName.substring(2).trim();
-            airlines.add({'code': code, 'name': name});
+            airlines.add({'code': code, 'name': name, 'isOther': false});
           }
         }
       }
+    } catch (e) {
+      debugPrint('匯入常用航空公司 CSV 失敗: $e');
+    }
 
-      if (airlines.isNotEmpty) {
-        await db.referenceDao.addAirlineBatch(airlines);
-        debugPrint('已匯入 ${airlines.length} 筆航空公司資料');
+    // 2. 匯入其他航空公司
+    try {
+      final data = await rootBundle.loadString(
+        'assets/csv/airport.medical.company.other.csv',
+      );
+      final rows = _csvConverter.convert(data);
+
+      for (var i = 1; i < rows.length; i++) {
+        final row = rows[i];
+        if (row.isEmpty) continue;
+
+        final rawName = row[0].toString().trim();
+        if (rawName.length > 2) {
+          final code = rawName.substring(0, 2).toUpperCase();
+          if (RegExp(r'^[A-Z0-9]{2}$').hasMatch(code)) {
+            final name = rawName.substring(2).trim();
+            airlines.add({'code': code, 'name': name, 'isOther': true});
+          } else if (rawName.length > 3) {
+            // 部分航空公司代碼可能是3碼或特殊格式，嘗試解析
+            // 這裡假設前2碼為代碼，若不符合規則則視為例外
+            // 根據 CSV 內容，其他航空公司也多為 2碼 + 名稱 (e.g., JX星宇航空)
+            // 3K, 3U 等也是 2碼
+            // 若有特殊狀況可在此擴充
+          }
+        }
       }
     } catch (e) {
-      debugPrint('匯入航空公司 CSV 失敗: $e');
+      debugPrint('匯入其他航空公司 CSV 失敗: $e');
+    }
+
+    if (airlines.isNotEmpty) {
+      // 批次寫入
+      await db.batch((batch) {
+        batch.insertAll(
+          db.airline,
+          airlines.map(
+            (a) => AirlineCompanion.insert(
+              code: a['code'] as String,
+              name: a['name'] as String,
+              isOther: Value(a['isOther'] as bool),
+            ),
+          ),
+        );
+      });
+      debugPrint('已匯入 ${airlines.length} 筆航空公司資料');
     }
   }
 

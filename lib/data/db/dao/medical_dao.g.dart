@@ -6,6 +6,7 @@ part of 'medical_dao.dart';
 mixin _$MedicalDaoMixin on DatabaseAccessor<AppDatabase> {
   $MedicalRecordTable get medicalRecord => attachedDatabase.medicalRecord;
   $SexTable get sex => attachedDatabase.sex;
+  $VisitReasonTable get visitReason => attachedDatabase.visitReason;
   $NationalityTable get nationality => attachedDatabase.nationality;
   $PatientTable get patient => attachedDatabase.patient;
 }

@@ -171,8 +171,12 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
   //  航空公司相關
 
   // 取得所有航空公司選項
-  Future<List<AirlineData>> getAllAirline() {
-    return (select(airline)..orderBy([(a) => OrderingTerm.asc(a.code)])).get();
+  Future<List<AirlineData>> getAllAirline({bool? isOther}) {
+    final query = select(airline);
+    if (isOther != null) {
+      query.where((a) => a.isOther.equals(isOther));
+    }
+    return (query..orderBy([(a) => OrderingTerm.asc(a.code)])).get();
   }
 
   // 根據 ID 取得航空公司
@@ -190,11 +194,15 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
   }
 
   // 搜尋航空公司 (模糊搜尋名稱或代碼)
-  Future<List<AirlineData>> searchAirline(String keyword) {
-    return (select(airline)
-          ..where((a) => a.name.like('%$keyword%') | a.code.like('%$keyword%'))
-          ..orderBy([(a) => OrderingTerm.asc(a.code)]))
-        .get();
+  Future<List<AirlineData>> searchAirline(String keyword, {bool? isOther}) {
+    final query = select(airline)
+      ..where((a) => a.name.like('%$keyword%') | a.code.like('%$keyword%'));
+
+    if (isOther != null) {
+      query.where((a) => a.isOther.equals(isOther));
+    }
+
+    return (query..orderBy([(a) => OrderingTerm.asc(a.code)])).get();
   }
 
   // 新增航空公司

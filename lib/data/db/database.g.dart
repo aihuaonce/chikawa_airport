@@ -499,8 +499,23 @@ class $AirlineTable extends Airline with TableInfo<$AirlineTable, AirlineData> {
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _isOtherMeta = const VerificationMeta(
+    'isOther',
+  );
   @override
-  List<GeneratedColumn> get $columns => [airlineId, code, name];
+  late final GeneratedColumn<bool> isOther = GeneratedColumn<bool>(
+    'is_other',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_other" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [airlineId, code, name, isOther];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -535,6 +550,12 @@ class $AirlineTable extends Airline with TableInfo<$AirlineTable, AirlineData> {
     } else if (isInserting) {
       context.missing(_nameMeta);
     }
+    if (data.containsKey('is_other')) {
+      context.handle(
+        _isOtherMeta,
+        isOther.isAcceptableOrUnknown(data['is_other']!, _isOtherMeta),
+      );
+    }
     return context;
   }
 
@@ -556,6 +577,10 @@ class $AirlineTable extends Airline with TableInfo<$AirlineTable, AirlineData> {
         DriftSqlType.string,
         data['${effectivePrefix}name'],
       )!,
+      isOther: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_other'],
+      )!,
     );
   }
 
@@ -569,10 +594,12 @@ class AirlineData extends DataClass implements Insertable<AirlineData> {
   final int airlineId;
   final String code;
   final String name;
+  final bool isOther;
   const AirlineData({
     required this.airlineId,
     required this.code,
     required this.name,
+    required this.isOther,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -580,6 +607,7 @@ class AirlineData extends DataClass implements Insertable<AirlineData> {
     map['airline_id'] = Variable<int>(airlineId);
     map['code'] = Variable<String>(code);
     map['name'] = Variable<String>(name);
+    map['is_other'] = Variable<bool>(isOther);
     return map;
   }
 
@@ -588,6 +616,7 @@ class AirlineData extends DataClass implements Insertable<AirlineData> {
       airlineId: Value(airlineId),
       code: Value(code),
       name: Value(name),
+      isOther: Value(isOther),
     );
   }
 
@@ -600,6 +629,7 @@ class AirlineData extends DataClass implements Insertable<AirlineData> {
       airlineId: serializer.fromJson<int>(json['airlineId']),
       code: serializer.fromJson<String>(json['code']),
       name: serializer.fromJson<String>(json['name']),
+      isOther: serializer.fromJson<bool>(json['isOther']),
     );
   }
   @override
@@ -609,20 +639,27 @@ class AirlineData extends DataClass implements Insertable<AirlineData> {
       'airlineId': serializer.toJson<int>(airlineId),
       'code': serializer.toJson<String>(code),
       'name': serializer.toJson<String>(name),
+      'isOther': serializer.toJson<bool>(isOther),
     };
   }
 
-  AirlineData copyWith({int? airlineId, String? code, String? name}) =>
-      AirlineData(
-        airlineId: airlineId ?? this.airlineId,
-        code: code ?? this.code,
-        name: name ?? this.name,
-      );
+  AirlineData copyWith({
+    int? airlineId,
+    String? code,
+    String? name,
+    bool? isOther,
+  }) => AirlineData(
+    airlineId: airlineId ?? this.airlineId,
+    code: code ?? this.code,
+    name: name ?? this.name,
+    isOther: isOther ?? this.isOther,
+  );
   AirlineData copyWithCompanion(AirlineCompanion data) {
     return AirlineData(
       airlineId: data.airlineId.present ? data.airlineId.value : this.airlineId,
       code: data.code.present ? data.code.value : this.code,
       name: data.name.present ? data.name.value : this.name,
+      isOther: data.isOther.present ? data.isOther.value : this.isOther,
     );
   }
 
@@ -631,46 +668,53 @@ class AirlineData extends DataClass implements Insertable<AirlineData> {
     return (StringBuffer('AirlineData(')
           ..write('airlineId: $airlineId, ')
           ..write('code: $code, ')
-          ..write('name: $name')
+          ..write('name: $name, ')
+          ..write('isOther: $isOther')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(airlineId, code, name);
+  int get hashCode => Object.hash(airlineId, code, name, isOther);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is AirlineData &&
           other.airlineId == this.airlineId &&
           other.code == this.code &&
-          other.name == this.name);
+          other.name == this.name &&
+          other.isOther == this.isOther);
 }
 
 class AirlineCompanion extends UpdateCompanion<AirlineData> {
   final Value<int> airlineId;
   final Value<String> code;
   final Value<String> name;
+  final Value<bool> isOther;
   const AirlineCompanion({
     this.airlineId = const Value.absent(),
     this.code = const Value.absent(),
     this.name = const Value.absent(),
+    this.isOther = const Value.absent(),
   });
   AirlineCompanion.insert({
     this.airlineId = const Value.absent(),
     required String code,
     required String name,
+    this.isOther = const Value.absent(),
   }) : code = Value(code),
        name = Value(name);
   static Insertable<AirlineData> custom({
     Expression<int>? airlineId,
     Expression<String>? code,
     Expression<String>? name,
+    Expression<bool>? isOther,
   }) {
     return RawValuesInsertable({
       if (airlineId != null) 'airline_id': airlineId,
       if (code != null) 'code': code,
       if (name != null) 'name': name,
+      if (isOther != null) 'is_other': isOther,
     });
   }
 
@@ -678,11 +722,13 @@ class AirlineCompanion extends UpdateCompanion<AirlineData> {
     Value<int>? airlineId,
     Value<String>? code,
     Value<String>? name,
+    Value<bool>? isOther,
   }) {
     return AirlineCompanion(
       airlineId: airlineId ?? this.airlineId,
       code: code ?? this.code,
       name: name ?? this.name,
+      isOther: isOther ?? this.isOther,
     );
   }
 
@@ -698,6 +744,9 @@ class AirlineCompanion extends UpdateCompanion<AirlineData> {
     if (name.present) {
       map['name'] = Variable<String>(name.value);
     }
+    if (isOther.present) {
+      map['is_other'] = Variable<bool>(isOther.value);
+    }
     return map;
   }
 
@@ -706,7 +755,8 @@ class AirlineCompanion extends UpdateCompanion<AirlineData> {
     return (StringBuffer('AirlineCompanion(')
           ..write('airlineId: $airlineId, ')
           ..write('code: $code, ')
-          ..write('name: $name')
+          ..write('name: $name, ')
+          ..write('isOther: $isOther')
           ..write(')'))
         .toString();
   }
@@ -9967,6 +10017,347 @@ class MedicalRecordCompanion extends UpdateCompanion<MedicalRecordData> {
   }
 }
 
+class $VisitReasonTable extends VisitReason
+    with TableInfo<$VisitReasonTable, VisitReasonData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $VisitReasonTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _codeMeta = const VerificationMeta('code');
+  @override
+  late final GeneratedColumn<String> code = GeneratedColumn<String>(
+    'code',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sortOrderMeta = const VerificationMeta(
+    'sortOrder',
+  );
+  @override
+  late final GeneratedColumn<int> sortOrder = GeneratedColumn<int>(
+    'sort_order',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _isActiveMeta = const VerificationMeta(
+    'isActive',
+  );
+  @override
+  late final GeneratedColumn<bool> isActive = GeneratedColumn<bool>(
+    'is_active',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_active" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, code, name, sortOrder, isActive];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'visit_reason';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<VisitReasonData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('code')) {
+      context.handle(
+        _codeMeta,
+        code.isAcceptableOrUnknown(data['code']!, _codeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_codeMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('sort_order')) {
+      context.handle(
+        _sortOrderMeta,
+        sortOrder.isAcceptableOrUnknown(data['sort_order']!, _sortOrderMeta),
+      );
+    }
+    if (data.containsKey('is_active')) {
+      context.handle(
+        _isActiveMeta,
+        isActive.isAcceptableOrUnknown(data['is_active']!, _isActiveMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  VisitReasonData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return VisitReasonData(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      code: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}code'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      sortOrder: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}sort_order'],
+      )!,
+      isActive: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_active'],
+      )!,
+    );
+  }
+
+  @override
+  $VisitReasonTable createAlias(String alias) {
+    return $VisitReasonTable(attachedDatabase, alias);
+  }
+}
+
+class VisitReasonData extends DataClass implements Insertable<VisitReasonData> {
+  final int id;
+  final String code;
+  final String name;
+  final int sortOrder;
+  final bool isActive;
+  const VisitReasonData({
+    required this.id,
+    required this.code,
+    required this.name,
+    required this.sortOrder,
+    required this.isActive,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['code'] = Variable<String>(code);
+    map['name'] = Variable<String>(name);
+    map['sort_order'] = Variable<int>(sortOrder);
+    map['is_active'] = Variable<bool>(isActive);
+    return map;
+  }
+
+  VisitReasonCompanion toCompanion(bool nullToAbsent) {
+    return VisitReasonCompanion(
+      id: Value(id),
+      code: Value(code),
+      name: Value(name),
+      sortOrder: Value(sortOrder),
+      isActive: Value(isActive),
+    );
+  }
+
+  factory VisitReasonData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return VisitReasonData(
+      id: serializer.fromJson<int>(json['id']),
+      code: serializer.fromJson<String>(json['code']),
+      name: serializer.fromJson<String>(json['name']),
+      sortOrder: serializer.fromJson<int>(json['sortOrder']),
+      isActive: serializer.fromJson<bool>(json['isActive']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'code': serializer.toJson<String>(code),
+      'name': serializer.toJson<String>(name),
+      'sortOrder': serializer.toJson<int>(sortOrder),
+      'isActive': serializer.toJson<bool>(isActive),
+    };
+  }
+
+  VisitReasonData copyWith({
+    int? id,
+    String? code,
+    String? name,
+    int? sortOrder,
+    bool? isActive,
+  }) => VisitReasonData(
+    id: id ?? this.id,
+    code: code ?? this.code,
+    name: name ?? this.name,
+    sortOrder: sortOrder ?? this.sortOrder,
+    isActive: isActive ?? this.isActive,
+  );
+  VisitReasonData copyWithCompanion(VisitReasonCompanion data) {
+    return VisitReasonData(
+      id: data.id.present ? data.id.value : this.id,
+      code: data.code.present ? data.code.value : this.code,
+      name: data.name.present ? data.name.value : this.name,
+      sortOrder: data.sortOrder.present ? data.sortOrder.value : this.sortOrder,
+      isActive: data.isActive.present ? data.isActive.value : this.isActive,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('VisitReasonData(')
+          ..write('id: $id, ')
+          ..write('code: $code, ')
+          ..write('name: $name, ')
+          ..write('sortOrder: $sortOrder, ')
+          ..write('isActive: $isActive')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, code, name, sortOrder, isActive);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is VisitReasonData &&
+          other.id == this.id &&
+          other.code == this.code &&
+          other.name == this.name &&
+          other.sortOrder == this.sortOrder &&
+          other.isActive == this.isActive);
+}
+
+class VisitReasonCompanion extends UpdateCompanion<VisitReasonData> {
+  final Value<int> id;
+  final Value<String> code;
+  final Value<String> name;
+  final Value<int> sortOrder;
+  final Value<bool> isActive;
+  const VisitReasonCompanion({
+    this.id = const Value.absent(),
+    this.code = const Value.absent(),
+    this.name = const Value.absent(),
+    this.sortOrder = const Value.absent(),
+    this.isActive = const Value.absent(),
+  });
+  VisitReasonCompanion.insert({
+    this.id = const Value.absent(),
+    required String code,
+    required String name,
+    this.sortOrder = const Value.absent(),
+    this.isActive = const Value.absent(),
+  }) : code = Value(code),
+       name = Value(name);
+  static Insertable<VisitReasonData> custom({
+    Expression<int>? id,
+    Expression<String>? code,
+    Expression<String>? name,
+    Expression<int>? sortOrder,
+    Expression<bool>? isActive,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (code != null) 'code': code,
+      if (name != null) 'name': name,
+      if (sortOrder != null) 'sort_order': sortOrder,
+      if (isActive != null) 'is_active': isActive,
+    });
+  }
+
+  VisitReasonCompanion copyWith({
+    Value<int>? id,
+    Value<String>? code,
+    Value<String>? name,
+    Value<int>? sortOrder,
+    Value<bool>? isActive,
+  }) {
+    return VisitReasonCompanion(
+      id: id ?? this.id,
+      code: code ?? this.code,
+      name: name ?? this.name,
+      sortOrder: sortOrder ?? this.sortOrder,
+      isActive: isActive ?? this.isActive,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (code.present) {
+      map['code'] = Variable<String>(code.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (sortOrder.present) {
+      map['sort_order'] = Variable<int>(sortOrder.value);
+    }
+    if (isActive.present) {
+      map['is_active'] = Variable<bool>(isActive.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('VisitReasonCompanion(')
+          ..write('id: $id, ')
+          ..write('code: $code, ')
+          ..write('name: $name, ')
+          ..write('sortOrder: $sortOrder, ')
+          ..write('isActive: $isActive')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $PatientTable extends Patient with TableInfo<$PatientTable, PatientData> {
   @override
   final GeneratedDatabase attachedDatabase;
@@ -10065,6 +10456,20 @@ class $PatientTable extends Patient with TableInfo<$PatientTable, PatientData> {
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _visitReasonIdMeta = const VerificationMeta(
+    'visitReasonId',
+  );
+  @override
+  late final GeneratedColumn<int> visitReasonId = GeneratedColumn<int>(
+    'visit_reason_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES visit_reason (id)',
+    ),
+  );
   static const VerificationMeta _nationalityIdMeta = const VerificationMeta(
     'nationalityId',
   );
@@ -10123,6 +10528,7 @@ class $PatientTable extends Patient with TableInfo<$PatientTable, PatientData> {
     sexId,
     passportOrIdNo,
     idNo,
+    visitReasonId,
     nationalityId,
     telephone,
     address,
@@ -10196,6 +10602,15 @@ class $PatientTable extends Patient with TableInfo<$PatientTable, PatientData> {
         idNo.isAcceptableOrUnknown(data['id_no']!, _idNoMeta),
       );
     }
+    if (data.containsKey('visit_reason_id')) {
+      context.handle(
+        _visitReasonIdMeta,
+        visitReasonId.isAcceptableOrUnknown(
+          data['visit_reason_id']!,
+          _visitReasonIdMeta,
+        ),
+      );
+    }
     if (data.containsKey('nationality_id')) {
       context.handle(
         _nationalityIdMeta,
@@ -10264,6 +10679,10 @@ class $PatientTable extends Patient with TableInfo<$PatientTable, PatientData> {
         DriftSqlType.string,
         data['${effectivePrefix}id_no'],
       ),
+      visitReasonId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}visit_reason_id'],
+      ),
       nationalityId: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}nationality_id'],
@@ -10298,6 +10717,7 @@ class PatientData extends DataClass implements Insertable<PatientData> {
   final int? sexId;
   final String? passportOrIdNo;
   final String? idNo;
+  final int? visitReasonId;
   final int? nationalityId;
   final String? telephone;
   final String? address;
@@ -10311,6 +10731,7 @@ class PatientData extends DataClass implements Insertable<PatientData> {
     this.sexId,
     this.passportOrIdNo,
     this.idNo,
+    this.visitReasonId,
     this.nationalityId,
     this.telephone,
     this.address,
@@ -10338,6 +10759,9 @@ class PatientData extends DataClass implements Insertable<PatientData> {
     }
     if (!nullToAbsent || idNo != null) {
       map['id_no'] = Variable<String>(idNo);
+    }
+    if (!nullToAbsent || visitReasonId != null) {
+      map['visit_reason_id'] = Variable<int>(visitReasonId);
     }
     if (!nullToAbsent || nationalityId != null) {
       map['nationality_id'] = Variable<int>(nationalityId);
@@ -10370,6 +10794,9 @@ class PatientData extends DataClass implements Insertable<PatientData> {
           ? const Value.absent()
           : Value(passportOrIdNo),
       idNo: idNo == null && nullToAbsent ? const Value.absent() : Value(idNo),
+      visitReasonId: visitReasonId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(visitReasonId),
       nationalityId: nationalityId == null && nullToAbsent
           ? const Value.absent()
           : Value(nationalityId),
@@ -10399,6 +10826,7 @@ class PatientData extends DataClass implements Insertable<PatientData> {
       sexId: serializer.fromJson<int?>(json['sexId']),
       passportOrIdNo: serializer.fromJson<String?>(json['passportOrIdNo']),
       idNo: serializer.fromJson<String?>(json['idNo']),
+      visitReasonId: serializer.fromJson<int?>(json['visitReasonId']),
       nationalityId: serializer.fromJson<int?>(json['nationalityId']),
       telephone: serializer.fromJson<String?>(json['telephone']),
       address: serializer.fromJson<String?>(json['address']),
@@ -10417,6 +10845,7 @@ class PatientData extends DataClass implements Insertable<PatientData> {
       'sexId': serializer.toJson<int?>(sexId),
       'passportOrIdNo': serializer.toJson<String?>(passportOrIdNo),
       'idNo': serializer.toJson<String?>(idNo),
+      'visitReasonId': serializer.toJson<int?>(visitReasonId),
       'nationalityId': serializer.toJson<int?>(nationalityId),
       'telephone': serializer.toJson<String?>(telephone),
       'address': serializer.toJson<String?>(address),
@@ -10433,6 +10862,7 @@ class PatientData extends DataClass implements Insertable<PatientData> {
     Value<int?> sexId = const Value.absent(),
     Value<String?> passportOrIdNo = const Value.absent(),
     Value<String?> idNo = const Value.absent(),
+    Value<int?> visitReasonId = const Value.absent(),
     Value<int?> nationalityId = const Value.absent(),
     Value<String?> telephone = const Value.absent(),
     Value<String?> address = const Value.absent(),
@@ -10450,6 +10880,9 @@ class PatientData extends DataClass implements Insertable<PatientData> {
         ? passportOrIdNo.value
         : this.passportOrIdNo,
     idNo: idNo.present ? idNo.value : this.idNo,
+    visitReasonId: visitReasonId.present
+        ? visitReasonId.value
+        : this.visitReasonId,
     nationalityId: nationalityId.present
         ? nationalityId.value
         : this.nationalityId,
@@ -10471,6 +10904,9 @@ class PatientData extends DataClass implements Insertable<PatientData> {
           ? data.passportOrIdNo.value
           : this.passportOrIdNo,
       idNo: data.idNo.present ? data.idNo.value : this.idNo,
+      visitReasonId: data.visitReasonId.present
+          ? data.visitReasonId.value
+          : this.visitReasonId,
       nationalityId: data.nationalityId.present
           ? data.nationalityId.value
           : this.nationalityId,
@@ -10491,6 +10927,7 @@ class PatientData extends DataClass implements Insertable<PatientData> {
           ..write('sexId: $sexId, ')
           ..write('passportOrIdNo: $passportOrIdNo, ')
           ..write('idNo: $idNo, ')
+          ..write('visitReasonId: $visitReasonId, ')
           ..write('nationalityId: $nationalityId, ')
           ..write('telephone: $telephone, ')
           ..write('address: $address, ')
@@ -10509,6 +10946,7 @@ class PatientData extends DataClass implements Insertable<PatientData> {
     sexId,
     passportOrIdNo,
     idNo,
+    visitReasonId,
     nationalityId,
     telephone,
     address,
@@ -10526,6 +10964,7 @@ class PatientData extends DataClass implements Insertable<PatientData> {
           other.sexId == this.sexId &&
           other.passportOrIdNo == this.passportOrIdNo &&
           other.idNo == this.idNo &&
+          other.visitReasonId == this.visitReasonId &&
           other.nationalityId == this.nationalityId &&
           other.telephone == this.telephone &&
           other.address == this.address &&
@@ -10541,6 +10980,7 @@ class PatientCompanion extends UpdateCompanion<PatientData> {
   final Value<int?> sexId;
   final Value<String?> passportOrIdNo;
   final Value<String?> idNo;
+  final Value<int?> visitReasonId;
   final Value<int?> nationalityId;
   final Value<String?> telephone;
   final Value<String?> address;
@@ -10554,6 +10994,7 @@ class PatientCompanion extends UpdateCompanion<PatientData> {
     this.sexId = const Value.absent(),
     this.passportOrIdNo = const Value.absent(),
     this.idNo = const Value.absent(),
+    this.visitReasonId = const Value.absent(),
     this.nationalityId = const Value.absent(),
     this.telephone = const Value.absent(),
     this.address = const Value.absent(),
@@ -10568,6 +11009,7 @@ class PatientCompanion extends UpdateCompanion<PatientData> {
     this.sexId = const Value.absent(),
     this.passportOrIdNo = const Value.absent(),
     this.idNo = const Value.absent(),
+    this.visitReasonId = const Value.absent(),
     this.nationalityId = const Value.absent(),
     this.telephone = const Value.absent(),
     this.address = const Value.absent(),
@@ -10582,6 +11024,7 @@ class PatientCompanion extends UpdateCompanion<PatientData> {
     Expression<int>? sexId,
     Expression<String>? passportOrIdNo,
     Expression<String>? idNo,
+    Expression<int>? visitReasonId,
     Expression<int>? nationalityId,
     Expression<String>? telephone,
     Expression<String>? address,
@@ -10596,6 +11039,7 @@ class PatientCompanion extends UpdateCompanion<PatientData> {
       if (sexId != null) 'sex_id': sexId,
       if (passportOrIdNo != null) 'passport_or_id_no': passportOrIdNo,
       if (idNo != null) 'id_no': idNo,
+      if (visitReasonId != null) 'visit_reason_id': visitReasonId,
       if (nationalityId != null) 'nationality_id': nationalityId,
       if (telephone != null) 'telephone': telephone,
       if (address != null) 'address': address,
@@ -10612,6 +11056,7 @@ class PatientCompanion extends UpdateCompanion<PatientData> {
     Value<int?>? sexId,
     Value<String?>? passportOrIdNo,
     Value<String?>? idNo,
+    Value<int?>? visitReasonId,
     Value<int?>? nationalityId,
     Value<String?>? telephone,
     Value<String?>? address,
@@ -10626,6 +11071,7 @@ class PatientCompanion extends UpdateCompanion<PatientData> {
       sexId: sexId ?? this.sexId,
       passportOrIdNo: passportOrIdNo ?? this.passportOrIdNo,
       idNo: idNo ?? this.idNo,
+      visitReasonId: visitReasonId ?? this.visitReasonId,
       nationalityId: nationalityId ?? this.nationalityId,
       telephone: telephone ?? this.telephone,
       address: address ?? this.address,
@@ -10660,6 +11106,9 @@ class PatientCompanion extends UpdateCompanion<PatientData> {
     if (idNo.present) {
       map['id_no'] = Variable<String>(idNo.value);
     }
+    if (visitReasonId.present) {
+      map['visit_reason_id'] = Variable<int>(visitReasonId.value);
+    }
     if (nationalityId.present) {
       map['nationality_id'] = Variable<int>(nationalityId.value);
     }
@@ -10686,6 +11135,7 @@ class PatientCompanion extends UpdateCompanion<PatientData> {
           ..write('sexId: $sexId, ')
           ..write('passportOrIdNo: $passportOrIdNo, ')
           ..write('idNo: $idNo, ')
+          ..write('visitReasonId: $visitReasonId, ')
           ..write('nationalityId: $nationalityId, ')
           ..write('telephone: $telephone, ')
           ..write('address: $address, ')
@@ -10737,9 +11187,9 @@ class $FlightRecordTable extends FlightRecord
   late final GeneratedColumn<int> airlineId = GeneratedColumn<int>(
     'airline_id',
     aliasedName,
-    false,
+    true,
     type: DriftSqlType.int,
-    requiredDuringInsert: true,
+    requiredDuringInsert: false,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
       'REFERENCES airline (airline_id)',
     ),
@@ -10762,9 +11212,9 @@ class $FlightRecordTable extends FlightRecord
   late final GeneratedColumn<int> travelStatusId = GeneratedColumn<int>(
     'travel_status_id',
     aliasedName,
-    false,
+    true,
     type: DriftSqlType.int,
-    requiredDuringInsert: true,
+    requiredDuringInsert: false,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
       'REFERENCES travel_status (travel_status_id)',
     ),
@@ -10775,9 +11225,9 @@ class $FlightRecordTable extends FlightRecord
   late final GeneratedColumn<int> departureLocationId = GeneratedColumn<int>(
     'departure_location_id',
     aliasedName,
-    false,
+    true,
     type: DriftSqlType.int,
-    requiredDuringInsert: true,
+    requiredDuringInsert: false,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
       'REFERENCES location (location_id)',
     ),
@@ -10789,9 +11239,9 @@ class $FlightRecordTable extends FlightRecord
   late final GeneratedColumn<int> arrivalLocationId = GeneratedColumn<int>(
     'arrival_location_id',
     aliasedName,
-    false,
+    true,
     type: DriftSqlType.int,
-    requiredDuringInsert: true,
+    requiredDuringInsert: false,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
       'REFERENCES location (location_id)',
     ),
@@ -10853,8 +11303,6 @@ class $FlightRecordTable extends FlightRecord
         _airlineIdMeta,
         airlineId.isAcceptableOrUnknown(data['airline_id']!, _airlineIdMeta),
       );
-    } else if (isInserting) {
-      context.missing(_airlineIdMeta);
     }
     if (data.containsKey('flight_number')) {
       context.handle(
@@ -10875,8 +11323,6 @@ class $FlightRecordTable extends FlightRecord
           _travelStatusIdMeta,
         ),
       );
-    } else if (isInserting) {
-      context.missing(_travelStatusIdMeta);
     }
     if (data.containsKey('departure_location_id')) {
       context.handle(
@@ -10886,8 +11332,6 @@ class $FlightRecordTable extends FlightRecord
           _departureLocationIdMeta,
         ),
       );
-    } else if (isInserting) {
-      context.missing(_departureLocationIdMeta);
     }
     if (data.containsKey('arrival_location_id')) {
       context.handle(
@@ -10897,8 +11341,6 @@ class $FlightRecordTable extends FlightRecord
           _arrivalLocationIdMeta,
         ),
       );
-    } else if (isInserting) {
-      context.missing(_arrivalLocationIdMeta);
     }
     if (data.containsKey('created_at')) {
       context.handle(
@@ -10926,7 +11368,7 @@ class $FlightRecordTable extends FlightRecord
       airlineId: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}airline_id'],
-      )!,
+      ),
       flightNumber: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}flight_number'],
@@ -10934,15 +11376,15 @@ class $FlightRecordTable extends FlightRecord
       travelStatusId: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}travel_status_id'],
-      )!,
+      ),
       departureLocationId: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}departure_location_id'],
-      )!,
+      ),
       arrivalLocationId: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}arrival_location_id'],
-      )!,
+      ),
       createdAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}created_at'],
@@ -10960,20 +11402,20 @@ class FlightRecordData extends DataClass
     implements Insertable<FlightRecordData> {
   final int flightRecordId;
   final int medicalId;
-  final int airlineId;
+  final int? airlineId;
   final String flightNumber;
-  final int travelStatusId;
-  final int departureLocationId;
-  final int arrivalLocationId;
+  final int? travelStatusId;
+  final int? departureLocationId;
+  final int? arrivalLocationId;
   final DateTime createdAt;
   const FlightRecordData({
     required this.flightRecordId,
     required this.medicalId,
-    required this.airlineId,
+    this.airlineId,
     required this.flightNumber,
-    required this.travelStatusId,
-    required this.departureLocationId,
-    required this.arrivalLocationId,
+    this.travelStatusId,
+    this.departureLocationId,
+    this.arrivalLocationId,
     required this.createdAt,
   });
   @override
@@ -10981,11 +11423,19 @@ class FlightRecordData extends DataClass
     final map = <String, Expression>{};
     map['flight_record_id'] = Variable<int>(flightRecordId);
     map['medical_id'] = Variable<int>(medicalId);
-    map['airline_id'] = Variable<int>(airlineId);
+    if (!nullToAbsent || airlineId != null) {
+      map['airline_id'] = Variable<int>(airlineId);
+    }
     map['flight_number'] = Variable<String>(flightNumber);
-    map['travel_status_id'] = Variable<int>(travelStatusId);
-    map['departure_location_id'] = Variable<int>(departureLocationId);
-    map['arrival_location_id'] = Variable<int>(arrivalLocationId);
+    if (!nullToAbsent || travelStatusId != null) {
+      map['travel_status_id'] = Variable<int>(travelStatusId);
+    }
+    if (!nullToAbsent || departureLocationId != null) {
+      map['departure_location_id'] = Variable<int>(departureLocationId);
+    }
+    if (!nullToAbsent || arrivalLocationId != null) {
+      map['arrival_location_id'] = Variable<int>(arrivalLocationId);
+    }
     map['created_at'] = Variable<DateTime>(createdAt);
     return map;
   }
@@ -10994,11 +11444,19 @@ class FlightRecordData extends DataClass
     return FlightRecordCompanion(
       flightRecordId: Value(flightRecordId),
       medicalId: Value(medicalId),
-      airlineId: Value(airlineId),
+      airlineId: airlineId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(airlineId),
       flightNumber: Value(flightNumber),
-      travelStatusId: Value(travelStatusId),
-      departureLocationId: Value(departureLocationId),
-      arrivalLocationId: Value(arrivalLocationId),
+      travelStatusId: travelStatusId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(travelStatusId),
+      departureLocationId: departureLocationId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(departureLocationId),
+      arrivalLocationId: arrivalLocationId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(arrivalLocationId),
       createdAt: Value(createdAt),
     );
   }
@@ -11011,13 +11469,13 @@ class FlightRecordData extends DataClass
     return FlightRecordData(
       flightRecordId: serializer.fromJson<int>(json['flightRecordId']),
       medicalId: serializer.fromJson<int>(json['medicalId']),
-      airlineId: serializer.fromJson<int>(json['airlineId']),
+      airlineId: serializer.fromJson<int?>(json['airlineId']),
       flightNumber: serializer.fromJson<String>(json['flightNumber']),
-      travelStatusId: serializer.fromJson<int>(json['travelStatusId']),
-      departureLocationId: serializer.fromJson<int>(
+      travelStatusId: serializer.fromJson<int?>(json['travelStatusId']),
+      departureLocationId: serializer.fromJson<int?>(
         json['departureLocationId'],
       ),
-      arrivalLocationId: serializer.fromJson<int>(json['arrivalLocationId']),
+      arrivalLocationId: serializer.fromJson<int?>(json['arrivalLocationId']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
     );
   }
@@ -11027,11 +11485,11 @@ class FlightRecordData extends DataClass
     return <String, dynamic>{
       'flightRecordId': serializer.toJson<int>(flightRecordId),
       'medicalId': serializer.toJson<int>(medicalId),
-      'airlineId': serializer.toJson<int>(airlineId),
+      'airlineId': serializer.toJson<int?>(airlineId),
       'flightNumber': serializer.toJson<String>(flightNumber),
-      'travelStatusId': serializer.toJson<int>(travelStatusId),
-      'departureLocationId': serializer.toJson<int>(departureLocationId),
-      'arrivalLocationId': serializer.toJson<int>(arrivalLocationId),
+      'travelStatusId': serializer.toJson<int?>(travelStatusId),
+      'departureLocationId': serializer.toJson<int?>(departureLocationId),
+      'arrivalLocationId': serializer.toJson<int?>(arrivalLocationId),
       'createdAt': serializer.toJson<DateTime>(createdAt),
     };
   }
@@ -11039,20 +11497,26 @@ class FlightRecordData extends DataClass
   FlightRecordData copyWith({
     int? flightRecordId,
     int? medicalId,
-    int? airlineId,
+    Value<int?> airlineId = const Value.absent(),
     String? flightNumber,
-    int? travelStatusId,
-    int? departureLocationId,
-    int? arrivalLocationId,
+    Value<int?> travelStatusId = const Value.absent(),
+    Value<int?> departureLocationId = const Value.absent(),
+    Value<int?> arrivalLocationId = const Value.absent(),
     DateTime? createdAt,
   }) => FlightRecordData(
     flightRecordId: flightRecordId ?? this.flightRecordId,
     medicalId: medicalId ?? this.medicalId,
-    airlineId: airlineId ?? this.airlineId,
+    airlineId: airlineId.present ? airlineId.value : this.airlineId,
     flightNumber: flightNumber ?? this.flightNumber,
-    travelStatusId: travelStatusId ?? this.travelStatusId,
-    departureLocationId: departureLocationId ?? this.departureLocationId,
-    arrivalLocationId: arrivalLocationId ?? this.arrivalLocationId,
+    travelStatusId: travelStatusId.present
+        ? travelStatusId.value
+        : this.travelStatusId,
+    departureLocationId: departureLocationId.present
+        ? departureLocationId.value
+        : this.departureLocationId,
+    arrivalLocationId: arrivalLocationId.present
+        ? arrivalLocationId.value
+        : this.arrivalLocationId,
     createdAt: createdAt ?? this.createdAt,
   );
   FlightRecordData copyWithCompanion(FlightRecordCompanion data) {
@@ -11121,11 +11585,11 @@ class FlightRecordData extends DataClass
 class FlightRecordCompanion extends UpdateCompanion<FlightRecordData> {
   final Value<int> flightRecordId;
   final Value<int> medicalId;
-  final Value<int> airlineId;
+  final Value<int?> airlineId;
   final Value<String> flightNumber;
-  final Value<int> travelStatusId;
-  final Value<int> departureLocationId;
-  final Value<int> arrivalLocationId;
+  final Value<int?> travelStatusId;
+  final Value<int?> departureLocationId;
+  final Value<int?> arrivalLocationId;
   final Value<DateTime> createdAt;
   const FlightRecordCompanion({
     this.flightRecordId = const Value.absent(),
@@ -11140,18 +11604,14 @@ class FlightRecordCompanion extends UpdateCompanion<FlightRecordData> {
   FlightRecordCompanion.insert({
     this.flightRecordId = const Value.absent(),
     required int medicalId,
-    required int airlineId,
+    this.airlineId = const Value.absent(),
     required String flightNumber,
-    required int travelStatusId,
-    required int departureLocationId,
-    required int arrivalLocationId,
+    this.travelStatusId = const Value.absent(),
+    this.departureLocationId = const Value.absent(),
+    this.arrivalLocationId = const Value.absent(),
     this.createdAt = const Value.absent(),
   }) : medicalId = Value(medicalId),
-       airlineId = Value(airlineId),
-       flightNumber = Value(flightNumber),
-       travelStatusId = Value(travelStatusId),
-       departureLocationId = Value(departureLocationId),
-       arrivalLocationId = Value(arrivalLocationId);
+       flightNumber = Value(flightNumber);
   static Insertable<FlightRecordData> custom({
     Expression<int>? flightRecordId,
     Expression<int>? medicalId,
@@ -11178,11 +11638,11 @@ class FlightRecordCompanion extends UpdateCompanion<FlightRecordData> {
   FlightRecordCompanion copyWith({
     Value<int>? flightRecordId,
     Value<int>? medicalId,
-    Value<int>? airlineId,
+    Value<int?>? airlineId,
     Value<String>? flightNumber,
-    Value<int>? travelStatusId,
-    Value<int>? departureLocationId,
-    Value<int>? arrivalLocationId,
+    Value<int?>? travelStatusId,
+    Value<int?>? departureLocationId,
+    Value<int?>? arrivalLocationId,
     Value<DateTime>? createdAt,
   }) {
     return FlightRecordCompanion(
@@ -23759,6 +24219,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $ConsciousnessLevelRefTable consciousnessLevelRef =
       $ConsciousnessLevelRefTable(this);
   late final $MedicalRecordTable medicalRecord = $MedicalRecordTable(this);
+  late final $VisitReasonTable visitReason = $VisitReasonTable(this);
   late final $PatientTable patient = $PatientTable(this);
   late final $FlightRecordTable flightRecord = $FlightRecordTable(this);
   late final $FlightTransitLocationsTable flightTransitLocations =
@@ -23841,6 +24302,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     pupilReactionRef,
     consciousnessLevelRef,
     medicalRecord,
+    visitReason,
     patient,
     flightRecord,
     flightTransitLocations,
@@ -24360,12 +24822,14 @@ typedef $$AirlineTableCreateCompanionBuilder =
       Value<int> airlineId,
       required String code,
       required String name,
+      Value<bool> isOther,
     });
 typedef $$AirlineTableUpdateCompanionBuilder =
     AirlineCompanion Function({
       Value<int> airlineId,
       Value<String> code,
       Value<String> name,
+      Value<bool> isOther,
     });
 
 final class $$AirlineTableReferences
@@ -24419,6 +24883,11 @@ class $$AirlineTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<bool> get isOther => $composableBuilder(
+    column: $table.isOther,
+    builder: (column) => ColumnFilters(column),
+  );
+
   Expression<bool> flightRecordRefs(
     Expression<bool> Function($$FlightRecordTableFilterComposer f) f,
   ) {
@@ -24468,6 +24937,11 @@ class $$AirlineTableOrderingComposer
     column: $table.name,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<bool> get isOther => $composableBuilder(
+    column: $table.isOther,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$AirlineTableAnnotationComposer
@@ -24487,6 +24961,9 @@ class $$AirlineTableAnnotationComposer
 
   GeneratedColumn<String> get name =>
       $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<bool> get isOther =>
+      $composableBuilder(column: $table.isOther, builder: (column) => column);
 
   Expression<T> flightRecordRefs<T extends Object>(
     Expression<T> Function($$FlightRecordTableAnnotationComposer a) f,
@@ -24545,20 +25022,24 @@ class $$AirlineTableTableManager
                 Value<int> airlineId = const Value.absent(),
                 Value<String> code = const Value.absent(),
                 Value<String> name = const Value.absent(),
+                Value<bool> isOther = const Value.absent(),
               }) => AirlineCompanion(
                 airlineId: airlineId,
                 code: code,
                 name: name,
+                isOther: isOther,
               ),
           createCompanionCallback:
               ({
                 Value<int> airlineId = const Value.absent(),
                 required String code,
                 required String name,
+                Value<bool> isOther = const Value.absent(),
               }) => AirlineCompanion.insert(
                 airlineId: airlineId,
                 code: code,
                 name: name,
+                isOther: isOther,
               ),
           withReferenceMapper: (p0) => p0
               .map(
@@ -33993,6 +34474,306 @@ typedef $$MedicalRecordTableProcessedTableManager =
         bool telexDocumentsRefs,
       })
     >;
+typedef $$VisitReasonTableCreateCompanionBuilder =
+    VisitReasonCompanion Function({
+      Value<int> id,
+      required String code,
+      required String name,
+      Value<int> sortOrder,
+      Value<bool> isActive,
+    });
+typedef $$VisitReasonTableUpdateCompanionBuilder =
+    VisitReasonCompanion Function({
+      Value<int> id,
+      Value<String> code,
+      Value<String> name,
+      Value<int> sortOrder,
+      Value<bool> isActive,
+    });
+
+final class $$VisitReasonTableReferences
+    extends BaseReferences<_$AppDatabase, $VisitReasonTable, VisitReasonData> {
+  $$VisitReasonTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static MultiTypedResultKey<$PatientTable, List<PatientData>>
+  _patientRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.patient,
+    aliasName: $_aliasNameGenerator(
+      db.visitReason.id,
+      db.patient.visitReasonId,
+    ),
+  );
+
+  $$PatientTableProcessedTableManager get patientRefs {
+    final manager = $$PatientTableTableManager(
+      $_db,
+      $_db.patient,
+    ).filter((f) => f.visitReasonId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_patientRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$VisitReasonTableFilterComposer
+    extends Composer<_$AppDatabase, $VisitReasonTable> {
+  $$VisitReasonTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get code => $composableBuilder(
+    column: $table.code,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get sortOrder => $composableBuilder(
+    column: $table.sortOrder,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isActive => $composableBuilder(
+    column: $table.isActive,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  Expression<bool> patientRefs(
+    Expression<bool> Function($$PatientTableFilterComposer f) f,
+  ) {
+    final $$PatientTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.patient,
+      getReferencedColumn: (t) => t.visitReasonId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PatientTableFilterComposer(
+            $db: $db,
+            $table: $db.patient,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$VisitReasonTableOrderingComposer
+    extends Composer<_$AppDatabase, $VisitReasonTable> {
+  $$VisitReasonTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get code => $composableBuilder(
+    column: $table.code,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get sortOrder => $composableBuilder(
+    column: $table.sortOrder,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isActive => $composableBuilder(
+    column: $table.isActive,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$VisitReasonTableAnnotationComposer
+    extends Composer<_$AppDatabase, $VisitReasonTable> {
+  $$VisitReasonTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get code =>
+      $composableBuilder(column: $table.code, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<int> get sortOrder =>
+      $composableBuilder(column: $table.sortOrder, builder: (column) => column);
+
+  GeneratedColumn<bool> get isActive =>
+      $composableBuilder(column: $table.isActive, builder: (column) => column);
+
+  Expression<T> patientRefs<T extends Object>(
+    Expression<T> Function($$PatientTableAnnotationComposer a) f,
+  ) {
+    final $$PatientTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.patient,
+      getReferencedColumn: (t) => t.visitReasonId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PatientTableAnnotationComposer(
+            $db: $db,
+            $table: $db.patient,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$VisitReasonTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $VisitReasonTable,
+          VisitReasonData,
+          $$VisitReasonTableFilterComposer,
+          $$VisitReasonTableOrderingComposer,
+          $$VisitReasonTableAnnotationComposer,
+          $$VisitReasonTableCreateCompanionBuilder,
+          $$VisitReasonTableUpdateCompanionBuilder,
+          (VisitReasonData, $$VisitReasonTableReferences),
+          VisitReasonData,
+          PrefetchHooks Function({bool patientRefs})
+        > {
+  $$VisitReasonTableTableManager(_$AppDatabase db, $VisitReasonTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$VisitReasonTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$VisitReasonTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$VisitReasonTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> code = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<int> sortOrder = const Value.absent(),
+                Value<bool> isActive = const Value.absent(),
+              }) => VisitReasonCompanion(
+                id: id,
+                code: code,
+                name: name,
+                sortOrder: sortOrder,
+                isActive: isActive,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String code,
+                required String name,
+                Value<int> sortOrder = const Value.absent(),
+                Value<bool> isActive = const Value.absent(),
+              }) => VisitReasonCompanion.insert(
+                id: id,
+                code: code,
+                name: name,
+                sortOrder: sortOrder,
+                isActive: isActive,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$VisitReasonTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({patientRefs = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [if (patientRefs) db.patient],
+              addJoins: null,
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (patientRefs)
+                    await $_getPrefetchedData<
+                      VisitReasonData,
+                      $VisitReasonTable,
+                      PatientData
+                    >(
+                      currentTable: table,
+                      referencedTable: $$VisitReasonTableReferences
+                          ._patientRefsTable(db),
+                      managerFromTypedResult: (p0) =>
+                          $$VisitReasonTableReferences(
+                            db,
+                            table,
+                            p0,
+                          ).patientRefs,
+                      referencedItemsForCurrentItem: (item, referencedItems) =>
+                          referencedItems.where(
+                            (e) => e.visitReasonId == item.id,
+                          ),
+                      typedResults: items,
+                    ),
+                ];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$VisitReasonTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $VisitReasonTable,
+      VisitReasonData,
+      $$VisitReasonTableFilterComposer,
+      $$VisitReasonTableOrderingComposer,
+      $$VisitReasonTableAnnotationComposer,
+      $$VisitReasonTableCreateCompanionBuilder,
+      $$VisitReasonTableUpdateCompanionBuilder,
+      (VisitReasonData, $$VisitReasonTableReferences),
+      VisitReasonData,
+      PrefetchHooks Function({bool patientRefs})
+    >;
 typedef $$PatientTableCreateCompanionBuilder =
     PatientCompanion Function({
       Value<int> patientId,
@@ -34003,6 +34784,7 @@ typedef $$PatientTableCreateCompanionBuilder =
       Value<int?> sexId,
       Value<String?> passportOrIdNo,
       Value<String?> idNo,
+      Value<int?> visitReasonId,
       Value<int?> nationalityId,
       Value<String?> telephone,
       Value<String?> address,
@@ -34018,6 +34800,7 @@ typedef $$PatientTableUpdateCompanionBuilder =
       Value<int?> sexId,
       Value<String?> passportOrIdNo,
       Value<String?> idNo,
+      Value<int?> visitReasonId,
       Value<int?> nationalityId,
       Value<String?> telephone,
       Value<String?> address,
@@ -34058,6 +34841,25 @@ final class $$PatientTableReferences
       $_db.sex,
     ).filter((f) => f.sexId.sqlEquals($_column));
     final item = $_typedResult.readTableOrNull(_sexIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $VisitReasonTable _visitReasonIdTable(_$AppDatabase db) =>
+      db.visitReason.createAlias(
+        $_aliasNameGenerator(db.patient.visitReasonId, db.visitReason.id),
+      );
+
+  $$VisitReasonTableProcessedTableManager? get visitReasonId {
+    final $_column = $_itemColumn<int>('visit_reason_id');
+    if ($_column == null) return null;
+    final manager = $$VisitReasonTableTableManager(
+      $_db,
+      $_db.visitReason,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_visitReasonIdTable($_db));
     if (item == null) return manager;
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: [item]),
@@ -34178,6 +34980,29 @@ class $$PatientTableFilterComposer
           }) => $$SexTableFilterComposer(
             $db: $db,
             $table: $db.sex,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$VisitReasonTableFilterComposer get visitReasonId {
+    final $$VisitReasonTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.visitReasonId,
+      referencedTable: $db.visitReason,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$VisitReasonTableFilterComposer(
+            $db: $db,
+            $table: $db.visitReason,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -34311,6 +35136,29 @@ class $$PatientTableOrderingComposer
     return composer;
   }
 
+  $$VisitReasonTableOrderingComposer get visitReasonId {
+    final $$VisitReasonTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.visitReasonId,
+      referencedTable: $db.visitReason,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$VisitReasonTableOrderingComposer(
+            $db: $db,
+            $table: $db.visitReason,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
   $$NationalityTableOrderingComposer get nationalityId {
     final $$NationalityTableOrderingComposer composer = $composerBuilder(
       composer: this,
@@ -34421,6 +35269,29 @@ class $$PatientTableAnnotationComposer
     return composer;
   }
 
+  $$VisitReasonTableAnnotationComposer get visitReasonId {
+    final $$VisitReasonTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.visitReasonId,
+      referencedTable: $db.visitReason,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$VisitReasonTableAnnotationComposer(
+            $db: $db,
+            $table: $db.visitReason,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
   $$NationalityTableAnnotationComposer get nationalityId {
     final $$NationalityTableAnnotationComposer composer = $composerBuilder(
       composer: this,
@@ -34461,6 +35332,7 @@ class $$PatientTableTableManager
           PrefetchHooks Function({
             bool medicalId,
             bool sexId,
+            bool visitReasonId,
             bool nationalityId,
           })
         > {
@@ -34485,6 +35357,7 @@ class $$PatientTableTableManager
                 Value<int?> sexId = const Value.absent(),
                 Value<String?> passportOrIdNo = const Value.absent(),
                 Value<String?> idNo = const Value.absent(),
+                Value<int?> visitReasonId = const Value.absent(),
                 Value<int?> nationalityId = const Value.absent(),
                 Value<String?> telephone = const Value.absent(),
                 Value<String?> address = const Value.absent(),
@@ -34498,6 +35371,7 @@ class $$PatientTableTableManager
                 sexId: sexId,
                 passportOrIdNo: passportOrIdNo,
                 idNo: idNo,
+                visitReasonId: visitReasonId,
                 nationalityId: nationalityId,
                 telephone: telephone,
                 address: address,
@@ -34513,6 +35387,7 @@ class $$PatientTableTableManager
                 Value<int?> sexId = const Value.absent(),
                 Value<String?> passportOrIdNo = const Value.absent(),
                 Value<String?> idNo = const Value.absent(),
+                Value<int?> visitReasonId = const Value.absent(),
                 Value<int?> nationalityId = const Value.absent(),
                 Value<String?> telephone = const Value.absent(),
                 Value<String?> address = const Value.absent(),
@@ -34526,6 +35401,7 @@ class $$PatientTableTableManager
                 sexId: sexId,
                 passportOrIdNo: passportOrIdNo,
                 idNo: idNo,
+                visitReasonId: visitReasonId,
                 nationalityId: nationalityId,
                 telephone: telephone,
                 address: address,
@@ -34540,7 +35416,12 @@ class $$PatientTableTableManager
               )
               .toList(),
           prefetchHooksCallback:
-              ({medicalId = false, sexId = false, nationalityId = false}) {
+              ({
+                medicalId = false,
+                sexId = false,
+                visitReasonId = false,
+                nationalityId = false,
+              }) {
                 return PrefetchHooks(
                   db: db,
                   explicitlyWatchedTables: [],
@@ -34586,6 +35467,19 @@ class $$PatientTableTableManager
                                   )
                                   as T;
                         }
+                        if (visitReasonId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.visitReasonId,
+                                    referencedTable: $$PatientTableReferences
+                                        ._visitReasonIdTable(db),
+                                    referencedColumn: $$PatientTableReferences
+                                        ._visitReasonIdTable(db)
+                                        .id,
+                                  )
+                                  as T;
+                        }
                         if (nationalityId) {
                           state =
                               state.withJoin(
@@ -34623,28 +35517,33 @@ typedef $$PatientTableProcessedTableManager =
       $$PatientTableUpdateCompanionBuilder,
       (PatientData, $$PatientTableReferences),
       PatientData,
-      PrefetchHooks Function({bool medicalId, bool sexId, bool nationalityId})
+      PrefetchHooks Function({
+        bool medicalId,
+        bool sexId,
+        bool visitReasonId,
+        bool nationalityId,
+      })
     >;
 typedef $$FlightRecordTableCreateCompanionBuilder =
     FlightRecordCompanion Function({
       Value<int> flightRecordId,
       required int medicalId,
-      required int airlineId,
+      Value<int?> airlineId,
       required String flightNumber,
-      required int travelStatusId,
-      required int departureLocationId,
-      required int arrivalLocationId,
+      Value<int?> travelStatusId,
+      Value<int?> departureLocationId,
+      Value<int?> arrivalLocationId,
       Value<DateTime> createdAt,
     });
 typedef $$FlightRecordTableUpdateCompanionBuilder =
     FlightRecordCompanion Function({
       Value<int> flightRecordId,
       Value<int> medicalId,
-      Value<int> airlineId,
+      Value<int?> airlineId,
       Value<String> flightNumber,
-      Value<int> travelStatusId,
-      Value<int> departureLocationId,
-      Value<int> arrivalLocationId,
+      Value<int?> travelStatusId,
+      Value<int?> departureLocationId,
+      Value<int?> arrivalLocationId,
       Value<DateTime> createdAt,
     });
 
@@ -34680,9 +35579,9 @@ final class $$FlightRecordTableReferences
         $_aliasNameGenerator(db.flightRecord.airlineId, db.airline.airlineId),
       );
 
-  $$AirlineTableProcessedTableManager get airlineId {
-    final $_column = $_itemColumn<int>('airline_id')!;
-
+  $$AirlineTableProcessedTableManager? get airlineId {
+    final $_column = $_itemColumn<int>('airline_id');
+    if ($_column == null) return null;
     final manager = $$AirlineTableTableManager(
       $_db,
       $_db.airline,
@@ -34702,9 +35601,9 @@ final class $$FlightRecordTableReferences
         ),
       );
 
-  $$TravelStatusTableProcessedTableManager get travelStatusId {
-    final $_column = $_itemColumn<int>('travel_status_id')!;
-
+  $$TravelStatusTableProcessedTableManager? get travelStatusId {
+    final $_column = $_itemColumn<int>('travel_status_id');
+    if ($_column == null) return null;
     final manager = $$TravelStatusTableTableManager(
       $_db,
       $_db.travelStatus,
@@ -34724,9 +35623,9 @@ final class $$FlightRecordTableReferences
         ),
       );
 
-  $$LocationTableProcessedTableManager get departureLocationId {
-    final $_column = $_itemColumn<int>('departure_location_id')!;
-
+  $$LocationTableProcessedTableManager? get departureLocationId {
+    final $_column = $_itemColumn<int>('departure_location_id');
+    if ($_column == null) return null;
     final manager = $$LocationTableTableManager(
       $_db,
       $_db.location,
@@ -34746,9 +35645,9 @@ final class $$FlightRecordTableReferences
         ),
       );
 
-  $$LocationTableProcessedTableManager get arrivalLocationId {
-    final $_column = $_itemColumn<int>('arrival_location_id')!;
-
+  $$LocationTableProcessedTableManager? get arrivalLocationId {
+    final $_column = $_itemColumn<int>('arrival_location_id');
+    if ($_column == null) return null;
     final manager = $$LocationTableTableManager(
       $_db,
       $_db.location,
@@ -35301,11 +36200,11 @@ class $$FlightRecordTableTableManager
               ({
                 Value<int> flightRecordId = const Value.absent(),
                 Value<int> medicalId = const Value.absent(),
-                Value<int> airlineId = const Value.absent(),
+                Value<int?> airlineId = const Value.absent(),
                 Value<String> flightNumber = const Value.absent(),
-                Value<int> travelStatusId = const Value.absent(),
-                Value<int> departureLocationId = const Value.absent(),
-                Value<int> arrivalLocationId = const Value.absent(),
+                Value<int?> travelStatusId = const Value.absent(),
+                Value<int?> departureLocationId = const Value.absent(),
+                Value<int?> arrivalLocationId = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
               }) => FlightRecordCompanion(
                 flightRecordId: flightRecordId,
@@ -35321,11 +36220,11 @@ class $$FlightRecordTableTableManager
               ({
                 Value<int> flightRecordId = const Value.absent(),
                 required int medicalId,
-                required int airlineId,
+                Value<int?> airlineId = const Value.absent(),
                 required String flightNumber,
-                required int travelStatusId,
-                required int departureLocationId,
-                required int arrivalLocationId,
+                Value<int?> travelStatusId = const Value.absent(),
+                Value<int?> departureLocationId = const Value.absent(),
+                Value<int?> arrivalLocationId = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
               }) => FlightRecordCompanion.insert(
                 flightRecordId: flightRecordId,
@@ -46170,6 +47069,8 @@ class $AppDatabaseManager {
       $$ConsciousnessLevelRefTableTableManager(_db, _db.consciousnessLevelRef);
   $$MedicalRecordTableTableManager get medicalRecord =>
       $$MedicalRecordTableTableManager(_db, _db.medicalRecord);
+  $$VisitReasonTableTableManager get visitReason =>
+      $$VisitReasonTableTableManager(_db, _db.visitReason);
   $$PatientTableTableManager get patient =>
       $$PatientTableTableManager(_db, _db.patient);
   $$FlightRecordTableTableManager get flightRecord =>

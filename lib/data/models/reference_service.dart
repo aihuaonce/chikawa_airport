@@ -39,6 +39,7 @@ class ReferenceService extends ChangeNotifier {
   List<ReferralPurposeData> _referralPurposeList = [];
   List<StationRefData> _stationList = [];
   List<RelationshipTypeData> _relationshipTypeList = [];
+  List<VisitReasonData> _visitReasonList = [];
 
   List<HistoryStatusRefData> _historyStatusList = [];
   List<MedicalStaffRoleData> _medicalStaffRoleList = [];
@@ -73,11 +74,13 @@ class ReferenceService extends ChangeNotifier {
   List<ReferralPurposeData> get referralPurposeList => _referralPurposeList;
   List<StationRefData> get stationList => _stationList;
   List<RelationshipTypeData> get relationshipTypeList => _relationshipTypeList;
+  List<VisitReasonData> get visitReasonList => _visitReasonList;
 
   List<HistoryStatusRefData> get historyStatusList => _historyStatusList;
   List<MedicalStaffRoleData> get medicalStaffRoleList => _medicalStaffRoleList;
   List<PupilReactionRefData> get pupilReactionList => _pupilReactionList;
-  List<ConsciousnessLevelRefData> get consciousnessLevelList => _consciousnessLevelList;
+  List<ConsciousnessLevelRefData> get consciousnessLevelList =>
+      _consciousnessLevelList;
 
   ReferenceService(this.db);
 
@@ -116,8 +119,12 @@ class ReferenceService extends ChangeNotifier {
   Future<void> _loadBasicReferences() async {
     try {
       // 病患相關
+      await _seedVisitReasons();
       _sexList = await db.referenceDao.getAllSex();
       _nationalityList = await db.referenceDao.getAllNationality();
+      _visitReasonList = await (db.select(
+        db.visitReason,
+      )..orderBy([(t) => OrderingTerm.asc(t.sortOrder)])).get();
 
       // 飛航相關
       _airlineList = await db.referenceDao.getAllAirline();
@@ -132,6 +139,36 @@ class ReferenceService extends ChangeNotifier {
       debugPrint('系統:基本參考資料載入完成');
     } catch (e) {
       debugPrint('系統:載入基本參考資料失敗 - $e');
+    }
+  }
+
+  Future<void> _seedVisitReasons() async {
+    try {
+      final count = await (db.select(db.visitReason)..limit(1)).get();
+      if (count.isEmpty) {
+        await db.batch((batch) {
+          batch.insertAll(db.visitReason, [
+            VisitReasonCompanion.insert(
+              code: 'crew',
+              name: '航空公司機組員',
+              sortOrder: const Value(1),
+            ),
+            VisitReasonCompanion.insert(
+              code: 'passenger',
+              name: '旅客/民眾',
+              sortOrder: const Value(2),
+            ),
+            VisitReasonCompanion.insert(
+              code: 'staff',
+              name: '機場內部員工',
+              sortOrder: const Value(3),
+            ),
+          ]);
+        });
+        debugPrint('系統:已初始化為何至機場選項');
+      }
+    } catch (e) {
+      debugPrint('系統:初始化為何至機場選項失敗 - $e');
     }
   }
 
@@ -151,16 +188,16 @@ class ReferenceService extends ChangeNotifier {
       _specialNoteRefs = await db.referenceDao.getAllSpecialNoteRefs();
       _nursingPhraseList = await db.referenceDao.getAllNursingPhrases();
 
-      _paymentMethodList = await (db.select(db.paymentMethod)
-            ..orderBy([(t) => OrderingTerm.asc(t.sortOrder)]))
-          .get();
-      _collectionStatusList = await (db.select(db.collectionStatus)
-            ..orderBy([(t) => OrderingTerm.asc(t.sortOrder)]))
-          .get();
+      _paymentMethodList = await (db.select(
+        db.paymentMethod,
+      )..orderBy([(t) => OrderingTerm.asc(t.sortOrder)])).get();
+      _collectionStatusList = await (db.select(
+        db.collectionStatus,
+      )..orderBy([(t) => OrderingTerm.asc(t.sortOrder)])).get();
       _currencyList = await db.select(db.currencyRef).get();
-      _referralPurposeList = await (db.select(db.referralPurpose)
-            ..orderBy([(t) => OrderingTerm.asc(t.sortOrder)]))
-          .get();
+      _referralPurposeList = await (db.select(
+        db.referralPurpose,
+      )..orderBy([(t) => OrderingTerm.asc(t.sortOrder)])).get();
       _stationList = await db.select(db.stationRef).get();
       _relationshipTypeList = await db.select(db.relationshipType).get();
 
@@ -183,43 +220,55 @@ class ReferenceService extends ChangeNotifier {
       debugPrint('  - 站點資料: ${_stationList.length}');
       debugPrint('  - 關係類型: ${_relationshipTypeList.length}');
 
-      _historyStatusList = await db.customSelect(
-        'SELECT * FROM history_status_ref ORDER BY sort_order',
-      ).map((row) => HistoryStatusRefData(
-        id: row.read<int>('id'),
-        code: row.read<String>('code'),
-        name: row.read<String>('name'),
-        nameEn: row.readNullable<String>('name_en'),
-        sortOrder: row.read<int>('sort_order'),
-      )).get();
-      
-      _medicalStaffRoleList = await db.customSelect(
-        'SELECT * FROM medical_staff_role ORDER BY sort_order',
-      ).map((row) => MedicalStaffRoleData(
-        id: row.read<int>('id'),
-        code: row.read<String>('code'),
-        name: row.read<String>('name'),
-        nameEn: row.readNullable<String>('name_en'),
-        sortOrder: row.read<int>('sort_order'),
-      )).get();
-      
-      _pupilReactionList = await db.customSelect(
-        'SELECT * FROM pupil_reaction_ref',
-      ).map((row) => PupilReactionRefData(
-        id: row.read<int>('id'),
-        code: row.read<String>('code'),
-        symbol: row.read<String>('symbol'),
-        name: row.read<String>('name'),
-      )).get();
-      
-      _consciousnessLevelList = await db.customSelect(
-        'SELECT * FROM consciousness_level_ref',
-      ).map((row) => ConsciousnessLevelRefData(
-        id: row.read<int>('id'),
-        code: row.read<String>('code'),
-        name: row.read<String>('name'),
-        nameEn: row.readNullable<String>('name_en'),
-      )).get();
+      _historyStatusList = await db
+          .customSelect('SELECT * FROM history_status_ref ORDER BY sort_order')
+          .map(
+            (row) => HistoryStatusRefData(
+              id: row.read<int>('id'),
+              code: row.read<String>('code'),
+              name: row.read<String>('name'),
+              nameEn: row.readNullable<String>('name_en'),
+              sortOrder: row.read<int>('sort_order'),
+            ),
+          )
+          .get();
+
+      _medicalStaffRoleList = await db
+          .customSelect('SELECT * FROM medical_staff_role ORDER BY sort_order')
+          .map(
+            (row) => MedicalStaffRoleData(
+              id: row.read<int>('id'),
+              code: row.read<String>('code'),
+              name: row.read<String>('name'),
+              nameEn: row.readNullable<String>('name_en'),
+              sortOrder: row.read<int>('sort_order'),
+            ),
+          )
+          .get();
+
+      _pupilReactionList = await db
+          .customSelect('SELECT * FROM pupil_reaction_ref')
+          .map(
+            (row) => PupilReactionRefData(
+              id: row.read<int>('id'),
+              code: row.read<String>('code'),
+              symbol: row.read<String>('symbol'),
+              name: row.read<String>('name'),
+            ),
+          )
+          .get();
+
+      _consciousnessLevelList = await db
+          .customSelect('SELECT * FROM consciousness_level_ref')
+          .map(
+            (row) => ConsciousnessLevelRefData(
+              id: row.read<int>('id'),
+              code: row.read<String>('code'),
+              name: row.read<String>('name'),
+              nameEn: row.readNullable<String>('name_en'),
+            ),
+          )
+          .get();
 
       debugPrint('  - 病史狀態: ${_historyStatusList.length}');
       debugPrint('  - 醫護角色: ${_medicalStaffRoleList.length}');
