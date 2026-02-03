@@ -2032,8 +2032,50 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
         return FilterChip(
           label: Text(item.name, style: const TextStyle(fontSize: 12)),
           selected: isSelected,
-          onSelected: (sel) {
-            // 使用 ViewModel 的多对多方法
+          onSelected: (sel) async {
+            // 若取消勾選，則清除對應資料
+            if (!sel) {
+              if (item.name == 'EKG心電圖') {
+                _ekgInterpretationController.clear();
+                viewModel.updateEkgInterpretation(null);
+              } else if (item.name == '血糖') {
+                _glucoseController.clear();
+                viewModel.updateGlucose(null);
+              } else if (item.name == '插管') {
+                setState(() => _intubationMethod = 'Endo');
+                viewModel.updateIntubationMethod(null);
+              } else if (item.name == '氧氣使用') {
+                setState(() => _oxygenMethod = '鼻管');
+                _oxygenFlowController.clear();
+                viewModel.updateOxygenMethod(null);
+                viewModel.updateOxygenFlow(null);
+              } else if (item.name == '診斷書') {
+                setState(() => _selectedCertTypes.clear());
+                viewModel.updateCertificateLogs(null);
+              } else if (item.name.contains('其')) {
+                _actionSummaryOtherController.clear();
+                viewModel.updateActionSummaryOther(null);
+              } else if (item.name == '建議轉診') {
+                setState(() {
+                  _clearanceMethod = '一般通關';
+                  _ambulanceSource = '醫療中心';
+                  _selectedTransferHospital = null;
+                  _selectedAccompanyingStaff = null;
+                });
+                viewModel.updateClearanceId(null);
+                viewModel.updateReferralHospitalId(null);
+                viewModel.updateReferralHospitalFinal(null);
+              } else if (item.name == '藥物使用') {
+                // 刪除所有藥物記錄
+                final medsToDelete = List<int>.from(
+                  viewModel.medications.map((m) => m.medicationId),
+                );
+                for (var id in medsToDelete) {
+                  await viewModel.deleteMedication(id);
+                }
+              }
+            }
+            // 使用 ViewModel 的多對多方法
             viewModel.toggleActionItem(item.id);
           },
           selectedColor: primaryColor.withValues(alpha: 0.1),
