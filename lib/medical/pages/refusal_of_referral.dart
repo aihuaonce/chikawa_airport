@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import '../widgets/signature_field.dart';
 import '../../data/models/medical/treatment_view.dart';
 
 class RefusalOfReferral extends StatefulWidget {
@@ -37,6 +39,7 @@ class _RefusalOfReferralState extends State<RefusalOfReferral> {
   bool _isSelf = true;
   String? _selectedDoctor; // 改為 nullable 以支援動態載入
   bool _isInitialized = false;
+  Uint8List? _signatorySignature;
 
   @override
   void initState() {
@@ -274,7 +277,12 @@ class _RefusalOfReferralState extends State<RefusalOfReferral> {
               flex: 2,
               child: _buildFieldWrapper(
                 '立切結書人簽署 Signature',
-                _buildSignaturePad('Digital Signature Area (請在此區域簽名)'),
+                SignatureField(
+                  placeholder: 'Digital Signature Area (請在此區域簽名)',
+                  value: _signatorySignature,
+                  onChanged: (data) =>
+                      setState(() => _signatorySignature = data),
+                ),
               ),
             ),
             const SizedBox(width: 24),
@@ -536,63 +544,6 @@ class _RefusalOfReferralState extends State<RefusalOfReferral> {
         controller.text = DateFormat('yyyy/MM/dd').format(picked);
       });
     }
-  }
-
-  Widget _buildSignaturePad(String placeholder) {
-    return AspectRatio(
-      aspectRatio: 2.5 / 1,
-      child: Container(
-        width: double.infinity,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border.all(color: borderColor, style: BorderStyle.solid),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Stack(
-          children: [
-            Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.draw_outlined, color: borderColor, size: 40),
-                  Text(
-                    placeholder,
-                    style: const TextStyle(
-                      color: textMuted,
-                      fontSize: 11,
-                      fontStyle: FontStyle.italic,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Positioned(
-              bottom: 12,
-              right: 12,
-              child: TextButton(
-                onPressed: () {},
-                style: TextButton.styleFrom(
-                  backgroundColor: primaryColor.withValues(alpha: 0.1),
-                  minimumSize: Size.zero,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
-                  ),
-                ),
-                child: const Text(
-                  '重寫 Clear',
-                  style: TextStyle(
-                    color: primaryColor,
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 
   // --- 基礎組件 ---

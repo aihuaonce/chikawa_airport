@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:signature/signature.dart';
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
 import '../../data/models/medical/treatment_view.dart';
 import '../../data/db/database.dart';
 import '../widgets/icd10_search_sheet.dart';
 import '../widgets/staff_search_sheet.dart';
 import '../widgets/reference_search_sheet.dart';
 import '../widgets/medication_edit_dialog.dart';
+import '../widgets/signature_field.dart';
 
 class TreatmentRecord extends StatefulWidget {
   final int medicalId;
@@ -1556,7 +1555,7 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
                               >(
                                 context,
                                 title: '選擇轉診醫院',
-                                searchFunction: viewModel.searchReferralHospitals,
+                                searchFunction: (q) => viewModel.searchReferralHospitals(q, includeAll: true),
                                 initialSelection: selectedHospital,
                                 isSelectedComparator: (a, b) => a.id == b?.id,
                                 itemBuilder: (context, item, isSelected) {
@@ -2284,26 +2283,26 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
                           children: [
                             _buildLabel('護理師簽章 Nurse Sign'),
                             const SizedBox(height: 4),
-                            _buildSignatureArea(
-                              context: context,
+                            SignatureField(
                               placeholder: '點擊簽名',
-                              signatureData: primaryNurse?.signature,
-                              onTap: () {
-                                if (primaryNurse == null) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text('請先選擇主責護理師')),
-                                  );
-                                  return;
-                                }
-                                _showSignatureDialog(context, '護理師簽章', (
-                                  data,
-                                ) async {
+                              value: primaryNurse?.signature,
+                              onChanged: (data) async {
+                                if (primaryNurse != null) {
                                   await viewModel.updateStaffSignature(
                                     primaryNurse.staffAssignmentId,
                                     data,
                                   );
-                                });
+                                }
                               },
+                              onTap: primaryNurse == null
+                                  ? () {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(
+                                          content: Text('請先選擇主責護理師'),
+                                        ),
+                                      );
+                                    }
+                                  : null,
                             ),
                           ],
                         ),
@@ -2367,25 +2366,24 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
                 children: [
                   _buildLabel('EMT 簽章 EMT Sign'),
                   const SizedBox(height: 4),
-                  _buildSignatureArea(
-                    context: context,
+                  SignatureField(
                     placeholder: '點擊簽名',
-                    signatureData: emtAssignment?.signature,
-                    onTap: () {
-                      if (emtAssignment == null) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('請先選擇 EMT')),
-                        );
-                        return;
-                      }
-
-                      _showSignatureDialog(context, 'EMT 簽章', (data) async {
+                    value: emtAssignment?.signature,
+                    onChanged: (data) async {
+                      if (emtAssignment != null) {
                         await viewModel.updateStaffSignature(
                           emtAssignment.staffAssignmentId,
                           data,
                         );
-                      });
+                      }
                     },
+                    onTap: emtAssignment == null
+                        ? () {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('請先選擇 EMT')),
+                            );
+                          }
+                        : null,
                   ),
                 ],
               ),
@@ -2472,102 +2470,6 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
         ],
       ],
     );
-  }
-
-  Widget _buildSignatureArea({
-    required BuildContext context,
-    required String placeholder,
-    required VoidCallback onTap,
-    Uint8List? signatureData,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        height: 80, // 增加高度以顯示簽名
-        width: double.infinity,
-        decoration: BoxDecoration(
-          color: bgField,
-          border: Border.all(color: borderColor, style: BorderStyle.solid),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: signatureData != null
-            ? ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: Image.memory(
-                  signatureData,
-                  fit: BoxFit.contain,
-                  width: double.infinity,
-                ),
-              )
-            : Center(
-                child: Text(
-                  placeholder,
-                  style: TextStyle(
-                    color: textMuted.withValues(alpha: 0.5),
-                    fontSize: 12,
-                    fontStyle: FontStyle.italic,
-                  ),
-                ),
-              ),
-      ),
-    );
-  }
-
-  Future<void> _showSignatureDialog(
-    BuildContext context,
-    String title,
-    Function(Uint8List) onConfirm,
-  ) async {
-    final SignatureController controller = SignatureController(
-      penStrokeWidth: 3,
-      penColor: Colors.black,
-      exportBackgroundColor: Colors.transparent,
-    );
-
-    await showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(title),
-        content: Container(
-          width: 500,
-          height: 300,
-          decoration: BoxDecoration(border: Border.all(color: Colors.grey)),
-          child: Signature(
-            controller: controller,
-            backgroundColor: Colors.white,
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => controller.clear(),
-            child: const Text('清除', style: TextStyle(color: Colors.red)),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('取消'),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              if (controller.isNotEmpty) {
-                final Uint8List? data = await controller.toPngBytes();
-                if (data != null) {
-                  onConfirm(data);
-                }
-              }
-              if (context.mounted) {
-                Navigator.of(context).pop();
-              }
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: primaryColor,
-              foregroundColor: Colors.white,
-            ),
-            child: const Text('確認'),
-          ),
-        ],
-      ),
-    );
-    controller.dispose();
   }
 
   Widget _buildSpecialNotesSection(TreatmentViewModel viewModel) {

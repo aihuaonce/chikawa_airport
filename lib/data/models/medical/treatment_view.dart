@@ -1134,8 +1134,22 @@ class TreatmentViewModel extends ChangeNotifier {
 
   void updateReferralHospitalId(int? hospitalId) {
     if (_treatment == null) return;
+    
+    // 如果選擇了特定醫院，自動同步到 referralHospitalFinal (後續結果的醫院名稱)
+    Value<String?>? newReferralHospitalFinal;
+    if (hospitalId != null) {
+      final hospital = getReferralHospitalById(hospitalId);
+      if (hospital != null && !hospital.isOther) {
+         // 如果是主要合約醫院（非 Other），同步名稱
+         newReferralHospitalFinal = Value(hospital.name);
+      }
+    }
+
     _updateTreatmentCacheAndSave(
-      _treatment!.copyWith(referralHospitalId: Value(hospitalId)),
+      _treatment!.copyWith(
+        referralHospitalId: Value(hospitalId),
+        referralHospitalFinal: newReferralHospitalFinal ?? const Value.absent(),
+      ),
     );
   }
 
@@ -1601,16 +1615,19 @@ class TreatmentViewModel extends ChangeNotifier {
   }
 
   Future<List<ReferralHospitalData>> searchReferralHospitals(
-    String keyword,
-  ) async {
+    String keyword, {
+    bool includeAll = false,
+  }) async {
     // 預設只顯示 'isOther' 為 true 的醫院 (排除主要合約醫院)
-    final otherHospitals = refService.referralHospitals
-        .where((h) => h.isOther)
-        .toList();
+    // 若 includeAll 為 true，則顯示所有醫院
+    final sourceList =
+        includeAll
+            ? refService.referralHospitals
+            : refService.referralHospitals.where((h) => h.isOther).toList();
 
-    if (keyword.isEmpty) return otherHospitals;
+    if (keyword.isEmpty) return sourceList;
     final lower = keyword.toLowerCase();
-    return otherHospitals
+    return sourceList
         .where((h) => h.name.toLowerCase().contains(lower))
         .toList();
   }

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import '../widgets/signature_field.dart';
 import '../../data/db/database.dart';
 import '../../data/models/medical/medical_fee_view.dart';
 import '../../data/models/reference_service.dart';
@@ -23,6 +25,10 @@ class _MedicalFeesState extends State<MedicalFees> {
   String _selfPayType = '現金';
   bool _receiptIssued = false;
   bool _userAgreed = false;
+  
+  Uint8List? _consenterSignature;
+  Uint8List? _witnessSignature;
+  Uint8List? _counterSignature;
 
   // 費用從 ViewModel 取得
   double get _consultFee =>
@@ -246,11 +252,15 @@ class _MedicalFeesState extends State<MedicalFees> {
             ),
           ],
           if (paymentMethodName == '總院會核代收') ...[
-            const SizedBox(height: 16),
-            _buildFieldWrapper(
-              '急診櫃檯簽收框 Counter Receipt',
-              _buildSignaturePad('Emergency Counter Signature Area'),
+            const SizedBox(height: 24),
+            _buildLabel('緊急醫療救護人員簽章 Emergency Counter Signature Area'),
+            const SizedBox(height: 8),
+            SignatureField(
+              placeholder: '點擊簽名',
+              value: _counterSignature,
+              onChanged: (data) => setState(() => _counterSignature = data),
             ),
+            const SizedBox(height: 40),
           ],
           if (paymentMethodName == '收費異常') ...[
             const SizedBox(height: 16),
@@ -613,60 +623,6 @@ class _MedicalFeesState extends State<MedicalFees> {
     );
   }
 
-  Widget _buildSignaturePad(String placeholder) {
-    return AspectRatio(
-      aspectRatio: 2.5 / 1,
-      child: Container(
-        width: double.infinity,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border.all(color: borderColor),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Stack(
-          children: [
-            Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.draw_outlined, color: borderColor, size: 36),
-                  const SizedBox(height: 4),
-                  Text(
-                    placeholder,
-                    style: const TextStyle(
-                      color: textMuted,
-                      fontSize: 10,
-                      fontStyle: FontStyle.italic,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Positioned(
-              bottom: 8,
-              right: 8,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: primaryColor.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: const Text(
-                  '重簽 CLEAR',
-                  style: TextStyle(
-                    color: primaryColor,
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget _buildConsentBox() {
     Color activeCol = _userAgreed ? primaryColor : Colors.grey;
     return InkWell(
@@ -724,7 +680,19 @@ class _MedicalFeesState extends State<MedicalFees> {
       children: [
         _buildLabel(label),
         const SizedBox(height: 8),
-        _buildSignaturePad('Digital Signature Area'),
+        SignatureField(
+          placeholder: '點擊簽名',
+          value: label.contains('同意人') ? _consenterSignature : _witnessSignature,
+          onChanged: (data) {
+            setState(() {
+              if (label.contains('同意人')) {
+                _consenterSignature = data;
+              } else {
+                _witnessSignature = data;
+              }
+            });
+          },
+        ),
       ],
     );
   }
