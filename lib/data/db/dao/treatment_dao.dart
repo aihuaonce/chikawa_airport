@@ -18,11 +18,32 @@ part 'treatment_dao.g.dart';
     ChiefComplaintSymptomLinks,
     TreatmentActionLinks,
     SpecialNoteLinks,
+    Medications,
   ],
 )
 class TreatmentDao extends DatabaseAccessor<AppDatabase>
     with _$TreatmentDaoMixin {
   TreatmentDao(super.db);
+
+  // 藥物記錄 CRUD
+  Future<int> insertMedication(MedicationsCompanion data) {
+    return into(medications).insert(data);
+  }
+
+  Future<List<MedicationData>> getMedications(int medicalId) {
+    return (select(medications)..where((t) => t.medicalId.equals(medicalId)))
+        .get();
+  }
+
+  Future<bool> updateMedication(MedicationsCompanion data) {
+    return update(medications).replace(data);
+  }
+
+  Future<int> deleteMedication(int medicationId) {
+    return (delete(medications)
+          ..where((t) => t.medicationId.equals(medicationId)))
+        .go();
+  }
 
   // CDC 健康評估
 

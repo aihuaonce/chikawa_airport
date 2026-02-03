@@ -9536,6 +9536,354 @@ class ConsciousnessLevelRefCompanion
   }
 }
 
+class $DrugRefTable extends DrugRef with TableInfo<$DrugRefTable, DrugRefData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $DrugRefTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _categoryMeta = const VerificationMeta(
+    'category',
+  );
+  @override
+  late final GeneratedColumn<String> category = GeneratedColumn<String>(
+    'category',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sortOrderMeta = const VerificationMeta(
+    'sortOrder',
+  );
+  @override
+  late final GeneratedColumn<int> sortOrder = GeneratedColumn<int>(
+    'sort_order',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _isActiveMeta = const VerificationMeta(
+    'isActive',
+  );
+  @override
+  late final GeneratedColumn<bool> isActive = GeneratedColumn<bool>(
+    'is_active',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_active" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    category,
+    name,
+    sortOrder,
+    isActive,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'drug_ref';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<DrugRefData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('category')) {
+      context.handle(
+        _categoryMeta,
+        category.isAcceptableOrUnknown(data['category']!, _categoryMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_categoryMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('sort_order')) {
+      context.handle(
+        _sortOrderMeta,
+        sortOrder.isAcceptableOrUnknown(data['sort_order']!, _sortOrderMeta),
+      );
+    }
+    if (data.containsKey('is_active')) {
+      context.handle(
+        _isActiveMeta,
+        isActive.isAcceptableOrUnknown(data['is_active']!, _isActiveMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  DrugRefData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return DrugRefData(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      category: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}category'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      sortOrder: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}sort_order'],
+      )!,
+      isActive: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_active'],
+      )!,
+    );
+  }
+
+  @override
+  $DrugRefTable createAlias(String alias) {
+    return $DrugRefTable(attachedDatabase, alias);
+  }
+}
+
+class DrugRefData extends DataClass implements Insertable<DrugRefData> {
+  final int id;
+  final String category;
+  final String name;
+  final int sortOrder;
+  final bool isActive;
+  const DrugRefData({
+    required this.id,
+    required this.category,
+    required this.name,
+    required this.sortOrder,
+    required this.isActive,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['category'] = Variable<String>(category);
+    map['name'] = Variable<String>(name);
+    map['sort_order'] = Variable<int>(sortOrder);
+    map['is_active'] = Variable<bool>(isActive);
+    return map;
+  }
+
+  DrugRefCompanion toCompanion(bool nullToAbsent) {
+    return DrugRefCompanion(
+      id: Value(id),
+      category: Value(category),
+      name: Value(name),
+      sortOrder: Value(sortOrder),
+      isActive: Value(isActive),
+    );
+  }
+
+  factory DrugRefData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return DrugRefData(
+      id: serializer.fromJson<int>(json['id']),
+      category: serializer.fromJson<String>(json['category']),
+      name: serializer.fromJson<String>(json['name']),
+      sortOrder: serializer.fromJson<int>(json['sortOrder']),
+      isActive: serializer.fromJson<bool>(json['isActive']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'category': serializer.toJson<String>(category),
+      'name': serializer.toJson<String>(name),
+      'sortOrder': serializer.toJson<int>(sortOrder),
+      'isActive': serializer.toJson<bool>(isActive),
+    };
+  }
+
+  DrugRefData copyWith({
+    int? id,
+    String? category,
+    String? name,
+    int? sortOrder,
+    bool? isActive,
+  }) => DrugRefData(
+    id: id ?? this.id,
+    category: category ?? this.category,
+    name: name ?? this.name,
+    sortOrder: sortOrder ?? this.sortOrder,
+    isActive: isActive ?? this.isActive,
+  );
+  DrugRefData copyWithCompanion(DrugRefCompanion data) {
+    return DrugRefData(
+      id: data.id.present ? data.id.value : this.id,
+      category: data.category.present ? data.category.value : this.category,
+      name: data.name.present ? data.name.value : this.name,
+      sortOrder: data.sortOrder.present ? data.sortOrder.value : this.sortOrder,
+      isActive: data.isActive.present ? data.isActive.value : this.isActive,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DrugRefData(')
+          ..write('id: $id, ')
+          ..write('category: $category, ')
+          ..write('name: $name, ')
+          ..write('sortOrder: $sortOrder, ')
+          ..write('isActive: $isActive')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, category, name, sortOrder, isActive);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is DrugRefData &&
+          other.id == this.id &&
+          other.category == this.category &&
+          other.name == this.name &&
+          other.sortOrder == this.sortOrder &&
+          other.isActive == this.isActive);
+}
+
+class DrugRefCompanion extends UpdateCompanion<DrugRefData> {
+  final Value<int> id;
+  final Value<String> category;
+  final Value<String> name;
+  final Value<int> sortOrder;
+  final Value<bool> isActive;
+  const DrugRefCompanion({
+    this.id = const Value.absent(),
+    this.category = const Value.absent(),
+    this.name = const Value.absent(),
+    this.sortOrder = const Value.absent(),
+    this.isActive = const Value.absent(),
+  });
+  DrugRefCompanion.insert({
+    this.id = const Value.absent(),
+    required String category,
+    required String name,
+    this.sortOrder = const Value.absent(),
+    this.isActive = const Value.absent(),
+  }) : category = Value(category),
+       name = Value(name);
+  static Insertable<DrugRefData> custom({
+    Expression<int>? id,
+    Expression<String>? category,
+    Expression<String>? name,
+    Expression<int>? sortOrder,
+    Expression<bool>? isActive,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (category != null) 'category': category,
+      if (name != null) 'name': name,
+      if (sortOrder != null) 'sort_order': sortOrder,
+      if (isActive != null) 'is_active': isActive,
+    });
+  }
+
+  DrugRefCompanion copyWith({
+    Value<int>? id,
+    Value<String>? category,
+    Value<String>? name,
+    Value<int>? sortOrder,
+    Value<bool>? isActive,
+  }) {
+    return DrugRefCompanion(
+      id: id ?? this.id,
+      category: category ?? this.category,
+      name: name ?? this.name,
+      sortOrder: sortOrder ?? this.sortOrder,
+      isActive: isActive ?? this.isActive,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (category.present) {
+      map['category'] = Variable<String>(category.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (sortOrder.present) {
+      map['sort_order'] = Variable<int>(sortOrder.value);
+    }
+    if (isActive.present) {
+      map['is_active'] = Variable<bool>(isActive.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DrugRefCompanion(')
+          ..write('id: $id, ')
+          ..write('category: $category, ')
+          ..write('name: $name, ')
+          ..write('sortOrder: $sortOrder, ')
+          ..write('isActive: $isActive')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $MedicalRecordTable extends MedicalRecord
     with TableInfo<$MedicalRecordTable, MedicalRecordData> {
   @override
@@ -16743,6 +17091,73 @@ class $TreatmentTable extends Treatment
         type: DriftSqlType.string,
         requiredDuringInsert: false,
       );
+  static const VerificationMeta _ekgInterpretationMeta = const VerificationMeta(
+    'ekgInterpretation',
+  );
+  @override
+  late final GeneratedColumn<String> ekgInterpretation =
+      GeneratedColumn<String>(
+        'ekg_interpretation',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _glucoseMeta = const VerificationMeta(
+    'glucose',
+  );
+  @override
+  late final GeneratedColumn<String> glucose = GeneratedColumn<String>(
+    'glucose',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _intubationMethodMeta = const VerificationMeta(
+    'intubationMethod',
+  );
+  @override
+  late final GeneratedColumn<String> intubationMethod = GeneratedColumn<String>(
+    'intubation_method',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _oxygenMethodMeta = const VerificationMeta(
+    'oxygenMethod',
+  );
+  @override
+  late final GeneratedColumn<String> oxygenMethod = GeneratedColumn<String>(
+    'oxygen_method',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _oxygenFlowMeta = const VerificationMeta(
+    'oxygenFlow',
+  );
+  @override
+  late final GeneratedColumn<double> oxygenFlow = GeneratedColumn<double>(
+    'oxygen_flow',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _certificateLogsMeta = const VerificationMeta(
+    'certificateLogs',
+  );
+  @override
+  late final GeneratedColumn<String> certificateLogs = GeneratedColumn<String>(
+    'certificate_logs',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _resultIdMeta = const VerificationMeta(
     'resultId',
   );
@@ -16901,6 +17316,12 @@ class $TreatmentTable extends Treatment
     treatmentOnSiteId,
     actionSummary,
     actionSummaryOther,
+    ekgInterpretation,
+    glucose,
+    intubationMethod,
+    oxygenMethod,
+    oxygenFlow,
+    certificateLogs,
     resultId,
     transportRequired,
     transportMethod,
@@ -17007,6 +17428,54 @@ class $TreatmentTable extends Treatment
         actionSummaryOther.isAcceptableOrUnknown(
           data['action_summary_other']!,
           _actionSummaryOtherMeta,
+        ),
+      );
+    }
+    if (data.containsKey('ekg_interpretation')) {
+      context.handle(
+        _ekgInterpretationMeta,
+        ekgInterpretation.isAcceptableOrUnknown(
+          data['ekg_interpretation']!,
+          _ekgInterpretationMeta,
+        ),
+      );
+    }
+    if (data.containsKey('glucose')) {
+      context.handle(
+        _glucoseMeta,
+        glucose.isAcceptableOrUnknown(data['glucose']!, _glucoseMeta),
+      );
+    }
+    if (data.containsKey('intubation_method')) {
+      context.handle(
+        _intubationMethodMeta,
+        intubationMethod.isAcceptableOrUnknown(
+          data['intubation_method']!,
+          _intubationMethodMeta,
+        ),
+      );
+    }
+    if (data.containsKey('oxygen_method')) {
+      context.handle(
+        _oxygenMethodMeta,
+        oxygenMethod.isAcceptableOrUnknown(
+          data['oxygen_method']!,
+          _oxygenMethodMeta,
+        ),
+      );
+    }
+    if (data.containsKey('oxygen_flow')) {
+      context.handle(
+        _oxygenFlowMeta,
+        oxygenFlow.isAcceptableOrUnknown(data['oxygen_flow']!, _oxygenFlowMeta),
+      );
+    }
+    if (data.containsKey('certificate_logs')) {
+      context.handle(
+        _certificateLogsMeta,
+        certificateLogs.isAcceptableOrUnknown(
+          data['certificate_logs']!,
+          _certificateLogsMeta,
         ),
       );
     }
@@ -17173,6 +17642,30 @@ class $TreatmentTable extends Treatment
         DriftSqlType.string,
         data['${effectivePrefix}action_summary_other'],
       ),
+      ekgInterpretation: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}ekg_interpretation'],
+      ),
+      glucose: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}glucose'],
+      ),
+      intubationMethod: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}intubation_method'],
+      ),
+      oxygenMethod: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}oxygen_method'],
+      ),
+      oxygenFlow: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}oxygen_flow'],
+      ),
+      certificateLogs: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}certificate_logs'],
+      ),
       resultId: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}result_id'],
@@ -17245,6 +17738,12 @@ class TreatmentData extends DataClass implements Insertable<TreatmentData> {
   final int? treatmentOnSiteId;
   final String? actionSummary;
   final String? actionSummaryOther;
+  final String? ekgInterpretation;
+  final String? glucose;
+  final String? intubationMethod;
+  final String? oxygenMethod;
+  final double? oxygenFlow;
+  final String? certificateLogs;
   final int? resultId;
   final bool? transportRequired;
   final String? transportMethod;
@@ -17269,6 +17768,12 @@ class TreatmentData extends DataClass implements Insertable<TreatmentData> {
     this.treatmentOnSiteId,
     this.actionSummary,
     this.actionSummaryOther,
+    this.ekgInterpretation,
+    this.glucose,
+    this.intubationMethod,
+    this.oxygenMethod,
+    this.oxygenFlow,
+    this.certificateLogs,
     this.resultId,
     this.transportRequired,
     this.transportMethod,
@@ -17311,6 +17816,24 @@ class TreatmentData extends DataClass implements Insertable<TreatmentData> {
     }
     if (!nullToAbsent || actionSummaryOther != null) {
       map['action_summary_other'] = Variable<String>(actionSummaryOther);
+    }
+    if (!nullToAbsent || ekgInterpretation != null) {
+      map['ekg_interpretation'] = Variable<String>(ekgInterpretation);
+    }
+    if (!nullToAbsent || glucose != null) {
+      map['glucose'] = Variable<String>(glucose);
+    }
+    if (!nullToAbsent || intubationMethod != null) {
+      map['intubation_method'] = Variable<String>(intubationMethod);
+    }
+    if (!nullToAbsent || oxygenMethod != null) {
+      map['oxygen_method'] = Variable<String>(oxygenMethod);
+    }
+    if (!nullToAbsent || oxygenFlow != null) {
+      map['oxygen_flow'] = Variable<double>(oxygenFlow);
+    }
+    if (!nullToAbsent || certificateLogs != null) {
+      map['certificate_logs'] = Variable<String>(certificateLogs);
     }
     if (!nullToAbsent || resultId != null) {
       map['result_id'] = Variable<int>(resultId);
@@ -17380,6 +17903,24 @@ class TreatmentData extends DataClass implements Insertable<TreatmentData> {
       actionSummaryOther: actionSummaryOther == null && nullToAbsent
           ? const Value.absent()
           : Value(actionSummaryOther),
+      ekgInterpretation: ekgInterpretation == null && nullToAbsent
+          ? const Value.absent()
+          : Value(ekgInterpretation),
+      glucose: glucose == null && nullToAbsent
+          ? const Value.absent()
+          : Value(glucose),
+      intubationMethod: intubationMethod == null && nullToAbsent
+          ? const Value.absent()
+          : Value(intubationMethod),
+      oxygenMethod: oxygenMethod == null && nullToAbsent
+          ? const Value.absent()
+          : Value(oxygenMethod),
+      oxygenFlow: oxygenFlow == null && nullToAbsent
+          ? const Value.absent()
+          : Value(oxygenFlow),
+      certificateLogs: certificateLogs == null && nullToAbsent
+          ? const Value.absent()
+          : Value(certificateLogs),
       resultId: resultId == null && nullToAbsent
           ? const Value.absent()
           : Value(resultId),
@@ -17444,6 +17985,14 @@ class TreatmentData extends DataClass implements Insertable<TreatmentData> {
       actionSummaryOther: serializer.fromJson<String?>(
         json['actionSummaryOther'],
       ),
+      ekgInterpretation: serializer.fromJson<String?>(
+        json['ekgInterpretation'],
+      ),
+      glucose: serializer.fromJson<String?>(json['glucose']),
+      intubationMethod: serializer.fromJson<String?>(json['intubationMethod']),
+      oxygenMethod: serializer.fromJson<String?>(json['oxygenMethod']),
+      oxygenFlow: serializer.fromJson<double?>(json['oxygenFlow']),
+      certificateLogs: serializer.fromJson<String?>(json['certificateLogs']),
       resultId: serializer.fromJson<int?>(json['resultId']),
       transportRequired: serializer.fromJson<bool?>(json['transportRequired']),
       transportMethod: serializer.fromJson<String?>(json['transportMethod']),
@@ -17477,6 +18026,12 @@ class TreatmentData extends DataClass implements Insertable<TreatmentData> {
       'treatmentOnSiteId': serializer.toJson<int?>(treatmentOnSiteId),
       'actionSummary': serializer.toJson<String?>(actionSummary),
       'actionSummaryOther': serializer.toJson<String?>(actionSummaryOther),
+      'ekgInterpretation': serializer.toJson<String?>(ekgInterpretation),
+      'glucose': serializer.toJson<String?>(glucose),
+      'intubationMethod': serializer.toJson<String?>(intubationMethod),
+      'oxygenMethod': serializer.toJson<String?>(oxygenMethod),
+      'oxygenFlow': serializer.toJson<double?>(oxygenFlow),
+      'certificateLogs': serializer.toJson<String?>(certificateLogs),
       'resultId': serializer.toJson<int?>(resultId),
       'transportRequired': serializer.toJson<bool?>(transportRequired),
       'transportMethod': serializer.toJson<String?>(transportMethod),
@@ -17506,6 +18061,12 @@ class TreatmentData extends DataClass implements Insertable<TreatmentData> {
     Value<int?> treatmentOnSiteId = const Value.absent(),
     Value<String?> actionSummary = const Value.absent(),
     Value<String?> actionSummaryOther = const Value.absent(),
+    Value<String?> ekgInterpretation = const Value.absent(),
+    Value<String?> glucose = const Value.absent(),
+    Value<String?> intubationMethod = const Value.absent(),
+    Value<String?> oxygenMethod = const Value.absent(),
+    Value<double?> oxygenFlow = const Value.absent(),
+    Value<String?> certificateLogs = const Value.absent(),
     Value<int?> resultId = const Value.absent(),
     Value<bool?> transportRequired = const Value.absent(),
     Value<String?> transportMethod = const Value.absent(),
@@ -17542,6 +18103,18 @@ class TreatmentData extends DataClass implements Insertable<TreatmentData> {
     actionSummaryOther: actionSummaryOther.present
         ? actionSummaryOther.value
         : this.actionSummaryOther,
+    ekgInterpretation: ekgInterpretation.present
+        ? ekgInterpretation.value
+        : this.ekgInterpretation,
+    glucose: glucose.present ? glucose.value : this.glucose,
+    intubationMethod: intubationMethod.present
+        ? intubationMethod.value
+        : this.intubationMethod,
+    oxygenMethod: oxygenMethod.present ? oxygenMethod.value : this.oxygenMethod,
+    oxygenFlow: oxygenFlow.present ? oxygenFlow.value : this.oxygenFlow,
+    certificateLogs: certificateLogs.present
+        ? certificateLogs.value
+        : this.certificateLogs,
     resultId: resultId.present ? resultId.value : this.resultId,
     transportRequired: transportRequired.present
         ? transportRequired.value
@@ -17596,6 +18169,22 @@ class TreatmentData extends DataClass implements Insertable<TreatmentData> {
       actionSummaryOther: data.actionSummaryOther.present
           ? data.actionSummaryOther.value
           : this.actionSummaryOther,
+      ekgInterpretation: data.ekgInterpretation.present
+          ? data.ekgInterpretation.value
+          : this.ekgInterpretation,
+      glucose: data.glucose.present ? data.glucose.value : this.glucose,
+      intubationMethod: data.intubationMethod.present
+          ? data.intubationMethod.value
+          : this.intubationMethod,
+      oxygenMethod: data.oxygenMethod.present
+          ? data.oxygenMethod.value
+          : this.oxygenMethod,
+      oxygenFlow: data.oxygenFlow.present
+          ? data.oxygenFlow.value
+          : this.oxygenFlow,
+      certificateLogs: data.certificateLogs.present
+          ? data.certificateLogs.value
+          : this.certificateLogs,
       resultId: data.resultId.present ? data.resultId.value : this.resultId,
       transportRequired: data.transportRequired.present
           ? data.transportRequired.value
@@ -17649,6 +18238,12 @@ class TreatmentData extends DataClass implements Insertable<TreatmentData> {
           ..write('treatmentOnSiteId: $treatmentOnSiteId, ')
           ..write('actionSummary: $actionSummary, ')
           ..write('actionSummaryOther: $actionSummaryOther, ')
+          ..write('ekgInterpretation: $ekgInterpretation, ')
+          ..write('glucose: $glucose, ')
+          ..write('intubationMethod: $intubationMethod, ')
+          ..write('oxygenMethod: $oxygenMethod, ')
+          ..write('oxygenFlow: $oxygenFlow, ')
+          ..write('certificateLogs: $certificateLogs, ')
           ..write('resultId: $resultId, ')
           ..write('transportRequired: $transportRequired, ')
           ..write('transportMethod: $transportMethod, ')
@@ -17678,6 +18273,12 @@ class TreatmentData extends DataClass implements Insertable<TreatmentData> {
     treatmentOnSiteId,
     actionSummary,
     actionSummaryOther,
+    ekgInterpretation,
+    glucose,
+    intubationMethod,
+    oxygenMethod,
+    oxygenFlow,
+    certificateLogs,
     resultId,
     transportRequired,
     transportMethod,
@@ -17706,6 +18307,12 @@ class TreatmentData extends DataClass implements Insertable<TreatmentData> {
           other.treatmentOnSiteId == this.treatmentOnSiteId &&
           other.actionSummary == this.actionSummary &&
           other.actionSummaryOther == this.actionSummaryOther &&
+          other.ekgInterpretation == this.ekgInterpretation &&
+          other.glucose == this.glucose &&
+          other.intubationMethod == this.intubationMethod &&
+          other.oxygenMethod == this.oxygenMethod &&
+          other.oxygenFlow == this.oxygenFlow &&
+          other.certificateLogs == this.certificateLogs &&
           other.resultId == this.resultId &&
           other.transportRequired == this.transportRequired &&
           other.transportMethod == this.transportMethod &&
@@ -17732,6 +18339,12 @@ class TreatmentCompanion extends UpdateCompanion<TreatmentData> {
   final Value<int?> treatmentOnSiteId;
   final Value<String?> actionSummary;
   final Value<String?> actionSummaryOther;
+  final Value<String?> ekgInterpretation;
+  final Value<String?> glucose;
+  final Value<String?> intubationMethod;
+  final Value<String?> oxygenMethod;
+  final Value<double?> oxygenFlow;
+  final Value<String?> certificateLogs;
   final Value<int?> resultId;
   final Value<bool?> transportRequired;
   final Value<String?> transportMethod;
@@ -17756,6 +18369,12 @@ class TreatmentCompanion extends UpdateCompanion<TreatmentData> {
     this.treatmentOnSiteId = const Value.absent(),
     this.actionSummary = const Value.absent(),
     this.actionSummaryOther = const Value.absent(),
+    this.ekgInterpretation = const Value.absent(),
+    this.glucose = const Value.absent(),
+    this.intubationMethod = const Value.absent(),
+    this.oxygenMethod = const Value.absent(),
+    this.oxygenFlow = const Value.absent(),
+    this.certificateLogs = const Value.absent(),
     this.resultId = const Value.absent(),
     this.transportRequired = const Value.absent(),
     this.transportMethod = const Value.absent(),
@@ -17781,6 +18400,12 @@ class TreatmentCompanion extends UpdateCompanion<TreatmentData> {
     this.treatmentOnSiteId = const Value.absent(),
     this.actionSummary = const Value.absent(),
     this.actionSummaryOther = const Value.absent(),
+    this.ekgInterpretation = const Value.absent(),
+    this.glucose = const Value.absent(),
+    this.intubationMethod = const Value.absent(),
+    this.oxygenMethod = const Value.absent(),
+    this.oxygenFlow = const Value.absent(),
+    this.certificateLogs = const Value.absent(),
     this.resultId = const Value.absent(),
     this.transportRequired = const Value.absent(),
     this.transportMethod = const Value.absent(),
@@ -17806,6 +18431,12 @@ class TreatmentCompanion extends UpdateCompanion<TreatmentData> {
     Expression<int>? treatmentOnSiteId,
     Expression<String>? actionSummary,
     Expression<String>? actionSummaryOther,
+    Expression<String>? ekgInterpretation,
+    Expression<String>? glucose,
+    Expression<String>? intubationMethod,
+    Expression<String>? oxygenMethod,
+    Expression<double>? oxygenFlow,
+    Expression<String>? certificateLogs,
     Expression<int>? resultId,
     Expression<bool>? transportRequired,
     Expression<String>? transportMethod,
@@ -17835,6 +18466,12 @@ class TreatmentCompanion extends UpdateCompanion<TreatmentData> {
       if (actionSummary != null) 'action_summary': actionSummary,
       if (actionSummaryOther != null)
         'action_summary_other': actionSummaryOther,
+      if (ekgInterpretation != null) 'ekg_interpretation': ekgInterpretation,
+      if (glucose != null) 'glucose': glucose,
+      if (intubationMethod != null) 'intubation_method': intubationMethod,
+      if (oxygenMethod != null) 'oxygen_method': oxygenMethod,
+      if (oxygenFlow != null) 'oxygen_flow': oxygenFlow,
+      if (certificateLogs != null) 'certificate_logs': certificateLogs,
       if (resultId != null) 'result_id': resultId,
       if (transportRequired != null) 'transport_required': transportRequired,
       if (transportMethod != null) 'transport_method': transportMethod,
@@ -17865,6 +18502,12 @@ class TreatmentCompanion extends UpdateCompanion<TreatmentData> {
     Value<int?>? treatmentOnSiteId,
     Value<String?>? actionSummary,
     Value<String?>? actionSummaryOther,
+    Value<String?>? ekgInterpretation,
+    Value<String?>? glucose,
+    Value<String?>? intubationMethod,
+    Value<String?>? oxygenMethod,
+    Value<double?>? oxygenFlow,
+    Value<String?>? certificateLogs,
     Value<int?>? resultId,
     Value<bool?>? transportRequired,
     Value<String?>? transportMethod,
@@ -17890,6 +18533,12 @@ class TreatmentCompanion extends UpdateCompanion<TreatmentData> {
       treatmentOnSiteId: treatmentOnSiteId ?? this.treatmentOnSiteId,
       actionSummary: actionSummary ?? this.actionSummary,
       actionSummaryOther: actionSummaryOther ?? this.actionSummaryOther,
+      ekgInterpretation: ekgInterpretation ?? this.ekgInterpretation,
+      glucose: glucose ?? this.glucose,
+      intubationMethod: intubationMethod ?? this.intubationMethod,
+      oxygenMethod: oxygenMethod ?? this.oxygenMethod,
+      oxygenFlow: oxygenFlow ?? this.oxygenFlow,
+      certificateLogs: certificateLogs ?? this.certificateLogs,
       resultId: resultId ?? this.resultId,
       transportRequired: transportRequired ?? this.transportRequired,
       transportMethod: transportMethod ?? this.transportMethod,
@@ -17939,6 +18588,24 @@ class TreatmentCompanion extends UpdateCompanion<TreatmentData> {
     }
     if (actionSummaryOther.present) {
       map['action_summary_other'] = Variable<String>(actionSummaryOther.value);
+    }
+    if (ekgInterpretation.present) {
+      map['ekg_interpretation'] = Variable<String>(ekgInterpretation.value);
+    }
+    if (glucose.present) {
+      map['glucose'] = Variable<String>(glucose.value);
+    }
+    if (intubationMethod.present) {
+      map['intubation_method'] = Variable<String>(intubationMethod.value);
+    }
+    if (oxygenMethod.present) {
+      map['oxygen_method'] = Variable<String>(oxygenMethod.value);
+    }
+    if (oxygenFlow.present) {
+      map['oxygen_flow'] = Variable<double>(oxygenFlow.value);
+    }
+    if (certificateLogs.present) {
+      map['certificate_logs'] = Variable<String>(certificateLogs.value);
     }
     if (resultId.present) {
       map['result_id'] = Variable<int>(resultId.value);
@@ -17997,6 +18664,12 @@ class TreatmentCompanion extends UpdateCompanion<TreatmentData> {
           ..write('treatmentOnSiteId: $treatmentOnSiteId, ')
           ..write('actionSummary: $actionSummary, ')
           ..write('actionSummaryOther: $actionSummaryOther, ')
+          ..write('ekgInterpretation: $ekgInterpretation, ')
+          ..write('glucose: $glucose, ')
+          ..write('intubationMethod: $intubationMethod, ')
+          ..write('oxygenMethod: $oxygenMethod, ')
+          ..write('oxygenFlow: $oxygenFlow, ')
+          ..write('certificateLogs: $certificateLogs, ')
           ..write('resultId: $resultId, ')
           ..write('transportRequired: $transportRequired, ')
           ..write('transportMethod: $transportMethod, ')
@@ -23821,6 +24494,604 @@ class SpecialNoteLinksCompanion extends UpdateCompanion<SpecialNoteLink> {
   }
 }
 
+class $MedicationsTable extends Medications
+    with TableInfo<$MedicationsTable, MedicationData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $MedicationsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _medicationIdMeta = const VerificationMeta(
+    'medicationId',
+  );
+  @override
+  late final GeneratedColumn<int> medicationId = GeneratedColumn<int>(
+    'medication_id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _medicalIdMeta = const VerificationMeta(
+    'medicalId',
+  );
+  @override
+  late final GeneratedColumn<int> medicalId = GeneratedColumn<int>(
+    'medical_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES medical_record (medical_id)',
+    ),
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _methodMeta = const VerificationMeta('method');
+  @override
+  late final GeneratedColumn<String> method = GeneratedColumn<String>(
+    'method',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _frequencyMeta = const VerificationMeta(
+    'frequency',
+  );
+  @override
+  late final GeneratedColumn<String> frequency = GeneratedColumn<String>(
+    'frequency',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _daysMeta = const VerificationMeta('days');
+  @override
+  late final GeneratedColumn<String> days = GeneratedColumn<String>(
+    'days',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _doseMeta = const VerificationMeta('dose');
+  @override
+  late final GeneratedColumn<String> dose = GeneratedColumn<String>(
+    'dose',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _unitMeta = const VerificationMeta('unit');
+  @override
+  late final GeneratedColumn<String> unit = GeneratedColumn<String>(
+    'unit',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _remarksMeta = const VerificationMeta(
+    'remarks',
+  );
+  @override
+  late final GeneratedColumn<String> remarks = GeneratedColumn<String>(
+    'remarks',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    medicationId,
+    medicalId,
+    name,
+    method,
+    frequency,
+    days,
+    dose,
+    unit,
+    remarks,
+    createdAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'medications';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<MedicationData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('medication_id')) {
+      context.handle(
+        _medicationIdMeta,
+        medicationId.isAcceptableOrUnknown(
+          data['medication_id']!,
+          _medicationIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('medical_id')) {
+      context.handle(
+        _medicalIdMeta,
+        medicalId.isAcceptableOrUnknown(data['medical_id']!, _medicalIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_medicalIdMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    }
+    if (data.containsKey('method')) {
+      context.handle(
+        _methodMeta,
+        method.isAcceptableOrUnknown(data['method']!, _methodMeta),
+      );
+    }
+    if (data.containsKey('frequency')) {
+      context.handle(
+        _frequencyMeta,
+        frequency.isAcceptableOrUnknown(data['frequency']!, _frequencyMeta),
+      );
+    }
+    if (data.containsKey('days')) {
+      context.handle(
+        _daysMeta,
+        days.isAcceptableOrUnknown(data['days']!, _daysMeta),
+      );
+    }
+    if (data.containsKey('dose')) {
+      context.handle(
+        _doseMeta,
+        dose.isAcceptableOrUnknown(data['dose']!, _doseMeta),
+      );
+    }
+    if (data.containsKey('unit')) {
+      context.handle(
+        _unitMeta,
+        unit.isAcceptableOrUnknown(data['unit']!, _unitMeta),
+      );
+    }
+    if (data.containsKey('remarks')) {
+      context.handle(
+        _remarksMeta,
+        remarks.isAcceptableOrUnknown(data['remarks']!, _remarksMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {medicationId};
+  @override
+  MedicationData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return MedicationData(
+      medicationId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}medication_id'],
+      )!,
+      medicalId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}medical_id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      ),
+      method: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}method'],
+      ),
+      frequency: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}frequency'],
+      ),
+      days: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}days'],
+      ),
+      dose: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}dose'],
+      ),
+      unit: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}unit'],
+      ),
+      remarks: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}remarks'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+    );
+  }
+
+  @override
+  $MedicationsTable createAlias(String alias) {
+    return $MedicationsTable(attachedDatabase, alias);
+  }
+}
+
+class MedicationData extends DataClass implements Insertable<MedicationData> {
+  final int medicationId;
+  final int medicalId;
+  final String? name;
+  final String? method;
+  final String? frequency;
+  final String? days;
+  final String? dose;
+  final String? unit;
+  final String? remarks;
+  final DateTime createdAt;
+  const MedicationData({
+    required this.medicationId,
+    required this.medicalId,
+    this.name,
+    this.method,
+    this.frequency,
+    this.days,
+    this.dose,
+    this.unit,
+    this.remarks,
+    required this.createdAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['medication_id'] = Variable<int>(medicationId);
+    map['medical_id'] = Variable<int>(medicalId);
+    if (!nullToAbsent || name != null) {
+      map['name'] = Variable<String>(name);
+    }
+    if (!nullToAbsent || method != null) {
+      map['method'] = Variable<String>(method);
+    }
+    if (!nullToAbsent || frequency != null) {
+      map['frequency'] = Variable<String>(frequency);
+    }
+    if (!nullToAbsent || days != null) {
+      map['days'] = Variable<String>(days);
+    }
+    if (!nullToAbsent || dose != null) {
+      map['dose'] = Variable<String>(dose);
+    }
+    if (!nullToAbsent || unit != null) {
+      map['unit'] = Variable<String>(unit);
+    }
+    if (!nullToAbsent || remarks != null) {
+      map['remarks'] = Variable<String>(remarks);
+    }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  MedicationsCompanion toCompanion(bool nullToAbsent) {
+    return MedicationsCompanion(
+      medicationId: Value(medicationId),
+      medicalId: Value(medicalId),
+      name: name == null && nullToAbsent ? const Value.absent() : Value(name),
+      method: method == null && nullToAbsent
+          ? const Value.absent()
+          : Value(method),
+      frequency: frequency == null && nullToAbsent
+          ? const Value.absent()
+          : Value(frequency),
+      days: days == null && nullToAbsent ? const Value.absent() : Value(days),
+      dose: dose == null && nullToAbsent ? const Value.absent() : Value(dose),
+      unit: unit == null && nullToAbsent ? const Value.absent() : Value(unit),
+      remarks: remarks == null && nullToAbsent
+          ? const Value.absent()
+          : Value(remarks),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory MedicationData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return MedicationData(
+      medicationId: serializer.fromJson<int>(json['medicationId']),
+      medicalId: serializer.fromJson<int>(json['medicalId']),
+      name: serializer.fromJson<String?>(json['name']),
+      method: serializer.fromJson<String?>(json['method']),
+      frequency: serializer.fromJson<String?>(json['frequency']),
+      days: serializer.fromJson<String?>(json['days']),
+      dose: serializer.fromJson<String?>(json['dose']),
+      unit: serializer.fromJson<String?>(json['unit']),
+      remarks: serializer.fromJson<String?>(json['remarks']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'medicationId': serializer.toJson<int>(medicationId),
+      'medicalId': serializer.toJson<int>(medicalId),
+      'name': serializer.toJson<String?>(name),
+      'method': serializer.toJson<String?>(method),
+      'frequency': serializer.toJson<String?>(frequency),
+      'days': serializer.toJson<String?>(days),
+      'dose': serializer.toJson<String?>(dose),
+      'unit': serializer.toJson<String?>(unit),
+      'remarks': serializer.toJson<String?>(remarks),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  MedicationData copyWith({
+    int? medicationId,
+    int? medicalId,
+    Value<String?> name = const Value.absent(),
+    Value<String?> method = const Value.absent(),
+    Value<String?> frequency = const Value.absent(),
+    Value<String?> days = const Value.absent(),
+    Value<String?> dose = const Value.absent(),
+    Value<String?> unit = const Value.absent(),
+    Value<String?> remarks = const Value.absent(),
+    DateTime? createdAt,
+  }) => MedicationData(
+    medicationId: medicationId ?? this.medicationId,
+    medicalId: medicalId ?? this.medicalId,
+    name: name.present ? name.value : this.name,
+    method: method.present ? method.value : this.method,
+    frequency: frequency.present ? frequency.value : this.frequency,
+    days: days.present ? days.value : this.days,
+    dose: dose.present ? dose.value : this.dose,
+    unit: unit.present ? unit.value : this.unit,
+    remarks: remarks.present ? remarks.value : this.remarks,
+    createdAt: createdAt ?? this.createdAt,
+  );
+  MedicationData copyWithCompanion(MedicationsCompanion data) {
+    return MedicationData(
+      medicationId: data.medicationId.present
+          ? data.medicationId.value
+          : this.medicationId,
+      medicalId: data.medicalId.present ? data.medicalId.value : this.medicalId,
+      name: data.name.present ? data.name.value : this.name,
+      method: data.method.present ? data.method.value : this.method,
+      frequency: data.frequency.present ? data.frequency.value : this.frequency,
+      days: data.days.present ? data.days.value : this.days,
+      dose: data.dose.present ? data.dose.value : this.dose,
+      unit: data.unit.present ? data.unit.value : this.unit,
+      remarks: data.remarks.present ? data.remarks.value : this.remarks,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MedicationData(')
+          ..write('medicationId: $medicationId, ')
+          ..write('medicalId: $medicalId, ')
+          ..write('name: $name, ')
+          ..write('method: $method, ')
+          ..write('frequency: $frequency, ')
+          ..write('days: $days, ')
+          ..write('dose: $dose, ')
+          ..write('unit: $unit, ')
+          ..write('remarks: $remarks, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    medicationId,
+    medicalId,
+    name,
+    method,
+    frequency,
+    days,
+    dose,
+    unit,
+    remarks,
+    createdAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is MedicationData &&
+          other.medicationId == this.medicationId &&
+          other.medicalId == this.medicalId &&
+          other.name == this.name &&
+          other.method == this.method &&
+          other.frequency == this.frequency &&
+          other.days == this.days &&
+          other.dose == this.dose &&
+          other.unit == this.unit &&
+          other.remarks == this.remarks &&
+          other.createdAt == this.createdAt);
+}
+
+class MedicationsCompanion extends UpdateCompanion<MedicationData> {
+  final Value<int> medicationId;
+  final Value<int> medicalId;
+  final Value<String?> name;
+  final Value<String?> method;
+  final Value<String?> frequency;
+  final Value<String?> days;
+  final Value<String?> dose;
+  final Value<String?> unit;
+  final Value<String?> remarks;
+  final Value<DateTime> createdAt;
+  const MedicationsCompanion({
+    this.medicationId = const Value.absent(),
+    this.medicalId = const Value.absent(),
+    this.name = const Value.absent(),
+    this.method = const Value.absent(),
+    this.frequency = const Value.absent(),
+    this.days = const Value.absent(),
+    this.dose = const Value.absent(),
+    this.unit = const Value.absent(),
+    this.remarks = const Value.absent(),
+    this.createdAt = const Value.absent(),
+  });
+  MedicationsCompanion.insert({
+    this.medicationId = const Value.absent(),
+    required int medicalId,
+    this.name = const Value.absent(),
+    this.method = const Value.absent(),
+    this.frequency = const Value.absent(),
+    this.days = const Value.absent(),
+    this.dose = const Value.absent(),
+    this.unit = const Value.absent(),
+    this.remarks = const Value.absent(),
+    this.createdAt = const Value.absent(),
+  }) : medicalId = Value(medicalId);
+  static Insertable<MedicationData> custom({
+    Expression<int>? medicationId,
+    Expression<int>? medicalId,
+    Expression<String>? name,
+    Expression<String>? method,
+    Expression<String>? frequency,
+    Expression<String>? days,
+    Expression<String>? dose,
+    Expression<String>? unit,
+    Expression<String>? remarks,
+    Expression<DateTime>? createdAt,
+  }) {
+    return RawValuesInsertable({
+      if (medicationId != null) 'medication_id': medicationId,
+      if (medicalId != null) 'medical_id': medicalId,
+      if (name != null) 'name': name,
+      if (method != null) 'method': method,
+      if (frequency != null) 'frequency': frequency,
+      if (days != null) 'days': days,
+      if (dose != null) 'dose': dose,
+      if (unit != null) 'unit': unit,
+      if (remarks != null) 'remarks': remarks,
+      if (createdAt != null) 'created_at': createdAt,
+    });
+  }
+
+  MedicationsCompanion copyWith({
+    Value<int>? medicationId,
+    Value<int>? medicalId,
+    Value<String?>? name,
+    Value<String?>? method,
+    Value<String?>? frequency,
+    Value<String?>? days,
+    Value<String?>? dose,
+    Value<String?>? unit,
+    Value<String?>? remarks,
+    Value<DateTime>? createdAt,
+  }) {
+    return MedicationsCompanion(
+      medicationId: medicationId ?? this.medicationId,
+      medicalId: medicalId ?? this.medicalId,
+      name: name ?? this.name,
+      method: method ?? this.method,
+      frequency: frequency ?? this.frequency,
+      days: days ?? this.days,
+      dose: dose ?? this.dose,
+      unit: unit ?? this.unit,
+      remarks: remarks ?? this.remarks,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (medicationId.present) {
+      map['medication_id'] = Variable<int>(medicationId.value);
+    }
+    if (medicalId.present) {
+      map['medical_id'] = Variable<int>(medicalId.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (method.present) {
+      map['method'] = Variable<String>(method.value);
+    }
+    if (frequency.present) {
+      map['frequency'] = Variable<String>(frequency.value);
+    }
+    if (days.present) {
+      map['days'] = Variable<String>(days.value);
+    }
+    if (dose.present) {
+      map['dose'] = Variable<String>(dose.value);
+    }
+    if (unit.present) {
+      map['unit'] = Variable<String>(unit.value);
+    }
+    if (remarks.present) {
+      map['remarks'] = Variable<String>(remarks.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MedicationsCompanion(')
+          ..write('medicationId: $medicationId, ')
+          ..write('medicalId: $medicalId, ')
+          ..write('name: $name, ')
+          ..write('method: $method, ')
+          ..write('frequency: $frequency, ')
+          ..write('days: $days, ')
+          ..write('dose: $dose, ')
+          ..write('unit: $unit, ')
+          ..write('remarks: $remarks, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $Icd10CodeTable extends Icd10Code
     with TableInfo<$Icd10CodeTable, Icd10CodeData> {
   @override
@@ -24218,6 +25489,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   );
   late final $ConsciousnessLevelRefTable consciousnessLevelRef =
       $ConsciousnessLevelRefTable(this);
+  late final $DrugRefTable drugRef = $DrugRefTable(this);
   late final $MedicalRecordTable medicalRecord = $MedicalRecordTable(this);
   late final $VisitReasonTable visitReason = $VisitReasonTable(this);
   late final $PatientTable patient = $PatientTable(this);
@@ -24249,6 +25521,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $SpecialNoteLinksTable specialNoteLinks = $SpecialNoteLinksTable(
     this,
   );
+  late final $MedicationsTable medications = $MedicationsTable(this);
   late final $Icd10CodeTable icd10Code = $Icd10CodeTable(this);
   late final ReferenceDao referenceDao = ReferenceDao(this as AppDatabase);
   late final MedicalDao medicalDao = MedicalDao(this as AppDatabase);
@@ -24301,6 +25574,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     medicalStaffRole,
     pupilReactionRef,
     consciousnessLevelRef,
+    drugRef,
     medicalRecord,
     visitReason,
     patient,
@@ -24323,6 +25597,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     chiefComplaintSymptomLinks,
     treatmentActionLinks,
     specialNoteLinks,
+    medications,
     icd10Code,
   ];
   @override
@@ -32621,6 +33896,197 @@ typedef $$ConsciousnessLevelRefTableProcessedTableManager =
       ConsciousnessLevelRefData,
       PrefetchHooks Function({bool medicalAssessmentRefs})
     >;
+typedef $$DrugRefTableCreateCompanionBuilder =
+    DrugRefCompanion Function({
+      Value<int> id,
+      required String category,
+      required String name,
+      Value<int> sortOrder,
+      Value<bool> isActive,
+    });
+typedef $$DrugRefTableUpdateCompanionBuilder =
+    DrugRefCompanion Function({
+      Value<int> id,
+      Value<String> category,
+      Value<String> name,
+      Value<int> sortOrder,
+      Value<bool> isActive,
+    });
+
+class $$DrugRefTableFilterComposer
+    extends Composer<_$AppDatabase, $DrugRefTable> {
+  $$DrugRefTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get category => $composableBuilder(
+    column: $table.category,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get sortOrder => $composableBuilder(
+    column: $table.sortOrder,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isActive => $composableBuilder(
+    column: $table.isActive,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$DrugRefTableOrderingComposer
+    extends Composer<_$AppDatabase, $DrugRefTable> {
+  $$DrugRefTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get category => $composableBuilder(
+    column: $table.category,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get sortOrder => $composableBuilder(
+    column: $table.sortOrder,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isActive => $composableBuilder(
+    column: $table.isActive,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$DrugRefTableAnnotationComposer
+    extends Composer<_$AppDatabase, $DrugRefTable> {
+  $$DrugRefTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get category =>
+      $composableBuilder(column: $table.category, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<int> get sortOrder =>
+      $composableBuilder(column: $table.sortOrder, builder: (column) => column);
+
+  GeneratedColumn<bool> get isActive =>
+      $composableBuilder(column: $table.isActive, builder: (column) => column);
+}
+
+class $$DrugRefTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $DrugRefTable,
+          DrugRefData,
+          $$DrugRefTableFilterComposer,
+          $$DrugRefTableOrderingComposer,
+          $$DrugRefTableAnnotationComposer,
+          $$DrugRefTableCreateCompanionBuilder,
+          $$DrugRefTableUpdateCompanionBuilder,
+          (
+            DrugRefData,
+            BaseReferences<_$AppDatabase, $DrugRefTable, DrugRefData>,
+          ),
+          DrugRefData,
+          PrefetchHooks Function()
+        > {
+  $$DrugRefTableTableManager(_$AppDatabase db, $DrugRefTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$DrugRefTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$DrugRefTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$DrugRefTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> category = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<int> sortOrder = const Value.absent(),
+                Value<bool> isActive = const Value.absent(),
+              }) => DrugRefCompanion(
+                id: id,
+                category: category,
+                name: name,
+                sortOrder: sortOrder,
+                isActive: isActive,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String category,
+                required String name,
+                Value<int> sortOrder = const Value.absent(),
+                Value<bool> isActive = const Value.absent(),
+              }) => DrugRefCompanion.insert(
+                id: id,
+                category: category,
+                name: name,
+                sortOrder: sortOrder,
+                isActive: isActive,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$DrugRefTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $DrugRefTable,
+      DrugRefData,
+      $$DrugRefTableFilterComposer,
+      $$DrugRefTableOrderingComposer,
+      $$DrugRefTableAnnotationComposer,
+      $$DrugRefTableCreateCompanionBuilder,
+      $$DrugRefTableUpdateCompanionBuilder,
+      (DrugRefData, BaseReferences<_$AppDatabase, $DrugRefTable, DrugRefData>),
+      DrugRefData,
+      PrefetchHooks Function()
+    >;
 typedef $$MedicalRecordTableCreateCompanionBuilder =
     MedicalRecordCompanion Function({
       Value<int> medicalId,
@@ -33032,6 +34498,28 @@ final class $$MedicalRecordTableReferences
         );
 
     final cache = $_typedResult.readTableOrNull(_telexDocumentsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$MedicationsTable, List<MedicationData>>
+  _medicationsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.medications,
+    aliasName: $_aliasNameGenerator(
+      db.medicalRecord.medicalId,
+      db.medications.medicalId,
+    ),
+  );
+
+  $$MedicationsTableProcessedTableManager get medicationsRefs {
+    final manager = $$MedicationsTableTableManager($_db, $_db.medications)
+        .filter(
+          (f) =>
+              f.medicalId.medicalId.sqlEquals($_itemColumn<int>('medical_id')!),
+        );
+
+    final cache = $_typedResult.readTableOrNull(_medicationsRefsTable($_db));
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
@@ -33474,6 +34962,31 @@ class $$MedicalRecordTableFilterComposer
           }) => $$TelexDocumentsTableFilterComposer(
             $db: $db,
             $table: $db.telexDocuments,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> medicationsRefs(
+    Expression<bool> Function($$MedicationsTableFilterComposer f) f,
+  ) {
+    final $$MedicationsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.medicalId,
+      referencedTable: $db.medications,
+      getReferencedColumn: (t) => t.medicalId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MedicationsTableFilterComposer(
+            $db: $db,
+            $table: $db.medications,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -33968,6 +35481,31 @@ class $$MedicalRecordTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> medicationsRefs<T extends Object>(
+    Expression<T> Function($$MedicationsTableAnnotationComposer a) f,
+  ) {
+    final $$MedicationsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.medicalId,
+      referencedTable: $db.medications,
+      getReferencedColumn: (t) => t.medicalId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MedicationsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.medications,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$MedicalRecordTableTableManager
@@ -34000,6 +35538,7 @@ class $$MedicalRecordTableTableManager
             bool nursingRecordsRefs,
             bool referralFormsRefs,
             bool telexDocumentsRefs,
+            bool medicationsRefs,
           })
         > {
   $$MedicalRecordTableTableManager(_$AppDatabase db, $MedicalRecordTable table)
@@ -34075,6 +35614,7 @@ class $$MedicalRecordTableTableManager
                 nursingRecordsRefs = false,
                 referralFormsRefs = false,
                 telexDocumentsRefs = false,
+                medicationsRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
@@ -34095,6 +35635,7 @@ class $$MedicalRecordTableTableManager
                     if (nursingRecordsRefs) db.nursingRecords,
                     if (referralFormsRefs) db.referralForms,
                     if (telexDocumentsRefs) db.telexDocuments,
+                    if (medicationsRefs) db.medications,
                   ],
                   addJoins: null,
                   getPrefetchedDataCallback: (items) async {
@@ -34435,6 +35976,27 @@ class $$MedicalRecordTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (medicationsRefs)
+                        await $_getPrefetchedData<
+                          MedicalRecordData,
+                          $MedicalRecordTable,
+                          MedicationData
+                        >(
+                          currentTable: table,
+                          referencedTable: $$MedicalRecordTableReferences
+                              ._medicationsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$MedicalRecordTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).medicationsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.medicalId == item.medicalId,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -34472,6 +36034,7 @@ typedef $$MedicalRecordTableProcessedTableManager =
         bool nursingRecordsRefs,
         bool referralFormsRefs,
         bool telexDocumentsRefs,
+        bool medicationsRefs,
       })
     >;
 typedef $$VisitReasonTableCreateCompanionBuilder =
@@ -40604,6 +42167,12 @@ typedef $$TreatmentTableCreateCompanionBuilder =
       Value<int?> treatmentOnSiteId,
       Value<String?> actionSummary,
       Value<String?> actionSummaryOther,
+      Value<String?> ekgInterpretation,
+      Value<String?> glucose,
+      Value<String?> intubationMethod,
+      Value<String?> oxygenMethod,
+      Value<double?> oxygenFlow,
+      Value<String?> certificateLogs,
       Value<int?> resultId,
       Value<bool?> transportRequired,
       Value<String?> transportMethod,
@@ -40630,6 +42199,12 @@ typedef $$TreatmentTableUpdateCompanionBuilder =
       Value<int?> treatmentOnSiteId,
       Value<String?> actionSummary,
       Value<String?> actionSummaryOther,
+      Value<String?> ekgInterpretation,
+      Value<String?> glucose,
+      Value<String?> intubationMethod,
+      Value<String?> oxygenMethod,
+      Value<double?> oxygenFlow,
+      Value<String?> certificateLogs,
       Value<int?> resultId,
       Value<bool?> transportRequired,
       Value<String?> transportMethod,
@@ -40756,6 +42331,36 @@ class $$TreatmentTableFilterComposer
 
   ColumnFilters<String> get actionSummaryOther => $composableBuilder(
     column: $table.actionSummaryOther,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get ekgInterpretation => $composableBuilder(
+    column: $table.ekgInterpretation,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get glucose => $composableBuilder(
+    column: $table.glucose,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get intubationMethod => $composableBuilder(
+    column: $table.intubationMethod,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get oxygenMethod => $composableBuilder(
+    column: $table.oxygenMethod,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get oxygenFlow => $composableBuilder(
+    column: $table.oxygenFlow,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get certificateLogs => $composableBuilder(
+    column: $table.certificateLogs,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -40927,6 +42532,36 @@ class $$TreatmentTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get ekgInterpretation => $composableBuilder(
+    column: $table.ekgInterpretation,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get glucose => $composableBuilder(
+    column: $table.glucose,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get intubationMethod => $composableBuilder(
+    column: $table.intubationMethod,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get oxygenMethod => $composableBuilder(
+    column: $table.oxygenMethod,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get oxygenFlow => $composableBuilder(
+    column: $table.oxygenFlow,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get certificateLogs => $composableBuilder(
+    column: $table.certificateLogs,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<int> get resultId => $composableBuilder(
     column: $table.resultId,
     builder: (column) => ColumnOrderings(column),
@@ -41063,6 +42698,34 @@ class $$TreatmentTableAnnotationComposer
 
   GeneratedColumn<String> get actionSummaryOther => $composableBuilder(
     column: $table.actionSummaryOther,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get ekgInterpretation => $composableBuilder(
+    column: $table.ekgInterpretation,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get glucose =>
+      $composableBuilder(column: $table.glucose, builder: (column) => column);
+
+  GeneratedColumn<String> get intubationMethod => $composableBuilder(
+    column: $table.intubationMethod,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get oxygenMethod => $composableBuilder(
+    column: $table.oxygenMethod,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get oxygenFlow => $composableBuilder(
+    column: $table.oxygenFlow,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get certificateLogs => $composableBuilder(
+    column: $table.certificateLogs,
     builder: (column) => column,
   );
 
@@ -41220,6 +42883,12 @@ class $$TreatmentTableTableManager
                 Value<int?> treatmentOnSiteId = const Value.absent(),
                 Value<String?> actionSummary = const Value.absent(),
                 Value<String?> actionSummaryOther = const Value.absent(),
+                Value<String?> ekgInterpretation = const Value.absent(),
+                Value<String?> glucose = const Value.absent(),
+                Value<String?> intubationMethod = const Value.absent(),
+                Value<String?> oxygenMethod = const Value.absent(),
+                Value<double?> oxygenFlow = const Value.absent(),
+                Value<String?> certificateLogs = const Value.absent(),
                 Value<int?> resultId = const Value.absent(),
                 Value<bool?> transportRequired = const Value.absent(),
                 Value<String?> transportMethod = const Value.absent(),
@@ -41244,6 +42913,12 @@ class $$TreatmentTableTableManager
                 treatmentOnSiteId: treatmentOnSiteId,
                 actionSummary: actionSummary,
                 actionSummaryOther: actionSummaryOther,
+                ekgInterpretation: ekgInterpretation,
+                glucose: glucose,
+                intubationMethod: intubationMethod,
+                oxygenMethod: oxygenMethod,
+                oxygenFlow: oxygenFlow,
+                certificateLogs: certificateLogs,
                 resultId: resultId,
                 transportRequired: transportRequired,
                 transportMethod: transportMethod,
@@ -41270,6 +42945,12 @@ class $$TreatmentTableTableManager
                 Value<int?> treatmentOnSiteId = const Value.absent(),
                 Value<String?> actionSummary = const Value.absent(),
                 Value<String?> actionSummaryOther = const Value.absent(),
+                Value<String?> ekgInterpretation = const Value.absent(),
+                Value<String?> glucose = const Value.absent(),
+                Value<String?> intubationMethod = const Value.absent(),
+                Value<String?> oxygenMethod = const Value.absent(),
+                Value<double?> oxygenFlow = const Value.absent(),
+                Value<String?> certificateLogs = const Value.absent(),
                 Value<int?> resultId = const Value.absent(),
                 Value<bool?> transportRequired = const Value.absent(),
                 Value<String?> transportMethod = const Value.absent(),
@@ -41294,6 +42975,12 @@ class $$TreatmentTableTableManager
                 treatmentOnSiteId: treatmentOnSiteId,
                 actionSummary: actionSummary,
                 actionSummaryOther: actionSummaryOther,
+                ekgInterpretation: ekgInterpretation,
+                glucose: glucose,
+                intubationMethod: intubationMethod,
+                oxygenMethod: oxygenMethod,
+                oxygenFlow: oxygenFlow,
+                certificateLogs: certificateLogs,
                 resultId: resultId,
                 transportRequired: transportRequired,
                 transportMethod: transportMethod,
@@ -46809,6 +48496,419 @@ typedef $$SpecialNoteLinksTableProcessedTableManager =
       SpecialNoteLink,
       PrefetchHooks Function({bool noteId, bool noteRefId})
     >;
+typedef $$MedicationsTableCreateCompanionBuilder =
+    MedicationsCompanion Function({
+      Value<int> medicationId,
+      required int medicalId,
+      Value<String?> name,
+      Value<String?> method,
+      Value<String?> frequency,
+      Value<String?> days,
+      Value<String?> dose,
+      Value<String?> unit,
+      Value<String?> remarks,
+      Value<DateTime> createdAt,
+    });
+typedef $$MedicationsTableUpdateCompanionBuilder =
+    MedicationsCompanion Function({
+      Value<int> medicationId,
+      Value<int> medicalId,
+      Value<String?> name,
+      Value<String?> method,
+      Value<String?> frequency,
+      Value<String?> days,
+      Value<String?> dose,
+      Value<String?> unit,
+      Value<String?> remarks,
+      Value<DateTime> createdAt,
+    });
+
+final class $$MedicationsTableReferences
+    extends BaseReferences<_$AppDatabase, $MedicationsTable, MedicationData> {
+  $$MedicationsTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $MedicalRecordTable _medicalIdTable(_$AppDatabase db) =>
+      db.medicalRecord.createAlias(
+        $_aliasNameGenerator(
+          db.medications.medicalId,
+          db.medicalRecord.medicalId,
+        ),
+      );
+
+  $$MedicalRecordTableProcessedTableManager get medicalId {
+    final $_column = $_itemColumn<int>('medical_id')!;
+
+    final manager = $$MedicalRecordTableTableManager(
+      $_db,
+      $_db.medicalRecord,
+    ).filter((f) => f.medicalId.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_medicalIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$MedicationsTableFilterComposer
+    extends Composer<_$AppDatabase, $MedicationsTable> {
+  $$MedicationsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get medicationId => $composableBuilder(
+    column: $table.medicationId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get method => $composableBuilder(
+    column: $table.method,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get frequency => $composableBuilder(
+    column: $table.frequency,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get days => $composableBuilder(
+    column: $table.days,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get dose => $composableBuilder(
+    column: $table.dose,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get unit => $composableBuilder(
+    column: $table.unit,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get remarks => $composableBuilder(
+    column: $table.remarks,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$MedicalRecordTableFilterComposer get medicalId {
+    final $$MedicalRecordTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.medicalId,
+      referencedTable: $db.medicalRecord,
+      getReferencedColumn: (t) => t.medicalId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MedicalRecordTableFilterComposer(
+            $db: $db,
+            $table: $db.medicalRecord,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$MedicationsTableOrderingComposer
+    extends Composer<_$AppDatabase, $MedicationsTable> {
+  $$MedicationsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get medicationId => $composableBuilder(
+    column: $table.medicationId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get method => $composableBuilder(
+    column: $table.method,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get frequency => $composableBuilder(
+    column: $table.frequency,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get days => $composableBuilder(
+    column: $table.days,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get dose => $composableBuilder(
+    column: $table.dose,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get unit => $composableBuilder(
+    column: $table.unit,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get remarks => $composableBuilder(
+    column: $table.remarks,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$MedicalRecordTableOrderingComposer get medicalId {
+    final $$MedicalRecordTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.medicalId,
+      referencedTable: $db.medicalRecord,
+      getReferencedColumn: (t) => t.medicalId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MedicalRecordTableOrderingComposer(
+            $db: $db,
+            $table: $db.medicalRecord,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$MedicationsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $MedicationsTable> {
+  $$MedicationsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get medicationId => $composableBuilder(
+    column: $table.medicationId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get method =>
+      $composableBuilder(column: $table.method, builder: (column) => column);
+
+  GeneratedColumn<String> get frequency =>
+      $composableBuilder(column: $table.frequency, builder: (column) => column);
+
+  GeneratedColumn<String> get days =>
+      $composableBuilder(column: $table.days, builder: (column) => column);
+
+  GeneratedColumn<String> get dose =>
+      $composableBuilder(column: $table.dose, builder: (column) => column);
+
+  GeneratedColumn<String> get unit =>
+      $composableBuilder(column: $table.unit, builder: (column) => column);
+
+  GeneratedColumn<String> get remarks =>
+      $composableBuilder(column: $table.remarks, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  $$MedicalRecordTableAnnotationComposer get medicalId {
+    final $$MedicalRecordTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.medicalId,
+      referencedTable: $db.medicalRecord,
+      getReferencedColumn: (t) => t.medicalId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MedicalRecordTableAnnotationComposer(
+            $db: $db,
+            $table: $db.medicalRecord,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$MedicationsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $MedicationsTable,
+          MedicationData,
+          $$MedicationsTableFilterComposer,
+          $$MedicationsTableOrderingComposer,
+          $$MedicationsTableAnnotationComposer,
+          $$MedicationsTableCreateCompanionBuilder,
+          $$MedicationsTableUpdateCompanionBuilder,
+          (MedicationData, $$MedicationsTableReferences),
+          MedicationData,
+          PrefetchHooks Function({bool medicalId})
+        > {
+  $$MedicationsTableTableManager(_$AppDatabase db, $MedicationsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$MedicationsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$MedicationsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$MedicationsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> medicationId = const Value.absent(),
+                Value<int> medicalId = const Value.absent(),
+                Value<String?> name = const Value.absent(),
+                Value<String?> method = const Value.absent(),
+                Value<String?> frequency = const Value.absent(),
+                Value<String?> days = const Value.absent(),
+                Value<String?> dose = const Value.absent(),
+                Value<String?> unit = const Value.absent(),
+                Value<String?> remarks = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+              }) => MedicationsCompanion(
+                medicationId: medicationId,
+                medicalId: medicalId,
+                name: name,
+                method: method,
+                frequency: frequency,
+                days: days,
+                dose: dose,
+                unit: unit,
+                remarks: remarks,
+                createdAt: createdAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> medicationId = const Value.absent(),
+                required int medicalId,
+                Value<String?> name = const Value.absent(),
+                Value<String?> method = const Value.absent(),
+                Value<String?> frequency = const Value.absent(),
+                Value<String?> days = const Value.absent(),
+                Value<String?> dose = const Value.absent(),
+                Value<String?> unit = const Value.absent(),
+                Value<String?> remarks = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+              }) => MedicationsCompanion.insert(
+                medicationId: medicationId,
+                medicalId: medicalId,
+                name: name,
+                method: method,
+                frequency: frequency,
+                days: days,
+                dose: dose,
+                unit: unit,
+                remarks: remarks,
+                createdAt: createdAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$MedicationsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({medicalId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (medicalId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.medicalId,
+                                referencedTable: $$MedicationsTableReferences
+                                    ._medicalIdTable(db),
+                                referencedColumn: $$MedicationsTableReferences
+                                    ._medicalIdTable(db)
+                                    .medicalId,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$MedicationsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $MedicationsTable,
+      MedicationData,
+      $$MedicationsTableFilterComposer,
+      $$MedicationsTableOrderingComposer,
+      $$MedicationsTableAnnotationComposer,
+      $$MedicationsTableCreateCompanionBuilder,
+      $$MedicationsTableUpdateCompanionBuilder,
+      (MedicationData, $$MedicationsTableReferences),
+      MedicationData,
+      PrefetchHooks Function({bool medicalId})
+    >;
 typedef $$Icd10CodeTableCreateCompanionBuilder =
     Icd10CodeCompanion Function({
       Value<int> id,
@@ -47067,6 +49167,8 @@ class $AppDatabaseManager {
       $$PupilReactionRefTableTableManager(_db, _db.pupilReactionRef);
   $$ConsciousnessLevelRefTableTableManager get consciousnessLevelRef =>
       $$ConsciousnessLevelRefTableTableManager(_db, _db.consciousnessLevelRef);
+  $$DrugRefTableTableManager get drugRef =>
+      $$DrugRefTableTableManager(_db, _db.drugRef);
   $$MedicalRecordTableTableManager get medicalRecord =>
       $$MedicalRecordTableTableManager(_db, _db.medicalRecord);
   $$VisitReasonTableTableManager get visitReason =>
@@ -47121,6 +49223,8 @@ class $AppDatabaseManager {
       $$TreatmentActionLinksTableTableManager(_db, _db.treatmentActionLinks);
   $$SpecialNoteLinksTableTableManager get specialNoteLinks =>
       $$SpecialNoteLinksTableTableManager(_db, _db.specialNoteLinks);
+  $$MedicationsTableTableManager get medications =>
+      $$MedicationsTableTableManager(_db, _db.medications);
   $$Icd10CodeTableTableManager get icd10Code =>
       $$Icd10CodeTableTableManager(_db, _db.icd10Code);
 }

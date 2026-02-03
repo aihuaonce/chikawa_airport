@@ -36,4 +36,5 @@ mixin _$TreatmentDaoMixin on DatabaseAccessor<AppDatabase> {
   $SpecialNoteRefTable get specialNoteRef => attachedDatabase.specialNoteRef;
   $SpecialNoteLinksTable get specialNoteLinks =>
       attachedDatabase.specialNoteLinks;
+  $MedicationsTable get medications => attachedDatabase.medications;
 }

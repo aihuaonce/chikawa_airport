@@ -72,6 +72,10 @@ class TreatmentViewModel extends ChangeNotifier {
   TreatmentData? _treatment;
   TreatmentData? get treatment => _treatment;
 
+  // 藥物記錄列表
+  List<MedicationData> _medications = [];
+  List<MedicationData> get medications => _medications;
+
   // 醫療人員指派列表
   List<MedicalStaffAssignmentData> _staffAssignments = [];
   List<MedicalStaffAssignmentData> get staffAssignments => _staffAssignments;
@@ -151,6 +155,9 @@ class TreatmentViewModel extends ChangeNotifier {
       await _createDefaultTreatment();
       _treatment = await db.treatmentDao.getTreatment(medicalId);
     }
+
+    // 載入藥物記錄
+    await _reloadMedications();
 
     // 載入醫療人員指派
     _staffAssignments = await db.treatmentDao.getStaffAssignments(medicalId);
@@ -987,6 +994,47 @@ class TreatmentViewModel extends ChangeNotifier {
     );
   }
 
+  // 動態處置細項更新
+  void updateEkgInterpretation(String? value) {
+    if (_treatment == null) return;
+    _updateTreatmentCacheAndSave(
+      _treatment!.copyWith(ekgInterpretation: Value(value)),
+    );
+  }
+
+  void updateGlucose(String? value) {
+    if (_treatment == null) return;
+    _updateTreatmentCacheAndSave(_treatment!.copyWith(glucose: Value(value)));
+  }
+
+  void updateIntubationMethod(String? value) {
+    if (_treatment == null) return;
+    _updateTreatmentCacheAndSave(
+      _treatment!.copyWith(intubationMethod: Value(value)),
+    );
+  }
+
+  void updateOxygenMethod(String? value) {
+    if (_treatment == null) return;
+    _updateTreatmentCacheAndSave(
+      _treatment!.copyWith(oxygenMethod: Value(value)),
+    );
+  }
+
+  void updateOxygenFlow(double? value) {
+    if (_treatment == null) return;
+    _updateTreatmentCacheAndSave(
+      _treatment!.copyWith(oxygenFlow: Value(value)),
+    );
+  }
+
+  void updateCertificateLogs(String? value) {
+    if (_treatment == null) return;
+    _updateTreatmentCacheAndSave(
+      _treatment!.copyWith(certificateLogs: Value(value)),
+    );
+  }
+
   // 結果相關
   void updateResultId(int? resultId) {
     if (_treatment == null) return;
@@ -1246,6 +1294,89 @@ class TreatmentViewModel extends ChangeNotifier {
   }
 
   // ===================================================================
+  // 藥物記錄 CRUD
+  // ===================================================================
+
+  Future<void> _reloadMedications() async {
+    _medications = await db.treatmentDao.getMedications(medicalId);
+    notifyListeners();
+  }
+
+  Future<void> addMedication() async {
+    try {
+      await db.treatmentDao.insertMedication(
+        MedicationsCompanion.insert(medicalId: medicalId),
+      );
+      await _reloadMedications();
+      debugPrint('系統:新增藥物記錄成功');
+    } catch (e) {
+      debugPrint('系統:新增藥物記錄失敗 - $e');
+    }
+  }
+
+  Future<void> deleteMedication(int medicationId) async {
+    try {
+      await db.treatmentDao.deleteMedication(medicationId);
+      await _reloadMedications();
+      debugPrint('系統:刪除藥物記錄成功');
+    } catch (e) {
+      debugPrint('系統:刪除藥物記錄失敗 - $e');
+    }
+  }
+
+  // 統一新增或更新藥物 (支援 Dialog 使用)
+  Future<void> saveMedication(MedicationsCompanion medication) async {
+    try {
+      if (medication.medicationId.present) {
+        // Update
+        await db.treatmentDao.updateMedication(medication);
+        debugPrint('系統:更新藥物記錄成功');
+      } else {
+        // Insert
+        await db.treatmentDao.insertMedication(medication);
+        debugPrint('系統:新增藥物記錄成功');
+      }
+      await _reloadMedications();
+    } catch (e) {
+      debugPrint('系統:儲存藥物記錄失敗 - $e');
+    }
+  }
+
+  // 統一更新藥物欄位
+  Future<void> updateMedication({
+    required int medicationId,
+    String? name,
+    String? method,
+    String? frequency,
+    String? days,
+    String? dose,
+    String? unit,
+    String? remarks,
+  }) async {
+    try {
+      await db.treatmentDao.updateMedication(
+        MedicationsCompanion(
+          medicationId: Value(medicationId),
+          medicalId: Value(medicalId),
+          name: name != null ? Value(name) : const Value.absent(),
+          method: method != null ? Value(method) : const Value.absent(),
+          frequency: frequency != null
+              ? Value(frequency)
+              : const Value.absent(),
+          days: days != null ? Value(days) : const Value.absent(),
+          dose: dose != null ? Value(dose) : const Value.absent(),
+          unit: unit != null ? Value(unit) : const Value.absent(),
+          remarks: remarks != null ? Value(remarks) : const Value.absent(),
+        ),
+      );
+      // 更新列表但保持 UI 狀態
+      await _reloadMedications();
+    } catch (e) {
+      debugPrint('系統:更新藥物記錄失敗 - $e');
+    }
+  }
+
+  // ===================================================================
   // 查詢輔助方法
   // ===================================================================
 
@@ -1387,6 +1518,14 @@ class TreatmentViewModel extends ChangeNotifier {
     final lower = keyword.toLowerCase();
     return refService.referralHospitals
         .where((h) => h.name.toLowerCase().contains(lower))
+        .toList();
+  }
+
+  Future<List<DrugRefData>> searchDrugs(String keyword) async {
+    if (keyword.isEmpty) return refService.drugList;
+    final lower = keyword.toLowerCase();
+    return refService.drugList
+        .where((d) => d.name.toLowerCase().contains(lower))
         .toList();
   }
 

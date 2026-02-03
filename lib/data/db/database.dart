@@ -57,6 +57,7 @@ part 'database.g.dart';
     MedicalStaffRole,
     PupilReactionRef,
     ConsciousnessLevelRef,
+    DrugRef,
 
     //醫療表
     MedicalRecord,
@@ -80,6 +81,7 @@ part 'database.g.dart';
     ChiefComplaintSymptomLinks,
     TreatmentActionLinks,
     SpecialNoteLinks,
+    Medications,
 
     //ICD-10
     Icd10Code,

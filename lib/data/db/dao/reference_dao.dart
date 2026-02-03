@@ -36,11 +36,43 @@ part 'reference_dao.g.dart';
     MedicalStaffRole,
     PupilReactionRef,
     ConsciousnessLevelRef,
+    DrugRef,
   ],
 )
 class ReferenceDao extends DatabaseAccessor<AppDatabase>
     with _$ReferenceDaoMixin {
   ReferenceDao(super.db);
+
+  //  藥物相關
+  Future<List<DrugRefData>> getAllDrugs({bool onlyActive = true}) {
+    final query = select(drugRef);
+    if (onlyActive) {
+      query.where((d) => d.isActive.equals(true));
+    }
+    return (query..orderBy([(d) => OrderingTerm.asc(d.sortOrder)])).get();
+  }
+
+  Future<List<DrugRefData>> searchDrugs(String keyword) {
+    return (select(drugRef)
+          ..where((d) => d.name.like('%$keyword%'))
+          ..where((d) => d.isActive.equals(true))
+          ..orderBy([(d) => OrderingTerm.asc(d.sortOrder)]))
+        .get();
+  }
+
+  Future<int> addDrug({
+    required String category,
+    required String name,
+    int sortOrder = 0,
+  }) {
+    return into(drugRef).insert(
+      DrugRefCompanion.insert(
+        category: category,
+        name: name,
+        sortOrder: Value(sortOrder),
+      ),
+    );
+  }
 
   //  護理常用語相關
   Future<List<NursingPhraseData>> getAllNursingPhrases({
@@ -762,6 +794,7 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
     await initializeMedicalStaffRoles();
     await initializePupilReactions();
     await initializeConsciousnessLevels();
+    await initializeDrugs();
   }
 
   // 初始化性別資料
@@ -1470,18 +1503,32 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
 
   // 初始化付款方式
   Future<void> initializePaymentMethods() async {
-    final count = await (select(paymentMethod).get()).then((list) => list.length);
+    final count = await (select(
+      paymentMethod,
+    ).get()).then((list) => list.length);
     if (count == 0) {
       await batch((batch) {
         batch.insertAll(paymentMethod, [
           PaymentMethodCompanion.insert(
-              code: 'self_pay', name: '自付', sortOrder: const Value(1)),
+            code: 'self_pay',
+            name: '自付',
+            sortOrder: const Value(1),
+          ),
           PaymentMethodCompanion.insert(
-              code: 'unified_billing', name: '統一請款', sortOrder: const Value(2)),
+            code: 'unified_billing',
+            name: '統一請款',
+            sortOrder: const Value(2),
+          ),
           PaymentMethodCompanion.insert(
-              code: 'hospital_collect', name: '總院會核代收', sortOrder: const Value(3)),
+            code: 'hospital_collect',
+            name: '總院會核代收',
+            sortOrder: const Value(3),
+          ),
           PaymentMethodCompanion.insert(
-              code: 'abnormal', name: '收費異常', sortOrder: const Value(4)),
+            code: 'abnormal',
+            name: '收費異常',
+            sortOrder: const Value(4),
+          ),
         ]);
       });
     }
@@ -1489,16 +1536,27 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
 
   // 初始化收款狀態
   Future<void> initializeCollectionStatus() async {
-    final count = await (select(collectionStatus).get()).then((list) => list.length);
+    final count = await (select(
+      collectionStatus,
+    ).get()).then((list) => list.length);
     if (count == 0) {
       await batch((batch) {
         batch.insertAll(collectionStatus, [
           CollectionStatusCompanion.insert(
-              code: 'not_collected', name: '尚未收款', sortOrder: const Value(1)),
+            code: 'not_collected',
+            name: '尚未收款',
+            sortOrder: const Value(1),
+          ),
           CollectionStatusCompanion.insert(
-              code: 'collected', name: '已收款', sortOrder: const Value(2)),
+            code: 'collected',
+            name: '已收款',
+            sortOrder: const Value(2),
+          ),
           CollectionStatusCompanion.insert(
-              code: 'not_required', name: '不需要', sortOrder: const Value(3)),
+            code: 'not_required',
+            name: '不需要',
+            sortOrder: const Value(3),
+          ),
         ]);
       });
     }
@@ -1510,11 +1568,31 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
     if (count == 0) {
       await batch((batch) {
         batch.insertAll(currencyRef, [
-          CurrencyRefCompanion.insert(code: 'TWD', name: '台幣', symbol: const Value('NT\$')),
-          CurrencyRefCompanion.insert(code: 'USD', name: '美金', symbol: const Value('\$')),
-          CurrencyRefCompanion.insert(code: 'CNY', name: '人民幣', symbol: const Value('¥')),
-          CurrencyRefCompanion.insert(code: 'JPY', name: '日幣', symbol: const Value('¥')),
-          CurrencyRefCompanion.insert(code: 'CAD', name: '加幣', symbol: const Value('C\$')),
+          CurrencyRefCompanion.insert(
+            code: 'TWD',
+            name: '台幣',
+            symbol: const Value('NT\$'),
+          ),
+          CurrencyRefCompanion.insert(
+            code: 'USD',
+            name: '美金',
+            symbol: const Value('\$'),
+          ),
+          CurrencyRefCompanion.insert(
+            code: 'CNY',
+            name: '人民幣',
+            symbol: const Value('¥'),
+          ),
+          CurrencyRefCompanion.insert(
+            code: 'JPY',
+            name: '日幣',
+            symbol: const Value('¥'),
+          ),
+          CurrencyRefCompanion.insert(
+            code: 'CAD',
+            name: '加幣',
+            symbol: const Value('C\$'),
+          ),
         ]);
       });
     }
@@ -1522,22 +1600,42 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
 
   // 初始化轉診目的
   Future<void> initializeReferralPurposes() async {
-    final count = await (select(referralPurpose).get()).then((list) => list.length);
+    final count = await (select(
+      referralPurpose,
+    ).get()).then((list) => list.length);
     if (count == 0) {
       await batch((batch) {
         batch.insertAll(referralPurpose, [
           ReferralPurposeCompanion.insert(
-              code: 'emergency', name: '急診治療', sortOrder: const Value(1)),
+            code: 'emergency',
+            name: '急診治療',
+            sortOrder: const Value(1),
+          ),
           ReferralPurposeCompanion.insert(
-              code: 'inpatient', name: '住院治療', sortOrder: const Value(2)),
+            code: 'inpatient',
+            name: '住院治療',
+            sortOrder: const Value(2),
+          ),
           ReferralPurposeCompanion.insert(
-              code: 'outpatient', name: '門診治療', sortOrder: const Value(3)),
+            code: 'outpatient',
+            name: '門診治療',
+            sortOrder: const Value(3),
+          ),
           ReferralPurposeCompanion.insert(
-              code: 'further_exam', name: '進一步檢查', sortOrder: const Value(4)),
+            code: 'further_exam',
+            name: '進一步檢查',
+            sortOrder: const Value(4),
+          ),
           ReferralPurposeCompanion.insert(
-              code: 'followup', name: '轉回轉出或適當之院所繼續追蹤', sortOrder: const Value(5)),
+            code: 'followup',
+            name: '轉回轉出或適當之院所繼續追蹤',
+            sortOrder: const Value(5),
+          ),
           ReferralPurposeCompanion.insert(
-              code: 'other', name: '其它', sortOrder: const Value(6)),
+            code: 'other',
+            name: '其它',
+            sortOrder: const Value(6),
+          ),
         ]);
       });
     }
@@ -1550,21 +1648,25 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
       await batch((batch) {
         batch.insertAll(stationRef, [
           StationRefCompanion.insert(
-              code: 'T1_OCC',
-              name: 'T1 03-3063578',
-              description: const Value('桃園國際機場股份有限公司營運控制中心 T1')),
+            code: 'T1_OCC',
+            name: 'T1 03-3063578',
+            description: const Value('桃園國際機場股份有限公司營運控制中心 T1'),
+          ),
           StationRefCompanion.insert(
-              code: 'T2_OCC',
-              name: 'T2 03-3063367',
-              description: const Value('桃園國際機場股份有限公司營運控制中心 T2')),
+            code: 'T2_OCC',
+            name: 'T2 03-3063367',
+            description: const Value('桃園國際機場股份有限公司營運控制中心 T2'),
+          ),
           StationRefCompanion.insert(
-              code: 'T1_MED',
-              name: 'T1 03-3834225',
-              description: const Value('聯新國際醫院桃園國際機場醫療中心 T1')),
+            code: 'T1_MED',
+            name: 'T1 03-3834225',
+            description: const Value('聯新國際醫院桃園國際機場醫療中心 T1'),
+          ),
           StationRefCompanion.insert(
-              code: 'T2_MED',
-              name: 'T2 03-3983485',
-              description: const Value('聯新國際醫院桃園國際機場醫療中心 T2')),
+            code: 'T2_MED',
+            name: 'T2 03-3983485',
+            description: const Value('聯新國際醫院桃園國際機場醫療中心 T2'),
+          ),
         ]);
       });
     }
@@ -1572,20 +1674,37 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
 
   // 初始化關係類型
   Future<void> initializeRelationshipTypes() async {
-    final count = await (select(relationshipType).get()).then((list) => list.length);
+    final count = await (select(
+      relationshipType,
+    ).get()).then((list) => list.length);
     if (count == 0) {
       await batch((batch) {
         batch.insertAll(relationshipType, [
           RelationshipTypeCompanion.insert(
-              code: 'self', name: '本人 (Self)', nameEn: const Value('Self')),
+            code: 'self',
+            name: '本人 (Self)',
+            nameEn: const Value('Self'),
+          ),
           RelationshipTypeCompanion.insert(
-              code: 'spouse', name: '配偶 (Spouse)', nameEn: const Value('Spouse')),
+            code: 'spouse',
+            name: '配偶 (Spouse)',
+            nameEn: const Value('Spouse'),
+          ),
           RelationshipTypeCompanion.insert(
-              code: 'parent', name: '父母 (Parent)', nameEn: const Value('Parent')),
+            code: 'parent',
+            name: '父母 (Parent)',
+            nameEn: const Value('Parent'),
+          ),
           RelationshipTypeCompanion.insert(
-              code: 'child', name: '子女 (Child)', nameEn: const Value('Child')),
+            code: 'child',
+            name: '子女 (Child)',
+            nameEn: const Value('Child'),
+          ),
           RelationshipTypeCompanion.insert(
-              code: 'other', name: '其他 (Other)', nameEn: const Value('Other')),
+            code: 'other',
+            name: '其他 (Other)',
+            nameEn: const Value('Other'),
+          ),
         ]);
       });
     }
@@ -1593,16 +1712,30 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
 
   // 初始化病史狀態
   Future<void> initializeHistoryStatus() async {
-    final count = await (select(historyStatusRef).get()).then((list) => list.length);
+    final count = await (select(
+      historyStatusRef,
+    ).get()).then((list) => list.length);
     if (count == 0) {
       await batch((batch) {
         batch.insertAll(historyStatusRef, [
           HistoryStatusRefCompanion.insert(
-              code: 'none', name: '無', nameEn: const Value('None'), sortOrder: const Value(1)),
+            code: 'none',
+            name: '無',
+            nameEn: const Value('None'),
+            sortOrder: const Value(1),
+          ),
           HistoryStatusRefCompanion.insert(
-              code: 'unknown', name: '不詳', nameEn: const Value('Unknown'), sortOrder: const Value(2)),
+            code: 'unknown',
+            name: '不詳',
+            nameEn: const Value('Unknown'),
+            sortOrder: const Value(2),
+          ),
           HistoryStatusRefCompanion.insert(
-              code: 'yes', name: '有', nameEn: const Value('Yes'), sortOrder: const Value(3)),
+            code: 'yes',
+            name: '有',
+            nameEn: const Value('Yes'),
+            sortOrder: const Value(3),
+          ),
         ]);
       });
     }
@@ -1610,18 +1743,36 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
 
   // 初始化醫護人員角色
   Future<void> initializeMedicalStaffRoles() async {
-    final count = await (select(medicalStaffRole).get()).then((list) => list.length);
+    final count = await (select(
+      medicalStaffRole,
+    ).get()).then((list) => list.length);
     if (count == 0) {
       await batch((batch) {
         batch.insertAll(medicalStaffRole, [
           MedicalStaffRoleCompanion.insert(
-              code: 'DOCTOR', name: '醫師', nameEn: const Value('Doctor'), sortOrder: const Value(1)),
+            code: 'DOCTOR',
+            name: '醫師',
+            nameEn: const Value('Doctor'),
+            sortOrder: const Value(1),
+          ),
           MedicalStaffRoleCompanion.insert(
-              code: 'NURSE', name: '護理師', nameEn: const Value('Nurse'), sortOrder: const Value(2)),
+            code: 'NURSE',
+            name: '護理師',
+            nameEn: const Value('Nurse'),
+            sortOrder: const Value(2),
+          ),
           MedicalStaffRoleCompanion.insert(
-              code: 'EMT', name: 'EMT', nameEn: const Value('EMT'), sortOrder: const Value(3)),
+            code: 'EMT',
+            name: 'EMT',
+            nameEn: const Value('EMT'),
+            sortOrder: const Value(3),
+          ),
           MedicalStaffRoleCompanion.insert(
-              code: 'ASSIST', name: '協助人員', nameEn: const Value('Assistant'), sortOrder: const Value(4)),
+            code: 'ASSIST',
+            name: '協助人員',
+            nameEn: const Value('Assistant'),
+            sortOrder: const Value(4),
+          ),
         ]);
       });
     }
@@ -1629,16 +1780,27 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
 
   // 初始化瞳孔反應
   Future<void> initializePupilReactions() async {
-    final count = await (select(pupilReactionRef).get()).then((list) => list.length);
+    final count = await (select(
+      pupilReactionRef,
+    ).get()).then((list) => list.length);
     if (count == 0) {
       await batch((batch) {
         batch.insertAll(pupilReactionRef, [
           PupilReactionRefCompanion.insert(
-              code: 'positive', symbol: '+', name: '有反應'),
+            code: 'positive',
+            symbol: '+',
+            name: '有反應',
+          ),
           PupilReactionRefCompanion.insert(
-              code: 'negative', symbol: '-', name: '無反應'),
+            code: 'negative',
+            symbol: '-',
+            name: '無反應',
+          ),
           PupilReactionRefCompanion.insert(
-              code: 'equivocal', symbol: '±', name: '疑似'),
+            code: 'equivocal',
+            symbol: '±',
+            name: '疑似',
+          ),
         ]);
       });
     }
@@ -1646,17 +1808,150 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
 
   // 初始化意識狀態
   Future<void> initializeConsciousnessLevels() async {
-    final count = await (select(consciousnessLevelRef).get()).then((list) => list.length);
+    final count = await (select(
+      consciousnessLevelRef,
+    ).get()).then((list) => list.length);
     if (count == 0) {
       await batch((batch) {
         batch.insertAll(consciousnessLevelRef, [
           ConsciousnessLevelRefCompanion.insert(
-              code: 'alert', name: '清醒', nameEn: const Value('Alert')),
+            code: 'alert',
+            name: '清醒',
+            nameEn: const Value('Alert'),
+          ),
           ConsciousnessLevelRefCompanion.insert(
-              code: 'drowsy', name: '嗜睡', nameEn: const Value('Drowsy')),
+            code: 'drowsy',
+            name: '嗜睡',
+            nameEn: const Value('Drowsy'),
+          ),
           ConsciousnessLevelRefCompanion.insert(
-              code: 'unconscious', name: '昏迷', nameEn: const Value('Unconscious')),
+            code: 'unconscious',
+            name: '昏迷',
+            nameEn: const Value('Unconscious'),
+          ),
         ]);
+      });
+    }
+  }
+
+  // 初始化藥物資料
+  Future<void> initializeDrugs() async {
+    final count = await (select(drugRef).get()).then((list) => list.length);
+    if (count == 0) {
+      final drugs = [
+        // Sprays/Inhalers
+        {'category': '噴劑/吸入劑', 'name': 'Berodual N'},
+        {'category': '噴劑/吸入劑', 'name': 'Combivent'},
+        // Syrups/Liquids
+        {'category': '水劑', 'name': 'Augmentin syrup'},
+        {'category': '水劑', 'name': 'Peace (鼻福)'},
+        {'category': '水劑', 'name': 'Wempty (胃利空)'},
+        {'category': '水劑', 'name': 'Secorine (息咳寧)'},
+        {'category': '水劑', 'name': 'Ibuprofen (依普芬)'},
+        {'category': '水劑', 'name': 'cypromin (希普利敏)'},
+        {'category': '水劑', 'name': 'D/W 20ml'},
+        {'category': '水劑', 'name': 'N/S 20ml'},
+        {'category': '水劑', 'name': '50% G/W 20ml'},
+        // IV Fluids
+        {'category': '點滴注射', 'name': 'N/S 500ml'},
+        {'category': '點滴注射', 'name': 'D5S 500ml'},
+        {'category': '點滴注射', 'name': "Lactated Ringer's (乳酸林格氏) 500ml"},
+        {'category': '點滴注射', 'name': 'Taita No.2 (台大2號) 500ml'},
+        {'category': '點滴注射', 'name': 'Taita No.5 (台大5號) 400ml'},
+        // Ointments
+        {'category': '藥膏', 'name': 'Kenalog'},
+        {'category': '藥膏', 'name': '眼藥膏 (Tetracycline Oint)'},
+        {'category': '藥膏', 'name': 'Neomycin Oint'},
+        {'category': '藥膏', 'name': 'Silivadene Cream 20mg'},
+        {'category': '藥膏', 'name': 'FOCUS JEL'},
+        {'category': '藥膏', 'name': 'Scheree Cream'},
+        // Eye Drops
+        {'category': '眼藥水', 'name': 'Sinomin'},
+        {'category': '眼藥水', 'name': 'Emadine'},
+        // Ear Drops
+        {'category': '耳滴劑', 'name': 'Tarivid'},
+        // Suppositories
+        {'category': '肛門塞劑', 'name': 'Motilium (supp)'},
+        {'category': '肛門塞劑', 'name': 'Voltaren-12.5 supp'},
+        // Injections
+        {'category': '注射藥物', 'name': 'Atropine'},
+        {'category': '注射藥物', 'name': 'Aminophyllin'},
+        {'category': '注射藥物', 'name': 'Xylocaine'},
+        {'category': '注射藥物', 'name': 'Bosmin'},
+        {'category': '注射藥物', 'name': 'Dopamin'},
+        {'category': '注射藥物', 'name': 'Solu-medrol 40mg'},
+        {'category': '注射藥物', 'name': 'Primperan'},
+        {'category': '注射藥物', 'name': 'Vena'},
+        {'category': '注射藥物', 'name': 'Decadrone'},
+        {'category': '注射藥物', 'name': 'Lasix'},
+        {'category': '注射藥物', 'name': 'Buscopan'},
+        {'category': '注射藥物', 'name': 'Haldol'},
+        {'category': '注射藥物', 'name': 'Novamin'},
+        {'category': '注射藥物', 'name': 'Solucortef'},
+        {'category': '注射藥物', 'name': 'Voren'},
+        {'category': '注射藥物', 'name': 'Valium'},
+        {'category': '注射藥物', 'name': 'Morphine'},
+        {'category': '注射藥物', 'name': 'Dormicum'},
+        // Oral Medications
+        {'category': '口服藥物', 'name': 'Augmentin 1g'},
+        {'category': '口服藥物', 'name': 'Actifed(peace)'},
+        {'category': '口服藥物', 'name': 'Adalat-5'},
+        {'category': '口服藥物', 'name': 'Adalat-10'},
+        {'category': '口服藥物', 'name': 'Allegra'},
+        {'category': '口服藥物', 'name': 'Amoxicillin-500'},
+        {'category': '口服藥物', 'name': 'Bensau'},
+        {'category': '口服藥物', 'name': 'Berotec'},
+        {'category': '口服藥物', 'name': 'Bokey'},
+        {'category': '口服藥物', 'name': 'Bonamin'},
+        {'category': '口服藥物', 'name': 'Buscopan'},
+        {'category': '口服藥物', 'name': 'Cafergot'},
+        {'category': '口服藥物', 'name': 'Cataflam'},
+        {'category': '口服藥物', 'name': 'Cephadol'},
+        {'category': '口服藥物', 'name': 'Clarinase'},
+        {'category': '口服藥物', 'name': 'Cety'},
+        {'category': '口服藥物', 'name': 'Capoten'},
+        {'category': '口服藥物', 'name': 'Colchicine'},
+        {'category': '口服藥物', 'name': 'Duspatalin'},
+        {'category': '口服藥物', 'name': 'Flatin'},
+        {'category': '口服藥物', 'name': 'Gascon'},
+        {'category': '口服藥物', 'name': 'Imodium'},
+        {'category': '口服藥物', 'name': 'Incidal'},
+        {'category': '口服藥物', 'name': 'Inderal-10'},
+        {'category': '口服藥物', 'name': 'KBT'},
+        {'category': '口服藥物', 'name': 'Medicon-A'},
+        {'category': '口服藥物', 'name': 'MgO'},
+        {'category': '口服藥物', 'name': 'Mucaine(Strocain)'},
+        {'category': '口服藥物', 'name': 'Motilium'},
+        {'category': '口服藥物', 'name': 'Novamin'},
+        {'category': '口服藥物', 'name': 'Norvasc'},
+        {'category': '口服藥物', 'name': 'NTG'},
+        {'category': '口服藥物', 'name': 'Panadol'},
+        {'category': '口服藥物', 'name': 'Predonine'},
+        {'category': '口服藥物', 'name': 'Periactin'},
+        {'category': '口服藥物', 'name': 'Ponstan'},
+        {'category': '口服藥物', 'name': 'Primperan'},
+        {'category': '口服藥物', 'name': 'Pyridium'},
+        {'category': '口服藥物', 'name': 'Solaxin'},
+        {'category': '口服藥物', 'name': 'Trandate'},
+        {'category': '口服藥物', 'name': 'Transamin'},
+        {'category': '口服藥物', 'name': 'U-save-500'},
+        {'category': '口服藥物', 'name': 'Xanthium'},
+        {'category': '口服藥物', 'name': 'Ativan'},
+        {'category': '口服藥物', 'name': 'Valium-2(管)'},
+        {'category': '口服藥物', 'name': 'Xanax(管)'},
+      ];
+
+      await batch((batch) {
+        for (var i = 0; i < drugs.length; i++) {
+          batch.insert(
+            drugRef,
+            DrugRefCompanion.insert(
+              category: drugs[i]['category']!,
+              name: drugs[i]['name']!,
+              sortOrder: Value(i + 1),
+            ),
+          );
+        }
       });
     }
   }

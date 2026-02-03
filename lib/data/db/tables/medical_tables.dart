@@ -236,6 +236,14 @@ class Treatment extends Table {
   TextColumn get actionSummary => text().nullable()(); // 處理摘要 (JSON)
   TextColumn get actionSummaryOther => text().nullable()(); // 其它處理項目
 
+  // 動態處置細項
+  TextColumn get ekgInterpretation => text().nullable()(); // 心電圖判讀
+  TextColumn get glucose => text().nullable()(); // 血糖值
+  TextColumn get intubationMethod => text().nullable()(); // 插管方式
+  TextColumn get oxygenMethod => text().nullable()(); // 氧氣處置方式
+  RealColumn get oxygenFlow => real().nullable()(); // 氧氣流量
+  TextColumn get certificateLogs => text().nullable()(); // 診斷書種類紀錄
+
   // 結果
   IntColumn get resultId => integer().nullable()(); // 後續結果
   BoolColumn get transportRequired => boolean().nullable()();
@@ -397,5 +405,22 @@ class TelexDocuments extends Table {
       integer().nullable().references(StationRef, #id)();
   IntColumn get fromStationId =>
       integer().nullable().references(StationRef, #id)();
+  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+}
+
+// 6. 藥物記錄表 - Medications
+@DataClassName('MedicationData')
+class Medications extends Table {
+  IntColumn get medicationId => integer().autoIncrement()();
+  IntColumn get medicalId => integer().references(MedicalRecord, #medicalId)();
+
+  TextColumn get name => text().nullable()(); // 藥名
+  TextColumn get method => text().nullable()(); // 方式
+  TextColumn get frequency => text().nullable()(); // 頻率
+  TextColumn get days => text().nullable()(); // 天數
+  TextColumn get dose => text().nullable()(); // 劑量
+  TextColumn get unit => text().nullable()(); // 單位
+  TextColumn get remarks => text().nullable()(); // 備註
+
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
 }

@@ -45,4 +45,5 @@ mixin _$ReferenceDaoMixin on DatabaseAccessor<AppDatabase> {
       attachedDatabase.pupilReactionRef;
   $ConsciousnessLevelRefTable get consciousnessLevelRef =>
       attachedDatabase.consciousnessLevelRef;
+  $DrugRefTable get drugRef => attachedDatabase.drugRef;
 }

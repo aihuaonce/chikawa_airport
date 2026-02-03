@@ -32,6 +32,7 @@ class ReferenceService extends ChangeNotifier {
   List<MedicalStaffData> _medicalStaffList = [];
   List<SpecialNoteRefData> _specialNoteRefs = [];
   List<NursingPhraseData> _nursingPhraseList = [];
+  List<DrugRefData> _drugList = [];
 
   List<PaymentMethodData> _paymentMethodList = [];
   List<CollectionStatusData> _collectionStatusList = [];
@@ -67,6 +68,7 @@ class ReferenceService extends ChangeNotifier {
   List<MedicalStaffData> get medicalStaffList => _medicalStaffList;
   List<SpecialNoteRefData> get specialNoteRefs => _specialNoteRefs;
   List<NursingPhraseData> get nursingPhraseList => _nursingPhraseList;
+  List<DrugRefData> get drugList => _drugList;
 
   List<PaymentMethodData> get paymentMethodList => _paymentMethodList;
   List<CollectionStatusData> get collectionStatusList => _collectionStatusList;
@@ -187,6 +189,7 @@ class ReferenceService extends ChangeNotifier {
       _medicalStaffList = await db.referenceDao.getAllMedicalStaff();
       _specialNoteRefs = await db.referenceDao.getAllSpecialNoteRefs();
       _nursingPhraseList = await db.referenceDao.getAllNursingPhrases();
+      _drugList = await db.referenceDao.getAllDrugs();
 
       _paymentMethodList = await (db.select(
         db.paymentMethod,
@@ -213,6 +216,7 @@ class ReferenceService extends ChangeNotifier {
       debugPrint('  - 醫療人員: ${_medicalStaffList.length}');
       debugPrint('  - 特別註記: ${_specialNoteRefs.length}');
       debugPrint('  - 護理用語: ${_nursingPhraseList.length}');
+      debugPrint('  - 藥物資料: ${_drugList.length}');
       debugPrint('  - 付款方式: ${_paymentMethodList.length}');
       debugPrint('  - 收款狀態: ${_collectionStatusList.length}');
       debugPrint('  - 貨幣種類: ${_currencyList.length}');

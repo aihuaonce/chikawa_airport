@@ -10,6 +10,7 @@ import '../../data/db/database.dart';
 import '../widgets/icd10_search_sheet.dart';
 import '../widgets/staff_search_sheet.dart';
 import '../widgets/reference_search_sheet.dart';
+import '../widgets/medication_edit_dialog.dart';
 
 class TreatmentRecord extends StatefulWidget {
   final int medicalId;
@@ -92,21 +93,7 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
     );
   }
 
-  final List<Map<String, dynamic>> _medicationList = [];
-
-  void _addMedication() {
-    setState(() {
-      _medicationList.add({
-        'name': '',
-        'method': '',
-        'frequency': '',
-        'days': '',
-        'dose': '',
-        'unit': '',
-        'remarks': '',
-      });
-    });
-  }
+  // Removed unused _medicationList and _addMedication
 
   @override
   void initState() {
@@ -208,6 +195,25 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
       _secondaryDiagnosis1Controller.text = treatment.secondaryDiagnosis1 ?? '';
       _secondaryDiagnosis2Controller.text = treatment.secondaryDiagnosis2 ?? '';
       _directorNameController.text = treatment.directorName ?? '';
+
+      // 動態欄位
+      _ekgInterpretationController.text = treatment.ekgInterpretation ?? '';
+      _glucoseController.text = treatment.glucose ?? '';
+      _oxygenFlowController.text = treatment.oxygenFlow?.toString() ?? '';
+
+      // 狀態變數同步
+      if (treatment.intubationMethod != null) {
+        _intubationMethod = treatment.intubationMethod!;
+      }
+      if (treatment.oxygenMethod != null) {
+        _oxygenMethod = treatment.oxygenMethod!;
+      }
+      if (treatment.certificateLogs != null) {
+        _selectedCertTypes.clear();
+        _selectedCertTypes.addAll(
+          treatment.certificateLogs!.split(',').where((s) => s.isNotEmpty),
+        );
+      }
     }
 
     final latestAssessment = viewModel.latestVitalSigns;
@@ -1295,8 +1301,10 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
                     _buildTextField(
                       hint: '請輸入判讀結果...',
                       controller: _ekgInterpretationController,
+                      onChanged: (v) => viewModel.updateEkgInterpretation(v),
                     ),
                     itemWidth,
+                    key: const ValueKey('ekg'),
                   ),
 
                 // 2. 血糖
@@ -1307,20 +1315,24 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
                       hint: '數值',
                       controller: _glucoseController,
                       keyboardType: TextInputType.number,
+                      onChanged: (v) => viewModel.updateGlucose(v),
                     ),
                     itemWidth,
+                    key: const ValueKey('glucose'),
                   ),
 
                 // 3. 插管
                 if (selectedActionNames.contains('插管'))
                   _buildDynamicGridItem(
                     '插管方式',
-                    _buildSegmentedControl(
-                      ['Endo', 'LMA'],
-                      _intubationMethod,
-                      (v) => setState(() => _intubationMethod = v),
-                    ),
+                    _buildSegmentedControl(['Endo', 'LMA'], _intubationMethod, (
+                      v,
+                    ) {
+                      setState(() => _intubationMethod = v);
+                      viewModel.updateIntubationMethod(v);
+                    }),
                     itemWidth,
+                    key: const ValueKey('intubation'),
                   ),
 
                 // 4. 氧氣使用
@@ -1332,7 +1344,10 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
                         _buildSegmentedControl(
                           ['鼻管', '面罩', 'NRM', 'Ambu'],
                           _oxygenMethod,
-                          (v) => setState(() => _oxygenMethod = v),
+                          (v) {
+                            setState(() => _oxygenMethod = v);
+                            viewModel.updateOxygenMethod(v);
+                          },
                         ),
                         const SizedBox(height: 12),
                         Row(
@@ -1343,6 +1358,9 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
                                 hint: '0',
                                 controller: _oxygenFlowController,
                                 keyboardType: TextInputType.number,
+                                onChanged: (v) => viewModel.updateOxygenFlow(
+                                  double.tryParse(v),
+                                ),
                               ),
                             ),
                             const Text(
@@ -1358,6 +1376,7 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
                       ],
                     ),
                     itemWidth,
+                    key: const ValueKey('oxygen'),
                   ),
 
                 // 5. 診斷書
@@ -1370,11 +1389,18 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
                         return Padding(
                           padding: const EdgeInsets.only(bottom: 6),
                           child: InkWell(
-                            onTap: () => setState(
-                              () => isSel
-                                  ? _selectedCertTypes.remove(type)
-                                  : _selectedCertTypes.add(type),
-                            ),
+                            onTap: () {
+                              setState(() {
+                                if (isSel) {
+                                  _selectedCertTypes.remove(type);
+                                } else {
+                                  _selectedCertTypes.add(type);
+                                }
+                                viewModel.updateCertificateLogs(
+                                  _selectedCertTypes.join(','),
+                                );
+                              });
+                            },
                             child: Container(
                               width: double.infinity,
                               padding: const EdgeInsets.symmetric(
@@ -1405,6 +1431,7 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
                       }).toList(),
                     ),
                     itemWidth,
+                    key: const ValueKey('certificate'),
                   ),
 
                 // 6. 其它
@@ -1418,6 +1445,7 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
                       onChanged: (v) => viewModel.updateActionSummaryOther(v),
                     ),
                     itemWidth,
+                    key: const ValueKey('other'),
                   ),
               ],
             );
@@ -1575,8 +1603,14 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
     );
   }
 
-  Widget _buildDynamicGridItem(String label, Widget child, double width) {
+  Widget _buildDynamicGridItem(
+    String label,
+    Widget child,
+    double width, {
+    Key? key,
+  }) {
     return Container(
+      key: key,
       width: width,
       constraints: const BoxConstraints(minHeight: 100),
       padding: const EdgeInsets.all(12),
@@ -1605,17 +1639,27 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
   }
 
   Widget _buildMedicationSection() {
+    final viewModel = context.watch<TreatmentViewModel>();
+    final medications = viewModel.medications;
+
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.only(top: 16),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: bgField,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: primaryColor.withValues(alpha: 0.2),
+          color: primaryColor.withValues(alpha: 0.15),
           width: 1.5,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: primaryColor.withValues(alpha: 0.03),
+            offset: const Offset(0, 4),
+            blurRadius: 12,
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1625,54 +1669,78 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
             children: [
               Row(
                 children: [
-                  Icon(
-                    Icons.medication_outlined,
-                    color: primaryColor,
-                    size: 20,
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: primaryColor.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(
+                      Icons.medication_outlined,
+                      color: primaryColor,
+                      size: 20,
+                    ),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 12),
                   const Text(
                     '藥物記錄表 Medication Record',
                     style: TextStyle(
                       color: primaryColor,
-                      fontSize: 13,
-                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w800,
                     ),
                   ),
                 ],
               ),
               // 新增藥物按鈕
-              TextButton.icon(
-                onPressed: _addMedication,
-                icon: const Icon(Icons.add_circle_outline, size: 18),
-                label: const Text(
-                  '新增藥物',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+              ElevatedButton.icon(
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) =>
+                        MedicationEditDialog(viewModel: viewModel),
+                  );
+                },
+                icon: const Icon(Icons.add_circle_outline, size: 16),
+                label: const Text('新增藥物 Add'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  foregroundColor: primaryColor,
+                  elevation: 0,
+                  side: const BorderSide(color: primaryColor),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
+                  textStyle: const TextStyle(fontWeight: FontWeight.bold),
                 ),
-                style: TextButton.styleFrom(foregroundColor: primaryColor),
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
 
           // 表頭標籤
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF1F5F9),
+              borderRadius: BorderRadius.circular(8),
+            ),
             child: Row(
               children: [
-                Expanded(flex: 3, child: _buildTableLabel('藥品名稱')),
+                Expanded(flex: 3, child: _buildTableLabel('藥品名稱 Drug Name')),
                 const SizedBox(width: 8),
-                Expanded(flex: 2, child: _buildTableLabel('使用方式')),
+                Expanded(flex: 2, child: _buildTableLabel('方式 Method')),
                 const SizedBox(width: 8),
-                Expanded(flex: 2, child: _buildTableLabel('服用頻率')),
+                Expanded(flex: 2, child: _buildTableLabel('頻率 Freq.')),
                 const SizedBox(width: 8),
-                Expanded(flex: 1, child: _buildTableLabel('天數')),
+                Expanded(flex: 1, child: _buildTableLabel('天數 Days')),
                 const SizedBox(width: 8),
-                Expanded(flex: 1, child: _buildTableLabel('劑量')),
+                Expanded(flex: 1, child: _buildTableLabel('劑量 Dose')),
                 const SizedBox(width: 8),
-                Expanded(flex: 2, child: _buildTableLabel('單位')),
+                Expanded(flex: 1, child: _buildTableLabel('單位 Unit')),
                 const SizedBox(width: 8),
-                Expanded(flex: 3, child: _buildTableLabel('備註')),
+                Expanded(flex: 3, child: _buildTableLabel('備註 Remarks')),
                 const SizedBox(width: 40), // 刪除按鈕空間
               ],
             ),
@@ -1680,92 +1748,182 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
           const SizedBox(height: 8),
 
           // 藥物列表內容
-          if (_medicationList.isEmpty)
-            Center(
-              child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Text(
-                  '尚未新增藥物資料',
-                  style: TextStyle(
-                    color: textMuted.withValues(alpha: 0.5),
-                    fontSize: 13,
+          if (medications.isEmpty)
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 40),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: borderColor),
+              ),
+              child: Column(
+                children: [
+                  Icon(
+                    Icons.medication_liquid_outlined,
+                    size: 48,
+                    color: textMuted.withValues(alpha: 0.3),
                   ),
-                ),
+                  const SizedBox(height: 12),
+                  Text(
+                    '尚未新增任何藥物記錄',
+                    style: TextStyle(
+                      color: textMuted.withValues(alpha: 0.7),
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'No medications recorded',
+                    style: TextStyle(
+                      color: textMuted.withValues(alpha: 0.5),
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
               ),
             )
           else
-            ..._medicationList.asMap().entries.map((entry) {
-              int idx = entry.key;
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 8.0),
-                child: Row(
-                  children: [
-                    Expanded(flex: 3, child: _buildCompactField('藥名')),
-                    const SizedBox(width: 8),
-                    Expanded(flex: 2, child: _buildCompactField('方式')),
-                    const SizedBox(width: 8),
-                    Expanded(flex: 2, child: _buildCompactField('頻率')),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      flex: 1,
-                      child: _buildCompactField('0', isNumber: true),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      flex: 1,
-                      child: _buildCompactField('0', isNumber: true),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(flex: 2, child: _buildCompactField('單位')),
-                    const SizedBox(width: 8),
-                    Expanded(flex: 3, child: _buildCompactField('備註')),
-                    const SizedBox(width: 8),
-                    // 刪除按鈕
-                    IconButton(
-                      onPressed: () =>
-                          setState(() => _medicationList.removeAt(idx)),
-                      icon: Icon(
-                        Icons.close_rounded,
-                        color: Colors.red.withValues(alpha: 0.5),
-                        size: 20,
+            ...medications.asMap().entries.map((entry) {
+              final medication = entry.value;
+              final isEven = entry.key % 2 == 0;
+              return Container(
+                margin: const EdgeInsets.only(bottom: 4),
+                child: Material(
+                  color: isEven ? Colors.white : const Color(0xFFF8FAFC),
+                  borderRadius: BorderRadius.circular(8),
+                  child: InkWell(
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) => MedicationEditDialog(
+                          medication: medication,
+                          viewModel: viewModel,
+                        ),
+                      );
+                    },
+                    borderRadius: BorderRadius.circular(8),
+                    hoverColor: primaryColor.withValues(alpha: 0.05),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 14,
                       ),
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            flex: 3,
+                            child: Text(
+                              medication.name ?? '',
+                              style: const TextStyle(
+                                fontSize: 13,
+                                color: Color(0xFF475569),
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            flex: 2,
+                            child: Text(
+                              medication.method ?? '',
+                              style: const TextStyle(
+                                fontSize: 13,
+                                color: Color(0xFF475569),
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            flex: 2,
+                            child: Text(
+                              medication.frequency ?? '',
+                              style: const TextStyle(
+                                fontSize: 13,
+                                color: Color(0xFF475569),
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            flex: 1,
+                            child: Text(
+                              medication.days ?? '',
+                              style: const TextStyle(
+                                fontSize: 13,
+                                color: Color(0xFF475569),
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            flex: 1,
+                            child: Text(
+                              medication.dose ?? '',
+                              style: const TextStyle(
+                                fontSize: 13,
+                                color: Color(0xFF475569),
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            flex: 1,
+                            child: Text(
+                              medication.unit ?? '',
+                              style: const TextStyle(
+                                fontSize: 13,
+                                color: Color(0xFF475569),
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            flex: 3,
+                            child: Text(
+                              medication.remarks ?? '',
+                              style: const TextStyle(
+                                color: textMuted,
+                                fontSize: 12,
+                                fontStyle: FontStyle.italic,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          // 刪除按鈕
+                          SizedBox(
+                            width: 32,
+                            height: 32,
+                            child: IconButton(
+                              onPressed: () => viewModel.deleteMedication(
+                                medication.medicationId,
+                              ),
+                              icon: Icon(
+                                Icons.delete_outline_rounded,
+                                color: Colors.red.withValues(alpha: 0.6),
+                                size: 18,
+                              ),
+                              padding: EdgeInsets.zero,
+                              tooltip: '刪除',
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ],
+                  ),
                 ),
               );
             }),
         ],
-      ),
-    );
-  }
-
-  // 輔助組件：表格專用小型輸入框
-  Widget _buildCompactField(String hint, {bool isNumber = false}) {
-    return SizedBox(
-      height: 38,
-      child: TextField(
-        keyboardType: isNumber ? TextInputType.number : TextInputType.text,
-        style: const TextStyle(fontSize: 13),
-        decoration: InputDecoration(
-          hintText: hint,
-          hintStyle: TextStyle(
-            color: textMuted.withValues(alpha: 0.3),
-            fontSize: 12,
-          ),
-          filled: true,
-          fillColor: Colors.white,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 10),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(6),
-            borderSide: const BorderSide(color: borderColor),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(6),
-            borderSide: const BorderSide(color: primaryColor, width: 1.5),
-          ),
-        ),
       ),
     );
   }
@@ -1775,9 +1933,10 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
     return Text(
       text,
       style: const TextStyle(
-        color: textMuted,
-        fontSize: 10,
+        color: Color(0xFF64748B),
+        fontSize: 11,
         fontWeight: FontWeight.bold,
+        letterSpacing: 0.3,
       ),
       textAlign: TextAlign.center,
     );

@@ -236,3 +236,12 @@ class VisitReason extends Table {
   IntColumn get sortOrder => integer().withDefault(const Constant(0))();
   BoolColumn get isActive => boolean().withDefault(const Constant(true))();
 }
+
+// 13. 藥物參考表 (DrugRef)
+class DrugRef extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get category => text()(); // 噴劑/吸入劑, 水劑, etc.
+  TextColumn get name => text()(); // Drug name
+  IntColumn get sortOrder => integer().withDefault(const Constant(0))();
+  BoolColumn get isActive => boolean().withDefault(const Constant(true))();
+}
