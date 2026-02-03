@@ -2649,6 +2649,7 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
       hint: '請選取現場處置',
       icon: Icons.medical_services,
       onTap: () async {
+        FocusScope.of(context).unfocus(); // 防止焦點跳動
         final result = await ReferenceSearchSheet.show<TreatmentOnSiteData>(
           context,
           title: '選擇現場處置',
@@ -2692,6 +2693,7 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
       hint: '請選取處置結果',
       icon: Icons.assignment_return,
       onTap: () async {
+        FocusScope.of(context).unfocus(); // 防止焦點跳動
         final result = await ReferenceSearchSheet.show<TreatmentResultData>(
           context,
           title: '選擇處置結果',
@@ -2737,6 +2739,7 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
       hint: '請選取轉診醫院',
       icon: Icons.local_hospital,
       onTap: () async {
+        FocusScope.of(context).unfocus(); // 防止焦點跳動
         final result = await ReferenceSearchSheet.show<ReferralHospitalData>(
           context,
           title: '選擇轉診醫院',
