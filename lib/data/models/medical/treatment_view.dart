@@ -1589,9 +1589,14 @@ class TreatmentViewModel extends ChangeNotifier {
   Future<List<ReferralHospitalData>> searchReferralHospitals(
     String keyword,
   ) async {
-    if (keyword.isEmpty) return refService.referralHospitals;
+    // 預設只顯示 'isOther' 為 true 的醫院 (排除主要合約醫院)
+    final otherHospitals = refService.referralHospitals
+        .where((h) => h.isOther)
+        .toList();
+
+    if (keyword.isEmpty) return otherHospitals;
     final lower = keyword.toLowerCase();
-    return refService.referralHospitals
+    return otherHospitals
         .where((h) => h.name.toLowerCase().contains(lower))
         .toList();
   }
