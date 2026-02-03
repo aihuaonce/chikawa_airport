@@ -50,6 +50,7 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
   late TextEditingController _actionSummaryOtherController;
   late TextEditingController _directorNameController;
   late TextEditingController _otherSpecialNoteController;
+  late TextEditingController _referralHospitalFinalController;
 
   // --- 控制器：生命徵象與檢查 ---
   late TextEditingController _tempController,
@@ -80,12 +81,7 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
 
   String _clearanceMethod = '一般通關';
   String _ambulanceSource = '醫療中心';
-  String? _selectedTransferHospital;
-  String? _selectedAccompanyingStaff;
-
-  final List<String> _hospitals = ['林口長庚醫院', '聯新國際醫院', '敏盛綜合醫院', '衛生福利部桃園醫院'];
-  final List<String> _staffs = ['醫護人員 A', '醫護人員 B', '隨車 EMT A', '隨車 EMT B'];
-
+  
   Widget _buildFieldWrapper(String label, Widget field) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -106,6 +102,7 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
     _actionSummaryOtherController = TextEditingController();
     _directorNameController = TextEditingController();
     _otherSpecialNoteController = TextEditingController();
+    _referralHospitalFinalController = TextEditingController();
     _tempController = TextEditingController();
     _pulseController = TextEditingController();
     _breathController = TextEditingController();
@@ -141,6 +138,7 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
     _actionSummaryOtherController.dispose();
     _directorNameController.dispose();
     _otherSpecialNoteController.dispose();
+    _referralHospitalFinalController.dispose();
     _tempController.dispose();
     _pulseController.dispose();
     _breathController.dispose();
@@ -195,6 +193,8 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
       _secondaryDiagnosis1Controller.text = treatment.secondaryDiagnosis1 ?? '';
       _secondaryDiagnosis2Controller.text = treatment.secondaryDiagnosis2 ?? '';
       _directorNameController.text = treatment.directorName ?? '';
+      _referralHospitalFinalController.text =
+          treatment.referralHospitalFinal ?? '';
 
       // 動態欄位
       _ekgInterpretationController.text = treatment.ekgInterpretation ?? '';
@@ -1458,6 +1458,23 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
   }
 
   Widget _buildReferralDetailSection() {
+    final viewModel = context.watch<TreatmentViewModel>();
+    final treatment = viewModel.treatment;
+
+    // 準備轉診醫院顯示文字
+    final selectedHospital =
+        treatment?.referralHospitalId != null
+            ? viewModel.getReferralHospitalById(treatment!.referralHospitalId)
+            : null;
+    final hospitalText =
+        selectedHospital != null
+            ? selectedHospital.name
+            : (treatment?.referralHospitalFinal ?? '');
+
+    // 準備隨車人員顯示文字
+    final selectedStaff = viewModel.ambulanceStaff;
+    final staffText = selectedStaff != null ? selectedStaff.name : '';
+
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.only(top: 16),
@@ -1526,23 +1543,139 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
                   children: [
                     _buildFieldWrapper(
                       '轉送醫院 Transfer Hospital',
-                      _buildSimpleDropdown(
-                        hint: '請選擇轉送醫院',
-                        value: _selectedTransferHospital,
-                        items: _hospitals,
-                        onChanged: (v) =>
-                            setState(() => _selectedTransferHospital = v),
+                      Column(
+                        children: [
+                          _buildSelectionField(
+                            text: hospitalText,
+                            hint: '請選擇轉送醫院',
+                            icon: Icons.local_hospital,
+                            onTap: () async {
+                              FocusScope.of(context).unfocus();
+                              final result = await ReferenceSearchSheet.show<
+                                ReferralHospitalData
+                              >(
+                                context,
+                                title: '選擇轉診醫院',
+                                searchFunction: viewModel.searchReferralHospitals,
+                                initialSelection: selectedHospital,
+                                isSelectedComparator: (a, b) => a.id == b?.id,
+                                itemBuilder: (context, item, isSelected) {
+                                  return ListTile(
+                                    title: Text(
+                                      item.name,
+                                      style: TextStyle(
+                                        color:
+                                            isSelected
+                                                ? primaryColor
+                                                : textDark,
+                                        fontWeight:
+                                            isSelected
+                                                ? FontWeight.bold
+                                                : FontWeight.normal,
+                                      ),
+                                    ),
+                                    trailing:
+                                        isSelected
+                                            ? const Icon(
+                                              Icons.check,
+                                              color: primaryColor,
+                                            )
+                                            : null,
+                                  );
+                                },
+                              );
+
+                              if (result != null) {
+                                viewModel.updateReferralHospitalId(result.id);
+                                if (result.name != '其他醫院') {
+                                  viewModel.updateReferralHospitalFinal(
+                                    result.name,
+                                  );
+                                  _referralHospitalFinalController.text =
+                                      result.name;
+                                } else {
+                                  viewModel.updateReferralHospitalFinal('');
+                                  _referralHospitalFinalController.clear();
+                                }
+                              }
+                            },
+                          ),
+                          if (selectedHospital?.name == '其他醫院') ...[
+                            const SizedBox(height: 8),
+                            _buildTextField(
+                              hint: '請輸入其它醫院名稱',
+                              controller: _referralHospitalFinalController,
+                              onChanged:
+                                  (val) =>
+                                      viewModel.updateReferralHospitalFinal(val),
+                            ),
+                          ],
+                        ],
                       ),
                     ),
                     const SizedBox(height: 20),
                     _buildFieldWrapper(
                       '隨車人員 Accompanying Staff',
-                      _buildSimpleDropdown(
+                      _buildSelectionField(
+                        text: staffText,
                         hint: '請選擇隨車人員',
-                        value: _selectedAccompanyingStaff,
-                        items: _staffs,
-                        onChanged: (v) =>
-                            setState(() => _selectedAccompanyingStaff = v),
+                        icon: Icons.person,
+                        onTap: () async {
+                          FocusScope.of(context).unfocus();
+                          final result =
+                              await ReferenceSearchSheet.show<MedicalStaffData>(
+                                context,
+                                title: '選擇隨車人員',
+                                searchFunction: viewModel.searchMedicalStaff,
+                                initialSelection: selectedStaff,
+                                isSelectedComparator: (a, b) => a.id == b?.id,
+                                itemBuilder: (context, item, isSelected) {
+                                  return ListTile(
+                                    leading: CircleAvatar(
+                                      backgroundColor: primaryColor.withValues(
+                                        alpha: 0.1,
+                                      ),
+                                      child: Text(
+                                        item.role.isNotEmpty
+                                            ? item.role[0]
+                                            : '?',
+                                        style: const TextStyle(
+                                          color: primaryColor,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                    title: Text(
+                                      item.name,
+                                      style: TextStyle(
+                                        color:
+                                            isSelected
+                                                ? primaryColor
+                                                : textDark,
+                                        fontWeight:
+                                            isSelected
+                                                ? FontWeight.bold
+                                                : FontWeight.w600,
+                                      ),
+                                    ),
+                                    subtitle: Text(
+                                      '${item.role} ${item.employeeId != null ? '(${item.employeeId})' : ''}',
+                                    ),
+                                    trailing:
+                                        isSelected
+                                            ? const Icon(
+                                              Icons.check,
+                                              color: primaryColor,
+                                            )
+                                            : null,
+                                  );
+                                },
+                              );
+
+                          if (result != null) {
+                            viewModel.updateAmbulanceStaffId(result.id);
+                          }
+                        },
                       ),
                     ),
                   ],
@@ -1551,54 +1684,6 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
             ],
           ),
         ],
-      ),
-    );
-  }
-
-  // 專為此區塊設計的簡約下拉選單
-  Widget _buildSimpleDropdown({
-    required String hint,
-    required String? value,
-    required List<String> items,
-    required Function(String?) onChanged,
-  }) {
-    return Container(
-      height: 44,
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: borderColor),
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<String>(
-          value: value,
-          hint: Text(
-            hint,
-            style: TextStyle(
-              color: textMuted.withValues(alpha: 0.5),
-              fontSize: 13,
-            ),
-          ),
-          isExpanded: true,
-          icon: const Icon(
-            Icons.keyboard_arrow_down,
-            size: 20,
-            color: textMuted,
-          ),
-          items: items
-              .map(
-                (s) => DropdownMenuItem(
-                  value: s,
-                  child: Text(
-                    s,
-                    style: const TextStyle(fontSize: 14, color: textDark),
-                  ),
-                ),
-              )
-              .toList(),
-          onChanged: onChanged,
-        ),
       ),
     );
   }
@@ -2059,12 +2144,11 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
                 setState(() {
                   _clearanceMethod = '一般通關';
                   _ambulanceSource = '醫療中心';
-                  _selectedTransferHospital = null;
-                  _selectedAccompanyingStaff = null;
                 });
                 viewModel.updateClearanceId(null);
                 viewModel.updateReferralHospitalId(null);
                 viewModel.updateReferralHospitalFinal(null);
+                viewModel.updateAmbulanceStaffId(null);
               } else if (item.name == '藥物使用') {
                 // 刪除所有藥物記錄
                 final medsToDelete = List<int>.from(
@@ -2734,39 +2818,62 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
         ? selectedHospital.name
         : (treatment?.referralHospitalFinal ?? '');
 
-    return _buildSelectionField(
-      text: text,
-      hint: '請選取轉診醫院',
-      icon: Icons.local_hospital,
-      onTap: () async {
-        FocusScope.of(context).unfocus(); // 防止焦點跳動
-        final result = await ReferenceSearchSheet.show<ReferralHospitalData>(
-          context,
-          title: '選擇轉診醫院',
-          searchFunction: viewModel.searchReferralHospitals,
-          initialSelection: selectedHospital,
-          isSelectedComparator: (a, b) => a.id == b?.id,
-          itemBuilder: (context, item, isSelected) {
-            return ListTile(
-              title: Text(
-                item.name,
-                style: TextStyle(
-                  color: isSelected ? primaryColor : textDark,
-                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                ),
-              ),
-              trailing: isSelected
-                  ? const Icon(Icons.check, color: primaryColor)
-                  : null,
-            );
-          },
-        );
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildSelectionField(
+          text: text,
+          hint: '請選取轉診醫院',
+          icon: Icons.local_hospital,
+          onTap: () async {
+            FocusScope.of(context).unfocus(); // 防止焦點跳動
+            final result =
+                await ReferenceSearchSheet.show<ReferralHospitalData>(
+                  context,
+                  title: '選擇轉診醫院',
+                  searchFunction: viewModel.searchReferralHospitals,
+                  initialSelection: selectedHospital,
+                  isSelectedComparator: (a, b) => a.id == b?.id,
+                  itemBuilder: (context, item, isSelected) {
+                    return ListTile(
+                      title: Text(
+                        item.name,
+                        style: TextStyle(
+                          color: isSelected ? primaryColor : textDark,
+                          fontWeight: isSelected
+                              ? FontWeight.bold
+                              : FontWeight.normal,
+                        ),
+                      ),
+                      trailing: isSelected
+                          ? const Icon(Icons.check, color: primaryColor)
+                          : null,
+                    );
+                  },
+                );
 
-        if (result != null) {
-          viewModel.updateReferralHospitalId(result.id);
-          viewModel.updateReferralHospitalFinal(result.name);
-        }
-      },
+            if (result != null) {
+              viewModel.updateReferralHospitalId(result.id);
+              // 如果選的不是「其他醫院」，則自動填入名稱，否則清空讓使用者輸入
+              if (result.name != '其他醫院') {
+                viewModel.updateReferralHospitalFinal(result.name);
+                _referralHospitalFinalController.text = result.name;
+              } else {
+                viewModel.updateReferralHospitalFinal('');
+                _referralHospitalFinalController.clear();
+              }
+            }
+          },
+        ),
+        if (selectedHospital?.name == '其他醫院') ...[
+          const SizedBox(height: 8),
+          _buildTextField(
+            hint: '請輸入其它醫院名稱',
+            controller: _referralHospitalFinalController,
+            onChanged: (val) => viewModel.updateReferralHospitalFinal(val),
+          ),
+        ],
+      ],
     );
   }
 

@@ -18,6 +18,7 @@ mixin _$TreatmentDaoMixin on DatabaseAccessor<AppDatabase> {
   $HistoryStatusRefTable get historyStatusRef =>
       attachedDatabase.historyStatusRef;
   $MedicalHistoryTable get medicalHistory => attachedDatabase.medicalHistory;
+  $MedicalStaffTable get medicalStaff => attachedDatabase.medicalStaff;
   $TreatmentTable get treatment => attachedDatabase.treatment;
   $MedicalStaffRoleTable get medicalStaffRole =>
       attachedDatabase.medicalStaffRole;

@@ -17215,6 +17215,20 @@ class $TreatmentTable extends Treatment
         type: DriftSqlType.string,
         requiredDuringInsert: false,
       );
+  static const VerificationMeta _ambulanceStaffIdMeta = const VerificationMeta(
+    'ambulanceStaffId',
+  );
+  @override
+  late final GeneratedColumn<int> ambulanceStaffId = GeneratedColumn<int>(
+    'ambulance_staff_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES medical_staff (id)',
+    ),
+  );
   static const VerificationMeta _arrivalTimeMeta = const VerificationMeta(
     'arrivalTime',
   );
@@ -17327,6 +17341,7 @@ class $TreatmentTable extends Treatment
     transportMethod,
     referralHospitalId,
     referralHospitalFinal,
+    ambulanceStaffId,
     arrivalTime,
     clearanceId,
     expeditedClearanceId,
@@ -17521,6 +17536,15 @@ class $TreatmentTable extends Treatment
         ),
       );
     }
+    if (data.containsKey('ambulance_staff_id')) {
+      context.handle(
+        _ambulanceStaffIdMeta,
+        ambulanceStaffId.isAcceptableOrUnknown(
+          data['ambulance_staff_id']!,
+          _ambulanceStaffIdMeta,
+        ),
+      );
+    }
     if (data.containsKey('arrival_time')) {
       context.handle(
         _arrivalTimeMeta,
@@ -17686,6 +17710,10 @@ class $TreatmentTable extends Treatment
         DriftSqlType.string,
         data['${effectivePrefix}referral_hospital_final'],
       ),
+      ambulanceStaffId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}ambulance_staff_id'],
+      ),
       arrivalTime: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}arrival_time'],
@@ -17749,6 +17777,7 @@ class TreatmentData extends DataClass implements Insertable<TreatmentData> {
   final String? transportMethod;
   final int? referralHospitalId;
   final String? referralHospitalFinal;
+  final int? ambulanceStaffId;
   final DateTime? arrivalTime;
   final int? clearanceId;
   final int? expeditedClearanceId;
@@ -17779,6 +17808,7 @@ class TreatmentData extends DataClass implements Insertable<TreatmentData> {
     this.transportMethod,
     this.referralHospitalId,
     this.referralHospitalFinal,
+    this.ambulanceStaffId,
     this.arrivalTime,
     this.clearanceId,
     this.expeditedClearanceId,
@@ -17849,6 +17879,9 @@ class TreatmentData extends DataClass implements Insertable<TreatmentData> {
     }
     if (!nullToAbsent || referralHospitalFinal != null) {
       map['referral_hospital_final'] = Variable<String>(referralHospitalFinal);
+    }
+    if (!nullToAbsent || ambulanceStaffId != null) {
+      map['ambulance_staff_id'] = Variable<int>(ambulanceStaffId);
     }
     if (!nullToAbsent || arrivalTime != null) {
       map['arrival_time'] = Variable<DateTime>(arrivalTime);
@@ -17936,6 +17969,9 @@ class TreatmentData extends DataClass implements Insertable<TreatmentData> {
       referralHospitalFinal: referralHospitalFinal == null && nullToAbsent
           ? const Value.absent()
           : Value(referralHospitalFinal),
+      ambulanceStaffId: ambulanceStaffId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(ambulanceStaffId),
       arrivalTime: arrivalTime == null && nullToAbsent
           ? const Value.absent()
           : Value(arrivalTime),
@@ -18000,6 +18036,7 @@ class TreatmentData extends DataClass implements Insertable<TreatmentData> {
       referralHospitalFinal: serializer.fromJson<String?>(
         json['referralHospitalFinal'],
       ),
+      ambulanceStaffId: serializer.fromJson<int?>(json['ambulanceStaffId']),
       arrivalTime: serializer.fromJson<DateTime?>(json['arrivalTime']),
       clearanceId: serializer.fromJson<int?>(json['clearanceId']),
       expeditedClearanceId: serializer.fromJson<int?>(
@@ -18039,6 +18076,7 @@ class TreatmentData extends DataClass implements Insertable<TreatmentData> {
       'referralHospitalFinal': serializer.toJson<String?>(
         referralHospitalFinal,
       ),
+      'ambulanceStaffId': serializer.toJson<int?>(ambulanceStaffId),
       'arrivalTime': serializer.toJson<DateTime?>(arrivalTime),
       'clearanceId': serializer.toJson<int?>(clearanceId),
       'expeditedClearanceId': serializer.toJson<int?>(expeditedClearanceId),
@@ -18072,6 +18110,7 @@ class TreatmentData extends DataClass implements Insertable<TreatmentData> {
     Value<String?> transportMethod = const Value.absent(),
     Value<int?> referralHospitalId = const Value.absent(),
     Value<String?> referralHospitalFinal = const Value.absent(),
+    Value<int?> ambulanceStaffId = const Value.absent(),
     Value<DateTime?> arrivalTime = const Value.absent(),
     Value<int?> clearanceId = const Value.absent(),
     Value<int?> expeditedClearanceId = const Value.absent(),
@@ -18128,6 +18167,9 @@ class TreatmentData extends DataClass implements Insertable<TreatmentData> {
     referralHospitalFinal: referralHospitalFinal.present
         ? referralHospitalFinal.value
         : this.referralHospitalFinal,
+    ambulanceStaffId: ambulanceStaffId.present
+        ? ambulanceStaffId.value
+        : this.ambulanceStaffId,
     arrivalTime: arrivalTime.present ? arrivalTime.value : this.arrivalTime,
     clearanceId: clearanceId.present ? clearanceId.value : this.clearanceId,
     expeditedClearanceId: expeditedClearanceId.present
@@ -18198,6 +18240,9 @@ class TreatmentData extends DataClass implements Insertable<TreatmentData> {
       referralHospitalFinal: data.referralHospitalFinal.present
           ? data.referralHospitalFinal.value
           : this.referralHospitalFinal,
+      ambulanceStaffId: data.ambulanceStaffId.present
+          ? data.ambulanceStaffId.value
+          : this.ambulanceStaffId,
       arrivalTime: data.arrivalTime.present
           ? data.arrivalTime.value
           : this.arrivalTime,
@@ -18249,6 +18294,7 @@ class TreatmentData extends DataClass implements Insertable<TreatmentData> {
           ..write('transportMethod: $transportMethod, ')
           ..write('referralHospitalId: $referralHospitalId, ')
           ..write('referralHospitalFinal: $referralHospitalFinal, ')
+          ..write('ambulanceStaffId: $ambulanceStaffId, ')
           ..write('arrivalTime: $arrivalTime, ')
           ..write('clearanceId: $clearanceId, ')
           ..write('expeditedClearanceId: $expeditedClearanceId, ')
@@ -18284,6 +18330,7 @@ class TreatmentData extends DataClass implements Insertable<TreatmentData> {
     transportMethod,
     referralHospitalId,
     referralHospitalFinal,
+    ambulanceStaffId,
     arrivalTime,
     clearanceId,
     expeditedClearanceId,
@@ -18318,6 +18365,7 @@ class TreatmentData extends DataClass implements Insertable<TreatmentData> {
           other.transportMethod == this.transportMethod &&
           other.referralHospitalId == this.referralHospitalId &&
           other.referralHospitalFinal == this.referralHospitalFinal &&
+          other.ambulanceStaffId == this.ambulanceStaffId &&
           other.arrivalTime == this.arrivalTime &&
           other.clearanceId == this.clearanceId &&
           other.expeditedClearanceId == this.expeditedClearanceId &&
@@ -18350,6 +18398,7 @@ class TreatmentCompanion extends UpdateCompanion<TreatmentData> {
   final Value<String?> transportMethod;
   final Value<int?> referralHospitalId;
   final Value<String?> referralHospitalFinal;
+  final Value<int?> ambulanceStaffId;
   final Value<DateTime?> arrivalTime;
   final Value<int?> clearanceId;
   final Value<int?> expeditedClearanceId;
@@ -18380,6 +18429,7 @@ class TreatmentCompanion extends UpdateCompanion<TreatmentData> {
     this.transportMethod = const Value.absent(),
     this.referralHospitalId = const Value.absent(),
     this.referralHospitalFinal = const Value.absent(),
+    this.ambulanceStaffId = const Value.absent(),
     this.arrivalTime = const Value.absent(),
     this.clearanceId = const Value.absent(),
     this.expeditedClearanceId = const Value.absent(),
@@ -18411,6 +18461,7 @@ class TreatmentCompanion extends UpdateCompanion<TreatmentData> {
     this.transportMethod = const Value.absent(),
     this.referralHospitalId = const Value.absent(),
     this.referralHospitalFinal = const Value.absent(),
+    this.ambulanceStaffId = const Value.absent(),
     this.arrivalTime = const Value.absent(),
     this.clearanceId = const Value.absent(),
     this.expeditedClearanceId = const Value.absent(),
@@ -18442,6 +18493,7 @@ class TreatmentCompanion extends UpdateCompanion<TreatmentData> {
     Expression<String>? transportMethod,
     Expression<int>? referralHospitalId,
     Expression<String>? referralHospitalFinal,
+    Expression<int>? ambulanceStaffId,
     Expression<DateTime>? arrivalTime,
     Expression<int>? clearanceId,
     Expression<int>? expeditedClearanceId,
@@ -18479,6 +18531,7 @@ class TreatmentCompanion extends UpdateCompanion<TreatmentData> {
         'referral_hospital_id': referralHospitalId,
       if (referralHospitalFinal != null)
         'referral_hospital_final': referralHospitalFinal,
+      if (ambulanceStaffId != null) 'ambulance_staff_id': ambulanceStaffId,
       if (arrivalTime != null) 'arrival_time': arrivalTime,
       if (clearanceId != null) 'clearance_id': clearanceId,
       if (expeditedClearanceId != null)
@@ -18513,6 +18566,7 @@ class TreatmentCompanion extends UpdateCompanion<TreatmentData> {
     Value<String?>? transportMethod,
     Value<int?>? referralHospitalId,
     Value<String?>? referralHospitalFinal,
+    Value<int?>? ambulanceStaffId,
     Value<DateTime?>? arrivalTime,
     Value<int?>? clearanceId,
     Value<int?>? expeditedClearanceId,
@@ -18545,6 +18599,7 @@ class TreatmentCompanion extends UpdateCompanion<TreatmentData> {
       referralHospitalId: referralHospitalId ?? this.referralHospitalId,
       referralHospitalFinal:
           referralHospitalFinal ?? this.referralHospitalFinal,
+      ambulanceStaffId: ambulanceStaffId ?? this.ambulanceStaffId,
       arrivalTime: arrivalTime ?? this.arrivalTime,
       clearanceId: clearanceId ?? this.clearanceId,
       expeditedClearanceId: expeditedClearanceId ?? this.expeditedClearanceId,
@@ -18624,6 +18679,9 @@ class TreatmentCompanion extends UpdateCompanion<TreatmentData> {
         referralHospitalFinal.value,
       );
     }
+    if (ambulanceStaffId.present) {
+      map['ambulance_staff_id'] = Variable<int>(ambulanceStaffId.value);
+    }
     if (arrivalTime.present) {
       map['arrival_time'] = Variable<DateTime>(arrivalTime.value);
     }
@@ -18675,6 +18733,7 @@ class TreatmentCompanion extends UpdateCompanion<TreatmentData> {
           ..write('transportMethod: $transportMethod, ')
           ..write('referralHospitalId: $referralHospitalId, ')
           ..write('referralHospitalFinal: $referralHospitalFinal, ')
+          ..write('ambulanceStaffId: $ambulanceStaffId, ')
           ..write('arrivalTime: $arrivalTime, ')
           ..write('clearanceId: $clearanceId, ')
           ..write('expeditedClearanceId: $expeditedClearanceId, ')
@@ -30329,6 +30388,27 @@ final class $$MedicalStaffTableReferences
         BaseReferences<_$AppDatabase, $MedicalStaffTable, MedicalStaffData> {
   $$MedicalStaffTableReferences(super.$_db, super.$_table, super.$_typedResult);
 
+  static MultiTypedResultKey<$TreatmentTable, List<TreatmentData>>
+  _treatmentRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.treatment,
+    aliasName: $_aliasNameGenerator(
+      db.medicalStaff.id,
+      db.treatment.ambulanceStaffId,
+    ),
+  );
+
+  $$TreatmentTableProcessedTableManager get treatmentRefs {
+    final manager = $$TreatmentTableTableManager(
+      $_db,
+      $_db.treatment,
+    ).filter((f) => f.ambulanceStaffId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_treatmentRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
   static MultiTypedResultKey<$NursingRecordsTable, List<NursingRecordData>>
   _nursingRecordsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
     db.nursingRecords,
@@ -30399,6 +30479,31 @@ class $$MedicalStaffTableFilterComposer
     column: $table.isActive,
     builder: (column) => ColumnFilters(column),
   );
+
+  Expression<bool> treatmentRefs(
+    Expression<bool> Function($$TreatmentTableFilterComposer f) f,
+  ) {
+    final $$TreatmentTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.treatment,
+      getReferencedColumn: (t) => t.ambulanceStaffId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TreatmentTableFilterComposer(
+            $db: $db,
+            $table: $db.treatment,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 
   Expression<bool> nursingRecordsRefs(
     Expression<bool> Function($$NursingRecordsTableFilterComposer f) f,
@@ -30513,6 +30618,31 @@ class $$MedicalStaffTableAnnotationComposer
   GeneratedColumn<bool> get isActive =>
       $composableBuilder(column: $table.isActive, builder: (column) => column);
 
+  Expression<T> treatmentRefs<T extends Object>(
+    Expression<T> Function($$TreatmentTableAnnotationComposer a) f,
+  ) {
+    final $$TreatmentTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.treatment,
+      getReferencedColumn: (t) => t.ambulanceStaffId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TreatmentTableAnnotationComposer(
+            $db: $db,
+            $table: $db.treatment,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
   Expression<T> nursingRecordsRefs<T extends Object>(
     Expression<T> Function($$NursingRecordsTableAnnotationComposer a) f,
   ) {
@@ -30552,7 +30682,7 @@ class $$MedicalStaffTableTableManager
           $$MedicalStaffTableUpdateCompanionBuilder,
           (MedicalStaffData, $$MedicalStaffTableReferences),
           MedicalStaffData,
-          PrefetchHooks Function({bool nursingRecordsRefs})
+          PrefetchHooks Function({bool treatmentRefs, bool nursingRecordsRefs})
         > {
   $$MedicalStaffTableTableManager(_$AppDatabase db, $MedicalStaffTable table)
     : super(
@@ -30613,38 +30743,63 @@ class $$MedicalStaffTableTableManager
                 ),
               )
               .toList(),
-          prefetchHooksCallback: ({nursingRecordsRefs = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [
-                if (nursingRecordsRefs) db.nursingRecords,
-              ],
-              addJoins: null,
-              getPrefetchedDataCallback: (items) async {
-                return [
-                  if (nursingRecordsRefs)
-                    await $_getPrefetchedData<
-                      MedicalStaffData,
-                      $MedicalStaffTable,
-                      NursingRecordData
-                    >(
-                      currentTable: table,
-                      referencedTable: $$MedicalStaffTableReferences
-                          ._nursingRecordsRefsTable(db),
-                      managerFromTypedResult: (p0) =>
-                          $$MedicalStaffTableReferences(
-                            db,
-                            table,
-                            p0,
-                          ).nursingRecordsRefs,
-                      referencedItemsForCurrentItem: (item, referencedItems) =>
-                          referencedItems.where((e) => e.nurseId == item.id),
-                      typedResults: items,
-                    ),
-                ];
+          prefetchHooksCallback:
+              ({treatmentRefs = false, nursingRecordsRefs = false}) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (treatmentRefs) db.treatment,
+                    if (nursingRecordsRefs) db.nursingRecords,
+                  ],
+                  addJoins: null,
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (treatmentRefs)
+                        await $_getPrefetchedData<
+                          MedicalStaffData,
+                          $MedicalStaffTable,
+                          TreatmentData
+                        >(
+                          currentTable: table,
+                          referencedTable: $$MedicalStaffTableReferences
+                              ._treatmentRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$MedicalStaffTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).treatmentRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.ambulanceStaffId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (nursingRecordsRefs)
+                        await $_getPrefetchedData<
+                          MedicalStaffData,
+                          $MedicalStaffTable,
+                          NursingRecordData
+                        >(
+                          currentTable: table,
+                          referencedTable: $$MedicalStaffTableReferences
+                              ._nursingRecordsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$MedicalStaffTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).nursingRecordsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.nurseId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
               },
-            );
-          },
         ),
       );
 }
@@ -30661,7 +30816,7 @@ typedef $$MedicalStaffTableProcessedTableManager =
       $$MedicalStaffTableUpdateCompanionBuilder,
       (MedicalStaffData, $$MedicalStaffTableReferences),
       MedicalStaffData,
-      PrefetchHooks Function({bool nursingRecordsRefs})
+      PrefetchHooks Function({bool treatmentRefs, bool nursingRecordsRefs})
     >;
 typedef $$SpecialNoteRefTableCreateCompanionBuilder =
     SpecialNoteRefCompanion Function({
@@ -42178,6 +42333,7 @@ typedef $$TreatmentTableCreateCompanionBuilder =
       Value<String?> transportMethod,
       Value<int?> referralHospitalId,
       Value<String?> referralHospitalFinal,
+      Value<int?> ambulanceStaffId,
       Value<DateTime?> arrivalTime,
       Value<int?> clearanceId,
       Value<int?> expeditedClearanceId,
@@ -42210,6 +42366,7 @@ typedef $$TreatmentTableUpdateCompanionBuilder =
       Value<String?> transportMethod,
       Value<int?> referralHospitalId,
       Value<String?> referralHospitalFinal,
+      Value<int?> ambulanceStaffId,
       Value<DateTime?> arrivalTime,
       Value<int?> clearanceId,
       Value<int?> expeditedClearanceId,
@@ -42240,6 +42397,25 @@ final class $$TreatmentTableReferences
       $_db.medicalRecord,
     ).filter((f) => f.medicalId.sqlEquals($_column));
     final item = $_typedResult.readTableOrNull(_medicalIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $MedicalStaffTable _ambulanceStaffIdTable(_$AppDatabase db) =>
+      db.medicalStaff.createAlias(
+        $_aliasNameGenerator(db.treatment.ambulanceStaffId, db.medicalStaff.id),
+      );
+
+  $$MedicalStaffTableProcessedTableManager? get ambulanceStaffId {
+    final $_column = $_itemColumn<int>('ambulance_staff_id');
+    if ($_column == null) return null;
+    final manager = $$MedicalStaffTableTableManager(
+      $_db,
+      $_db.medicalStaff,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_ambulanceStaffIdTable($_db));
     if (item == null) return manager;
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: [item]),
@@ -42452,6 +42628,29 @@ class $$TreatmentTableFilterComposer
     return composer;
   }
 
+  $$MedicalStaffTableFilterComposer get ambulanceStaffId {
+    final $$MedicalStaffTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.ambulanceStaffId,
+      referencedTable: $db.medicalStaff,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MedicalStaffTableFilterComposer(
+            $db: $db,
+            $table: $db.medicalStaff,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
   Expression<bool> treatmentActionLinksRefs(
     Expression<bool> Function($$TreatmentActionLinksTableFilterComposer f) f,
   ) {
@@ -42649,6 +42848,29 @@ class $$TreatmentTableOrderingComposer
     );
     return composer;
   }
+
+  $$MedicalStaffTableOrderingComposer get ambulanceStaffId {
+    final $$MedicalStaffTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.ambulanceStaffId,
+      referencedTable: $db.medicalStaff,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MedicalStaffTableOrderingComposer(
+            $db: $db,
+            $table: $db.medicalStaff,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
 }
 
 class $$TreatmentTableAnnotationComposer
@@ -42815,6 +43037,29 @@ class $$TreatmentTableAnnotationComposer
     return composer;
   }
 
+  $$MedicalStaffTableAnnotationComposer get ambulanceStaffId {
+    final $$MedicalStaffTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.ambulanceStaffId,
+      referencedTable: $db.medicalStaff,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MedicalStaffTableAnnotationComposer(
+            $db: $db,
+            $table: $db.medicalStaff,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
   Expression<T> treatmentActionLinksRefs<T extends Object>(
     Expression<T> Function($$TreatmentActionLinksTableAnnotationComposer a) f,
   ) {
@@ -42857,6 +43102,7 @@ class $$TreatmentTableTableManager
           TreatmentData,
           PrefetchHooks Function({
             bool medicalId,
+            bool ambulanceStaffId,
             bool treatmentActionLinksRefs,
           })
         > {
@@ -42894,6 +43140,7 @@ class $$TreatmentTableTableManager
                 Value<String?> transportMethod = const Value.absent(),
                 Value<int?> referralHospitalId = const Value.absent(),
                 Value<String?> referralHospitalFinal = const Value.absent(),
+                Value<int?> ambulanceStaffId = const Value.absent(),
                 Value<DateTime?> arrivalTime = const Value.absent(),
                 Value<int?> clearanceId = const Value.absent(),
                 Value<int?> expeditedClearanceId = const Value.absent(),
@@ -42924,6 +43171,7 @@ class $$TreatmentTableTableManager
                 transportMethod: transportMethod,
                 referralHospitalId: referralHospitalId,
                 referralHospitalFinal: referralHospitalFinal,
+                ambulanceStaffId: ambulanceStaffId,
                 arrivalTime: arrivalTime,
                 clearanceId: clearanceId,
                 expeditedClearanceId: expeditedClearanceId,
@@ -42956,6 +43204,7 @@ class $$TreatmentTableTableManager
                 Value<String?> transportMethod = const Value.absent(),
                 Value<int?> referralHospitalId = const Value.absent(),
                 Value<String?> referralHospitalFinal = const Value.absent(),
+                Value<int?> ambulanceStaffId = const Value.absent(),
                 Value<DateTime?> arrivalTime = const Value.absent(),
                 Value<int?> clearanceId = const Value.absent(),
                 Value<int?> expeditedClearanceId = const Value.absent(),
@@ -42986,6 +43235,7 @@ class $$TreatmentTableTableManager
                 transportMethod: transportMethod,
                 referralHospitalId: referralHospitalId,
                 referralHospitalFinal: referralHospitalFinal,
+                ambulanceStaffId: ambulanceStaffId,
                 arrivalTime: arrivalTime,
                 clearanceId: clearanceId,
                 expeditedClearanceId: expeditedClearanceId,
@@ -43004,7 +43254,11 @@ class $$TreatmentTableTableManager
               )
               .toList(),
           prefetchHooksCallback:
-              ({medicalId = false, treatmentActionLinksRefs = false}) {
+              ({
+                medicalId = false,
+                ambulanceStaffId = false,
+                treatmentActionLinksRefs = false,
+              }) {
                 return PrefetchHooks(
                   db: db,
                   explicitlyWatchedTables: [
@@ -43036,6 +43290,19 @@ class $$TreatmentTableTableManager
                                     referencedColumn: $$TreatmentTableReferences
                                         ._medicalIdTable(db)
                                         .medicalId,
+                                  )
+                                  as T;
+                        }
+                        if (ambulanceStaffId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.ambulanceStaffId,
+                                    referencedTable: $$TreatmentTableReferences
+                                        ._ambulanceStaffIdTable(db),
+                                    referencedColumn: $$TreatmentTableReferences
+                                        ._ambulanceStaffIdTable(db)
+                                        .id,
                                   )
                                   as T;
                         }
@@ -43085,7 +43352,11 @@ typedef $$TreatmentTableProcessedTableManager =
       $$TreatmentTableUpdateCompanionBuilder,
       (TreatmentData, $$TreatmentTableReferences),
       TreatmentData,
-      PrefetchHooks Function({bool medicalId, bool treatmentActionLinksRefs})
+      PrefetchHooks Function({
+        bool medicalId,
+        bool ambulanceStaffId,
+        bool treatmentActionLinksRefs,
+      })
     >;
 typedef $$MedicalStaffAssignmentTableCreateCompanionBuilder =
     MedicalStaffAssignmentCompanion Function({

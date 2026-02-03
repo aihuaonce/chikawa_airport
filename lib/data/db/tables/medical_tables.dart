@@ -250,6 +250,7 @@ class Treatment extends Table {
   TextColumn get transportMethod => text().nullable()();
   IntColumn get referralHospitalId => integer().nullable()();
   TextColumn get referralHospitalFinal => text().nullable()(); // 其它醫院名稱
+  IntColumn get ambulanceStaffId => integer().nullable().references(MedicalStaff, #id)(); // 隨車人員
 
   DateTimeColumn get arrivalTime => dateTime().nullable()();
   IntColumn get clearanceId => integer().nullable()();

@@ -1146,6 +1146,13 @@ class TreatmentViewModel extends ChangeNotifier {
     );
   }
 
+  void updateAmbulanceStaffId(int? staffId) {
+    if (_treatment == null) return;
+    _updateTreatmentCacheAndSave(
+      _treatment!.copyWith(ambulanceStaffId: Value(staffId)),
+    );
+  }
+
   void updateArrivalTime(DateTime? time) {
     if (_treatment == null) return;
     _updateTreatmentCacheAndSave(
@@ -1544,6 +1551,13 @@ class TreatmentViewModel extends ChangeNotifier {
       return null;
     }
   }
+
+  // 取得隨車人員資料
+  MedicalStaffData? get ambulanceStaff {
+    if (_treatment?.ambulanceStaffId == null) return null;
+    return getMedicalStaffById(_treatment!.ambulanceStaffId);
+  }
+
 
   // ===================================================================
   // ICD-10 搜尋
