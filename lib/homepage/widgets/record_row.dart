@@ -6,6 +6,9 @@ import 'package:chikawa_airport/data/models/reference_service.dart';
 import '../../data/db/database.dart';
 import '../../data/models/medical/medical_view.dart';
 import '../../medical/medical.dart';
+import '../../emergency/emergency.dart';
+import '../../data/models/dashboard_view_model.dart';
+import '../../data/models/record_page.dart';
 
 class RecordRow extends StatelessWidget {
   final MedicalRecordWithPatient data;
@@ -35,23 +38,46 @@ class RecordRow extends StatelessWidget {
 
     return InkWell(
       onTap: () {
-        // 1. 同時獲取 Database 和 ReferenceService
-        final database = context.read<AppDatabase>();
-        final refService = context.read<ReferenceService>(); // 新增這一行
+        // 1. 取得目前的頁面過濾器 (Primary, Ambulance, FirstAid)
+        final currentFilter = context.read<DashboardViewModel>().currentFilter;
 
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => ChangeNotifierProvider(
-              create: (_) => MedicalViewModel(
-                database, // 參數 1: db
-                refService, // 參數 2: refService (新增)
-                record.medicalId, // 參數 3: medicalId
-              )..init(),
-              child: MedicalPage(medicalId: record.medicalId),
+        // 2. 根據不同頁面跳轉
+        if (currentFilter == RecordPage.firstAid) {
+          // 急救記錄 -> EmergencyPage
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) =>
+                  EmergencyPage(emergencyId: record.medicalId),
             ),
-          ),
-        );
+          );
+        } else if (currentFilter == RecordPage.ambulance) {
+          // 救護車記錄 -> 尚未實作
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('救護車記錄功能尚未完成 (Ambulance record not implemented)'),
+              duration: Duration(seconds: 2),
+            ),
+          );
+        } else {
+          // 主診記錄 (Primary) -> MedicalPage
+          final database = context.read<AppDatabase>();
+          final refService = context.read<ReferenceService>();
+
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ChangeNotifierProvider(
+                create: (_) => MedicalViewModel(
+                  database,
+                  refService,
+                  record.medicalId,
+                )..init(),
+                child: MedicalPage(medicalId: record.medicalId),
+              ),
+            ),
+          );
+        }
       },
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),

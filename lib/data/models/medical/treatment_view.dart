@@ -1691,7 +1691,27 @@ class TreatmentViewModel extends ChangeNotifier {
         actionItemId,
       );
       await _reloadActionIds();
-      debugPrint('系統:處置項目選擇已切換 ID=$actionItemId');
+
+      // 同步更新 MedicalRecord 狀態
+      // 1. 取得目前所有選中的項目名稱
+      final selectedItems = actionItems
+          .where((item) => _selectedActionIds.contains(item.id))
+          .map((item) => item.name)
+          .toList();
+
+      // 2. 判斷是否包含關鍵項目
+      final hasCPR = selectedItems.contains('CPR');
+      final hasReferral = selectedItems.contains('建議轉診');
+
+      // 3. 更新 MedicalRecord
+      await db.medicalDao.updateMedicalStatus(
+        medicalId,
+        isEmergency: hasCPR,
+        hasAmbulance: hasReferral,
+      );
+      await _reloadMedicalRecord();
+
+      debugPrint('系統:處置項目選擇已切換 ID=$actionItemId, CPR=$hasCPR, 轉診=$hasReferral');
     } catch (e) {
       debugPrint('系統:處置項目選擇切換失敗 - $e');
     }
