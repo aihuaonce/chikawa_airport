@@ -1,64 +1,70 @@
 import 'package:flutter/material.dart';
 
-class EmergencyPersonalInfo extends StatelessWidget {
+class EmergencyFlightLog extends StatelessWidget {
   final int emergencyId;
 
-  const EmergencyPersonalInfo({super.key, required this.emergencyId});
+  const EmergencyFlightLog({super.key, required this.emergencyId});
 
   // 顏色與樣式定義
   static const Color primaryColor = Color(0xFF007A8A);
   static const Color textDark = Color(0xFF1E293B);
   static const Color textMuted = Color(0xFF64748B);
   static const Color borderColor = Color(0xFFE2E8F0);
-  static const Color bgReadOnly = Color(0xFFF8FAFC); // 稍微灰一點代表唯讀
+  static const Color bgReadOnly = Color(0xFFF8FAFC);
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // 移除標題，直接開始佈局
+        // 第一排：來源 與 為何至機場
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // --- 左側欄位 ---
+            // 來源
             Expanded(
-              child: Column(
-                children: [
-                  _buildFieldWrapper(
-                    '身分證字號 ID Number',
-                    _buildReadOnlyField(value: ''), // 預設空白，之後帶入資料
-                  ),
-                  const SizedBox(height: 24),
-                  _buildFieldWrapper(
-                    '出生日期 Birth Date',
-                    _buildReadOnlyField(
-                      value: '', // 預設空白
-                      suffixIcon: Icons.calendar_today,
-                    ),
-                  ),
-                ],
+              child: _buildFieldWrapper(
+                '來源 SOURCE',
+                _buildReadOnlyField(value: '', suffixIcon: Icons.expand_more),
               ),
             ),
 
-            const SizedBox(width: 32), // 左右欄間距
-            // --- 右側欄位 ---
+            const SizedBox(width: 32),
+
+            // 為何至機場
             Expanded(
-              child: Column(
-                children: [
-                  _buildFieldWrapper(
-                    '性別 Gender',
-                    _buildReadOnlyField(
-                      value: '', // 預設空白
-                      suffixIcon: Icons.expand_more,
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  _buildFieldWrapper(
-                    '護照號碼 Passport Number',
-                    _buildReadOnlyField(value: ''), // 預設空白
-                  ),
-                ],
+              child: _buildFieldWrapper(
+                '為何至機場 REASON FOR VISIT',
+                _buildReadOnlyField(value: '', suffixIcon: Icons.expand_more),
+              ),
+            ),
+          ],
+        ),
+
+        const SizedBox(height: 24),
+
+        // 第二排：航空公司 與 國籍
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // 航空公司
+            Expanded(
+              child: _buildFieldWrapper(
+                '航空公司 AIRLINE',
+                _buildReadOnlyField(
+                  value: '',
+                  suffixIcon: Icons.corporate_fare,
+                ),
+              ),
+            ),
+
+            const SizedBox(width: 32),
+
+            // 國籍
+            Expanded(
+              child: _buildFieldWrapper(
+                '國籍 NATIONALITY',
+                _buildReadOnlyField(value: '', suffixIcon: Icons.public),
               ),
             ),
           ],
@@ -67,14 +73,14 @@ class EmergencyPersonalInfo extends StatelessWidget {
     );
   }
 
-  // --- UI 元件方法 ---
+  // --- UI 共用元件方法 ---
 
   Widget _buildFieldWrapper(String label, Widget field) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          label.toUpperCase(),
+          label,
           style: const TextStyle(
             color: textMuted,
             fontSize: 11,
@@ -88,14 +94,13 @@ class EmergencyPersonalInfo extends StatelessWidget {
     );
   }
 
-  // 建立唯讀狀態的顯示框 (取代原本的 TextField 與 Dropdown)
   Widget _buildReadOnlyField({required String value, IconData? suffixIcon}) {
     return Container(
       height: 44,
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 14),
       decoration: BoxDecoration(
-        color: bgReadOnly, // 使用唯讀背景色
+        color: bgReadOnly,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: borderColor),
       ),
