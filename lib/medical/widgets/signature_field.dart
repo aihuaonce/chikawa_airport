@@ -27,41 +27,63 @@ class SignatureField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool isSigned = value != null;
+    
     return GestureDetector(
       onTap: onTap ?? () => _showSignatureDialog(context),
       child: Container(
         height: height,
         width: double.infinity,
         decoration: BoxDecoration(
-          color: backgroundColor,
-          border: Border.all(color: borderColor, style: BorderStyle.solid),
-          borderRadius: BorderRadius.circular(8),
+          color: Colors.white,
+          border: Border.all(
+            color: isSigned ? primaryColor : borderColor,
+            width: isSigned ? 1.5 : 1,
+          ),
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            if (isSigned)
+              BoxShadow(
+                color: primaryColor.withValues(alpha: 0.05),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+          ],
         ),
-        child: value != null
+        child: isSigned
             ? ClipRRect(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(11), // Slightly less than container
                 child: Image.memory(
                   value!,
                   fit: BoxFit.contain,
                   width: double.infinity,
+                  color: primaryColor, // Optional: Tint the signature to primary color for consistency
+                  colorBlendMode: BlendMode.srcIn,
                 ),
               )
             : Center(
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(
-                      Icons.draw_outlined,
-                      size: 18,
-                      color: textMuted.withValues(alpha: 0.5),
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: textMuted.withValues(alpha: 0.05),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.edit_outlined,
+                        size: 18,
+                        color: textMuted.withValues(alpha: 0.7),
+                      ),
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: 12),
                     Text(
                       placeholder,
                       style: TextStyle(
-                        color: textMuted.withValues(alpha: 0.5),
-                        fontSize: 12,
-                        fontStyle: FontStyle.italic,
+                        color: textMuted.withValues(alpha: 0.7),
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ],
@@ -80,55 +102,135 @@ class SignatureField extends StatelessWidget {
 
     await showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(placeholder.split(' ').first), // Use first part of placeholder as title
-        content: Column(
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        backgroundColor: Colors.white,
+        insetPadding: const EdgeInsets.all(16),
+        child: Column(
           mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Container(
-              width: 500,
-              height: 300,
-              decoration: BoxDecoration(border: Border.all(color: Colors.grey)),
-              child: Signature(
-                controller: controller,
-                backgroundColor: Colors.white,
+            // Header
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: primaryColor.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(Icons.draw, color: primaryColor, size: 24),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          placeholder.split(' ').first,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF1E293B),
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        const Text(
+                          '請在下方區域簽名 Please sign below',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: textMuted,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    icon: const Icon(Icons.close, color: textMuted),
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 8),
-            const Text(
-              '請在上方區域簽名',
-              style: TextStyle(color: textMuted, fontSize: 12),
+            
+            const Divider(height: 1),
+
+            // Canvas
+            Flexible(
+              child: Container(
+                margin: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF8FAFC),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: borderColor),
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Signature(
+                    controller: controller,
+                    backgroundColor: const Color(0xFFF8FAFC),
+                    height: 300,
+                    width: double.infinity,
+                  ),
+                ),
+              ),
+            ),
+
+            // Actions
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextButton.icon(
+                      onPressed: () => controller.clear(),
+                      icon: const Icon(Icons.refresh, size: 18),
+                      label: const Text('重新簽名 Clear'),
+                      style: TextButton.styleFrom(
+                        foregroundColor: Colors.red.shade400,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          side: BorderSide(color: Colors.red.shade100),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    flex: 2,
+                    child: ElevatedButton.icon(
+                      onPressed: () async {
+                        if (controller.isNotEmpty) {
+                          final Uint8List? data = await controller.toPngBytes();
+                          if (data != null) {
+                            onChanged(data);
+                          }
+                        }
+                        if (context.mounted) {
+                          Navigator.of(context).pop();
+                        }
+                      },
+                      icon: const Icon(Icons.check, size: 18),
+                      label: const Text('確認簽名 Confirm'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: primaryColor,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => controller.clear(),
-            child: const Text('清除 Clear', style: TextStyle(color: Colors.red)),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('取消 Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              if (controller.isNotEmpty) {
-                final Uint8List? data = await controller.toPngBytes();
-                if (data != null) {
-                  onChanged(data);
-                }
-              }
-              if (context.mounted) {
-                Navigator.of(context).pop();
-              }
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: primaryColor,
-              foregroundColor: Colors.white,
-            ),
-            child: const Text('確認 Confirm'),
-          ),
-        ],
       ),
     );
     controller.dispose();
