@@ -278,7 +278,99 @@ class TreatmentViewModel extends ChangeNotifier {
   // 主訴更新
   // ===================================================================
 
-  Future<void> updateChiefComplaint({
+  Timer? _chiefComplaintDebounceTimer;
+
+  // 自動儲存主訴
+  void _autoSaveChiefComplaint() {
+    if (_chiefComplaintDebounceTimer?.isActive ?? false) {
+      _chiefComplaintDebounceTimer!.cancel();
+    }
+
+    _chiefComplaintDebounceTimer = Timer(const Duration(seconds: 2), () async {
+      debugPrint('系統:正在自動儲存主訴資料...');
+      try {
+        if (_chiefComplaint == null) return;
+        await db.treatmentDao.updateChiefComplaint(
+          _chiefComplaint!.toCompanion(true),
+        );
+        debugPrint('系統:主訴自動存檔成功');
+      } catch (e) {
+        debugPrint('系統:主訴自動存檔失敗 - $e');
+      }
+    });
+  }
+
+  void updateChiefComplaint({
+    int? chiefComplaintTypeId,
+    String? selectedSymptoms,
+    String? otherSymptomDetail,
+    String? chiefComplaintFinal,
+    String? supplementaryNotes,
+    DateTime? onsetTime,
+    String? reportedBy,
+    bool? isConfirmed,
+  }) {
+    if (_chiefComplaint == null) {
+      // 第一次建立，需立即寫入 DB 取得 ID
+      _createChiefComplaint(
+        chiefComplaintTypeId: chiefComplaintTypeId,
+        selectedSymptoms: selectedSymptoms,
+        otherSymptomDetail: otherSymptomDetail,
+        chiefComplaintFinal: chiefComplaintFinal,
+        supplementaryNotes: supplementaryNotes,
+        onsetTime: onsetTime,
+        reportedBy: reportedBy,
+        isConfirmed: isConfirmed,
+      );
+      return;
+    }
+
+    // 更新本地物件
+    _chiefComplaint = _chiefComplaint!.copyWith(
+      chiefComplaintTypeId: chiefComplaintTypeId != null
+          ? Value(chiefComplaintTypeId)
+          : const Value.absent(),
+      selectedSymptoms: selectedSymptoms != null
+          ? Value(selectedSymptoms)
+          : const Value.absent(),
+      otherSymptomDetail: otherSymptomDetail != null
+          ? Value(otherSymptomDetail)
+          : const Value.absent(),
+      chiefComplaintFinal: chiefComplaintFinal != null
+          ? Value(chiefComplaintFinal)
+          : const Value.absent(),
+      supplementaryNotes: supplementaryNotes != null
+          ? Value(supplementaryNotes)
+          : const Value.absent(),
+      onsetTime: onsetTime != null ? Value(onsetTime) : const Value.absent(),
+      reportedBy: reportedBy != null ? Value(reportedBy) : const Value.absent(),
+      isConfirmed: isConfirmed,
+    );
+
+    // 觸發自動存檔
+    _autoSaveChiefComplaint();
+
+    // 判斷是否需要通知 UI
+    // 如果只有文字欄位變更 (otherSymptomDetail, supplementaryNotes)，則不通知
+    // 其他欄位變更 (Type, Symptoms 等) 則通知
+    bool shouldNotify = true;
+    if (chiefComplaintTypeId == null &&
+        selectedSymptoms == null &&
+        onsetTime == null &&
+        reportedBy == null &&
+        isConfirmed == null &&
+        (otherSymptomDetail != null ||
+            supplementaryNotes != null ||
+            chiefComplaintFinal != null)) {
+      shouldNotify = false;
+    }
+
+    if (shouldNotify) {
+      notifyListeners();
+    }
+  }
+
+  Future<void> _createChiefComplaint({
     int? chiefComplaintTypeId,
     String? selectedSymptoms,
     String? otherSymptomDetail,
@@ -289,58 +381,24 @@ class TreatmentViewModel extends ChangeNotifier {
     bool? isConfirmed,
   }) async {
     try {
-      if (_chiefComplaint == null) {
-        // 建立新記錄
-        await db.treatmentDao.insertChiefComplaint(
-          ChiefComplaintCompanion.insert(
-            medicalId: medicalId,
-            chiefComplaintTypeId: Value(chiefComplaintTypeId),
-            selectedSymptoms: Value(selectedSymptoms),
-            otherSymptomDetail: Value(otherSymptomDetail),
-            chiefComplaintFinal: Value(chiefComplaintFinal),
-            supplementaryNotes: Value(supplementaryNotes),
-            onsetTime: Value(onsetTime),
-            reportedBy: Value(reportedBy),
-            isConfirmed: Value(isConfirmed ?? false),
-          ),
-        );
-      } else {
-        // 更新現有記錄
-        await db.treatmentDao.updateChiefComplaint(
-          ChiefComplaintCompanion(
-            complaintId: Value(_chiefComplaint!.complaintId),
-            chiefComplaintTypeId: chiefComplaintTypeId != null
-                ? Value(chiefComplaintTypeId)
-                : const Value.absent(),
-            selectedSymptoms: selectedSymptoms != null
-                ? Value(selectedSymptoms)
-                : const Value.absent(),
-            otherSymptomDetail: otherSymptomDetail != null
-                ? Value(otherSymptomDetail)
-                : const Value.absent(),
-            chiefComplaintFinal: chiefComplaintFinal != null
-                ? Value(chiefComplaintFinal)
-                : const Value.absent(),
-            supplementaryNotes: supplementaryNotes != null
-                ? Value(supplementaryNotes)
-                : const Value.absent(),
-            onsetTime: onsetTime != null
-                ? Value(onsetTime)
-                : const Value.absent(),
-            reportedBy: reportedBy != null
-                ? Value(reportedBy)
-                : const Value.absent(),
-            isConfirmed: isConfirmed != null
-                ? Value(isConfirmed)
-                : const Value.absent(),
-          ),
-        );
-      }
+      await db.treatmentDao.insertChiefComplaint(
+        ChiefComplaintCompanion.insert(
+          medicalId: medicalId,
+          chiefComplaintTypeId: Value(chiefComplaintTypeId),
+          selectedSymptoms: Value(selectedSymptoms),
+          otherSymptomDetail: Value(otherSymptomDetail),
+          chiefComplaintFinal: Value(chiefComplaintFinal),
+          supplementaryNotes: Value(supplementaryNotes),
+          onsetTime: Value(onsetTime),
+          reportedBy: Value(reportedBy),
+          isConfirmed: Value(isConfirmed ?? false),
+        ),
+      );
       _chiefComplaint = await db.treatmentDao.getChiefComplaint(medicalId);
       notifyListeners();
-      debugPrint('系統:主訴更新成功');
+      debugPrint('系統:主訴建立成功');
     } catch (e) {
-      debugPrint('系統:主訴更新失敗 - $e');
+      debugPrint('系統:主訴建立失敗 - $e');
     }
   }
 
@@ -828,6 +886,7 @@ class TreatmentViewModel extends ChangeNotifier {
     String? pastHistoryDetail,
     int? allergyStatusId,
     String? allergyDetail,
+    bool notify = true,
   }) {
     // 更新快取
     if (pastHistoryStatusId != null) {
@@ -844,7 +903,7 @@ class TreatmentViewModel extends ChangeNotifier {
     }
 
     _historySaveStatus = SaveStatus.saving;
-    notifyListeners();
+    if (notify) notifyListeners();
     _autoSaveHistory();
   }
 
@@ -854,7 +913,7 @@ class TreatmentViewModel extends ChangeNotifier {
   }
 
   void updatePastHistoryDetail(String detail) {
-    _updateHistoryCacheAndSave(pastHistoryDetail: detail);
+    _updateHistoryCacheAndSave(pastHistoryDetail: detail, notify: false);
   }
 
   void updateAllergyStatusId(int? id) {
@@ -862,7 +921,7 @@ class TreatmentViewModel extends ChangeNotifier {
   }
 
   void updateAllergyDetail(String detail) {
-    _updateHistoryCacheAndSave(allergyDetail: detail);
+    _updateHistoryCacheAndSave(allergyDetail: detail, notify: false);
   }
 
   // 病史自動儲存機制
@@ -911,9 +970,12 @@ class TreatmentViewModel extends ChangeNotifier {
   // 處置/診斷更新（主要功能，使用自動存檔）
   // ===================================================================
 
-  void _updateTreatmentCacheAndSave(TreatmentData newData) {
+  void _updateTreatmentCacheAndSave(
+    TreatmentData newData, {
+    bool notify = true,
+  }) {
     _treatment = newData;
-    notifyListeners();
+    if (notify) notifyListeners();
     _autoSave();
   }
 
@@ -929,6 +991,7 @@ class TreatmentViewModel extends ChangeNotifier {
     if (_treatment == null) return;
     _updateTreatmentCacheAndSave(
       _treatment!.copyWith(tentative: Value(tentative)),
+      notify: false,
     );
   }
 
@@ -936,6 +999,7 @@ class TreatmentViewModel extends ChangeNotifier {
     if (_treatment == null) return;
     _updateTreatmentCacheAndSave(
       _treatment!.copyWith(secondaryDiagnosis1: Value(diagnosis)),
+      notify: false,
     );
   }
 
@@ -943,6 +1007,7 @@ class TreatmentViewModel extends ChangeNotifier {
     if (_treatment == null) return;
     _updateTreatmentCacheAndSave(
       _treatment!.copyWith(secondaryDiagnosis2: Value(diagnosis)),
+      notify: false,
     );
   }
 
@@ -991,6 +1056,7 @@ class TreatmentViewModel extends ChangeNotifier {
     if (_treatment == null) return;
     _updateTreatmentCacheAndSave(
       _treatment!.copyWith(actionSummaryOther: Value(other)),
+      notify: false,
     );
   }
 
@@ -999,18 +1065,23 @@ class TreatmentViewModel extends ChangeNotifier {
     if (_treatment == null) return;
     _updateTreatmentCacheAndSave(
       _treatment!.copyWith(ekgInterpretation: Value(value)),
+      notify: false,
     );
   }
 
   void updateGlucose(String? value) {
     if (_treatment == null) return;
-    _updateTreatmentCacheAndSave(_treatment!.copyWith(glucose: Value(value)));
+    _updateTreatmentCacheAndSave(
+      _treatment!.copyWith(glucose: Value(value)),
+      notify: false,
+    );
   }
 
   void updateIntubationMethod(String? value) {
     if (_treatment == null) return;
     _updateTreatmentCacheAndSave(
       _treatment!.copyWith(intubationMethod: Value(value)),
+      notify: false,
     );
   }
 
@@ -1018,6 +1089,7 @@ class TreatmentViewModel extends ChangeNotifier {
     if (_treatment == null) return;
     _updateTreatmentCacheAndSave(
       _treatment!.copyWith(oxygenMethod: Value(value)),
+      notify: false,
     );
   }
 
@@ -1025,6 +1097,7 @@ class TreatmentViewModel extends ChangeNotifier {
     if (_treatment == null) return;
     _updateTreatmentCacheAndSave(
       _treatment!.copyWith(oxygenFlow: Value(value)),
+      notify: false,
     );
   }
 
@@ -1032,6 +1105,7 @@ class TreatmentViewModel extends ChangeNotifier {
     if (_treatment == null) return;
     _updateTreatmentCacheAndSave(
       _treatment!.copyWith(certificateLogs: Value(value)),
+      notify: false,
     );
   }
 
@@ -1054,6 +1128,7 @@ class TreatmentViewModel extends ChangeNotifier {
     if (_treatment == null) return;
     _updateTreatmentCacheAndSave(
       _treatment!.copyWith(transportMethod: Value(method)),
+      notify: false,
     );
   }
 
