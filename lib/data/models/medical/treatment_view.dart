@@ -1525,7 +1525,11 @@ class TreatmentViewModel extends ChangeNotifier {
     if (keyword.isEmpty) return refService.drugList;
     final lower = keyword.toLowerCase();
     return refService.drugList
-        .where((d) => d.name.toLowerCase().contains(lower))
+        .where(
+          (d) =>
+              d.name.toLowerCase().contains(lower) ||
+              d.category.toLowerCase().contains(lower),
+        )
         .toList();
   }
 

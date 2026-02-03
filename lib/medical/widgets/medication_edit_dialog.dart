@@ -3,6 +3,8 @@ import 'package:drift/drift.dart' as drift;
 import '../../data/db/database.dart';
 import '../../data/models/medical/treatment_view.dart';
 
+import 'drug_search_sheet.dart';
+
 class MedicationEditDialog extends StatefulWidget {
   final MedicationData? medication;
   final TreatmentViewModel viewModel;
@@ -23,6 +25,7 @@ class _MedicationEditDialogState extends State<MedicationEditDialog> {
   // Selections
   String? _selectedCategory;
   String? _selectedDrugName;
+  final TextEditingController _drugNameController = TextEditingController();
 
   // Controllers
   late TextEditingController _methodController;
@@ -32,20 +35,7 @@ class _MedicationEditDialogState extends State<MedicationEditDialog> {
   late TextEditingController _unitController;
   late TextEditingController _remarksController;
 
-  // Data Sources
-  List<String> _categories = [];
-  List<DrugRefData> _filteredDrugs = [];
-
   // Helper Options with Chinese Explanations
-  final Map<String, String> _methodMap = {
-    'PO': '口服',
-    'IV': '靜脈注射',
-    'IM': '肌肉注射',
-    'EXT': '外用',
-    'SC': '皮下注射',
-    'INH': '吸入',
-  };
-
   final Map<String, String> _frequencyMap = {
     'ST': '',
     'QD': '',
@@ -57,6 +47,16 @@ class _MedicationEditDialogState extends State<MedicationEditDialog> {
     'Q12H': '',
     'Q8H': '',
     'PRN': '',
+  };
+
+  final Map<String, String> _unitMap = {
+    'c.c.': '',
+    'tab': '',
+    'amp': '',
+    'bot': '',
+    'pack': '',
+    'tube': '',
+    'vial': '',
   };
 
   @override
@@ -83,41 +83,16 @@ class _MedicationEditDialogState extends State<MedicationEditDialog> {
       text: widget.medication?.remarks ?? '',
     );
 
-    // Extract unique categories from DrugRef
-    final allDrugs = widget.viewModel.refService.drugList;
-    _categories = allDrugs.map((e) => e.category).toSet().toList();
-
     // Initialize selection if editing
     if (widget.medication != null) {
       _selectedDrugName = widget.medication!.name;
-      // Try to find category from drug name
-      try {
-        final drug = allDrugs.firstWhere((d) => d.name == _selectedDrugName);
-        _selectedCategory = drug.category;
-      } catch (e) {
-        // If drug name not found in ref list
-      }
-    } else {
-      if (_categories.isNotEmpty) {
-        _selectedCategory = _categories.first;
-      }
-    }
-
-    _updateFilteredDrugs();
-  }
-
-  void _updateFilteredDrugs() {
-    if (_selectedCategory == null) {
-      _filteredDrugs = [];
-    } else {
-      _filteredDrugs = widget.viewModel.refService.drugList
-          .where((d) => d.category == _selectedCategory)
-          .toList();
+      _drugNameController.text = _selectedDrugName ?? '';
     }
   }
 
   @override
   void dispose() {
+    _drugNameController.dispose();
     _methodController.dispose();
     _frequencyController.dispose();
     _daysController.dispose();
@@ -183,7 +158,7 @@ class _MedicationEditDialogState extends State<MedicationEditDialog> {
                             ),
                           ),
                           const Text(
-                            '請依序選擇分類並填寫詳細用藥資訊',
+                            '請填寫詳細用藥資訊',
                             style: TextStyle(
                               fontSize: 12,
                               color: Color(0xFF64748B),
@@ -212,156 +187,85 @@ class _MedicationEditDialogState extends State<MedicationEditDialog> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // 1. Category Selection
+                      // 1. Drug Selection (Combined Search)
                       _buildStepHeader(
                         number: '1',
-                        title: '選擇藥物類別',
-                        subtitle: 'Drug Category',
-                      ),
-                      const SizedBox(height: 12),
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: bgField,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: borderColor),
-                        ),
-                        child: Wrap(
-                          spacing: 8,
-                          runSpacing: 8,
-                          children: _categories.map((category) {
-                            final isSelected = _selectedCategory == category;
-                            return ChoiceChip(
-                              label: Text(category),
-                              selected: isSelected,
-                              onSelected: (selected) {
-                                if (selected) {
-                                  setState(() {
-                                    _selectedCategory = category;
-                                    _selectedDrugName = null;
-                                    _updateFilteredDrugs();
-                                  });
-                                }
-                              },
-                              selectedColor: primaryColor,
-                              backgroundColor: Colors.white,
-                              labelStyle: TextStyle(
-                                color: isSelected
-                                    ? Colors.white
-                                    : const Color(0xFF475569),
-                                fontWeight: isSelected
-                                    ? FontWeight.bold
-                                    : FontWeight.w500,
-                              ),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 8,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                                side: BorderSide(
-                                  color: isSelected
-                                      ? Colors.transparent
-                                      : const Color(0xFFCBD5E1),
-                                ),
-                              ),
-                            );
-                          }).toList(),
-                        ),
-                      ),
-
-                      const SizedBox(height: 32),
-
-                      // 2. Drug Selection
-                      _buildStepHeader(
-                        number: '2',
-                        title: '選擇藥物名稱',
+                        title: '藥物名稱',
                         subtitle: 'Drug Name',
                       ),
                       const SizedBox(height: 12),
-                      if (_filteredDrugs.isEmpty)
-                        _buildEmptyState(
-                          icon: Icons.category_outlined,
-                          text: '請先選擇上方的藥物大類',
-                        )
-                      else
-                        Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: bgField,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: borderColor),
-                          ),
-                          child: Wrap(
-                            spacing: 8,
-                            runSpacing: 8,
-                            children: _filteredDrugs.map((drug) {
-                              final isSelected = _selectedDrugName == drug.name;
-                              return FilterChip(
-                                label: Text(drug.name),
-                                selected: isSelected,
-                                onSelected: (selected) {
-                                  setState(() {
-                                    _selectedDrugName = selected
-                                        ? drug.name
-                                        : null;
-                                  });
-                                },
-                                selectedColor: primaryColor.withValues(
-                                  alpha: 0.15,
+                      InkWell(
+                        onTap: () async {
+                          final result = await DrugSearchSheet.show(
+                            context,
+                            title: '搜尋藥物',
+                            initialValue: _drugNameController.text,
+                            viewModel: widget.viewModel,
+                          );
+                          if (result != null) {
+                            setState(() {
+                              _selectedCategory = result.category;
+                              _selectedDrugName = result.name;
+                              _drugNameController.text = result.name;
+                              _methodController.text = result.category;
+                            });
+                          }
+                        },
+                        child: IgnorePointer(
+                          child: TextFormField(
+                            controller: _drugNameController,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            decoration: InputDecoration(
+                              hintText: '點擊搜尋藥物...',
+                              hintStyle: TextStyle(
+                                color: Colors.grey[400],
+                                fontWeight: FontWeight.normal,
+                              ),
+                              prefixIcon: const Icon(
+                                Icons.search,
+                                color: primaryColor,
+                              ),
+                              suffixIcon: const Icon(
+                                Icons.arrow_drop_down,
+                                color: Colors.grey,
+                              ),
+                              filled: true,
+                              fillColor: bgField,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: const BorderSide(
+                                  color: borderColor,
                                 ),
-                                checkmarkColor: primaryColor,
-                                backgroundColor: Colors.white,
-                                labelStyle: TextStyle(
-                                  color: isSelected
-                                      ? primaryColor
-                                      : const Color(0xFF334155),
-                                  fontWeight: isSelected
-                                      ? FontWeight.bold
-                                      : FontWeight.normal,
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: const BorderSide(
+                                  color: borderColor,
                                 ),
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 4,
-                                  vertical: 4,
-                                ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                  side: BorderSide(
-                                    color: isSelected
-                                        ? primaryColor
-                                        : const Color(0xFFCBD5E1),
-                                  ),
-                                ),
-                              );
-                            }).toList(),
+                              ),
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 12,
+                              ),
+                            ),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return '請選擇藥物';
+                              }
+                              return null;
+                            },
                           ),
                         ),
-                      if (_selectedDrugName == null &&
-                          _selectedCategory != null) ...[
-                        const SizedBox(height: 8),
-                        const Row(
-                          children: [
-                            Icon(
-                              Icons.error_outline,
-                              size: 14,
-                              color: Colors.red,
-                            ),
-                            SizedBox(width: 4),
-                            Text(
-                              '請選擇一種藥物',
-                              style: TextStyle(color: Colors.red, fontSize: 12),
-                            ),
-                          ],
-                        ),
-                      ],
+                      ),
 
                       const SizedBox(height: 32),
 
-                      // 3. Usage Details
+                      // 2. Usage Details
                       _buildStepHeader(
-                        number: '3',
+                        number: '2',
                         title: '處方細節',
                         subtitle: 'Prescription Details',
                       ),
@@ -372,17 +276,16 @@ class _MedicationEditDialogState extends State<MedicationEditDialog> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Expanded(
-                            child: _buildInputWithQuickSelect(
+                            child: _buildTextField(
                               label: '使用方式',
                               subLabel: 'Method',
                               controller: _methodController,
-                              options: _methodMap,
                               icon: Icons.healing,
                             ),
                           ),
                           const SizedBox(width: 24),
                           Expanded(
-                            child: _buildInputWithQuickSelect(
+                            child: _buildDropdownField(
                               label: '使用頻率',
                               subLabel: 'Frequency',
                               controller: _frequencyController,
@@ -397,16 +300,20 @@ class _MedicationEditDialogState extends State<MedicationEditDialog> {
 
                       // Dose, Unit, Days
                       Container(
-                        padding: const EdgeInsets.all(16),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(color: borderColor),
                         ),
                         child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             Expanded(
-                              flex: 2,
+                              flex: 3,
                               child: _buildSimpleField(
                                 label: '劑量',
                                 subLabel: 'Dose',
@@ -414,7 +321,7 @@ class _MedicationEditDialogState extends State<MedicationEditDialog> {
                               ),
                             ),
                             Container(
-                              height: 40,
+                              height: 24,
                               width: 1,
                               color: borderColor,
                               margin: const EdgeInsets.symmetric(
@@ -422,15 +329,17 @@ class _MedicationEditDialogState extends State<MedicationEditDialog> {
                               ),
                             ),
                             Expanded(
-                              flex: 1,
-                              child: _buildSimpleField(
+                              flex: 3,
+                              child: _buildDropdownField(
                                 label: '單位',
                                 subLabel: 'Unit',
                                 controller: _unitController,
+                                options: _unitMap,
+                                isCompact: true,
                               ),
                             ),
                             Container(
-                              height: 40,
+                              height: 24,
                               width: 1,
                               color: borderColor,
                               margin: const EdgeInsets.symmetric(
@@ -438,7 +347,7 @@ class _MedicationEditDialogState extends State<MedicationEditDialog> {
                               ),
                             ),
                             Expanded(
-                              flex: 1,
+                              flex: 2,
                               child: _buildSimpleField(
                                 label: '天數',
                                 subLabel: 'Days',
@@ -567,31 +476,6 @@ class _MedicationEditDialogState extends State<MedicationEditDialog> {
     );
   }
 
-  Widget _buildEmptyState({required IconData icon, required String text}) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 32),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: const Color(0xFFE2E8F0),
-          style: BorderStyle.solid,
-        ),
-      ),
-      child: Column(
-        children: [
-          Icon(icon, color: const Color(0xFFCBD5E1), size: 32),
-          const SizedBox(height: 8),
-          Text(
-            text,
-            style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 13),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildSimpleField({
     required String label,
     required String subLabel,
@@ -697,72 +581,93 @@ class _MedicationEditDialogState extends State<MedicationEditDialog> {
     );
   }
 
-  Widget _buildInputWithQuickSelect({
+  Widget _buildDropdownField({
     required String label,
     required String subLabel,
     required TextEditingController controller,
     required Map<String, String> options,
     IconData? icon,
+    bool isCompact = false,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildTextField(
-          label: label,
-          subLabel: subLabel,
-          controller: controller,
-          icon: icon,
-        ),
-        const SizedBox(height: 8),
-        Wrap(
-          spacing: 6,
-          runSpacing: 6,
-          children: options.entries.map((entry) {
-            final code = entry.key;
-            final desc = entry.value;
-            return InkWell(
-              onTap: () {
-                controller.text = code;
-              },
-              borderRadius: BorderRadius.circular(6),
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 4,
-                ),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF1F5F9),
-                  borderRadius: BorderRadius.circular(6),
-                  border: Border.all(color: const Color(0xFFE2E8F0)),
-                ),
-                child: RichText(
-                  text: TextSpan(
-                    children: [
-                      TextSpan(
-                        text: code,
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: Color(0xFF007A8A),
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      if (desc.isNotEmpty) ...[
-                        const WidgetSpan(child: SizedBox(width: 4)),
-                        TextSpan(
-                          text: desc,
-                          style: const TextStyle(
-                            fontSize: 11,
-                            color: Color(0xFF64748B),
-                            fontWeight: FontWeight.normal,
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
+        Row(
+          children: [
+            if (icon != null && !isCompact) ...[
+              Icon(icon, size: 14, color: const Color(0xFF64748B)),
+              const SizedBox(width: 6),
+            ],
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: isCompact ? 12 : 13,
+                fontWeight: FontWeight.bold,
+                color: const Color(0xFF475569),
               ),
+            ),
+            const SizedBox(width: 6),
+            Text(
+              subLabel,
+              style: TextStyle(
+                fontSize: isCompact ? 10 : 11,
+                color: const Color(0xFF94A3B8),
+              ),
+            ),
+          ],
+        ),
+        if (!isCompact) const SizedBox(height: 8),
+        DropdownMenu<String>(
+          width: double.infinity,
+          initialSelection: controller.text.isNotEmpty ? controller.text : null,
+          controller: controller,
+          enableFilter: true,
+          requestFocusOnTap: true,
+          menuStyle: MenuStyle(
+            backgroundColor: WidgetStateProperty.all(Colors.white),
+            surfaceTintColor: WidgetStateProperty.all(Colors.white),
+            elevation: WidgetStateProperty.all(2),
+            shape: WidgetStateProperty.all(
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+          ),
+          dropdownMenuEntries: options.entries.map((entry) {
+            return DropdownMenuEntry<String>(
+              value: entry.key,
+              label: entry.key,
             );
           }).toList(),
+          inputDecorationTheme: InputDecorationTheme(
+            isDense: true,
+            filled: !isCompact,
+            fillColor: isCompact ? Colors.transparent : Colors.white,
+            contentPadding: isCompact
+                ? const EdgeInsets.symmetric(vertical: 8)
+                : const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            border: isCompact
+                ? InputBorder.none
+                : OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                  ),
+            enabledBorder: isCompact
+                ? InputBorder.none
+                : OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                  ),
+            focusedBorder: isCompact
+                ? InputBorder.none
+                : OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: const BorderSide(color: Color(0xFF007A8A)),
+                  ),
+          ),
+          onSelected: (value) {
+            if (value != null) {
+              controller.text = value;
+            }
+          },
         ),
       ],
     );
