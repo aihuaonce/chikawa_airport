@@ -7,6 +7,7 @@ import '../../data/db/database.dart';
 import '../../data/models/medical/medical_view.dart';
 import '../../medical/medical.dart';
 import '../../emergency/emergency.dart';
+import '../../ambulance/ambulance.dart';
 import '../../data/models/dashboard_view_model.dart';
 import '../../data/models/record_page.dart';
 
@@ -52,11 +53,12 @@ class RecordRow extends StatelessWidget {
             ),
           );
         } else if (currentFilter == RecordPage.ambulance) {
-          // 救護車記錄 -> 尚未實作
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('救護車記錄功能尚未完成 (Ambulance record not implemented)'),
-              duration: Duration(seconds: 2),
+          // 救護車記錄 -> AmbulancePage
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) =>
+                  AmbulancePage(ambulanceId: record.medicalId),
             ),
           );
         } else {
@@ -68,11 +70,9 @@ class RecordRow extends StatelessWidget {
             context,
             MaterialPageRoute(
               builder: (context) => ChangeNotifierProvider(
-                create: (_) => MedicalViewModel(
-                  database,
-                  refService,
-                  record.medicalId,
-                )..init(),
+                create: (_) =>
+                    MedicalViewModel(database, refService, record.medicalId)
+                      ..init(),
                 child: MedicalPage(medicalId: record.medicalId),
               ),
             ),
