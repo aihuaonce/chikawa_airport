@@ -20305,6 +20305,17 @@ class $MedicalFeesTable extends MedicalFees
       'REFERENCES payment_method (id)',
     ),
   );
+  static const VerificationMeta _paymentTypeMeta = const VerificationMeta(
+    'paymentType',
+  );
+  @override
+  late final GeneratedColumn<String> paymentType = GeneratedColumn<String>(
+    'payment_type',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _consultFeeMeta = const VerificationMeta(
     'consultFee',
   );
@@ -20371,6 +20382,21 @@ class $MedicalFeesTable extends MedicalFees
     ),
     defaultValue: const Constant(false),
   );
+  static const VerificationMeta _userAgreedMeta = const VerificationMeta(
+    'userAgreed',
+  );
+  @override
+  late final GeneratedColumn<bool> userAgreed = GeneratedColumn<bool>(
+    'user_agreed',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("user_agreed" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
   static const VerificationMeta _applicantNameMeta = const VerificationMeta(
     'applicantName',
   );
@@ -20404,6 +20430,17 @@ class $MedicalFeesTable extends MedicalFees
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _abnormalReasonMeta = const VerificationMeta(
+    'abnormalReason',
+  );
+  @override
+  late final GeneratedColumn<String> abnormalReason = GeneratedColumn<String>(
+    'abnormal_reason',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _remarksMeta = const VerificationMeta(
     'remarks',
   );
@@ -20415,6 +20452,41 @@ class $MedicalFeesTable extends MedicalFees
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _consenterSignatureMeta =
+      const VerificationMeta('consenterSignature');
+  @override
+  late final GeneratedColumn<Uint8List> consenterSignature =
+      GeneratedColumn<Uint8List>(
+        'consenter_signature',
+        aliasedName,
+        true,
+        type: DriftSqlType.blob,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _witnessSignatureMeta = const VerificationMeta(
+    'witnessSignature',
+  );
+  @override
+  late final GeneratedColumn<Uint8List> witnessSignature =
+      GeneratedColumn<Uint8List>(
+        'witness_signature',
+        aliasedName,
+        true,
+        type: DriftSqlType.blob,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _counterSignatureMeta = const VerificationMeta(
+    'counterSignature',
+  );
+  @override
+  late final GeneratedColumn<Uint8List> counterSignature =
+      GeneratedColumn<Uint8List>(
+        'counter_signature',
+        aliasedName,
+        true,
+        type: DriftSqlType.blob,
+        requiredDuringInsert: false,
+      );
   static const VerificationMeta _createdAtMeta = const VerificationMeta(
     'createdAt',
   );
@@ -20432,15 +20504,21 @@ class $MedicalFeesTable extends MedicalFees
     feeId,
     medicalId,
     paymentMethodId,
+    paymentType,
     consultFee,
     ambulanceFee,
     currencyId,
     collectionStatusId,
     receiptIssued,
+    userAgreed,
     applicantName,
     applicantUnit,
     applicantPhone,
+    abnormalReason,
     remarks,
+    consenterSignature,
+    witnessSignature,
+    counterSignature,
     createdAt,
   ];
   @override
@@ -20475,6 +20553,15 @@ class $MedicalFeesTable extends MedicalFees
         paymentMethodId.isAcceptableOrUnknown(
           data['payment_method_id']!,
           _paymentMethodIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('payment_type')) {
+      context.handle(
+        _paymentTypeMeta,
+        paymentType.isAcceptableOrUnknown(
+          data['payment_type']!,
+          _paymentTypeMeta,
         ),
       );
     }
@@ -20517,6 +20604,12 @@ class $MedicalFeesTable extends MedicalFees
         ),
       );
     }
+    if (data.containsKey('user_agreed')) {
+      context.handle(
+        _userAgreedMeta,
+        userAgreed.isAcceptableOrUnknown(data['user_agreed']!, _userAgreedMeta),
+      );
+    }
     if (data.containsKey('applicant_name')) {
       context.handle(
         _applicantNameMeta,
@@ -20544,10 +20637,46 @@ class $MedicalFeesTable extends MedicalFees
         ),
       );
     }
+    if (data.containsKey('abnormal_reason')) {
+      context.handle(
+        _abnormalReasonMeta,
+        abnormalReason.isAcceptableOrUnknown(
+          data['abnormal_reason']!,
+          _abnormalReasonMeta,
+        ),
+      );
+    }
     if (data.containsKey('remarks')) {
       context.handle(
         _remarksMeta,
         remarks.isAcceptableOrUnknown(data['remarks']!, _remarksMeta),
+      );
+    }
+    if (data.containsKey('consenter_signature')) {
+      context.handle(
+        _consenterSignatureMeta,
+        consenterSignature.isAcceptableOrUnknown(
+          data['consenter_signature']!,
+          _consenterSignatureMeta,
+        ),
+      );
+    }
+    if (data.containsKey('witness_signature')) {
+      context.handle(
+        _witnessSignatureMeta,
+        witnessSignature.isAcceptableOrUnknown(
+          data['witness_signature']!,
+          _witnessSignatureMeta,
+        ),
+      );
+    }
+    if (data.containsKey('counter_signature')) {
+      context.handle(
+        _counterSignatureMeta,
+        counterSignature.isAcceptableOrUnknown(
+          data['counter_signature']!,
+          _counterSignatureMeta,
+        ),
       );
     }
     if (data.containsKey('created_at')) {
@@ -20577,6 +20706,10 @@ class $MedicalFeesTable extends MedicalFees
         DriftSqlType.int,
         data['${effectivePrefix}payment_method_id'],
       ),
+      paymentType: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}payment_type'],
+      ),
       consultFee: attachedDatabase.typeMapping.read(
         DriftSqlType.double,
         data['${effectivePrefix}consult_fee'],
@@ -20597,6 +20730,10 @@ class $MedicalFeesTable extends MedicalFees
         DriftSqlType.bool,
         data['${effectivePrefix}receipt_issued'],
       )!,
+      userAgreed: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}user_agreed'],
+      )!,
       applicantName: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}applicant_name'],
@@ -20609,9 +20746,25 @@ class $MedicalFeesTable extends MedicalFees
         DriftSqlType.string,
         data['${effectivePrefix}applicant_phone'],
       ),
+      abnormalReason: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}abnormal_reason'],
+      ),
       remarks: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}remarks'],
+      ),
+      consenterSignature: attachedDatabase.typeMapping.read(
+        DriftSqlType.blob,
+        data['${effectivePrefix}consenter_signature'],
+      ),
+      witnessSignature: attachedDatabase.typeMapping.read(
+        DriftSqlType.blob,
+        data['${effectivePrefix}witness_signature'],
+      ),
+      counterSignature: attachedDatabase.typeMapping.read(
+        DriftSqlType.blob,
+        data['${effectivePrefix}counter_signature'],
       ),
       createdAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
@@ -20630,29 +20783,41 @@ class MedicalFeeData extends DataClass implements Insertable<MedicalFeeData> {
   final int feeId;
   final int medicalId;
   final int? paymentMethodId;
+  final String? paymentType;
   final double consultFee;
   final double ambulanceFee;
   final int? currencyId;
   final int? collectionStatusId;
   final bool receiptIssued;
+  final bool userAgreed;
   final String? applicantName;
   final String? applicantUnit;
   final String? applicantPhone;
+  final String? abnormalReason;
   final String? remarks;
+  final Uint8List? consenterSignature;
+  final Uint8List? witnessSignature;
+  final Uint8List? counterSignature;
   final DateTime createdAt;
   const MedicalFeeData({
     required this.feeId,
     required this.medicalId,
     this.paymentMethodId,
+    this.paymentType,
     required this.consultFee,
     required this.ambulanceFee,
     this.currencyId,
     this.collectionStatusId,
     required this.receiptIssued,
+    required this.userAgreed,
     this.applicantName,
     this.applicantUnit,
     this.applicantPhone,
+    this.abnormalReason,
     this.remarks,
+    this.consenterSignature,
+    this.witnessSignature,
+    this.counterSignature,
     required this.createdAt,
   });
   @override
@@ -20663,6 +20828,9 @@ class MedicalFeeData extends DataClass implements Insertable<MedicalFeeData> {
     if (!nullToAbsent || paymentMethodId != null) {
       map['payment_method_id'] = Variable<int>(paymentMethodId);
     }
+    if (!nullToAbsent || paymentType != null) {
+      map['payment_type'] = Variable<String>(paymentType);
+    }
     map['consult_fee'] = Variable<double>(consultFee);
     map['ambulance_fee'] = Variable<double>(ambulanceFee);
     if (!nullToAbsent || currencyId != null) {
@@ -20672,6 +20840,7 @@ class MedicalFeeData extends DataClass implements Insertable<MedicalFeeData> {
       map['collection_status_id'] = Variable<int>(collectionStatusId);
     }
     map['receipt_issued'] = Variable<bool>(receiptIssued);
+    map['user_agreed'] = Variable<bool>(userAgreed);
     if (!nullToAbsent || applicantName != null) {
       map['applicant_name'] = Variable<String>(applicantName);
     }
@@ -20681,8 +20850,20 @@ class MedicalFeeData extends DataClass implements Insertable<MedicalFeeData> {
     if (!nullToAbsent || applicantPhone != null) {
       map['applicant_phone'] = Variable<String>(applicantPhone);
     }
+    if (!nullToAbsent || abnormalReason != null) {
+      map['abnormal_reason'] = Variable<String>(abnormalReason);
+    }
     if (!nullToAbsent || remarks != null) {
       map['remarks'] = Variable<String>(remarks);
+    }
+    if (!nullToAbsent || consenterSignature != null) {
+      map['consenter_signature'] = Variable<Uint8List>(consenterSignature);
+    }
+    if (!nullToAbsent || witnessSignature != null) {
+      map['witness_signature'] = Variable<Uint8List>(witnessSignature);
+    }
+    if (!nullToAbsent || counterSignature != null) {
+      map['counter_signature'] = Variable<Uint8List>(counterSignature);
     }
     map['created_at'] = Variable<DateTime>(createdAt);
     return map;
@@ -20695,6 +20876,9 @@ class MedicalFeeData extends DataClass implements Insertable<MedicalFeeData> {
       paymentMethodId: paymentMethodId == null && nullToAbsent
           ? const Value.absent()
           : Value(paymentMethodId),
+      paymentType: paymentType == null && nullToAbsent
+          ? const Value.absent()
+          : Value(paymentType),
       consultFee: Value(consultFee),
       ambulanceFee: Value(ambulanceFee),
       currencyId: currencyId == null && nullToAbsent
@@ -20704,6 +20888,7 @@ class MedicalFeeData extends DataClass implements Insertable<MedicalFeeData> {
           ? const Value.absent()
           : Value(collectionStatusId),
       receiptIssued: Value(receiptIssued),
+      userAgreed: Value(userAgreed),
       applicantName: applicantName == null && nullToAbsent
           ? const Value.absent()
           : Value(applicantName),
@@ -20713,9 +20898,21 @@ class MedicalFeeData extends DataClass implements Insertable<MedicalFeeData> {
       applicantPhone: applicantPhone == null && nullToAbsent
           ? const Value.absent()
           : Value(applicantPhone),
+      abnormalReason: abnormalReason == null && nullToAbsent
+          ? const Value.absent()
+          : Value(abnormalReason),
       remarks: remarks == null && nullToAbsent
           ? const Value.absent()
           : Value(remarks),
+      consenterSignature: consenterSignature == null && nullToAbsent
+          ? const Value.absent()
+          : Value(consenterSignature),
+      witnessSignature: witnessSignature == null && nullToAbsent
+          ? const Value.absent()
+          : Value(witnessSignature),
+      counterSignature: counterSignature == null && nullToAbsent
+          ? const Value.absent()
+          : Value(counterSignature),
       createdAt: Value(createdAt),
     );
   }
@@ -20729,15 +20926,27 @@ class MedicalFeeData extends DataClass implements Insertable<MedicalFeeData> {
       feeId: serializer.fromJson<int>(json['feeId']),
       medicalId: serializer.fromJson<int>(json['medicalId']),
       paymentMethodId: serializer.fromJson<int?>(json['paymentMethodId']),
+      paymentType: serializer.fromJson<String?>(json['paymentType']),
       consultFee: serializer.fromJson<double>(json['consultFee']),
       ambulanceFee: serializer.fromJson<double>(json['ambulanceFee']),
       currencyId: serializer.fromJson<int?>(json['currencyId']),
       collectionStatusId: serializer.fromJson<int?>(json['collectionStatusId']),
       receiptIssued: serializer.fromJson<bool>(json['receiptIssued']),
+      userAgreed: serializer.fromJson<bool>(json['userAgreed']),
       applicantName: serializer.fromJson<String?>(json['applicantName']),
       applicantUnit: serializer.fromJson<String?>(json['applicantUnit']),
       applicantPhone: serializer.fromJson<String?>(json['applicantPhone']),
+      abnormalReason: serializer.fromJson<String?>(json['abnormalReason']),
       remarks: serializer.fromJson<String?>(json['remarks']),
+      consenterSignature: serializer.fromJson<Uint8List?>(
+        json['consenterSignature'],
+      ),
+      witnessSignature: serializer.fromJson<Uint8List?>(
+        json['witnessSignature'],
+      ),
+      counterSignature: serializer.fromJson<Uint8List?>(
+        json['counterSignature'],
+      ),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
     );
   }
@@ -20748,15 +20957,21 @@ class MedicalFeeData extends DataClass implements Insertable<MedicalFeeData> {
       'feeId': serializer.toJson<int>(feeId),
       'medicalId': serializer.toJson<int>(medicalId),
       'paymentMethodId': serializer.toJson<int?>(paymentMethodId),
+      'paymentType': serializer.toJson<String?>(paymentType),
       'consultFee': serializer.toJson<double>(consultFee),
       'ambulanceFee': serializer.toJson<double>(ambulanceFee),
       'currencyId': serializer.toJson<int?>(currencyId),
       'collectionStatusId': serializer.toJson<int?>(collectionStatusId),
       'receiptIssued': serializer.toJson<bool>(receiptIssued),
+      'userAgreed': serializer.toJson<bool>(userAgreed),
       'applicantName': serializer.toJson<String?>(applicantName),
       'applicantUnit': serializer.toJson<String?>(applicantUnit),
       'applicantPhone': serializer.toJson<String?>(applicantPhone),
+      'abnormalReason': serializer.toJson<String?>(abnormalReason),
       'remarks': serializer.toJson<String?>(remarks),
+      'consenterSignature': serializer.toJson<Uint8List?>(consenterSignature),
+      'witnessSignature': serializer.toJson<Uint8List?>(witnessSignature),
+      'counterSignature': serializer.toJson<Uint8List?>(counterSignature),
       'createdAt': serializer.toJson<DateTime>(createdAt),
     };
   }
@@ -20765,15 +20980,21 @@ class MedicalFeeData extends DataClass implements Insertable<MedicalFeeData> {
     int? feeId,
     int? medicalId,
     Value<int?> paymentMethodId = const Value.absent(),
+    Value<String?> paymentType = const Value.absent(),
     double? consultFee,
     double? ambulanceFee,
     Value<int?> currencyId = const Value.absent(),
     Value<int?> collectionStatusId = const Value.absent(),
     bool? receiptIssued,
+    bool? userAgreed,
     Value<String?> applicantName = const Value.absent(),
     Value<String?> applicantUnit = const Value.absent(),
     Value<String?> applicantPhone = const Value.absent(),
+    Value<String?> abnormalReason = const Value.absent(),
     Value<String?> remarks = const Value.absent(),
+    Value<Uint8List?> consenterSignature = const Value.absent(),
+    Value<Uint8List?> witnessSignature = const Value.absent(),
+    Value<Uint8List?> counterSignature = const Value.absent(),
     DateTime? createdAt,
   }) => MedicalFeeData(
     feeId: feeId ?? this.feeId,
@@ -20781,6 +21002,7 @@ class MedicalFeeData extends DataClass implements Insertable<MedicalFeeData> {
     paymentMethodId: paymentMethodId.present
         ? paymentMethodId.value
         : this.paymentMethodId,
+    paymentType: paymentType.present ? paymentType.value : this.paymentType,
     consultFee: consultFee ?? this.consultFee,
     ambulanceFee: ambulanceFee ?? this.ambulanceFee,
     currencyId: currencyId.present ? currencyId.value : this.currencyId,
@@ -20788,6 +21010,7 @@ class MedicalFeeData extends DataClass implements Insertable<MedicalFeeData> {
         ? collectionStatusId.value
         : this.collectionStatusId,
     receiptIssued: receiptIssued ?? this.receiptIssued,
+    userAgreed: userAgreed ?? this.userAgreed,
     applicantName: applicantName.present
         ? applicantName.value
         : this.applicantName,
@@ -20797,7 +21020,19 @@ class MedicalFeeData extends DataClass implements Insertable<MedicalFeeData> {
     applicantPhone: applicantPhone.present
         ? applicantPhone.value
         : this.applicantPhone,
+    abnormalReason: abnormalReason.present
+        ? abnormalReason.value
+        : this.abnormalReason,
     remarks: remarks.present ? remarks.value : this.remarks,
+    consenterSignature: consenterSignature.present
+        ? consenterSignature.value
+        : this.consenterSignature,
+    witnessSignature: witnessSignature.present
+        ? witnessSignature.value
+        : this.witnessSignature,
+    counterSignature: counterSignature.present
+        ? counterSignature.value
+        : this.counterSignature,
     createdAt: createdAt ?? this.createdAt,
   );
   MedicalFeeData copyWithCompanion(MedicalFeesCompanion data) {
@@ -20807,6 +21042,9 @@ class MedicalFeeData extends DataClass implements Insertable<MedicalFeeData> {
       paymentMethodId: data.paymentMethodId.present
           ? data.paymentMethodId.value
           : this.paymentMethodId,
+      paymentType: data.paymentType.present
+          ? data.paymentType.value
+          : this.paymentType,
       consultFee: data.consultFee.present
           ? data.consultFee.value
           : this.consultFee,
@@ -20822,6 +21060,9 @@ class MedicalFeeData extends DataClass implements Insertable<MedicalFeeData> {
       receiptIssued: data.receiptIssued.present
           ? data.receiptIssued.value
           : this.receiptIssued,
+      userAgreed: data.userAgreed.present
+          ? data.userAgreed.value
+          : this.userAgreed,
       applicantName: data.applicantName.present
           ? data.applicantName.value
           : this.applicantName,
@@ -20831,7 +21072,19 @@ class MedicalFeeData extends DataClass implements Insertable<MedicalFeeData> {
       applicantPhone: data.applicantPhone.present
           ? data.applicantPhone.value
           : this.applicantPhone,
+      abnormalReason: data.abnormalReason.present
+          ? data.abnormalReason.value
+          : this.abnormalReason,
       remarks: data.remarks.present ? data.remarks.value : this.remarks,
+      consenterSignature: data.consenterSignature.present
+          ? data.consenterSignature.value
+          : this.consenterSignature,
+      witnessSignature: data.witnessSignature.present
+          ? data.witnessSignature.value
+          : this.witnessSignature,
+      counterSignature: data.counterSignature.present
+          ? data.counterSignature.value
+          : this.counterSignature,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
     );
   }
@@ -20842,15 +21095,21 @@ class MedicalFeeData extends DataClass implements Insertable<MedicalFeeData> {
           ..write('feeId: $feeId, ')
           ..write('medicalId: $medicalId, ')
           ..write('paymentMethodId: $paymentMethodId, ')
+          ..write('paymentType: $paymentType, ')
           ..write('consultFee: $consultFee, ')
           ..write('ambulanceFee: $ambulanceFee, ')
           ..write('currencyId: $currencyId, ')
           ..write('collectionStatusId: $collectionStatusId, ')
           ..write('receiptIssued: $receiptIssued, ')
+          ..write('userAgreed: $userAgreed, ')
           ..write('applicantName: $applicantName, ')
           ..write('applicantUnit: $applicantUnit, ')
           ..write('applicantPhone: $applicantPhone, ')
+          ..write('abnormalReason: $abnormalReason, ')
           ..write('remarks: $remarks, ')
+          ..write('consenterSignature: $consenterSignature, ')
+          ..write('witnessSignature: $witnessSignature, ')
+          ..write('counterSignature: $counterSignature, ')
           ..write('createdAt: $createdAt')
           ..write(')'))
         .toString();
@@ -20861,15 +21120,21 @@ class MedicalFeeData extends DataClass implements Insertable<MedicalFeeData> {
     feeId,
     medicalId,
     paymentMethodId,
+    paymentType,
     consultFee,
     ambulanceFee,
     currencyId,
     collectionStatusId,
     receiptIssued,
+    userAgreed,
     applicantName,
     applicantUnit,
     applicantPhone,
+    abnormalReason,
     remarks,
+    $driftBlobEquality.hash(consenterSignature),
+    $driftBlobEquality.hash(witnessSignature),
+    $driftBlobEquality.hash(counterSignature),
     createdAt,
   );
   @override
@@ -20879,15 +21144,30 @@ class MedicalFeeData extends DataClass implements Insertable<MedicalFeeData> {
           other.feeId == this.feeId &&
           other.medicalId == this.medicalId &&
           other.paymentMethodId == this.paymentMethodId &&
+          other.paymentType == this.paymentType &&
           other.consultFee == this.consultFee &&
           other.ambulanceFee == this.ambulanceFee &&
           other.currencyId == this.currencyId &&
           other.collectionStatusId == this.collectionStatusId &&
           other.receiptIssued == this.receiptIssued &&
+          other.userAgreed == this.userAgreed &&
           other.applicantName == this.applicantName &&
           other.applicantUnit == this.applicantUnit &&
           other.applicantPhone == this.applicantPhone &&
+          other.abnormalReason == this.abnormalReason &&
           other.remarks == this.remarks &&
+          $driftBlobEquality.equals(
+            other.consenterSignature,
+            this.consenterSignature,
+          ) &&
+          $driftBlobEquality.equals(
+            other.witnessSignature,
+            this.witnessSignature,
+          ) &&
+          $driftBlobEquality.equals(
+            other.counterSignature,
+            this.counterSignature,
+          ) &&
           other.createdAt == this.createdAt);
 }
 
@@ -20895,75 +21175,105 @@ class MedicalFeesCompanion extends UpdateCompanion<MedicalFeeData> {
   final Value<int> feeId;
   final Value<int> medicalId;
   final Value<int?> paymentMethodId;
+  final Value<String?> paymentType;
   final Value<double> consultFee;
   final Value<double> ambulanceFee;
   final Value<int?> currencyId;
   final Value<int?> collectionStatusId;
   final Value<bool> receiptIssued;
+  final Value<bool> userAgreed;
   final Value<String?> applicantName;
   final Value<String?> applicantUnit;
   final Value<String?> applicantPhone;
+  final Value<String?> abnormalReason;
   final Value<String?> remarks;
+  final Value<Uint8List?> consenterSignature;
+  final Value<Uint8List?> witnessSignature;
+  final Value<Uint8List?> counterSignature;
   final Value<DateTime> createdAt;
   const MedicalFeesCompanion({
     this.feeId = const Value.absent(),
     this.medicalId = const Value.absent(),
     this.paymentMethodId = const Value.absent(),
+    this.paymentType = const Value.absent(),
     this.consultFee = const Value.absent(),
     this.ambulanceFee = const Value.absent(),
     this.currencyId = const Value.absent(),
     this.collectionStatusId = const Value.absent(),
     this.receiptIssued = const Value.absent(),
+    this.userAgreed = const Value.absent(),
     this.applicantName = const Value.absent(),
     this.applicantUnit = const Value.absent(),
     this.applicantPhone = const Value.absent(),
+    this.abnormalReason = const Value.absent(),
     this.remarks = const Value.absent(),
+    this.consenterSignature = const Value.absent(),
+    this.witnessSignature = const Value.absent(),
+    this.counterSignature = const Value.absent(),
     this.createdAt = const Value.absent(),
   });
   MedicalFeesCompanion.insert({
     this.feeId = const Value.absent(),
     required int medicalId,
     this.paymentMethodId = const Value.absent(),
+    this.paymentType = const Value.absent(),
     this.consultFee = const Value.absent(),
     this.ambulanceFee = const Value.absent(),
     this.currencyId = const Value.absent(),
     this.collectionStatusId = const Value.absent(),
     this.receiptIssued = const Value.absent(),
+    this.userAgreed = const Value.absent(),
     this.applicantName = const Value.absent(),
     this.applicantUnit = const Value.absent(),
     this.applicantPhone = const Value.absent(),
+    this.abnormalReason = const Value.absent(),
     this.remarks = const Value.absent(),
+    this.consenterSignature = const Value.absent(),
+    this.witnessSignature = const Value.absent(),
+    this.counterSignature = const Value.absent(),
     this.createdAt = const Value.absent(),
   }) : medicalId = Value(medicalId);
   static Insertable<MedicalFeeData> custom({
     Expression<int>? feeId,
     Expression<int>? medicalId,
     Expression<int>? paymentMethodId,
+    Expression<String>? paymentType,
     Expression<double>? consultFee,
     Expression<double>? ambulanceFee,
     Expression<int>? currencyId,
     Expression<int>? collectionStatusId,
     Expression<bool>? receiptIssued,
+    Expression<bool>? userAgreed,
     Expression<String>? applicantName,
     Expression<String>? applicantUnit,
     Expression<String>? applicantPhone,
+    Expression<String>? abnormalReason,
     Expression<String>? remarks,
+    Expression<Uint8List>? consenterSignature,
+    Expression<Uint8List>? witnessSignature,
+    Expression<Uint8List>? counterSignature,
     Expression<DateTime>? createdAt,
   }) {
     return RawValuesInsertable({
       if (feeId != null) 'fee_id': feeId,
       if (medicalId != null) 'medical_id': medicalId,
       if (paymentMethodId != null) 'payment_method_id': paymentMethodId,
+      if (paymentType != null) 'payment_type': paymentType,
       if (consultFee != null) 'consult_fee': consultFee,
       if (ambulanceFee != null) 'ambulance_fee': ambulanceFee,
       if (currencyId != null) 'currency_id': currencyId,
       if (collectionStatusId != null)
         'collection_status_id': collectionStatusId,
       if (receiptIssued != null) 'receipt_issued': receiptIssued,
+      if (userAgreed != null) 'user_agreed': userAgreed,
       if (applicantName != null) 'applicant_name': applicantName,
       if (applicantUnit != null) 'applicant_unit': applicantUnit,
       if (applicantPhone != null) 'applicant_phone': applicantPhone,
+      if (abnormalReason != null) 'abnormal_reason': abnormalReason,
       if (remarks != null) 'remarks': remarks,
+      if (consenterSignature != null) 'consenter_signature': consenterSignature,
+      if (witnessSignature != null) 'witness_signature': witnessSignature,
+      if (counterSignature != null) 'counter_signature': counterSignature,
       if (createdAt != null) 'created_at': createdAt,
     });
   }
@@ -20972,30 +21282,42 @@ class MedicalFeesCompanion extends UpdateCompanion<MedicalFeeData> {
     Value<int>? feeId,
     Value<int>? medicalId,
     Value<int?>? paymentMethodId,
+    Value<String?>? paymentType,
     Value<double>? consultFee,
     Value<double>? ambulanceFee,
     Value<int?>? currencyId,
     Value<int?>? collectionStatusId,
     Value<bool>? receiptIssued,
+    Value<bool>? userAgreed,
     Value<String?>? applicantName,
     Value<String?>? applicantUnit,
     Value<String?>? applicantPhone,
+    Value<String?>? abnormalReason,
     Value<String?>? remarks,
+    Value<Uint8List?>? consenterSignature,
+    Value<Uint8List?>? witnessSignature,
+    Value<Uint8List?>? counterSignature,
     Value<DateTime>? createdAt,
   }) {
     return MedicalFeesCompanion(
       feeId: feeId ?? this.feeId,
       medicalId: medicalId ?? this.medicalId,
       paymentMethodId: paymentMethodId ?? this.paymentMethodId,
+      paymentType: paymentType ?? this.paymentType,
       consultFee: consultFee ?? this.consultFee,
       ambulanceFee: ambulanceFee ?? this.ambulanceFee,
       currencyId: currencyId ?? this.currencyId,
       collectionStatusId: collectionStatusId ?? this.collectionStatusId,
       receiptIssued: receiptIssued ?? this.receiptIssued,
+      userAgreed: userAgreed ?? this.userAgreed,
       applicantName: applicantName ?? this.applicantName,
       applicantUnit: applicantUnit ?? this.applicantUnit,
       applicantPhone: applicantPhone ?? this.applicantPhone,
+      abnormalReason: abnormalReason ?? this.abnormalReason,
       remarks: remarks ?? this.remarks,
+      consenterSignature: consenterSignature ?? this.consenterSignature,
+      witnessSignature: witnessSignature ?? this.witnessSignature,
+      counterSignature: counterSignature ?? this.counterSignature,
       createdAt: createdAt ?? this.createdAt,
     );
   }
@@ -21012,6 +21334,9 @@ class MedicalFeesCompanion extends UpdateCompanion<MedicalFeeData> {
     if (paymentMethodId.present) {
       map['payment_method_id'] = Variable<int>(paymentMethodId.value);
     }
+    if (paymentType.present) {
+      map['payment_type'] = Variable<String>(paymentType.value);
+    }
     if (consultFee.present) {
       map['consult_fee'] = Variable<double>(consultFee.value);
     }
@@ -21027,6 +21352,9 @@ class MedicalFeesCompanion extends UpdateCompanion<MedicalFeeData> {
     if (receiptIssued.present) {
       map['receipt_issued'] = Variable<bool>(receiptIssued.value);
     }
+    if (userAgreed.present) {
+      map['user_agreed'] = Variable<bool>(userAgreed.value);
+    }
     if (applicantName.present) {
       map['applicant_name'] = Variable<String>(applicantName.value);
     }
@@ -21036,8 +21364,22 @@ class MedicalFeesCompanion extends UpdateCompanion<MedicalFeeData> {
     if (applicantPhone.present) {
       map['applicant_phone'] = Variable<String>(applicantPhone.value);
     }
+    if (abnormalReason.present) {
+      map['abnormal_reason'] = Variable<String>(abnormalReason.value);
+    }
     if (remarks.present) {
       map['remarks'] = Variable<String>(remarks.value);
+    }
+    if (consenterSignature.present) {
+      map['consenter_signature'] = Variable<Uint8List>(
+        consenterSignature.value,
+      );
+    }
+    if (witnessSignature.present) {
+      map['witness_signature'] = Variable<Uint8List>(witnessSignature.value);
+    }
+    if (counterSignature.present) {
+      map['counter_signature'] = Variable<Uint8List>(counterSignature.value);
     }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
@@ -21051,15 +21393,21 @@ class MedicalFeesCompanion extends UpdateCompanion<MedicalFeeData> {
           ..write('feeId: $feeId, ')
           ..write('medicalId: $medicalId, ')
           ..write('paymentMethodId: $paymentMethodId, ')
+          ..write('paymentType: $paymentType, ')
           ..write('consultFee: $consultFee, ')
           ..write('ambulanceFee: $ambulanceFee, ')
           ..write('currencyId: $currencyId, ')
           ..write('collectionStatusId: $collectionStatusId, ')
           ..write('receiptIssued: $receiptIssued, ')
+          ..write('userAgreed: $userAgreed, ')
           ..write('applicantName: $applicantName, ')
           ..write('applicantUnit: $applicantUnit, ')
           ..write('applicantPhone: $applicantPhone, ')
+          ..write('abnormalReason: $abnormalReason, ')
           ..write('remarks: $remarks, ')
+          ..write('consenterSignature: $consenterSignature, ')
+          ..write('witnessSignature: $witnessSignature, ')
+          ..write('counterSignature: $counterSignature, ')
           ..write('createdAt: $createdAt')
           ..write(')'))
         .toString();
@@ -44792,15 +45140,21 @@ typedef $$MedicalFeesTableCreateCompanionBuilder =
       Value<int> feeId,
       required int medicalId,
       Value<int?> paymentMethodId,
+      Value<String?> paymentType,
       Value<double> consultFee,
       Value<double> ambulanceFee,
       Value<int?> currencyId,
       Value<int?> collectionStatusId,
       Value<bool> receiptIssued,
+      Value<bool> userAgreed,
       Value<String?> applicantName,
       Value<String?> applicantUnit,
       Value<String?> applicantPhone,
+      Value<String?> abnormalReason,
       Value<String?> remarks,
+      Value<Uint8List?> consenterSignature,
+      Value<Uint8List?> witnessSignature,
+      Value<Uint8List?> counterSignature,
       Value<DateTime> createdAt,
     });
 typedef $$MedicalFeesTableUpdateCompanionBuilder =
@@ -44808,15 +45162,21 @@ typedef $$MedicalFeesTableUpdateCompanionBuilder =
       Value<int> feeId,
       Value<int> medicalId,
       Value<int?> paymentMethodId,
+      Value<String?> paymentType,
       Value<double> consultFee,
       Value<double> ambulanceFee,
       Value<int?> currencyId,
       Value<int?> collectionStatusId,
       Value<bool> receiptIssued,
+      Value<bool> userAgreed,
       Value<String?> applicantName,
       Value<String?> applicantUnit,
       Value<String?> applicantPhone,
+      Value<String?> abnormalReason,
       Value<String?> remarks,
+      Value<Uint8List?> consenterSignature,
+      Value<Uint8List?> witnessSignature,
+      Value<Uint8List?> counterSignature,
       Value<DateTime> createdAt,
     });
 
@@ -44924,6 +45284,11 @@ class $$MedicalFeesTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<String> get paymentType => $composableBuilder(
+    column: $table.paymentType,
+    builder: (column) => ColumnFilters(column),
+  );
+
   ColumnFilters<double> get consultFee => $composableBuilder(
     column: $table.consultFee,
     builder: (column) => ColumnFilters(column),
@@ -44936,6 +45301,11 @@ class $$MedicalFeesTableFilterComposer
 
   ColumnFilters<bool> get receiptIssued => $composableBuilder(
     column: $table.receiptIssued,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get userAgreed => $composableBuilder(
+    column: $table.userAgreed,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -44954,8 +45324,28 @@ class $$MedicalFeesTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<String> get abnormalReason => $composableBuilder(
+    column: $table.abnormalReason,
+    builder: (column) => ColumnFilters(column),
+  );
+
   ColumnFilters<String> get remarks => $composableBuilder(
     column: $table.remarks,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<Uint8List> get consenterSignature => $composableBuilder(
+    column: $table.consenterSignature,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<Uint8List> get witnessSignature => $composableBuilder(
+    column: $table.witnessSignature,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<Uint8List> get counterSignature => $composableBuilder(
+    column: $table.counterSignature,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -45071,6 +45461,11 @@ class $$MedicalFeesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get paymentType => $composableBuilder(
+    column: $table.paymentType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<double> get consultFee => $composableBuilder(
     column: $table.consultFee,
     builder: (column) => ColumnOrderings(column),
@@ -45083,6 +45478,11 @@ class $$MedicalFeesTableOrderingComposer
 
   ColumnOrderings<bool> get receiptIssued => $composableBuilder(
     column: $table.receiptIssued,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get userAgreed => $composableBuilder(
+    column: $table.userAgreed,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -45101,8 +45501,28 @@ class $$MedicalFeesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get abnormalReason => $composableBuilder(
+    column: $table.abnormalReason,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get remarks => $composableBuilder(
     column: $table.remarks,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<Uint8List> get consenterSignature => $composableBuilder(
+    column: $table.consenterSignature,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<Uint8List> get witnessSignature => $composableBuilder(
+    column: $table.witnessSignature,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<Uint8List> get counterSignature => $composableBuilder(
+    column: $table.counterSignature,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -45216,6 +45636,11 @@ class $$MedicalFeesTableAnnotationComposer
   GeneratedColumn<int> get feeId =>
       $composableBuilder(column: $table.feeId, builder: (column) => column);
 
+  GeneratedColumn<String> get paymentType => $composableBuilder(
+    column: $table.paymentType,
+    builder: (column) => column,
+  );
+
   GeneratedColumn<double> get consultFee => $composableBuilder(
     column: $table.consultFee,
     builder: (column) => column,
@@ -45228,6 +45653,11 @@ class $$MedicalFeesTableAnnotationComposer
 
   GeneratedColumn<bool> get receiptIssued => $composableBuilder(
     column: $table.receiptIssued,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get userAgreed => $composableBuilder(
+    column: $table.userAgreed,
     builder: (column) => column,
   );
 
@@ -45246,8 +45676,28 @@ class $$MedicalFeesTableAnnotationComposer
     builder: (column) => column,
   );
 
+  GeneratedColumn<String> get abnormalReason => $composableBuilder(
+    column: $table.abnormalReason,
+    builder: (column) => column,
+  );
+
   GeneratedColumn<String> get remarks =>
       $composableBuilder(column: $table.remarks, builder: (column) => column);
+
+  GeneratedColumn<Uint8List> get consenterSignature => $composableBuilder(
+    column: $table.consenterSignature,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<Uint8List> get witnessSignature => $composableBuilder(
+    column: $table.witnessSignature,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<Uint8List> get counterSignature => $composableBuilder(
+    column: $table.counterSignature,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
@@ -45381,29 +45831,41 @@ class $$MedicalFeesTableTableManager
                 Value<int> feeId = const Value.absent(),
                 Value<int> medicalId = const Value.absent(),
                 Value<int?> paymentMethodId = const Value.absent(),
+                Value<String?> paymentType = const Value.absent(),
                 Value<double> consultFee = const Value.absent(),
                 Value<double> ambulanceFee = const Value.absent(),
                 Value<int?> currencyId = const Value.absent(),
                 Value<int?> collectionStatusId = const Value.absent(),
                 Value<bool> receiptIssued = const Value.absent(),
+                Value<bool> userAgreed = const Value.absent(),
                 Value<String?> applicantName = const Value.absent(),
                 Value<String?> applicantUnit = const Value.absent(),
                 Value<String?> applicantPhone = const Value.absent(),
+                Value<String?> abnormalReason = const Value.absent(),
                 Value<String?> remarks = const Value.absent(),
+                Value<Uint8List?> consenterSignature = const Value.absent(),
+                Value<Uint8List?> witnessSignature = const Value.absent(),
+                Value<Uint8List?> counterSignature = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
               }) => MedicalFeesCompanion(
                 feeId: feeId,
                 medicalId: medicalId,
                 paymentMethodId: paymentMethodId,
+                paymentType: paymentType,
                 consultFee: consultFee,
                 ambulanceFee: ambulanceFee,
                 currencyId: currencyId,
                 collectionStatusId: collectionStatusId,
                 receiptIssued: receiptIssued,
+                userAgreed: userAgreed,
                 applicantName: applicantName,
                 applicantUnit: applicantUnit,
                 applicantPhone: applicantPhone,
+                abnormalReason: abnormalReason,
                 remarks: remarks,
+                consenterSignature: consenterSignature,
+                witnessSignature: witnessSignature,
+                counterSignature: counterSignature,
                 createdAt: createdAt,
               ),
           createCompanionCallback:
@@ -45411,29 +45873,41 @@ class $$MedicalFeesTableTableManager
                 Value<int> feeId = const Value.absent(),
                 required int medicalId,
                 Value<int?> paymentMethodId = const Value.absent(),
+                Value<String?> paymentType = const Value.absent(),
                 Value<double> consultFee = const Value.absent(),
                 Value<double> ambulanceFee = const Value.absent(),
                 Value<int?> currencyId = const Value.absent(),
                 Value<int?> collectionStatusId = const Value.absent(),
                 Value<bool> receiptIssued = const Value.absent(),
+                Value<bool> userAgreed = const Value.absent(),
                 Value<String?> applicantName = const Value.absent(),
                 Value<String?> applicantUnit = const Value.absent(),
                 Value<String?> applicantPhone = const Value.absent(),
+                Value<String?> abnormalReason = const Value.absent(),
                 Value<String?> remarks = const Value.absent(),
+                Value<Uint8List?> consenterSignature = const Value.absent(),
+                Value<Uint8List?> witnessSignature = const Value.absent(),
+                Value<Uint8List?> counterSignature = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
               }) => MedicalFeesCompanion.insert(
                 feeId: feeId,
                 medicalId: medicalId,
                 paymentMethodId: paymentMethodId,
+                paymentType: paymentType,
                 consultFee: consultFee,
                 ambulanceFee: ambulanceFee,
                 currencyId: currencyId,
                 collectionStatusId: collectionStatusId,
                 receiptIssued: receiptIssued,
+                userAgreed: userAgreed,
                 applicantName: applicantName,
                 applicantUnit: applicantUnit,
                 applicantPhone: applicantPhone,
+                abnormalReason: abnormalReason,
                 remarks: remarks,
+                consenterSignature: consenterSignature,
+                witnessSignature: witnessSignature,
+                counterSignature: counterSignature,
                 createdAt: createdAt,
               ),
           withReferenceMapper: (p0) => p0

@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:drift/drift.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import '../../db/database.dart';
 import '../reference_service.dart';
@@ -87,10 +86,48 @@ class MedicalFeeViewModel extends ChangeNotifier {
   // 更新付款方式
   void updatePaymentMethod(int? methodId) {
     if (_feeCache == null) return;
-    _feeCache = _feeCache!.copyWith(paymentMethodId: Value(methodId));
+
+    // 如果付款方式改變，清除特定欄位
+    if (_feeCache!.paymentMethodId != methodId) {
+      _feeCache = _feeCache!.copyWith(
+        paymentMethodId: Value(methodId),
+        paymentType: const Value(null),
+        applicantName: const Value(null),
+        applicantUnit: const Value(null),
+        applicantPhone: const Value(null),
+        receiptIssued: false,
+        abnormalReason: const Value(null),
+        counterSignature: const Value(null),
+      );
+
+      notifyListeners();
+
+      _debounceSave(() async {
+        // 先清除舊資料
+        await db.medicalFeeDao.clearPaymentMethodSpecificData(_feeCache!.feeId);
+        // 再更新付款方式
+        return db.medicalFeeDao.updatePaymentMethod(_feeCache!.feeId, methodId);
+      });
+    }
+  }
+
+  // 更新自付方式
+  void updatePaymentType(String? type) {
+    if (_feeCache == null) return;
+    _feeCache = _feeCache!.copyWith(paymentType: Value(type));
     notifyListeners();
     _debounceSave(
-      () => db.medicalFeeDao.updatePaymentMethod(_feeCache!.feeId, methodId),
+      () => db.medicalFeeDao.updatePaymentType(_feeCache!.feeId, type),
+    );
+  }
+
+  // 更新收費異常原因
+  void updateAbnormalReason(String? reason) {
+    if (_feeCache == null) return;
+    _feeCache = _feeCache!.copyWith(abnormalReason: Value(reason));
+    notifyListeners();
+    _debounceSave(
+      () => db.medicalFeeDao.updateAbnormalReason(_feeCache!.feeId, reason),
     );
   }
 
@@ -144,6 +181,16 @@ class MedicalFeeViewModel extends ChangeNotifier {
     );
   }
 
+  // 更新使用者同意狀態
+  void updateUserAgreed(bool agreed) {
+    if (_feeCache == null) return;
+    _feeCache = _feeCache!.copyWith(userAgreed: agreed);
+    notifyListeners();
+    _debounceSave(
+      () => db.medicalFeeDao.updateUserAgreed(_feeCache!.feeId, agreed),
+    );
+  }
+
   // 更新申請人資訊
   void updateApplicantInfo({String? name, String? unit, String? phone}) {
     if (_feeCache == null) return;
@@ -163,6 +210,19 @@ class MedicalFeeViewModel extends ChangeNotifier {
     );
   }
 
+  // 搜尋貨幣
+  Future<List<CurrencyRefData>> searchCurrencies(String keyword) async {
+    if (keyword.isEmpty) return refService.currencyList;
+    final lower = keyword.toLowerCase();
+    return refService.currencyList
+        .where(
+          (c) =>
+              c.code.toLowerCase().contains(lower) ||
+              c.name.toLowerCase().contains(lower),
+        )
+        .toList();
+  }
+
   // 更新備註
   void updateRemarks(String? remarks) {
     if (_feeCache == null) return;
@@ -170,6 +230,41 @@ class MedicalFeeViewModel extends ChangeNotifier {
     notifyListeners();
     _debounceSave(
       () => db.medicalFeeDao.updateRemarks(_feeCache!.feeId, remarks),
+    );
+  }
+
+  // 更新同意人簽名
+  void updateConsenterSignature(Uint8List? signature) {
+    if (_feeCache == null) return;
+    _feeCache = _feeCache!.copyWith(consenterSignature: Value(signature));
+    notifyListeners();
+    _debounceSave(
+      () => db.medicalFeeDao.updateConsenterSignature(
+        _feeCache!.feeId,
+        signature,
+      ),
+    );
+  }
+
+  // 更新見證人簽名
+  void updateWitnessSignature(Uint8List? signature) {
+    if (_feeCache == null) return;
+    _feeCache = _feeCache!.copyWith(witnessSignature: Value(signature));
+    notifyListeners();
+    _debounceSave(
+      () =>
+          db.medicalFeeDao.updateWitnessSignature(_feeCache!.feeId, signature),
+    );
+  }
+
+  // 更新緊急醫療救護人員簽章
+  void updateCounterSignature(Uint8List? signature) {
+    if (_feeCache == null) return;
+    _feeCache = _feeCache!.copyWith(counterSignature: Value(signature));
+    notifyListeners();
+    _debounceSave(
+      () =>
+          db.medicalFeeDao.updateCounterSignature(_feeCache!.feeId, signature),
     );
   }
 

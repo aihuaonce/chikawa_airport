@@ -313,6 +313,7 @@ class MedicalFees extends Table {
   IntColumn get medicalId => integer().references(MedicalRecord, #medicalId)();
   IntColumn get paymentMethodId =>
       integer().nullable().references(PaymentMethod, #id)();
+  TextColumn get paymentType => text().nullable()(); // 自付方式 (現金/刷卡)
   RealColumn get consultFee => real().withDefault(const Constant(0))();
   RealColumn get ambulanceFee => real().withDefault(const Constant(0))();
   IntColumn get currencyId =>
@@ -321,10 +322,16 @@ class MedicalFees extends Table {
       integer().nullable().references(CollectionStatus, #id)();
   BoolColumn get receiptIssued =>
       boolean().withDefault(const Constant(false))();
+  BoolColumn get userAgreed =>
+      boolean().withDefault(const Constant(false))();
   TextColumn get applicantName => text().nullable()();
   TextColumn get applicantUnit => text().nullable()();
   TextColumn get applicantPhone => text().nullable()();
+  TextColumn get abnormalReason => text().nullable()(); // 收費異常原因
   TextColumn get remarks => text().nullable()();
+  BlobColumn get consenterSignature => blob().nullable()();
+  BlobColumn get witnessSignature => blob().nullable()();
+  BlobColumn get counterSignature => blob().nullable()();
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
 }
 

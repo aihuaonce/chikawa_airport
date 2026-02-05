@@ -34,6 +34,35 @@ class MedicalFeeDao extends DatabaseAccessor<AppDatabase>
     );
   }
 
+  // 更新自付方式
+  Future<int> updatePaymentType(int feeId, String? paymentType) {
+    return (update(medicalFees)..where((f) => f.feeId.equals(feeId))).write(
+      MedicalFeesCompanion(paymentType: Value(paymentType)),
+    );
+  }
+
+  // 更新收費異常原因
+  Future<int> updateAbnormalReason(int feeId, String? reason) {
+    return (update(medicalFees)..where((f) => f.feeId.equals(feeId))).write(
+      MedicalFeesCompanion(abnormalReason: Value(reason)),
+    );
+  }
+
+  // 清除特定付款方式的資料 (切換付款方式時使用)
+  Future<int> clearPaymentMethodSpecificData(int feeId) {
+    return (update(medicalFees)..where((f) => f.feeId.equals(feeId))).write(
+      const MedicalFeesCompanion(
+        paymentType: Value(null),
+        applicantName: Value(null),
+        applicantUnit: Value(null),
+        applicantPhone: Value(null),
+        receiptIssued: Value(false),
+        abnormalReason: Value(null),
+        counterSignature: Value(null),
+      ),
+    );
+  }
+
   // 更新出診費
   Future<int> updateConsultFee(int feeId, double fee) {
     return (update(medicalFees)..where((f) => f.feeId.equals(feeId))).write(
@@ -69,6 +98,13 @@ class MedicalFeeDao extends DatabaseAccessor<AppDatabase>
     );
   }
 
+  // 更新使用者同意狀態
+  Future<int> updateUserAgreed(int feeId, bool agreed) {
+    return (update(medicalFees)..where((f) => f.feeId.equals(feeId))).write(
+      MedicalFeesCompanion(userAgreed: Value(agreed)),
+    );
+  }
+
   // 更新申請人資訊（統一請款用）
   Future<int> updateApplicantInfo(
     int feeId, {
@@ -89,6 +125,27 @@ class MedicalFeeDao extends DatabaseAccessor<AppDatabase>
   Future<int> updateRemarks(int feeId, String? remarks) {
     return (update(medicalFees)..where((f) => f.feeId.equals(feeId))).write(
       MedicalFeesCompanion(remarks: Value(remarks)),
+    );
+  }
+
+  // 更新同意人簽名
+  Future<int> updateConsenterSignature(int feeId, Uint8List? signature) {
+    return (update(medicalFees)..where((f) => f.feeId.equals(feeId))).write(
+      MedicalFeesCompanion(consenterSignature: Value(signature)),
+    );
+  }
+
+  // 更新見證人簽名
+  Future<int> updateWitnessSignature(int feeId, Uint8List? signature) {
+    return (update(medicalFees)..where((f) => f.feeId.equals(feeId))).write(
+      MedicalFeesCompanion(witnessSignature: Value(signature)),
+    );
+  }
+
+  // 更新緊急醫療救護人員簽章
+  Future<int> updateCounterSignature(int feeId, Uint8List? signature) {
+    return (update(medicalFees)..where((f) => f.feeId.equals(feeId))).write(
+      MedicalFeesCompanion(counterSignature: Value(signature)),
     );
   }
 
