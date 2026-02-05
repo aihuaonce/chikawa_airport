@@ -84,24 +84,35 @@ class _RefusalOfReferralState extends State<RefusalOfReferral> {
 
     // 2. 處理主責醫師 (若未選擇，嘗試自動帶入)
     if (_selectedDoctor == null && viewModel.medicalStaffList.isNotEmpty) {
+      // 輔助函式：根據 ID 查找姓名
+      String? findStaffName(int? staffId) {
+        if (staffId == null) return null;
+        try {
+          return viewModel.medicalStaffList
+              .firstWhere((s) => s.id == staffId)
+              .name;
+        } catch (_) {
+          return null;
+        }
+      }
+
       try {
         final primaryDoctor = viewModel.staffAssignments.firstWhere(
           (a) =>
               viewModel.getStaffRoleCode(a.staffRoleId) == 'DOCTOR' &&
               a.isPrimary,
         );
-        if (primaryDoctor.staffName != null) {
-          _selectedDoctor = primaryDoctor.staffName;
-        }
+        // 優先使用 assignment 中的姓名，若無則透過 ID 查找
+        _selectedDoctor =
+            primaryDoctor.staffName ?? findStaffName(primaryDoctor.staffId);
       } catch (_) {
         // 若無主責醫師，嘗試找任一醫師
         try {
           final anyDoctor = viewModel.staffAssignments.firstWhere(
             (a) => viewModel.getStaffRoleCode(a.staffRoleId) == 'DOCTOR',
           );
-          if (anyDoctor.staffName != null) {
-            _selectedDoctor = anyDoctor.staffName;
-          }
+          _selectedDoctor =
+              anyDoctor.staffName ?? findStaffName(anyDoctor.staffId);
         } catch (_) {}
       }
     }
