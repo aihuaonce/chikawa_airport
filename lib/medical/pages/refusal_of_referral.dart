@@ -38,7 +38,11 @@ class _RefusalOfReferralState extends State<RefusalOfReferral> {
   // 狀態變數
   bool _isSelf = true;
   String? _selectedDoctor; // 改為 nullable 以支援動態載入
-  bool _isInitialized = false;
+  
+  // 初始化標記
+  bool _isPatientInitialized = false;
+  bool _isFormInitialized = false;
+
   Uint8List? _signatorySignature;
 
   @override
@@ -65,59 +69,96 @@ class _RefusalOfReferralState extends State<RefusalOfReferral> {
 
   // 初始化並帶入資料
   void _updateControllers(TreatmentViewModel viewModel) {
-    if (_isInitialized) return;
-
-    // 檢查關鍵資料是否已載入
-    if (viewModel.patient == null || viewModel.medicalStaffList.isEmpty) {
-      return;
-    }
-
+    // 1. 處理病患基本資料 (唯讀，有資料就更新，除非已經手動修改過 - 但此處為唯讀所以直接更新)
     final patient = viewModel.patient;
-    if (patient != null) {
-      if (_patientNameController.text.isEmpty) {
-        _patientNameController.text = patient.name ?? '';
-      }
-      if (_patientIdController.text.isEmpty) {
-        _patientIdController.text = patient.passportOrIdNo ?? '';
-      }
-      if (_patientBirthController.text.isEmpty && patient.birthday != null) {
+    if (patient != null && !_isPatientInitialized) {
+      _patientNameController.text = patient.name ?? '';
+      _patientIdController.text = patient.passportOrIdNo ?? '';
+      if (patient.birthday != null) {
         _patientBirthController.text = DateFormat(
           'yyyy/MM/dd',
         ).format(patient.birthday!);
       }
+      _isPatientInitialized = true;
     }
 
-    // 嘗試帶入主責醫師
-    if (_selectedDoctor == null) {
+    // 2. 處理主責醫師 (若未選擇，嘗試自動帶入)
+    if (_selectedDoctor == null && viewModel.medicalStaffList.isNotEmpty) {
+      // 輔助函式：根據 ID 查找姓名
+      String? findStaffName(int? staffId) {
+        if (staffId == null) return null;
+        try {
+          return viewModel.medicalStaffList
+              .firstWhere((s) => s.id == staffId)
+              .name;
+        } catch (_) {
+          return null;
+        }
+      }
+
       try {
         final primaryDoctor = viewModel.staffAssignments.firstWhere(
           (a) =>
               viewModel.getStaffRoleCode(a.staffRoleId) == 'DOCTOR' &&
               a.isPrimary,
         );
-        if (primaryDoctor.staffName != null) {
-          _selectedDoctor = primaryDoctor.staffName;
-        }
+        // 優先使用 assignment 中的姓名，若無則透過 ID 查找
+        _selectedDoctor =
+            primaryDoctor.staffName ?? findStaffName(primaryDoctor.staffId);
       } catch (_) {
         // 若無主責醫師，嘗試找任一醫師
         try {
           final anyDoctor = viewModel.staffAssignments.firstWhere(
             (a) => viewModel.getStaffRoleCode(a.staffRoleId) == 'DOCTOR',
           );
-          if (anyDoctor.staffName != null) {
-            _selectedDoctor = anyDoctor.staffName;
-          }
+          _selectedDoctor =
+              anyDoctor.staffName ?? findStaffName(anyDoctor.staffId);
         } catch (_) {}
       }
     }
 
-    _isInitialized = true;
+    // 3. 處理轉診單/切結書資料
+    final form = viewModel.referralForm;
+    if (form != null && !_isFormInitialized) {
+      // 填入已存資料
+      if (form.contactName != null) {
+        _signatoryNameController.text = form.contactName!;
+      }
+      if (form.contactIdNo != null) {
+        _signatoryIdController.text = form.contactIdNo!;
+      }
+      if (form.otherRelationship != null) {
+        _relationshipController.text = form.otherRelationship!;
+      }
+      if (form.contactAddress != null) {
+        _addressController.text = form.contactAddress!;
+      }
+      if (form.contactPhone != null) {
+        _phoneController.text = form.contactPhone!;
+      }
+      if (form.consentSignature != null) {
+        _signatorySignature = form.consentSignature;
+      }
+
+      // 若資料庫無資料，且為「本人」模式，則自動帶入病患資料
+      if (_isSelf &&
+          (form.contactName == null || form.contactName!.isEmpty) &&
+          patient != null) {
+        _updateSignatoryInfo(viewModel);
+      }
+      
+      _isFormInitialized = true;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<TreatmentViewModel>();
-    _updateControllers(viewModel);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _updateControllers(viewModel);
+      }
+    });
 
     // 檢查處置結果是否為拒絕轉診
     final treatment = viewModel.treatment;
@@ -145,20 +186,22 @@ class _RefusalOfReferralState extends State<RefusalOfReferral> {
           children: [
             Expanded(
               child: _buildFieldWrapper(
-                '本人/病患姓名 PATIENT NAME',
+                '病患姓名 PATIENT NAME',
                 _buildTextField(
                   hint: '例如: CHEN TAI MAN',
                   controller: _patientNameController,
+                  readOnly: true,
                 ),
               ),
             ),
             const SizedBox(width: 16),
             Expanded(
               child: _buildFieldWrapper(
-                '身分證/護照號碼 ID/PASSPORT NO',
+                '身分證字號 ID NO.',
                 _buildTextField(
                   hint: '例如: P12345678',
                   controller: _patientIdController,
+                  readOnly: true,
                 ),
               ),
             ),
@@ -209,6 +252,8 @@ class _RefusalOfReferralState extends State<RefusalOfReferral> {
                   _buildTextField(
                     hint: '例如：本人、父母、配偶',
                     controller: _relationshipController,
+                    onChanged: (val) =>
+                        viewModel.updateReferralConsent(otherRelationship: val),
                   ),
                 ),
               )
@@ -227,6 +272,8 @@ class _RefusalOfReferralState extends State<RefusalOfReferral> {
                 _buildTextField(
                   hint: '請輸入姓名',
                   controller: _signatoryNameController,
+                  onChanged: (val) =>
+                      viewModel.updateReferralContactInfo(name: val),
                 ),
               ),
             ),
@@ -237,6 +284,8 @@ class _RefusalOfReferralState extends State<RefusalOfReferral> {
                 _buildTextField(
                   hint: '請輸入身分證或護照號碼',
                   controller: _signatoryIdController,
+                  onChanged: (val) =>
+                      viewModel.updateReferralContactInfo(idNo: val),
                 ),
               ),
             ),
@@ -254,6 +303,8 @@ class _RefusalOfReferralState extends State<RefusalOfReferral> {
                 _buildTextField(
                   hint: '請輸入詳細聯絡地址',
                   controller: _addressController,
+                  onChanged: (val) =>
+                      viewModel.updateReferralContactInfo(address: val),
                 ),
               ),
             ),
@@ -261,7 +312,12 @@ class _RefusalOfReferralState extends State<RefusalOfReferral> {
             Expanded(
               child: _buildFieldWrapper(
                 '電話 Phone',
-                _buildTextField(hint: '請輸入聯絡電話', controller: _phoneController),
+                _buildTextField(
+                  hint: '請輸入聯絡電話',
+                  controller: _phoneController,
+                  onChanged: (val) =>
+                      viewModel.updateReferralContactInfo(phone: val),
+                ),
               ),
             ),
           ],
@@ -280,8 +336,10 @@ class _RefusalOfReferralState extends State<RefusalOfReferral> {
                 SignatureField(
                   placeholder: 'Digital Signature Area (請在此區域簽名)',
                   value: _signatorySignature,
-                  onChanged: (data) =>
-                      setState(() => _signatorySignature = data),
+                  onChanged: (data) {
+                    setState(() => _signatorySignature = data);
+                    viewModel.updateReferralConsent(signature: data);
+                  },
                 ),
               ),
             ),
@@ -323,18 +381,18 @@ class _RefusalOfReferralState extends State<RefusalOfReferral> {
           // 中文部分
           Row(
             children: [
-              const Text(
-                '本人：',
-                style: TextStyle(
+              Text(
+                '本人：${_patientNameController.text}',
+                style: const TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.bold,
                   color: textDark,
                 ),
               ),
               const Spacer(),
-              const Text(
-                '身分證字號：',
-                style: TextStyle(
+              Text(
+                '身分證字號 ID No.：${_patientIdController.text}',
+                style: const TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.bold,
                   color: textDark,
@@ -351,7 +409,15 @@ class _RefusalOfReferralState extends State<RefusalOfReferral> {
                 '${_currentDateController.text} 於桃園國際機場接受聯新國際醫院桃園國際機場醫療中心醫師 ',
                 style: const TextStyle(fontSize: 14, color: textDark),
               ),
-              _buildDoctorDropdown(viewModel),
+              Text(
+                _selectedDoctor ?? '___________',
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                  color: textDark,
+                  decoration: TextDecoration.underline,
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 12),
@@ -366,25 +432,25 @@ class _RefusalOfReferralState extends State<RefusalOfReferral> {
           ),
 
           // 英文部分 (圖一精確還原)
-          const Text(
-            'I:',
-            style: TextStyle(
+          Text(
+            'I: ${_patientNameController.text}',
+            style: const TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.bold,
               color: textDark,
             ),
           ),
-          const Text(
-            'Date of birth:',
-            style: TextStyle(
+          Text(
+            'Date of birth: ${_patientBirthController.text}',
+            style: const TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.bold,
               color: textDark,
             ),
           ),
-          const Text(
-            'Passport / I.D. No:',
-            style: TextStyle(
+          Text(
+            'Passport / I.D. No: ${_patientIdController.text}',
+            style: const TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.bold,
               color: textDark,
@@ -468,9 +534,16 @@ class _RefusalOfReferralState extends State<RefusalOfReferral> {
       if (patient != null) {
         _signatoryNameController.text = patient.name ?? '';
         _signatoryIdController.text =
-            patient.idNo ?? patient.passportOrIdNo ?? '';
+            patient.passportOrIdNo ?? patient.idNo ?? '';
         _addressController.text = patient.address ?? '';
         _phoneController.text = patient.telephone ?? '';
+
+        viewModel.updateReferralContactInfo(
+          name: patient.name,
+          idNo: patient.passportOrIdNo ?? patient.idNo,
+          address: patient.address,
+          phone: patient.telephone,
+        );
       }
     } else {
       _signatoryNameController.clear();
@@ -478,47 +551,14 @@ class _RefusalOfReferralState extends State<RefusalOfReferral> {
       _relationshipController.clear();
       _addressController.clear();
       _phoneController.clear();
+
+      viewModel.updateReferralContactInfo(
+        name: '',
+        idNo: '',
+        address: '',
+        phone: '',
+      );
     }
-  }
-
-  Widget _buildDoctorDropdown(TreatmentViewModel viewModel) {
-    // 篩選出醫師清單
-    final doctors = viewModel.medicalStaffList
-        .where((s) => s.role == 'Doctor')
-        .map((s) => s.name)
-        .toSet() // 去重
-        .toList();
-
-    // 確保當前選擇的醫師在清單中
-    if (_selectedDoctor != null && !doctors.contains(_selectedDoctor)) {
-      doctors.add(_selectedDoctor!);
-    }
-
-    // 若清單為空，提供預設選項
-    if (doctors.isEmpty) {
-      doctors.add('醫師 A');
-    }
-
-    return DropdownButtonHideUnderline(
-      child: DropdownButton<String>(
-        value: _selectedDoctor,
-        hint: const Text('請選擇醫師'),
-        icon: const Icon(Icons.arrow_drop_down, color: primaryColor),
-        style: const TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.bold,
-          color: primaryColor,
-        ),
-        onChanged: (String? newValue) {
-          setState(() {
-            _selectedDoctor = newValue!;
-          });
-        },
-        items: doctors.map<DropdownMenuItem<String>>((String value) {
-          return DropdownMenuItem<String>(value: value, child: Text(value));
-        }).toList(),
-      ),
-    );
   }
 
   Future<void> _selectDate(
@@ -604,11 +644,13 @@ class _RefusalOfReferralState extends State<RefusalOfReferral> {
     bool readOnly = false,
     IconData? suffixIcon,
     VoidCallback? onTap,
+    Function(String)? onChanged,
   }) {
     return TextField(
       controller: controller,
       readOnly: readOnly,
       onTap: onTap,
+      onChanged: onChanged,
       style: const TextStyle(
         fontSize: 14,
         color: textDark,

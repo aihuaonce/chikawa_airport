@@ -31,12 +31,14 @@ class ReferralFormDao extends DatabaseAccessor<AppDatabase>
     String? name,
     String? phone,
     String? address,
+    String? idNo,
   }) {
     return (update(referralForms)..where((f) => f.formId.equals(formId))).write(
       ReferralFormsCompanion(
         contactName: Value(name),
         contactPhone: Value(phone),
         contactAddress: Value(address),
+        contactIdNo: Value(idNo),
       ),
     );
   }

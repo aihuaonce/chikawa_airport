@@ -84,6 +84,10 @@ class TreatmentViewModel extends ChangeNotifier {
   SpecialNotesData? _specialNotes;
   SpecialNotesData? get specialNotes => _specialNotes;
 
+  // 轉診單/切結書
+  ReferralFormData? _referralForm;
+  ReferralFormData? get referralForm => _referralForm;
+
   // === 參考資料（從 refService 取得）===
 
   List<ChiefComplaintTypeData> get complaintTypes =>
@@ -164,6 +168,13 @@ class TreatmentViewModel extends ChangeNotifier {
 
     // 載入特別註記
     _specialNotes = await db.treatmentDao.getSpecialNotes(medicalId);
+
+    // 載入轉診單/切結書
+    _referralForm = await db.referralFormDao.getFormByMedicalId(medicalId);
+    if (_referralForm == null) {
+      await db.referralFormDao.createForm(medicalId);
+      _referralForm = await db.referralFormDao.getFormByMedicalId(medicalId);
+    }
 
     await _loadMultiSelectData();
   }
@@ -1825,6 +1836,98 @@ class TreatmentViewModel extends ChangeNotifier {
     await _reloadSymptomIds();
     await _reloadActionIds();
     await _reloadSpecialNoteIds();
+  }
+
+  // ===================================================================
+  // 轉診單/切結書 CRUD
+  // ===================================================================
+
+  Timer? _referralFormDebounceTimer;
+  SaveStatus _referralFormSaveStatus = SaveStatus.idle;
+  SaveStatus get referralFormSaveStatus => _referralFormSaveStatus;
+
+  void updateReferralContactInfo({
+    String? name,
+    String? phone,
+    String? address,
+    String? idNo,
+  }) {
+    if (_referralForm == null) return;
+    _referralForm = _referralForm!.copyWith(
+      contactName: name != null ? Value(name) : const Value.absent(),
+      contactPhone: phone != null ? Value(phone) : const Value.absent(),
+      contactAddress: address != null ? Value(address) : const Value.absent(),
+      contactIdNo: idNo != null ? Value(idNo) : const Value.absent(),
+    );
+    notifyListeners();
+    _autoSaveReferralForm();
+  }
+
+  void updateReferralConsent({
+    String? otherRelationship,
+    Uint8List? signature,
+  }) {
+    if (_referralForm == null) return;
+    _referralForm = _referralForm!.copyWith(
+      otherRelationship: otherRelationship != null
+          ? Value(otherRelationship)
+          : const Value.absent(),
+      consentSignature: signature != null
+          ? Value(signature)
+          : const Value.absent(),
+      consentDateTime: signature != null
+          ? Value(DateTime.now())
+          : const Value.absent(),
+    );
+    notifyListeners();
+    _autoSaveReferralForm();
+  }
+
+  void _autoSaveReferralForm() {
+    if (_referralFormDebounceTimer?.isActive ?? false) {
+      _referralFormDebounceTimer!.cancel();
+    }
+    _referralFormSaveStatus = SaveStatus.saving;
+
+    _referralFormDebounceTimer = Timer(const Duration(seconds: 2), () async {
+      debugPrint('系統:正在自動儲存轉診單/切結書...');
+      await _saveReferralFormToDatabase();
+    });
+  }
+
+  Future<void> _saveReferralFormToDatabase() async {
+    if (_referralForm == null) return;
+    try {
+      await db.referralFormDao.updateContactInfo(
+        _referralForm!.formId,
+        name: _referralForm!.contactName,
+        phone: _referralForm!.contactPhone,
+        address: _referralForm!.contactAddress,
+        idNo: _referralForm!.contactIdNo,
+      );
+      await db.referralFormDao.updateConsent(
+        _referralForm!.formId,
+        otherRelationship: _referralForm!.otherRelationship,
+        consentDateTime: _referralForm!.consentDateTime,
+      );
+      if (_referralForm!.consentSignature != null) {
+        await db.referralFormDao.updateConsentSignature(
+          _referralForm!.formId,
+          _referralForm!.consentSignature!,
+        );
+      }
+
+      debugPrint('系統:轉診單/切結書自動存檔成功');
+      _referralFormSaveStatus = SaveStatus.success;
+      notifyListeners();
+      await Future.delayed(const Duration(seconds: 3));
+      _referralFormSaveStatus = SaveStatus.idle;
+      notifyListeners();
+    } catch (e) {
+      debugPrint('系統:轉診單/切結書自動存檔失敗 - $e');
+      _referralFormSaveStatus = SaveStatus.idle;
+      notifyListeners();
+    }
   }
 
   // ===================================================================
