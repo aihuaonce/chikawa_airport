@@ -67,6 +67,13 @@ class _RefusalOfReferralState extends State<RefusalOfReferral> {
     super.dispose();
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final viewModel = Provider.of<TreatmentViewModel>(context);
+    _updateControllers(viewModel);
+  }
+
   // 初始化並帶入資料
   void _updateControllers(TreatmentViewModel viewModel) {
     // 1. 處理病患基本資料 (唯讀，有資料就更新，除非已經手動修改過 - 但此處為唯讀所以直接更新)
@@ -144,7 +151,7 @@ class _RefusalOfReferralState extends State<RefusalOfReferral> {
       if (_isSelf &&
           (form.contactName == null || form.contactName!.isEmpty) &&
           patient != null) {
-        _updateSignatoryInfo(viewModel);
+        Future.microtask(() => _updateSignatoryInfo(viewModel));
       }
       
       _isFormInitialized = true;
@@ -154,12 +161,7 @@ class _RefusalOfReferralState extends State<RefusalOfReferral> {
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<TreatmentViewModel>();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        _updateControllers(viewModel);
-      }
-    });
-
+    
     // 檢查處置結果是否為拒絕轉診
     final treatment = viewModel.treatment;
     final refusedResult = viewModel.treatmentResults

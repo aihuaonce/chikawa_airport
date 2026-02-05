@@ -110,6 +110,9 @@ class TreatmentViewModel extends ChangeNotifier {
   SaveStatus _saveStatus = SaveStatus.idle;
   SaveStatus get saveStatus => _saveStatus;
 
+  // Health Assessment Debounce Timers
+  final Map<int, Timer> _healthAssessmentDebounceTimers = {};
+
   TreatmentViewModel(this.db, this.refService, this.medicalId);
 
   // === 初始化 ===
@@ -235,21 +238,43 @@ class TreatmentViewModel extends ChangeNotifier {
     required String relation,
     required double temperature,
   }) async {
-    try {
-      await db.treatmentDao.updateHealthAssessment(
-        HealthAssessmentFormCompanion(
-          assessmentFormId: Value(assessmentFormId),
-          medicalId: Value(medicalId),
-          name: Value(name),
-          relation: Value(relation),
-          temperature: Value(temperature),
-        ),
+    // 1. Optimistic Update (更新本地快取，但不通知 UI 以避免重建)
+    final index = _healthAssessments.indexWhere(
+      (a) => a.assessmentFormId == assessmentFormId,
+    );
+    if (index != -1) {
+      _healthAssessments[index] = _healthAssessments[index].copyWith(
+        name: name,
+        relation: relation,
+        temperature: temperature,
       );
-      await _reloadHealthAssessments();
-      debugPrint('系統:更新健康評估表成功');
-    } catch (e) {
-      debugPrint('系統:更新健康評估表失敗 - $e');
     }
+
+    // 2. Debounce Save (延遲 2 秒寫入資料庫)
+    if (_healthAssessmentDebounceTimers.containsKey(assessmentFormId)) {
+      _healthAssessmentDebounceTimers[assessmentFormId]?.cancel();
+    }
+
+    _healthAssessmentDebounceTimers[assessmentFormId] = Timer(
+      const Duration(seconds: 2),
+      () async {
+        try {
+          await db.treatmentDao.updateHealthAssessment(
+            HealthAssessmentFormCompanion(
+              assessmentFormId: Value(assessmentFormId),
+              medicalId: Value(medicalId),
+              name: Value(name),
+              relation: Value(relation),
+              temperature: Value(temperature),
+            ),
+          );
+          debugPrint('系統:更新健康評估表成功 (Debounced)');
+          _healthAssessmentDebounceTimers.remove(assessmentFormId);
+        } catch (e) {
+          debugPrint('系統:更新健康評估表失敗 - $e');
+        }
+      },
+    );
   }
 
   // ===================================================================

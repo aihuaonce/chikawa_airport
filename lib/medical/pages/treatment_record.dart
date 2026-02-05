@@ -10,6 +10,7 @@ import '../widgets/staff_search_sheet.dart';
 import '../widgets/reference_search_sheet.dart';
 import '../widgets/medication_edit_dialog.dart';
 import '../widgets/signature_field.dart';
+import '../widgets/treatment_consciousness_card.dart';
 
 class TreatmentRecord extends StatefulWidget {
   final int medicalId;
@@ -33,8 +34,6 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
   bool _cdcPassed = false;
   String _screeningMethod = '';
   bool _photoTrauma = false, _photoEcg = false, _photoOther = false;
-  bool _isAlert = true;
-  int? _leftPupilReactionId = 1, _rightPupilReactionId = 1, _gcsTotal;
 
   // --- 動態欄位狀態 (前端專用) ---
   String _intubationMethod = 'Endotracheal tube';
@@ -58,14 +57,6 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
   late TextEditingController _systolicController,
       _diastolicController,
       _spo2Controller;
-  late TextEditingController _gcsEController, _gcsVController, _gcsMController;
-  late TextEditingController _leftPupilSizeController,
-      _rightPupilSizeController;
-  late TextEditingController _headNeckController,
-      _chestController,
-      _abdomenController;
-  late TextEditingController _extremitiesController,
-      _otherPhysicalExamController;
   late TextEditingController _tentativeController,
       _secondaryDiagnosis1Controller,
       _secondaryDiagnosis2Controller;
@@ -80,7 +71,7 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
 
   String _clearanceMethod = '一般通關';
   String _ambulanceSource = '醫療中心';
-  
+
   Widget _buildFieldWrapper(String label, Widget field) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -108,16 +99,6 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
     _systolicController = TextEditingController();
     _diastolicController = TextEditingController();
     _spo2Controller = TextEditingController();
-    _gcsEController = TextEditingController();
-    _gcsVController = TextEditingController();
-    _gcsMController = TextEditingController();
-    _leftPupilSizeController = TextEditingController();
-    _rightPupilSizeController = TextEditingController();
-    _headNeckController = TextEditingController();
-    _chestController = TextEditingController();
-    _abdomenController = TextEditingController();
-    _extremitiesController = TextEditingController();
-    _otherPhysicalExamController = TextEditingController();
     _tentativeController = TextEditingController();
     _secondaryDiagnosis1Controller = TextEditingController();
     _secondaryDiagnosis2Controller = TextEditingController();
@@ -144,16 +125,6 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
     _systolicController.dispose();
     _diastolicController.dispose();
     _spo2Controller.dispose();
-    _gcsEController.dispose();
-    _gcsVController.dispose();
-    _gcsMController.dispose();
-    _leftPupilSizeController.dispose();
-    _rightPupilSizeController.dispose();
-    _headNeckController.dispose();
-    _chestController.dispose();
-    _abdomenController.dispose();
-    _extremitiesController.dispose();
-    _otherPhysicalExamController.dispose();
     _tentativeController.dispose();
     _secondaryDiagnosis1Controller.dispose();
     _secondaryDiagnosis2Controller.dispose();
@@ -223,27 +194,6 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
       _systolicController.text = latestAssessment.systolic?.toString() ?? '';
       _diastolicController.text = latestAssessment.diastolic?.toString() ?? '';
       _spo2Controller.text = latestAssessment.spo2?.toString() ?? '';
-    }
-
-    final latestConsciousnessExam = viewModel.latestConsciousnessExam;
-    if (latestConsciousnessExam != null) {
-      _gcsEController.text = latestConsciousnessExam.gcsE ?? '';
-      _gcsVController.text = latestConsciousnessExam.gcsV ?? '';
-      _gcsMController.text = latestConsciousnessExam.gcsM ?? '';
-      _leftPupilSizeController.text =
-          latestConsciousnessExam.leftPupilSize?.toString() ?? '';
-      _rightPupilSizeController.text =
-          latestConsciousnessExam.rightPupilSize?.toString() ?? '';
-      _leftPupilReactionId = latestConsciousnessExam.leftPupilReactionId ?? 1;
-      _rightPupilReactionId = latestConsciousnessExam.rightPupilReactionId ?? 1;
-      _headNeckController.text = latestConsciousnessExam.headNeckExam ?? '';
-      _chestController.text = latestConsciousnessExam.chestExam ?? '';
-      _abdomenController.text = latestConsciousnessExam.abdomenExam ?? '';
-      _extremitiesController.text =
-          latestConsciousnessExam.extremitiesExam ?? '';
-      _otherPhysicalExamController.text =
-          latestConsciousnessExam.otherPhysicalExam ?? '';
-      _isAlert = latestConsciousnessExam.consciousnessLevelId == 1;
     }
 
     _isInitialized = true;
@@ -919,174 +869,7 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
   }
 
   Widget _buildConsciousnessSection(TreatmentViewModel viewModel) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildCheckboxTile(
-          label: '意識清晰 Alert & Oriented',
-          value: _isAlert,
-          onChanged: (v) {
-            setState(() => _isAlert = v!);
-            if (_isAlert) {
-              _gcsEController.clear();
-              _gcsVController.clear();
-              _gcsMController.clear();
-              _gcsTotal = null;
-            }
-            _onConsciousnessAndExamChanged(viewModel);
-          },
-        ),
-        if (!_isAlert) ...[
-          const SizedBox(height: 12),
-          _buildLabel('GCS 指數評估'),
-          const SizedBox(height: 4),
-          Row(
-            children: [
-              Expanded(
-                child: _buildTextField(
-                  hint: 'E',
-                  controller: _gcsEController,
-                  textAlign: TextAlign.center,
-                  onChanged: (_) => _updateGCSTotalAndValidate(viewModel),
-                ),
-              ),
-              const SizedBox(width: 6),
-              Expanded(
-                child: _buildTextField(
-                  hint: 'V',
-                  controller: _gcsVController,
-                  textAlign: TextAlign.center,
-                  onChanged: (_) => _updateGCSTotalAndValidate(viewModel),
-                ),
-              ),
-              const SizedBox(width: 6),
-              Expanded(
-                child: _buildTextField(
-                  hint: 'M',
-                  controller: _gcsMController,
-                  textAlign: TextAlign.center,
-                  onChanged: (_) => _updateGCSTotalAndValidate(viewModel),
-                ),
-              ),
-              const SizedBox(width: 6),
-              Expanded(
-                child: Container(
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: primaryColor.withValues(alpha: 0.05),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: borderColor),
-                  ),
-                  alignment: Alignment.center,
-                  child: Text(
-                    _gcsTotal != null ? 'Total: $_gcsTotal' : 'Total',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      color: _gcsTotal != null ? primaryColor : textMuted,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: _buildPupilSection(
-                  '左瞳孔 Left Pupil',
-                  (v) {
-                    setState(
-                      () => _leftPupilReactionId = v == '+'
-                          ? 1
-                          : (v == '-' ? 2 : 3),
-                    );
-                    _onConsciousnessAndExamChanged(viewModel);
-                  },
-                  _leftPupilReactionId == 1
-                      ? '+'
-                      : (_leftPupilReactionId == 2 ? '-' : '±'),
-                  _leftPupilSizeController,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _buildPupilSection(
-                  '右瞳孔 Right Pupil',
-                  (v) {
-                    setState(
-                      () => _rightPupilReactionId = v == '+'
-                          ? 1
-                          : (v == '-' ? 2 : 3),
-                    );
-                    _onConsciousnessAndExamChanged(viewModel);
-                  },
-                  _rightPupilReactionId == 1
-                      ? '+'
-                      : (_rightPupilReactionId == 2 ? '-' : '±'),
-                  _rightPupilSizeController,
-                ),
-              ),
-            ],
-          ),
-        ],
-        const SizedBox(height: 12),
-
-        // --- 這裡改用 Row 佈局取代 GridView ---
-        Row(
-          children: [
-            Expanded(
-              child: _buildLabeledFieldWithController(
-                '頭頸部 Head/Neck',
-                '',
-                _headNeckController,
-                () => _onConsciousnessAndExamChanged(viewModel),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: _buildLabeledFieldWithController(
-                '胸部 Chest',
-                '',
-                _chestController,
-                () => _onConsciousnessAndExamChanged(viewModel),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 10),
-        Row(
-          children: [
-            Expanded(
-              child: _buildLabeledFieldWithController(
-                '腹部 Abdomen',
-                '',
-                _abdomenController,
-                () => _onConsciousnessAndExamChanged(viewModel),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: _buildLabeledFieldWithController(
-                '四肢 Extremities',
-                '',
-                _extremitiesController,
-                () => _onConsciousnessAndExamChanged(viewModel),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 10),
-        _buildLabeledFieldWithController(
-          '其它理學觀察 Other Observations...',
-          '',
-          _otherPhysicalExamController,
-          () => _onConsciousnessAndExamChanged(viewModel),
-          maxLines: 2,
-        ),
-      ],
-    );
+    return const TreatmentConsciousnessCard();
   }
 
   Widget _buildHistorySection(TreatmentViewModel viewModel) {
@@ -1461,14 +1244,12 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
     final treatment = viewModel.treatment;
 
     // 準備轉診醫院顯示文字
-    final selectedHospital =
-        treatment?.referralHospitalId != null
-            ? viewModel.getReferralHospitalById(treatment!.referralHospitalId)
-            : null;
-    final hospitalText =
-        selectedHospital != null
-            ? selectedHospital.name
-            : (treatment?.referralHospitalFinal ?? '');
+    final selectedHospital = treatment?.referralHospitalId != null
+        ? viewModel.getReferralHospitalById(treatment!.referralHospitalId)
+        : null;
+    final hospitalText = selectedHospital != null
+        ? selectedHospital.name
+        : (treatment?.referralHospitalFinal ?? '');
 
     // 準備隨車人員顯示文字
     final selectedStaff = viewModel.ambulanceStaff;
@@ -1550,39 +1331,42 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
                             icon: Icons.local_hospital,
                             onTap: () async {
                               FocusScope.of(context).unfocus();
-                              final result = await ReferenceSearchSheet.show<
-                                ReferralHospitalData
-                              >(
-                                context,
-                                title: '選擇轉診醫院',
-                                searchFunction: (q) => viewModel.searchReferralHospitals(q, includeAll: true),
-                                initialSelection: selectedHospital,
-                                isSelectedComparator: (a, b) => a.id == b?.id,
-                                itemBuilder: (context, item, isSelected) {
-                                  return ListTile(
-                                    title: Text(
-                                      item.name,
-                                      style: TextStyle(
-                                        color:
-                                            isSelected
+                              final result =
+                                  await ReferenceSearchSheet.show<
+                                    ReferralHospitalData
+                                  >(
+                                    context,
+                                    title: '選擇轉診醫院',
+                                    searchFunction: (q) =>
+                                        viewModel.searchReferralHospitals(
+                                          q,
+                                          includeAll: true,
+                                        ),
+                                    initialSelection: selectedHospital,
+                                    isSelectedComparator: (a, b) =>
+                                        a.id == b?.id,
+                                    itemBuilder: (context, item, isSelected) {
+                                      return ListTile(
+                                        title: Text(
+                                          item.name,
+                                          style: TextStyle(
+                                            color: isSelected
                                                 ? primaryColor
                                                 : textDark,
-                                        fontWeight:
-                                            isSelected
+                                            fontWeight: isSelected
                                                 ? FontWeight.bold
                                                 : FontWeight.normal,
-                                      ),
-                                    ),
-                                    trailing:
-                                        isSelected
+                                          ),
+                                        ),
+                                        trailing: isSelected
                                             ? const Icon(
-                                              Icons.check,
-                                              color: primaryColor,
-                                            )
+                                                Icons.check,
+                                                color: primaryColor,
+                                              )
                                             : null,
+                                      );
+                                    },
                                   );
-                                },
-                              );
 
                               if (result != null) {
                                 viewModel.updateReferralHospitalId(result.id);
@@ -1604,9 +1388,8 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
                             _buildTextField(
                               hint: '請輸入其它醫院名稱',
                               controller: _referralHospitalFinalController,
-                              onChanged:
-                                  (val) =>
-                                      viewModel.updateReferralHospitalFinal(val),
+                              onChanged: (val) =>
+                                  viewModel.updateReferralHospitalFinal(val),
                             ),
                           ],
                         ],
@@ -1647,26 +1430,23 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
                                     title: Text(
                                       item.name,
                                       style: TextStyle(
-                                        color:
-                                            isSelected
-                                                ? primaryColor
-                                                : textDark,
-                                        fontWeight:
-                                            isSelected
-                                                ? FontWeight.bold
-                                                : FontWeight.w600,
+                                        color: isSelected
+                                            ? primaryColor
+                                            : textDark,
+                                        fontWeight: isSelected
+                                            ? FontWeight.bold
+                                            : FontWeight.w600,
                                       ),
                                     ),
                                     subtitle: Text(
                                       '${item.role} ${item.employeeId != null ? '(${item.employeeId})' : ''}',
                                     ),
-                                    trailing:
-                                        isSelected
-                                            ? const Icon(
-                                              Icons.check,
-                                              color: primaryColor,
-                                            )
-                                            : null,
+                                    trailing: isSelected
+                                        ? const Icon(
+                                            Icons.check,
+                                            color: primaryColor,
+                                          )
+                                        : null,
                                   );
                                 },
                               );
@@ -2296,7 +2076,9 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
                               },
                               onTap: primaryNurse == null
                                   ? () {
-                                      ScaffoldMessenger.of(context).showSnackBar(
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
                                         const SnackBar(
                                           content: Text('請先選擇主責護理師'),
                                         ),
@@ -3080,64 +2862,6 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
     return int.tryParse(text);
   }
 
-  // GCS 驗證：檢查數值是否在有效範圍內
-  String? _validateGCS(String value, int max, String fieldName) {
-    if (value.isEmpty) return null; // 空值不驗證
-    final num = int.tryParse(value);
-    if (num == null) return '$fieldName 必須為數字';
-    if (num < 1 || num > max) {
-      return '$fieldName 必須在 1-$max 之間';
-    }
-    return null; // 驗證通過
-  }
-
-  // GCS 自動計算並驗證
-  void _updateGCSTotalAndValidate(TreatmentViewModel viewModel) {
-    // 驗證各欄位
-    final eError = _validateGCS(_gcsEController.text, 4, 'E');
-    final vError = _validateGCS(_gcsVController.text, 5, 'V');
-    final mError = _validateGCS(_gcsMController.text, 6, 'M');
-
-    // 計算 Total（只有通過驗證的才計入）
-    final e = (eError == null) ? (int.tryParse(_gcsEController.text) ?? 0) : 0;
-    final v = (vError == null) ? (int.tryParse(_gcsVController.text) ?? 0) : 0;
-    final m = (mError == null) ? (int.tryParse(_gcsMController.text) ?? 0) : 0;
-
-    setState(() {
-      _gcsTotal = (e > 0 && v > 0 && m > 0) ? (e + v + m) : null;
-    });
-
-    // 觸發自動儲存
-    _onConsciousnessAndExamChanged(viewModel);
-  }
-
-  // 意識與理學檢查變更時觸發自動儲存
-  void _onConsciousnessAndExamChanged(TreatmentViewModel viewModel) {
-    // 計算 GCS Total
-    final e = int.tryParse(_gcsEController.text) ?? 0;
-    final v = int.tryParse(_gcsVController.text) ?? 0;
-    final m = int.tryParse(_gcsMController.text) ?? 0;
-    final gcsTotal = (e > 0 && v > 0 && m > 0) ? (e + v + m) : null;
-
-    viewModel.updateConsciousnessAndExamCache(
-      isAlert: _isAlert,
-      consciousnessLevelId: _isAlert ? 1 : 2,
-      gcsE: _gcsEController.text,
-      gcsV: _gcsVController.text,
-      gcsM: _gcsMController.text,
-      gcs: gcsTotal,
-      leftPupilReactionId: _leftPupilReactionId,
-      leftPupilSize: double.tryParse(_leftPupilSizeController.text),
-      rightPupilReactionId: _rightPupilReactionId,
-      rightPupilSize: double.tryParse(_rightPupilSizeController.text),
-      headNeckExam: _headNeckController.text,
-      chestExam: _chestController.text,
-      abdomenExam: _abdomenController.text,
-      extremitiesExam: _extremitiesController.text,
-      otherPhysicalExam: _otherPhysicalExamController.text,
-    );
-  }
-
   // 理學檢查欄位
   Widget _buildLabeledFieldWithController(
     String label,
@@ -3156,43 +2880,6 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
           controller: controller,
           onChanged: (_) => onChanged(),
           maxLines: maxLines,
-        ),
-      ],
-    );
-  }
-
-  // 簡化版瞳孔檢查（參考 treatment.dart 設計）
-  Widget _buildPupilSection(
-    String side,
-    Function(String) onReact,
-    String currentReact,
-    TextEditingController sizeController,
-  ) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildLabel(side),
-        const SizedBox(height: 4),
-        Row(
-          children: [
-            Expanded(
-              flex: 2,
-              child: _buildSegmentedControl(
-                ['+', '-', '±'],
-                currentReact,
-                (v) => onReact(v),
-              ),
-            ),
-            const SizedBox(width: 6),
-            Expanded(
-              child: _buildTextField(
-                hint: 'mm',
-                textAlign: TextAlign.center,
-                controller: sizeController,
-                onChanged: (_) {},
-              ),
-            ),
-          ],
         ),
       ],
     );
@@ -3319,9 +3006,6 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
                   hint: '姓名',
                   controller: controllers['name'],
                   onChanged: (val) async {
-                    setState(() {
-                      controllers['name']?.text = val;
-                    });
                     // 保存到資料庫
                     final temp =
                         double.tryParse(controllers['temp']?.text ?? '0') ??
@@ -3341,9 +3025,6 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
                   hint: '關係',
                   controller: controllers['relation'],
                   onChanged: (val) async {
-                    setState(() {
-                      controllers['relation']?.text = val;
-                    });
                     // 保存到資料庫
                     final temp =
                         double.tryParse(controllers['temp']?.text ?? '0') ??
@@ -3364,9 +3045,6 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
                   hint: '體溫',
                   controller: controllers['temp'],
                   onChanged: (val) async {
-                    setState(() {
-                      controllers['temp']?.text = val;
-                    });
                     // 保存到資料庫
                     final temp = double.tryParse(val) ?? 0.0;
                     await viewModel.updateHealthAssessment(
