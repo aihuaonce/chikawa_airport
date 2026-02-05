@@ -21926,6 +21926,17 @@ class $ReferralFormsTable extends ReferralForms
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _contactIdNoMeta = const VerificationMeta(
+    'contactIdNo',
+  );
+  @override
+  late final GeneratedColumn<String> contactIdNo = GeneratedColumn<String>(
+    'contact_id_no',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _contactPhoneMeta = const VerificationMeta(
     'contactPhone',
   );
@@ -22272,6 +22283,7 @@ class $ReferralFormsTable extends ReferralForms
     formId,
     medicalId,
     contactName,
+    contactIdNo,
     contactPhone,
     contactAddress,
     primaryDiagnosis,
@@ -22335,6 +22347,15 @@ class $ReferralFormsTable extends ReferralForms
         contactName.isAcceptableOrUnknown(
           data['contact_name']!,
           _contactNameMeta,
+        ),
+      );
+    }
+    if (data.containsKey('contact_id_no')) {
+      context.handle(
+        _contactIdNoMeta,
+        contactIdNo.isAcceptableOrUnknown(
+          data['contact_id_no']!,
+          _contactIdNoMeta,
         ),
       );
     }
@@ -22614,6 +22635,10 @@ class $ReferralFormsTable extends ReferralForms
         DriftSqlType.string,
         data['${effectivePrefix}contact_name'],
       ),
+      contactIdNo: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}contact_id_no'],
+      ),
       contactPhone: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}contact_phone'],
@@ -22748,6 +22773,7 @@ class ReferralFormData extends DataClass
   final int formId;
   final int medicalId;
   final String? contactName;
+  final String? contactIdNo;
   final String? contactPhone;
   final String? contactAddress;
   final String? primaryDiagnosis;
@@ -22782,6 +22808,7 @@ class ReferralFormData extends DataClass
     required this.formId,
     required this.medicalId,
     this.contactName,
+    this.contactIdNo,
     this.contactPhone,
     this.contactAddress,
     this.primaryDiagnosis,
@@ -22820,6 +22847,9 @@ class ReferralFormData extends DataClass
     map['medical_id'] = Variable<int>(medicalId);
     if (!nullToAbsent || contactName != null) {
       map['contact_name'] = Variable<String>(contactName);
+    }
+    if (!nullToAbsent || contactIdNo != null) {
+      map['contact_id_no'] = Variable<String>(contactIdNo);
     }
     if (!nullToAbsent || contactPhone != null) {
       map['contact_phone'] = Variable<String>(contactPhone);
@@ -22919,6 +22949,9 @@ class ReferralFormData extends DataClass
       contactName: contactName == null && nullToAbsent
           ? const Value.absent()
           : Value(contactName),
+      contactIdNo: contactIdNo == null && nullToAbsent
+          ? const Value.absent()
+          : Value(contactIdNo),
       contactPhone: contactPhone == null && nullToAbsent
           ? const Value.absent()
           : Value(contactPhone),
@@ -23019,6 +23052,7 @@ class ReferralFormData extends DataClass
       formId: serializer.fromJson<int>(json['formId']),
       medicalId: serializer.fromJson<int>(json['medicalId']),
       contactName: serializer.fromJson<String?>(json['contactName']),
+      contactIdNo: serializer.fromJson<String?>(json['contactIdNo']),
       contactPhone: serializer.fromJson<String?>(json['contactPhone']),
       contactAddress: serializer.fromJson<String?>(json['contactAddress']),
       primaryDiagnosis: serializer.fromJson<String?>(json['primaryDiagnosis']),
@@ -23066,6 +23100,7 @@ class ReferralFormData extends DataClass
       'formId': serializer.toJson<int>(formId),
       'medicalId': serializer.toJson<int>(medicalId),
       'contactName': serializer.toJson<String?>(contactName),
+      'contactIdNo': serializer.toJson<String?>(contactIdNo),
       'contactPhone': serializer.toJson<String?>(contactPhone),
       'contactAddress': serializer.toJson<String?>(contactAddress),
       'primaryDiagnosis': serializer.toJson<String?>(primaryDiagnosis),
@@ -23103,6 +23138,7 @@ class ReferralFormData extends DataClass
     int? formId,
     int? medicalId,
     Value<String?> contactName = const Value.absent(),
+    Value<String?> contactIdNo = const Value.absent(),
     Value<String?> contactPhone = const Value.absent(),
     Value<String?> contactAddress = const Value.absent(),
     Value<String?> primaryDiagnosis = const Value.absent(),
@@ -23137,6 +23173,7 @@ class ReferralFormData extends DataClass
     formId: formId ?? this.formId,
     medicalId: medicalId ?? this.medicalId,
     contactName: contactName.present ? contactName.value : this.contactName,
+    contactIdNo: contactIdNo.present ? contactIdNo.value : this.contactIdNo,
     contactPhone: contactPhone.present ? contactPhone.value : this.contactPhone,
     contactAddress: contactAddress.present
         ? contactAddress.value
@@ -23217,6 +23254,9 @@ class ReferralFormData extends DataClass
       contactName: data.contactName.present
           ? data.contactName.value
           : this.contactName,
+      contactIdNo: data.contactIdNo.present
+          ? data.contactIdNo.value
+          : this.contactIdNo,
       contactPhone: data.contactPhone.present
           ? data.contactPhone.value
           : this.contactPhone,
@@ -23308,6 +23348,7 @@ class ReferralFormData extends DataClass
           ..write('formId: $formId, ')
           ..write('medicalId: $medicalId, ')
           ..write('contactName: $contactName, ')
+          ..write('contactIdNo: $contactIdNo, ')
           ..write('contactPhone: $contactPhone, ')
           ..write('contactAddress: $contactAddress, ')
           ..write('primaryDiagnosis: $primaryDiagnosis, ')
@@ -23347,6 +23388,7 @@ class ReferralFormData extends DataClass
     formId,
     medicalId,
     contactName,
+    contactIdNo,
     contactPhone,
     contactAddress,
     primaryDiagnosis,
@@ -23385,6 +23427,7 @@ class ReferralFormData extends DataClass
           other.formId == this.formId &&
           other.medicalId == this.medicalId &&
           other.contactName == this.contactName &&
+          other.contactIdNo == this.contactIdNo &&
           other.contactPhone == this.contactPhone &&
           other.contactAddress == this.contactAddress &&
           other.primaryDiagnosis == this.primaryDiagnosis &&
@@ -23427,6 +23470,7 @@ class ReferralFormsCompanion extends UpdateCompanion<ReferralFormData> {
   final Value<int> formId;
   final Value<int> medicalId;
   final Value<String?> contactName;
+  final Value<String?> contactIdNo;
   final Value<String?> contactPhone;
   final Value<String?> contactAddress;
   final Value<String?> primaryDiagnosis;
@@ -23461,6 +23505,7 @@ class ReferralFormsCompanion extends UpdateCompanion<ReferralFormData> {
     this.formId = const Value.absent(),
     this.medicalId = const Value.absent(),
     this.contactName = const Value.absent(),
+    this.contactIdNo = const Value.absent(),
     this.contactPhone = const Value.absent(),
     this.contactAddress = const Value.absent(),
     this.primaryDiagnosis = const Value.absent(),
@@ -23496,6 +23541,7 @@ class ReferralFormsCompanion extends UpdateCompanion<ReferralFormData> {
     this.formId = const Value.absent(),
     required int medicalId,
     this.contactName = const Value.absent(),
+    this.contactIdNo = const Value.absent(),
     this.contactPhone = const Value.absent(),
     this.contactAddress = const Value.absent(),
     this.primaryDiagnosis = const Value.absent(),
@@ -23531,6 +23577,7 @@ class ReferralFormsCompanion extends UpdateCompanion<ReferralFormData> {
     Expression<int>? formId,
     Expression<int>? medicalId,
     Expression<String>? contactName,
+    Expression<String>? contactIdNo,
     Expression<String>? contactPhone,
     Expression<String>? contactAddress,
     Expression<String>? primaryDiagnosis,
@@ -23566,6 +23613,7 @@ class ReferralFormsCompanion extends UpdateCompanion<ReferralFormData> {
       if (formId != null) 'form_id': formId,
       if (medicalId != null) 'medical_id': medicalId,
       if (contactName != null) 'contact_name': contactName,
+      if (contactIdNo != null) 'contact_id_no': contactIdNo,
       if (contactPhone != null) 'contact_phone': contactPhone,
       if (contactAddress != null) 'contact_address': contactAddress,
       if (primaryDiagnosis != null) 'primary_diagnosis': primaryDiagnosis,
@@ -23605,6 +23653,7 @@ class ReferralFormsCompanion extends UpdateCompanion<ReferralFormData> {
     Value<int>? formId,
     Value<int>? medicalId,
     Value<String?>? contactName,
+    Value<String?>? contactIdNo,
     Value<String?>? contactPhone,
     Value<String?>? contactAddress,
     Value<String?>? primaryDiagnosis,
@@ -23640,6 +23689,7 @@ class ReferralFormsCompanion extends UpdateCompanion<ReferralFormData> {
       formId: formId ?? this.formId,
       medicalId: medicalId ?? this.medicalId,
       contactName: contactName ?? this.contactName,
+      contactIdNo: contactIdNo ?? this.contactIdNo,
       contactPhone: contactPhone ?? this.contactPhone,
       contactAddress: contactAddress ?? this.contactAddress,
       primaryDiagnosis: primaryDiagnosis ?? this.primaryDiagnosis,
@@ -23684,6 +23734,9 @@ class ReferralFormsCompanion extends UpdateCompanion<ReferralFormData> {
     }
     if (contactName.present) {
       map['contact_name'] = Variable<String>(contactName.value);
+    }
+    if (contactIdNo.present) {
+      map['contact_id_no'] = Variable<String>(contactIdNo.value);
     }
     if (contactPhone.present) {
       map['contact_phone'] = Variable<String>(contactPhone.value);
@@ -23784,6 +23837,7 @@ class ReferralFormsCompanion extends UpdateCompanion<ReferralFormData> {
           ..write('formId: $formId, ')
           ..write('medicalId: $medicalId, ')
           ..write('contactName: $contactName, ')
+          ..write('contactIdNo: $contactIdNo, ')
           ..write('contactPhone: $contactPhone, ')
           ..write('contactAddress: $contactAddress, ')
           ..write('primaryDiagnosis: $primaryDiagnosis, ')
@@ -46493,6 +46547,7 @@ typedef $$ReferralFormsTableCreateCompanionBuilder =
       Value<int> formId,
       required int medicalId,
       Value<String?> contactName,
+      Value<String?> contactIdNo,
       Value<String?> contactPhone,
       Value<String?> contactAddress,
       Value<String?> primaryDiagnosis,
@@ -46529,6 +46584,7 @@ typedef $$ReferralFormsTableUpdateCompanionBuilder =
       Value<int> formId,
       Value<int> medicalId,
       Value<String?> contactName,
+      Value<String?> contactIdNo,
       Value<String?> contactPhone,
       Value<String?> contactAddress,
       Value<String?> primaryDiagnosis,
@@ -46653,6 +46709,11 @@ class $$ReferralFormsTableFilterComposer
 
   ColumnFilters<String> get contactName => $composableBuilder(
     column: $table.contactName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get contactIdNo => $composableBuilder(
+    column: $table.contactIdNo,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -46885,6 +46946,11 @@ class $$ReferralFormsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get contactIdNo => $composableBuilder(
+    column: $table.contactIdNo,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get contactPhone => $composableBuilder(
     column: $table.contactPhone,
     builder: (column) => ColumnOrderings(column),
@@ -47109,6 +47175,11 @@ class $$ReferralFormsTableAnnotationComposer
 
   GeneratedColumn<String> get contactName => $composableBuilder(
     column: $table.contactName,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get contactIdNo => $composableBuilder(
+    column: $table.contactIdNo,
     builder: (column) => column,
   );
 
@@ -47349,6 +47420,7 @@ class $$ReferralFormsTableTableManager
                 Value<int> formId = const Value.absent(),
                 Value<int> medicalId = const Value.absent(),
                 Value<String?> contactName = const Value.absent(),
+                Value<String?> contactIdNo = const Value.absent(),
                 Value<String?> contactPhone = const Value.absent(),
                 Value<String?> contactAddress = const Value.absent(),
                 Value<String?> primaryDiagnosis = const Value.absent(),
@@ -47383,6 +47455,7 @@ class $$ReferralFormsTableTableManager
                 formId: formId,
                 medicalId: medicalId,
                 contactName: contactName,
+                contactIdNo: contactIdNo,
                 contactPhone: contactPhone,
                 contactAddress: contactAddress,
                 primaryDiagnosis: primaryDiagnosis,
@@ -47419,6 +47492,7 @@ class $$ReferralFormsTableTableManager
                 Value<int> formId = const Value.absent(),
                 required int medicalId,
                 Value<String?> contactName = const Value.absent(),
+                Value<String?> contactIdNo = const Value.absent(),
                 Value<String?> contactPhone = const Value.absent(),
                 Value<String?> contactAddress = const Value.absent(),
                 Value<String?> primaryDiagnosis = const Value.absent(),
@@ -47453,6 +47527,7 @@ class $$ReferralFormsTableTableManager
                 formId: formId,
                 medicalId: medicalId,
                 contactName: contactName,
+                contactIdNo: contactIdNo,
                 contactPhone: contactPhone,
                 contactAddress: contactAddress,
                 primaryDiagnosis: primaryDiagnosis,

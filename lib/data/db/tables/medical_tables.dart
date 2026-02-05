@@ -355,6 +355,7 @@ class ReferralForms extends Table {
 
   // 聯絡人資料
   TextColumn get contactName => text().nullable()();
+  TextColumn get contactIdNo => text().nullable()(); // 新增身分證字號
   TextColumn get contactPhone => text().nullable()();
   TextColumn get contactAddress => text().nullable()();
 
