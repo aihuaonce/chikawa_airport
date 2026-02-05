@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'widgets/ambulance_header.dart';
 import 'pages/dispatch_info.dart';
+import 'pages/personal_info.dart';
+import 'pages/scene_status.dart';
+import 'pages/fees.dart';
 
 class AmbulancePage extends StatefulWidget {
   final int ambulanceId;
@@ -38,13 +41,13 @@ class _AmbulancePageState extends State<AmbulancePage> {
       case 0:
         return DispatchInfo(ambulanceId: widget.ambulanceId);
       case 1:
-        return _buildPlaceholder("個人資料內容區域 (Personal Info)");
+        return AmbulancePersonalInfo(ambulanceId: widget.ambulanceId);
       case 2:
-        return _buildPlaceholder("現場狀況內容區域 (Scene Status)");
+        return AmbulanceSceneStatus(ambulanceId: widget.ambulanceId);
       case 3:
         return _buildPlaceholder("處置項目內容區域 (Treatment Items)");
       case 4:
-        return _buildPlaceholder("收取費用內容區域 (Fees)");
+        return AmbulanceFees(ambulanceId: widget.ambulanceId);
       case 5:
         return _buildPlaceholder("人形圖內容區域 (Body Map)");
       default:
