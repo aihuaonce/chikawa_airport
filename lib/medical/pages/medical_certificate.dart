@@ -2,8 +2,10 @@ import 'package:chikawa_airport/data/models/reference_service.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import '../../data/db/database.dart';
 import '../../data/models/medical/certificate_view.dart';
 import '../../data/models/medical/treatment_view.dart';
+import '../widgets/reference_search_sheet.dart';
 
 class MedicalCertificate extends StatefulWidget {
   final int medicalId;
@@ -67,14 +69,6 @@ class _MedicalCertificateState extends State<MedicalCertificate> {
         final treatment = treatmentViewModel.treatment;
         if (treatment != null) {
           _diagnosisController.text = treatment.tentative ?? '';
-        }
-      }
-
-      // 若診斷分類為空，嘗試從處置記錄帶入 (Item 3)
-      if (viewModel.selectedCategory == null) {
-        final treatment = treatmentViewModel.treatment;
-        if (treatment?.tentativeCategoryId != null) {
-          viewModel.updateDiagnosisCategoryId(treatment!.tentativeCategoryId);
         }
       }
 
@@ -244,30 +238,86 @@ class _MedicalCertificateState extends State<MedicalCertificate> {
     MedicalCertificateViewModel viewModel,
     ReferenceService refService,
   ) {
-    final selectedCategory = viewModel.selectedCategory;
-    final categories = refService.diagnosisCategories;
+    // 改用 TreatmentViewModel 的資料 (直接綁定)
+    final treatmentViewModel = context.watch<TreatmentViewModel>();
+    final treatment = treatmentViewModel.treatment;
+    
+    // 取得目前的分類資料
+    final selectedCategory = treatment?.tentativeCategoryId != null
+        ? treatmentViewModel.getDiagnosisCategoryById(treatment!.tentativeCategoryId)
+        : null;
+        
+    final text = selectedCategory != null ? selectedCategory.name : '';
 
-    return Container(
-      height: 44,
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: borderColor),
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<int?>(
-          value: selectedCategory?.id,
-          isExpanded: true,
-          hint: const Text('請選擇診斷分類', style: TextStyle(color: textMuted)),
-          items: [
-            const DropdownMenuItem(value: null, child: Text('無分類')),
-            ...categories.map((cat) => DropdownMenuItem(
-                  value: cat.id,
-                  child: Text(cat.name),
-                )),
+    return _buildSelectionField(
+      text: text,
+      hint: '請選取診斷分類',
+      icon: Icons.category,
+      onTap: () async {
+        final result = await ReferenceSearchSheet.show<DiagnosisCategoryData>(
+          context,
+          title: '選擇診斷分類',
+          searchFunction: treatmentViewModel.searchDiagnosisCategories,
+          initialSelection: selectedCategory,
+          isSelectedComparator: (a, b) => a.id == b?.id,
+          itemBuilder: (context, item, isSelected) {
+            return ListTile(
+              title: Text(
+                item.name,
+                style: TextStyle(
+                  color: isSelected ? primaryColor : textDark,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                ),
+              ),
+              trailing: isSelected
+                  ? const Icon(Icons.check, color: primaryColor)
+                  : null,
+            );
+          },
+        );
+
+        if (result != null) {
+          treatmentViewModel.updateTentativeCategoryId(result.id);
+        }
+      },
+    );
+  }
+
+  // 通用選擇欄位元件
+  Widget _buildSelectionField({
+    required String text,
+    required String hint,
+    required IconData icon,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: borderColor),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                text.isNotEmpty ? text : hint,
+                style: TextStyle(
+                  color: text.isNotEmpty
+                      ? textDark
+                      : textMuted.withValues(alpha: 0.4),
+                  fontSize: 14,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            const SizedBox(width: 8),
+            const Icon(Icons.expand_more, size: 20, color: textMuted),
           ],
-          onChanged: (id) => viewModel.updateDiagnosisCategoryId(id),
         ),
       ),
     );
