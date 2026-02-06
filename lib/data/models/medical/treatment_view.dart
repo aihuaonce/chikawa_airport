@@ -1170,14 +1170,14 @@ class TreatmentViewModel extends ChangeNotifier {
 
   void updateReferralHospitalId(int? hospitalId) {
     if (_treatment == null) return;
-    
+
     // 如果選擇了特定醫院，自動同步到 referralHospitalFinal (後續結果的醫院名稱)
     Value<String?>? newReferralHospitalFinal;
     if (hospitalId != null) {
       final hospital = getReferralHospitalById(hospitalId);
       if (hospital != null && !hospital.isOther) {
-         // 如果是主要合約醫院（非 Other），同步名稱
-         newReferralHospitalFinal = Value(hospital.name);
+        // 如果是主要合約醫院（非 Other），同步名稱
+        newReferralHospitalFinal = Value(hospital.name);
       }
     }
 
@@ -1306,8 +1306,14 @@ class TreatmentViewModel extends ChangeNotifier {
       Uint8List? signature;
       if (staffId != null) {
         final staff = refService.getMedicalStaffById(staffId);
-        if (staff != null && staff.signature != null) {
-          signature = staff.signature;
+        if (staff != null) {
+          if (staff.signature != null) {
+            signature = staff.signature;
+          }
+          // 如果沒有提供 staffName，則使用 Reference 中的名字
+          if (staffName == null || staffName.isEmpty) {
+            staffName = staff.name;
+          }
         }
       }
 
@@ -1608,7 +1614,6 @@ class TreatmentViewModel extends ChangeNotifier {
     return getMedicalStaffById(_treatment!.ambulanceStaffId);
   }
 
-
   // ===================================================================
   // ICD-10 搜尋
   // ===================================================================
@@ -1656,10 +1661,9 @@ class TreatmentViewModel extends ChangeNotifier {
   }) async {
     // 預設只顯示 'isOther' 為 true 的醫院 (排除主要合約醫院)
     // 若 includeAll 為 true，則顯示所有醫院
-    final sourceList =
-        includeAll
-            ? refService.referralHospitals
-            : refService.referralHospitals.where((h) => h.isOther).toList();
+    final sourceList = includeAll
+        ? refService.referralHospitals
+        : refService.referralHospitals.where((h) => h.isOther).toList();
 
     if (keyword.isEmpty) return sourceList;
     final lower = keyword.toLowerCase();

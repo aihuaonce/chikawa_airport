@@ -6,6 +6,7 @@ import '../../data/models/medical/referral_form_view.dart';
 import '../../data/models/medical/treatment_view.dart';
 import '../../data/db/database.dart';
 import '../widgets/reference_search_sheet.dart';
+import '../widgets/signature_field.dart';
 
 class ReferralForm extends StatefulWidget {
   final int medicalId;
@@ -84,6 +85,22 @@ class _ReferralFormState extends State<ReferralForm> {
   bool _controllersInitialized = false;
 
   @override
+  void initState() {
+    super.initState();
+    // 每次進入頁面時，嘗試從其他模組（如處置）帶入最新資料
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final viewModel = context.read<ReferralFormViewModel>();
+      // 如果有資料更新（從 DB 帶入新的預設值），則重置控制器初始化狀態，讓 _updateControllers 重新填值
+      final updated = await viewModel.populateMissingData();
+      if (updated && mounted) {
+        setState(() {
+          _controllersInitialized = false;
+        });
+      }
+    });
+  }
+
+  @override
   void dispose() {
     // 聯絡人資料
     _contactNameController.dispose();
@@ -159,12 +176,6 @@ class _ReferralFormState extends State<ReferralForm> {
   ) {
     if (_controllersInitialized || viewModel.form == null) return;
 
-    // 檢查關鍵資料是否已載入，若未載入則暫不執行初始化
-    if (treatmentViewModel.treatment == null ||
-        treatmentViewModel.patient == null) {
-      return;
-    }
-
     final form = viewModel.form!;
 
     // 聯絡人資料
@@ -172,35 +183,10 @@ class _ReferralFormState extends State<ReferralForm> {
     _contactPhoneController.text = form.contactPhone ?? '';
     _contactAddressController.text = form.contactAddress ?? '';
 
-    // 若聯絡人資料為空，嘗試從病患資料帶入
-    if (_contactNameController.text.isEmpty) {
-      _contactNameController.text = treatmentViewModel.patient?.name ?? '';
-    }
-    if (_contactPhoneController.text.isEmpty) {
-      // 假設 patient 有 telephone 欄位
-      _contactPhoneController.text =
-          treatmentViewModel.patient?.telephone ?? '';
-    }
-
     // 診斷
     _primaryDiagnosisController.text = form.primaryDiagnosis ?? '';
-    // 嘗試從處置記錄帶入診斷
-    if (_primaryDiagnosisController.text.isEmpty) {
-      _primaryDiagnosisController.text =
-          treatmentViewModel.treatment?.tentative ?? '';
-    }
-
     _secondaryDiagnosis1Controller.text = form.secondaryDiagnosis1 ?? '';
-    if (_secondaryDiagnosis1Controller.text.isEmpty) {
-      _secondaryDiagnosis1Controller.text =
-          treatmentViewModel.treatment?.secondaryDiagnosis1 ?? '';
-    }
-
     _secondaryDiagnosis2Controller.text = form.secondaryDiagnosis2 ?? '';
-    if (_secondaryDiagnosis2Controller.text.isEmpty) {
-      _secondaryDiagnosis2Controller.text =
-          treatmentViewModel.treatment?.secondaryDiagnosis2 ?? '';
-    }
 
     // 檢查及治療摘要
     _recentExamResultController.text = form.recentExamResult ?? '';
@@ -217,61 +203,14 @@ class _ReferralFormState extends State<ReferralForm> {
 
     // 醫師交辦
     _doctorNameController.text = form.doctorName ?? '';
-    // 嘗試帶入醫師姓名
-    if (_doctorNameController.text.isEmpty) {
-      _doctorNameController.text =
-          treatmentViewModel.treatment?.directorName ?? '';
-      // 若處置記錄無負責人，嘗試帶入主責醫師
-      if (_doctorNameController.text.isEmpty) {
-        try {
-          final primaryDoctor = treatmentViewModel.staffAssignments.firstWhere(
-            (a) =>
-                treatmentViewModel.getStaffRoleCode(a.staffRoleId) ==
-                    'DOCTOR' &&
-                a.isPrimary,
-          );
-          _doctorNameController.text = primaryDoctor.staffName ?? '';
-        } catch (_) {}
-      }
-    }
-
     _doctorDepartmentController.text = form.doctorDepartment ?? '';
     _orderDateController.text = form.orderDate != null
         ? DateFormat('yyyy/MM/dd').format(form.orderDate!)
         : '';
     _notesController.text = form.notes ?? '';
-    // 嘗試帶入醫囑
-    if (_notesController.text.isEmpty) {
-      _notesController.text = treatmentViewModel.treatment?.doctorOrderCh ?? '';
-    }
 
     // 建議轉診院所
     _hospitalNameController.text = form.hospitalName ?? '';
-    // 嘗試帶入轉診醫院
-    if (_hospitalNameController.text.isEmpty) {
-      // 優先使用文字欄位
-      if (treatmentViewModel.treatment?.referralHospitalFinal != null &&
-          treatmentViewModel.treatment!.referralHospitalFinal!.isNotEmpty) {
-        _hospitalNameController.text =
-            treatmentViewModel.treatment!.referralHospitalFinal!;
-      } else if (treatmentViewModel.treatment?.referralHospitalId != null) {
-        // 若文字欄位為空，嘗試從 ID 查找
-        final hospital = treatmentViewModel.getReferralHospitalById(
-          treatmentViewModel.treatment!.referralHospitalId,
-        );
-        if (hospital != null) {
-          _hospitalNameController.text = hospital.name;
-          // 若 ReferralForm 的電話/地址為空，順便帶入
-          if (_hospitalPhoneController.text.isEmpty) {
-            _hospitalPhoneController.text = hospital.phone ?? '';
-          }
-          if (_hospitalAddressController.text.isEmpty) {
-            _hospitalAddressController.text = hospital.address ?? '';
-          }
-        }
-      }
-    }
-
     _hospitalDeptController.text = form.hospitalDept ?? '';
     _hospitalDoctorController.text = form.hospitalDoctor ?? '';
     _hospitalPhoneController.text = form.hospitalPhone ?? '';
@@ -533,7 +472,12 @@ class _ReferralFormState extends State<ReferralForm> {
             Expanded(
               child: _buildFieldWrapper(
                 '診治醫師簽名 Signature',
-                _buildSignaturePad('請簽署', height: 44),
+                SignatureField(
+                  placeholder: '醫師簽名',
+                  value: viewModel.form?.doctorSignature,
+                  onChanged: (data) => viewModel.updateDoctorSignature(data),
+                  height: 108,
+                ),
               ),
             ),
             const SizedBox(width: 16),
@@ -908,27 +852,6 @@ class _ReferralFormState extends State<ReferralForm> {
     );
   }
 
-  Widget _buildSignaturePad(String placeholder, {double height = 44}) {
-    return Container(
-      height: height,
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: bgField,
-        border: Border.all(color: borderColor, style: BorderStyle.solid),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Center(
-        child: Text(
-          placeholder,
-          style: TextStyle(
-            color: textMuted.withValues(alpha: 0.5),
-            fontSize: 12,
-            fontStyle: FontStyle.italic,
-          ),
-        ),
-      ),
-    );
-  }
 
   Widget _buildConsentSection(ReferralFormViewModel viewModel) {
     final selectedRelationship = viewModel.selectedRelationship;
@@ -961,8 +884,10 @@ class _ReferralFormState extends State<ReferralForm> {
               Expanded(
                 child: _buildFieldWrapper(
                   '同意人簽名 Consenter Signature',
-                  _buildSignaturePad(
-                    'Patient Signature',
+                  SignatureField(
+                    placeholder: '同意人簽名',
+                    value: viewModel.form?.consentSignature,
+                    onChanged: (data) => viewModel.updateConsentSignature(data),
                     height: isOther ? 168 : 108,
                   ),
                 ),

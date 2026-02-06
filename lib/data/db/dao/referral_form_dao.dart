@@ -179,4 +179,14 @@ class ReferralFormDao extends DatabaseAccessor<AppDatabase>
   Future<int> deleteForm(int formId) {
     return (delete(referralForms)..where((f) => f.formId.equals(formId))).go();
   }
+
+  // 更新轉診單 (通用)
+  Future<int> updateReferralForm(ReferralFormsCompanion form) {
+    if (!form.formId.present) {
+      throw ArgumentError('formId must be present for update');
+    }
+    return (update(referralForms)
+          ..where((f) => f.formId.equals(form.formId.value)))
+        .write(form);
+  }
 }

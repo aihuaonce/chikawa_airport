@@ -16,8 +16,10 @@ class ReferralFormViewModel extends ChangeNotifier {
   ReferralFormData? get form => _formCache;
 
   // 參考資料 Getters
-  List<ReferralPurposeData> get referralPurposes => refService.referralPurposeList;
-  List<RelationshipTypeData> get relationshipTypes => refService.relationshipTypeList;
+  List<ReferralPurposeData> get referralPurposes =>
+      refService.referralPurposeList;
+  List<RelationshipTypeData> get relationshipTypes =>
+      refService.relationshipTypeList;
 
   // 選中的參考資料
   ReferralPurposeData? get selectedPurpose {
@@ -53,7 +55,239 @@ class ReferralFormViewModel extends ChangeNotifier {
       _formCache = await db.referralFormDao.getFormByMedicalId(medicalId);
     }
 
+    // 自動從資料庫帶入缺少的資料
+    await populateMissingData();
+
     notifyListeners();
+  }
+
+  // 從資料庫帶入預設資料
+  Future<bool> populateMissingData() async {
+    if (_formCache == null) return false;
+
+    // 準備更新的資料容器
+    var companion = _formCache!.toCompanion(true);
+    bool needsUpdate = false;
+
+    // 1. 聯絡人資料 (不自動帶入，由使用者自行填寫)
+    
+    // 2. 診斷與醫院資料 (從 Treatment 表)
+    // 3. 醫師資料 (從 StaffAssignment 表)
+    // 4. 關係 (從 HealthAssessment 表)
+
+    // 為了效能，一次讀取 Treatment
+    final treatment = await db.treatmentDao.getTreatment(medicalId);
+
+    if (treatment != null) {
+      // 診斷 (Tentative -> Primary Diagnosis)
+      if ((_formCache!.primaryDiagnosis ?? '').isEmpty &&
+          (treatment.tentative ?? '').isNotEmpty) {
+        companion = companion.copyWith(primaryDiagnosis: Value(treatment.tentative));
+        needsUpdate = true;
+      }
+      if ((_formCache!.secondaryDiagnosis1 ?? '').isEmpty &&
+          (treatment.secondaryDiagnosis1 ?? '').isNotEmpty) {
+        companion = companion.copyWith(
+            secondaryDiagnosis1: Value(treatment.secondaryDiagnosis1));
+        needsUpdate = true;
+      }
+      if ((_formCache!.secondaryDiagnosis2 ?? '').isEmpty &&
+          (treatment.secondaryDiagnosis2 ?? '').isNotEmpty) {
+        companion = companion.copyWith(
+            secondaryDiagnosis2: Value(treatment.secondaryDiagnosis2));
+        needsUpdate = true;
+      }
+
+      // 醫囑
+      if ((_formCache!.notes ?? '').isEmpty &&
+          (treatment.doctorOrderCh ?? '').isNotEmpty) {
+        companion = companion.copyWith(notes: Value(treatment.doctorOrderCh));
+        needsUpdate = true;
+      }
+
+      // 檢查及治療摘要 (自動帶入)
+      if ((_formCache!.recentMedication ?? '').isEmpty) {
+        final medications = await db.treatmentDao.getMedications(medicalId);
+        if (medications.isNotEmpty) {
+          final medList =
+              medications
+                  .map((m) => '${m.name} ${m.dose ?? ''}${m.unit ?? ''}')
+                  .join(', ');
+          companion = companion.copyWith(recentMedication: Value(medList));
+          needsUpdate = true;
+        }
+      }
+
+      if ((_formCache!.recentExamResult ?? '').isEmpty) {
+        // 嘗試從生命徵象帶入
+        final assessments = await db.treatmentDao.getMedicalAssessments(
+          medicalId,
+        );
+        if (assessments.isNotEmpty) {
+          // 找最新的有數值的評估
+          final latest = assessments.last; // 假設最新的在最後或依時間排序
+          final vitalSigns = [
+            if (latest.temperature != null) 'BT:${latest.temperature}',
+            if (latest.pulse != null) 'PR:${latest.pulse}',
+            if (latest.systolic != null) 'BP:${latest.systolic}/${latest.diastolic}',
+            if (latest.spo2 != null) 'SpO2:${latest.spo2}%',
+          ].join(' ');
+          
+          if (vitalSigns.isNotEmpty) {
+             companion = companion.copyWith(
+                 recentExamResult: Value('生命徵象: $vitalSigns'));
+             needsUpdate = true;
+          }
+        }
+      }
+
+      // 醫院資料
+      if ((_formCache!.hospitalName ?? '').isEmpty) {
+        bool hospitalFound = false;
+
+        // 1. 優先嘗試從 Reference 表查找完整資料 (Name, Phone, Address)
+        if (treatment.referralHospitalId != null) {
+          try {
+            final hospital = refService.referralHospitals.firstWhere(
+              (h) => h.id == treatment.referralHospitalId,
+            );
+            
+            // 如果不是 "其他醫院"，則使用其資料
+            if (!hospital.isOther) {
+              companion = companion.copyWith(hospitalName: Value(hospital.name));
+              needsUpdate = true;
+              hospitalFound = true;
+
+              // 順便帶入電話地址
+              if ((_formCache!.hospitalPhone ?? '').isEmpty &&
+                  (hospital.phone ?? '').isNotEmpty) {
+                companion = companion.copyWith(
+                    hospitalPhone: Value(hospital.phone));
+              }
+              if ((_formCache!.hospitalAddress ?? '').isEmpty &&
+                  (hospital.address ?? '').isNotEmpty) {
+                companion = companion.copyWith(
+                    hospitalAddress: Value(hospital.address));
+              }
+            }
+          } catch (_) {}
+        }
+
+        // 2. 如果沒有找到 (或選擇了 "其他醫院")，且有手動輸入的醫院名稱，則使用該名稱
+        if (!hospitalFound && 
+            (treatment.referralHospitalFinal ?? '').isNotEmpty) {
+          companion = companion.copyWith(
+              hospitalName: Value(treatment.referralHospitalFinal));
+          needsUpdate = true;
+        }
+      }
+    }
+
+    // 醫師資料
+    if ((_formCache!.doctorName ?? '').isEmpty ||
+        (_formCache!.doctorDepartment ?? '').isEmpty) {
+      // 先嘗試從 Treatment 的 DirectorName
+      if ((_formCache!.doctorName ?? '').isEmpty &&
+          treatment?.directorName != null &&
+          treatment!.directorName!.isNotEmpty) {
+        companion = companion.copyWith(
+            doctorName: Value(treatment.directorName));
+        needsUpdate = true;
+      }
+
+      // 若仍為空，或需要科別，查 StaffAssignment
+      if ((companion.doctorName.value == null ||
+              (companion.doctorName.value ?? '').isEmpty) ||
+          (_formCache!.doctorDepartment ?? '').isEmpty) {
+        final assignments = await db.treatmentDao.getStaffAssignments(
+          medicalId,
+        );
+        try {
+          final primaryDoctor = assignments.firstWhere((a) {
+            final roleCode = refService.medicalStaffRoleList
+                .firstWhere(
+                  (r) => r.id == a.staffRoleId,
+                  orElse: () => refService.medicalStaffRoleList.first,
+                )
+                .code;
+            return roleCode == 'DOCTOR' && a.isPrimary;
+          });
+
+          if ((companion.doctorName.value == null ||
+              (companion.doctorName.value ?? '').isEmpty)) {
+            
+            String? doctorName = primaryDoctor.staffName;
+            
+            // 若 assignment 中沒有名字，但有 ID，嘗試從 Reference 查找
+            if ((doctorName == null || doctorName.isEmpty) && 
+                primaryDoctor.staffId != null) {
+              try {
+                final staff = refService.medicalStaffList.firstWhere(
+                  (s) => s.id == primaryDoctor.staffId,
+                );
+                doctorName = staff.name;
+              } catch (_) {}
+            }
+
+            if (doctorName != null && doctorName.isNotEmpty) {
+              companion = companion.copyWith(
+                  doctorName: Value(doctorName));
+              needsUpdate = true;
+            }
+          }
+
+          if ((_formCache!.doctorDepartment ?? '').isEmpty &&
+              primaryDoctor.staffId != null) {
+            final staff = refService.medicalStaffList.firstWhere(
+              (s) => s.id == primaryDoctor.staffId,
+            );
+            if ((staff.department ?? '').isNotEmpty) {
+              companion = companion.copyWith(
+                  doctorDepartment: Value(staff.department));
+              needsUpdate = true;
+            }
+          }
+        } catch (_) {}
+      }
+    }
+
+    // 關係 (從 HealthAssessment)
+    if (_formCache!.relationshipId == null &&
+        (_formCache!.otherRelationship ?? '').isEmpty) {
+      final assessments = await db.treatmentDao.getHealthAssessments(medicalId);
+      if (assessments.isNotEmpty) {
+        final relation = assessments.first.relation;
+        if (relation.isNotEmpty) {
+          // 嘗試匹配 RelationshipType
+          try {
+            final type = refService.relationshipTypeList.firstWhere(
+              (t) => t.name == relation,
+            );
+            companion = companion.copyWith(relationshipId: Value(type.id));
+            needsUpdate = true;
+          } catch (_) {
+            // 找不到匹配，設為其他
+            try {
+              final otherType = refService.relationshipTypeList.firstWhere(
+                (t) => t.name == '其他' || t.nameEn?.toLowerCase() == 'other',
+              );
+              companion = companion.copyWith(
+                  relationshipId: Value(otherType.id),
+                  otherRelationship: Value(relation));
+              needsUpdate = true;
+            } catch (_) {}
+          }
+        }
+      }
+    }
+
+    // 如果有更新，寫入資料庫並更新快取
+    if (needsUpdate) {
+      await db.referralFormDao.updateReferralForm(companion);
+      _formCache = await db.referralFormDao.getFormByMedicalId(medicalId);
+      debugPrint('系統：轉診單已自動帶入預設資料');
+    }
+    return needsUpdate;
   }
 
   // 建立預設轉診單
@@ -75,16 +309,22 @@ class ReferralFormViewModel extends ChangeNotifier {
       contactAddress: Value(address),
     );
     notifyListeners();
-    _debounceSave(() => db.referralFormDao.updateContactInfo(
-          _formCache!.formId,
-          name: name,
-          phone: phone,
-          address: address,
-        ));
+    _debounceSave(
+      () => db.referralFormDao.updateContactInfo(
+        _formCache!.formId,
+        name: name,
+        phone: phone,
+        address: address,
+      ),
+    );
   }
 
   // ========== 診斷 ==========
-  void updateDiagnosis({String? primary, String? secondary1, String? secondary2}) {
+  void updateDiagnosis({
+    String? primary,
+    String? secondary1,
+    String? secondary2,
+  }) {
     if (_formCache == null) return;
     _formCache = _formCache!.copyWith(
       primaryDiagnosis: Value(primary),
@@ -92,12 +332,14 @@ class ReferralFormViewModel extends ChangeNotifier {
       secondaryDiagnosis2: Value(secondary2),
     );
     notifyListeners();
-    _debounceSave(() => db.referralFormDao.updateDiagnosis(
-          _formCache!.formId,
-          primary: primary,
-          secondary1: secondary1,
-          secondary2: secondary2,
-        ));
+    _debounceSave(
+      () => db.referralFormDao.updateDiagnosis(
+        _formCache!.formId,
+        primary: primary,
+        secondary1: secondary1,
+        secondary2: secondary2,
+      ),
+    );
   }
 
   // ========== 檢查及治療摘要 ==========
@@ -115,13 +357,15 @@ class ReferralFormViewModel extends ChangeNotifier {
       medicationDate: Value(medicationDate),
     );
     notifyListeners();
-    _debounceSave(() => db.referralFormDao.updateExamSummary(
-          _formCache!.formId,
-          recentExamResult: recentExamResult,
-          examDate: examDate,
-          recentMedication: recentMedication,
-          medicationDate: medicationDate,
-        ));
+    _debounceSave(
+      () => db.referralFormDao.updateExamSummary(
+        _formCache!.formId,
+        recentExamResult: recentExamResult,
+        examDate: examDate,
+        recentMedication: recentMedication,
+        medicationDate: medicationDate,
+      ),
+    );
   }
 
   // ========== 轉診目的 ==========
@@ -132,11 +376,13 @@ class ReferralFormViewModel extends ChangeNotifier {
       otherPurpose: Value(otherPurpose),
     );
     notifyListeners();
-    _debounceSave(() => db.referralFormDao.updateReferralPurpose(
-          _formCache!.formId,
-          purposeId: purposeId,
-          otherPurpose: otherPurpose,
-        ));
+    _debounceSave(
+      () => db.referralFormDao.updateReferralPurpose(
+        _formCache!.formId,
+        purposeId: purposeId,
+        otherPurpose: otherPurpose,
+      ),
+    );
   }
 
   // ========== 醫師交辦與簽署 ==========
@@ -154,19 +400,24 @@ class ReferralFormViewModel extends ChangeNotifier {
       notes: Value(notes),
     );
     notifyListeners();
-    _debounceSave(() => db.referralFormDao.updateDoctorInfo(
-          _formCache!.formId,
-          name: name,
-          department: department,
-          orderDate: orderDate,
-          notes: notes,
-        ));
+    _debounceSave(
+      () => db.referralFormDao.updateDoctorInfo(
+        _formCache!.formId,
+        name: name,
+        department: department,
+        orderDate: orderDate,
+        notes: notes,
+      ),
+    );
   }
 
   Future<void> updateDoctorSignature(Uint8List signature) async {
     if (_formCache == null) return;
     try {
-      await db.referralFormDao.updateDoctorSignature(_formCache!.formId, signature);
+      await db.referralFormDao.updateDoctorSignature(
+        _formCache!.formId,
+        signature,
+      );
       _formCache = _formCache!.copyWith(doctorSignature: Value(signature));
       notifyListeners();
       debugPrint('系統：已儲存醫師簽名');
@@ -192,14 +443,16 @@ class ReferralFormViewModel extends ChangeNotifier {
       hospitalAddress: Value(address),
     );
     notifyListeners();
-    _debounceSave(() => db.referralFormDao.updateHospitalInfo(
-          _formCache!.formId,
-          name: name,
-          dept: dept,
-          doctor: doctor,
-          phone: phone,
-          address: address,
-        ));
+    _debounceSave(
+      () => db.referralFormDao.updateHospitalInfo(
+        _formCache!.formId,
+        name: name,
+        dept: dept,
+        doctor: doctor,
+        phone: phone,
+        address: address,
+      ),
+    );
   }
 
   // ========== 安排就醫 ==========
@@ -217,13 +470,15 @@ class ReferralFormViewModel extends ChangeNotifier {
       scheduledNumber: Value(number),
     );
     notifyListeners();
-    _debounceSave(() => db.referralFormDao.updateScheduledVisit(
-          _formCache!.formId,
-          date: date,
-          dept: dept,
-          room: room,
-          number: number,
-        ));
+    _debounceSave(
+      () => db.referralFormDao.updateScheduledVisit(
+        _formCache!.formId,
+        date: date,
+        dept: dept,
+        room: room,
+        number: number,
+      ),
+    );
   }
 
   // ========== 聲明與同意 ==========
@@ -239,18 +494,23 @@ class ReferralFormViewModel extends ChangeNotifier {
       consentDateTime: Value(consentDateTime),
     );
     notifyListeners();
-    _debounceSave(() => db.referralFormDao.updateConsent(
-          _formCache!.formId,
-          relationshipId: relationshipId,
-          otherRelationship: otherRelationship,
-          consentDateTime: consentDateTime,
-        ));
+    _debounceSave(
+      () => db.referralFormDao.updateConsent(
+        _formCache!.formId,
+        relationshipId: relationshipId,
+        otherRelationship: otherRelationship,
+        consentDateTime: consentDateTime,
+      ),
+    );
   }
 
   Future<void> updateConsentSignature(Uint8List signature) async {
     if (_formCache == null) return;
     try {
-      await db.referralFormDao.updateConsentSignature(_formCache!.formId, signature);
+      await db.referralFormDao.updateConsentSignature(
+        _formCache!.formId,
+        signature,
+      );
       _formCache = _formCache!.copyWith(consentSignature: Value(signature));
       notifyListeners();
       debugPrint('系統：已儲存同意人簽名');

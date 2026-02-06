@@ -2863,27 +2863,6 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
   }
 
   // 理學檢查欄位
-  Widget _buildLabeledFieldWithController(
-    String label,
-    String hint,
-    TextEditingController controller,
-    VoidCallback onChanged, {
-    int maxLines = 1,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildLabel(label),
-        const SizedBox(height: 4),
-        _buildTextField(
-          hint: hint,
-          controller: controller,
-          onChanged: (_) => onChanged(),
-          maxLines: maxLines,
-        ),
-      ],
-    );
-  }
 
   // 使用外部 Controller 的生命徵象欄位（避免每次重建都建立新 Controller）
   Widget _buildVitalFieldWithController({
