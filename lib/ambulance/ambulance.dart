@@ -3,7 +3,9 @@ import 'widgets/ambulance_header.dart';
 import 'pages/dispatch_info.dart';
 import 'pages/personal_info.dart';
 import 'pages/scene_status.dart';
+import 'pages/treatment_items.dart';
 import 'pages/fees.dart';
+import 'pages/body_map.dart';
 
 class AmbulancePage extends StatefulWidget {
   final int ambulanceId;
@@ -45,7 +47,7 @@ class _AmbulancePageState extends State<AmbulancePage> {
       case 2:
         return AmbulanceSceneStatus(ambulanceId: widget.ambulanceId);
       case 3:
-        return _buildPlaceholder("處置項目內容區域 (Treatment Items)");
+        return AmbulanceTreatmentItems(ambulanceId: widget.ambulanceId);
       case 4:
         return AmbulanceFees(ambulanceId: widget.ambulanceId);
       case 5:
