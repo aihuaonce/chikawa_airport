@@ -11,6 +11,10 @@ class ReferralFormViewModel extends ChangeNotifier {
   final ReferenceService refService;
   final int medicalId;
 
+  // 當前病患 ID
+  int? _patientId;
+  int? get patientId => _patientId;
+
   // 轉診單資料快取
   ReferralFormData? _formCache;
   ReferralFormData? get form => _formCache;
@@ -57,8 +61,22 @@ class ReferralFormViewModel extends ChangeNotifier {
 
     // 自動從資料庫帶入缺少的資料
     await populateMissingData();
+    
+    // 載入病患 ID
+    await _loadPatientId();
 
     notifyListeners();
+  }
+
+  Future<void> _loadPatientId() async {
+    try {
+      final patient = await db.medicalDao.getPatientByMedicalId(medicalId);
+      if (patient != null) {
+        _patientId = patient.patientId;
+      }
+    } catch (e) {
+      debugPrint('系統：載入病患 ID 失敗 - $e');
+    }
   }
 
   // 從資料庫帶入預設資料
@@ -303,19 +321,32 @@ class ReferralFormViewModel extends ChangeNotifier {
   // ========== 聯絡人資料 ==========
   void updateContactInfo({String? name, String? phone, String? address}) {
     if (_formCache == null) return;
+    
+    final newName = name ?? _formCache!.contactName;
+    final newPhone = phone ?? _formCache!.contactPhone;
+    final newAddress = address ?? _formCache!.contactAddress;
+
     _formCache = _formCache!.copyWith(
-      contactName: Value(name),
-      contactPhone: Value(phone),
-      contactAddress: Value(address),
+      contactName: Value(newName),
+      contactPhone: Value(newPhone),
+      contactAddress: Value(newAddress),
     );
     notifyListeners();
     _debounceSave(
       () => db.referralFormDao.updateContactInfo(
         _formCache!.formId,
-        name: name,
-        phone: phone,
-        address: address,
+        name: newName,
+        phone: newPhone,
+        address: newAddress,
       ),
+    );
+  }
+
+  Future<void> updateContactFromList(ContactData contact) async {
+    updateContactInfo(
+      name: contact.name,
+      phone: contact.phone,
+      address: contact.address,
     );
   }
 
@@ -326,18 +357,23 @@ class ReferralFormViewModel extends ChangeNotifier {
     String? secondary2,
   }) {
     if (_formCache == null) return;
+    
+    final newPrimary = primary ?? _formCache!.primaryDiagnosis;
+    final newSecondary1 = secondary1 ?? _formCache!.secondaryDiagnosis1;
+    final newSecondary2 = secondary2 ?? _formCache!.secondaryDiagnosis2;
+
     _formCache = _formCache!.copyWith(
-      primaryDiagnosis: Value(primary),
-      secondaryDiagnosis1: Value(secondary1),
-      secondaryDiagnosis2: Value(secondary2),
+      primaryDiagnosis: Value(newPrimary),
+      secondaryDiagnosis1: Value(newSecondary1),
+      secondaryDiagnosis2: Value(newSecondary2),
     );
     notifyListeners();
     _debounceSave(
       () => db.referralFormDao.updateDiagnosis(
         _formCache!.formId,
-        primary: primary,
-        secondary1: secondary1,
-        secondary2: secondary2,
+        primary: newPrimary,
+        secondary1: newSecondary1,
+        secondary2: newSecondary2,
       ),
     );
   }
@@ -350,20 +386,26 @@ class ReferralFormViewModel extends ChangeNotifier {
     DateTime? medicationDate,
   }) {
     if (_formCache == null) return;
+
+    final newResult = recentExamResult ?? _formCache!.recentExamResult;
+    final newDate = examDate ?? _formCache!.examDate;
+    final newMed = recentMedication ?? _formCache!.recentMedication;
+    final newMedDate = medicationDate ?? _formCache!.medicationDate;
+
     _formCache = _formCache!.copyWith(
-      recentExamResult: Value(recentExamResult),
-      examDate: Value(examDate),
-      recentMedication: Value(recentMedication),
-      medicationDate: Value(medicationDate),
+      recentExamResult: Value(newResult),
+      examDate: Value(newDate),
+      recentMedication: Value(newMed),
+      medicationDate: Value(newMedDate),
     );
     notifyListeners();
     _debounceSave(
       () => db.referralFormDao.updateExamSummary(
         _formCache!.formId,
-        recentExamResult: recentExamResult,
-        examDate: examDate,
-        recentMedication: recentMedication,
-        medicationDate: medicationDate,
+        recentExamResult: newResult,
+        examDate: newDate,
+        recentMedication: newMed,
+        medicationDate: newMedDate,
       ),
     );
   }
@@ -371,16 +413,36 @@ class ReferralFormViewModel extends ChangeNotifier {
   // ========== 轉診目的 ==========
   void updateReferralPurpose(int? purposeId, {String? otherPurpose}) {
     if (_formCache == null) return;
+    
+    // purposeId is usually explicit, but otherPurpose can be updated independently
+    // However, the original code had purposeId as nullable argument to clear selection or set it
+    // But updateReferralPurpose is usually called with one or the other or both.
+    // Let's check logic: if purposeId is passed, it might be intended to change.
+    // If purposeId is null in args, does it mean "clear" or "keep"?
+    // The UI calls: updateReferralPurpose(selected ? purpose.id : null) -> this means explicit set/clear.
+    // The UI also calls: updateReferralPurpose(viewModel.selectedPurpose?.id, otherPurpose: v) -> keeps ID, updates text.
+    // So we need to handle "keep" vs "clear".
+    // For simplicity in this specific function, purposeId is usually passed explicitly. 
+    // BUT otherPurpose is the main risk.
+    
+    final newPurposeId = purposeId; // This one is tricky because null means "clear" in toggle logic
+    // Actually, looking at UI: `updateReferralPurpose(selected ? purpose.id : null)` 
+    // So null IS a valid value for purposeId (to clear it).
+    // But when updating otherPurpose text: `updateReferralPurpose(viewModel.selectedPurpose?.id, otherPurpose: v)`
+    // It passes the CURRENT ID. So that's safe.
+    
+    final newOtherPurpose = otherPurpose ?? _formCache!.otherPurpose;
+
     _formCache = _formCache!.copyWith(
-      referralPurposeId: Value(purposeId),
-      otherPurpose: Value(otherPurpose),
+      referralPurposeId: Value(newPurposeId),
+      otherPurpose: Value(newOtherPurpose),
     );
     notifyListeners();
     _debounceSave(
       () => db.referralFormDao.updateReferralPurpose(
         _formCache!.formId,
-        purposeId: purposeId,
-        otherPurpose: otherPurpose,
+        purposeId: newPurposeId,
+        otherPurpose: newOtherPurpose,
       ),
     );
   }
@@ -393,22 +455,39 @@ class ReferralFormViewModel extends ChangeNotifier {
     String? notes,
   }) {
     if (_formCache == null) return;
+
+    final newName = name ?? _formCache!.doctorName;
+    final newDept = department ?? _formCache!.doctorDepartment;
+    final newDate = orderDate ?? _formCache!.orderDate;
+    final newNotes = notes ?? _formCache!.notes;
+
     _formCache = _formCache!.copyWith(
-      doctorName: Value(name),
-      doctorDepartment: Value(department),
-      orderDate: Value(orderDate),
-      notes: Value(notes),
+      doctorName: Value(newName),
+      doctorDepartment: Value(newDept),
+      orderDate: Value(newDate),
+      notes: Value(newNotes),
     );
     notifyListeners();
     _debounceSave(
       () => db.referralFormDao.updateDoctorInfo(
         _formCache!.formId,
-        name: name,
-        department: department,
-        orderDate: orderDate,
-        notes: notes,
+        name: newName,
+        department: newDept,
+        orderDate: newDate,
+        notes: newNotes,
       ),
     );
+  }
+
+  Future<void> updateDoctorFromStaff(MedicalStaffData staff) async {
+    updateDoctorInfo(
+      name: staff.name,
+      department: staff.department,
+    );
+    
+    if (staff.signature != null) {
+      await updateDoctorSignature(staff.signature!);
+    }
   }
 
   Future<void> updateDoctorSignature(Uint8List signature) async {
@@ -435,22 +514,29 @@ class ReferralFormViewModel extends ChangeNotifier {
     String? address,
   }) {
     if (_formCache == null) return;
+
+    final newName = name ?? _formCache!.hospitalName;
+    final newDept = dept ?? _formCache!.hospitalDept;
+    final newDoctor = doctor ?? _formCache!.hospitalDoctor;
+    final newPhone = phone ?? _formCache!.hospitalPhone;
+    final newAddress = address ?? _formCache!.hospitalAddress;
+
     _formCache = _formCache!.copyWith(
-      hospitalName: Value(name),
-      hospitalDept: Value(dept),
-      hospitalDoctor: Value(doctor),
-      hospitalPhone: Value(phone),
-      hospitalAddress: Value(address),
+      hospitalName: Value(newName),
+      hospitalDept: Value(newDept),
+      hospitalDoctor: Value(newDoctor),
+      hospitalPhone: Value(newPhone),
+      hospitalAddress: Value(newAddress),
     );
     notifyListeners();
     _debounceSave(
       () => db.referralFormDao.updateHospitalInfo(
         _formCache!.formId,
-        name: name,
-        dept: dept,
-        doctor: doctor,
-        phone: phone,
-        address: address,
+        name: newName,
+        dept: newDept,
+        doctor: newDoctor,
+        phone: newPhone,
+        address: newAddress,
       ),
     );
   }
@@ -463,20 +549,26 @@ class ReferralFormViewModel extends ChangeNotifier {
     String? number,
   }) {
     if (_formCache == null) return;
+
+    final newDate = date ?? _formCache!.scheduledDate;
+    final newDept = dept ?? _formCache!.scheduledDept;
+    final newRoom = room ?? _formCache!.scheduledRoom;
+    final newNumber = number ?? _formCache!.scheduledNumber;
+
     _formCache = _formCache!.copyWith(
-      scheduledDate: Value(date),
-      scheduledDept: Value(dept),
-      scheduledRoom: Value(room),
-      scheduledNumber: Value(number),
+      scheduledDate: Value(newDate),
+      scheduledDept: Value(newDept),
+      scheduledRoom: Value(newRoom),
+      scheduledNumber: Value(newNumber),
     );
     notifyListeners();
     _debounceSave(
       () => db.referralFormDao.updateScheduledVisit(
         _formCache!.formId,
-        date: date,
-        dept: dept,
-        room: room,
-        number: number,
+        date: newDate,
+        dept: newDept,
+        room: newRoom,
+        number: newNumber,
       ),
     );
   }
@@ -488,18 +580,44 @@ class ReferralFormViewModel extends ChangeNotifier {
     DateTime? consentDateTime,
   }) {
     if (_formCache == null) return;
+
+    // relationshipId usually explicitly set/changed. 
+    // If it's passed as null, check if we intend to clear it?
+    // The UI: updateConsent(relationshipId: v.id) -> explicit.
+    // The UI date: updateConsent(relationshipId: selectedRelationship?.id, consentDateTime: date) -> preserves ID.
+    // So if relationshipId is passed, use it. If null, use existing?
+    // Wait, if I want to CLEAR relationshipId, I'd pass null. 
+    // But optional params default to null. So we can't distinguish "not provided" vs "explicit null".
+    // In Dart, we can't unless we use a wrapper.
+    // However, looking at usage:
+    // 1. Dropdown change: updateConsent(relationshipId: v.id) -> other fields null.
+    // 2. Text change: updateConsent(relationshipId: currentId, otherRelationship: v) -> explicit ID.
+    // 3. Date change: updateConsent(relationshipId: currentId, consentDateTime: v) -> explicit ID.
+    // So it seems the UI always passes the relationshipId.
+    // BUT what if I just want to update date and forget to pass ID?
+    // Ideally, we should use existing if null.
+    // Let's assume the UI might NOT always pass ID.
+    // If I change the logic to: newId = relationshipId ?? _formCache!.relationshipId
+    // Then I can never clear it by passing null.
+    // But is there a case where we clear it? Usually no. Dropdowns select valid values.
+    // So using ?? is safer for preventing accidental clears.
+    
+    final newRelId = relationshipId ?? _formCache!.relationshipId;
+    final newOther = otherRelationship ?? _formCache!.otherRelationship;
+    final newDate = consentDateTime ?? _formCache!.consentDateTime;
+
     _formCache = _formCache!.copyWith(
-      relationshipId: Value(relationshipId),
-      otherRelationship: Value(otherRelationship),
-      consentDateTime: Value(consentDateTime),
+      relationshipId: Value(newRelId),
+      otherRelationship: Value(newOther),
+      consentDateTime: Value(newDate),
     );
     notifyListeners();
     _debounceSave(
       () => db.referralFormDao.updateConsent(
         _formCache!.formId,
-        relationshipId: relationshipId,
-        otherRelationship: otherRelationship,
-        consentDateTime: consentDateTime,
+        relationshipId: newRelId,
+        otherRelationship: newOther,
+        consentDateTime: newDate,
       ),
     );
   }

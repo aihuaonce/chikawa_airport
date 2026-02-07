@@ -446,10 +446,60 @@ class _ReferralFormState extends State<ReferralForm> {
             Expanded(
               child: _buildFieldWrapper(
                 '診治醫師姓名 Doctor Name',
-                _buildTextField(
-                  hint: '醫師姓名',
-                  controller: _doctorNameController,
-                  onChanged: (v) => viewModel.updateDoctorInfo(name: v),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildTextField(
+                        hint: '醫師姓名',
+                        controller: _doctorNameController,
+                        onChanged: (v) => viewModel.updateDoctorInfo(name: v),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    GestureDetector(
+                      onTap: () async {
+                        final result = await ReferenceSearchSheet.show<MedicalStaffData>(
+                          context,
+                          title: '選擇醫師',
+                          searchFunction: (query) async {
+                             final staff = viewModel.refService.medicalStaffList
+                                .where((s) => s.role == 'DOCTOR' || s.role == 'PHYSICIAN')
+                                .toList();
+                             if (query.isEmpty) return staff;
+                             return staff.where((s) => s.name.contains(query)).toList();
+                          },
+                          itemBuilder: (context, item, isSelected) {
+                            return ListTile(
+                              title: Text(item.name),
+                              subtitle: Text(item.department ?? ''),
+                            );
+                          },
+                        );
+                        
+                        if (result != null) {
+                           await viewModel.updateDoctorFromStaff(result);
+                           if (mounted) {
+                             _doctorNameController.text = result.name;
+                             _doctorDepartmentController.text = result.department ?? '';
+                           }
+                        }
+                      },
+                      child: Container(
+                        width: 44,
+                        height: 44,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: borderColor),
+                        ),
+                        child: const Icon(
+                          Icons.search,
+                          color: primaryColor,
+                          size: 20,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -982,36 +1032,66 @@ class _ReferralFormState extends State<ReferralForm> {
 
   Widget _buildRelationshipDropdown(ReferralFormViewModel viewModel) {
     final selectedRelationship = viewModel.selectedRelationship;
-    final relationshipTypes = viewModel.relationshipTypes;
 
-    return Container(
-      height: 44,
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: borderColor),
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<RelationshipTypeData?>(
-          value: selectedRelationship,
-          isExpanded: true,
-          items: relationshipTypes.map((type) {
-            return DropdownMenuItem<RelationshipTypeData>(
-              value: type,
-              child: Text(
-                type.nameEn != null && type.nameEn!.isNotEmpty
-                    ? '${type.name} (${type.nameEn})'
-                    : type.name,
-                style: const TextStyle(fontSize: 14, color: textDark),
-              ),
-            );
-          }).toList(),
-          onChanged: (v) {
-            if (v != null) {
-              viewModel.updateConsent(relationshipId: v.id);
-            }
+    return GestureDetector(
+      onTap: () async {
+        final result = await ReferenceSearchSheet.show<RelationshipTypeData>(
+          context,
+          title: '選擇關係',
+          searchFunction: (query) async {
+            final list = viewModel.relationshipTypes;
+            if (query.isEmpty) return list;
+            return list
+                .where(
+                  (r) =>
+                      r.name.contains(query) ||
+                      (r.nameEn?.toLowerCase().contains(query.toLowerCase()) ??
+                          false),
+                )
+                .toList();
           },
+          itemBuilder: (context, item, isSelected) {
+            return ListTile(
+              title: Text(item.name),
+              subtitle:
+                  item.nameEn != null ? Text(item.nameEn!) : null,
+              trailing: isSelected
+                  ? const Icon(Icons.check, color: primaryColor)
+                  : null,
+            );
+          },
+        );
+
+        if (result != null) {
+          viewModel.updateConsent(relationshipId: result.id);
+        }
+      },
+      child: Container(
+        height: 44,
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: borderColor),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              selectedRelationship != null
+                  ? (selectedRelationship.nameEn != null &&
+                          selectedRelationship.nameEn!.isNotEmpty
+                      ? '${selectedRelationship.name} (${selectedRelationship.nameEn})'
+                      : selectedRelationship.name)
+                  : '請選擇關係',
+              style: TextStyle(
+                fontSize: 14,
+                color:
+                    selectedRelationship != null ? textDark : textMuted.withValues(alpha: 0.4),
+              ),
+            ),
+            const Icon(Icons.arrow_drop_down, color: textMuted),
+          ],
         ),
       ),
     );

@@ -9,6 +9,7 @@ import 'tables/reference_tables.dart';
 import 'tables/medical_tables.dart';
 import 'tables/icd10_tables.dart';
 import 'tables/normalization_tables.dart';
+import 'tables/contact_tables.dart';
 
 //匯入DAO
 import 'dao/reference_dao.dart';
@@ -22,6 +23,7 @@ import 'dao/telex_dao.dart';
 import 'dao/medical_fee_dao.dart';
 import 'dao/nursing_record_dao.dart';
 import 'dao/referral_form_dao.dart';
+import 'dao/contact_dao.dart';
 
 part 'database.g.dart';
 
@@ -85,6 +87,9 @@ part 'database.g.dart';
 
     //ICD-10
     Icd10Code,
+
+    // 聯絡人
+    Contact,
   ],
   daos: [
     ReferenceDao,
@@ -138,4 +143,5 @@ class AppDatabase extends _$AppDatabase {
   NursingRecordDao get nursingRecordDao => NursingRecordDao(this);
   @override
   ReferralFormDao get referralFormDao => ReferralFormDao(this);
+  ContactDao get contactDao => ContactDao(this);
 }
