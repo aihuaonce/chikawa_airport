@@ -6,17 +6,20 @@ import '../../data/models/medical/treatment_view.dart';
 class StaffSearchSheet extends StatefulWidget {
   final String title;
   final TreatmentViewModel viewModel;
+  final String? roleFilter;
 
   const StaffSearchSheet({
     super.key,
     required this.title,
     required this.viewModel,
+    this.roleFilter,
   });
 
   static Future<MedicalStaffData?> show(
     BuildContext context, {
     required String title,
     required TreatmentViewModel viewModel,
+    String? roleFilter,
   }) async {
     return showModalBottomSheet<MedicalStaffData>(
       context: context,
@@ -25,10 +28,12 @@ class StaffSearchSheet extends StatefulWidget {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (context) => StaffSearchSheet(
-        title: title,
-        viewModel: viewModel,
-      ),
+      builder:
+          (context) => StaffSearchSheet(
+            title: title,
+            viewModel: viewModel,
+            roleFilter: roleFilter,
+          ),
     );
   }
 
@@ -74,10 +79,16 @@ class _StaffSearchSheetState extends State<StaffSearchSheet> {
     
     try {
       final results = await widget.viewModel.searchMedicalStaff(query);
-      
+
+      // 過濾角色
+      final filteredResults =
+          widget.roleFilter != null
+              ? results.where((s) => s.role == widget.roleFilter).toList()
+              : results;
+
       if (mounted) {
         setState(() {
-          _results = results;
+          _results = filteredResults;
           _isLoading = false;
         });
       }

@@ -17,7 +17,7 @@ class NursingRecordViewModel extends ChangeNotifier {
 
   // 醫護人員列表（護理師）
   List<MedicalStaffData> get nurses =>
-      refService.medicalStaffList.where((s) => s.role == 'NURSE').toList();
+      refService.medicalStaffList.where((s) => s.role == 'Nurse').toList();
 
   // 護理常用語
   List<NursingPhraseData> get phrases => refService.nursingPhraseList;
@@ -309,13 +309,47 @@ class NursingRecordViewModel extends ChangeNotifier {
     // 3. 主訴 {cc} - 來自 ChiefComplaint 表
     try {
       final ccData = await db.treatmentDao.getChiefComplaint(medicalId);
-      if (ccData != null &&
-          ccData.chiefComplaintFinal != null &&
-          ccData.chiefComplaintFinal!.isNotEmpty) {
-        result = result.replaceAll('{cc}', ccData.chiefComplaintFinal!);
-      } else {
-        result = result.replaceAll('{cc}', '--');
+      String ccText = '--';
+
+      if (ccData != null) {
+        // 優先使用最終主訴描述
+        if (ccData.chiefComplaintFinal != null &&
+            ccData.chiefComplaintFinal!.isNotEmpty) {
+          ccText = ccData.chiefComplaintFinal!;
+        } else {
+          // 若無最終描述，則組合「選取症狀」與「其他症狀」
+          List<String> parts = [];
+
+          // 1. 取得選取的症狀名稱
+          final symptomIds = await db.treatmentDao.getChiefComplaintSymptomIds(
+            ccData.complaintId,
+          );
+          if (symptomIds.isNotEmpty) {
+            final allDetails = refService.chiefComplaintDetails;
+            final names = symptomIds
+                .map((id) {
+                  final detail = allDetails
+                      .where((d) => d.id == id)
+                      .firstOrNull;
+                  return detail?.name;
+                })
+                .whereType<String>()
+                .toList();
+            parts.addAll(names);
+          }
+
+          // 2. 加入其他症狀說明
+          if (ccData.otherSymptomDetail != null &&
+              ccData.otherSymptomDetail!.isNotEmpty) {
+            parts.add(ccData.otherSymptomDetail!);
+          }
+
+          if (parts.isNotEmpty) {
+            ccText = parts.join('、');
+          }
+        }
       }
+      result = result.replaceAll('{cc}', ccText);
     } catch (_) {
       result = result.replaceAll('{cc}', '--');
     }

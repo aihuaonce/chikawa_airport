@@ -149,6 +149,10 @@ class _NursingRecordState extends State<NursingRecord> {
                     onChanged: (val) {
                       if (val != null) {
                         viewModel.updateRecordNurse(record.recordId, val);
+                        final signature = viewModel.getNurseSignature(val);
+                        if (signature != null) {
+                          viewModel.addSignature(record.recordId, signature);
+                        }
                       }
                     },
                   ),
@@ -259,6 +263,26 @@ class _NursingRecordState extends State<NursingRecord> {
     String? tempNurseName;
     Uint8List? tempSignature;
 
+    // 自動帶入主責護理師
+    try {
+      final assignments = treatmentViewModel.staffAssignments;
+      final primaryNurse = assignments
+          .where(
+            (a) =>
+                treatmentViewModel.getStaffRoleCode(a.staffRoleId) == 'NURSE' &&
+                a.isPrimary,
+          )
+          .firstOrNull;
+
+      if (primaryNurse != null) {
+        tempNurseId = primaryNurse.staffId;
+        tempNurseName = viewModel.getNurseNameById(tempNurseId);
+        tempSignature = viewModel.getNurseSignature(tempNurseId);
+      }
+    } catch (_) {
+      // 忽略錯誤，維持空值
+    }
+
     final TextEditingController timeCtrl = TextEditingController(
       text: DateFormat('yyyy/MM/dd HH:mm:ss').format(DateTime.now()),
     );
@@ -300,45 +324,91 @@ class _NursingRecordState extends State<NursingRecord> {
                     // 片語選擇 (單選)
                     _buildLabel('快捷片語 (單選帶入內容)'),
                     const SizedBox(height: 10),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: viewModel.phrases.map((phrase) {
-                        bool isSel = tempSelectedPhraseId == phrase.id;
-                        return ChoiceChip(
-                          label: Text(phrase.title),
-                          selected: isSel,
-                          onSelected: (selected) async {
-                            if (selected) {
-                              setModalState(() {
-                                tempSelectedPhraseId = phrase.id;
-                              });
-                              
-                              // 處理片語變數替換
-                              final processedContent = await viewModel.applyTemplate(phrase.content);
-                              
-                              // 檢查元件是否還存在
-                              if (context.mounted) {
-                                contentCtrl.text = processedContent;
-                              }
-                            } else {
-                              setModalState(() {
-                                tempSelectedPhraseId = null;
-                              });
-                            }
-                          },
-                          selectedColor: primaryColor.withValues(alpha: 0.1),
-                          checkmarkColor: primaryColor,
-                          labelStyle: TextStyle(
-                            color: isSel ? primaryColor : textMuted,
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        );
-                      }).toList(),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: bgField,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: borderColor),
+                      ),
+                      child: Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children:
+                            viewModel.phrases.map((phrase) {
+                              bool isSel = tempSelectedPhraseId == phrase.id;
+                              return InkWell(
+                                onTap: () async {
+                                  if (isSel) {
+                                    setModalState(() {
+                                      tempSelectedPhraseId = null;
+                                    });
+                                  } else {
+                                    setModalState(() {
+                                      tempSelectedPhraseId = phrase.id;
+                                    });
+
+                                    // 處理片語變數替換
+                                    final processedContent =
+                                        await viewModel.applyTemplate(
+                                          phrase.content,
+                                        );
+
+                                    // 檢查元件是否還存在
+                                    if (context.mounted) {
+                                      contentCtrl.text = processedContent;
+                                    }
+                                  }
+                                },
+                                borderRadius: BorderRadius.circular(20),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 8,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color:
+                                        isSel
+                                            ? primaryColor
+                                            : Colors.white,
+                                    borderRadius: BorderRadius.circular(20),
+                                    border: Border.all(
+                                      color:
+                                          isSel
+                                              ? primaryColor
+                                              : borderColor,
+                                    ),
+                                    boxShadow:
+                                        isSel
+                                            ? [
+                                              BoxShadow(
+                                                color: primaryColor
+                                                    .withValues(alpha: 0.3),
+                                                blurRadius: 4,
+                                                offset: const Offset(0, 2),
+                                              ),
+                                            ]
+                                            : null,
+                                  ),
+                                  child: Text(
+                                    phrase.title,
+                                    style: TextStyle(
+                                      color:
+                                          isSel
+                                              ? Colors.white
+                                              : textDark,
+                                      fontSize: 13,
+                                      fontWeight:
+                                          isSel
+                                              ? FontWeight.bold
+                                              : FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                      ),
                     ),
 
                     const SizedBox(height: 24),
@@ -349,7 +419,79 @@ class _NursingRecordState extends State<NursingRecord> {
                           flex: 2,
                           child: _buildFieldWrapper(
                             '記錄時間',
-                            _buildTextField(hint: '', controller: timeCtrl),
+                            GestureDetector(
+                              onTap: () async {
+                                final now = DateTime.now();
+                                final currentDate = DateTime.tryParse(
+                                  timeCtrl.text,
+                                );
+                                final initialDate = currentDate ?? now;
+
+                                // 1. 選擇日期
+                                final pickedDate = await showDatePicker(
+                                  context: context,
+                                  initialDate: initialDate,
+                                  firstDate: DateTime(2000),
+                                  lastDate: DateTime(2100),
+                                  builder: (context, child) {
+                                    return Theme(
+                                      data: Theme.of(context).copyWith(
+                                        colorScheme: const ColorScheme.light(
+                                          primary: primaryColor,
+                                          onPrimary: Colors.white,
+                                          onSurface: textDark,
+                                        ),
+                                      ),
+                                      child: child!,
+                                    );
+                                  },
+                                );
+
+                                if (pickedDate != null) {
+                                  // 2. 選擇時間
+                                  if (!context.mounted) return;
+                                  final pickedTime = await showTimePicker(
+                                    context: context,
+                                    initialTime: TimeOfDay.fromDateTime(
+                                      initialDate,
+                                    ),
+                                    builder: (context, child) {
+                                      return Theme(
+                                        data: Theme.of(context).copyWith(
+                                          colorScheme: const ColorScheme.light(
+                                            primary: primaryColor,
+                                            onPrimary: Colors.white,
+                                            onSurface: textDark,
+                                          ),
+                                        ),
+                                        child: child!,
+                                      );
+                                    },
+                                  );
+
+                                  if (pickedTime != null) {
+                                    final newDateTime = DateTime(
+                                      pickedDate.year,
+                                      pickedDate.month,
+                                      pickedDate.day,
+                                      pickedTime.hour,
+                                      pickedTime.minute,
+                                      // 保持原有的秒數或歸零，這裡選擇歸零
+                                      0,
+                                    );
+                                    timeCtrl.text = DateFormat(
+                                      'yyyy/MM/dd HH:mm:ss',
+                                    ).format(newDateTime);
+                                  }
+                                }
+                              },
+                              child: AbsorbPointer(
+                                child: _buildTextField(
+                                  hint: '',
+                                  controller: timeCtrl,
+                                ),
+                              ),
+                            ),
                           ),
                         ),
                         const SizedBox(width: 16),
@@ -362,14 +504,16 @@ class _NursingRecordState extends State<NursingRecord> {
                                   context,
                                   title: '選擇護理師',
                                   viewModel: treatmentViewModel,
+                                  roleFilter: 'Nurse',
                                 );
                                 if (result != null) {
                                   setModalState(() {
                                     tempNurseId = result.id;
                                     tempNurseName = result.name;
-                                    
+
                                     // 自動帶入護理師簽名
-                                    final signature = viewModel.getNurseSignature(result.id);
+                                    final signature = viewModel
+                                        .getNurseSignature(result.id);
                                     if (signature != null) {
                                       tempSignature = signature;
                                     }
@@ -526,6 +670,7 @@ class _NursingRecordState extends State<NursingRecord> {
           context,
           title: '選擇護理師',
           viewModel: treatmentViewModel,
+          roleFilter: 'Nurse',
         );
         if (result != null) {
           onChanged(result.id);
