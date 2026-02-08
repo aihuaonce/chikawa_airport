@@ -201,10 +201,8 @@ class CsvReferenceImporter {
 
   /// 4. 匯入護理常用語 (NursingPhrase)
   static Future<void> importNursingPhrases(AppDatabase db) async {
-    final count = await (db.select(db.nursingPhrase).get()).then(
-      (l) => l.length,
-    );
-    if (count > 0) return;
+    // 強制重新匯入：先刪除所有舊資料
+    await db.delete(db.nursingPhrase).go();
 
     debugPrint('正在匯入護理常用語...');
     try {
@@ -223,7 +221,12 @@ class CsvReferenceImporter {
         final content = row[1].toString().trim();
 
         if (title.isNotEmpty && content.isNotEmpty) {
-          phrases.add({'title': title, 'content': content, 'sortOrder': i});
+          phrases.add({
+            'title': title,
+            'content': content,
+            'sortOrder': i,
+            'isActive': true, // Explicitly set active
+          });
         }
       }
 

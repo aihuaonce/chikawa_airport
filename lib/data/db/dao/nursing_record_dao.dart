@@ -23,6 +23,7 @@ class NursingRecordDao extends DatabaseAccessor<AppDatabase>
     required DateTime recordTime,
     required String content,
     int? nurseId,
+    Uint8List? signature,
   }) {
     return into(nursingRecords).insert(
       NursingRecordsCompanion.insert(
@@ -30,6 +31,7 @@ class NursingRecordDao extends DatabaseAccessor<AppDatabase>
         recordTime: recordTime,
         content: content,
         nurseId: Value(nurseId),
+        signature: Value(signature),
       ),
     );
   }

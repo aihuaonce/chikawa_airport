@@ -1402,6 +1402,134 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
     }
   }
 
+  // 初始化護理常用語 (Fallback)
+  Future<void> initializeNursingPhrases() async {
+    final count = await (select(nursingPhrase).get()).then((list) => list.length);
+    if (count == 0) {
+      await batch((batch) {
+        batch.insertAll(nursingPhrase, [
+          NursingPhraseCompanion.insert(
+            title: '接獲通知',
+            content: '接獲[通報單位][通報人員]通報位於[事故地點]有旅客{cc}身體不適，需要醫護出診協助。',
+            sortOrder: const Value(1),
+            isActive: const Value(true),
+          ),
+          NursingPhraseCompanion.insert(
+            title: '通知1',
+            content: '通知T1-OCC。',
+            sortOrder: const Value(2),
+            isActive: const Value(true),
+          ),
+          NursingPhraseCompanion.insert(
+            title: '通知2',
+            content: '通知T2-OCC。',
+            sortOrder: const Value(3),
+            isActive: const Value(true),
+          ),
+          NursingPhraseCompanion.insert(
+            title: '通知3',
+            content: '通知另外航廈醫護及EMT請求支援。',
+            sortOrder: const Value(4),
+            isActive: const Value(true),
+          ),
+          NursingPhraseCompanion.insert(
+            title: '抵達現場',
+            content:
+                '抵達現場，病人{gcs}，坐在椅子上/坐在機艙內/躺在地上，測量生命徵象 T:{temp} P:{pulse} R:{rr} BP:{bp} SpO2:{spo2}，自述{cc}，醫師診療評估中。',
+            sortOrder: const Value(5),
+            isActive: const Value(true),
+          ),
+          NursingPhraseCompanion.insert(
+            title: '測血糖',
+            content: '依醫囑執行測血糖{bs}。',
+            sortOrder: const Value(6),
+            isActive: const Value(true),
+          ),
+          NursingPhraseCompanion.insert(
+            title: '診斷給藥',
+            content: '醫師診視後，診斷為[初步診斷]，向病人解釋後開立[藥物]使用並衛教。',
+            sortOrder: const Value(7),
+            isActive: const Value(true),
+          ),
+          NursingPhraseCompanion.insert(
+            title: '開診斷書',
+            content: '開立[診斷書]。',
+            sortOrder: const Value(8),
+            isActive: const Value(true),
+          ),
+          NursingPhraseCompanion.insert(
+            title: '轉診',
+            content:
+                '醫師診視後，診斷為[初步診斷]，建議轉診至醫院進一步檢查及治療，醫師跟病人及家屬解釋後，表示同意，通知航空公司協助退關/入境後送事宜。',
+            sortOrder: const Value(9),
+            isActive: const Value(true),
+          ),
+          NursingPhraseCompanion.insert(
+            title: '轉診交班',
+            content: '協助醫師打電話至[轉診醫院]電話交班。',
+            sortOrder: const Value(10),
+            isActive: const Value(true),
+          ),
+          NursingPhraseCompanion.insert(
+            title: '轉送通知',
+            content: '通知救護車EMT，病人需後送至[轉送醫院]，請其待命等候病人入關。',
+            sortOrder: const Value(11),
+            isActive: const Value(true),
+          ),
+          NursingPhraseCompanion.insert(
+            title: '一般通關',
+            content: '現由航勤人員協助推輪椅，陪同病人通關。',
+            sortOrder: const Value(12),
+            isActive: const Value(true),
+          ),
+          NursingPhraseCompanion.insert(
+            title: '緊急通關',
+            content:
+                '由醫師判斷病人診斷為[初步診斷]，由於情況危急，須採緊急機坪通關，告知現場航空公司地勤，請其協助聯繫相關單位。',
+            sortOrder: const Value(13),
+            isActive: const Value(true),
+          ),
+          NursingPhraseCompanion.insert(
+            title: '轉送1',
+            content: '抵達醫療中心/北空橋，協助更換至擔架上。',
+            sortOrder: const Value(14),
+            isActive: const Value(true),
+          ),
+          NursingPhraseCompanion.insert(
+            title: '轉送2',
+            content: '出發前往[轉送醫院]',
+            sortOrder: const Value(15),
+            isActive: const Value(true),
+          ),
+          NursingPhraseCompanion.insert(
+            title: '轉送3',
+            content: '抵達[轉送醫院]急診，與急診檢傷護理師交班。',
+            sortOrder: const Value(16),
+            isActive: const Value(true),
+          ),
+          NursingPhraseCompanion.insert(
+            title: '收費',
+            content: '向病人及家屬解釋出診費用[出診費]，病人表示了解及接受並採[支付方式]支付，並請其簽名，開立中文/英文收據一份。',
+            sortOrder: const Value(17),
+            isActive: const Value(true),
+          ),
+          NursingPhraseCompanion.insert(
+            title: '結束出診',
+            content: '收拾用物，結束出診。',
+            sortOrder: const Value(18),
+            isActive: const Value(true),
+          ),
+          NursingPhraseCompanion.insert(
+            title: '返回待命',
+            content: '返回醫療中心待命。',
+            sortOrder: const Value(19),
+            isActive: const Value(true),
+          ),
+        ]);
+      });
+    }
+  }
+
   //  統計相關
   // 取得參考表統計資訊
   Future<ReferenceStatistics> getStatistics() async {

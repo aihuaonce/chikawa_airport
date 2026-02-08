@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -5,6 +7,7 @@ import '../../data/models/medical/nursing_record_view.dart';
 import '../../data/models/medical/treatment_view.dart';
 import '../../data/db/database.dart';
 import '../widgets/staff_search_sheet.dart';
+import '../widgets/signature_field.dart';
 
 class NursingRecord extends StatefulWidget {
   final int medicalId;
@@ -151,14 +154,24 @@ class _NursingRecordState extends State<NursingRecord> {
                   ),
                 ),
                 const SizedBox(width: 12),
-                // 簽名狀態圖示
-                const SizedBox(
+                // 簽名狀態圖示 / 按鈕
+                SizedBox(
                   width: 40,
                   height: 40,
-                  child: Icon(
-                    Icons.verified_user_rounded,
-                    color: primaryColor,
-                    size: 22,
+                  child: IconButton(
+                    padding: EdgeInsets.zero,
+                    icon: Icon(
+                      record.signature != null
+                          ? Icons.verified_user_rounded
+                          : Icons.draw_outlined,
+                      color: record.signature != null
+                          ? primaryColor
+                          : textMuted.withValues(alpha: 0.5),
+                      size: 22,
+                    ),
+                    onPressed: () {
+                      _showSignatureDialog(context, viewModel, record);
+                    },
                   ),
                 ),
                 // 刪除按鈕
@@ -180,6 +193,62 @@ class _NursingRecordState extends State<NursingRecord> {
     );
   }
 
+  // --- 3. 獨立簽名彈窗 (用於內嵌表格) ---
+  void _showSignatureDialog(
+    BuildContext context,
+    NursingRecordViewModel viewModel,
+    NursingRecordData record,
+  ) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const Text(
+                  '護理師簽名',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 16),
+                SizedBox(
+                  height: 200,
+                  child: SignatureField(
+                    value: record.signature,
+                    onChanged: (data) {
+                      viewModel.addSignature(record.recordId, data);
+                      // 簽名後自動關閉? 或者讓使用者點確認?
+                      // SignatureField 內部已有 Dialog, 但這裡是直接顯示在 Dialog 中?
+                      // Wait, SignatureField is a button/preview that OPENS a dialog.
+                      // So here we are putting a SignatureField inside a Dialog?
+                      // Actually, SignatureField is designed to look like a field.
+                      // If we want to sign directly, we should use SignatureField logic.
+                      // But if we want to update the record signature, we can just let the user tap the field.
+                    },
+                    // We can customize height
+                    height: 180,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('關閉'),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   // --- 2. 新增記錄彈窗 ---
   void _showAddRecordModal(
     NursingRecordViewModel viewModel,
@@ -188,6 +257,7 @@ class _NursingRecordState extends State<NursingRecord> {
     int? tempSelectedPhraseId;
     int? tempNurseId;
     String? tempNurseName;
+    Uint8List? tempSignature;
 
     final TextEditingController timeCtrl = TextEditingController(
       text: DateFormat('yyyy/MM/dd HH:mm:ss').format(DateTime.now()),
@@ -238,37 +308,24 @@ class _NursingRecordState extends State<NursingRecord> {
                         return ChoiceChip(
                           label: Text(phrase.title),
                           selected: isSel,
-                          onSelected: (selected) {
-                            setModalState(() {
-                              tempSelectedPhraseId = selected
-                                  ? phrase.id
-                                  : null;
-                              if (selected) {
-                                // 處理片語變數替換
-                                String content = phrase.content;
-                                final vital =
-                                    treatmentViewModel.latestVitalSigns;
-                                if (vital != null) {
-                                  content = content.replaceAll(
-                                    '{temp}',
-                                    vital.temperature?.toString() ?? '',
-                                  );
-                                  content = content.replaceAll(
-                                    '{bp}',
-                                    '${vital.systolic}/${vital.diastolic}',
-                                  );
-                                  content = content.replaceAll(
-                                    '{pulse}',
-                                    vital.pulse?.toString() ?? '',
-                                  );
-                                  content = content.replaceAll(
-                                    '{spo2}',
-                                    vital.spo2?.toString() ?? '',
-                                  );
-                                }
-                                contentCtrl.text = content;
+                          onSelected: (selected) async {
+                            if (selected) {
+                              setModalState(() {
+                                tempSelectedPhraseId = phrase.id;
+                              });
+                              
+                              // 處理片語變數替換
+                              final processedContent = await viewModel.applyTemplate(phrase.content);
+                              
+                              // 檢查元件是否還存在
+                              if (context.mounted) {
+                                contentCtrl.text = processedContent;
                               }
-                            });
+                            } else {
+                              setModalState(() {
+                                tempSelectedPhraseId = null;
+                              });
+                            }
                           },
                           selectedColor: primaryColor.withValues(alpha: 0.1),
                           checkmarkColor: primaryColor,
@@ -310,6 +367,12 @@ class _NursingRecordState extends State<NursingRecord> {
                                   setModalState(() {
                                     tempNurseId = result.id;
                                     tempNurseName = result.name;
+                                    
+                                    // 自動帶入護理師簽名
+                                    final signature = viewModel.getNurseSignature(result.id);
+                                    if (signature != null) {
+                                      tempSignature = signature;
+                                    }
                                   });
                                 }
                               },
@@ -363,7 +426,15 @@ class _NursingRecordState extends State<NursingRecord> {
                     const SizedBox(height: 20),
                     _buildLabel('護理師簽名'),
                     const SizedBox(height: 8),
-                    _buildSignaturePlaceholder(),
+                    SignatureField(
+                      value: tempSignature,
+                      onChanged: (data) {
+                        setModalState(() {
+                          tempSignature = data;
+                        });
+                      },
+                    ),
+                    // Container(...) was removed
 
                     const SizedBox(height: 32),
                     Row(
@@ -390,6 +461,7 @@ class _NursingRecordState extends State<NursingRecord> {
                                   recordTime: dateTime ?? DateTime.now(),
                                   content: contentCtrl.text,
                                   nurseId: tempNurseId,
+                                  signature: tempSignature,
                                 );
                                 Navigator.pop(context);
                               }
@@ -502,27 +574,6 @@ class _NursingRecordState extends State<NursingRecord> {
     );
   }
 
-  Widget _buildSignaturePlaceholder() {
-    return Container(
-      height: 80,
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: bgField,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: borderColor, style: BorderStyle.solid),
-      ),
-      child: const Center(
-        child: Text(
-          'Digital Signature Pad Area',
-          style: TextStyle(
-            color: textMuted,
-            fontSize: 11,
-            fontStyle: FontStyle.italic,
-          ),
-        ),
-      ),
-    );
-  }
 
   Widget _buildLabel(String text) => Text(
     text,

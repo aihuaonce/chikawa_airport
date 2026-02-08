@@ -189,6 +189,12 @@ class ReferenceService extends ChangeNotifier {
       _medicalStaffList = await db.referenceDao.getAllMedicalStaff();
       _specialNoteRefs = await db.referenceDao.getAllSpecialNoteRefs();
       _nursingPhraseList = await db.referenceDao.getAllNursingPhrases();
+      if (_nursingPhraseList.isEmpty) {
+        // Fallback: 如果列表為空 (例如 CSV 匯入失敗或未觸發)，則嘗試寫入預設資料並重新讀取
+        debugPrint('系統:護理常用語列表為空，嘗試初始化預設資料...');
+        await db.referenceDao.initializeNursingPhrases();
+        _nursingPhraseList = await db.referenceDao.getAllNursingPhrases();
+      }
       _drugList = await db.referenceDao.getAllDrugs();
 
       _paymentMethodList = await (db.select(
