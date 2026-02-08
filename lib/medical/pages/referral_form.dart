@@ -237,6 +237,18 @@ class _ReferralFormState extends State<ReferralForm> {
   Widget build(BuildContext context) {
     final viewModel = context.watch<ReferralFormViewModel>();
     final treatmentViewModel = context.watch<TreatmentViewModel>();
+    
+    // 檢查是否有轉診需求 (hasAmbulance)
+    final medicalRecord = treatmentViewModel.medicalRecord;
+    if (medicalRecord == null || !medicalRecord.hasAmbulance) {
+      return const Center(
+        child: Text(
+          '此案件無需轉診，無需填寫此轉診單。\n(This case does not require referral)',
+          textAlign: TextAlign.center,
+          style: TextStyle(color: textMuted, fontSize: 16),
+        ),
+      );
+    }
 
     // 同步 ViewModel 資料到 Controllers
     _updateControllers(viewModel, treatmentViewModel);
