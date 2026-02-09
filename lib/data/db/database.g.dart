@@ -26437,6 +26437,1012 @@ class ContactCompanion extends UpdateCompanion<ContactData> {
   }
 }
 
+class $AmbulanceRecordsTable extends AmbulanceRecords
+    with TableInfo<$AmbulanceRecordsTable, AmbulanceRecord> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $AmbulanceRecordsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _ambulanceIdMeta = const VerificationMeta(
+    'ambulanceId',
+  );
+  @override
+  late final GeneratedColumn<int> ambulanceId = GeneratedColumn<int>(
+    'ambulance_id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _medicalIdMeta = const VerificationMeta(
+    'medicalId',
+  );
+  @override
+  late final GeneratedColumn<int> medicalId = GeneratedColumn<int>(
+    'medical_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _licensePlateMeta = const VerificationMeta(
+    'licensePlate',
+  );
+  @override
+  late final GeneratedColumn<String> licensePlate = GeneratedColumn<String>(
+    'license_plate',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _incidentLocationIdMeta =
+      const VerificationMeta('incidentLocationId');
+  @override
+  late final GeneratedColumn<int> incidentLocationId = GeneratedColumn<int>(
+    'incident_location_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES incident_place_category (id)',
+    ),
+  );
+  static const VerificationMeta _incidentLocation2IdMeta =
+      const VerificationMeta('incidentLocation2Id');
+  @override
+  late final GeneratedColumn<int> incidentLocation2Id = GeneratedColumn<int>(
+    'incident_location2_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES incident_place_category2 (id)',
+    ),
+  );
+  static const VerificationMeta _locationRemarksMeta = const VerificationMeta(
+    'locationRemarks',
+  );
+  @override
+  late final GeneratedColumn<String> locationRemarks = GeneratedColumn<String>(
+    'location_remarks',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _dispatchTimeMeta = const VerificationMeta(
+    'dispatchTime',
+  );
+  @override
+  late final GeneratedColumn<DateTime> dispatchTime = GeneratedColumn<DateTime>(
+    'dispatch_time',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _arrivalTimeMeta = const VerificationMeta(
+    'arrivalTime',
+  );
+  @override
+  late final GeneratedColumn<DateTime> arrivalTime = GeneratedColumn<DateTime>(
+    'arrival_time',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _hospitalIdMeta = const VerificationMeta(
+    'hospitalId',
+  );
+  @override
+  late final GeneratedColumn<int> hospitalId = GeneratedColumn<int>(
+    'hospital_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES referral_hospital (id)',
+    ),
+  );
+  static const VerificationMeta _transportReasonMeta = const VerificationMeta(
+    'transportReason',
+  );
+  @override
+  late final GeneratedColumn<String> transportReason = GeneratedColumn<String>(
+    'transport_reason',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _leavingSceneTimeMeta = const VerificationMeta(
+    'leavingSceneTime',
+  );
+  @override
+  late final GeneratedColumn<DateTime> leavingSceneTime =
+      GeneratedColumn<DateTime>(
+        'leaving_scene_time',
+        aliasedName,
+        true,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _arrivalHospitalTimeMeta =
+      const VerificationMeta('arrivalHospitalTime');
+  @override
+  late final GeneratedColumn<DateTime> arrivalHospitalTime =
+      GeneratedColumn<DateTime>(
+        'arrival_hospital_time',
+        aliasedName,
+        true,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _leavingHospitalTimeMeta =
+      const VerificationMeta('leavingHospitalTime');
+  @override
+  late final GeneratedColumn<DateTime> leavingHospitalTime =
+      GeneratedColumn<DateTime>(
+        'leaving_hospital_time',
+        aliasedName,
+        true,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _returnStandbyTimeMeta = const VerificationMeta(
+    'returnStandbyTime',
+  );
+  @override
+  late final GeneratedColumn<DateTime> returnStandbyTime =
+      GeneratedColumn<DateTime>(
+        'return_standby_time',
+        aliasedName,
+        true,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    ambulanceId,
+    medicalId,
+    licensePlate,
+    incidentLocationId,
+    incidentLocation2Id,
+    locationRemarks,
+    dispatchTime,
+    arrivalTime,
+    hospitalId,
+    transportReason,
+    leavingSceneTime,
+    arrivalHospitalTime,
+    leavingHospitalTime,
+    returnStandbyTime,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'ambulance_records';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<AmbulanceRecord> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('ambulance_id')) {
+      context.handle(
+        _ambulanceIdMeta,
+        ambulanceId.isAcceptableOrUnknown(
+          data['ambulance_id']!,
+          _ambulanceIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('medical_id')) {
+      context.handle(
+        _medicalIdMeta,
+        medicalId.isAcceptableOrUnknown(data['medical_id']!, _medicalIdMeta),
+      );
+    }
+    if (data.containsKey('license_plate')) {
+      context.handle(
+        _licensePlateMeta,
+        licensePlate.isAcceptableOrUnknown(
+          data['license_plate']!,
+          _licensePlateMeta,
+        ),
+      );
+    }
+    if (data.containsKey('incident_location_id')) {
+      context.handle(
+        _incidentLocationIdMeta,
+        incidentLocationId.isAcceptableOrUnknown(
+          data['incident_location_id']!,
+          _incidentLocationIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('incident_location2_id')) {
+      context.handle(
+        _incidentLocation2IdMeta,
+        incidentLocation2Id.isAcceptableOrUnknown(
+          data['incident_location2_id']!,
+          _incidentLocation2IdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('location_remarks')) {
+      context.handle(
+        _locationRemarksMeta,
+        locationRemarks.isAcceptableOrUnknown(
+          data['location_remarks']!,
+          _locationRemarksMeta,
+        ),
+      );
+    }
+    if (data.containsKey('dispatch_time')) {
+      context.handle(
+        _dispatchTimeMeta,
+        dispatchTime.isAcceptableOrUnknown(
+          data['dispatch_time']!,
+          _dispatchTimeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('arrival_time')) {
+      context.handle(
+        _arrivalTimeMeta,
+        arrivalTime.isAcceptableOrUnknown(
+          data['arrival_time']!,
+          _arrivalTimeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('hospital_id')) {
+      context.handle(
+        _hospitalIdMeta,
+        hospitalId.isAcceptableOrUnknown(data['hospital_id']!, _hospitalIdMeta),
+      );
+    }
+    if (data.containsKey('transport_reason')) {
+      context.handle(
+        _transportReasonMeta,
+        transportReason.isAcceptableOrUnknown(
+          data['transport_reason']!,
+          _transportReasonMeta,
+        ),
+      );
+    }
+    if (data.containsKey('leaving_scene_time')) {
+      context.handle(
+        _leavingSceneTimeMeta,
+        leavingSceneTime.isAcceptableOrUnknown(
+          data['leaving_scene_time']!,
+          _leavingSceneTimeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('arrival_hospital_time')) {
+      context.handle(
+        _arrivalHospitalTimeMeta,
+        arrivalHospitalTime.isAcceptableOrUnknown(
+          data['arrival_hospital_time']!,
+          _arrivalHospitalTimeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('leaving_hospital_time')) {
+      context.handle(
+        _leavingHospitalTimeMeta,
+        leavingHospitalTime.isAcceptableOrUnknown(
+          data['leaving_hospital_time']!,
+          _leavingHospitalTimeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('return_standby_time')) {
+      context.handle(
+        _returnStandbyTimeMeta,
+        returnStandbyTime.isAcceptableOrUnknown(
+          data['return_standby_time']!,
+          _returnStandbyTimeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {ambulanceId};
+  @override
+  AmbulanceRecord map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return AmbulanceRecord(
+      ambulanceId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}ambulance_id'],
+      )!,
+      medicalId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}medical_id'],
+      ),
+      licensePlate: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}license_plate'],
+      ),
+      incidentLocationId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}incident_location_id'],
+      ),
+      incidentLocation2Id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}incident_location2_id'],
+      ),
+      locationRemarks: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}location_remarks'],
+      ),
+      dispatchTime: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}dispatch_time'],
+      ),
+      arrivalTime: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}arrival_time'],
+      ),
+      hospitalId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}hospital_id'],
+      ),
+      transportReason: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}transport_reason'],
+      ),
+      leavingSceneTime: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}leaving_scene_time'],
+      ),
+      arrivalHospitalTime: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}arrival_hospital_time'],
+      ),
+      leavingHospitalTime: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}leaving_hospital_time'],
+      ),
+      returnStandbyTime: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}return_standby_time'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $AmbulanceRecordsTable createAlias(String alias) {
+    return $AmbulanceRecordsTable(attachedDatabase, alias);
+  }
+}
+
+class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
+  final int ambulanceId;
+  final int? medicalId;
+  final String? licensePlate;
+  final int? incidentLocationId;
+  final int? incidentLocation2Id;
+  final String? locationRemarks;
+  final DateTime? dispatchTime;
+  final DateTime? arrivalTime;
+  final int? hospitalId;
+  final String? transportReason;
+  final DateTime? leavingSceneTime;
+  final DateTime? arrivalHospitalTime;
+  final DateTime? leavingHospitalTime;
+  final DateTime? returnStandbyTime;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  const AmbulanceRecord({
+    required this.ambulanceId,
+    this.medicalId,
+    this.licensePlate,
+    this.incidentLocationId,
+    this.incidentLocation2Id,
+    this.locationRemarks,
+    this.dispatchTime,
+    this.arrivalTime,
+    this.hospitalId,
+    this.transportReason,
+    this.leavingSceneTime,
+    this.arrivalHospitalTime,
+    this.leavingHospitalTime,
+    this.returnStandbyTime,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['ambulance_id'] = Variable<int>(ambulanceId);
+    if (!nullToAbsent || medicalId != null) {
+      map['medical_id'] = Variable<int>(medicalId);
+    }
+    if (!nullToAbsent || licensePlate != null) {
+      map['license_plate'] = Variable<String>(licensePlate);
+    }
+    if (!nullToAbsent || incidentLocationId != null) {
+      map['incident_location_id'] = Variable<int>(incidentLocationId);
+    }
+    if (!nullToAbsent || incidentLocation2Id != null) {
+      map['incident_location2_id'] = Variable<int>(incidentLocation2Id);
+    }
+    if (!nullToAbsent || locationRemarks != null) {
+      map['location_remarks'] = Variable<String>(locationRemarks);
+    }
+    if (!nullToAbsent || dispatchTime != null) {
+      map['dispatch_time'] = Variable<DateTime>(dispatchTime);
+    }
+    if (!nullToAbsent || arrivalTime != null) {
+      map['arrival_time'] = Variable<DateTime>(arrivalTime);
+    }
+    if (!nullToAbsent || hospitalId != null) {
+      map['hospital_id'] = Variable<int>(hospitalId);
+    }
+    if (!nullToAbsent || transportReason != null) {
+      map['transport_reason'] = Variable<String>(transportReason);
+    }
+    if (!nullToAbsent || leavingSceneTime != null) {
+      map['leaving_scene_time'] = Variable<DateTime>(leavingSceneTime);
+    }
+    if (!nullToAbsent || arrivalHospitalTime != null) {
+      map['arrival_hospital_time'] = Variable<DateTime>(arrivalHospitalTime);
+    }
+    if (!nullToAbsent || leavingHospitalTime != null) {
+      map['leaving_hospital_time'] = Variable<DateTime>(leavingHospitalTime);
+    }
+    if (!nullToAbsent || returnStandbyTime != null) {
+      map['return_standby_time'] = Variable<DateTime>(returnStandbyTime);
+    }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  AmbulanceRecordsCompanion toCompanion(bool nullToAbsent) {
+    return AmbulanceRecordsCompanion(
+      ambulanceId: Value(ambulanceId),
+      medicalId: medicalId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(medicalId),
+      licensePlate: licensePlate == null && nullToAbsent
+          ? const Value.absent()
+          : Value(licensePlate),
+      incidentLocationId: incidentLocationId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(incidentLocationId),
+      incidentLocation2Id: incidentLocation2Id == null && nullToAbsent
+          ? const Value.absent()
+          : Value(incidentLocation2Id),
+      locationRemarks: locationRemarks == null && nullToAbsent
+          ? const Value.absent()
+          : Value(locationRemarks),
+      dispatchTime: dispatchTime == null && nullToAbsent
+          ? const Value.absent()
+          : Value(dispatchTime),
+      arrivalTime: arrivalTime == null && nullToAbsent
+          ? const Value.absent()
+          : Value(arrivalTime),
+      hospitalId: hospitalId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(hospitalId),
+      transportReason: transportReason == null && nullToAbsent
+          ? const Value.absent()
+          : Value(transportReason),
+      leavingSceneTime: leavingSceneTime == null && nullToAbsent
+          ? const Value.absent()
+          : Value(leavingSceneTime),
+      arrivalHospitalTime: arrivalHospitalTime == null && nullToAbsent
+          ? const Value.absent()
+          : Value(arrivalHospitalTime),
+      leavingHospitalTime: leavingHospitalTime == null && nullToAbsent
+          ? const Value.absent()
+          : Value(leavingHospitalTime),
+      returnStandbyTime: returnStandbyTime == null && nullToAbsent
+          ? const Value.absent()
+          : Value(returnStandbyTime),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory AmbulanceRecord.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return AmbulanceRecord(
+      ambulanceId: serializer.fromJson<int>(json['ambulanceId']),
+      medicalId: serializer.fromJson<int?>(json['medicalId']),
+      licensePlate: serializer.fromJson<String?>(json['licensePlate']),
+      incidentLocationId: serializer.fromJson<int?>(json['incidentLocationId']),
+      incidentLocation2Id: serializer.fromJson<int?>(
+        json['incidentLocation2Id'],
+      ),
+      locationRemarks: serializer.fromJson<String?>(json['locationRemarks']),
+      dispatchTime: serializer.fromJson<DateTime?>(json['dispatchTime']),
+      arrivalTime: serializer.fromJson<DateTime?>(json['arrivalTime']),
+      hospitalId: serializer.fromJson<int?>(json['hospitalId']),
+      transportReason: serializer.fromJson<String?>(json['transportReason']),
+      leavingSceneTime: serializer.fromJson<DateTime?>(
+        json['leavingSceneTime'],
+      ),
+      arrivalHospitalTime: serializer.fromJson<DateTime?>(
+        json['arrivalHospitalTime'],
+      ),
+      leavingHospitalTime: serializer.fromJson<DateTime?>(
+        json['leavingHospitalTime'],
+      ),
+      returnStandbyTime: serializer.fromJson<DateTime?>(
+        json['returnStandbyTime'],
+      ),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'ambulanceId': serializer.toJson<int>(ambulanceId),
+      'medicalId': serializer.toJson<int?>(medicalId),
+      'licensePlate': serializer.toJson<String?>(licensePlate),
+      'incidentLocationId': serializer.toJson<int?>(incidentLocationId),
+      'incidentLocation2Id': serializer.toJson<int?>(incidentLocation2Id),
+      'locationRemarks': serializer.toJson<String?>(locationRemarks),
+      'dispatchTime': serializer.toJson<DateTime?>(dispatchTime),
+      'arrivalTime': serializer.toJson<DateTime?>(arrivalTime),
+      'hospitalId': serializer.toJson<int?>(hospitalId),
+      'transportReason': serializer.toJson<String?>(transportReason),
+      'leavingSceneTime': serializer.toJson<DateTime?>(leavingSceneTime),
+      'arrivalHospitalTime': serializer.toJson<DateTime?>(arrivalHospitalTime),
+      'leavingHospitalTime': serializer.toJson<DateTime?>(leavingHospitalTime),
+      'returnStandbyTime': serializer.toJson<DateTime?>(returnStandbyTime),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  AmbulanceRecord copyWith({
+    int? ambulanceId,
+    Value<int?> medicalId = const Value.absent(),
+    Value<String?> licensePlate = const Value.absent(),
+    Value<int?> incidentLocationId = const Value.absent(),
+    Value<int?> incidentLocation2Id = const Value.absent(),
+    Value<String?> locationRemarks = const Value.absent(),
+    Value<DateTime?> dispatchTime = const Value.absent(),
+    Value<DateTime?> arrivalTime = const Value.absent(),
+    Value<int?> hospitalId = const Value.absent(),
+    Value<String?> transportReason = const Value.absent(),
+    Value<DateTime?> leavingSceneTime = const Value.absent(),
+    Value<DateTime?> arrivalHospitalTime = const Value.absent(),
+    Value<DateTime?> leavingHospitalTime = const Value.absent(),
+    Value<DateTime?> returnStandbyTime = const Value.absent(),
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) => AmbulanceRecord(
+    ambulanceId: ambulanceId ?? this.ambulanceId,
+    medicalId: medicalId.present ? medicalId.value : this.medicalId,
+    licensePlate: licensePlate.present ? licensePlate.value : this.licensePlate,
+    incidentLocationId: incidentLocationId.present
+        ? incidentLocationId.value
+        : this.incidentLocationId,
+    incidentLocation2Id: incidentLocation2Id.present
+        ? incidentLocation2Id.value
+        : this.incidentLocation2Id,
+    locationRemarks: locationRemarks.present
+        ? locationRemarks.value
+        : this.locationRemarks,
+    dispatchTime: dispatchTime.present ? dispatchTime.value : this.dispatchTime,
+    arrivalTime: arrivalTime.present ? arrivalTime.value : this.arrivalTime,
+    hospitalId: hospitalId.present ? hospitalId.value : this.hospitalId,
+    transportReason: transportReason.present
+        ? transportReason.value
+        : this.transportReason,
+    leavingSceneTime: leavingSceneTime.present
+        ? leavingSceneTime.value
+        : this.leavingSceneTime,
+    arrivalHospitalTime: arrivalHospitalTime.present
+        ? arrivalHospitalTime.value
+        : this.arrivalHospitalTime,
+    leavingHospitalTime: leavingHospitalTime.present
+        ? leavingHospitalTime.value
+        : this.leavingHospitalTime,
+    returnStandbyTime: returnStandbyTime.present
+        ? returnStandbyTime.value
+        : this.returnStandbyTime,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  AmbulanceRecord copyWithCompanion(AmbulanceRecordsCompanion data) {
+    return AmbulanceRecord(
+      ambulanceId: data.ambulanceId.present
+          ? data.ambulanceId.value
+          : this.ambulanceId,
+      medicalId: data.medicalId.present ? data.medicalId.value : this.medicalId,
+      licensePlate: data.licensePlate.present
+          ? data.licensePlate.value
+          : this.licensePlate,
+      incidentLocationId: data.incidentLocationId.present
+          ? data.incidentLocationId.value
+          : this.incidentLocationId,
+      incidentLocation2Id: data.incidentLocation2Id.present
+          ? data.incidentLocation2Id.value
+          : this.incidentLocation2Id,
+      locationRemarks: data.locationRemarks.present
+          ? data.locationRemarks.value
+          : this.locationRemarks,
+      dispatchTime: data.dispatchTime.present
+          ? data.dispatchTime.value
+          : this.dispatchTime,
+      arrivalTime: data.arrivalTime.present
+          ? data.arrivalTime.value
+          : this.arrivalTime,
+      hospitalId: data.hospitalId.present
+          ? data.hospitalId.value
+          : this.hospitalId,
+      transportReason: data.transportReason.present
+          ? data.transportReason.value
+          : this.transportReason,
+      leavingSceneTime: data.leavingSceneTime.present
+          ? data.leavingSceneTime.value
+          : this.leavingSceneTime,
+      arrivalHospitalTime: data.arrivalHospitalTime.present
+          ? data.arrivalHospitalTime.value
+          : this.arrivalHospitalTime,
+      leavingHospitalTime: data.leavingHospitalTime.present
+          ? data.leavingHospitalTime.value
+          : this.leavingHospitalTime,
+      returnStandbyTime: data.returnStandbyTime.present
+          ? data.returnStandbyTime.value
+          : this.returnStandbyTime,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AmbulanceRecord(')
+          ..write('ambulanceId: $ambulanceId, ')
+          ..write('medicalId: $medicalId, ')
+          ..write('licensePlate: $licensePlate, ')
+          ..write('incidentLocationId: $incidentLocationId, ')
+          ..write('incidentLocation2Id: $incidentLocation2Id, ')
+          ..write('locationRemarks: $locationRemarks, ')
+          ..write('dispatchTime: $dispatchTime, ')
+          ..write('arrivalTime: $arrivalTime, ')
+          ..write('hospitalId: $hospitalId, ')
+          ..write('transportReason: $transportReason, ')
+          ..write('leavingSceneTime: $leavingSceneTime, ')
+          ..write('arrivalHospitalTime: $arrivalHospitalTime, ')
+          ..write('leavingHospitalTime: $leavingHospitalTime, ')
+          ..write('returnStandbyTime: $returnStandbyTime, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    ambulanceId,
+    medicalId,
+    licensePlate,
+    incidentLocationId,
+    incidentLocation2Id,
+    locationRemarks,
+    dispatchTime,
+    arrivalTime,
+    hospitalId,
+    transportReason,
+    leavingSceneTime,
+    arrivalHospitalTime,
+    leavingHospitalTime,
+    returnStandbyTime,
+    createdAt,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is AmbulanceRecord &&
+          other.ambulanceId == this.ambulanceId &&
+          other.medicalId == this.medicalId &&
+          other.licensePlate == this.licensePlate &&
+          other.incidentLocationId == this.incidentLocationId &&
+          other.incidentLocation2Id == this.incidentLocation2Id &&
+          other.locationRemarks == this.locationRemarks &&
+          other.dispatchTime == this.dispatchTime &&
+          other.arrivalTime == this.arrivalTime &&
+          other.hospitalId == this.hospitalId &&
+          other.transportReason == this.transportReason &&
+          other.leavingSceneTime == this.leavingSceneTime &&
+          other.arrivalHospitalTime == this.arrivalHospitalTime &&
+          other.leavingHospitalTime == this.leavingHospitalTime &&
+          other.returnStandbyTime == this.returnStandbyTime &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class AmbulanceRecordsCompanion extends UpdateCompanion<AmbulanceRecord> {
+  final Value<int> ambulanceId;
+  final Value<int?> medicalId;
+  final Value<String?> licensePlate;
+  final Value<int?> incidentLocationId;
+  final Value<int?> incidentLocation2Id;
+  final Value<String?> locationRemarks;
+  final Value<DateTime?> dispatchTime;
+  final Value<DateTime?> arrivalTime;
+  final Value<int?> hospitalId;
+  final Value<String?> transportReason;
+  final Value<DateTime?> leavingSceneTime;
+  final Value<DateTime?> arrivalHospitalTime;
+  final Value<DateTime?> leavingHospitalTime;
+  final Value<DateTime?> returnStandbyTime;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  const AmbulanceRecordsCompanion({
+    this.ambulanceId = const Value.absent(),
+    this.medicalId = const Value.absent(),
+    this.licensePlate = const Value.absent(),
+    this.incidentLocationId = const Value.absent(),
+    this.incidentLocation2Id = const Value.absent(),
+    this.locationRemarks = const Value.absent(),
+    this.dispatchTime = const Value.absent(),
+    this.arrivalTime = const Value.absent(),
+    this.hospitalId = const Value.absent(),
+    this.transportReason = const Value.absent(),
+    this.leavingSceneTime = const Value.absent(),
+    this.arrivalHospitalTime = const Value.absent(),
+    this.leavingHospitalTime = const Value.absent(),
+    this.returnStandbyTime = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  });
+  AmbulanceRecordsCompanion.insert({
+    this.ambulanceId = const Value.absent(),
+    this.medicalId = const Value.absent(),
+    this.licensePlate = const Value.absent(),
+    this.incidentLocationId = const Value.absent(),
+    this.incidentLocation2Id = const Value.absent(),
+    this.locationRemarks = const Value.absent(),
+    this.dispatchTime = const Value.absent(),
+    this.arrivalTime = const Value.absent(),
+    this.hospitalId = const Value.absent(),
+    this.transportReason = const Value.absent(),
+    this.leavingSceneTime = const Value.absent(),
+    this.arrivalHospitalTime = const Value.absent(),
+    this.leavingHospitalTime = const Value.absent(),
+    this.returnStandbyTime = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  });
+  static Insertable<AmbulanceRecord> custom({
+    Expression<int>? ambulanceId,
+    Expression<int>? medicalId,
+    Expression<String>? licensePlate,
+    Expression<int>? incidentLocationId,
+    Expression<int>? incidentLocation2Id,
+    Expression<String>? locationRemarks,
+    Expression<DateTime>? dispatchTime,
+    Expression<DateTime>? arrivalTime,
+    Expression<int>? hospitalId,
+    Expression<String>? transportReason,
+    Expression<DateTime>? leavingSceneTime,
+    Expression<DateTime>? arrivalHospitalTime,
+    Expression<DateTime>? leavingHospitalTime,
+    Expression<DateTime>? returnStandbyTime,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+  }) {
+    return RawValuesInsertable({
+      if (ambulanceId != null) 'ambulance_id': ambulanceId,
+      if (medicalId != null) 'medical_id': medicalId,
+      if (licensePlate != null) 'license_plate': licensePlate,
+      if (incidentLocationId != null)
+        'incident_location_id': incidentLocationId,
+      if (incidentLocation2Id != null)
+        'incident_location2_id': incidentLocation2Id,
+      if (locationRemarks != null) 'location_remarks': locationRemarks,
+      if (dispatchTime != null) 'dispatch_time': dispatchTime,
+      if (arrivalTime != null) 'arrival_time': arrivalTime,
+      if (hospitalId != null) 'hospital_id': hospitalId,
+      if (transportReason != null) 'transport_reason': transportReason,
+      if (leavingSceneTime != null) 'leaving_scene_time': leavingSceneTime,
+      if (arrivalHospitalTime != null)
+        'arrival_hospital_time': arrivalHospitalTime,
+      if (leavingHospitalTime != null)
+        'leaving_hospital_time': leavingHospitalTime,
+      if (returnStandbyTime != null) 'return_standby_time': returnStandbyTime,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+    });
+  }
+
+  AmbulanceRecordsCompanion copyWith({
+    Value<int>? ambulanceId,
+    Value<int?>? medicalId,
+    Value<String?>? licensePlate,
+    Value<int?>? incidentLocationId,
+    Value<int?>? incidentLocation2Id,
+    Value<String?>? locationRemarks,
+    Value<DateTime?>? dispatchTime,
+    Value<DateTime?>? arrivalTime,
+    Value<int?>? hospitalId,
+    Value<String?>? transportReason,
+    Value<DateTime?>? leavingSceneTime,
+    Value<DateTime?>? arrivalHospitalTime,
+    Value<DateTime?>? leavingHospitalTime,
+    Value<DateTime?>? returnStandbyTime,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+  }) {
+    return AmbulanceRecordsCompanion(
+      ambulanceId: ambulanceId ?? this.ambulanceId,
+      medicalId: medicalId ?? this.medicalId,
+      licensePlate: licensePlate ?? this.licensePlate,
+      incidentLocationId: incidentLocationId ?? this.incidentLocationId,
+      incidentLocation2Id: incidentLocation2Id ?? this.incidentLocation2Id,
+      locationRemarks: locationRemarks ?? this.locationRemarks,
+      dispatchTime: dispatchTime ?? this.dispatchTime,
+      arrivalTime: arrivalTime ?? this.arrivalTime,
+      hospitalId: hospitalId ?? this.hospitalId,
+      transportReason: transportReason ?? this.transportReason,
+      leavingSceneTime: leavingSceneTime ?? this.leavingSceneTime,
+      arrivalHospitalTime: arrivalHospitalTime ?? this.arrivalHospitalTime,
+      leavingHospitalTime: leavingHospitalTime ?? this.leavingHospitalTime,
+      returnStandbyTime: returnStandbyTime ?? this.returnStandbyTime,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (ambulanceId.present) {
+      map['ambulance_id'] = Variable<int>(ambulanceId.value);
+    }
+    if (medicalId.present) {
+      map['medical_id'] = Variable<int>(medicalId.value);
+    }
+    if (licensePlate.present) {
+      map['license_plate'] = Variable<String>(licensePlate.value);
+    }
+    if (incidentLocationId.present) {
+      map['incident_location_id'] = Variable<int>(incidentLocationId.value);
+    }
+    if (incidentLocation2Id.present) {
+      map['incident_location2_id'] = Variable<int>(incidentLocation2Id.value);
+    }
+    if (locationRemarks.present) {
+      map['location_remarks'] = Variable<String>(locationRemarks.value);
+    }
+    if (dispatchTime.present) {
+      map['dispatch_time'] = Variable<DateTime>(dispatchTime.value);
+    }
+    if (arrivalTime.present) {
+      map['arrival_time'] = Variable<DateTime>(arrivalTime.value);
+    }
+    if (hospitalId.present) {
+      map['hospital_id'] = Variable<int>(hospitalId.value);
+    }
+    if (transportReason.present) {
+      map['transport_reason'] = Variable<String>(transportReason.value);
+    }
+    if (leavingSceneTime.present) {
+      map['leaving_scene_time'] = Variable<DateTime>(leavingSceneTime.value);
+    }
+    if (arrivalHospitalTime.present) {
+      map['arrival_hospital_time'] = Variable<DateTime>(
+        arrivalHospitalTime.value,
+      );
+    }
+    if (leavingHospitalTime.present) {
+      map['leaving_hospital_time'] = Variable<DateTime>(
+        leavingHospitalTime.value,
+      );
+    }
+    if (returnStandbyTime.present) {
+      map['return_standby_time'] = Variable<DateTime>(returnStandbyTime.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AmbulanceRecordsCompanion(')
+          ..write('ambulanceId: $ambulanceId, ')
+          ..write('medicalId: $medicalId, ')
+          ..write('licensePlate: $licensePlate, ')
+          ..write('incidentLocationId: $incidentLocationId, ')
+          ..write('incidentLocation2Id: $incidentLocation2Id, ')
+          ..write('locationRemarks: $locationRemarks, ')
+          ..write('dispatchTime: $dispatchTime, ')
+          ..write('arrivalTime: $arrivalTime, ')
+          ..write('hospitalId: $hospitalId, ')
+          ..write('transportReason: $transportReason, ')
+          ..write('leavingSceneTime: $leavingSceneTime, ')
+          ..write('arrivalHospitalTime: $arrivalHospitalTime, ')
+          ..write('leavingHospitalTime: $leavingHospitalTime, ')
+          ..write('returnStandbyTime: $returnStandbyTime, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -26528,6 +27534,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $MedicationsTable medications = $MedicationsTable(this);
   late final $Icd10CodeTable icd10Code = $Icd10CodeTable(this);
   late final $ContactTable contact = $ContactTable(this);
+  late final $AmbulanceRecordsTable ambulanceRecords = $AmbulanceRecordsTable(
+    this,
+  );
   late final ReferenceDao referenceDao = ReferenceDao(this as AppDatabase);
   late final MedicalDao medicalDao = MedicalDao(this as AppDatabase);
   late final FlightDao flightDao = FlightDao(this as AppDatabase);
@@ -26545,6 +27554,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final ReferralFormDao referralFormDao = ReferralFormDao(
     this as AppDatabase,
   );
+  late final AmbulanceDao ambulanceDao = AmbulanceDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -26605,6 +27615,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     medications,
     icd10Code,
     contact,
+    ambulanceRecords,
   ];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
@@ -28002,6 +29013,29 @@ final class $$IncidentPlaceCategoryTableReferences
       manager.$state.copyWith(prefetchedData: cache),
     );
   }
+
+  static MultiTypedResultKey<$AmbulanceRecordsTable, List<AmbulanceRecord>>
+  _ambulanceRecordsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.ambulanceRecords,
+    aliasName: $_aliasNameGenerator(
+      db.incidentPlaceCategory.id,
+      db.ambulanceRecords.incidentLocationId,
+    ),
+  );
+
+  $$AmbulanceRecordsTableProcessedTableManager get ambulanceRecordsRefs {
+    final manager =
+        $$AmbulanceRecordsTableTableManager($_db, $_db.ambulanceRecords).filter(
+          (f) => f.incidentLocationId.id.sqlEquals($_itemColumn<int>('id')!),
+        );
+
+    final cache = $_typedResult.readTableOrNull(
+      _ambulanceRecordsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$IncidentPlaceCategoryTableFilterComposer
@@ -28075,6 +29109,31 @@ class $$IncidentPlaceCategoryTableFilterComposer
           }) => $$IncidentRecordTableFilterComposer(
             $db: $db,
             $table: $db.incidentRecord,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> ambulanceRecordsRefs(
+    Expression<bool> Function($$AmbulanceRecordsTableFilterComposer f) f,
+  ) {
+    final $$AmbulanceRecordsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.ambulanceRecords,
+      getReferencedColumn: (t) => t.incidentLocationId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$AmbulanceRecordsTableFilterComposer(
+            $db: $db,
+            $table: $db.ambulanceRecords,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -28186,6 +29245,31 @@ class $$IncidentPlaceCategoryTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> ambulanceRecordsRefs<T extends Object>(
+    Expression<T> Function($$AmbulanceRecordsTableAnnotationComposer a) f,
+  ) {
+    final $$AmbulanceRecordsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.ambulanceRecords,
+      getReferencedColumn: (t) => t.incidentLocationId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$AmbulanceRecordsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.ambulanceRecords,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$IncidentPlaceCategoryTableTableManager
@@ -28204,6 +29288,7 @@ class $$IncidentPlaceCategoryTableTableManager
           PrefetchHooks Function({
             bool incidentPlaceCategory2Refs,
             bool incidentRecordRefs,
+            bool ambulanceRecordsRefs,
           })
         > {
   $$IncidentPlaceCategoryTableTableManager(
@@ -28264,12 +29349,14 @@ class $$IncidentPlaceCategoryTableTableManager
               ({
                 incidentPlaceCategory2Refs = false,
                 incidentRecordRefs = false,
+                ambulanceRecordsRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
                   explicitlyWatchedTables: [
                     if (incidentPlaceCategory2Refs) db.incidentPlaceCategory2,
                     if (incidentRecordRefs) db.incidentRecord,
+                    if (ambulanceRecordsRefs) db.ambulanceRecords,
                   ],
                   addJoins: null,
                   getPrefetchedDataCallback: (items) async {
@@ -28318,6 +29405,28 @@ class $$IncidentPlaceCategoryTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (ambulanceRecordsRefs)
+                        await $_getPrefetchedData<
+                          IncidentPlaceCategoryData,
+                          $IncidentPlaceCategoryTable,
+                          AmbulanceRecord
+                        >(
+                          currentTable: table,
+                          referencedTable:
+                              $$IncidentPlaceCategoryTableReferences
+                                  ._ambulanceRecordsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$IncidentPlaceCategoryTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).ambulanceRecordsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.incidentLocationId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -28341,6 +29450,7 @@ typedef $$IncidentPlaceCategoryTableProcessedTableManager =
       PrefetchHooks Function({
         bool incidentPlaceCategory2Refs,
         bool incidentRecordRefs,
+        bool ambulanceRecordsRefs,
       })
     >;
 typedef $$IncidentPlaceCategory2TableCreateCompanionBuilder =
@@ -28416,6 +29526,29 @@ final class $$IncidentPlaceCategory2TableReferences
       manager.$state.copyWith(prefetchedData: cache),
     );
   }
+
+  static MultiTypedResultKey<$AmbulanceRecordsTable, List<AmbulanceRecord>>
+  _ambulanceRecordsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.ambulanceRecords,
+    aliasName: $_aliasNameGenerator(
+      db.incidentPlaceCategory2.id,
+      db.ambulanceRecords.incidentLocation2Id,
+    ),
+  );
+
+  $$AmbulanceRecordsTableProcessedTableManager get ambulanceRecordsRefs {
+    final manager =
+        $$AmbulanceRecordsTableTableManager($_db, $_db.ambulanceRecords).filter(
+          (f) => f.incidentLocation2Id.id.sqlEquals($_itemColumn<int>('id')!),
+        );
+
+    final cache = $_typedResult.readTableOrNull(
+      _ambulanceRecordsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$IncidentPlaceCategory2TableFilterComposer
@@ -28487,6 +29620,31 @@ class $$IncidentPlaceCategory2TableFilterComposer
           }) => $$IncidentRecordTableFilterComposer(
             $db: $db,
             $table: $db.incidentRecord,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> ambulanceRecordsRefs(
+    Expression<bool> Function($$AmbulanceRecordsTableFilterComposer f) f,
+  ) {
+    final $$AmbulanceRecordsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.ambulanceRecords,
+      getReferencedColumn: (t) => t.incidentLocation2Id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$AmbulanceRecordsTableFilterComposer(
+            $db: $db,
+            $table: $db.ambulanceRecords,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -28620,6 +29778,31 @@ class $$IncidentPlaceCategory2TableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> ambulanceRecordsRefs<T extends Object>(
+    Expression<T> Function($$AmbulanceRecordsTableAnnotationComposer a) f,
+  ) {
+    final $$AmbulanceRecordsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.ambulanceRecords,
+      getReferencedColumn: (t) => t.incidentLocation2Id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$AmbulanceRecordsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.ambulanceRecords,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$IncidentPlaceCategory2TableTableManager
@@ -28635,7 +29818,11 @@ class $$IncidentPlaceCategory2TableTableManager
           $$IncidentPlaceCategory2TableUpdateCompanionBuilder,
           (IncidentPlaceCategory2Data, $$IncidentPlaceCategory2TableReferences),
           IncidentPlaceCategory2Data,
-          PrefetchHooks Function({bool categoryId, bool incidentRecordRefs})
+          PrefetchHooks Function({
+            bool categoryId,
+            bool incidentRecordRefs,
+            bool ambulanceRecordsRefs,
+          })
         > {
   $$IncidentPlaceCategory2TableTableManager(
     _$AppDatabase db,
@@ -28696,11 +29883,16 @@ class $$IncidentPlaceCategory2TableTableManager
               )
               .toList(),
           prefetchHooksCallback:
-              ({categoryId = false, incidentRecordRefs = false}) {
+              ({
+                categoryId = false,
+                incidentRecordRefs = false,
+                ambulanceRecordsRefs = false,
+              }) {
                 return PrefetchHooks(
                   db: db,
                   explicitlyWatchedTables: [
                     if (incidentRecordRefs) db.incidentRecord,
+                    if (ambulanceRecordsRefs) db.ambulanceRecords,
                   ],
                   addJoins:
                       <
@@ -28760,6 +29952,28 @@ class $$IncidentPlaceCategory2TableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (ambulanceRecordsRefs)
+                        await $_getPrefetchedData<
+                          IncidentPlaceCategory2Data,
+                          $IncidentPlaceCategory2Table,
+                          AmbulanceRecord
+                        >(
+                          currentTable: table,
+                          referencedTable:
+                              $$IncidentPlaceCategory2TableReferences
+                                  ._ambulanceRecordsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$IncidentPlaceCategory2TableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).ambulanceRecordsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.incidentLocation2Id == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -28780,7 +29994,11 @@ typedef $$IncidentPlaceCategory2TableProcessedTableManager =
       $$IncidentPlaceCategory2TableUpdateCompanionBuilder,
       (IncidentPlaceCategory2Data, $$IncidentPlaceCategory2TableReferences),
       IncidentPlaceCategory2Data,
-      PrefetchHooks Function({bool categoryId, bool incidentRecordRefs})
+      PrefetchHooks Function({
+        bool categoryId,
+        bool incidentRecordRefs,
+        bool ambulanceRecordsRefs,
+      })
     >;
 typedef $$ReportingUnitTableCreateCompanionBuilder =
     ReportingUnitCompanion Function({
@@ -30795,6 +32013,43 @@ typedef $$ReferralHospitalTableUpdateCompanionBuilder =
       Value<bool> isActive,
     });
 
+final class $$ReferralHospitalTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $ReferralHospitalTable,
+          ReferralHospitalData
+        > {
+  $$ReferralHospitalTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static MultiTypedResultKey<$AmbulanceRecordsTable, List<AmbulanceRecord>>
+  _ambulanceRecordsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.ambulanceRecords,
+    aliasName: $_aliasNameGenerator(
+      db.referralHospital.id,
+      db.ambulanceRecords.hospitalId,
+    ),
+  );
+
+  $$AmbulanceRecordsTableProcessedTableManager get ambulanceRecordsRefs {
+    final manager = $$AmbulanceRecordsTableTableManager(
+      $_db,
+      $_db.ambulanceRecords,
+    ).filter((f) => f.hospitalId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _ambulanceRecordsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
 class $$ReferralHospitalTableFilterComposer
     extends Composer<_$AppDatabase, $ReferralHospitalTable> {
   $$ReferralHospitalTableFilterComposer({
@@ -30838,6 +32093,31 @@ class $$ReferralHospitalTableFilterComposer
     column: $table.isActive,
     builder: (column) => ColumnFilters(column),
   );
+
+  Expression<bool> ambulanceRecordsRefs(
+    Expression<bool> Function($$AmbulanceRecordsTableFilterComposer f) f,
+  ) {
+    final $$AmbulanceRecordsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.ambulanceRecords,
+      getReferencedColumn: (t) => t.hospitalId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$AmbulanceRecordsTableFilterComposer(
+            $db: $db,
+            $table: $db.ambulanceRecords,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$ReferralHospitalTableOrderingComposer
@@ -30914,6 +32194,31 @@ class $$ReferralHospitalTableAnnotationComposer
 
   GeneratedColumn<bool> get isActive =>
       $composableBuilder(column: $table.isActive, builder: (column) => column);
+
+  Expression<T> ambulanceRecordsRefs<T extends Object>(
+    Expression<T> Function($$AmbulanceRecordsTableAnnotationComposer a) f,
+  ) {
+    final $$AmbulanceRecordsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.ambulanceRecords,
+      getReferencedColumn: (t) => t.hospitalId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$AmbulanceRecordsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.ambulanceRecords,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$ReferralHospitalTableTableManager
@@ -30927,16 +32232,9 @@ class $$ReferralHospitalTableTableManager
           $$ReferralHospitalTableAnnotationComposer,
           $$ReferralHospitalTableCreateCompanionBuilder,
           $$ReferralHospitalTableUpdateCompanionBuilder,
-          (
-            ReferralHospitalData,
-            BaseReferences<
-              _$AppDatabase,
-              $ReferralHospitalTable,
-              ReferralHospitalData
-            >,
-          ),
+          (ReferralHospitalData, $$ReferralHospitalTableReferences),
           ReferralHospitalData,
-          PrefetchHooks Function()
+          PrefetchHooks Function({bool ambulanceRecordsRefs})
         > {
   $$ReferralHospitalTableTableManager(
     _$AppDatabase db,
@@ -30988,9 +32286,45 @@ class $$ReferralHospitalTableTableManager
                 isActive: isActive,
               ),
           withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$ReferralHospitalTableReferences(db, table, e),
+                ),
+              )
               .toList(),
-          prefetchHooksCallback: null,
+          prefetchHooksCallback: ({ambulanceRecordsRefs = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [
+                if (ambulanceRecordsRefs) db.ambulanceRecords,
+              ],
+              addJoins: null,
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (ambulanceRecordsRefs)
+                    await $_getPrefetchedData<
+                      ReferralHospitalData,
+                      $ReferralHospitalTable,
+                      AmbulanceRecord
+                    >(
+                      currentTable: table,
+                      referencedTable: $$ReferralHospitalTableReferences
+                          ._ambulanceRecordsRefsTable(db),
+                      managerFromTypedResult: (p0) =>
+                          $$ReferralHospitalTableReferences(
+                            db,
+                            table,
+                            p0,
+                          ).ambulanceRecordsRefs,
+                      referencedItemsForCurrentItem: (item, referencedItems) =>
+                          referencedItems.where((e) => e.hospitalId == item.id),
+                      typedResults: items,
+                    ),
+                ];
+              },
+            );
+          },
         ),
       );
 }
@@ -31005,16 +32339,9 @@ typedef $$ReferralHospitalTableProcessedTableManager =
       $$ReferralHospitalTableAnnotationComposer,
       $$ReferralHospitalTableCreateCompanionBuilder,
       $$ReferralHospitalTableUpdateCompanionBuilder,
-      (
-        ReferralHospitalData,
-        BaseReferences<
-          _$AppDatabase,
-          $ReferralHospitalTable,
-          ReferralHospitalData
-        >,
-      ),
+      (ReferralHospitalData, $$ReferralHospitalTableReferences),
       ReferralHospitalData,
-      PrefetchHooks Function()
+      PrefetchHooks Function({bool ambulanceRecordsRefs})
     >;
 typedef $$ActionItemTableCreateCompanionBuilder =
     ActionItemCompanion Function({
@@ -50949,6 +52276,767 @@ typedef $$ContactTableProcessedTableManager =
       ContactData,
       PrefetchHooks Function({bool patientId})
     >;
+typedef $$AmbulanceRecordsTableCreateCompanionBuilder =
+    AmbulanceRecordsCompanion Function({
+      Value<int> ambulanceId,
+      Value<int?> medicalId,
+      Value<String?> licensePlate,
+      Value<int?> incidentLocationId,
+      Value<int?> incidentLocation2Id,
+      Value<String?> locationRemarks,
+      Value<DateTime?> dispatchTime,
+      Value<DateTime?> arrivalTime,
+      Value<int?> hospitalId,
+      Value<String?> transportReason,
+      Value<DateTime?> leavingSceneTime,
+      Value<DateTime?> arrivalHospitalTime,
+      Value<DateTime?> leavingHospitalTime,
+      Value<DateTime?> returnStandbyTime,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+    });
+typedef $$AmbulanceRecordsTableUpdateCompanionBuilder =
+    AmbulanceRecordsCompanion Function({
+      Value<int> ambulanceId,
+      Value<int?> medicalId,
+      Value<String?> licensePlate,
+      Value<int?> incidentLocationId,
+      Value<int?> incidentLocation2Id,
+      Value<String?> locationRemarks,
+      Value<DateTime?> dispatchTime,
+      Value<DateTime?> arrivalTime,
+      Value<int?> hospitalId,
+      Value<String?> transportReason,
+      Value<DateTime?> leavingSceneTime,
+      Value<DateTime?> arrivalHospitalTime,
+      Value<DateTime?> leavingHospitalTime,
+      Value<DateTime?> returnStandbyTime,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+    });
+
+final class $$AmbulanceRecordsTableReferences
+    extends
+        BaseReferences<_$AppDatabase, $AmbulanceRecordsTable, AmbulanceRecord> {
+  $$AmbulanceRecordsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $IncidentPlaceCategoryTable _incidentLocationIdTable(
+    _$AppDatabase db,
+  ) => db.incidentPlaceCategory.createAlias(
+    $_aliasNameGenerator(
+      db.ambulanceRecords.incidentLocationId,
+      db.incidentPlaceCategory.id,
+    ),
+  );
+
+  $$IncidentPlaceCategoryTableProcessedTableManager? get incidentLocationId {
+    final $_column = $_itemColumn<int>('incident_location_id');
+    if ($_column == null) return null;
+    final manager = $$IncidentPlaceCategoryTableTableManager(
+      $_db,
+      $_db.incidentPlaceCategory,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_incidentLocationIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $IncidentPlaceCategory2Table _incidentLocation2IdTable(
+    _$AppDatabase db,
+  ) => db.incidentPlaceCategory2.createAlias(
+    $_aliasNameGenerator(
+      db.ambulanceRecords.incidentLocation2Id,
+      db.incidentPlaceCategory2.id,
+    ),
+  );
+
+  $$IncidentPlaceCategory2TableProcessedTableManager? get incidentLocation2Id {
+    final $_column = $_itemColumn<int>('incident_location2_id');
+    if ($_column == null) return null;
+    final manager = $$IncidentPlaceCategory2TableTableManager(
+      $_db,
+      $_db.incidentPlaceCategory2,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_incidentLocation2IdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $ReferralHospitalTable _hospitalIdTable(_$AppDatabase db) =>
+      db.referralHospital.createAlias(
+        $_aliasNameGenerator(
+          db.ambulanceRecords.hospitalId,
+          db.referralHospital.id,
+        ),
+      );
+
+  $$ReferralHospitalTableProcessedTableManager? get hospitalId {
+    final $_column = $_itemColumn<int>('hospital_id');
+    if ($_column == null) return null;
+    final manager = $$ReferralHospitalTableTableManager(
+      $_db,
+      $_db.referralHospital,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_hospitalIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$AmbulanceRecordsTableFilterComposer
+    extends Composer<_$AppDatabase, $AmbulanceRecordsTable> {
+  $$AmbulanceRecordsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get ambulanceId => $composableBuilder(
+    column: $table.ambulanceId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get medicalId => $composableBuilder(
+    column: $table.medicalId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get licensePlate => $composableBuilder(
+    column: $table.licensePlate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get locationRemarks => $composableBuilder(
+    column: $table.locationRemarks,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get dispatchTime => $composableBuilder(
+    column: $table.dispatchTime,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get arrivalTime => $composableBuilder(
+    column: $table.arrivalTime,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get transportReason => $composableBuilder(
+    column: $table.transportReason,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get leavingSceneTime => $composableBuilder(
+    column: $table.leavingSceneTime,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get arrivalHospitalTime => $composableBuilder(
+    column: $table.arrivalHospitalTime,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get leavingHospitalTime => $composableBuilder(
+    column: $table.leavingHospitalTime,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get returnStandbyTime => $composableBuilder(
+    column: $table.returnStandbyTime,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$IncidentPlaceCategoryTableFilterComposer get incidentLocationId {
+    final $$IncidentPlaceCategoryTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.incidentLocationId,
+          referencedTable: $db.incidentPlaceCategory,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$IncidentPlaceCategoryTableFilterComposer(
+                $db: $db,
+                $table: $db.incidentPlaceCategory,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+
+  $$IncidentPlaceCategory2TableFilterComposer get incidentLocation2Id {
+    final $$IncidentPlaceCategory2TableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.incidentLocation2Id,
+          referencedTable: $db.incidentPlaceCategory2,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$IncidentPlaceCategory2TableFilterComposer(
+                $db: $db,
+                $table: $db.incidentPlaceCategory2,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+
+  $$ReferralHospitalTableFilterComposer get hospitalId {
+    final $$ReferralHospitalTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.hospitalId,
+      referencedTable: $db.referralHospital,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ReferralHospitalTableFilterComposer(
+            $db: $db,
+            $table: $db.referralHospital,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$AmbulanceRecordsTableOrderingComposer
+    extends Composer<_$AppDatabase, $AmbulanceRecordsTable> {
+  $$AmbulanceRecordsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get ambulanceId => $composableBuilder(
+    column: $table.ambulanceId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get medicalId => $composableBuilder(
+    column: $table.medicalId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get licensePlate => $composableBuilder(
+    column: $table.licensePlate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get locationRemarks => $composableBuilder(
+    column: $table.locationRemarks,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get dispatchTime => $composableBuilder(
+    column: $table.dispatchTime,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get arrivalTime => $composableBuilder(
+    column: $table.arrivalTime,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get transportReason => $composableBuilder(
+    column: $table.transportReason,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get leavingSceneTime => $composableBuilder(
+    column: $table.leavingSceneTime,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get arrivalHospitalTime => $composableBuilder(
+    column: $table.arrivalHospitalTime,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get leavingHospitalTime => $composableBuilder(
+    column: $table.leavingHospitalTime,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get returnStandbyTime => $composableBuilder(
+    column: $table.returnStandbyTime,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$IncidentPlaceCategoryTableOrderingComposer get incidentLocationId {
+    final $$IncidentPlaceCategoryTableOrderingComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.incidentLocationId,
+          referencedTable: $db.incidentPlaceCategory,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$IncidentPlaceCategoryTableOrderingComposer(
+                $db: $db,
+                $table: $db.incidentPlaceCategory,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+
+  $$IncidentPlaceCategory2TableOrderingComposer get incidentLocation2Id {
+    final $$IncidentPlaceCategory2TableOrderingComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.incidentLocation2Id,
+          referencedTable: $db.incidentPlaceCategory2,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$IncidentPlaceCategory2TableOrderingComposer(
+                $db: $db,
+                $table: $db.incidentPlaceCategory2,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+
+  $$ReferralHospitalTableOrderingComposer get hospitalId {
+    final $$ReferralHospitalTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.hospitalId,
+      referencedTable: $db.referralHospital,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ReferralHospitalTableOrderingComposer(
+            $db: $db,
+            $table: $db.referralHospital,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$AmbulanceRecordsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $AmbulanceRecordsTable> {
+  $$AmbulanceRecordsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get ambulanceId => $composableBuilder(
+    column: $table.ambulanceId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get medicalId =>
+      $composableBuilder(column: $table.medicalId, builder: (column) => column);
+
+  GeneratedColumn<String> get licensePlate => $composableBuilder(
+    column: $table.licensePlate,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get locationRemarks => $composableBuilder(
+    column: $table.locationRemarks,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get dispatchTime => $composableBuilder(
+    column: $table.dispatchTime,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get arrivalTime => $composableBuilder(
+    column: $table.arrivalTime,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get transportReason => $composableBuilder(
+    column: $table.transportReason,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get leavingSceneTime => $composableBuilder(
+    column: $table.leavingSceneTime,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get arrivalHospitalTime => $composableBuilder(
+    column: $table.arrivalHospitalTime,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get leavingHospitalTime => $composableBuilder(
+    column: $table.leavingHospitalTime,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get returnStandbyTime => $composableBuilder(
+    column: $table.returnStandbyTime,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  $$IncidentPlaceCategoryTableAnnotationComposer get incidentLocationId {
+    final $$IncidentPlaceCategoryTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.incidentLocationId,
+          referencedTable: $db.incidentPlaceCategory,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$IncidentPlaceCategoryTableAnnotationComposer(
+                $db: $db,
+                $table: $db.incidentPlaceCategory,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+
+  $$IncidentPlaceCategory2TableAnnotationComposer get incidentLocation2Id {
+    final $$IncidentPlaceCategory2TableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.incidentLocation2Id,
+          referencedTable: $db.incidentPlaceCategory2,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$IncidentPlaceCategory2TableAnnotationComposer(
+                $db: $db,
+                $table: $db.incidentPlaceCategory2,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+
+  $$ReferralHospitalTableAnnotationComposer get hospitalId {
+    final $$ReferralHospitalTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.hospitalId,
+      referencedTable: $db.referralHospital,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ReferralHospitalTableAnnotationComposer(
+            $db: $db,
+            $table: $db.referralHospital,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$AmbulanceRecordsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $AmbulanceRecordsTable,
+          AmbulanceRecord,
+          $$AmbulanceRecordsTableFilterComposer,
+          $$AmbulanceRecordsTableOrderingComposer,
+          $$AmbulanceRecordsTableAnnotationComposer,
+          $$AmbulanceRecordsTableCreateCompanionBuilder,
+          $$AmbulanceRecordsTableUpdateCompanionBuilder,
+          (AmbulanceRecord, $$AmbulanceRecordsTableReferences),
+          AmbulanceRecord,
+          PrefetchHooks Function({
+            bool incidentLocationId,
+            bool incidentLocation2Id,
+            bool hospitalId,
+          })
+        > {
+  $$AmbulanceRecordsTableTableManager(
+    _$AppDatabase db,
+    $AmbulanceRecordsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$AmbulanceRecordsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$AmbulanceRecordsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$AmbulanceRecordsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> ambulanceId = const Value.absent(),
+                Value<int?> medicalId = const Value.absent(),
+                Value<String?> licensePlate = const Value.absent(),
+                Value<int?> incidentLocationId = const Value.absent(),
+                Value<int?> incidentLocation2Id = const Value.absent(),
+                Value<String?> locationRemarks = const Value.absent(),
+                Value<DateTime?> dispatchTime = const Value.absent(),
+                Value<DateTime?> arrivalTime = const Value.absent(),
+                Value<int?> hospitalId = const Value.absent(),
+                Value<String?> transportReason = const Value.absent(),
+                Value<DateTime?> leavingSceneTime = const Value.absent(),
+                Value<DateTime?> arrivalHospitalTime = const Value.absent(),
+                Value<DateTime?> leavingHospitalTime = const Value.absent(),
+                Value<DateTime?> returnStandbyTime = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+              }) => AmbulanceRecordsCompanion(
+                ambulanceId: ambulanceId,
+                medicalId: medicalId,
+                licensePlate: licensePlate,
+                incidentLocationId: incidentLocationId,
+                incidentLocation2Id: incidentLocation2Id,
+                locationRemarks: locationRemarks,
+                dispatchTime: dispatchTime,
+                arrivalTime: arrivalTime,
+                hospitalId: hospitalId,
+                transportReason: transportReason,
+                leavingSceneTime: leavingSceneTime,
+                arrivalHospitalTime: arrivalHospitalTime,
+                leavingHospitalTime: leavingHospitalTime,
+                returnStandbyTime: returnStandbyTime,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> ambulanceId = const Value.absent(),
+                Value<int?> medicalId = const Value.absent(),
+                Value<String?> licensePlate = const Value.absent(),
+                Value<int?> incidentLocationId = const Value.absent(),
+                Value<int?> incidentLocation2Id = const Value.absent(),
+                Value<String?> locationRemarks = const Value.absent(),
+                Value<DateTime?> dispatchTime = const Value.absent(),
+                Value<DateTime?> arrivalTime = const Value.absent(),
+                Value<int?> hospitalId = const Value.absent(),
+                Value<String?> transportReason = const Value.absent(),
+                Value<DateTime?> leavingSceneTime = const Value.absent(),
+                Value<DateTime?> arrivalHospitalTime = const Value.absent(),
+                Value<DateTime?> leavingHospitalTime = const Value.absent(),
+                Value<DateTime?> returnStandbyTime = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+              }) => AmbulanceRecordsCompanion.insert(
+                ambulanceId: ambulanceId,
+                medicalId: medicalId,
+                licensePlate: licensePlate,
+                incidentLocationId: incidentLocationId,
+                incidentLocation2Id: incidentLocation2Id,
+                locationRemarks: locationRemarks,
+                dispatchTime: dispatchTime,
+                arrivalTime: arrivalTime,
+                hospitalId: hospitalId,
+                transportReason: transportReason,
+                leavingSceneTime: leavingSceneTime,
+                arrivalHospitalTime: arrivalHospitalTime,
+                leavingHospitalTime: leavingHospitalTime,
+                returnStandbyTime: returnStandbyTime,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$AmbulanceRecordsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({
+                incidentLocationId = false,
+                incidentLocation2Id = false,
+                hospitalId = false,
+              }) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (incidentLocationId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.incidentLocationId,
+                                    referencedTable:
+                                        $$AmbulanceRecordsTableReferences
+                                            ._incidentLocationIdTable(db),
+                                    referencedColumn:
+                                        $$AmbulanceRecordsTableReferences
+                                            ._incidentLocationIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+                        if (incidentLocation2Id) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.incidentLocation2Id,
+                                    referencedTable:
+                                        $$AmbulanceRecordsTableReferences
+                                            ._incidentLocation2IdTable(db),
+                                    referencedColumn:
+                                        $$AmbulanceRecordsTableReferences
+                                            ._incidentLocation2IdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+                        if (hospitalId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.hospitalId,
+                                    referencedTable:
+                                        $$AmbulanceRecordsTableReferences
+                                            ._hospitalIdTable(db),
+                                    referencedColumn:
+                                        $$AmbulanceRecordsTableReferences
+                                            ._hospitalIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$AmbulanceRecordsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $AmbulanceRecordsTable,
+      AmbulanceRecord,
+      $$AmbulanceRecordsTableFilterComposer,
+      $$AmbulanceRecordsTableOrderingComposer,
+      $$AmbulanceRecordsTableAnnotationComposer,
+      $$AmbulanceRecordsTableCreateCompanionBuilder,
+      $$AmbulanceRecordsTableUpdateCompanionBuilder,
+      (AmbulanceRecord, $$AmbulanceRecordsTableReferences),
+      AmbulanceRecord,
+      PrefetchHooks Function({
+        bool incidentLocationId,
+        bool incidentLocation2Id,
+        bool hospitalId,
+      })
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -51075,4 +53163,6 @@ class $AppDatabaseManager {
       $$Icd10CodeTableTableManager(_db, _db.icd10Code);
   $$ContactTableTableManager get contact =>
       $$ContactTableTableManager(_db, _db.contact);
+  $$AmbulanceRecordsTableTableManager get ambulanceRecords =>
+      $$AmbulanceRecordsTableTableManager(_db, _db.ambulanceRecords);
 }

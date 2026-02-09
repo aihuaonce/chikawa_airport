@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import 'package:drift/drift.dart' as drift;
+import '../../data/db/database.dart';
+import '../../medical/widgets/reference_search_sheet.dart';
 
 class DispatchInfo extends StatefulWidget {
   final int ambulanceId;
@@ -19,6 +23,9 @@ class _DispatchInfoState extends State<DispatchInfo> {
   static const Color bgField = Colors.white;
 
   // 控制器
+  final TextEditingController _licensePlateController = TextEditingController();
+  final TextEditingController _locationRemarksController =
+      TextEditingController();
   final TextEditingController _dispatchTimeController = TextEditingController();
   final TextEditingController _arrivalSceneController = TextEditingController();
   final TextEditingController _leavingSceneController = TextEditingController();
@@ -29,18 +36,222 @@ class _DispatchInfoState extends State<DispatchInfo> {
   final TextEditingController _returnStandbyController =
       TextEditingController();
 
+  // FocusNodes for auto-save on blur
+  final FocusNode _licensePlateFocus = FocusNode();
+  final FocusNode _locationRemarksFocus = FocusNode();
+
   // 狀態變數
   String _transportReason = '病情需要'; // 病情需要, 病人/家屬要求
 
+  // 資料庫資料
+  List<IncidentPlaceCategoryData> _locations = [];
+  List<IncidentPlaceCategory2Data> _location2s = []; // 二級地點列表
+  List<ReferralHospitalData> _hospitals = [];
+  int? _selectedLocationId;
+  int? _selectedLocation2Id; // 二級地點 ID
+  int? _selectedHospitalId;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+
+    // 綁定 FocusListener 以在失焦時儲存
+    _licensePlateFocus.addListener(_onFocusChange);
+    _locationRemarksFocus.addListener(_onFocusChange);
+  }
+
+  void _onFocusChange() {
+    if (!_licensePlateFocus.hasFocus && !_locationRemarksFocus.hasFocus) {
+      _saveData();
+    }
+  }
+
   @override
   void dispose() {
+    _licensePlateController.dispose();
+    _locationRemarksController.dispose();
     _dispatchTimeController.dispose();
     _arrivalSceneController.dispose();
     _leavingSceneController.dispose();
     _arrivalHospitalController.dispose();
     _leavingHospitalController.dispose();
     _returnStandbyController.dispose();
+
+    _licensePlateFocus.removeListener(_onFocusChange);
+    _licensePlateFocus.dispose();
+    _locationRemarksFocus.removeListener(_onFocusChange);
+    _locationRemarksFocus.dispose();
+
     super.dispose();
+  }
+
+  Future<void> _loadData() async {
+    setState(() => _isLoading = true);
+    try {
+      final db = context.read<AppDatabase>();
+
+      // 載入選項資料 (用於預先顯示名稱，實際搜尋使用 ReferenceSearchSheet)
+      _locations = await db.ambulanceDao.getIncidentLocations();
+      _hospitals = await db.ambulanceDao.getHospitals();
+
+      // 載入紀錄
+      final record = await db.ambulanceDao.getAmbulanceRecord(
+        widget.ambulanceId,
+      );
+
+      if (record != null) {
+        _licensePlateController.text = record.licensePlate ?? '';
+        _locationRemarksController.text = record.locationRemarks ?? '';
+        _dispatchTimeController.text = _formatDate(record.dispatchTime);
+        _arrivalSceneController.text = _formatDate(record.arrivalTime);
+        _leavingSceneController.text = _formatDate(record.leavingSceneTime);
+        _arrivalHospitalController.text = _formatDate(
+          record.arrivalHospitalTime,
+        );
+        _leavingHospitalController.text = _formatDate(
+          record.leavingHospitalTime,
+        );
+        _returnStandbyController.text = _formatDate(record.returnStandbyTime);
+
+        _selectedLocationId = record.incidentLocationId;
+        _selectedLocation2Id = record.incidentLocation2Id; // 載入二級地點
+        _selectedHospitalId = record.hospitalId;
+        if (record.transportReason != null &&
+            record.transportReason!.isNotEmpty) {
+          _transportReason = record.transportReason!;
+        }
+
+        // 若有一級地點，載入對應的二級地點
+        if (_selectedLocationId != null) {
+          _location2s = await db.ambulanceDao.getIncidentLocation2s(
+            _selectedLocationId!,
+          );
+        }
+
+        // 自動代入邏輯 (若欄位為空且有 medicalId)
+        if (record.medicalId != null) {
+          await _autoFillFromMedicalRecord(db, record.medicalId!);
+        }
+      }
+    } catch (e) {
+      debugPrint('Error loading ambulance data: $e');
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  // 從 MedicalRecord 相關表格自動代入資料
+  Future<void> _autoFillFromMedicalRecord(AppDatabase db, int medicalId) async {
+    bool dataChanged = false;
+
+    // 1. 代入 IncidentRecord 資料
+    if (_selectedLocationId == null ||
+        _locationRemarksController.text.isEmpty) {
+      final incident = await db.ambulanceDao.getIncidentRecordByMedicalId(
+        medicalId,
+      );
+
+      debugPrint('IncidentRecord found: $incident');
+
+      if (incident != null) {
+        if (_selectedLocationId == null) {
+          _selectedLocationId = incident.incidentPlaceCategoryId;
+          // 同時載入二級地點列表
+          _location2s = await db.ambulanceDao.getIncidentLocation2s(
+            _selectedLocationId!,
+          );
+
+          // 代入二級地點
+          if (incident.incidentPlaceCategory2Id != null) {
+            _selectedLocation2Id = incident.incidentPlaceCategory2Id;
+          }
+
+          dataChanged = true;
+        }
+
+        if (_locationRemarksController.text.isEmpty &&
+            incident.incidentPlaceFinal != null) {
+          _locationRemarksController.text = incident.incidentPlaceFinal!;
+          dataChanged = true;
+        }
+      }
+    }
+
+    // 2. 代入 ReferralForm 資料 (醫院)
+    if (_selectedHospitalId == null) {
+      final referral = await db.ambulanceDao.getReferralFormByMedicalId(
+        medicalId,
+      );
+      if (referral != null && referral.hospitalName != null) {
+        // 嘗試從醫院列表中尋找名稱相符的項目
+        try {
+          final hospital = _hospitals.firstWhere(
+            (h) => h.name == referral.hospitalName,
+          );
+          _selectedHospitalId = hospital.id;
+          dataChanged = true;
+        } catch (e) {
+          // 找不到對應醫院名稱，保持為空
+        }
+      }
+    }
+
+    if (dataChanged) {
+      _saveData();
+    }
+  }
+
+  Future<void> _saveData() async {
+    if (!mounted) return;
+
+    try {
+      final db = context.read<AppDatabase>();
+
+      final companion = AmbulanceRecordsCompanion(
+        ambulanceId: drift.Value(widget.ambulanceId),
+        licensePlate: drift.Value(_licensePlateController.text),
+        incidentLocationId: drift.Value(_selectedLocationId),
+        incidentLocation2Id: drift.Value(_selectedLocation2Id),
+        locationRemarks: drift.Value(_locationRemarksController.text),
+        dispatchTime: drift.Value(_parseDate(_dispatchTimeController.text)),
+        arrivalTime: drift.Value(_parseDate(_arrivalSceneController.text)),
+        hospitalId: drift.Value(_selectedHospitalId),
+        transportReason: drift.Value(_transportReason),
+        leavingSceneTime: drift.Value(_parseDate(_leavingSceneController.text)),
+        arrivalHospitalTime: drift.Value(
+          _parseDate(_arrivalHospitalController.text),
+        ),
+        leavingHospitalTime: drift.Value(
+          _parseDate(_leavingHospitalController.text),
+        ),
+        returnStandbyTime: drift.Value(
+          _parseDate(_returnStandbyController.text),
+        ),
+        updatedAt: drift.Value(DateTime.now()),
+      );
+
+      await db.ambulanceDao.insertOrUpdateAmbulanceRecord(companion);
+    } catch (e) {
+      debugPrint('Error saving ambulance data: $e');
+    }
+  }
+
+  String _formatDate(DateTime? date) {
+    if (date == null) return '';
+    return DateFormat('yyyy/MM/dd HH:mm:ss').format(date);
+  }
+
+  DateTime? _parseDate(String text) {
+    if (text.isEmpty) return null;
+    try {
+      return DateFormat('yyyy/MM/dd HH:mm:ss').parse(text);
+    } catch (e) {
+      return null;
+    }
   }
 
   // 更新時間為現在
@@ -50,27 +261,44 @@ class _DispatchInfoState extends State<DispatchInfo> {
         'yyyy/MM/dd HH:mm:ss',
       ).format(DateTime.now());
     });
+    _saveData();
   }
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // 第一排：車牌 與 地點
+        // 第一排：車牌 與 地點 (一級 & 二級)
         Row(
           children: [
             Expanded(
+              flex: 2,
               child: _buildFieldWrapper(
                 '車牌號碼 License Plate No.',
-                _buildTextField(hint: '輸入車牌號碼'),
+                _buildTextField(
+                  hint: '輸入車牌號碼',
+                  controller: _licensePlateController,
+                  focusNode: _licensePlateFocus,
+                ),
               ),
             ),
-            const SizedBox(width: 24),
+            const SizedBox(width: 16),
             Expanded(
+              flex: 3,
               child: _buildFieldWrapper(
                 '發生地點 Incident Location',
-                _buildTextField(hint: '輸入發生地點'),
+                Row(
+                  children: [
+                    Expanded(child: _buildLocationSelection()),
+                    const SizedBox(width: 8),
+                    Expanded(child: _buildLocation2Selection()),
+                  ],
+                ),
               ),
             ),
           ],
@@ -81,7 +309,12 @@ class _DispatchInfoState extends State<DispatchInfo> {
         // 第二排：地點備註 (全寬)
         _buildFieldWrapper(
           '地點備註 Location Remarks',
-          _buildTextField(hint: '請詳述具體地點資訊...', maxLines: 3),
+          _buildTextField(
+            hint: '請詳述具體地點資訊...',
+            maxLines: 3,
+            controller: _locationRemarksController,
+            focusNode: _locationRemarksFocus,
+          ),
         ),
 
         const SizedBox(height: 24),
@@ -113,18 +346,19 @@ class _DispatchInfoState extends State<DispatchInfo> {
             Expanded(
               child: _buildFieldWrapper(
                 '送往醫院或地點 Hospital/Destination',
-                _buildTextField(hint: '輸入醫院名稱'),
+                _buildHospitalSelection(),
               ),
             ),
             const SizedBox(width: 24),
             Expanded(
               child: _buildFieldWrapper(
                 '運送原因 Transport Reason',
-                _buildSegmentedControl(
-                  ['病情需要', '病人/家屬要求'],
-                  _transportReason,
-                  (v) => setState(() => _transportReason = v),
-                ),
+                _buildSegmentedControl(['病情需要', '病人/家屬要求'], _transportReason, (
+                  v,
+                ) {
+                  setState(() => _transportReason = v);
+                  _saveData();
+                }),
               ),
             ),
           ],
@@ -259,6 +493,180 @@ class _DispatchInfoState extends State<DispatchInfo> {
     );
   }
 
+  // --- 選擇器實作 ---
+
+  Widget _buildLocationSelection() {
+    // 尋找當前選擇的物件
+    IncidentPlaceCategoryData? selectedItem;
+    try {
+      if (_selectedLocationId != null) {
+        selectedItem = _locations.firstWhere(
+          (e) => e.id == _selectedLocationId,
+        );
+      }
+    } catch (_) {}
+
+    return _buildSelectionField(
+      text: selectedItem?.name ?? '',
+      hint: '主地點',
+      icon: Icons.location_on_outlined,
+      onTap: () async {
+        final db = context.read<AppDatabase>();
+        final result =
+            await ReferenceSearchSheet.show<IncidentPlaceCategoryData>(
+              context,
+              title: '選擇發生地點',
+              searchFunction: db.ambulanceDao.searchIncidentLocations,
+              initialSelection: selectedItem,
+              isSelectedComparator: (a, b) => a.id == b?.id,
+              itemBuilder: (context, item, isSelected) {
+                return ListTile(
+                  title: Text(
+                    item.name,
+                    style: TextStyle(
+                      color: isSelected ? primaryColor : textDark,
+                      fontWeight: isSelected
+                          ? FontWeight.bold
+                          : FontWeight.normal,
+                    ),
+                  ),
+                  trailing: isSelected
+                      ? const Icon(Icons.check, color: primaryColor)
+                      : null,
+                );
+              },
+            );
+
+        if (result != null) {
+          if (!mounted) return;
+
+          setState(() {
+            _selectedLocationId = result.id;
+            // 清空二級地點並重置列表
+            _selectedLocation2Id = null;
+            _location2s = [];
+          });
+
+          // 載入新的二級地點
+          final db = context.read<AppDatabase>();
+          final newSubLocations = await db.ambulanceDao.getIncidentLocation2s(
+            result.id,
+          );
+
+          setState(() {
+            _location2s = newSubLocations;
+          });
+
+          _saveData();
+        }
+      },
+    );
+  }
+
+  Widget _buildLocation2Selection() {
+    // 若未選擇一級地點或該地點無二級選項，則禁用
+    if (_selectedLocationId == null) {
+      return _buildDisabledSelectionField('次地點');
+    }
+
+    // 尋找當前選擇的物件
+    IncidentPlaceCategory2Data? selectedItem;
+    try {
+      if (_selectedLocation2Id != null) {
+        selectedItem = _location2s.firstWhere(
+          (e) => e.id == _selectedLocation2Id,
+        );
+      }
+    } catch (_) {}
+
+    return _buildSelectionField(
+      text: selectedItem?.name ?? '',
+      hint: '次地點',
+      icon: Icons.subdirectory_arrow_right_rounded,
+      onTap: () async {
+        final db = context.read<AppDatabase>();
+        final result =
+            await ReferenceSearchSheet.show<IncidentPlaceCategory2Data>(
+              context,
+              title: '選擇次要地點',
+              searchFunction: (query) => db.ambulanceDao
+                  .searchIncidentLocation2s(query, _selectedLocationId),
+              initialSelection: selectedItem,
+              isSelectedComparator: (a, b) => a.id == b?.id,
+              itemBuilder: (context, item, isSelected) {
+                return ListTile(
+                  title: Text(
+                    item.name,
+                    style: TextStyle(
+                      color: isSelected ? primaryColor : textDark,
+                      fontWeight: isSelected
+                          ? FontWeight.bold
+                          : FontWeight.normal,
+                    ),
+                  ),
+                  trailing: isSelected
+                      ? const Icon(Icons.check, color: primaryColor)
+                      : null,
+                );
+              },
+            );
+
+        if (result != null) {
+          setState(() => _selectedLocation2Id = result.id);
+          _saveData();
+        }
+      },
+    );
+  }
+
+  Widget _buildHospitalSelection() {
+    // 尋找當前選擇的物件
+    ReferralHospitalData? selectedItem;
+    try {
+      if (_selectedHospitalId != null) {
+        selectedItem = _hospitals.firstWhere(
+          (e) => e.id == _selectedHospitalId,
+        );
+      }
+    } catch (_) {}
+
+    return _buildSelectionField(
+      text: selectedItem?.name ?? '',
+      hint: '選擇醫院',
+      icon: Icons.local_hospital_outlined,
+      onTap: () async {
+        final db = context.read<AppDatabase>();
+        final result = await ReferenceSearchSheet.show<ReferralHospitalData>(
+          context,
+          title: '選擇醫院',
+          searchFunction: db.ambulanceDao.searchHospitals,
+          initialSelection: selectedItem,
+          isSelectedComparator: (a, b) => a.id == b?.id,
+          itemBuilder: (context, item, isSelected) {
+            return ListTile(
+              title: Text(
+                item.name,
+                style: TextStyle(
+                  color: isSelected ? primaryColor : textDark,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                ),
+              ),
+              subtitle: item.address != null ? Text(item.address!) : null,
+              trailing: isSelected
+                  ? const Icon(Icons.check, color: primaryColor)
+                  : null,
+            );
+          },
+        );
+
+        if (result != null) {
+          setState(() => _selectedHospitalId = result.id);
+          _saveData();
+        }
+      },
+    );
+  }
+
   // --- 基礎元件 ---
 
   Widget _buildLabel(String text) => Text(
@@ -287,11 +695,13 @@ class _DispatchInfoState extends State<DispatchInfo> {
     TextEditingController? controller,
     int maxLines = 1,
     bool readOnly = false,
+    FocusNode? focusNode,
   }) {
     return SizedBox(
       height: maxLines == 1 ? 44 : null,
       child: TextField(
         controller: controller,
+        focusNode: focusNode,
         maxLines: maxLines,
         readOnly: readOnly,
         style: const TextStyle(fontSize: 14, color: textDark),
@@ -316,6 +726,76 @@ class _DispatchInfoState extends State<DispatchInfo> {
             borderSide: const BorderSide(color: primaryColor, width: 1.5),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildSelectionField({
+    required String text,
+    required String hint,
+    required IconData icon,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: borderColor),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, size: 18, color: textMuted),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                text.isNotEmpty ? text : hint,
+                style: TextStyle(
+                  color: text.isNotEmpty
+                      ? textDark
+                      : textMuted.withValues(alpha: 0.5),
+                  fontSize: 14,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            const Icon(Icons.arrow_drop_down, color: textMuted),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDisabledSelectionField(String hint) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF1F5F9), // 灰色背景表示禁用
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: borderColor),
+      ),
+      child: Row(
+        children: [
+          const Icon(
+            Icons.subdirectory_arrow_right_rounded,
+            size: 18,
+            color: textMuted,
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              hint,
+              style: TextStyle(
+                color: textMuted.withValues(alpha: 0.5),
+                fontSize: 14,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

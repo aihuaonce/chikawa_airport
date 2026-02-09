@@ -10,9 +10,11 @@ import 'tables/medical_tables.dart';
 import 'tables/icd10_tables.dart';
 import 'tables/normalization_tables.dart';
 import 'tables/contact_tables.dart';
+import 'tables/ambulance_tables.dart';
 
 //匯入DAO
 import 'dao/reference_dao.dart';
+import 'dao/ambulance_dao.dart';
 import 'dao/medical_dao.dart';
 import 'dao/flight_dao.dart';
 import 'dao/incident_dao.dart';
@@ -90,6 +92,9 @@ part 'database.g.dart';
 
     // 聯絡人
     Contact,
+
+    // 救護車
+    AmbulanceRecords,
   ],
   daos: [
     ReferenceDao,
@@ -103,6 +108,7 @@ part 'database.g.dart';
     MedicalFeeDao,
     NursingRecordDao,
     ReferralFormDao,
+    AmbulanceDao,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -143,5 +149,7 @@ class AppDatabase extends _$AppDatabase {
   NursingRecordDao get nursingRecordDao => NursingRecordDao(this);
   @override
   ReferralFormDao get referralFormDao => ReferralFormDao(this);
+  @override
+  AmbulanceDao get ambulanceDao => AmbulanceDao(this);
   ContactDao get contactDao => ContactDao(this);
 }
