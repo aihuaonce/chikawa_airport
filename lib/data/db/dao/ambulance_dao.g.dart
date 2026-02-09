@@ -19,4 +19,6 @@ mixin _$AmbulanceDaoMixin on DatabaseAccessor<AppDatabase> {
   $RelationshipTypeTable get relationshipType =>
       attachedDatabase.relationshipType;
   $ReferralFormsTable get referralForms => attachedDatabase.referralForms;
+  $MedicalStaffTable get medicalStaff => attachedDatabase.medicalStaff;
+  $TreatmentTable get treatment => attachedDatabase.treatment;
 }

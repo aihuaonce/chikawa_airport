@@ -12,7 +12,8 @@ part 'ambulance_dao.g.dart';
   IncidentPlaceCategory2,
   ReferralHospital,
   IncidentRecord,
-  ReferralForms
+  ReferralForms,
+  Treatment
 ])
 class AmbulanceDao extends DatabaseAccessor<AppDatabase> with _$AmbulanceDaoMixin {
   AmbulanceDao(super.db);
@@ -96,5 +97,10 @@ class AmbulanceDao extends DatabaseAccessor<AppDatabase> with _$AmbulanceDaoMixi
   // 取得相關 ReferralForm
   Future<ReferralFormData?> getReferralFormByMedicalId(int medicalId) {
     return (select(referralForms)..where((t) => t.medicalId.equals(medicalId))).getSingleOrNull();
+  }
+
+  // 取得相關 Treatment
+  Future<TreatmentData?> getTreatmentByMedicalId(int medicalId) {
+    return (select(treatment)..where((t) => t.medicalId.equals(medicalId))).getSingleOrNull();
   }
 }
