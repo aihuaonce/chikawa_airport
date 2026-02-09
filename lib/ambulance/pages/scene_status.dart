@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 class AmbulanceSceneStatus extends StatefulWidget {
-  final int ambulanceId;
-  const AmbulanceSceneStatus({super.key, required this.ambulanceId});
+  final int medicalId;
+  const AmbulanceSceneStatus({super.key, required this.medicalId});
 
   @override
   State<AmbulanceSceneStatus> createState() => _AmbulanceSceneStatusState();

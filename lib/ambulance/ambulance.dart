@@ -8,9 +8,9 @@ import 'pages/fees.dart';
 import 'pages/body_map.dart';
 
 class AmbulancePage extends StatefulWidget {
-  final int ambulanceId;
+  final int medicalId;
 
-  const AmbulancePage({super.key, required this.ambulanceId});
+  const AmbulancePage({super.key, required this.medicalId});
 
   @override
   State<AmbulancePage> createState() => _AmbulancePageState();
@@ -41,19 +41,19 @@ class _AmbulancePageState extends State<AmbulancePage> {
   Widget _getCurrentPage() {
     switch (_currentSectionIndex) {
       case 0:
-        return DispatchInfo(ambulanceId: widget.ambulanceId);
+        return DispatchInfo(medicalId: widget.medicalId);
       case 1:
-        return AmbulancePersonalInfo(ambulanceId: widget.ambulanceId);
+        return AmbulancePersonalInfo(medicalId: widget.medicalId);
       case 2:
-        return AmbulanceSceneStatus(ambulanceId: widget.ambulanceId);
+        return AmbulanceSceneStatus(medicalId: widget.medicalId);
       case 3:
-        return AmbulanceTreatmentItems(ambulanceId: widget.ambulanceId);
+        return AmbulanceTreatmentItems(medicalId: widget.medicalId);
       case 4:
-        return AmbulanceFees(ambulanceId: widget.ambulanceId);
+        return AmbulanceFees(medicalId: widget.medicalId);
       case 5:
         return _buildPlaceholder("人形圖內容區域 (Body Map)");
       default:
-        return DispatchInfo(ambulanceId: widget.ambulanceId);
+        return DispatchInfo(medicalId: widget.medicalId);
     }
   }
 

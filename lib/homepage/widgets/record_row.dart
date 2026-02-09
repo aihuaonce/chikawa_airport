@@ -57,8 +57,7 @@ class RecordRow extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) =>
-                  AmbulancePage(ambulanceId: record.medicalId),
+              builder: (context) => AmbulancePage(medicalId: record.medicalId),
             ),
           );
         } else {

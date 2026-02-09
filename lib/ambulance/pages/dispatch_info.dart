@@ -6,9 +6,9 @@ import '../../data/db/database.dart';
 import '../../medical/widgets/reference_search_sheet.dart';
 
 class DispatchInfo extends StatefulWidget {
-  final int ambulanceId;
+  final int medicalId;
 
-  const DispatchInfo({super.key, required this.ambulanceId});
+  const DispatchInfo({super.key, required this.medicalId});
 
   @override
   State<DispatchInfo> createState() => _DispatchInfoState();
@@ -42,6 +42,7 @@ class _DispatchInfoState extends State<DispatchInfo> {
 
   // 狀態變數
   String _transportReason = '病情需要'; // 病情需要, 病人/家屬要求
+  int? _ambulanceRecordId; // 真實的救護車紀錄 ID
 
   // 資料庫資料
   List<IncidentPlaceCategoryData> _locations = [];
@@ -96,12 +97,14 @@ class _DispatchInfoState extends State<DispatchInfo> {
       _locations = await db.ambulanceDao.getIncidentLocations();
       _hospitals = await db.ambulanceDao.getHospitals();
 
-      // 載入紀錄
-      final record = await db.ambulanceDao.getAmbulanceRecord(
-        widget.ambulanceId,
+      // 透過 medicalId 查詢紀錄
+      final record = await db.ambulanceDao.getAmbulanceRecordByMedicalId(
+        widget.medicalId,
       );
 
       if (record != null) {
+        _ambulanceRecordId = record.ambulanceId;
+
         _licensePlateController.text = record.licensePlate ?? '';
         _locationRemarksController.text = record.locationRemarks ?? '';
         _dispatchTimeController.text = _formatDate(record.dispatchTime);
@@ -129,11 +132,9 @@ class _DispatchInfoState extends State<DispatchInfo> {
             _selectedLocationId!,
           );
         }
-
-        // 自動代入邏輯 (若欄位為空且有 medicalId)
-        if (record.medicalId != null) {
-          await _autoFillFromMedicalRecord(db, record.medicalId!);
-        }
+      } else {
+        // 沒有紀錄，執行自動代入
+        await _autoFillFromMedicalRecord(db, widget.medicalId);
       }
     } catch (e) {
       debugPrint('Error loading ambulance data: $e');
@@ -155,7 +156,7 @@ class _DispatchInfoState extends State<DispatchInfo> {
         medicalId,
       );
 
-      debugPrint('IncidentRecord found: $incident');
+      debugPrint('IncidentRecord found for auto-fill: $incident');
 
       if (incident != null) {
         if (_selectedLocationId == null) {
@@ -187,21 +188,91 @@ class _DispatchInfoState extends State<DispatchInfo> {
         medicalId,
       );
       if (referral != null && referral.hospitalName != null) {
-        // 嘗試從醫院列表中尋找名稱相符的項目
-        try {
-          final hospital = _hospitals.firstWhere(
-            (h) => h.name == referral.hospitalName,
+        await _tryMatchHospital(referral.hospitalName!);
+      }
+    }
+
+    // 3. 代入 Treatment 資料 (如果 ReferralForm 沒有資料)
+    if (_selectedHospitalId == null) {
+      final treatment = await db.ambulanceDao.getTreatmentByMedicalId(medicalId);
+      if (treatment != null) {
+        // A. 優先嘗試 ID
+        if (treatment.referralHospitalId != null) {
+          try {
+            final hospital = _hospitals.firstWhere(
+              (h) => h.id == treatment.referralHospitalId,
+            );
+            _selectedHospitalId = hospital.id;
+            dataChanged = true;
+            debugPrint(
+              'Hospital matched by Treatment ID: ${treatment.referralHospitalId}',
+            );
+          } catch (e) {
+            debugPrint(
+              'Treatment Hospital ID ${treatment.referralHospitalId} not found in list',
+            );
+          }
+        }
+
+        // B. 如果 ID 沒中，嘗試名稱 (referralHospitalFinal)
+        if (_selectedHospitalId == null &&
+            treatment.referralHospitalFinal != null) {
+          debugPrint(
+            'Trying match by Treatment Final Name: ${treatment.referralHospitalFinal}',
           );
-          _selectedHospitalId = hospital.id;
-          dataChanged = true;
-        } catch (e) {
-          // 找不到對應醫院名稱，保持為空
+          await _tryMatchHospital(treatment.referralHospitalFinal!);
         }
       }
     }
 
     if (dataChanged) {
-      _saveData();
+      // 這裡不直接儲存，因為還沒有 ambulanceId。
+      // 等到使用者修改或離開頁面時，_saveData 會處理新增邏輯。
+      // 但如果希望一進入就建立紀錄，也可以在這裡呼叫 _saveData。
+      // 為了 UX (避免產生太多空紀錄)，我們通常等到使用者操作再存，
+      // 但為了確保代入資料不遺失，這裡可以選擇先存。
+      // 考慮到這是「自動代入」，若使用者不喜歡可以改，所以先只更新 UI 狀態。
+      // 然而，如果 _saveData 邏輯是依賴 _ambulanceRecordId 來判斷 update/insert，
+      // 那第一次 _saveData 會執行 insert。
+    }
+  }
+
+  // 輔助方法：嘗試比對醫院名稱或 ID
+  Future<void> _tryMatchHospital(String hospitalName) async {
+    debugPrint('Matching hospital name/id: $hospitalName');
+
+    // 嘗試解析為 ID
+    final hospitalId = int.tryParse(hospitalName);
+    if (hospitalId != null) {
+      // 若是數字，直接比對 ID
+      try {
+        final hospital = _hospitals.firstWhere((h) => h.id == hospitalId);
+        setState(() => _selectedHospitalId = hospital.id);
+        debugPrint('Hospital matched by ID: ${hospital.name}');
+      } catch (e) {
+        debugPrint('Hospital ID $hospitalId not found in list');
+      }
+    } else {
+      // 若不是數字，嘗試名稱模糊比對
+      try {
+        // 標準化：去空格、轉小寫、統一括號等 (這裡簡化處理)
+        String normalize(String s) =>
+            s.replaceAll(RegExp(r'\s+'), '').toLowerCase();
+
+        final targetName = normalize(hospitalName);
+
+        final hospital = _hospitals.firstWhere((h) {
+          final currentName = normalize(h.name);
+          return currentName == targetName ||
+              currentName.contains(targetName) ||
+              targetName.contains(currentName);
+        });
+
+        setState(() => _selectedHospitalId = hospital.id);
+        debugPrint('Hospital matched by Name: ${hospital.name}');
+      } catch (e) {
+        debugPrint('Hospital name "$hospitalName" not found (fuzzy match)');
+      }
     }
   }
 
@@ -212,7 +283,7 @@ class _DispatchInfoState extends State<DispatchInfo> {
       final db = context.read<AppDatabase>();
 
       final companion = AmbulanceRecordsCompanion(
-        ambulanceId: drift.Value(widget.ambulanceId),
+        medicalId: drift.Value(widget.medicalId), // 確保關聯到 medicalId
         licensePlate: drift.Value(_licensePlateController.text),
         incidentLocationId: drift.Value(_selectedLocationId),
         incidentLocation2Id: drift.Value(_selectedLocation2Id),
@@ -234,7 +305,19 @@ class _DispatchInfoState extends State<DispatchInfo> {
         updatedAt: drift.Value(DateTime.now()),
       );
 
-      await db.ambulanceDao.insertOrUpdateAmbulanceRecord(companion);
+      if (_ambulanceRecordId == null) {
+        // 新增紀錄
+        final newId = await db.ambulanceDao.createAmbulanceRecord(companion);
+        setState(() {
+          _ambulanceRecordId = newId;
+        });
+      } else {
+        // 更新紀錄
+        final updateCompanion = companion.copyWith(
+          ambulanceId: drift.Value(_ambulanceRecordId!),
+        );
+        await db.ambulanceDao.updateAmbulanceRecord(updateCompanion);
+      }
     } catch (e) {
       debugPrint('Error saving ambulance data: $e');
     }
