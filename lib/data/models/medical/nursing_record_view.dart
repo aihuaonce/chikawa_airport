@@ -279,17 +279,17 @@ class NursingRecordViewModel extends ChangeNotifier {
         final m = latest.gcsM != null ? 'M${latest.gcsM}' : '';
         result = result.replaceAll('{gcs}', '$e$v$m');
       } else {
-        result = result.replaceAll('{gcs}', '--');
+        result = result.replaceAll('{gcs}', '意識清晰');
       }
     } else {
-      // 若無生命徵象，所有相關變數設為 --
+      // 若無生命徵象，相關變數設為預設值
       result = result
           .replaceAll('{temp}', '--')
           .replaceAll('{bp}', '--/--')
           .replaceAll('{pulse}', '--')
           .replaceAll('{spo2}', '--')
           .replaceAll('{rr}', '--')
-          .replaceAll('{gcs}', '--');
+          .replaceAll('{gcs}', '意識清晰');
     }
 
     // 2. 血糖 {bs} - 來自 Treatment 表
@@ -468,17 +468,23 @@ class NursingRecordViewModel extends ChangeNotifier {
         result = result.replaceAll('[藥物]', medsStr);
       }
 
-      // 診斷書: 檢查是否有開立
+      // 診斷書: 優先讀取 certificateLogs
       if (result.contains('[診斷書]')) {
-        String certStr = '乙種診斷書'; // 預設或檢查是否已開立
+        String certStr = '乙種診斷書(未開立)';
         try {
-          final cert = await db.certificateDao.getCertificateByMedicalId(
-            medicalId,
-          );
-          if (cert != null) {
-            certStr = '乙種診斷書(已開立)';
+          final treatment = await db.treatmentDao.getTreatment(medicalId);
+          if (treatment != null &&
+              treatment.certificateLogs != null &&
+              treatment.certificateLogs!.isNotEmpty) {
+            certStr = treatment.certificateLogs!;
           } else {
-            certStr = '乙種診斷書(未開立)';
+            // Fallback: 檢查是否有開立記錄
+            final cert = await db.certificateDao.getCertificateByMedicalId(
+              medicalId,
+            );
+            if (cert != null) {
+              certStr = '乙種診斷書(已開立)';
+            }
           }
         } catch (_) {}
         result = result.replaceAll('[診斷書]', certStr);

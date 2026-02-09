@@ -1404,7 +1404,9 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
 
   // 初始化護理常用語 (Fallback)
   Future<void> initializeNursingPhrases() async {
-    final count = await (select(nursingPhrase).get()).then((list) => list.length);
+    final count = await (select(
+      nursingPhrase,
+    ).get()).then((list) => list.length);
     if (count == 0) {
       await batch((batch) {
         batch.insertAll(nursingPhrase, [
@@ -1435,13 +1437,13 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
           NursingPhraseCompanion.insert(
             title: '抵達現場',
             content:
-                '抵達現場，病人{gcs}，坐在椅子上/坐在機艙內/躺在地上，測量生命徵象 T:{temp} P:{pulse} R:{rr} BP:{bp} SpO2:{spo2}，自述{cc}，醫師診療評估中。',
+                '抵達現場，病人 {gcs} ，坐在椅子上/坐在機艙內/躺在地上，測量生命徵象 體溫:{temp}度、脈搏:{pulse}次/分、呼吸:{rr}次/分、血壓:{bp}mmhg、血氧:{spo2}%，自述 {cc} ，醫師診療評估中。',
             sortOrder: const Value(5),
             isActive: const Value(true),
           ),
           NursingPhraseCompanion.insert(
             title: '測血糖',
-            content: '依醫囑執行測血糖{bs}。',
+            content: '依醫囑執行測血糖{bs}mg/dL。',
             sortOrder: const Value(6),
             isActive: const Value(true),
           ),
@@ -1484,8 +1486,7 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
           ),
           NursingPhraseCompanion.insert(
             title: '緊急通關',
-            content:
-                '由醫師判斷病人診斷為[初步診斷]，由於情況危急，須採緊急機坪通關，告知現場航空公司地勤，請其協助聯繫相關單位。',
+            content: '由醫師判斷病人診斷為[初步診斷]，由於情況危急，須採緊急機坪通關，告知現場航空公司地勤，請其協助聯繫相關單位。',
             sortOrder: const Value(13),
             isActive: const Value(true),
           ),
