@@ -15,6 +15,12 @@ mixin _$AmbulanceDaoMixin on DatabaseAccessor<AppDatabase> {
   $MedicalRecordTable get medicalRecord => attachedDatabase.medicalRecord;
   $AmbulancePersonalPropertyTable get ambulancePersonalProperty =>
       attachedDatabase.ambulancePersonalProperty;
+  $AmbulanceSceneRecordsTable get ambulanceSceneRecords =>
+      attachedDatabase.ambulanceSceneRecords;
+  $AmbulanceReferenceItemsTable get ambulanceReferenceItems =>
+      attachedDatabase.ambulanceReferenceItems;
+  $AmbulanceSceneItemLinksTable get ambulanceSceneItemLinks =>
+      attachedDatabase.ambulanceSceneItemLinks;
   $ReportingUnitTable get reportingUnit => attachedDatabase.reportingUnit;
   $IncidentRecordTable get incidentRecord => attachedDatabase.incidentRecord;
   $ReferralPurposeTable get referralPurpose => attachedDatabase.referralPurpose;

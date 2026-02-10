@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart';
 import '../database.dart';
 import '../tables/ambulance_tables.dart';
+import '../tables/ambulance_scene_tables.dart';
 import '../tables/reference_tables.dart';
 import '../tables/medical_tables.dart';
 
@@ -9,6 +10,9 @@ part 'ambulance_dao.g.dart';
 @DriftAccessor(tables: [
   AmbulanceRecords,
   AmbulancePersonalProperty,
+  AmbulanceSceneRecords,
+  AmbulanceReferenceItems,
+  AmbulanceSceneItemLinks,
   IncidentPlaceCategory, 
   IncidentPlaceCategory2,
   ReferralHospital,
@@ -18,6 +22,133 @@ part 'ambulance_dao.g.dart';
 ])
 class AmbulanceDao extends DatabaseAccessor<AppDatabase> with _$AmbulanceDaoMixin {
   AmbulanceDao(super.db);
+
+  // --- 救護車現場紀錄相關 (AmbulanceSceneRecords) ---
+
+  // 取得現場紀錄
+  Future<AmbulanceSceneRecordData?> getSceneRecord(int medicalId) {
+    return (select(ambulanceSceneRecords)..where((t) => t.medicalId.equals(medicalId))).getSingleOrNull();
+  }
+
+  // 建立或更新現場紀錄
+  Future<int> updateSceneRecord(AmbulanceSceneRecordsCompanion data) async {
+    final existing = await (select(ambulanceSceneRecords)
+      ..where((t) => t.medicalId.equals(data.medicalId.value)))
+      .getSingleOrNull();
+
+    if (existing != null) {
+      await (update(ambulanceSceneRecords)
+        ..where((t) => t.medicalId.equals(data.medicalId.value)))
+        .write(data);
+      return existing.id;
+    } else {
+      return into(ambulanceSceneRecords).insert(data);
+    }
+  }
+
+  // --- 參考選項相關 (AmbulanceReferenceItems) ---
+
+  // 根據類別取得選項
+  Future<List<AmbulanceReferenceItemData>> getReferenceItemsByCategory(String category) {
+    return (select(ambulanceReferenceItems)
+      ..where((t) => t.category.equals(category))
+      ..where((t) => t.isActive.equals(true))
+      ..orderBy([(t) => OrderingTerm(expression: t.sortOrder)])
+    ).get();
+  }
+
+  // 取得已選取的選項 ID
+  Future<List<int>> getSelectedLinkIds(int sceneRecordId, String category) async {
+    final query = select(ambulanceSceneItemLinks).join([
+      innerJoin(ambulanceReferenceItems, ambulanceReferenceItems.id.equalsExp(ambulanceSceneItemLinks.itemId))
+    ]);
+    
+    query.where(ambulanceSceneItemLinks.sceneRecordId.equals(sceneRecordId));
+    query.where(ambulanceReferenceItems.category.equals(category));
+    
+    final result = await query.get();
+    return result.map((row) => row.readTable(ambulanceReferenceItems).id).toList();
+  }
+  
+  // 取得已選取的選項名稱 (UI顯示用)
+  Future<List<String>> getSelectedLinkNames(int sceneRecordId, String category) async {
+    final query = select(ambulanceSceneItemLinks).join([
+      innerJoin(ambulanceReferenceItems, ambulanceReferenceItems.id.equalsExp(ambulanceSceneItemLinks.itemId))
+    ]);
+    
+    query.where(ambulanceSceneItemLinks.sceneRecordId.equals(sceneRecordId));
+    query.where(ambulanceReferenceItems.category.equals(category));
+    
+    final result = await query.get();
+    return result.map((row) => row.readTable(ambulanceReferenceItems).name).toList();
+  }
+
+  // 更新選取的選項 (全刪全加模式)
+  Future<void> updateSelectedLinks(int sceneRecordId, String category, List<String> selectedNames) async {
+    await transaction(() async {
+      // 1. 找出該類別的所有 Item ID
+      final allItems = await getReferenceItemsByCategory(category);
+      final nameToIdMap = {for (var item in allItems) item.name: item.id};
+
+      // 2. 刪除該 SceneRecord 下，屬於該 Category 的所有連結
+      // 由於 Drift delete join 比較複雜，這裡先查詢出要刪除的 Link IDs
+      final linksToDelete = await (select(ambulanceSceneItemLinks).join([
+        innerJoin(ambulanceReferenceItems, ambulanceReferenceItems.id.equalsExp(ambulanceSceneItemLinks.itemId))
+      ])
+        ..where(ambulanceSceneItemLinks.sceneRecordId.equals(sceneRecordId))
+        ..where(ambulanceReferenceItems.category.equals(category)))
+        .map((row) => row.readTable(ambulanceSceneItemLinks).id)
+        .get();
+
+      if (linksToDelete.isNotEmpty) {
+        await (delete(ambulanceSceneItemLinks)..where((t) => t.id.isIn(linksToDelete))).go();
+      }
+
+      // 3. 插入新的連結
+      for (final name in selectedNames) {
+        final itemId = nameToIdMap[name];
+        if (itemId != null) {
+          await into(ambulanceSceneItemLinks).insert(
+            AmbulanceSceneItemLinksCompanion(
+              sceneRecordId: Value(sceneRecordId),
+              itemId: Value(itemId),
+            ),
+          );
+        }
+      }
+    });
+  }
+
+  // 初始化參考資料
+  Future<void> initializeAmbulanceReferenceData() async {
+    final count = await (select(ambulanceReferenceItems).get()).then((list) => list.length);
+    if (count > 0) return;
+
+    // 定義初始資料
+    final data = <String, List<String>>{
+      'TraumaGroup': ['一般外傷', '受傷機轉', '溺水', '摔跌傷', '墜落傷', '穿刺傷', '燒燙傷', '電擊傷', '生物咬螫傷', '到院前心肺功能停止', '其它'],
+      'GeneralTrauma': ['頸部外傷', '胸部外傷', '腹部外傷', '背部外傷', '肢體外傷', '其它'],
+      'Mechanism': ['因交通事故', '非交通事故'],
+      'NonTraumaGroup': ['急症', '一般疾病'],
+      'Acute': ['呼吸問題(喘)', '呼吸道問題', '昏迷', '胸痛/胸悶', '腹痛', '中毒', '癲癇', '路倒', '精神異常', '孕婦急產', 'OHCA', '其它'],
+      'GeneralDisease': ['頭痛/頭暈', '昏倒/昏厥', '發燒', '噁心/嘔吐', '肢體無力'],
+      'Allergy': ['食物', '藥物', '其它'],
+      'History': ['高血壓', '糖尿病', '氣喘', '心臟疾病', '其它'],
+    };
+
+    await batch((batch) {
+      data.forEach((category, items) {
+        for (var i = 0; i < items.length; i++) {
+          batch.insert(ambulanceReferenceItems, AmbulanceReferenceItemsCompanion.insert(
+            category: category,
+            name: items[i],
+            sortOrder: Value(i + 1),
+          ));
+        }
+      });
+    });
+  }
+
 
   // 取得救護車紀錄
   Future<AmbulanceRecord?> getAmbulanceRecord(int id) {

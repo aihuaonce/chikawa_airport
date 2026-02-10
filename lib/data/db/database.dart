@@ -11,6 +11,7 @@ import 'tables/icd10_tables.dart';
 import 'tables/normalization_tables.dart';
 import 'tables/contact_tables.dart';
 import 'tables/ambulance_tables.dart';
+import 'tables/ambulance_scene_tables.dart';
 
 //匯入DAO
 import 'dao/reference_dao.dart';
@@ -96,6 +97,9 @@ part 'database.g.dart';
     // 救護車
     AmbulanceRecords,
     AmbulancePersonalProperty,
+    AmbulanceSceneRecords,
+    AmbulanceReferenceItems,
+    AmbulanceSceneItemLinks,
   ],
   daos: [
     ReferenceDao,

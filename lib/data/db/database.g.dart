@@ -27987,6 +27987,1531 @@ class AmbulancePersonalPropertyCompanion
   }
 }
 
+class $AmbulanceSceneRecordsTable extends AmbulanceSceneRecords
+    with TableInfo<$AmbulanceSceneRecordsTable, AmbulanceSceneRecordData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $AmbulanceSceneRecordsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _medicalIdMeta = const VerificationMeta(
+    'medicalId',
+  );
+  @override
+  late final GeneratedColumn<int> medicalId = GeneratedColumn<int>(
+    'medical_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'UNIQUE REFERENCES medical_record (medical_id)',
+    ),
+  );
+  static const VerificationMeta _patientComplaintMeta = const VerificationMeta(
+    'patientComplaint',
+  );
+  @override
+  late final GeneratedColumn<String> patientComplaint = GeneratedColumn<String>(
+    'patient_complaint',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _isProxyComplaintMeta = const VerificationMeta(
+    'isProxyComplaint',
+  );
+  @override
+  late final GeneratedColumn<bool> isProxyComplaint = GeneratedColumn<bool>(
+    'is_proxy_complaint',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_proxy_complaint" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _fallHeightMeta = const VerificationMeta(
+    'fallHeight',
+  );
+  @override
+  late final GeneratedColumn<String> fallHeight = GeneratedColumn<String>(
+    'fall_height',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _burnDegreeMeta = const VerificationMeta(
+    'burnDegree',
+  );
+  @override
+  late final GeneratedColumn<String> burnDegree = GeneratedColumn<String>(
+    'burn_degree',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _burnAreaMeta = const VerificationMeta(
+    'burnArea',
+  );
+  @override
+  late final GeneratedColumn<String> burnArea = GeneratedColumn<String>(
+    'burn_area',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _burnPercentageMeta = const VerificationMeta(
+    'burnPercentage',
+  );
+  @override
+  late final GeneratedColumn<String> burnPercentage = GeneratedColumn<String>(
+    'burn_percentage',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _otherTraumaNoteMeta = const VerificationMeta(
+    'otherTraumaNote',
+  );
+  @override
+  late final GeneratedColumn<String> otherTraumaNote = GeneratedColumn<String>(
+    'other_trauma_note',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _allergyStatusMeta = const VerificationMeta(
+    'allergyStatus',
+  );
+  @override
+  late final GeneratedColumn<String> allergyStatus = GeneratedColumn<String>(
+    'allergy_status',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('無'),
+  );
+  static const VerificationMeta _allergyNoteMeta = const VerificationMeta(
+    'allergyNote',
+  );
+  @override
+  late final GeneratedColumn<String> allergyNote = GeneratedColumn<String>(
+    'allergy_note',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _historyStatusMeta = const VerificationMeta(
+    'historyStatus',
+  );
+  @override
+  late final GeneratedColumn<String> historyStatus = GeneratedColumn<String>(
+    'history_status',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('無'),
+  );
+  static const VerificationMeta _historyNoteMeta = const VerificationMeta(
+    'historyNote',
+  );
+  @override
+  late final GeneratedColumn<String> historyNote = GeneratedColumn<String>(
+    'history_note',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    medicalId,
+    patientComplaint,
+    isProxyComplaint,
+    fallHeight,
+    burnDegree,
+    burnArea,
+    burnPercentage,
+    otherTraumaNote,
+    allergyStatus,
+    allergyNote,
+    historyStatus,
+    historyNote,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'ambulance_scene_records';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<AmbulanceSceneRecordData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('medical_id')) {
+      context.handle(
+        _medicalIdMeta,
+        medicalId.isAcceptableOrUnknown(data['medical_id']!, _medicalIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_medicalIdMeta);
+    }
+    if (data.containsKey('patient_complaint')) {
+      context.handle(
+        _patientComplaintMeta,
+        patientComplaint.isAcceptableOrUnknown(
+          data['patient_complaint']!,
+          _patientComplaintMeta,
+        ),
+      );
+    }
+    if (data.containsKey('is_proxy_complaint')) {
+      context.handle(
+        _isProxyComplaintMeta,
+        isProxyComplaint.isAcceptableOrUnknown(
+          data['is_proxy_complaint']!,
+          _isProxyComplaintMeta,
+        ),
+      );
+    }
+    if (data.containsKey('fall_height')) {
+      context.handle(
+        _fallHeightMeta,
+        fallHeight.isAcceptableOrUnknown(data['fall_height']!, _fallHeightMeta),
+      );
+    }
+    if (data.containsKey('burn_degree')) {
+      context.handle(
+        _burnDegreeMeta,
+        burnDegree.isAcceptableOrUnknown(data['burn_degree']!, _burnDegreeMeta),
+      );
+    }
+    if (data.containsKey('burn_area')) {
+      context.handle(
+        _burnAreaMeta,
+        burnArea.isAcceptableOrUnknown(data['burn_area']!, _burnAreaMeta),
+      );
+    }
+    if (data.containsKey('burn_percentage')) {
+      context.handle(
+        _burnPercentageMeta,
+        burnPercentage.isAcceptableOrUnknown(
+          data['burn_percentage']!,
+          _burnPercentageMeta,
+        ),
+      );
+    }
+    if (data.containsKey('other_trauma_note')) {
+      context.handle(
+        _otherTraumaNoteMeta,
+        otherTraumaNote.isAcceptableOrUnknown(
+          data['other_trauma_note']!,
+          _otherTraumaNoteMeta,
+        ),
+      );
+    }
+    if (data.containsKey('allergy_status')) {
+      context.handle(
+        _allergyStatusMeta,
+        allergyStatus.isAcceptableOrUnknown(
+          data['allergy_status']!,
+          _allergyStatusMeta,
+        ),
+      );
+    }
+    if (data.containsKey('allergy_note')) {
+      context.handle(
+        _allergyNoteMeta,
+        allergyNote.isAcceptableOrUnknown(
+          data['allergy_note']!,
+          _allergyNoteMeta,
+        ),
+      );
+    }
+    if (data.containsKey('history_status')) {
+      context.handle(
+        _historyStatusMeta,
+        historyStatus.isAcceptableOrUnknown(
+          data['history_status']!,
+          _historyStatusMeta,
+        ),
+      );
+    }
+    if (data.containsKey('history_note')) {
+      context.handle(
+        _historyNoteMeta,
+        historyNote.isAcceptableOrUnknown(
+          data['history_note']!,
+          _historyNoteMeta,
+        ),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  AmbulanceSceneRecordData map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return AmbulanceSceneRecordData(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      medicalId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}medical_id'],
+      )!,
+      patientComplaint: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}patient_complaint'],
+      ),
+      isProxyComplaint: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_proxy_complaint'],
+      )!,
+      fallHeight: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}fall_height'],
+      ),
+      burnDegree: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}burn_degree'],
+      ),
+      burnArea: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}burn_area'],
+      ),
+      burnPercentage: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}burn_percentage'],
+      ),
+      otherTraumaNote: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}other_trauma_note'],
+      ),
+      allergyStatus: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}allergy_status'],
+      )!,
+      allergyNote: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}allergy_note'],
+      ),
+      historyStatus: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}history_status'],
+      )!,
+      historyNote: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}history_note'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $AmbulanceSceneRecordsTable createAlias(String alias) {
+    return $AmbulanceSceneRecordsTable(attachedDatabase, alias);
+  }
+}
+
+class AmbulanceSceneRecordData extends DataClass
+    implements Insertable<AmbulanceSceneRecordData> {
+  final int id;
+  final int medicalId;
+  final String? patientComplaint;
+  final bool isProxyComplaint;
+  final String? fallHeight;
+  final String? burnDegree;
+  final String? burnArea;
+  final String? burnPercentage;
+  final String? otherTraumaNote;
+  final String allergyStatus;
+  final String? allergyNote;
+  final String historyStatus;
+  final String? historyNote;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  const AmbulanceSceneRecordData({
+    required this.id,
+    required this.medicalId,
+    this.patientComplaint,
+    required this.isProxyComplaint,
+    this.fallHeight,
+    this.burnDegree,
+    this.burnArea,
+    this.burnPercentage,
+    this.otherTraumaNote,
+    required this.allergyStatus,
+    this.allergyNote,
+    required this.historyStatus,
+    this.historyNote,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['medical_id'] = Variable<int>(medicalId);
+    if (!nullToAbsent || patientComplaint != null) {
+      map['patient_complaint'] = Variable<String>(patientComplaint);
+    }
+    map['is_proxy_complaint'] = Variable<bool>(isProxyComplaint);
+    if (!nullToAbsent || fallHeight != null) {
+      map['fall_height'] = Variable<String>(fallHeight);
+    }
+    if (!nullToAbsent || burnDegree != null) {
+      map['burn_degree'] = Variable<String>(burnDegree);
+    }
+    if (!nullToAbsent || burnArea != null) {
+      map['burn_area'] = Variable<String>(burnArea);
+    }
+    if (!nullToAbsent || burnPercentage != null) {
+      map['burn_percentage'] = Variable<String>(burnPercentage);
+    }
+    if (!nullToAbsent || otherTraumaNote != null) {
+      map['other_trauma_note'] = Variable<String>(otherTraumaNote);
+    }
+    map['allergy_status'] = Variable<String>(allergyStatus);
+    if (!nullToAbsent || allergyNote != null) {
+      map['allergy_note'] = Variable<String>(allergyNote);
+    }
+    map['history_status'] = Variable<String>(historyStatus);
+    if (!nullToAbsent || historyNote != null) {
+      map['history_note'] = Variable<String>(historyNote);
+    }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  AmbulanceSceneRecordsCompanion toCompanion(bool nullToAbsent) {
+    return AmbulanceSceneRecordsCompanion(
+      id: Value(id),
+      medicalId: Value(medicalId),
+      patientComplaint: patientComplaint == null && nullToAbsent
+          ? const Value.absent()
+          : Value(patientComplaint),
+      isProxyComplaint: Value(isProxyComplaint),
+      fallHeight: fallHeight == null && nullToAbsent
+          ? const Value.absent()
+          : Value(fallHeight),
+      burnDegree: burnDegree == null && nullToAbsent
+          ? const Value.absent()
+          : Value(burnDegree),
+      burnArea: burnArea == null && nullToAbsent
+          ? const Value.absent()
+          : Value(burnArea),
+      burnPercentage: burnPercentage == null && nullToAbsent
+          ? const Value.absent()
+          : Value(burnPercentage),
+      otherTraumaNote: otherTraumaNote == null && nullToAbsent
+          ? const Value.absent()
+          : Value(otherTraumaNote),
+      allergyStatus: Value(allergyStatus),
+      allergyNote: allergyNote == null && nullToAbsent
+          ? const Value.absent()
+          : Value(allergyNote),
+      historyStatus: Value(historyStatus),
+      historyNote: historyNote == null && nullToAbsent
+          ? const Value.absent()
+          : Value(historyNote),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory AmbulanceSceneRecordData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return AmbulanceSceneRecordData(
+      id: serializer.fromJson<int>(json['id']),
+      medicalId: serializer.fromJson<int>(json['medicalId']),
+      patientComplaint: serializer.fromJson<String?>(json['patientComplaint']),
+      isProxyComplaint: serializer.fromJson<bool>(json['isProxyComplaint']),
+      fallHeight: serializer.fromJson<String?>(json['fallHeight']),
+      burnDegree: serializer.fromJson<String?>(json['burnDegree']),
+      burnArea: serializer.fromJson<String?>(json['burnArea']),
+      burnPercentage: serializer.fromJson<String?>(json['burnPercentage']),
+      otherTraumaNote: serializer.fromJson<String?>(json['otherTraumaNote']),
+      allergyStatus: serializer.fromJson<String>(json['allergyStatus']),
+      allergyNote: serializer.fromJson<String?>(json['allergyNote']),
+      historyStatus: serializer.fromJson<String>(json['historyStatus']),
+      historyNote: serializer.fromJson<String?>(json['historyNote']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'medicalId': serializer.toJson<int>(medicalId),
+      'patientComplaint': serializer.toJson<String?>(patientComplaint),
+      'isProxyComplaint': serializer.toJson<bool>(isProxyComplaint),
+      'fallHeight': serializer.toJson<String?>(fallHeight),
+      'burnDegree': serializer.toJson<String?>(burnDegree),
+      'burnArea': serializer.toJson<String?>(burnArea),
+      'burnPercentage': serializer.toJson<String?>(burnPercentage),
+      'otherTraumaNote': serializer.toJson<String?>(otherTraumaNote),
+      'allergyStatus': serializer.toJson<String>(allergyStatus),
+      'allergyNote': serializer.toJson<String?>(allergyNote),
+      'historyStatus': serializer.toJson<String>(historyStatus),
+      'historyNote': serializer.toJson<String?>(historyNote),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  AmbulanceSceneRecordData copyWith({
+    int? id,
+    int? medicalId,
+    Value<String?> patientComplaint = const Value.absent(),
+    bool? isProxyComplaint,
+    Value<String?> fallHeight = const Value.absent(),
+    Value<String?> burnDegree = const Value.absent(),
+    Value<String?> burnArea = const Value.absent(),
+    Value<String?> burnPercentage = const Value.absent(),
+    Value<String?> otherTraumaNote = const Value.absent(),
+    String? allergyStatus,
+    Value<String?> allergyNote = const Value.absent(),
+    String? historyStatus,
+    Value<String?> historyNote = const Value.absent(),
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) => AmbulanceSceneRecordData(
+    id: id ?? this.id,
+    medicalId: medicalId ?? this.medicalId,
+    patientComplaint: patientComplaint.present
+        ? patientComplaint.value
+        : this.patientComplaint,
+    isProxyComplaint: isProxyComplaint ?? this.isProxyComplaint,
+    fallHeight: fallHeight.present ? fallHeight.value : this.fallHeight,
+    burnDegree: burnDegree.present ? burnDegree.value : this.burnDegree,
+    burnArea: burnArea.present ? burnArea.value : this.burnArea,
+    burnPercentage: burnPercentage.present
+        ? burnPercentage.value
+        : this.burnPercentage,
+    otherTraumaNote: otherTraumaNote.present
+        ? otherTraumaNote.value
+        : this.otherTraumaNote,
+    allergyStatus: allergyStatus ?? this.allergyStatus,
+    allergyNote: allergyNote.present ? allergyNote.value : this.allergyNote,
+    historyStatus: historyStatus ?? this.historyStatus,
+    historyNote: historyNote.present ? historyNote.value : this.historyNote,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  AmbulanceSceneRecordData copyWithCompanion(
+    AmbulanceSceneRecordsCompanion data,
+  ) {
+    return AmbulanceSceneRecordData(
+      id: data.id.present ? data.id.value : this.id,
+      medicalId: data.medicalId.present ? data.medicalId.value : this.medicalId,
+      patientComplaint: data.patientComplaint.present
+          ? data.patientComplaint.value
+          : this.patientComplaint,
+      isProxyComplaint: data.isProxyComplaint.present
+          ? data.isProxyComplaint.value
+          : this.isProxyComplaint,
+      fallHeight: data.fallHeight.present
+          ? data.fallHeight.value
+          : this.fallHeight,
+      burnDegree: data.burnDegree.present
+          ? data.burnDegree.value
+          : this.burnDegree,
+      burnArea: data.burnArea.present ? data.burnArea.value : this.burnArea,
+      burnPercentage: data.burnPercentage.present
+          ? data.burnPercentage.value
+          : this.burnPercentage,
+      otherTraumaNote: data.otherTraumaNote.present
+          ? data.otherTraumaNote.value
+          : this.otherTraumaNote,
+      allergyStatus: data.allergyStatus.present
+          ? data.allergyStatus.value
+          : this.allergyStatus,
+      allergyNote: data.allergyNote.present
+          ? data.allergyNote.value
+          : this.allergyNote,
+      historyStatus: data.historyStatus.present
+          ? data.historyStatus.value
+          : this.historyStatus,
+      historyNote: data.historyNote.present
+          ? data.historyNote.value
+          : this.historyNote,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AmbulanceSceneRecordData(')
+          ..write('id: $id, ')
+          ..write('medicalId: $medicalId, ')
+          ..write('patientComplaint: $patientComplaint, ')
+          ..write('isProxyComplaint: $isProxyComplaint, ')
+          ..write('fallHeight: $fallHeight, ')
+          ..write('burnDegree: $burnDegree, ')
+          ..write('burnArea: $burnArea, ')
+          ..write('burnPercentage: $burnPercentage, ')
+          ..write('otherTraumaNote: $otherTraumaNote, ')
+          ..write('allergyStatus: $allergyStatus, ')
+          ..write('allergyNote: $allergyNote, ')
+          ..write('historyStatus: $historyStatus, ')
+          ..write('historyNote: $historyNote, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    medicalId,
+    patientComplaint,
+    isProxyComplaint,
+    fallHeight,
+    burnDegree,
+    burnArea,
+    burnPercentage,
+    otherTraumaNote,
+    allergyStatus,
+    allergyNote,
+    historyStatus,
+    historyNote,
+    createdAt,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is AmbulanceSceneRecordData &&
+          other.id == this.id &&
+          other.medicalId == this.medicalId &&
+          other.patientComplaint == this.patientComplaint &&
+          other.isProxyComplaint == this.isProxyComplaint &&
+          other.fallHeight == this.fallHeight &&
+          other.burnDegree == this.burnDegree &&
+          other.burnArea == this.burnArea &&
+          other.burnPercentage == this.burnPercentage &&
+          other.otherTraumaNote == this.otherTraumaNote &&
+          other.allergyStatus == this.allergyStatus &&
+          other.allergyNote == this.allergyNote &&
+          other.historyStatus == this.historyStatus &&
+          other.historyNote == this.historyNote &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class AmbulanceSceneRecordsCompanion
+    extends UpdateCompanion<AmbulanceSceneRecordData> {
+  final Value<int> id;
+  final Value<int> medicalId;
+  final Value<String?> patientComplaint;
+  final Value<bool> isProxyComplaint;
+  final Value<String?> fallHeight;
+  final Value<String?> burnDegree;
+  final Value<String?> burnArea;
+  final Value<String?> burnPercentage;
+  final Value<String?> otherTraumaNote;
+  final Value<String> allergyStatus;
+  final Value<String?> allergyNote;
+  final Value<String> historyStatus;
+  final Value<String?> historyNote;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  const AmbulanceSceneRecordsCompanion({
+    this.id = const Value.absent(),
+    this.medicalId = const Value.absent(),
+    this.patientComplaint = const Value.absent(),
+    this.isProxyComplaint = const Value.absent(),
+    this.fallHeight = const Value.absent(),
+    this.burnDegree = const Value.absent(),
+    this.burnArea = const Value.absent(),
+    this.burnPercentage = const Value.absent(),
+    this.otherTraumaNote = const Value.absent(),
+    this.allergyStatus = const Value.absent(),
+    this.allergyNote = const Value.absent(),
+    this.historyStatus = const Value.absent(),
+    this.historyNote = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  });
+  AmbulanceSceneRecordsCompanion.insert({
+    this.id = const Value.absent(),
+    required int medicalId,
+    this.patientComplaint = const Value.absent(),
+    this.isProxyComplaint = const Value.absent(),
+    this.fallHeight = const Value.absent(),
+    this.burnDegree = const Value.absent(),
+    this.burnArea = const Value.absent(),
+    this.burnPercentage = const Value.absent(),
+    this.otherTraumaNote = const Value.absent(),
+    this.allergyStatus = const Value.absent(),
+    this.allergyNote = const Value.absent(),
+    this.historyStatus = const Value.absent(),
+    this.historyNote = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  }) : medicalId = Value(medicalId);
+  static Insertable<AmbulanceSceneRecordData> custom({
+    Expression<int>? id,
+    Expression<int>? medicalId,
+    Expression<String>? patientComplaint,
+    Expression<bool>? isProxyComplaint,
+    Expression<String>? fallHeight,
+    Expression<String>? burnDegree,
+    Expression<String>? burnArea,
+    Expression<String>? burnPercentage,
+    Expression<String>? otherTraumaNote,
+    Expression<String>? allergyStatus,
+    Expression<String>? allergyNote,
+    Expression<String>? historyStatus,
+    Expression<String>? historyNote,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (medicalId != null) 'medical_id': medicalId,
+      if (patientComplaint != null) 'patient_complaint': patientComplaint,
+      if (isProxyComplaint != null) 'is_proxy_complaint': isProxyComplaint,
+      if (fallHeight != null) 'fall_height': fallHeight,
+      if (burnDegree != null) 'burn_degree': burnDegree,
+      if (burnArea != null) 'burn_area': burnArea,
+      if (burnPercentage != null) 'burn_percentage': burnPercentage,
+      if (otherTraumaNote != null) 'other_trauma_note': otherTraumaNote,
+      if (allergyStatus != null) 'allergy_status': allergyStatus,
+      if (allergyNote != null) 'allergy_note': allergyNote,
+      if (historyStatus != null) 'history_status': historyStatus,
+      if (historyNote != null) 'history_note': historyNote,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+    });
+  }
+
+  AmbulanceSceneRecordsCompanion copyWith({
+    Value<int>? id,
+    Value<int>? medicalId,
+    Value<String?>? patientComplaint,
+    Value<bool>? isProxyComplaint,
+    Value<String?>? fallHeight,
+    Value<String?>? burnDegree,
+    Value<String?>? burnArea,
+    Value<String?>? burnPercentage,
+    Value<String?>? otherTraumaNote,
+    Value<String>? allergyStatus,
+    Value<String?>? allergyNote,
+    Value<String>? historyStatus,
+    Value<String?>? historyNote,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+  }) {
+    return AmbulanceSceneRecordsCompanion(
+      id: id ?? this.id,
+      medicalId: medicalId ?? this.medicalId,
+      patientComplaint: patientComplaint ?? this.patientComplaint,
+      isProxyComplaint: isProxyComplaint ?? this.isProxyComplaint,
+      fallHeight: fallHeight ?? this.fallHeight,
+      burnDegree: burnDegree ?? this.burnDegree,
+      burnArea: burnArea ?? this.burnArea,
+      burnPercentage: burnPercentage ?? this.burnPercentage,
+      otherTraumaNote: otherTraumaNote ?? this.otherTraumaNote,
+      allergyStatus: allergyStatus ?? this.allergyStatus,
+      allergyNote: allergyNote ?? this.allergyNote,
+      historyStatus: historyStatus ?? this.historyStatus,
+      historyNote: historyNote ?? this.historyNote,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (medicalId.present) {
+      map['medical_id'] = Variable<int>(medicalId.value);
+    }
+    if (patientComplaint.present) {
+      map['patient_complaint'] = Variable<String>(patientComplaint.value);
+    }
+    if (isProxyComplaint.present) {
+      map['is_proxy_complaint'] = Variable<bool>(isProxyComplaint.value);
+    }
+    if (fallHeight.present) {
+      map['fall_height'] = Variable<String>(fallHeight.value);
+    }
+    if (burnDegree.present) {
+      map['burn_degree'] = Variable<String>(burnDegree.value);
+    }
+    if (burnArea.present) {
+      map['burn_area'] = Variable<String>(burnArea.value);
+    }
+    if (burnPercentage.present) {
+      map['burn_percentage'] = Variable<String>(burnPercentage.value);
+    }
+    if (otherTraumaNote.present) {
+      map['other_trauma_note'] = Variable<String>(otherTraumaNote.value);
+    }
+    if (allergyStatus.present) {
+      map['allergy_status'] = Variable<String>(allergyStatus.value);
+    }
+    if (allergyNote.present) {
+      map['allergy_note'] = Variable<String>(allergyNote.value);
+    }
+    if (historyStatus.present) {
+      map['history_status'] = Variable<String>(historyStatus.value);
+    }
+    if (historyNote.present) {
+      map['history_note'] = Variable<String>(historyNote.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AmbulanceSceneRecordsCompanion(')
+          ..write('id: $id, ')
+          ..write('medicalId: $medicalId, ')
+          ..write('patientComplaint: $patientComplaint, ')
+          ..write('isProxyComplaint: $isProxyComplaint, ')
+          ..write('fallHeight: $fallHeight, ')
+          ..write('burnDegree: $burnDegree, ')
+          ..write('burnArea: $burnArea, ')
+          ..write('burnPercentage: $burnPercentage, ')
+          ..write('otherTraumaNote: $otherTraumaNote, ')
+          ..write('allergyStatus: $allergyStatus, ')
+          ..write('allergyNote: $allergyNote, ')
+          ..write('historyStatus: $historyStatus, ')
+          ..write('historyNote: $historyNote, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $AmbulanceReferenceItemsTable extends AmbulanceReferenceItems
+    with TableInfo<$AmbulanceReferenceItemsTable, AmbulanceReferenceItemData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $AmbulanceReferenceItemsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _categoryMeta = const VerificationMeta(
+    'category',
+  );
+  @override
+  late final GeneratedColumn<String> category = GeneratedColumn<String>(
+    'category',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sortOrderMeta = const VerificationMeta(
+    'sortOrder',
+  );
+  @override
+  late final GeneratedColumn<int> sortOrder = GeneratedColumn<int>(
+    'sort_order',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _isActiveMeta = const VerificationMeta(
+    'isActive',
+  );
+  @override
+  late final GeneratedColumn<bool> isActive = GeneratedColumn<bool>(
+    'is_active',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_active" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    category,
+    name,
+    sortOrder,
+    isActive,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'ambulance_reference_items';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<AmbulanceReferenceItemData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('category')) {
+      context.handle(
+        _categoryMeta,
+        category.isAcceptableOrUnknown(data['category']!, _categoryMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_categoryMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('sort_order')) {
+      context.handle(
+        _sortOrderMeta,
+        sortOrder.isAcceptableOrUnknown(data['sort_order']!, _sortOrderMeta),
+      );
+    }
+    if (data.containsKey('is_active')) {
+      context.handle(
+        _isActiveMeta,
+        isActive.isAcceptableOrUnknown(data['is_active']!, _isActiveMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  AmbulanceReferenceItemData map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return AmbulanceReferenceItemData(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      category: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}category'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      sortOrder: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}sort_order'],
+      )!,
+      isActive: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_active'],
+      )!,
+    );
+  }
+
+  @override
+  $AmbulanceReferenceItemsTable createAlias(String alias) {
+    return $AmbulanceReferenceItemsTable(attachedDatabase, alias);
+  }
+}
+
+class AmbulanceReferenceItemData extends DataClass
+    implements Insertable<AmbulanceReferenceItemData> {
+  final int id;
+  final String category;
+  final String name;
+  final int sortOrder;
+  final bool isActive;
+  const AmbulanceReferenceItemData({
+    required this.id,
+    required this.category,
+    required this.name,
+    required this.sortOrder,
+    required this.isActive,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['category'] = Variable<String>(category);
+    map['name'] = Variable<String>(name);
+    map['sort_order'] = Variable<int>(sortOrder);
+    map['is_active'] = Variable<bool>(isActive);
+    return map;
+  }
+
+  AmbulanceReferenceItemsCompanion toCompanion(bool nullToAbsent) {
+    return AmbulanceReferenceItemsCompanion(
+      id: Value(id),
+      category: Value(category),
+      name: Value(name),
+      sortOrder: Value(sortOrder),
+      isActive: Value(isActive),
+    );
+  }
+
+  factory AmbulanceReferenceItemData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return AmbulanceReferenceItemData(
+      id: serializer.fromJson<int>(json['id']),
+      category: serializer.fromJson<String>(json['category']),
+      name: serializer.fromJson<String>(json['name']),
+      sortOrder: serializer.fromJson<int>(json['sortOrder']),
+      isActive: serializer.fromJson<bool>(json['isActive']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'category': serializer.toJson<String>(category),
+      'name': serializer.toJson<String>(name),
+      'sortOrder': serializer.toJson<int>(sortOrder),
+      'isActive': serializer.toJson<bool>(isActive),
+    };
+  }
+
+  AmbulanceReferenceItemData copyWith({
+    int? id,
+    String? category,
+    String? name,
+    int? sortOrder,
+    bool? isActive,
+  }) => AmbulanceReferenceItemData(
+    id: id ?? this.id,
+    category: category ?? this.category,
+    name: name ?? this.name,
+    sortOrder: sortOrder ?? this.sortOrder,
+    isActive: isActive ?? this.isActive,
+  );
+  AmbulanceReferenceItemData copyWithCompanion(
+    AmbulanceReferenceItemsCompanion data,
+  ) {
+    return AmbulanceReferenceItemData(
+      id: data.id.present ? data.id.value : this.id,
+      category: data.category.present ? data.category.value : this.category,
+      name: data.name.present ? data.name.value : this.name,
+      sortOrder: data.sortOrder.present ? data.sortOrder.value : this.sortOrder,
+      isActive: data.isActive.present ? data.isActive.value : this.isActive,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AmbulanceReferenceItemData(')
+          ..write('id: $id, ')
+          ..write('category: $category, ')
+          ..write('name: $name, ')
+          ..write('sortOrder: $sortOrder, ')
+          ..write('isActive: $isActive')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, category, name, sortOrder, isActive);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is AmbulanceReferenceItemData &&
+          other.id == this.id &&
+          other.category == this.category &&
+          other.name == this.name &&
+          other.sortOrder == this.sortOrder &&
+          other.isActive == this.isActive);
+}
+
+class AmbulanceReferenceItemsCompanion
+    extends UpdateCompanion<AmbulanceReferenceItemData> {
+  final Value<int> id;
+  final Value<String> category;
+  final Value<String> name;
+  final Value<int> sortOrder;
+  final Value<bool> isActive;
+  const AmbulanceReferenceItemsCompanion({
+    this.id = const Value.absent(),
+    this.category = const Value.absent(),
+    this.name = const Value.absent(),
+    this.sortOrder = const Value.absent(),
+    this.isActive = const Value.absent(),
+  });
+  AmbulanceReferenceItemsCompanion.insert({
+    this.id = const Value.absent(),
+    required String category,
+    required String name,
+    this.sortOrder = const Value.absent(),
+    this.isActive = const Value.absent(),
+  }) : category = Value(category),
+       name = Value(name);
+  static Insertable<AmbulanceReferenceItemData> custom({
+    Expression<int>? id,
+    Expression<String>? category,
+    Expression<String>? name,
+    Expression<int>? sortOrder,
+    Expression<bool>? isActive,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (category != null) 'category': category,
+      if (name != null) 'name': name,
+      if (sortOrder != null) 'sort_order': sortOrder,
+      if (isActive != null) 'is_active': isActive,
+    });
+  }
+
+  AmbulanceReferenceItemsCompanion copyWith({
+    Value<int>? id,
+    Value<String>? category,
+    Value<String>? name,
+    Value<int>? sortOrder,
+    Value<bool>? isActive,
+  }) {
+    return AmbulanceReferenceItemsCompanion(
+      id: id ?? this.id,
+      category: category ?? this.category,
+      name: name ?? this.name,
+      sortOrder: sortOrder ?? this.sortOrder,
+      isActive: isActive ?? this.isActive,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (category.present) {
+      map['category'] = Variable<String>(category.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (sortOrder.present) {
+      map['sort_order'] = Variable<int>(sortOrder.value);
+    }
+    if (isActive.present) {
+      map['is_active'] = Variable<bool>(isActive.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AmbulanceReferenceItemsCompanion(')
+          ..write('id: $id, ')
+          ..write('category: $category, ')
+          ..write('name: $name, ')
+          ..write('sortOrder: $sortOrder, ')
+          ..write('isActive: $isActive')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $AmbulanceSceneItemLinksTable extends AmbulanceSceneItemLinks
+    with TableInfo<$AmbulanceSceneItemLinksTable, AmbulanceSceneItemLinkData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $AmbulanceSceneItemLinksTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _sceneRecordIdMeta = const VerificationMeta(
+    'sceneRecordId',
+  );
+  @override
+  late final GeneratedColumn<int> sceneRecordId = GeneratedColumn<int>(
+    'scene_record_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES ambulance_scene_records (id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _itemIdMeta = const VerificationMeta('itemId');
+  @override
+  late final GeneratedColumn<int> itemId = GeneratedColumn<int>(
+    'item_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES ambulance_reference_items (id) ON DELETE CASCADE',
+    ),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, sceneRecordId, itemId];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'ambulance_scene_item_links';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<AmbulanceSceneItemLinkData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('scene_record_id')) {
+      context.handle(
+        _sceneRecordIdMeta,
+        sceneRecordId.isAcceptableOrUnknown(
+          data['scene_record_id']!,
+          _sceneRecordIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_sceneRecordIdMeta);
+    }
+    if (data.containsKey('item_id')) {
+      context.handle(
+        _itemIdMeta,
+        itemId.isAcceptableOrUnknown(data['item_id']!, _itemIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_itemIdMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  AmbulanceSceneItemLinkData map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return AmbulanceSceneItemLinkData(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      sceneRecordId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}scene_record_id'],
+      )!,
+      itemId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}item_id'],
+      )!,
+    );
+  }
+
+  @override
+  $AmbulanceSceneItemLinksTable createAlias(String alias) {
+    return $AmbulanceSceneItemLinksTable(attachedDatabase, alias);
+  }
+}
+
+class AmbulanceSceneItemLinkData extends DataClass
+    implements Insertable<AmbulanceSceneItemLinkData> {
+  final int id;
+  final int sceneRecordId;
+  final int itemId;
+  const AmbulanceSceneItemLinkData({
+    required this.id,
+    required this.sceneRecordId,
+    required this.itemId,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['scene_record_id'] = Variable<int>(sceneRecordId);
+    map['item_id'] = Variable<int>(itemId);
+    return map;
+  }
+
+  AmbulanceSceneItemLinksCompanion toCompanion(bool nullToAbsent) {
+    return AmbulanceSceneItemLinksCompanion(
+      id: Value(id),
+      sceneRecordId: Value(sceneRecordId),
+      itemId: Value(itemId),
+    );
+  }
+
+  factory AmbulanceSceneItemLinkData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return AmbulanceSceneItemLinkData(
+      id: serializer.fromJson<int>(json['id']),
+      sceneRecordId: serializer.fromJson<int>(json['sceneRecordId']),
+      itemId: serializer.fromJson<int>(json['itemId']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'sceneRecordId': serializer.toJson<int>(sceneRecordId),
+      'itemId': serializer.toJson<int>(itemId),
+    };
+  }
+
+  AmbulanceSceneItemLinkData copyWith({
+    int? id,
+    int? sceneRecordId,
+    int? itemId,
+  }) => AmbulanceSceneItemLinkData(
+    id: id ?? this.id,
+    sceneRecordId: sceneRecordId ?? this.sceneRecordId,
+    itemId: itemId ?? this.itemId,
+  );
+  AmbulanceSceneItemLinkData copyWithCompanion(
+    AmbulanceSceneItemLinksCompanion data,
+  ) {
+    return AmbulanceSceneItemLinkData(
+      id: data.id.present ? data.id.value : this.id,
+      sceneRecordId: data.sceneRecordId.present
+          ? data.sceneRecordId.value
+          : this.sceneRecordId,
+      itemId: data.itemId.present ? data.itemId.value : this.itemId,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AmbulanceSceneItemLinkData(')
+          ..write('id: $id, ')
+          ..write('sceneRecordId: $sceneRecordId, ')
+          ..write('itemId: $itemId')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, sceneRecordId, itemId);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is AmbulanceSceneItemLinkData &&
+          other.id == this.id &&
+          other.sceneRecordId == this.sceneRecordId &&
+          other.itemId == this.itemId);
+}
+
+class AmbulanceSceneItemLinksCompanion
+    extends UpdateCompanion<AmbulanceSceneItemLinkData> {
+  final Value<int> id;
+  final Value<int> sceneRecordId;
+  final Value<int> itemId;
+  const AmbulanceSceneItemLinksCompanion({
+    this.id = const Value.absent(),
+    this.sceneRecordId = const Value.absent(),
+    this.itemId = const Value.absent(),
+  });
+  AmbulanceSceneItemLinksCompanion.insert({
+    this.id = const Value.absent(),
+    required int sceneRecordId,
+    required int itemId,
+  }) : sceneRecordId = Value(sceneRecordId),
+       itemId = Value(itemId);
+  static Insertable<AmbulanceSceneItemLinkData> custom({
+    Expression<int>? id,
+    Expression<int>? sceneRecordId,
+    Expression<int>? itemId,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (sceneRecordId != null) 'scene_record_id': sceneRecordId,
+      if (itemId != null) 'item_id': itemId,
+    });
+  }
+
+  AmbulanceSceneItemLinksCompanion copyWith({
+    Value<int>? id,
+    Value<int>? sceneRecordId,
+    Value<int>? itemId,
+  }) {
+    return AmbulanceSceneItemLinksCompanion(
+      id: id ?? this.id,
+      sceneRecordId: sceneRecordId ?? this.sceneRecordId,
+      itemId: itemId ?? this.itemId,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (sceneRecordId.present) {
+      map['scene_record_id'] = Variable<int>(sceneRecordId.value);
+    }
+    if (itemId.present) {
+      map['item_id'] = Variable<int>(itemId.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AmbulanceSceneItemLinksCompanion(')
+          ..write('id: $id, ')
+          ..write('sceneRecordId: $sceneRecordId, ')
+          ..write('itemId: $itemId')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -28083,6 +29608,12 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   );
   late final $AmbulancePersonalPropertyTable ambulancePersonalProperty =
       $AmbulancePersonalPropertyTable(this);
+  late final $AmbulanceSceneRecordsTable ambulanceSceneRecords =
+      $AmbulanceSceneRecordsTable(this);
+  late final $AmbulanceReferenceItemsTable ambulanceReferenceItems =
+      $AmbulanceReferenceItemsTable(this);
+  late final $AmbulanceSceneItemLinksTable ambulanceSceneItemLinks =
+      $AmbulanceSceneItemLinksTable(this);
   late final ReferenceDao referenceDao = ReferenceDao(this as AppDatabase);
   late final MedicalDao medicalDao = MedicalDao(this as AppDatabase);
   late final FlightDao flightDao = FlightDao(this as AppDatabase);
@@ -28163,6 +29694,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     contact,
     ambulanceRecords,
     ambulancePersonalProperty,
+    ambulanceSceneRecords,
+    ambulanceReferenceItems,
+    ambulanceSceneItemLinks,
   ];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
@@ -28173,6 +29707,24 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       ),
       result: [
         TableUpdate('flight_transit_locations', kind: UpdateKind.delete),
+      ],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'ambulance_scene_records',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [
+        TableUpdate('ambulance_scene_item_links', kind: UpdateKind.delete),
+      ],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'ambulance_reference_items',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [
+        TableUpdate('ambulance_scene_item_links', kind: UpdateKind.delete),
       ],
     ),
   ]);
@@ -37532,6 +39084,38 @@ final class $$MedicalRecordTableReferences
       manager.$state.copyWith(prefetchedData: cache),
     );
   }
+
+  static MultiTypedResultKey<
+    $AmbulanceSceneRecordsTable,
+    List<AmbulanceSceneRecordData>
+  >
+  _ambulanceSceneRecordsRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.ambulanceSceneRecords,
+        aliasName: $_aliasNameGenerator(
+          db.medicalRecord.medicalId,
+          db.ambulanceSceneRecords.medicalId,
+        ),
+      );
+
+  $$AmbulanceSceneRecordsTableProcessedTableManager
+  get ambulanceSceneRecordsRefs {
+    final manager =
+        $$AmbulanceSceneRecordsTableTableManager(
+          $_db,
+          $_db.ambulanceSceneRecords,
+        ).filter(
+          (f) =>
+              f.medicalId.medicalId.sqlEquals($_itemColumn<int>('medical_id')!),
+        );
+
+    final cache = $_typedResult.readTableOrNull(
+      _ambulanceSceneRecordsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$MedicalRecordTableFilterComposer
@@ -38022,6 +39606,32 @@ class $$MedicalRecordTableFilterComposer
               }) => $$AmbulancePersonalPropertyTableFilterComposer(
                 $db: $db,
                 $table: $db.ambulancePersonalProperty,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<bool> ambulanceSceneRecordsRefs(
+    Expression<bool> Function($$AmbulanceSceneRecordsTableFilterComposer f) f,
+  ) {
+    final $$AmbulanceSceneRecordsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.medicalId,
+          referencedTable: $db.ambulanceSceneRecords,
+          getReferencedColumn: (t) => t.medicalId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$AmbulanceSceneRecordsTableFilterComposer(
+                $db: $db,
+                $table: $db.ambulanceSceneRecords,
                 $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
                 joinBuilder: joinBuilder,
                 $removeJoinBuilderFromRootComposer:
@@ -38568,6 +40178,32 @@ class $$MedicalRecordTableAnnotationComposer
         );
     return f(composer);
   }
+
+  Expression<T> ambulanceSceneRecordsRefs<T extends Object>(
+    Expression<T> Function($$AmbulanceSceneRecordsTableAnnotationComposer a) f,
+  ) {
+    final $$AmbulanceSceneRecordsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.medicalId,
+          referencedTable: $db.ambulanceSceneRecords,
+          getReferencedColumn: (t) => t.medicalId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$AmbulanceSceneRecordsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.ambulanceSceneRecords,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
 }
 
 class $$MedicalRecordTableTableManager
@@ -38602,6 +40238,7 @@ class $$MedicalRecordTableTableManager
             bool telexDocumentsRefs,
             bool medicationsRefs,
             bool ambulancePersonalPropertyRefs,
+            bool ambulanceSceneRecordsRefs,
           })
         > {
   $$MedicalRecordTableTableManager(_$AppDatabase db, $MedicalRecordTable table)
@@ -38679,6 +40316,7 @@ class $$MedicalRecordTableTableManager
                 telexDocumentsRefs = false,
                 medicationsRefs = false,
                 ambulancePersonalPropertyRefs = false,
+                ambulanceSceneRecordsRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
@@ -38702,6 +40340,7 @@ class $$MedicalRecordTableTableManager
                     if (medicationsRefs) db.medications,
                     if (ambulancePersonalPropertyRefs)
                       db.ambulancePersonalProperty,
+                    if (ambulanceSceneRecordsRefs) db.ambulanceSceneRecords,
                   ],
                   addJoins: null,
                   getPrefetchedDataCallback: (items) async {
@@ -39084,6 +40723,27 @@ class $$MedicalRecordTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (ambulanceSceneRecordsRefs)
+                        await $_getPrefetchedData<
+                          MedicalRecordData,
+                          $MedicalRecordTable,
+                          AmbulanceSceneRecordData
+                        >(
+                          currentTable: table,
+                          referencedTable: $$MedicalRecordTableReferences
+                              ._ambulanceSceneRecordsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$MedicalRecordTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).ambulanceSceneRecordsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.medicalId == item.medicalId,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -39123,6 +40783,7 @@ typedef $$MedicalRecordTableProcessedTableManager =
         bool telexDocumentsRefs,
         bool medicationsRefs,
         bool ambulancePersonalPropertyRefs,
+        bool ambulanceSceneRecordsRefs,
       })
     >;
 typedef $$VisitReasonTableCreateCompanionBuilder =
@@ -54103,6 +55764,1399 @@ typedef $$AmbulancePersonalPropertyTableProcessedTableManager =
       AmbulancePersonalPropertyData,
       PrefetchHooks Function({bool medicalId})
     >;
+typedef $$AmbulanceSceneRecordsTableCreateCompanionBuilder =
+    AmbulanceSceneRecordsCompanion Function({
+      Value<int> id,
+      required int medicalId,
+      Value<String?> patientComplaint,
+      Value<bool> isProxyComplaint,
+      Value<String?> fallHeight,
+      Value<String?> burnDegree,
+      Value<String?> burnArea,
+      Value<String?> burnPercentage,
+      Value<String?> otherTraumaNote,
+      Value<String> allergyStatus,
+      Value<String?> allergyNote,
+      Value<String> historyStatus,
+      Value<String?> historyNote,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+    });
+typedef $$AmbulanceSceneRecordsTableUpdateCompanionBuilder =
+    AmbulanceSceneRecordsCompanion Function({
+      Value<int> id,
+      Value<int> medicalId,
+      Value<String?> patientComplaint,
+      Value<bool> isProxyComplaint,
+      Value<String?> fallHeight,
+      Value<String?> burnDegree,
+      Value<String?> burnArea,
+      Value<String?> burnPercentage,
+      Value<String?> otherTraumaNote,
+      Value<String> allergyStatus,
+      Value<String?> allergyNote,
+      Value<String> historyStatus,
+      Value<String?> historyNote,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+    });
+
+final class $$AmbulanceSceneRecordsTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $AmbulanceSceneRecordsTable,
+          AmbulanceSceneRecordData
+        > {
+  $$AmbulanceSceneRecordsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $MedicalRecordTable _medicalIdTable(_$AppDatabase db) =>
+      db.medicalRecord.createAlias(
+        $_aliasNameGenerator(
+          db.ambulanceSceneRecords.medicalId,
+          db.medicalRecord.medicalId,
+        ),
+      );
+
+  $$MedicalRecordTableProcessedTableManager get medicalId {
+    final $_column = $_itemColumn<int>('medical_id')!;
+
+    final manager = $$MedicalRecordTableTableManager(
+      $_db,
+      $_db.medicalRecord,
+    ).filter((f) => f.medicalId.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_medicalIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $AmbulanceSceneItemLinksTable,
+    List<AmbulanceSceneItemLinkData>
+  >
+  _ambulanceSceneItemLinksRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.ambulanceSceneItemLinks,
+        aliasName: $_aliasNameGenerator(
+          db.ambulanceSceneRecords.id,
+          db.ambulanceSceneItemLinks.sceneRecordId,
+        ),
+      );
+
+  $$AmbulanceSceneItemLinksTableProcessedTableManager
+  get ambulanceSceneItemLinksRefs {
+    final manager = $$AmbulanceSceneItemLinksTableTableManager(
+      $_db,
+      $_db.ambulanceSceneItemLinks,
+    ).filter((f) => f.sceneRecordId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _ambulanceSceneItemLinksRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$AmbulanceSceneRecordsTableFilterComposer
+    extends Composer<_$AppDatabase, $AmbulanceSceneRecordsTable> {
+  $$AmbulanceSceneRecordsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get patientComplaint => $composableBuilder(
+    column: $table.patientComplaint,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isProxyComplaint => $composableBuilder(
+    column: $table.isProxyComplaint,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get fallHeight => $composableBuilder(
+    column: $table.fallHeight,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get burnDegree => $composableBuilder(
+    column: $table.burnDegree,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get burnArea => $composableBuilder(
+    column: $table.burnArea,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get burnPercentage => $composableBuilder(
+    column: $table.burnPercentage,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get otherTraumaNote => $composableBuilder(
+    column: $table.otherTraumaNote,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get allergyStatus => $composableBuilder(
+    column: $table.allergyStatus,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get allergyNote => $composableBuilder(
+    column: $table.allergyNote,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get historyStatus => $composableBuilder(
+    column: $table.historyStatus,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get historyNote => $composableBuilder(
+    column: $table.historyNote,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$MedicalRecordTableFilterComposer get medicalId {
+    final $$MedicalRecordTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.medicalId,
+      referencedTable: $db.medicalRecord,
+      getReferencedColumn: (t) => t.medicalId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MedicalRecordTableFilterComposer(
+            $db: $db,
+            $table: $db.medicalRecord,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<bool> ambulanceSceneItemLinksRefs(
+    Expression<bool> Function($$AmbulanceSceneItemLinksTableFilterComposer f) f,
+  ) {
+    final $$AmbulanceSceneItemLinksTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.ambulanceSceneItemLinks,
+          getReferencedColumn: (t) => t.sceneRecordId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$AmbulanceSceneItemLinksTableFilterComposer(
+                $db: $db,
+                $table: $db.ambulanceSceneItemLinks,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+}
+
+class $$AmbulanceSceneRecordsTableOrderingComposer
+    extends Composer<_$AppDatabase, $AmbulanceSceneRecordsTable> {
+  $$AmbulanceSceneRecordsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get patientComplaint => $composableBuilder(
+    column: $table.patientComplaint,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isProxyComplaint => $composableBuilder(
+    column: $table.isProxyComplaint,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get fallHeight => $composableBuilder(
+    column: $table.fallHeight,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get burnDegree => $composableBuilder(
+    column: $table.burnDegree,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get burnArea => $composableBuilder(
+    column: $table.burnArea,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get burnPercentage => $composableBuilder(
+    column: $table.burnPercentage,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get otherTraumaNote => $composableBuilder(
+    column: $table.otherTraumaNote,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get allergyStatus => $composableBuilder(
+    column: $table.allergyStatus,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get allergyNote => $composableBuilder(
+    column: $table.allergyNote,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get historyStatus => $composableBuilder(
+    column: $table.historyStatus,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get historyNote => $composableBuilder(
+    column: $table.historyNote,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$MedicalRecordTableOrderingComposer get medicalId {
+    final $$MedicalRecordTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.medicalId,
+      referencedTable: $db.medicalRecord,
+      getReferencedColumn: (t) => t.medicalId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MedicalRecordTableOrderingComposer(
+            $db: $db,
+            $table: $db.medicalRecord,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$AmbulanceSceneRecordsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $AmbulanceSceneRecordsTable> {
+  $$AmbulanceSceneRecordsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get patientComplaint => $composableBuilder(
+    column: $table.patientComplaint,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get isProxyComplaint => $composableBuilder(
+    column: $table.isProxyComplaint,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get fallHeight => $composableBuilder(
+    column: $table.fallHeight,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get burnDegree => $composableBuilder(
+    column: $table.burnDegree,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get burnArea =>
+      $composableBuilder(column: $table.burnArea, builder: (column) => column);
+
+  GeneratedColumn<String> get burnPercentage => $composableBuilder(
+    column: $table.burnPercentage,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get otherTraumaNote => $composableBuilder(
+    column: $table.otherTraumaNote,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get allergyStatus => $composableBuilder(
+    column: $table.allergyStatus,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get allergyNote => $composableBuilder(
+    column: $table.allergyNote,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get historyStatus => $composableBuilder(
+    column: $table.historyStatus,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get historyNote => $composableBuilder(
+    column: $table.historyNote,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  $$MedicalRecordTableAnnotationComposer get medicalId {
+    final $$MedicalRecordTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.medicalId,
+      referencedTable: $db.medicalRecord,
+      getReferencedColumn: (t) => t.medicalId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MedicalRecordTableAnnotationComposer(
+            $db: $db,
+            $table: $db.medicalRecord,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<T> ambulanceSceneItemLinksRefs<T extends Object>(
+    Expression<T> Function($$AmbulanceSceneItemLinksTableAnnotationComposer a)
+    f,
+  ) {
+    final $$AmbulanceSceneItemLinksTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.ambulanceSceneItemLinks,
+          getReferencedColumn: (t) => t.sceneRecordId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$AmbulanceSceneItemLinksTableAnnotationComposer(
+                $db: $db,
+                $table: $db.ambulanceSceneItemLinks,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+}
+
+class $$AmbulanceSceneRecordsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $AmbulanceSceneRecordsTable,
+          AmbulanceSceneRecordData,
+          $$AmbulanceSceneRecordsTableFilterComposer,
+          $$AmbulanceSceneRecordsTableOrderingComposer,
+          $$AmbulanceSceneRecordsTableAnnotationComposer,
+          $$AmbulanceSceneRecordsTableCreateCompanionBuilder,
+          $$AmbulanceSceneRecordsTableUpdateCompanionBuilder,
+          (AmbulanceSceneRecordData, $$AmbulanceSceneRecordsTableReferences),
+          AmbulanceSceneRecordData,
+          PrefetchHooks Function({
+            bool medicalId,
+            bool ambulanceSceneItemLinksRefs,
+          })
+        > {
+  $$AmbulanceSceneRecordsTableTableManager(
+    _$AppDatabase db,
+    $AmbulanceSceneRecordsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$AmbulanceSceneRecordsTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$AmbulanceSceneRecordsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$AmbulanceSceneRecordsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> medicalId = const Value.absent(),
+                Value<String?> patientComplaint = const Value.absent(),
+                Value<bool> isProxyComplaint = const Value.absent(),
+                Value<String?> fallHeight = const Value.absent(),
+                Value<String?> burnDegree = const Value.absent(),
+                Value<String?> burnArea = const Value.absent(),
+                Value<String?> burnPercentage = const Value.absent(),
+                Value<String?> otherTraumaNote = const Value.absent(),
+                Value<String> allergyStatus = const Value.absent(),
+                Value<String?> allergyNote = const Value.absent(),
+                Value<String> historyStatus = const Value.absent(),
+                Value<String?> historyNote = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+              }) => AmbulanceSceneRecordsCompanion(
+                id: id,
+                medicalId: medicalId,
+                patientComplaint: patientComplaint,
+                isProxyComplaint: isProxyComplaint,
+                fallHeight: fallHeight,
+                burnDegree: burnDegree,
+                burnArea: burnArea,
+                burnPercentage: burnPercentage,
+                otherTraumaNote: otherTraumaNote,
+                allergyStatus: allergyStatus,
+                allergyNote: allergyNote,
+                historyStatus: historyStatus,
+                historyNote: historyNote,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int medicalId,
+                Value<String?> patientComplaint = const Value.absent(),
+                Value<bool> isProxyComplaint = const Value.absent(),
+                Value<String?> fallHeight = const Value.absent(),
+                Value<String?> burnDegree = const Value.absent(),
+                Value<String?> burnArea = const Value.absent(),
+                Value<String?> burnPercentage = const Value.absent(),
+                Value<String?> otherTraumaNote = const Value.absent(),
+                Value<String> allergyStatus = const Value.absent(),
+                Value<String?> allergyNote = const Value.absent(),
+                Value<String> historyStatus = const Value.absent(),
+                Value<String?> historyNote = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+              }) => AmbulanceSceneRecordsCompanion.insert(
+                id: id,
+                medicalId: medicalId,
+                patientComplaint: patientComplaint,
+                isProxyComplaint: isProxyComplaint,
+                fallHeight: fallHeight,
+                burnDegree: burnDegree,
+                burnArea: burnArea,
+                burnPercentage: burnPercentage,
+                otherTraumaNote: otherTraumaNote,
+                allergyStatus: allergyStatus,
+                allergyNote: allergyNote,
+                historyStatus: historyStatus,
+                historyNote: historyNote,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$AmbulanceSceneRecordsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({medicalId = false, ambulanceSceneItemLinksRefs = false}) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (ambulanceSceneItemLinksRefs) db.ambulanceSceneItemLinks,
+                  ],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (medicalId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.medicalId,
+                                    referencedTable:
+                                        $$AmbulanceSceneRecordsTableReferences
+                                            ._medicalIdTable(db),
+                                    referencedColumn:
+                                        $$AmbulanceSceneRecordsTableReferences
+                                            ._medicalIdTable(db)
+                                            .medicalId,
+                                  )
+                                  as T;
+                        }
+
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (ambulanceSceneItemLinksRefs)
+                        await $_getPrefetchedData<
+                          AmbulanceSceneRecordData,
+                          $AmbulanceSceneRecordsTable,
+                          AmbulanceSceneItemLinkData
+                        >(
+                          currentTable: table,
+                          referencedTable:
+                              $$AmbulanceSceneRecordsTableReferences
+                                  ._ambulanceSceneItemLinksRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$AmbulanceSceneRecordsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).ambulanceSceneItemLinksRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.sceneRecordId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$AmbulanceSceneRecordsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $AmbulanceSceneRecordsTable,
+      AmbulanceSceneRecordData,
+      $$AmbulanceSceneRecordsTableFilterComposer,
+      $$AmbulanceSceneRecordsTableOrderingComposer,
+      $$AmbulanceSceneRecordsTableAnnotationComposer,
+      $$AmbulanceSceneRecordsTableCreateCompanionBuilder,
+      $$AmbulanceSceneRecordsTableUpdateCompanionBuilder,
+      (AmbulanceSceneRecordData, $$AmbulanceSceneRecordsTableReferences),
+      AmbulanceSceneRecordData,
+      PrefetchHooks Function({bool medicalId, bool ambulanceSceneItemLinksRefs})
+    >;
+typedef $$AmbulanceReferenceItemsTableCreateCompanionBuilder =
+    AmbulanceReferenceItemsCompanion Function({
+      Value<int> id,
+      required String category,
+      required String name,
+      Value<int> sortOrder,
+      Value<bool> isActive,
+    });
+typedef $$AmbulanceReferenceItemsTableUpdateCompanionBuilder =
+    AmbulanceReferenceItemsCompanion Function({
+      Value<int> id,
+      Value<String> category,
+      Value<String> name,
+      Value<int> sortOrder,
+      Value<bool> isActive,
+    });
+
+final class $$AmbulanceReferenceItemsTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $AmbulanceReferenceItemsTable,
+          AmbulanceReferenceItemData
+        > {
+  $$AmbulanceReferenceItemsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static MultiTypedResultKey<
+    $AmbulanceSceneItemLinksTable,
+    List<AmbulanceSceneItemLinkData>
+  >
+  _ambulanceSceneItemLinksRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.ambulanceSceneItemLinks,
+        aliasName: $_aliasNameGenerator(
+          db.ambulanceReferenceItems.id,
+          db.ambulanceSceneItemLinks.itemId,
+        ),
+      );
+
+  $$AmbulanceSceneItemLinksTableProcessedTableManager
+  get ambulanceSceneItemLinksRefs {
+    final manager = $$AmbulanceSceneItemLinksTableTableManager(
+      $_db,
+      $_db.ambulanceSceneItemLinks,
+    ).filter((f) => f.itemId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _ambulanceSceneItemLinksRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$AmbulanceReferenceItemsTableFilterComposer
+    extends Composer<_$AppDatabase, $AmbulanceReferenceItemsTable> {
+  $$AmbulanceReferenceItemsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get category => $composableBuilder(
+    column: $table.category,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get sortOrder => $composableBuilder(
+    column: $table.sortOrder,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isActive => $composableBuilder(
+    column: $table.isActive,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  Expression<bool> ambulanceSceneItemLinksRefs(
+    Expression<bool> Function($$AmbulanceSceneItemLinksTableFilterComposer f) f,
+  ) {
+    final $$AmbulanceSceneItemLinksTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.ambulanceSceneItemLinks,
+          getReferencedColumn: (t) => t.itemId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$AmbulanceSceneItemLinksTableFilterComposer(
+                $db: $db,
+                $table: $db.ambulanceSceneItemLinks,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+}
+
+class $$AmbulanceReferenceItemsTableOrderingComposer
+    extends Composer<_$AppDatabase, $AmbulanceReferenceItemsTable> {
+  $$AmbulanceReferenceItemsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get category => $composableBuilder(
+    column: $table.category,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get sortOrder => $composableBuilder(
+    column: $table.sortOrder,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isActive => $composableBuilder(
+    column: $table.isActive,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$AmbulanceReferenceItemsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $AmbulanceReferenceItemsTable> {
+  $$AmbulanceReferenceItemsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get category =>
+      $composableBuilder(column: $table.category, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<int> get sortOrder =>
+      $composableBuilder(column: $table.sortOrder, builder: (column) => column);
+
+  GeneratedColumn<bool> get isActive =>
+      $composableBuilder(column: $table.isActive, builder: (column) => column);
+
+  Expression<T> ambulanceSceneItemLinksRefs<T extends Object>(
+    Expression<T> Function($$AmbulanceSceneItemLinksTableAnnotationComposer a)
+    f,
+  ) {
+    final $$AmbulanceSceneItemLinksTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.ambulanceSceneItemLinks,
+          getReferencedColumn: (t) => t.itemId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$AmbulanceSceneItemLinksTableAnnotationComposer(
+                $db: $db,
+                $table: $db.ambulanceSceneItemLinks,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+}
+
+class $$AmbulanceReferenceItemsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $AmbulanceReferenceItemsTable,
+          AmbulanceReferenceItemData,
+          $$AmbulanceReferenceItemsTableFilterComposer,
+          $$AmbulanceReferenceItemsTableOrderingComposer,
+          $$AmbulanceReferenceItemsTableAnnotationComposer,
+          $$AmbulanceReferenceItemsTableCreateCompanionBuilder,
+          $$AmbulanceReferenceItemsTableUpdateCompanionBuilder,
+          (
+            AmbulanceReferenceItemData,
+            $$AmbulanceReferenceItemsTableReferences,
+          ),
+          AmbulanceReferenceItemData,
+          PrefetchHooks Function({bool ambulanceSceneItemLinksRefs})
+        > {
+  $$AmbulanceReferenceItemsTableTableManager(
+    _$AppDatabase db,
+    $AmbulanceReferenceItemsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$AmbulanceReferenceItemsTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$AmbulanceReferenceItemsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$AmbulanceReferenceItemsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> category = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<int> sortOrder = const Value.absent(),
+                Value<bool> isActive = const Value.absent(),
+              }) => AmbulanceReferenceItemsCompanion(
+                id: id,
+                category: category,
+                name: name,
+                sortOrder: sortOrder,
+                isActive: isActive,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String category,
+                required String name,
+                Value<int> sortOrder = const Value.absent(),
+                Value<bool> isActive = const Value.absent(),
+              }) => AmbulanceReferenceItemsCompanion.insert(
+                id: id,
+                category: category,
+                name: name,
+                sortOrder: sortOrder,
+                isActive: isActive,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$AmbulanceReferenceItemsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({ambulanceSceneItemLinksRefs = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [
+                if (ambulanceSceneItemLinksRefs) db.ambulanceSceneItemLinks,
+              ],
+              addJoins: null,
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (ambulanceSceneItemLinksRefs)
+                    await $_getPrefetchedData<
+                      AmbulanceReferenceItemData,
+                      $AmbulanceReferenceItemsTable,
+                      AmbulanceSceneItemLinkData
+                    >(
+                      currentTable: table,
+                      referencedTable: $$AmbulanceReferenceItemsTableReferences
+                          ._ambulanceSceneItemLinksRefsTable(db),
+                      managerFromTypedResult: (p0) =>
+                          $$AmbulanceReferenceItemsTableReferences(
+                            db,
+                            table,
+                            p0,
+                          ).ambulanceSceneItemLinksRefs,
+                      referencedItemsForCurrentItem: (item, referencedItems) =>
+                          referencedItems.where((e) => e.itemId == item.id),
+                      typedResults: items,
+                    ),
+                ];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$AmbulanceReferenceItemsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $AmbulanceReferenceItemsTable,
+      AmbulanceReferenceItemData,
+      $$AmbulanceReferenceItemsTableFilterComposer,
+      $$AmbulanceReferenceItemsTableOrderingComposer,
+      $$AmbulanceReferenceItemsTableAnnotationComposer,
+      $$AmbulanceReferenceItemsTableCreateCompanionBuilder,
+      $$AmbulanceReferenceItemsTableUpdateCompanionBuilder,
+      (AmbulanceReferenceItemData, $$AmbulanceReferenceItemsTableReferences),
+      AmbulanceReferenceItemData,
+      PrefetchHooks Function({bool ambulanceSceneItemLinksRefs})
+    >;
+typedef $$AmbulanceSceneItemLinksTableCreateCompanionBuilder =
+    AmbulanceSceneItemLinksCompanion Function({
+      Value<int> id,
+      required int sceneRecordId,
+      required int itemId,
+    });
+typedef $$AmbulanceSceneItemLinksTableUpdateCompanionBuilder =
+    AmbulanceSceneItemLinksCompanion Function({
+      Value<int> id,
+      Value<int> sceneRecordId,
+      Value<int> itemId,
+    });
+
+final class $$AmbulanceSceneItemLinksTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $AmbulanceSceneItemLinksTable,
+          AmbulanceSceneItemLinkData
+        > {
+  $$AmbulanceSceneItemLinksTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $AmbulanceSceneRecordsTable _sceneRecordIdTable(_$AppDatabase db) =>
+      db.ambulanceSceneRecords.createAlias(
+        $_aliasNameGenerator(
+          db.ambulanceSceneItemLinks.sceneRecordId,
+          db.ambulanceSceneRecords.id,
+        ),
+      );
+
+  $$AmbulanceSceneRecordsTableProcessedTableManager get sceneRecordId {
+    final $_column = $_itemColumn<int>('scene_record_id')!;
+
+    final manager = $$AmbulanceSceneRecordsTableTableManager(
+      $_db,
+      $_db.ambulanceSceneRecords,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_sceneRecordIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $AmbulanceReferenceItemsTable _itemIdTable(_$AppDatabase db) =>
+      db.ambulanceReferenceItems.createAlias(
+        $_aliasNameGenerator(
+          db.ambulanceSceneItemLinks.itemId,
+          db.ambulanceReferenceItems.id,
+        ),
+      );
+
+  $$AmbulanceReferenceItemsTableProcessedTableManager get itemId {
+    final $_column = $_itemColumn<int>('item_id')!;
+
+    final manager = $$AmbulanceReferenceItemsTableTableManager(
+      $_db,
+      $_db.ambulanceReferenceItems,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_itemIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$AmbulanceSceneItemLinksTableFilterComposer
+    extends Composer<_$AppDatabase, $AmbulanceSceneItemLinksTable> {
+  $$AmbulanceSceneItemLinksTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$AmbulanceSceneRecordsTableFilterComposer get sceneRecordId {
+    final $$AmbulanceSceneRecordsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.sceneRecordId,
+          referencedTable: $db.ambulanceSceneRecords,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$AmbulanceSceneRecordsTableFilterComposer(
+                $db: $db,
+                $table: $db.ambulanceSceneRecords,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+
+  $$AmbulanceReferenceItemsTableFilterComposer get itemId {
+    final $$AmbulanceReferenceItemsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.itemId,
+          referencedTable: $db.ambulanceReferenceItems,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$AmbulanceReferenceItemsTableFilterComposer(
+                $db: $db,
+                $table: $db.ambulanceReferenceItems,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+}
+
+class $$AmbulanceSceneItemLinksTableOrderingComposer
+    extends Composer<_$AppDatabase, $AmbulanceSceneItemLinksTable> {
+  $$AmbulanceSceneItemLinksTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$AmbulanceSceneRecordsTableOrderingComposer get sceneRecordId {
+    final $$AmbulanceSceneRecordsTableOrderingComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.sceneRecordId,
+          referencedTable: $db.ambulanceSceneRecords,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$AmbulanceSceneRecordsTableOrderingComposer(
+                $db: $db,
+                $table: $db.ambulanceSceneRecords,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+
+  $$AmbulanceReferenceItemsTableOrderingComposer get itemId {
+    final $$AmbulanceReferenceItemsTableOrderingComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.itemId,
+          referencedTable: $db.ambulanceReferenceItems,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$AmbulanceReferenceItemsTableOrderingComposer(
+                $db: $db,
+                $table: $db.ambulanceReferenceItems,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+}
+
+class $$AmbulanceSceneItemLinksTableAnnotationComposer
+    extends Composer<_$AppDatabase, $AmbulanceSceneItemLinksTable> {
+  $$AmbulanceSceneItemLinksTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  $$AmbulanceSceneRecordsTableAnnotationComposer get sceneRecordId {
+    final $$AmbulanceSceneRecordsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.sceneRecordId,
+          referencedTable: $db.ambulanceSceneRecords,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$AmbulanceSceneRecordsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.ambulanceSceneRecords,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+
+  $$AmbulanceReferenceItemsTableAnnotationComposer get itemId {
+    final $$AmbulanceReferenceItemsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.itemId,
+          referencedTable: $db.ambulanceReferenceItems,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$AmbulanceReferenceItemsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.ambulanceReferenceItems,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+}
+
+class $$AmbulanceSceneItemLinksTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $AmbulanceSceneItemLinksTable,
+          AmbulanceSceneItemLinkData,
+          $$AmbulanceSceneItemLinksTableFilterComposer,
+          $$AmbulanceSceneItemLinksTableOrderingComposer,
+          $$AmbulanceSceneItemLinksTableAnnotationComposer,
+          $$AmbulanceSceneItemLinksTableCreateCompanionBuilder,
+          $$AmbulanceSceneItemLinksTableUpdateCompanionBuilder,
+          (
+            AmbulanceSceneItemLinkData,
+            $$AmbulanceSceneItemLinksTableReferences,
+          ),
+          AmbulanceSceneItemLinkData,
+          PrefetchHooks Function({bool sceneRecordId, bool itemId})
+        > {
+  $$AmbulanceSceneItemLinksTableTableManager(
+    _$AppDatabase db,
+    $AmbulanceSceneItemLinksTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$AmbulanceSceneItemLinksTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$AmbulanceSceneItemLinksTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$AmbulanceSceneItemLinksTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> sceneRecordId = const Value.absent(),
+                Value<int> itemId = const Value.absent(),
+              }) => AmbulanceSceneItemLinksCompanion(
+                id: id,
+                sceneRecordId: sceneRecordId,
+                itemId: itemId,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int sceneRecordId,
+                required int itemId,
+              }) => AmbulanceSceneItemLinksCompanion.insert(
+                id: id,
+                sceneRecordId: sceneRecordId,
+                itemId: itemId,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$AmbulanceSceneItemLinksTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({sceneRecordId = false, itemId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (sceneRecordId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.sceneRecordId,
+                                referencedTable:
+                                    $$AmbulanceSceneItemLinksTableReferences
+                                        ._sceneRecordIdTable(db),
+                                referencedColumn:
+                                    $$AmbulanceSceneItemLinksTableReferences
+                                        ._sceneRecordIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+                    if (itemId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.itemId,
+                                referencedTable:
+                                    $$AmbulanceSceneItemLinksTableReferences
+                                        ._itemIdTable(db),
+                                referencedColumn:
+                                    $$AmbulanceSceneItemLinksTableReferences
+                                        ._itemIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$AmbulanceSceneItemLinksTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $AmbulanceSceneItemLinksTable,
+      AmbulanceSceneItemLinkData,
+      $$AmbulanceSceneItemLinksTableFilterComposer,
+      $$AmbulanceSceneItemLinksTableOrderingComposer,
+      $$AmbulanceSceneItemLinksTableAnnotationComposer,
+      $$AmbulanceSceneItemLinksTableCreateCompanionBuilder,
+      $$AmbulanceSceneItemLinksTableUpdateCompanionBuilder,
+      (AmbulanceSceneItemLinkData, $$AmbulanceSceneItemLinksTableReferences),
+      AmbulanceSceneItemLinkData,
+      PrefetchHooks Function({bool sceneRecordId, bool itemId})
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -54235,5 +57289,17 @@ class $AppDatabaseManager {
       $$AmbulancePersonalPropertyTableTableManager(
         _db,
         _db.ambulancePersonalProperty,
+      );
+  $$AmbulanceSceneRecordsTableTableManager get ambulanceSceneRecords =>
+      $$AmbulanceSceneRecordsTableTableManager(_db, _db.ambulanceSceneRecords);
+  $$AmbulanceReferenceItemsTableTableManager get ambulanceReferenceItems =>
+      $$AmbulanceReferenceItemsTableTableManager(
+        _db,
+        _db.ambulanceReferenceItems,
+      );
+  $$AmbulanceSceneItemLinksTableTableManager get ambulanceSceneItemLinks =>
+      $$AmbulanceSceneItemLinksTableTableManager(
+        _db,
+        _db.ambulanceSceneItemLinks,
       );
 }
