@@ -7,7 +7,8 @@ import '../tables/medical_tables.dart';
 part 'ambulance_dao.g.dart';
 
 @DriftAccessor(tables: [
-  AmbulanceRecords, 
+  AmbulanceRecords,
+  AmbulancePersonalProperty,
   IncidentPlaceCategory, 
   IncidentPlaceCategory2,
   ReferralHospital,
@@ -26,6 +27,30 @@ class AmbulanceDao extends DatabaseAccessor<AppDatabase> with _$AmbulanceDaoMixi
   // 透過 medicalId 取得救護車紀錄 (如果有的話)
   Future<AmbulanceRecord?> getAmbulanceRecordByMedicalId(int medicalId) {
     return (select(ambulanceRecords)..where((t) => t.medicalId.equals(medicalId))).getSingleOrNull();
+  }
+
+  // 取得個人財物紀錄
+  Future<AmbulancePersonalPropertyData?> getPersonalProperty(int medicalId) {
+    return (select(ambulancePersonalProperty)..where((t) => t.medicalId.equals(medicalId))).getSingleOrNull();
+  }
+
+  // 更新個人財物紀錄
+  Future<int> updatePersonalProperty(AmbulancePersonalPropertyCompanion data) async {
+    // 檢查是否已存在
+    final existing = await (select(ambulancePersonalProperty)
+      ..where((t) => t.medicalId.equals(data.medicalId.value)))
+      .getSingleOrNull();
+
+    if (existing != null) {
+      // 如果存在，執行更新
+      await (update(ambulancePersonalProperty)
+        ..where((t) => t.medicalId.equals(data.medicalId.value)))
+        .write(data);
+      return existing.id;
+    } else {
+      // 如果不存在，執行插入
+      return into(ambulancePersonalProperty).insert(data);
+    }
   }
 
   // 建立救護車紀錄

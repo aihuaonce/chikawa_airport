@@ -95,6 +95,7 @@ part 'database.g.dart';
 
     // 救護車
     AmbulanceRecords,
+    AmbulancePersonalProperty,
   ],
   daos: [
     ReferenceDao,

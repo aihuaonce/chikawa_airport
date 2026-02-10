@@ -124,7 +124,7 @@ class RecordRow extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          '${patient.sexId == 1 ? "M" : "F"} / ${_calculateAge(patient.birthday)}y',
+                          '${patient.sexId == 1 ? "M" : (patient.sexId == 2 ? "F" : "?")} / ${_calculateAge(patient.birthday)}y',
                           style: const TextStyle(
                             color: textMuted,
                             fontSize: 11,

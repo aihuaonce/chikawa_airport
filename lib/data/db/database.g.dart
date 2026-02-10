@@ -27443,6 +27443,550 @@ class AmbulanceRecordsCompanion extends UpdateCompanion<AmbulanceRecord> {
   }
 }
 
+class $AmbulancePersonalPropertyTable extends AmbulancePersonalProperty
+    with
+        TableInfo<
+          $AmbulancePersonalPropertyTable,
+          AmbulancePersonalPropertyData
+        > {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $AmbulancePersonalPropertyTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _medicalIdMeta = const VerificationMeta(
+    'medicalId',
+  );
+  @override
+  late final GeneratedColumn<int> medicalId = GeneratedColumn<int>(
+    'medical_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'UNIQUE REFERENCES medical_record (medical_id)',
+    ),
+  );
+  static const VerificationMeta _financialDetailsMeta = const VerificationMeta(
+    'financialDetails',
+  );
+  @override
+  late final GeneratedColumn<String> financialDetails = GeneratedColumn<String>(
+    'financial_details',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _isHandledMeta = const VerificationMeta(
+    'isHandled',
+  );
+  @override
+  late final GeneratedColumn<bool> isHandled = GeneratedColumn<bool>(
+    'is_handled',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_handled" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _custodianNameMeta = const VerificationMeta(
+    'custodianName',
+  );
+  @override
+  late final GeneratedColumn<String> custodianName = GeneratedColumn<String>(
+    'custodian_name',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _custodianSignatureMeta =
+      const VerificationMeta('custodianSignature');
+  @override
+  late final GeneratedColumn<Uint8List> custodianSignature =
+      GeneratedColumn<Uint8List>(
+        'custodian_signature',
+        aliasedName,
+        true,
+        type: DriftSqlType.blob,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    medicalId,
+    financialDetails,
+    isHandled,
+    custodianName,
+    custodianSignature,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'ambulance_personal_property';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<AmbulancePersonalPropertyData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('medical_id')) {
+      context.handle(
+        _medicalIdMeta,
+        medicalId.isAcceptableOrUnknown(data['medical_id']!, _medicalIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_medicalIdMeta);
+    }
+    if (data.containsKey('financial_details')) {
+      context.handle(
+        _financialDetailsMeta,
+        financialDetails.isAcceptableOrUnknown(
+          data['financial_details']!,
+          _financialDetailsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('is_handled')) {
+      context.handle(
+        _isHandledMeta,
+        isHandled.isAcceptableOrUnknown(data['is_handled']!, _isHandledMeta),
+      );
+    }
+    if (data.containsKey('custodian_name')) {
+      context.handle(
+        _custodianNameMeta,
+        custodianName.isAcceptableOrUnknown(
+          data['custodian_name']!,
+          _custodianNameMeta,
+        ),
+      );
+    }
+    if (data.containsKey('custodian_signature')) {
+      context.handle(
+        _custodianSignatureMeta,
+        custodianSignature.isAcceptableOrUnknown(
+          data['custodian_signature']!,
+          _custodianSignatureMeta,
+        ),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  AmbulancePersonalPropertyData map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return AmbulancePersonalPropertyData(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      medicalId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}medical_id'],
+      )!,
+      financialDetails: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}financial_details'],
+      ),
+      isHandled: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_handled'],
+      )!,
+      custodianName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}custodian_name'],
+      ),
+      custodianSignature: attachedDatabase.typeMapping.read(
+        DriftSqlType.blob,
+        data['${effectivePrefix}custodian_signature'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $AmbulancePersonalPropertyTable createAlias(String alias) {
+    return $AmbulancePersonalPropertyTable(attachedDatabase, alias);
+  }
+}
+
+class AmbulancePersonalPropertyData extends DataClass
+    implements Insertable<AmbulancePersonalPropertyData> {
+  final int id;
+  final int medicalId;
+  final String? financialDetails;
+  final bool isHandled;
+  final String? custodianName;
+  final Uint8List? custodianSignature;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  const AmbulancePersonalPropertyData({
+    required this.id,
+    required this.medicalId,
+    this.financialDetails,
+    required this.isHandled,
+    this.custodianName,
+    this.custodianSignature,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['medical_id'] = Variable<int>(medicalId);
+    if (!nullToAbsent || financialDetails != null) {
+      map['financial_details'] = Variable<String>(financialDetails);
+    }
+    map['is_handled'] = Variable<bool>(isHandled);
+    if (!nullToAbsent || custodianName != null) {
+      map['custodian_name'] = Variable<String>(custodianName);
+    }
+    if (!nullToAbsent || custodianSignature != null) {
+      map['custodian_signature'] = Variable<Uint8List>(custodianSignature);
+    }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  AmbulancePersonalPropertyCompanion toCompanion(bool nullToAbsent) {
+    return AmbulancePersonalPropertyCompanion(
+      id: Value(id),
+      medicalId: Value(medicalId),
+      financialDetails: financialDetails == null && nullToAbsent
+          ? const Value.absent()
+          : Value(financialDetails),
+      isHandled: Value(isHandled),
+      custodianName: custodianName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(custodianName),
+      custodianSignature: custodianSignature == null && nullToAbsent
+          ? const Value.absent()
+          : Value(custodianSignature),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory AmbulancePersonalPropertyData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return AmbulancePersonalPropertyData(
+      id: serializer.fromJson<int>(json['id']),
+      medicalId: serializer.fromJson<int>(json['medicalId']),
+      financialDetails: serializer.fromJson<String?>(json['financialDetails']),
+      isHandled: serializer.fromJson<bool>(json['isHandled']),
+      custodianName: serializer.fromJson<String?>(json['custodianName']),
+      custodianSignature: serializer.fromJson<Uint8List?>(
+        json['custodianSignature'],
+      ),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'medicalId': serializer.toJson<int>(medicalId),
+      'financialDetails': serializer.toJson<String?>(financialDetails),
+      'isHandled': serializer.toJson<bool>(isHandled),
+      'custodianName': serializer.toJson<String?>(custodianName),
+      'custodianSignature': serializer.toJson<Uint8List?>(custodianSignature),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  AmbulancePersonalPropertyData copyWith({
+    int? id,
+    int? medicalId,
+    Value<String?> financialDetails = const Value.absent(),
+    bool? isHandled,
+    Value<String?> custodianName = const Value.absent(),
+    Value<Uint8List?> custodianSignature = const Value.absent(),
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) => AmbulancePersonalPropertyData(
+    id: id ?? this.id,
+    medicalId: medicalId ?? this.medicalId,
+    financialDetails: financialDetails.present
+        ? financialDetails.value
+        : this.financialDetails,
+    isHandled: isHandled ?? this.isHandled,
+    custodianName: custodianName.present
+        ? custodianName.value
+        : this.custodianName,
+    custodianSignature: custodianSignature.present
+        ? custodianSignature.value
+        : this.custodianSignature,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  AmbulancePersonalPropertyData copyWithCompanion(
+    AmbulancePersonalPropertyCompanion data,
+  ) {
+    return AmbulancePersonalPropertyData(
+      id: data.id.present ? data.id.value : this.id,
+      medicalId: data.medicalId.present ? data.medicalId.value : this.medicalId,
+      financialDetails: data.financialDetails.present
+          ? data.financialDetails.value
+          : this.financialDetails,
+      isHandled: data.isHandled.present ? data.isHandled.value : this.isHandled,
+      custodianName: data.custodianName.present
+          ? data.custodianName.value
+          : this.custodianName,
+      custodianSignature: data.custodianSignature.present
+          ? data.custodianSignature.value
+          : this.custodianSignature,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AmbulancePersonalPropertyData(')
+          ..write('id: $id, ')
+          ..write('medicalId: $medicalId, ')
+          ..write('financialDetails: $financialDetails, ')
+          ..write('isHandled: $isHandled, ')
+          ..write('custodianName: $custodianName, ')
+          ..write('custodianSignature: $custodianSignature, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    medicalId,
+    financialDetails,
+    isHandled,
+    custodianName,
+    $driftBlobEquality.hash(custodianSignature),
+    createdAt,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is AmbulancePersonalPropertyData &&
+          other.id == this.id &&
+          other.medicalId == this.medicalId &&
+          other.financialDetails == this.financialDetails &&
+          other.isHandled == this.isHandled &&
+          other.custodianName == this.custodianName &&
+          $driftBlobEquality.equals(
+            other.custodianSignature,
+            this.custodianSignature,
+          ) &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class AmbulancePersonalPropertyCompanion
+    extends UpdateCompanion<AmbulancePersonalPropertyData> {
+  final Value<int> id;
+  final Value<int> medicalId;
+  final Value<String?> financialDetails;
+  final Value<bool> isHandled;
+  final Value<String?> custodianName;
+  final Value<Uint8List?> custodianSignature;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  const AmbulancePersonalPropertyCompanion({
+    this.id = const Value.absent(),
+    this.medicalId = const Value.absent(),
+    this.financialDetails = const Value.absent(),
+    this.isHandled = const Value.absent(),
+    this.custodianName = const Value.absent(),
+    this.custodianSignature = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  });
+  AmbulancePersonalPropertyCompanion.insert({
+    this.id = const Value.absent(),
+    required int medicalId,
+    this.financialDetails = const Value.absent(),
+    this.isHandled = const Value.absent(),
+    this.custodianName = const Value.absent(),
+    this.custodianSignature = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  }) : medicalId = Value(medicalId);
+  static Insertable<AmbulancePersonalPropertyData> custom({
+    Expression<int>? id,
+    Expression<int>? medicalId,
+    Expression<String>? financialDetails,
+    Expression<bool>? isHandled,
+    Expression<String>? custodianName,
+    Expression<Uint8List>? custodianSignature,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (medicalId != null) 'medical_id': medicalId,
+      if (financialDetails != null) 'financial_details': financialDetails,
+      if (isHandled != null) 'is_handled': isHandled,
+      if (custodianName != null) 'custodian_name': custodianName,
+      if (custodianSignature != null) 'custodian_signature': custodianSignature,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+    });
+  }
+
+  AmbulancePersonalPropertyCompanion copyWith({
+    Value<int>? id,
+    Value<int>? medicalId,
+    Value<String?>? financialDetails,
+    Value<bool>? isHandled,
+    Value<String?>? custodianName,
+    Value<Uint8List?>? custodianSignature,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+  }) {
+    return AmbulancePersonalPropertyCompanion(
+      id: id ?? this.id,
+      medicalId: medicalId ?? this.medicalId,
+      financialDetails: financialDetails ?? this.financialDetails,
+      isHandled: isHandled ?? this.isHandled,
+      custodianName: custodianName ?? this.custodianName,
+      custodianSignature: custodianSignature ?? this.custodianSignature,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (medicalId.present) {
+      map['medical_id'] = Variable<int>(medicalId.value);
+    }
+    if (financialDetails.present) {
+      map['financial_details'] = Variable<String>(financialDetails.value);
+    }
+    if (isHandled.present) {
+      map['is_handled'] = Variable<bool>(isHandled.value);
+    }
+    if (custodianName.present) {
+      map['custodian_name'] = Variable<String>(custodianName.value);
+    }
+    if (custodianSignature.present) {
+      map['custodian_signature'] = Variable<Uint8List>(
+        custodianSignature.value,
+      );
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AmbulancePersonalPropertyCompanion(')
+          ..write('id: $id, ')
+          ..write('medicalId: $medicalId, ')
+          ..write('financialDetails: $financialDetails, ')
+          ..write('isHandled: $isHandled, ')
+          ..write('custodianName: $custodianName, ')
+          ..write('custodianSignature: $custodianSignature, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -27537,6 +28081,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $AmbulanceRecordsTable ambulanceRecords = $AmbulanceRecordsTable(
     this,
   );
+  late final $AmbulancePersonalPropertyTable ambulancePersonalProperty =
+      $AmbulancePersonalPropertyTable(this);
   late final ReferenceDao referenceDao = ReferenceDao(this as AppDatabase);
   late final MedicalDao medicalDao = MedicalDao(this as AppDatabase);
   late final FlightDao flightDao = FlightDao(this as AppDatabase);
@@ -27616,6 +28162,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     icd10Code,
     contact,
     ambulanceRecords,
+    ambulancePersonalProperty,
   ];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
@@ -36953,6 +37500,38 @@ final class $$MedicalRecordTableReferences
       manager.$state.copyWith(prefetchedData: cache),
     );
   }
+
+  static MultiTypedResultKey<
+    $AmbulancePersonalPropertyTable,
+    List<AmbulancePersonalPropertyData>
+  >
+  _ambulancePersonalPropertyRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.ambulancePersonalProperty,
+        aliasName: $_aliasNameGenerator(
+          db.medicalRecord.medicalId,
+          db.ambulancePersonalProperty.medicalId,
+        ),
+      );
+
+  $$AmbulancePersonalPropertyTableProcessedTableManager
+  get ambulancePersonalPropertyRefs {
+    final manager =
+        $$AmbulancePersonalPropertyTableTableManager(
+          $_db,
+          $_db.ambulancePersonalProperty,
+        ).filter(
+          (f) =>
+              f.medicalId.medicalId.sqlEquals($_itemColumn<int>('medical_id')!),
+        );
+
+    final cache = $_typedResult.readTableOrNull(
+      _ambulancePersonalPropertyRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$MedicalRecordTableFilterComposer
@@ -37422,6 +38001,33 @@ class $$MedicalRecordTableFilterComposer
                 $removeJoinBuilderFromRootComposer,
           ),
     );
+    return f(composer);
+  }
+
+  Expression<bool> ambulancePersonalPropertyRefs(
+    Expression<bool> Function($$AmbulancePersonalPropertyTableFilterComposer f)
+    f,
+  ) {
+    final $$AmbulancePersonalPropertyTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.medicalId,
+          referencedTable: $db.ambulancePersonalProperty,
+          getReferencedColumn: (t) => t.medicalId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$AmbulancePersonalPropertyTableFilterComposer(
+                $db: $db,
+                $table: $db.ambulancePersonalProperty,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
     return f(composer);
   }
 }
@@ -37935,6 +38541,33 @@ class $$MedicalRecordTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> ambulancePersonalPropertyRefs<T extends Object>(
+    Expression<T> Function($$AmbulancePersonalPropertyTableAnnotationComposer a)
+    f,
+  ) {
+    final $$AmbulancePersonalPropertyTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.medicalId,
+          referencedTable: $db.ambulancePersonalProperty,
+          getReferencedColumn: (t) => t.medicalId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$AmbulancePersonalPropertyTableAnnotationComposer(
+                $db: $db,
+                $table: $db.ambulancePersonalProperty,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
 }
 
 class $$MedicalRecordTableTableManager
@@ -37968,6 +38601,7 @@ class $$MedicalRecordTableTableManager
             bool referralFormsRefs,
             bool telexDocumentsRefs,
             bool medicationsRefs,
+            bool ambulancePersonalPropertyRefs,
           })
         > {
   $$MedicalRecordTableTableManager(_$AppDatabase db, $MedicalRecordTable table)
@@ -38044,6 +38678,7 @@ class $$MedicalRecordTableTableManager
                 referralFormsRefs = false,
                 telexDocumentsRefs = false,
                 medicationsRefs = false,
+                ambulancePersonalPropertyRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
@@ -38065,6 +38700,8 @@ class $$MedicalRecordTableTableManager
                     if (referralFormsRefs) db.referralForms,
                     if (telexDocumentsRefs) db.telexDocuments,
                     if (medicationsRefs) db.medications,
+                    if (ambulancePersonalPropertyRefs)
+                      db.ambulancePersonalProperty,
                   ],
                   addJoins: null,
                   getPrefetchedDataCallback: (items) async {
@@ -38426,6 +39063,27 @@ class $$MedicalRecordTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (ambulancePersonalPropertyRefs)
+                        await $_getPrefetchedData<
+                          MedicalRecordData,
+                          $MedicalRecordTable,
+                          AmbulancePersonalPropertyData
+                        >(
+                          currentTable: table,
+                          referencedTable: $$MedicalRecordTableReferences
+                              ._ambulancePersonalPropertyRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$MedicalRecordTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).ambulancePersonalPropertyRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.medicalId == item.medicalId,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -38464,6 +39122,7 @@ typedef $$MedicalRecordTableProcessedTableManager =
         bool referralFormsRefs,
         bool telexDocumentsRefs,
         bool medicationsRefs,
+        bool ambulancePersonalPropertyRefs,
       })
     >;
 typedef $$VisitReasonTableCreateCompanionBuilder =
@@ -53037,6 +53696,413 @@ typedef $$AmbulanceRecordsTableProcessedTableManager =
         bool hospitalId,
       })
     >;
+typedef $$AmbulancePersonalPropertyTableCreateCompanionBuilder =
+    AmbulancePersonalPropertyCompanion Function({
+      Value<int> id,
+      required int medicalId,
+      Value<String?> financialDetails,
+      Value<bool> isHandled,
+      Value<String?> custodianName,
+      Value<Uint8List?> custodianSignature,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+    });
+typedef $$AmbulancePersonalPropertyTableUpdateCompanionBuilder =
+    AmbulancePersonalPropertyCompanion Function({
+      Value<int> id,
+      Value<int> medicalId,
+      Value<String?> financialDetails,
+      Value<bool> isHandled,
+      Value<String?> custodianName,
+      Value<Uint8List?> custodianSignature,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+    });
+
+final class $$AmbulancePersonalPropertyTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $AmbulancePersonalPropertyTable,
+          AmbulancePersonalPropertyData
+        > {
+  $$AmbulancePersonalPropertyTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $MedicalRecordTable _medicalIdTable(_$AppDatabase db) =>
+      db.medicalRecord.createAlias(
+        $_aliasNameGenerator(
+          db.ambulancePersonalProperty.medicalId,
+          db.medicalRecord.medicalId,
+        ),
+      );
+
+  $$MedicalRecordTableProcessedTableManager get medicalId {
+    final $_column = $_itemColumn<int>('medical_id')!;
+
+    final manager = $$MedicalRecordTableTableManager(
+      $_db,
+      $_db.medicalRecord,
+    ).filter((f) => f.medicalId.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_medicalIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$AmbulancePersonalPropertyTableFilterComposer
+    extends Composer<_$AppDatabase, $AmbulancePersonalPropertyTable> {
+  $$AmbulancePersonalPropertyTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get financialDetails => $composableBuilder(
+    column: $table.financialDetails,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isHandled => $composableBuilder(
+    column: $table.isHandled,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get custodianName => $composableBuilder(
+    column: $table.custodianName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<Uint8List> get custodianSignature => $composableBuilder(
+    column: $table.custodianSignature,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$MedicalRecordTableFilterComposer get medicalId {
+    final $$MedicalRecordTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.medicalId,
+      referencedTable: $db.medicalRecord,
+      getReferencedColumn: (t) => t.medicalId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MedicalRecordTableFilterComposer(
+            $db: $db,
+            $table: $db.medicalRecord,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$AmbulancePersonalPropertyTableOrderingComposer
+    extends Composer<_$AppDatabase, $AmbulancePersonalPropertyTable> {
+  $$AmbulancePersonalPropertyTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get financialDetails => $composableBuilder(
+    column: $table.financialDetails,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isHandled => $composableBuilder(
+    column: $table.isHandled,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get custodianName => $composableBuilder(
+    column: $table.custodianName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<Uint8List> get custodianSignature => $composableBuilder(
+    column: $table.custodianSignature,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$MedicalRecordTableOrderingComposer get medicalId {
+    final $$MedicalRecordTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.medicalId,
+      referencedTable: $db.medicalRecord,
+      getReferencedColumn: (t) => t.medicalId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MedicalRecordTableOrderingComposer(
+            $db: $db,
+            $table: $db.medicalRecord,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$AmbulancePersonalPropertyTableAnnotationComposer
+    extends Composer<_$AppDatabase, $AmbulancePersonalPropertyTable> {
+  $$AmbulancePersonalPropertyTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get financialDetails => $composableBuilder(
+    column: $table.financialDetails,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get isHandled =>
+      $composableBuilder(column: $table.isHandled, builder: (column) => column);
+
+  GeneratedColumn<String> get custodianName => $composableBuilder(
+    column: $table.custodianName,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<Uint8List> get custodianSignature => $composableBuilder(
+    column: $table.custodianSignature,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  $$MedicalRecordTableAnnotationComposer get medicalId {
+    final $$MedicalRecordTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.medicalId,
+      referencedTable: $db.medicalRecord,
+      getReferencedColumn: (t) => t.medicalId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MedicalRecordTableAnnotationComposer(
+            $db: $db,
+            $table: $db.medicalRecord,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$AmbulancePersonalPropertyTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $AmbulancePersonalPropertyTable,
+          AmbulancePersonalPropertyData,
+          $$AmbulancePersonalPropertyTableFilterComposer,
+          $$AmbulancePersonalPropertyTableOrderingComposer,
+          $$AmbulancePersonalPropertyTableAnnotationComposer,
+          $$AmbulancePersonalPropertyTableCreateCompanionBuilder,
+          $$AmbulancePersonalPropertyTableUpdateCompanionBuilder,
+          (
+            AmbulancePersonalPropertyData,
+            $$AmbulancePersonalPropertyTableReferences,
+          ),
+          AmbulancePersonalPropertyData,
+          PrefetchHooks Function({bool medicalId})
+        > {
+  $$AmbulancePersonalPropertyTableTableManager(
+    _$AppDatabase db,
+    $AmbulancePersonalPropertyTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$AmbulancePersonalPropertyTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$AmbulancePersonalPropertyTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$AmbulancePersonalPropertyTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> medicalId = const Value.absent(),
+                Value<String?> financialDetails = const Value.absent(),
+                Value<bool> isHandled = const Value.absent(),
+                Value<String?> custodianName = const Value.absent(),
+                Value<Uint8List?> custodianSignature = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+              }) => AmbulancePersonalPropertyCompanion(
+                id: id,
+                medicalId: medicalId,
+                financialDetails: financialDetails,
+                isHandled: isHandled,
+                custodianName: custodianName,
+                custodianSignature: custodianSignature,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int medicalId,
+                Value<String?> financialDetails = const Value.absent(),
+                Value<bool> isHandled = const Value.absent(),
+                Value<String?> custodianName = const Value.absent(),
+                Value<Uint8List?> custodianSignature = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+              }) => AmbulancePersonalPropertyCompanion.insert(
+                id: id,
+                medicalId: medicalId,
+                financialDetails: financialDetails,
+                isHandled: isHandled,
+                custodianName: custodianName,
+                custodianSignature: custodianSignature,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$AmbulancePersonalPropertyTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({medicalId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (medicalId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.medicalId,
+                                referencedTable:
+                                    $$AmbulancePersonalPropertyTableReferences
+                                        ._medicalIdTable(db),
+                                referencedColumn:
+                                    $$AmbulancePersonalPropertyTableReferences
+                                        ._medicalIdTable(db)
+                                        .medicalId,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$AmbulancePersonalPropertyTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $AmbulancePersonalPropertyTable,
+      AmbulancePersonalPropertyData,
+      $$AmbulancePersonalPropertyTableFilterComposer,
+      $$AmbulancePersonalPropertyTableOrderingComposer,
+      $$AmbulancePersonalPropertyTableAnnotationComposer,
+      $$AmbulancePersonalPropertyTableCreateCompanionBuilder,
+      $$AmbulancePersonalPropertyTableUpdateCompanionBuilder,
+      (
+        AmbulancePersonalPropertyData,
+        $$AmbulancePersonalPropertyTableReferences,
+      ),
+      AmbulancePersonalPropertyData,
+      PrefetchHooks Function({bool medicalId})
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -53165,4 +54231,9 @@ class $AppDatabaseManager {
       $$ContactTableTableManager(_db, _db.contact);
   $$AmbulanceRecordsTableTableManager get ambulanceRecords =>
       $$AmbulanceRecordsTableTableManager(_db, _db.ambulanceRecords);
+  $$AmbulancePersonalPropertyTableTableManager get ambulancePersonalProperty =>
+      $$AmbulancePersonalPropertyTableTableManager(
+        _db,
+        _db.ambulancePersonalProperty,
+      );
 }

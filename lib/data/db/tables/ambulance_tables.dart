@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart';
 import 'reference_tables.dart';
+import 'medical_tables.dart';
 
 // 救護車派遣紀錄表
 @DataClassName('AmbulanceRecord')
@@ -46,6 +47,30 @@ class AmbulanceRecords extends Table {
   DateTimeColumn get returnStandbyTime => dateTime().nullable()();
 
   // 建立與更新時間
+  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+  DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
+}
+
+// 救護車個人財物表
+@DataClassName('AmbulancePersonalPropertyData')
+class AmbulancePersonalProperty extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  
+  // 關聯到 MedicalRecord
+  IntColumn get medicalId => integer().unique().references(MedicalRecord, #medicalId)();
+
+  // 財務明細
+  TextColumn get financialDetails => text().nullable()();
+  
+  // 是否經手
+  BoolColumn get isHandled => boolean().withDefault(const Constant(false))();
+  
+  // 保管人姓名
+  TextColumn get custodianName => text().nullable()();
+  
+  // 保管人簽名
+  BlobColumn get custodianSignature => blob().nullable()();
+
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
   DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
 }

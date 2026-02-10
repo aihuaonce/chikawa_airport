@@ -171,10 +171,35 @@ class _PersonalInfoState extends State<PersonalInfo> {
                   const SizedBox(height: 24),
                   _buildLabel('性別 GENDER'),
                   const SizedBox(height: 8),
-                  SlidingToggle(
-                    selectedIndex: patient.sexId ?? 0,
-                    options: const ['Male', 'Female', 'Other'],
-                    onChanged: (index) => viewModel.updateSexId(index),
+                  Builder(
+                    builder: (context) {
+                      final options = viewModel.sexOptions;
+                      if (options.isEmpty) {
+                        return const SizedBox(
+                          height: 44,
+                          child: Center(child: Text('Loading...')),
+                        );
+                      }
+
+                      final optionNames = options.map((e) => e.name).toList();
+                      int selectedIndex = 0;
+                      if (patient.sexId != null) {
+                        final index = options.indexWhere(
+                          (e) => e.sexId == patient.sexId,
+                        );
+                        if (index != -1) selectedIndex = index;
+                      }
+
+                      return SlidingToggle(
+                        selectedIndex: selectedIndex,
+                        options: optionNames,
+                        onChanged: (index) {
+                          if (index >= 0 && index < options.length) {
+                            viewModel.updateSexId(options[index].sexId);
+                          }
+                        },
+                      );
+                    },
                   ),
 
                   const SizedBox(height: 24),

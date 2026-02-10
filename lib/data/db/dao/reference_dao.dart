@@ -1,4 +1,5 @@
 import 'package:drift/drift.dart';
+import 'package:flutter/material.dart';
 import '../database.dart';
 import '../tables/reference_tables.dart';
 import '../tables/normalization_tables.dart';
@@ -799,13 +800,20 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
 
   // 初始化性別資料
   Future<void> initializeSex() async {
+    // 確保移除 'Other' 選項 (如果存在)
+    try {
+      await (delete(sex)..where((s) => s.name.equals('Other'))).go();
+    } catch (e) {
+      // 如果被引用導致無法刪除，則忽略
+      debugPrint('Failed to delete "Other" from Sex table: $e');
+    }
+
     final count = await (select(sex).get()).then((list) => list.length);
     if (count == 0) {
       await batch((batch) {
         batch.insertAll(sex, [
           SexCompanion.insert(name: 'Male'),
           SexCompanion.insert(name: 'Female'),
-          SexCompanion.insert(name: 'Other'),
         ]);
       });
     }
