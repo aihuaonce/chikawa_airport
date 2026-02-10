@@ -1,5 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import 'package:drift/drift.dart' as drift;
+import '../../data/db/database.dart';
+import '../widgets/ambulance_medication_dialog.dart';
+import '../widgets/ambulance_vital_sign_dialog.dart';
+import '../widgets/ambulance_staff_dialog.dart';
+import '../widgets/ambulance_treatment_item_dialog.dart';
 
 class AmbulanceTreatmentItems extends StatefulWidget {
   final int medicalId;
@@ -20,67 +27,385 @@ class _AmbulanceTreatmentItemsState extends State<AmbulanceTreatmentItems> {
   static const Color headerBg = Color(0xFFF8FAFC);
 
   // --- 2. 狀態變數 ---
-  final List<String> _selectedCategories = [];
-  final Map<String, List<String>> _selectedSubItems = {
-    '呼吸道處置': [],
-    '創傷處置': [],
-    '搬運': [],
-    '心肺復甦術': [],
-    '藥物處置': [],
-    '其它處置': [],
-  };
+  bool _isInitialized = false;
+  int? _recordId;
 
-  final List<Map<String, String>> _medicationList = [];
-  final List<Map<String, dynamic>> _vitalSignsList = [];
-  final List<Map<String, String>> _escortStaffList = [];
-  bool _isRefused = false;
-  String _relationship = '病患 Patient';
+  // Reference Data
+  List<AmbulanceTreatmentCategoryData> _categories = [];
+  final Map<int, List<AmbulanceTreatmentItemData>> _itemsByCategory = {};
 
+  // Selections
+  final List<int> _selectedCategoryIds = [];
+  final List<int> _selectedItemIds = [];
+
+  // Dynamic Item Details (keyed by Item ID)
+  // Stores tubeSize, fixationDepth, shockCount, shockJoules, otherDescription
+  final Map<int, Map<String, dynamic>> _itemDetails = {};
+
+  // Form Fields
+  final TextEditingController _doctorInstructionsController =
+      TextEditingController();
+  final TextEditingController _receivingHospitalController =
+      TextEditingController();
   final TextEditingController _receivingTimeController = TextEditingController(
     text: '-- : -- : --',
   );
+  bool _isRefused = false;
+  String _relationship = '病患 Patient';
+  final TextEditingController _relativeNameController = TextEditingController();
+  final TextEditingController _relativePhoneController =
+      TextEditingController();
+
+  // Lists (Synced with DB)
+  List<AmbulanceMedicationLogData> _medicationList = [];
+  List<AmbulanceVitalSignData> _vitalSignsList = [];
+  List<AmbulanceEscortStaffData> _escortStaffList = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
 
   @override
   void dispose() {
+    _doctorInstructionsController.dispose();
+    _receivingHospitalController.dispose();
     _receivingTimeController.dispose();
+    _relativeNameController.dispose();
+    _relativePhoneController.dispose();
     super.dispose();
   }
 
-  // --- 3. 邏輯方法 ---
+  Future<void> _loadData() async {
+    final dao = context.read<AppDatabase>().ambulanceTreatmentDao;
+
+    // 1. Initialize & Fetch References
+    await dao.initializeTreatmentData();
+    _categories = await dao.getCategories();
+    for (var cat in _categories) {
+      _itemsByCategory[cat.id] = await dao.getItemsByCategory(cat.id);
+    }
+
+    // 2. Fetch Record
+    var record = await dao.getRecord(widget.medicalId);
+    if (record == null) {
+      // Create default record if not exists
+      await dao.updateRecord(
+        AmbulanceTreatmentRecordsCompanion(
+          medicalId: drift.Value(widget.medicalId),
+        ),
+      );
+      record = await dao.getRecord(widget.medicalId);
+    }
+
+    if (record != null) {
+      _recordId = record.id;
+      _doctorInstructionsController.text = record.doctorInstructions ?? '';
+      _receivingHospitalController.text = record.receivingHospital ?? '';
+      _receivingTimeController.text = record.receivingTime ?? '-- : -- : --';
+      _isRefused = record.isRefusedHospital;
+      _relationship = record.relationship;
+      _relativeNameController.text = record.relativeName ?? '';
+      _relativePhoneController.text = record.relativePhone ?? '';
+
+      // 3. Fetch Items & Details
+      final joinedItems = await dao.getJoinedRecordItems(record.id);
+      _selectedItemIds.clear();
+      _selectedCategoryIds.clear();
+      _itemDetails.clear();
+
+      for (var joined in joinedItems) {
+        _selectedItemIds.add(joined.item.id);
+        if (!_selectedCategoryIds.contains(joined.item.categoryId)) {
+          _selectedCategoryIds.add(joined.item.categoryId);
+        }
+
+        // Populate details
+        _itemDetails[joined.item.id] = {
+          'tubeSize': joined.link.tubeSize,
+          'fixationDepth': joined.link.fixationDepth,
+          'shockCount': joined.link.shockCount,
+          'shockJoules': joined.link.shockJoules,
+          'otherDescription': joined.link.otherDescription,
+        };
+      }
+
+      // 4. Fetch Sub-tables
+      _medicationList = await dao.getMedicationLogs(record.id);
+      _vitalSignsList = await dao.getVitalSigns(record.id);
+      _escortStaffList = await dao.getEscortStaff(record.id);
+    }
+
+    setState(() {
+      _isInitialized = true;
+    });
+  }
+
+  // --- Auto-Save Methods ---
+
+  Future<void> _updateRecord({
+    drift.Value<String?>? doctorInstructions,
+    drift.Value<String?>? receivingHospital,
+    drift.Value<String?>? receivingTime,
+    drift.Value<bool>? isRefusedHospital,
+    drift.Value<String>? relationship,
+    drift.Value<String?>? relativeName,
+    drift.Value<String?>? relativePhone,
+  }) async {
+    if (_recordId == null) return;
+    final dao = context.read<AppDatabase>().ambulanceTreatmentDao;
+
+    await dao.updateRecord(
+      AmbulanceTreatmentRecordsCompanion(
+        medicalId: drift.Value(widget.medicalId),
+        doctorInstructions: doctorInstructions ?? const drift.Value.absent(),
+        receivingHospital: receivingHospital ?? const drift.Value.absent(),
+        receivingTime: receivingTime ?? const drift.Value.absent(),
+        isRefusedHospital: isRefusedHospital ?? const drift.Value.absent(),
+        relationship: relationship ?? const drift.Value.absent(),
+        relativeName: relativeName ?? const drift.Value.absent(),
+        relativePhone: relativePhone ?? const drift.Value.absent(),
+      ),
+    );
+  }
+
+  bool _hasDetails(AmbulanceTreatmentItemData item) {
+    return item.name == '氣管內管' || item.name == '手動電擊器' || item.isOther;
+  }
+
+  Future<void> _editItemDetails(
+    int itemId,
+    AmbulanceTreatmentItemData item,
+  ) async {
+    final result = await showDialog<Map<String, dynamic>>(
+      context: context,
+      builder:
+          (context) => AmbulanceTreatmentItemDialog(
+            itemName: item.name,
+            isOther: item.isOther,
+            initialDetails: _itemDetails[itemId] ?? {},
+          ),
+    );
+
+    if (result != null) {
+      await _updateItemDetails(
+        itemId,
+        tubeSize: result['tubeSize'],
+        fixationDepth: result['fixationDepth'],
+        shockCount: result['shockCount'],
+        shockJoules: result['shockJoules'],
+        otherDescription: result['otherDescription'],
+      );
+      setState(() {}); // Refresh UI to show new details in list
+    }
+  }
+
+  Future<void> _toggleItem(int catId, int itemId, bool selected) async {
+    if (_recordId == null) return;
+    final dao = context.read<AppDatabase>().ambulanceTreatmentDao;
+
+    // Find the item data
+    final item = _itemsByCategory[catId]?.firstWhere((i) => i.id == itemId);
+    if (item == null) return;
+
+    if (selected) {
+      // Check if details required
+      if (_hasDetails(item)) {
+        final result = await showDialog<Map<String, dynamic>>(
+          context: context,
+          builder:
+              (context) => AmbulanceTreatmentItemDialog(
+                itemName: item.name,
+                isOther: item.isOther,
+                initialDetails: _itemDetails[itemId] ?? {},
+              ),
+        );
+
+        if (result == null) return; // Cancelled
+
+        setState(() {
+          _selectedItemIds.add(itemId);
+        });
+
+        await _updateItemDetails(
+          itemId,
+          tubeSize: result['tubeSize'],
+          fixationDepth: result['fixationDepth'],
+          shockCount: result['shockCount'],
+          shockJoules: result['shockJoules'],
+          otherDescription: result['otherDescription'],
+        );
+        return;
+      }
+
+      setState(() {
+        _selectedItemIds.add(itemId);
+      });
+
+      await dao.addOrUpdateItemLink(
+        AmbulanceTreatmentRecordItemsCompanion(
+          recordId: drift.Value(_recordId!),
+          itemId: drift.Value(itemId),
+        ),
+      );
+    } else {
+      setState(() {
+        _selectedItemIds.remove(itemId);
+      });
+      await dao.removeItemLink(_recordId!, itemId);
+      _itemDetails.remove(itemId); // Clear local details
+    }
+  }
+
+  Future<void> _updateItemDetails(
+    int itemId, {
+    String? tubeSize,
+    String? fixationDepth,
+    String? shockCount,
+    String? shockJoules,
+    String? otherDescription,
+  }) async {
+    if (_recordId == null) return;
+    final dao = context.read<AppDatabase>().ambulanceTreatmentDao;
+
+    // Update local state
+    if (!_itemDetails.containsKey(itemId)) _itemDetails[itemId] = {};
+    if (tubeSize != null) _itemDetails[itemId]!['tubeSize'] = tubeSize;
+    if (fixationDepth != null) {
+      _itemDetails[itemId]!['fixationDepth'] = fixationDepth;
+    }
+    if (shockCount != null) _itemDetails[itemId]!['shockCount'] = shockCount;
+    if (shockJoules != null) _itemDetails[itemId]!['shockJoules'] = shockJoules;
+    if (otherDescription != null) {
+      _itemDetails[itemId]!['otherDescription'] = otherDescription;
+    }
+
+    // Save to DB
+    await dao.addOrUpdateItemLink(
+      AmbulanceTreatmentRecordItemsCompanion(
+        recordId: drift.Value(_recordId!),
+        itemId: drift.Value(itemId),
+        tubeSize: tubeSize != null
+            ? drift.Value(tubeSize)
+            : const drift.Value.absent(),
+        fixationDepth: fixationDepth != null
+            ? drift.Value(fixationDepth)
+            : const drift.Value.absent(),
+        shockCount: shockCount != null
+            ? drift.Value(shockCount)
+            : const drift.Value.absent(),
+        shockJoules: shockJoules != null
+            ? drift.Value(shockJoules)
+            : const drift.Value.absent(),
+        otherDescription: otherDescription != null
+            ? drift.Value(otherDescription)
+            : const drift.Value.absent(),
+      ),
+    );
+  }
+
+  // --- Sub-table Methods ---
+
+  Future<void> _addMedicationLog() async {
+    if (_recordId == null) return;
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) => AmbulanceMedicationDialog(recordId: _recordId!),
+    );
+    if (result == true) {
+      _loadData();
+    }
+  }
+
+  Future<void> _removeMedicationLog(int id) async {
+    final dao = context.read<AppDatabase>().ambulanceTreatmentDao;
+    await dao.deleteMedicationLog(id);
+    if (_recordId != null) {
+      _medicationList = await dao.getMedicationLogs(_recordId!);
+      setState(() {});
+    }
+  }
+
+  Future<void> _addVitalSign() async {
+    if (_recordId == null) return;
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) => AmbulanceVitalSignDialog(recordId: _recordId!),
+    );
+    if (result == true) {
+      _loadData();
+    }
+  }
+
+  Future<void> _removeVitalSign(int id) async {
+    final dao = context.read<AppDatabase>().ambulanceTreatmentDao;
+    await dao.deleteVitalSign(id);
+    if (_recordId != null) {
+      _vitalSignsList = await dao.getVitalSigns(_recordId!);
+      setState(() {});
+    }
+  }
+
+  Future<void> _addEscortStaff() async {
+    if (_recordId == null) return;
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) => AmbulanceStaffDialog(recordId: _recordId!),
+    );
+    if (result == true) {
+      _loadData();
+    }
+  }
+
+  Future<void> _removeEscortStaff(int id) async {
+    final dao = context.read<AppDatabase>().ambulanceTreatmentDao;
+    await dao.deleteEscortStaff(id);
+    if (_recordId != null) {
+      _escortStaffList = await dao.getEscortStaff(_recordId!);
+      setState(() {});
+    }
+  }
 
   // 計算單一列的 GCS 總分
-  String _calculateGcsTotal(Map<String, dynamic> data) {
-    int e = int.tryParse(data['e'] ?? '0') ?? 0;
-    int v = int.tryParse(data['v'] ?? '0') ?? 0;
-    int m = int.tryParse(data['m'] ?? '0') ?? 0;
+  String _calculateGcsTotal(AmbulanceVitalSignData data) {
+    int e = int.tryParse(data.gcsE ?? '0') ?? 0;
+    int v = int.tryParse(data.gcsV ?? '0') ?? 0;
+    int m = int.tryParse(data.gcsM ?? '0') ?? 0;
     if (e == 0 && v == 0 && m == 0) return '--';
     return (e + v + m).toString();
   }
 
   @override
   Widget build(BuildContext context) {
+    if (!_isInitialized) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildLabel('急救處置大類 EMERGENCY CATEGORIES'),
         const SizedBox(height: 10),
         _buildMainCategoryGrid(),
-        if (_selectedCategories.isNotEmpty) _buildDynamicSubActionSections(),
+        if (_selectedCategoryIds.isNotEmpty) _buildDynamicSubActionSections(),
         const SizedBox(height: 24),
         _buildFieldWrapper(
           '線上指導醫師指導說明 DOCTOR\'S INSTRUCTIONS',
-          _buildTextField(hint: '請輸入醫師指示內容...', maxLines: 2),
+          _buildTextField(
+            controller: _doctorInstructionsController,
+            hint: '請輸入醫師指示內容...',
+            maxLines: 2,
+            onChanged: (v) => _updateRecord(doctorInstructions: drift.Value(v)),
+          ),
         ),
         const SizedBox(height: 32),
 
         // 4. 藥物記錄表
         _buildTableContainer(
           title: '藥物記錄表 MEDICATION LOG',
-          onAdd: () => setState(
-            () => _medicationList.add({
-              'time': DateFormat('HH:mm:ss').format(DateTime.now()), // 加上 :ss
-            }),
-          ),
+          buttonLabel: '新增藥物 Add',
+          onAdd: _addMedicationLog,
           child: _buildMedicationTable(),
         ),
         const SizedBox(height: 32),
@@ -88,12 +413,8 @@ class _AmbulanceTreatmentItemsState extends State<AmbulanceTreatmentItems> {
         // 5. 生命徵象記錄表 (含 EVM 自動計算)
         _buildTableContainer(
           title: '生命徵象記錄表 VITAL SIGNS LOG',
-          onAdd: () => setState(
-            () => _vitalSignsList.add({
-              'time': DateFormat('HH:mm:ss').format(DateTime.now()), // 加上 :ss
-              'atHosp': false, 'avpu': '清', 'e': '', 'v': '', 'm': '',
-            }),
-          ),
+          buttonLabel: '新增記錄 Add',
+          onAdd: _addVitalSign,
           child: _buildVitalSignsTable(),
         ),
         const SizedBox(height: 32),
@@ -101,7 +422,8 @@ class _AmbulanceTreatmentItemsState extends State<AmbulanceTreatmentItems> {
         // 6. 隨車人員表
         _buildTableContainer(
           title: '隨車人員表 ESCORT STAFF',
-          onAdd: () => setState(() => _escortStaffList.add({'name': ''})),
+          buttonLabel: '新增人員 Add',
+          onAdd: _addEscortStaff,
           child: _buildEscortStaffTable(),
         ),
         const SizedBox(height: 32),
@@ -147,61 +469,106 @@ class _AmbulanceTreatmentItemsState extends State<AmbulanceTreatmentItems> {
                   _buildTableHeaderRow(labels, flexes),
                   if (_vitalSignsList.isEmpty) _buildEmptyRow(),
                   ..._vitalSignsList.asMap().entries.map((entry) {
-                    int idx = entry.key;
-                    var data = entry.value;
-                    return _buildDataRow(flexes, [
-                      _buildCompactTimeField(data['time']),
-                      Center(
-                        child: SizedBox(
-                          height: 24,
-                          width: 24,
-                          child: Checkbox(
-                            value: data['atHosp'],
-                            onChanged: (v) =>
-                                setState(() => data['atHosp'] = v),
-                            activeColor: primaryColor,
+                    final data = entry.value;
+                    return _buildDataRow(
+                      flexes,
+                      [
+                        _buildCompactTimeField(data.time ?? ''),
+                        Center(
+                          child: SizedBox(
+                            height: 24,
+                            width: 24,
+                            child: Checkbox(
+                              value: data.atHospital,
+                              onChanged: (v) async {
+                                final dao = context
+                                    .read<AppDatabase>()
+                                    .ambulanceTreatmentDao;
+                                await dao.updateVitalSign(
+                                  AmbulanceVitalSignsCompanion(
+                                    id: drift.Value(data.id),
+                                    atHospital: drift.Value(v ?? false),
+                                  ),
+                                );
+                                setState(() {
+                                  // Optimistic update or reload
+                                  _loadData();
+                                });
+                              },
+                              activeColor: primaryColor,
+                            ),
                           ),
                         ),
-                      ),
-                      _buildSimpleDropdown(
-                        ['清', '聲', '痛', '否'],
-                        data['avpu'],
-                        (v) => setState(() => data['avpu'] = v),
-                      ),
-                      _buildCompactTextField(
-                        'E',
-                        (v) => setState(() => data['e'] = v),
-                        data['e'],
-                      ),
-                      _buildCompactTextField(
-                        'V',
-                        (v) => setState(() => data['v'] = v),
-                        data['v'],
-                      ),
-                      _buildCompactTextField(
-                        'M',
-                        (v) => setState(() => data['m'] = v),
-                        data['m'],
-                      ),
-                      Container(
-                        alignment: Alignment.center,
-                        child: Text(
-                          _calculateGcsTotal(data),
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: primaryColor,
+                        Center(
+                            child: Text(data.avpu ?? '',
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                    fontSize: 13, color: textDark))),
+                        Center(
+                            child: Text(data.gcsE ?? '',
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                    fontSize: 13, color: textDark))),
+                        Center(
+                            child: Text(data.gcsV ?? '',
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                    fontSize: 13, color: textDark))),
+                        Center(
+                            child: Text(data.gcsM ?? '',
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                    fontSize: 13, color: textDark))),
+                        Container(
+                          alignment: Alignment.center,
+                          child: Text(
+                            _calculateGcsTotal(data),
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: primaryColor,
+                            ),
                           ),
                         ),
-                      ),
-                      _buildCompactTextField('°C'),
-                      _buildCompactTextField('BPM'),
-                      _buildCompactTextField('RR'),
-                      _buildCompactTextField('BP'),
-                      _buildCompactTextField('%'),
-                      _buildDeleteBtn(
-                        () => setState(() => _vitalSignsList.removeAt(idx)),
-                      ),
-                    ]);
+                        Center(
+                            child: Text(data.temperature ?? '',
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                    fontSize: 13, color: textDark))),
+                        Center(
+                            child: Text(data.pulse ?? '',
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                    fontSize: 13, color: textDark))),
+                        Center(
+                            child: Text(data.respirationRate ?? '',
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                    fontSize: 13, color: textDark))),
+                        Center(
+                            child: Text(data.bloodPressure ?? '',
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                    fontSize: 13, color: textDark))),
+                        Center(
+                            child: Text(data.spo2 ?? '',
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                    fontSize: 13, color: textDark))),
+                        _buildDeleteBtn(() => _removeVitalSign(data.id)),
+                      ],
+                      onTap: () async {
+                        final result = await showDialog<bool>(
+                          context: context,
+                          builder: (context) => AmbulanceVitalSignDialog(
+                            recordId: _recordId!,
+                            initialData: data,
+                          ),
+                        );
+                        if (result == true) {
+                          _loadData();
+                        }
+                      },
+                    );
                   }),
                 ],
               ),
@@ -226,18 +593,44 @@ class _AmbulanceTreatmentItemsState extends State<AmbulanceTreatmentItems> {
       children: [
         _buildTableHeaderRow(labels, flexes),
         if (_medicationList.isEmpty) _buildEmptyRow(),
-        ..._medicationList.asMap().entries.map(
-          (e) => _buildDataRow(flexes, [
-            _buildCompactTimeField(e.value['time'] ?? '--:--'),
-            _buildCompactTextField('Drug Name'),
-            _buildCompactTextField('Route'),
-            _buildCompactTextField('Dose'),
-            _buildCompactTextField('Name'),
-            _buildDeleteBtn(
-              () => setState(() => _medicationList.removeAt(e.key)),
-            ),
-          ]),
-        ),
+        ..._medicationList.asMap().entries.map((e) {
+          final data = e.value;
+          return _buildDataRow(
+            flexes,
+            [
+              _buildCompactTimeField(data.time ?? '--:--'),
+              Center(
+                  child: Text(data.drugName ?? '',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(fontSize: 13, color: textDark))),
+              Center(
+                  child: Text(data.route ?? '',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(fontSize: 13, color: textDark))),
+              Center(
+                  child: Text(data.dose ?? '',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(fontSize: 13, color: textDark))),
+              Center(
+                  child: Text(data.emtName ?? '',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(fontSize: 13, color: textDark))),
+              _buildDeleteBtn(() => _removeMedicationLog(data.id)),
+            ],
+            onTap: () async {
+              final result = await showDialog<bool>(
+                context: context,
+                builder: (context) => AmbulanceMedicationDialog(
+                  recordId: _recordId!,
+                  initialData: data,
+                ),
+              );
+              if (result == true) {
+                _loadData();
+              }
+            },
+          );
+        }),
       ],
     );
   }
@@ -249,24 +642,41 @@ class _AmbulanceTreatmentItemsState extends State<AmbulanceTreatmentItems> {
       children: [
         _buildTableHeaderRow(labels, flexes),
         if (_escortStaffList.isEmpty) _buildEmptyRow(),
-        ..._escortStaffList.asMap().entries.map(
-          (e) => _buildDataRow(flexes, [
-            _buildCompactTextField('Enter Name'),
-            const Center(
-              child: Text(
-                'Sign here',
-                style: TextStyle(
-                  fontStyle: FontStyle.italic,
-                  color: textMuted,
-                  fontSize: 12,
+        ..._escortStaffList.asMap().entries.map((e) {
+          final data = e.value;
+          return _buildDataRow(
+            flexes,
+            [
+              Center(
+                  child: Text(data.name ?? '',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(fontSize: 13, color: textDark))),
+              const Center(
+                child: Text(
+                  'Sign here',
+                  style: TextStyle(
+                    fontStyle: FontStyle.italic,
+                    color: textMuted,
+                    fontSize: 12,
+                  ),
                 ),
               ),
-            ),
-            _buildDeleteBtn(
-              () => setState(() => _escortStaffList.removeAt(e.key)),
-            ),
-          ]),
-        ),
+              _buildDeleteBtn(() => _removeEscortStaff(data.id)),
+            ],
+            onTap: () async {
+              final result = await showDialog<bool>(
+                context: context,
+                builder: (context) => AmbulanceStaffDialog(
+                  recordId: _recordId!,
+                  initialData: data,
+                ),
+              );
+              if (result == true) {
+                _loadData();
+              }
+            },
+          );
+        }),
       ],
     );
   }
@@ -303,54 +713,36 @@ class _AmbulanceTreatmentItemsState extends State<AmbulanceTreatmentItems> {
     );
   }
 
-  Widget _buildDataRow(List<int> flexes, List<Widget> children) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
-      decoration: const BoxDecoration(
-        border: Border(top: BorderSide(color: borderColor)),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: children
-            .asMap()
-            .entries
-            .map(
-              (e) => Expanded(
-                flex: flexes[e.key],
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 2),
-                  child: e.value,
+  Widget _buildDataRow(List<int> flexes, List<Widget> children,
+      {VoidCallback? onTap}) {
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+        decoration: const BoxDecoration(
+          border: Border(top: BorderSide(color: borderColor)),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: children
+              .asMap()
+              .entries
+              .map(
+                (e) => Expanded(
+                  flex: flexes[e.key],
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 2),
+                    child: e.value,
+                  ),
                 ),
-              ),
-            )
-            .toList(),
+              )
+              .toList(),
+        ),
       ),
     );
   }
 
   // 6. 基礎輸入與 UI 元件
-
-  Widget _buildCompactTextField(
-    String hint, [
-    Function(String)? onChanged,
-    String? value,
-  ]) {
-    return SizedBox(
-      height: 36,
-      child: TextFormField(
-        initialValue: value,
-        onChanged: onChanged,
-        textAlign: TextAlign.center,
-        style: const TextStyle(fontSize: 13, color: textDark),
-        decoration: InputDecoration(
-          hintText: hint,
-          hintStyle: const TextStyle(color: borderColor, fontSize: 11),
-          border: InputBorder.none,
-          isDense: true,
-        ),
-      ),
-    );
-  }
 
   Widget _buildCompactTimeField(String time) {
     return Row(
@@ -367,38 +759,6 @@ class _AmbulanceTreatmentItemsState extends State<AmbulanceTreatmentItems> {
         const SizedBox(width: 4),
         const Icon(Icons.access_time, size: 12, color: textMuted),
       ],
-    );
-  }
-
-  Widget _buildSimpleDropdown(
-    List<String> items,
-    String? val,
-    Function(String?) onChg,
-  ) {
-    return Container(
-      height: 32,
-      padding: const EdgeInsets.symmetric(horizontal: 4),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(4),
-        border: Border.all(color: borderColor),
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<String>(
-          value: val,
-          isDense: true,
-          isExpanded: true,
-          items: items
-              .map(
-                (s) => DropdownMenuItem(
-                  value: s,
-                  child: Text(s, style: const TextStyle(fontSize: 12)),
-                ),
-              )
-              .toList(),
-          onChanged: onChg,
-        ),
-      ),
     );
   }
 
@@ -421,17 +781,16 @@ class _AmbulanceTreatmentItemsState extends State<AmbulanceTreatmentItems> {
   // 其他佈局元件
 
   Widget _buildMainCategoryGrid() {
-    final categories = ['呼吸道處置', '創傷處置', '搬運', '心肺復甦術', '藥物處置', '其它處置'];
     return Wrap(
       spacing: 10,
       runSpacing: 10,
-      children: categories.map((cat) {
-        bool isSel = _selectedCategories.contains(cat);
+      children: _categories.map((cat) {
+        bool isSel = _selectedCategoryIds.contains(cat.id);
         return InkWell(
           onTap: () => setState(
             () => isSel
-                ? _selectedCategories.remove(cat)
-                : _selectedCategories.add(cat),
+                ? _selectedCategoryIds.remove(cat.id)
+                : _selectedCategoryIds.add(cat.id),
           ),
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 200),
@@ -445,7 +804,7 @@ class _AmbulanceTreatmentItemsState extends State<AmbulanceTreatmentItems> {
               ),
             ),
             child: Text(
-              cat,
+              cat.name,
               style: TextStyle(
                 color: isSel ? Colors.white : textDark,
                 fontSize: 13,
@@ -460,39 +819,19 @@ class _AmbulanceTreatmentItemsState extends State<AmbulanceTreatmentItems> {
 
   Widget _buildDynamicSubActionSections() {
     return Column(
-      children: _selectedCategories.map((cat) {
-        List<String> options = [];
-        if (cat == '呼吸道處置') {
-          options = [
-            '口咽呼吸道',
-            '鼻咽呼吸道',
-            '抽吸',
-            '哈姆立克法',
-            '鼻管',
-            '面罩',
-            '非再呼吸型面罩',
-            'BVM',
-            'LMA',
-            'I-Gel',
-            '氣管內管',
-            '其它',
-          ];
-        }
-        if (cat == '創傷處置') {
-          options = ['頸圈', '清洗傷口', '止血、包紮', '骨折固定', '長背板固定', '鏟式擔架固定', '其它'];
-        }
-        if (cat == '搬運') {
-          options = ['自行上車', '適當方式搬運'];
-        }
-        if (cat == '心肺復甦術') {
-          options = ['自動心肺復甦機', 'CPR', '使用AED', '手動電擊器'];
-        }
-        if (cat == '藥物處置') {
-          options = ['靜脈輸液', '口服葡萄糖', 'Aspirin', 'NTG', '支氣管擴張劑'];
-        }
-        if (cat == '其它處置') {
-          options = ['保暖', '心理支持', '約束帶', '拒絕氧氣', '監測', '其它'];
-        }
+      children: _selectedCategoryIds.map((catId) {
+        final cat = _categories.firstWhere(
+          (c) => c.id == catId,
+          orElse: () => AmbulanceTreatmentCategoryData(
+            id: -1,
+            code: '',
+            name: 'Unknown',
+            sortOrder: 0,
+          ),
+        );
+        if (cat.id == -1) return const SizedBox.shrink();
+
+        final items = _itemsByCategory[catId] ?? [];
 
         return Container(
           width: double.infinity,
@@ -507,7 +846,7 @@ class _AmbulanceTreatmentItemsState extends State<AmbulanceTreatmentItems> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                cat,
+                cat.name,
                 style: const TextStyle(
                   color: primaryColor,
                   fontSize: 12,
@@ -520,21 +859,15 @@ class _AmbulanceTreatmentItemsState extends State<AmbulanceTreatmentItems> {
               Wrap(
                 spacing: 8,
                 runSpacing: 8,
-                children: options.map((opt) {
-                  bool isSelected =
-                      _selectedSubItems[cat]?.contains(opt) ?? false;
+                children: items.map((item) {
+                  bool isSelected = _selectedItemIds.contains(item.id);
                   return FilterChip(
-                    label: Text(opt, style: const TextStyle(fontSize: 12)),
+                    label: Text(
+                      item.name,
+                      style: const TextStyle(fontSize: 12),
+                    ),
                     selected: isSelected,
-                    onSelected: (val) {
-                      setState(() {
-                        if (val) {
-                          _selectedSubItems[cat]!.add(opt);
-                        } else {
-                          _selectedSubItems[cat]!.remove(opt);
-                        }
-                      });
-                    },
+                    onSelected: (val) => _toggleItem(cat.id, item.id, val),
                     selectedColor: primaryColor.withValues(alpha: 0.1),
                     checkmarkColor: primaryColor,
                     backgroundColor: Colors.white,
@@ -548,37 +881,11 @@ class _AmbulanceTreatmentItemsState extends State<AmbulanceTreatmentItems> {
                 }).toList(),
               ),
 
-              // 2. 核心連動：內嵌 ALS 詳細欄位
-
-              // 呼吸道處置 -> 氣管內管
-              if (cat == '呼吸道處置' && _selectedSubItems[cat]!.contains('氣管內管'))
-                _buildEmbeddedDetailBox(
-                  Row(
-                    children: [
-                      Expanded(child: _buildTextField(hint: '氣管內管號碼 Size')),
-                      const SizedBox(width: 12),
-                      Expanded(child: _buildTextField(hint: '固定公分數 (cm)')),
-                    ],
-                  ),
-                ),
-
-              // 心肺復甦術 -> 手動電擊器
-              if (cat == '心肺復甦術' && _selectedSubItems[cat]!.contains('手動電擊器'))
-                _buildEmbeddedDetailBox(
-                  Row(
-                    children: [
-                      Expanded(child: _buildTextField(hint: '手動電擊次數')),
-                      const SizedBox(width: 12),
-                      Expanded(child: _buildTextField(hint: '手動電擊焦耳數 (J)')),
-                    ],
-                  ),
-                ),
-
-              // 通用：其它 -> 輸入框
-              if (_selectedSubItems[cat]!.contains('其它'))
-                _buildEmbeddedDetailBox(
-                  _buildTextField(hint: '請輸入其它處置細節描述...'),
-                ),
+              // 2. Selected Items List (Table)
+              if (_selectedItemIds.any((id) => items.any((i) => i.id == id))) ...[
+                const SizedBox(height: 16),
+                _buildSelectedItemsList(items),
+              ],
             ],
           ),
         );
@@ -586,24 +893,105 @@ class _AmbulanceTreatmentItemsState extends State<AmbulanceTreatmentItems> {
     );
   }
 
-  // 輔助組件：內嵌的詳細資訊灰框
-  Widget _buildEmbeddedDetailBox(Widget child) {
-    return Container(
-      margin: const EdgeInsets.only(top: 12),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.5),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: borderColor.withValues(alpha: 0.5)),
-      ),
-      child: child,
+  Widget _buildSelectedItemsList(
+    List<AmbulanceTreatmentItemData> categoryItems,
+  ) {
+    // Filter items that are selected AND belong to this category
+    final selectedItems =
+        categoryItems
+            .where((i) => _selectedItemIds.contains(i.id))
+            .toList();
+
+    if (selectedItems.isEmpty) return const SizedBox.shrink();
+
+    final flexes = [3, 4, 1];
+    final labels = ['項目 ITEM', '詳細資料 DETAILS', ''];
+
+    return Column(
+      children: [
+        _buildTableHeaderRow(labels, flexes),
+        ...selectedItems.asMap().entries.map((e) {
+          final item = e.value;
+          final details = _formatItemDetails(item);
+
+          return _buildDataRow(
+            flexes,
+            [
+              Padding(
+                padding: const EdgeInsets.only(left: 8.0),
+                child: Text(
+                  item.name,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                    color: textDark,
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 8.0),
+                child: Text(
+                  details,
+                  style: const TextStyle(fontSize: 13, color: textMuted),
+                ),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  if (_hasDetails(item))
+                    IconButton(
+                      icon: const Icon(
+                        Icons.edit_outlined,
+                        size: 18,
+                        color: primaryColor,
+                      ),
+                      onPressed: () => _editItemDetails(item.id, item),
+                      constraints: const BoxConstraints(),
+                      padding: EdgeInsets.zero,
+                      tooltip: '編輯 Edit',
+                    ),
+                  const SizedBox(width: 8),
+                  _buildDeleteBtn(
+                    () => _toggleItem(item.categoryId, item.id, false),
+                  ),
+                ],
+              ),
+            ],
+            onTap:
+                _hasDetails(item)
+                    ? () => _editItemDetails(item.id, item)
+                    : null,
+          );
+        }),
+      ],
     );
+  }
+
+  String _formatItemDetails(AmbulanceTreatmentItemData item) {
+    final d = _itemDetails[item.id];
+    if (d == null) return '--';
+
+    if (item.name == '氣管內管') {
+      final size = d['tubeSize'];
+      final depth = d['fixationDepth'];
+      if ((size == null || size.isEmpty) && (depth == null || depth.isEmpty)) return '--';
+      return 'Size: ${size ?? '-'}, Depth: ${depth ?? '-'} cm';
+    } else if (item.name == '手動電擊器') {
+      final count = d['shockCount'];
+      final joules = d['shockJoules'];
+      if ((count == null || count.isEmpty) && (joules == null || joules.isEmpty)) return '--';
+      return 'Count: ${count ?? '-'}, Joules: ${joules ?? '-'} J';
+    } else if (item.isOther) {
+      return d['otherDescription'] ?? '--';
+    }
+    return '--';
   }
 
   Widget _buildTableContainer({
     required String title,
     required VoidCallback onAdd,
     required Widget child,
+    String buttonLabel = 'Add Row',
   }) {
     return Column(
       children: [
@@ -618,14 +1006,21 @@ class _AmbulanceTreatmentItemsState extends State<AmbulanceTreatmentItems> {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            TextButton.icon(
+            ElevatedButton.icon(
               onPressed: onAdd,
-              icon: const Icon(Icons.add, size: 16),
-              label: const Text(
-                'Add Row',
-                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+              icon: const Icon(Icons.add_circle_outline, size: 16),
+              label: Text(buttonLabel),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white,
+                foregroundColor: primaryColor,
+                elevation: 0,
+                side: const BorderSide(color: primaryColor),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
+                textStyle: const TextStyle(fontWeight: FontWeight.bold),
               ),
-              style: TextButton.styleFrom(foregroundColor: primaryColor),
             ),
           ],
         ),
@@ -656,7 +1051,12 @@ class _AmbulanceTreatmentItemsState extends State<AmbulanceTreatmentItems> {
               flex: 3,
               child: _buildFieldWrapper(
                 '接收單位 RECEIVING UNIT',
-                _buildTextField(hint: 'Enter Hospital/Unit Name'),
+                _buildTextField(
+                  controller: _receivingHospitalController,
+                  hint: 'Enter Hospital/Unit Name',
+                  onChanged: (v) =>
+                      _updateRecord(receivingHospital: drift.Value(v)),
+                ),
               ),
             ),
             const SizedBox(width: horizontalGap),
@@ -690,7 +1090,10 @@ class _AmbulanceTreatmentItemsState extends State<AmbulanceTreatmentItems> {
                   hint: '',
                   value: _relationship,
                   items: ['病患 Patient', '家屬 Family', '關係人 Associate'],
-                  onChanged: (v) => setState(() => _relationship = v!),
+                  onChanged: (v) {
+                    setState(() => _relationship = v!);
+                    _updateRecord(relationship: drift.Value(v!));
+                  },
                 ),
               ),
             ),
@@ -699,7 +1102,11 @@ class _AmbulanceTreatmentItemsState extends State<AmbulanceTreatmentItems> {
               flex: 3,
               child: _buildFieldWrapper(
                 '姓名 NAME',
-                _buildTextField(hint: 'Enter Full Name'),
+                _buildTextField(
+                  controller: _relativeNameController,
+                  hint: 'Enter Full Name',
+                  onChanged: (v) => _updateRecord(relativeName: drift.Value(v)),
+                ),
               ),
             ),
             const SizedBox(width: horizontalGap),
@@ -707,7 +1114,12 @@ class _AmbulanceTreatmentItemsState extends State<AmbulanceTreatmentItems> {
               flex: 3,
               child: _buildFieldWrapper(
                 '聯絡電話 PHONE',
-                _buildTextField(hint: 'Enter Contact Number'),
+                _buildTextField(
+                  controller: _relativePhoneController,
+                  hint: 'Enter Contact Number',
+                  onChanged: (v) =>
+                      _updateRecord(relativePhone: drift.Value(v)),
+                ),
               ),
             ),
           ],
@@ -732,7 +1144,10 @@ class _AmbulanceTreatmentItemsState extends State<AmbulanceTreatmentItems> {
             height: 20,
             child: Checkbox(
               value: _isRefused,
-              onChanged: (v) => setState(() => _isRefused = v!),
+              onChanged: (v) {
+                setState(() => _isRefused = v!);
+                _updateRecord(isRefusedHospital: drift.Value(v!));
+              },
               activeColor: Colors.redAccent,
             ),
           ),
@@ -756,11 +1171,11 @@ class _AmbulanceTreatmentItemsState extends State<AmbulanceTreatmentItems> {
     return InkWell(
       onTap: () {
         // 點擊整塊區域直接更新為現在時間（含秒）
+        final now = DateFormat('HH:mm:ss').format(DateTime.now());
         setState(() {
-          _receivingTimeController.text = DateFormat(
-            'HH:mm:ss',
-          ).format(DateTime.now());
+          _receivingTimeController.text = now;
         });
+        _updateRecord(receivingTime: drift.Value(now));
       },
       borderRadius: BorderRadius.circular(8),
       child: Container(
@@ -809,8 +1224,18 @@ class _AmbulanceTreatmentItemsState extends State<AmbulanceTreatmentItems> {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [_buildLabel(label), const SizedBox(height: 6), field],
   );
-  Widget _buildTextField({required String hint, int maxLines = 1}) => TextField(
+  Widget _buildTextField({
+    required String hint,
+    int maxLines = 1,
+    TextEditingController? controller,
+    Function(String)? onChanged,
+    String? value,
+  }) => TextField(
+    controller:
+        controller ??
+        (value != null ? TextEditingController(text: value) : null),
     maxLines: maxLines,
+    onChanged: onChanged,
     style: const TextStyle(fontSize: 14),
     decoration: InputDecoration(
       hintText: hint,

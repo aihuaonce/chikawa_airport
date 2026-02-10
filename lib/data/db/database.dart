@@ -12,6 +12,7 @@ import 'tables/normalization_tables.dart';
 import 'tables/contact_tables.dart';
 import 'tables/ambulance_tables.dart';
 import 'tables/ambulance_scene_tables.dart';
+import 'tables/ambulance_treatment_tables.dart';
 
 //匯入DAO
 import 'dao/reference_dao.dart';
@@ -27,6 +28,7 @@ import 'dao/medical_fee_dao.dart';
 import 'dao/nursing_record_dao.dart';
 import 'dao/referral_form_dao.dart';
 import 'dao/contact_dao.dart';
+import 'dao/ambulance_treatment_dao.dart';
 
 part 'database.g.dart';
 
@@ -100,6 +102,15 @@ part 'database.g.dart';
     AmbulanceSceneRecords,
     AmbulanceReferenceItems,
     AmbulanceSceneItemLinks,
+
+    // 救護車處置
+    AmbulanceTreatmentRecords,
+    AmbulanceTreatmentCategories,
+    AmbulanceTreatmentItems,
+    AmbulanceTreatmentRecordItems,
+    AmbulanceMedicationLogs,
+    AmbulanceVitalSigns,
+    AmbulanceEscortStaff,
   ],
   daos: [
     ReferenceDao,
@@ -114,6 +125,7 @@ part 'database.g.dart';
     NursingRecordDao,
     ReferralFormDao,
     AmbulanceDao,
+    AmbulanceTreatmentDao,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -129,6 +141,7 @@ class AppDatabase extends _$AppDatabase {
     },
     beforeOpen: (details) async {
       await referenceDao.initializeAllReferenceData();
+      await ambulanceTreatmentDao.initializeTreatmentData();
     },
   );
 
@@ -157,4 +170,7 @@ class AppDatabase extends _$AppDatabase {
   @override
   AmbulanceDao get ambulanceDao => AmbulanceDao(this);
   ContactDao get contactDao => ContactDao(this);
+  @override
+  AmbulanceTreatmentDao get ambulanceTreatmentDao =>
+      AmbulanceTreatmentDao(this);
 }

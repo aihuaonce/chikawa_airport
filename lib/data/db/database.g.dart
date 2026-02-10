@@ -29512,6 +29512,3487 @@ class AmbulanceSceneItemLinksCompanion
   }
 }
 
+class $AmbulanceTreatmentRecordsTable extends AmbulanceTreatmentRecords
+    with
+        TableInfo<
+          $AmbulanceTreatmentRecordsTable,
+          AmbulanceTreatmentRecordData
+        > {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $AmbulanceTreatmentRecordsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _medicalIdMeta = const VerificationMeta(
+    'medicalId',
+  );
+  @override
+  late final GeneratedColumn<int> medicalId = GeneratedColumn<int>(
+    'medical_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'UNIQUE REFERENCES medical_record (medical_id)',
+    ),
+  );
+  static const VerificationMeta _doctorInstructionsMeta =
+      const VerificationMeta('doctorInstructions');
+  @override
+  late final GeneratedColumn<String> doctorInstructions =
+      GeneratedColumn<String>(
+        'doctor_instructions',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _receivingHospitalMeta = const VerificationMeta(
+    'receivingHospital',
+  );
+  @override
+  late final GeneratedColumn<String> receivingHospital =
+      GeneratedColumn<String>(
+        'receiving_hospital',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _receivingTimeMeta = const VerificationMeta(
+    'receivingTime',
+  );
+  @override
+  late final GeneratedColumn<String> receivingTime = GeneratedColumn<String>(
+    'receiving_time',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _isRefusedHospitalMeta = const VerificationMeta(
+    'isRefusedHospital',
+  );
+  @override
+  late final GeneratedColumn<bool> isRefusedHospital = GeneratedColumn<bool>(
+    'is_refused_hospital',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_refused_hospital" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _relationshipMeta = const VerificationMeta(
+    'relationship',
+  );
+  @override
+  late final GeneratedColumn<String> relationship = GeneratedColumn<String>(
+    'relationship',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('病患 Patient'),
+  );
+  static const VerificationMeta _relativeNameMeta = const VerificationMeta(
+    'relativeName',
+  );
+  @override
+  late final GeneratedColumn<String> relativeName = GeneratedColumn<String>(
+    'relative_name',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _relativePhoneMeta = const VerificationMeta(
+    'relativePhone',
+  );
+  @override
+  late final GeneratedColumn<String> relativePhone = GeneratedColumn<String>(
+    'relative_phone',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    medicalId,
+    doctorInstructions,
+    receivingHospital,
+    receivingTime,
+    isRefusedHospital,
+    relationship,
+    relativeName,
+    relativePhone,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'ambulance_treatment_records';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<AmbulanceTreatmentRecordData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('medical_id')) {
+      context.handle(
+        _medicalIdMeta,
+        medicalId.isAcceptableOrUnknown(data['medical_id']!, _medicalIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_medicalIdMeta);
+    }
+    if (data.containsKey('doctor_instructions')) {
+      context.handle(
+        _doctorInstructionsMeta,
+        doctorInstructions.isAcceptableOrUnknown(
+          data['doctor_instructions']!,
+          _doctorInstructionsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('receiving_hospital')) {
+      context.handle(
+        _receivingHospitalMeta,
+        receivingHospital.isAcceptableOrUnknown(
+          data['receiving_hospital']!,
+          _receivingHospitalMeta,
+        ),
+      );
+    }
+    if (data.containsKey('receiving_time')) {
+      context.handle(
+        _receivingTimeMeta,
+        receivingTime.isAcceptableOrUnknown(
+          data['receiving_time']!,
+          _receivingTimeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('is_refused_hospital')) {
+      context.handle(
+        _isRefusedHospitalMeta,
+        isRefusedHospital.isAcceptableOrUnknown(
+          data['is_refused_hospital']!,
+          _isRefusedHospitalMeta,
+        ),
+      );
+    }
+    if (data.containsKey('relationship')) {
+      context.handle(
+        _relationshipMeta,
+        relationship.isAcceptableOrUnknown(
+          data['relationship']!,
+          _relationshipMeta,
+        ),
+      );
+    }
+    if (data.containsKey('relative_name')) {
+      context.handle(
+        _relativeNameMeta,
+        relativeName.isAcceptableOrUnknown(
+          data['relative_name']!,
+          _relativeNameMeta,
+        ),
+      );
+    }
+    if (data.containsKey('relative_phone')) {
+      context.handle(
+        _relativePhoneMeta,
+        relativePhone.isAcceptableOrUnknown(
+          data['relative_phone']!,
+          _relativePhoneMeta,
+        ),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  AmbulanceTreatmentRecordData map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return AmbulanceTreatmentRecordData(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      medicalId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}medical_id'],
+      )!,
+      doctorInstructions: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}doctor_instructions'],
+      ),
+      receivingHospital: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}receiving_hospital'],
+      ),
+      receivingTime: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}receiving_time'],
+      ),
+      isRefusedHospital: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_refused_hospital'],
+      )!,
+      relationship: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}relationship'],
+      )!,
+      relativeName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}relative_name'],
+      ),
+      relativePhone: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}relative_phone'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $AmbulanceTreatmentRecordsTable createAlias(String alias) {
+    return $AmbulanceTreatmentRecordsTable(attachedDatabase, alias);
+  }
+}
+
+class AmbulanceTreatmentRecordData extends DataClass
+    implements Insertable<AmbulanceTreatmentRecordData> {
+  final int id;
+  final int medicalId;
+  final String? doctorInstructions;
+  final String? receivingHospital;
+  final String? receivingTime;
+  final bool isRefusedHospital;
+  final String relationship;
+  final String? relativeName;
+  final String? relativePhone;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  const AmbulanceTreatmentRecordData({
+    required this.id,
+    required this.medicalId,
+    this.doctorInstructions,
+    this.receivingHospital,
+    this.receivingTime,
+    required this.isRefusedHospital,
+    required this.relationship,
+    this.relativeName,
+    this.relativePhone,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['medical_id'] = Variable<int>(medicalId);
+    if (!nullToAbsent || doctorInstructions != null) {
+      map['doctor_instructions'] = Variable<String>(doctorInstructions);
+    }
+    if (!nullToAbsent || receivingHospital != null) {
+      map['receiving_hospital'] = Variable<String>(receivingHospital);
+    }
+    if (!nullToAbsent || receivingTime != null) {
+      map['receiving_time'] = Variable<String>(receivingTime);
+    }
+    map['is_refused_hospital'] = Variable<bool>(isRefusedHospital);
+    map['relationship'] = Variable<String>(relationship);
+    if (!nullToAbsent || relativeName != null) {
+      map['relative_name'] = Variable<String>(relativeName);
+    }
+    if (!nullToAbsent || relativePhone != null) {
+      map['relative_phone'] = Variable<String>(relativePhone);
+    }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  AmbulanceTreatmentRecordsCompanion toCompanion(bool nullToAbsent) {
+    return AmbulanceTreatmentRecordsCompanion(
+      id: Value(id),
+      medicalId: Value(medicalId),
+      doctorInstructions: doctorInstructions == null && nullToAbsent
+          ? const Value.absent()
+          : Value(doctorInstructions),
+      receivingHospital: receivingHospital == null && nullToAbsent
+          ? const Value.absent()
+          : Value(receivingHospital),
+      receivingTime: receivingTime == null && nullToAbsent
+          ? const Value.absent()
+          : Value(receivingTime),
+      isRefusedHospital: Value(isRefusedHospital),
+      relationship: Value(relationship),
+      relativeName: relativeName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(relativeName),
+      relativePhone: relativePhone == null && nullToAbsent
+          ? const Value.absent()
+          : Value(relativePhone),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory AmbulanceTreatmentRecordData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return AmbulanceTreatmentRecordData(
+      id: serializer.fromJson<int>(json['id']),
+      medicalId: serializer.fromJson<int>(json['medicalId']),
+      doctorInstructions: serializer.fromJson<String?>(
+        json['doctorInstructions'],
+      ),
+      receivingHospital: serializer.fromJson<String?>(
+        json['receivingHospital'],
+      ),
+      receivingTime: serializer.fromJson<String?>(json['receivingTime']),
+      isRefusedHospital: serializer.fromJson<bool>(json['isRefusedHospital']),
+      relationship: serializer.fromJson<String>(json['relationship']),
+      relativeName: serializer.fromJson<String?>(json['relativeName']),
+      relativePhone: serializer.fromJson<String?>(json['relativePhone']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'medicalId': serializer.toJson<int>(medicalId),
+      'doctorInstructions': serializer.toJson<String?>(doctorInstructions),
+      'receivingHospital': serializer.toJson<String?>(receivingHospital),
+      'receivingTime': serializer.toJson<String?>(receivingTime),
+      'isRefusedHospital': serializer.toJson<bool>(isRefusedHospital),
+      'relationship': serializer.toJson<String>(relationship),
+      'relativeName': serializer.toJson<String?>(relativeName),
+      'relativePhone': serializer.toJson<String?>(relativePhone),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  AmbulanceTreatmentRecordData copyWith({
+    int? id,
+    int? medicalId,
+    Value<String?> doctorInstructions = const Value.absent(),
+    Value<String?> receivingHospital = const Value.absent(),
+    Value<String?> receivingTime = const Value.absent(),
+    bool? isRefusedHospital,
+    String? relationship,
+    Value<String?> relativeName = const Value.absent(),
+    Value<String?> relativePhone = const Value.absent(),
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) => AmbulanceTreatmentRecordData(
+    id: id ?? this.id,
+    medicalId: medicalId ?? this.medicalId,
+    doctorInstructions: doctorInstructions.present
+        ? doctorInstructions.value
+        : this.doctorInstructions,
+    receivingHospital: receivingHospital.present
+        ? receivingHospital.value
+        : this.receivingHospital,
+    receivingTime: receivingTime.present
+        ? receivingTime.value
+        : this.receivingTime,
+    isRefusedHospital: isRefusedHospital ?? this.isRefusedHospital,
+    relationship: relationship ?? this.relationship,
+    relativeName: relativeName.present ? relativeName.value : this.relativeName,
+    relativePhone: relativePhone.present
+        ? relativePhone.value
+        : this.relativePhone,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  AmbulanceTreatmentRecordData copyWithCompanion(
+    AmbulanceTreatmentRecordsCompanion data,
+  ) {
+    return AmbulanceTreatmentRecordData(
+      id: data.id.present ? data.id.value : this.id,
+      medicalId: data.medicalId.present ? data.medicalId.value : this.medicalId,
+      doctorInstructions: data.doctorInstructions.present
+          ? data.doctorInstructions.value
+          : this.doctorInstructions,
+      receivingHospital: data.receivingHospital.present
+          ? data.receivingHospital.value
+          : this.receivingHospital,
+      receivingTime: data.receivingTime.present
+          ? data.receivingTime.value
+          : this.receivingTime,
+      isRefusedHospital: data.isRefusedHospital.present
+          ? data.isRefusedHospital.value
+          : this.isRefusedHospital,
+      relationship: data.relationship.present
+          ? data.relationship.value
+          : this.relationship,
+      relativeName: data.relativeName.present
+          ? data.relativeName.value
+          : this.relativeName,
+      relativePhone: data.relativePhone.present
+          ? data.relativePhone.value
+          : this.relativePhone,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AmbulanceTreatmentRecordData(')
+          ..write('id: $id, ')
+          ..write('medicalId: $medicalId, ')
+          ..write('doctorInstructions: $doctorInstructions, ')
+          ..write('receivingHospital: $receivingHospital, ')
+          ..write('receivingTime: $receivingTime, ')
+          ..write('isRefusedHospital: $isRefusedHospital, ')
+          ..write('relationship: $relationship, ')
+          ..write('relativeName: $relativeName, ')
+          ..write('relativePhone: $relativePhone, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    medicalId,
+    doctorInstructions,
+    receivingHospital,
+    receivingTime,
+    isRefusedHospital,
+    relationship,
+    relativeName,
+    relativePhone,
+    createdAt,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is AmbulanceTreatmentRecordData &&
+          other.id == this.id &&
+          other.medicalId == this.medicalId &&
+          other.doctorInstructions == this.doctorInstructions &&
+          other.receivingHospital == this.receivingHospital &&
+          other.receivingTime == this.receivingTime &&
+          other.isRefusedHospital == this.isRefusedHospital &&
+          other.relationship == this.relationship &&
+          other.relativeName == this.relativeName &&
+          other.relativePhone == this.relativePhone &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class AmbulanceTreatmentRecordsCompanion
+    extends UpdateCompanion<AmbulanceTreatmentRecordData> {
+  final Value<int> id;
+  final Value<int> medicalId;
+  final Value<String?> doctorInstructions;
+  final Value<String?> receivingHospital;
+  final Value<String?> receivingTime;
+  final Value<bool> isRefusedHospital;
+  final Value<String> relationship;
+  final Value<String?> relativeName;
+  final Value<String?> relativePhone;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  const AmbulanceTreatmentRecordsCompanion({
+    this.id = const Value.absent(),
+    this.medicalId = const Value.absent(),
+    this.doctorInstructions = const Value.absent(),
+    this.receivingHospital = const Value.absent(),
+    this.receivingTime = const Value.absent(),
+    this.isRefusedHospital = const Value.absent(),
+    this.relationship = const Value.absent(),
+    this.relativeName = const Value.absent(),
+    this.relativePhone = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  });
+  AmbulanceTreatmentRecordsCompanion.insert({
+    this.id = const Value.absent(),
+    required int medicalId,
+    this.doctorInstructions = const Value.absent(),
+    this.receivingHospital = const Value.absent(),
+    this.receivingTime = const Value.absent(),
+    this.isRefusedHospital = const Value.absent(),
+    this.relationship = const Value.absent(),
+    this.relativeName = const Value.absent(),
+    this.relativePhone = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  }) : medicalId = Value(medicalId);
+  static Insertable<AmbulanceTreatmentRecordData> custom({
+    Expression<int>? id,
+    Expression<int>? medicalId,
+    Expression<String>? doctorInstructions,
+    Expression<String>? receivingHospital,
+    Expression<String>? receivingTime,
+    Expression<bool>? isRefusedHospital,
+    Expression<String>? relationship,
+    Expression<String>? relativeName,
+    Expression<String>? relativePhone,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (medicalId != null) 'medical_id': medicalId,
+      if (doctorInstructions != null) 'doctor_instructions': doctorInstructions,
+      if (receivingHospital != null) 'receiving_hospital': receivingHospital,
+      if (receivingTime != null) 'receiving_time': receivingTime,
+      if (isRefusedHospital != null) 'is_refused_hospital': isRefusedHospital,
+      if (relationship != null) 'relationship': relationship,
+      if (relativeName != null) 'relative_name': relativeName,
+      if (relativePhone != null) 'relative_phone': relativePhone,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+    });
+  }
+
+  AmbulanceTreatmentRecordsCompanion copyWith({
+    Value<int>? id,
+    Value<int>? medicalId,
+    Value<String?>? doctorInstructions,
+    Value<String?>? receivingHospital,
+    Value<String?>? receivingTime,
+    Value<bool>? isRefusedHospital,
+    Value<String>? relationship,
+    Value<String?>? relativeName,
+    Value<String?>? relativePhone,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+  }) {
+    return AmbulanceTreatmentRecordsCompanion(
+      id: id ?? this.id,
+      medicalId: medicalId ?? this.medicalId,
+      doctorInstructions: doctorInstructions ?? this.doctorInstructions,
+      receivingHospital: receivingHospital ?? this.receivingHospital,
+      receivingTime: receivingTime ?? this.receivingTime,
+      isRefusedHospital: isRefusedHospital ?? this.isRefusedHospital,
+      relationship: relationship ?? this.relationship,
+      relativeName: relativeName ?? this.relativeName,
+      relativePhone: relativePhone ?? this.relativePhone,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (medicalId.present) {
+      map['medical_id'] = Variable<int>(medicalId.value);
+    }
+    if (doctorInstructions.present) {
+      map['doctor_instructions'] = Variable<String>(doctorInstructions.value);
+    }
+    if (receivingHospital.present) {
+      map['receiving_hospital'] = Variable<String>(receivingHospital.value);
+    }
+    if (receivingTime.present) {
+      map['receiving_time'] = Variable<String>(receivingTime.value);
+    }
+    if (isRefusedHospital.present) {
+      map['is_refused_hospital'] = Variable<bool>(isRefusedHospital.value);
+    }
+    if (relationship.present) {
+      map['relationship'] = Variable<String>(relationship.value);
+    }
+    if (relativeName.present) {
+      map['relative_name'] = Variable<String>(relativeName.value);
+    }
+    if (relativePhone.present) {
+      map['relative_phone'] = Variable<String>(relativePhone.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AmbulanceTreatmentRecordsCompanion(')
+          ..write('id: $id, ')
+          ..write('medicalId: $medicalId, ')
+          ..write('doctorInstructions: $doctorInstructions, ')
+          ..write('receivingHospital: $receivingHospital, ')
+          ..write('receivingTime: $receivingTime, ')
+          ..write('isRefusedHospital: $isRefusedHospital, ')
+          ..write('relationship: $relationship, ')
+          ..write('relativeName: $relativeName, ')
+          ..write('relativePhone: $relativePhone, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $AmbulanceTreatmentCategoriesTable extends AmbulanceTreatmentCategories
+    with
+        TableInfo<
+          $AmbulanceTreatmentCategoriesTable,
+          AmbulanceTreatmentCategoryData
+        > {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $AmbulanceTreatmentCategoriesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _codeMeta = const VerificationMeta('code');
+  @override
+  late final GeneratedColumn<String> code = GeneratedColumn<String>(
+    'code',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'),
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sortOrderMeta = const VerificationMeta(
+    'sortOrder',
+  );
+  @override
+  late final GeneratedColumn<int> sortOrder = GeneratedColumn<int>(
+    'sort_order',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, code, name, sortOrder];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'ambulance_treatment_categories';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<AmbulanceTreatmentCategoryData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('code')) {
+      context.handle(
+        _codeMeta,
+        code.isAcceptableOrUnknown(data['code']!, _codeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_codeMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('sort_order')) {
+      context.handle(
+        _sortOrderMeta,
+        sortOrder.isAcceptableOrUnknown(data['sort_order']!, _sortOrderMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  AmbulanceTreatmentCategoryData map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return AmbulanceTreatmentCategoryData(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      code: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}code'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      sortOrder: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}sort_order'],
+      )!,
+    );
+  }
+
+  @override
+  $AmbulanceTreatmentCategoriesTable createAlias(String alias) {
+    return $AmbulanceTreatmentCategoriesTable(attachedDatabase, alias);
+  }
+}
+
+class AmbulanceTreatmentCategoryData extends DataClass
+    implements Insertable<AmbulanceTreatmentCategoryData> {
+  final int id;
+  final String code;
+  final String name;
+  final int sortOrder;
+  const AmbulanceTreatmentCategoryData({
+    required this.id,
+    required this.code,
+    required this.name,
+    required this.sortOrder,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['code'] = Variable<String>(code);
+    map['name'] = Variable<String>(name);
+    map['sort_order'] = Variable<int>(sortOrder);
+    return map;
+  }
+
+  AmbulanceTreatmentCategoriesCompanion toCompanion(bool nullToAbsent) {
+    return AmbulanceTreatmentCategoriesCompanion(
+      id: Value(id),
+      code: Value(code),
+      name: Value(name),
+      sortOrder: Value(sortOrder),
+    );
+  }
+
+  factory AmbulanceTreatmentCategoryData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return AmbulanceTreatmentCategoryData(
+      id: serializer.fromJson<int>(json['id']),
+      code: serializer.fromJson<String>(json['code']),
+      name: serializer.fromJson<String>(json['name']),
+      sortOrder: serializer.fromJson<int>(json['sortOrder']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'code': serializer.toJson<String>(code),
+      'name': serializer.toJson<String>(name),
+      'sortOrder': serializer.toJson<int>(sortOrder),
+    };
+  }
+
+  AmbulanceTreatmentCategoryData copyWith({
+    int? id,
+    String? code,
+    String? name,
+    int? sortOrder,
+  }) => AmbulanceTreatmentCategoryData(
+    id: id ?? this.id,
+    code: code ?? this.code,
+    name: name ?? this.name,
+    sortOrder: sortOrder ?? this.sortOrder,
+  );
+  AmbulanceTreatmentCategoryData copyWithCompanion(
+    AmbulanceTreatmentCategoriesCompanion data,
+  ) {
+    return AmbulanceTreatmentCategoryData(
+      id: data.id.present ? data.id.value : this.id,
+      code: data.code.present ? data.code.value : this.code,
+      name: data.name.present ? data.name.value : this.name,
+      sortOrder: data.sortOrder.present ? data.sortOrder.value : this.sortOrder,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AmbulanceTreatmentCategoryData(')
+          ..write('id: $id, ')
+          ..write('code: $code, ')
+          ..write('name: $name, ')
+          ..write('sortOrder: $sortOrder')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, code, name, sortOrder);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is AmbulanceTreatmentCategoryData &&
+          other.id == this.id &&
+          other.code == this.code &&
+          other.name == this.name &&
+          other.sortOrder == this.sortOrder);
+}
+
+class AmbulanceTreatmentCategoriesCompanion
+    extends UpdateCompanion<AmbulanceTreatmentCategoryData> {
+  final Value<int> id;
+  final Value<String> code;
+  final Value<String> name;
+  final Value<int> sortOrder;
+  const AmbulanceTreatmentCategoriesCompanion({
+    this.id = const Value.absent(),
+    this.code = const Value.absent(),
+    this.name = const Value.absent(),
+    this.sortOrder = const Value.absent(),
+  });
+  AmbulanceTreatmentCategoriesCompanion.insert({
+    this.id = const Value.absent(),
+    required String code,
+    required String name,
+    this.sortOrder = const Value.absent(),
+  }) : code = Value(code),
+       name = Value(name);
+  static Insertable<AmbulanceTreatmentCategoryData> custom({
+    Expression<int>? id,
+    Expression<String>? code,
+    Expression<String>? name,
+    Expression<int>? sortOrder,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (code != null) 'code': code,
+      if (name != null) 'name': name,
+      if (sortOrder != null) 'sort_order': sortOrder,
+    });
+  }
+
+  AmbulanceTreatmentCategoriesCompanion copyWith({
+    Value<int>? id,
+    Value<String>? code,
+    Value<String>? name,
+    Value<int>? sortOrder,
+  }) {
+    return AmbulanceTreatmentCategoriesCompanion(
+      id: id ?? this.id,
+      code: code ?? this.code,
+      name: name ?? this.name,
+      sortOrder: sortOrder ?? this.sortOrder,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (code.present) {
+      map['code'] = Variable<String>(code.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (sortOrder.present) {
+      map['sort_order'] = Variable<int>(sortOrder.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AmbulanceTreatmentCategoriesCompanion(')
+          ..write('id: $id, ')
+          ..write('code: $code, ')
+          ..write('name: $name, ')
+          ..write('sortOrder: $sortOrder')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $AmbulanceTreatmentItemsTable extends AmbulanceTreatmentItems
+    with TableInfo<$AmbulanceTreatmentItemsTable, AmbulanceTreatmentItemData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $AmbulanceTreatmentItemsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _categoryIdMeta = const VerificationMeta(
+    'categoryId',
+  );
+  @override
+  late final GeneratedColumn<int> categoryId = GeneratedColumn<int>(
+    'category_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES ambulance_treatment_categories (id)',
+    ),
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sortOrderMeta = const VerificationMeta(
+    'sortOrder',
+  );
+  @override
+  late final GeneratedColumn<int> sortOrder = GeneratedColumn<int>(
+    'sort_order',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _isOtherMeta = const VerificationMeta(
+    'isOther',
+  );
+  @override
+  late final GeneratedColumn<bool> isOther = GeneratedColumn<bool>(
+    'is_other',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_other" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    categoryId,
+    name,
+    sortOrder,
+    isOther,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'ambulance_treatment_items';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<AmbulanceTreatmentItemData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('category_id')) {
+      context.handle(
+        _categoryIdMeta,
+        categoryId.isAcceptableOrUnknown(data['category_id']!, _categoryIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_categoryIdMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('sort_order')) {
+      context.handle(
+        _sortOrderMeta,
+        sortOrder.isAcceptableOrUnknown(data['sort_order']!, _sortOrderMeta),
+      );
+    }
+    if (data.containsKey('is_other')) {
+      context.handle(
+        _isOtherMeta,
+        isOther.isAcceptableOrUnknown(data['is_other']!, _isOtherMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  AmbulanceTreatmentItemData map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return AmbulanceTreatmentItemData(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      categoryId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}category_id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      sortOrder: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}sort_order'],
+      )!,
+      isOther: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_other'],
+      )!,
+    );
+  }
+
+  @override
+  $AmbulanceTreatmentItemsTable createAlias(String alias) {
+    return $AmbulanceTreatmentItemsTable(attachedDatabase, alias);
+  }
+}
+
+class AmbulanceTreatmentItemData extends DataClass
+    implements Insertable<AmbulanceTreatmentItemData> {
+  final int id;
+  final int categoryId;
+  final String name;
+  final int sortOrder;
+  final bool isOther;
+  const AmbulanceTreatmentItemData({
+    required this.id,
+    required this.categoryId,
+    required this.name,
+    required this.sortOrder,
+    required this.isOther,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['category_id'] = Variable<int>(categoryId);
+    map['name'] = Variable<String>(name);
+    map['sort_order'] = Variable<int>(sortOrder);
+    map['is_other'] = Variable<bool>(isOther);
+    return map;
+  }
+
+  AmbulanceTreatmentItemsCompanion toCompanion(bool nullToAbsent) {
+    return AmbulanceTreatmentItemsCompanion(
+      id: Value(id),
+      categoryId: Value(categoryId),
+      name: Value(name),
+      sortOrder: Value(sortOrder),
+      isOther: Value(isOther),
+    );
+  }
+
+  factory AmbulanceTreatmentItemData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return AmbulanceTreatmentItemData(
+      id: serializer.fromJson<int>(json['id']),
+      categoryId: serializer.fromJson<int>(json['categoryId']),
+      name: serializer.fromJson<String>(json['name']),
+      sortOrder: serializer.fromJson<int>(json['sortOrder']),
+      isOther: serializer.fromJson<bool>(json['isOther']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'categoryId': serializer.toJson<int>(categoryId),
+      'name': serializer.toJson<String>(name),
+      'sortOrder': serializer.toJson<int>(sortOrder),
+      'isOther': serializer.toJson<bool>(isOther),
+    };
+  }
+
+  AmbulanceTreatmentItemData copyWith({
+    int? id,
+    int? categoryId,
+    String? name,
+    int? sortOrder,
+    bool? isOther,
+  }) => AmbulanceTreatmentItemData(
+    id: id ?? this.id,
+    categoryId: categoryId ?? this.categoryId,
+    name: name ?? this.name,
+    sortOrder: sortOrder ?? this.sortOrder,
+    isOther: isOther ?? this.isOther,
+  );
+  AmbulanceTreatmentItemData copyWithCompanion(
+    AmbulanceTreatmentItemsCompanion data,
+  ) {
+    return AmbulanceTreatmentItemData(
+      id: data.id.present ? data.id.value : this.id,
+      categoryId: data.categoryId.present
+          ? data.categoryId.value
+          : this.categoryId,
+      name: data.name.present ? data.name.value : this.name,
+      sortOrder: data.sortOrder.present ? data.sortOrder.value : this.sortOrder,
+      isOther: data.isOther.present ? data.isOther.value : this.isOther,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AmbulanceTreatmentItemData(')
+          ..write('id: $id, ')
+          ..write('categoryId: $categoryId, ')
+          ..write('name: $name, ')
+          ..write('sortOrder: $sortOrder, ')
+          ..write('isOther: $isOther')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, categoryId, name, sortOrder, isOther);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is AmbulanceTreatmentItemData &&
+          other.id == this.id &&
+          other.categoryId == this.categoryId &&
+          other.name == this.name &&
+          other.sortOrder == this.sortOrder &&
+          other.isOther == this.isOther);
+}
+
+class AmbulanceTreatmentItemsCompanion
+    extends UpdateCompanion<AmbulanceTreatmentItemData> {
+  final Value<int> id;
+  final Value<int> categoryId;
+  final Value<String> name;
+  final Value<int> sortOrder;
+  final Value<bool> isOther;
+  const AmbulanceTreatmentItemsCompanion({
+    this.id = const Value.absent(),
+    this.categoryId = const Value.absent(),
+    this.name = const Value.absent(),
+    this.sortOrder = const Value.absent(),
+    this.isOther = const Value.absent(),
+  });
+  AmbulanceTreatmentItemsCompanion.insert({
+    this.id = const Value.absent(),
+    required int categoryId,
+    required String name,
+    this.sortOrder = const Value.absent(),
+    this.isOther = const Value.absent(),
+  }) : categoryId = Value(categoryId),
+       name = Value(name);
+  static Insertable<AmbulanceTreatmentItemData> custom({
+    Expression<int>? id,
+    Expression<int>? categoryId,
+    Expression<String>? name,
+    Expression<int>? sortOrder,
+    Expression<bool>? isOther,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (categoryId != null) 'category_id': categoryId,
+      if (name != null) 'name': name,
+      if (sortOrder != null) 'sort_order': sortOrder,
+      if (isOther != null) 'is_other': isOther,
+    });
+  }
+
+  AmbulanceTreatmentItemsCompanion copyWith({
+    Value<int>? id,
+    Value<int>? categoryId,
+    Value<String>? name,
+    Value<int>? sortOrder,
+    Value<bool>? isOther,
+  }) {
+    return AmbulanceTreatmentItemsCompanion(
+      id: id ?? this.id,
+      categoryId: categoryId ?? this.categoryId,
+      name: name ?? this.name,
+      sortOrder: sortOrder ?? this.sortOrder,
+      isOther: isOther ?? this.isOther,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (categoryId.present) {
+      map['category_id'] = Variable<int>(categoryId.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (sortOrder.present) {
+      map['sort_order'] = Variable<int>(sortOrder.value);
+    }
+    if (isOther.present) {
+      map['is_other'] = Variable<bool>(isOther.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AmbulanceTreatmentItemsCompanion(')
+          ..write('id: $id, ')
+          ..write('categoryId: $categoryId, ')
+          ..write('name: $name, ')
+          ..write('sortOrder: $sortOrder, ')
+          ..write('isOther: $isOther')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $AmbulanceTreatmentRecordItemsTable extends AmbulanceTreatmentRecordItems
+    with
+        TableInfo<
+          $AmbulanceTreatmentRecordItemsTable,
+          AmbulanceTreatmentRecordItemData
+        > {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $AmbulanceTreatmentRecordItemsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _recordIdMeta = const VerificationMeta(
+    'recordId',
+  );
+  @override
+  late final GeneratedColumn<int> recordId = GeneratedColumn<int>(
+    'record_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES ambulance_treatment_records (id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _itemIdMeta = const VerificationMeta('itemId');
+  @override
+  late final GeneratedColumn<int> itemId = GeneratedColumn<int>(
+    'item_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES ambulance_treatment_items (id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _tubeSizeMeta = const VerificationMeta(
+    'tubeSize',
+  );
+  @override
+  late final GeneratedColumn<String> tubeSize = GeneratedColumn<String>(
+    'tube_size',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _fixationDepthMeta = const VerificationMeta(
+    'fixationDepth',
+  );
+  @override
+  late final GeneratedColumn<String> fixationDepth = GeneratedColumn<String>(
+    'fixation_depth',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _shockCountMeta = const VerificationMeta(
+    'shockCount',
+  );
+  @override
+  late final GeneratedColumn<String> shockCount = GeneratedColumn<String>(
+    'shock_count',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _shockJoulesMeta = const VerificationMeta(
+    'shockJoules',
+  );
+  @override
+  late final GeneratedColumn<String> shockJoules = GeneratedColumn<String>(
+    'shock_joules',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _otherDescriptionMeta = const VerificationMeta(
+    'otherDescription',
+  );
+  @override
+  late final GeneratedColumn<String> otherDescription = GeneratedColumn<String>(
+    'other_description',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    recordId,
+    itemId,
+    tubeSize,
+    fixationDepth,
+    shockCount,
+    shockJoules,
+    otherDescription,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'ambulance_treatment_record_items';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<AmbulanceTreatmentRecordItemData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('record_id')) {
+      context.handle(
+        _recordIdMeta,
+        recordId.isAcceptableOrUnknown(data['record_id']!, _recordIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_recordIdMeta);
+    }
+    if (data.containsKey('item_id')) {
+      context.handle(
+        _itemIdMeta,
+        itemId.isAcceptableOrUnknown(data['item_id']!, _itemIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_itemIdMeta);
+    }
+    if (data.containsKey('tube_size')) {
+      context.handle(
+        _tubeSizeMeta,
+        tubeSize.isAcceptableOrUnknown(data['tube_size']!, _tubeSizeMeta),
+      );
+    }
+    if (data.containsKey('fixation_depth')) {
+      context.handle(
+        _fixationDepthMeta,
+        fixationDepth.isAcceptableOrUnknown(
+          data['fixation_depth']!,
+          _fixationDepthMeta,
+        ),
+      );
+    }
+    if (data.containsKey('shock_count')) {
+      context.handle(
+        _shockCountMeta,
+        shockCount.isAcceptableOrUnknown(data['shock_count']!, _shockCountMeta),
+      );
+    }
+    if (data.containsKey('shock_joules')) {
+      context.handle(
+        _shockJoulesMeta,
+        shockJoules.isAcceptableOrUnknown(
+          data['shock_joules']!,
+          _shockJoulesMeta,
+        ),
+      );
+    }
+    if (data.containsKey('other_description')) {
+      context.handle(
+        _otherDescriptionMeta,
+        otherDescription.isAcceptableOrUnknown(
+          data['other_description']!,
+          _otherDescriptionMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  AmbulanceTreatmentRecordItemData map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return AmbulanceTreatmentRecordItemData(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      recordId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}record_id'],
+      )!,
+      itemId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}item_id'],
+      )!,
+      tubeSize: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}tube_size'],
+      ),
+      fixationDepth: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}fixation_depth'],
+      ),
+      shockCount: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}shock_count'],
+      ),
+      shockJoules: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}shock_joules'],
+      ),
+      otherDescription: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}other_description'],
+      ),
+    );
+  }
+
+  @override
+  $AmbulanceTreatmentRecordItemsTable createAlias(String alias) {
+    return $AmbulanceTreatmentRecordItemsTable(attachedDatabase, alias);
+  }
+}
+
+class AmbulanceTreatmentRecordItemData extends DataClass
+    implements Insertable<AmbulanceTreatmentRecordItemData> {
+  final int id;
+  final int recordId;
+  final int itemId;
+  final String? tubeSize;
+  final String? fixationDepth;
+  final String? shockCount;
+  final String? shockJoules;
+  final String? otherDescription;
+  const AmbulanceTreatmentRecordItemData({
+    required this.id,
+    required this.recordId,
+    required this.itemId,
+    this.tubeSize,
+    this.fixationDepth,
+    this.shockCount,
+    this.shockJoules,
+    this.otherDescription,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['record_id'] = Variable<int>(recordId);
+    map['item_id'] = Variable<int>(itemId);
+    if (!nullToAbsent || tubeSize != null) {
+      map['tube_size'] = Variable<String>(tubeSize);
+    }
+    if (!nullToAbsent || fixationDepth != null) {
+      map['fixation_depth'] = Variable<String>(fixationDepth);
+    }
+    if (!nullToAbsent || shockCount != null) {
+      map['shock_count'] = Variable<String>(shockCount);
+    }
+    if (!nullToAbsent || shockJoules != null) {
+      map['shock_joules'] = Variable<String>(shockJoules);
+    }
+    if (!nullToAbsent || otherDescription != null) {
+      map['other_description'] = Variable<String>(otherDescription);
+    }
+    return map;
+  }
+
+  AmbulanceTreatmentRecordItemsCompanion toCompanion(bool nullToAbsent) {
+    return AmbulanceTreatmentRecordItemsCompanion(
+      id: Value(id),
+      recordId: Value(recordId),
+      itemId: Value(itemId),
+      tubeSize: tubeSize == null && nullToAbsent
+          ? const Value.absent()
+          : Value(tubeSize),
+      fixationDepth: fixationDepth == null && nullToAbsent
+          ? const Value.absent()
+          : Value(fixationDepth),
+      shockCount: shockCount == null && nullToAbsent
+          ? const Value.absent()
+          : Value(shockCount),
+      shockJoules: shockJoules == null && nullToAbsent
+          ? const Value.absent()
+          : Value(shockJoules),
+      otherDescription: otherDescription == null && nullToAbsent
+          ? const Value.absent()
+          : Value(otherDescription),
+    );
+  }
+
+  factory AmbulanceTreatmentRecordItemData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return AmbulanceTreatmentRecordItemData(
+      id: serializer.fromJson<int>(json['id']),
+      recordId: serializer.fromJson<int>(json['recordId']),
+      itemId: serializer.fromJson<int>(json['itemId']),
+      tubeSize: serializer.fromJson<String?>(json['tubeSize']),
+      fixationDepth: serializer.fromJson<String?>(json['fixationDepth']),
+      shockCount: serializer.fromJson<String?>(json['shockCount']),
+      shockJoules: serializer.fromJson<String?>(json['shockJoules']),
+      otherDescription: serializer.fromJson<String?>(json['otherDescription']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'recordId': serializer.toJson<int>(recordId),
+      'itemId': serializer.toJson<int>(itemId),
+      'tubeSize': serializer.toJson<String?>(tubeSize),
+      'fixationDepth': serializer.toJson<String?>(fixationDepth),
+      'shockCount': serializer.toJson<String?>(shockCount),
+      'shockJoules': serializer.toJson<String?>(shockJoules),
+      'otherDescription': serializer.toJson<String?>(otherDescription),
+    };
+  }
+
+  AmbulanceTreatmentRecordItemData copyWith({
+    int? id,
+    int? recordId,
+    int? itemId,
+    Value<String?> tubeSize = const Value.absent(),
+    Value<String?> fixationDepth = const Value.absent(),
+    Value<String?> shockCount = const Value.absent(),
+    Value<String?> shockJoules = const Value.absent(),
+    Value<String?> otherDescription = const Value.absent(),
+  }) => AmbulanceTreatmentRecordItemData(
+    id: id ?? this.id,
+    recordId: recordId ?? this.recordId,
+    itemId: itemId ?? this.itemId,
+    tubeSize: tubeSize.present ? tubeSize.value : this.tubeSize,
+    fixationDepth: fixationDepth.present
+        ? fixationDepth.value
+        : this.fixationDepth,
+    shockCount: shockCount.present ? shockCount.value : this.shockCount,
+    shockJoules: shockJoules.present ? shockJoules.value : this.shockJoules,
+    otherDescription: otherDescription.present
+        ? otherDescription.value
+        : this.otherDescription,
+  );
+  AmbulanceTreatmentRecordItemData copyWithCompanion(
+    AmbulanceTreatmentRecordItemsCompanion data,
+  ) {
+    return AmbulanceTreatmentRecordItemData(
+      id: data.id.present ? data.id.value : this.id,
+      recordId: data.recordId.present ? data.recordId.value : this.recordId,
+      itemId: data.itemId.present ? data.itemId.value : this.itemId,
+      tubeSize: data.tubeSize.present ? data.tubeSize.value : this.tubeSize,
+      fixationDepth: data.fixationDepth.present
+          ? data.fixationDepth.value
+          : this.fixationDepth,
+      shockCount: data.shockCount.present
+          ? data.shockCount.value
+          : this.shockCount,
+      shockJoules: data.shockJoules.present
+          ? data.shockJoules.value
+          : this.shockJoules,
+      otherDescription: data.otherDescription.present
+          ? data.otherDescription.value
+          : this.otherDescription,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AmbulanceTreatmentRecordItemData(')
+          ..write('id: $id, ')
+          ..write('recordId: $recordId, ')
+          ..write('itemId: $itemId, ')
+          ..write('tubeSize: $tubeSize, ')
+          ..write('fixationDepth: $fixationDepth, ')
+          ..write('shockCount: $shockCount, ')
+          ..write('shockJoules: $shockJoules, ')
+          ..write('otherDescription: $otherDescription')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    recordId,
+    itemId,
+    tubeSize,
+    fixationDepth,
+    shockCount,
+    shockJoules,
+    otherDescription,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is AmbulanceTreatmentRecordItemData &&
+          other.id == this.id &&
+          other.recordId == this.recordId &&
+          other.itemId == this.itemId &&
+          other.tubeSize == this.tubeSize &&
+          other.fixationDepth == this.fixationDepth &&
+          other.shockCount == this.shockCount &&
+          other.shockJoules == this.shockJoules &&
+          other.otherDescription == this.otherDescription);
+}
+
+class AmbulanceTreatmentRecordItemsCompanion
+    extends UpdateCompanion<AmbulanceTreatmentRecordItemData> {
+  final Value<int> id;
+  final Value<int> recordId;
+  final Value<int> itemId;
+  final Value<String?> tubeSize;
+  final Value<String?> fixationDepth;
+  final Value<String?> shockCount;
+  final Value<String?> shockJoules;
+  final Value<String?> otherDescription;
+  const AmbulanceTreatmentRecordItemsCompanion({
+    this.id = const Value.absent(),
+    this.recordId = const Value.absent(),
+    this.itemId = const Value.absent(),
+    this.tubeSize = const Value.absent(),
+    this.fixationDepth = const Value.absent(),
+    this.shockCount = const Value.absent(),
+    this.shockJoules = const Value.absent(),
+    this.otherDescription = const Value.absent(),
+  });
+  AmbulanceTreatmentRecordItemsCompanion.insert({
+    this.id = const Value.absent(),
+    required int recordId,
+    required int itemId,
+    this.tubeSize = const Value.absent(),
+    this.fixationDepth = const Value.absent(),
+    this.shockCount = const Value.absent(),
+    this.shockJoules = const Value.absent(),
+    this.otherDescription = const Value.absent(),
+  }) : recordId = Value(recordId),
+       itemId = Value(itemId);
+  static Insertable<AmbulanceTreatmentRecordItemData> custom({
+    Expression<int>? id,
+    Expression<int>? recordId,
+    Expression<int>? itemId,
+    Expression<String>? tubeSize,
+    Expression<String>? fixationDepth,
+    Expression<String>? shockCount,
+    Expression<String>? shockJoules,
+    Expression<String>? otherDescription,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (recordId != null) 'record_id': recordId,
+      if (itemId != null) 'item_id': itemId,
+      if (tubeSize != null) 'tube_size': tubeSize,
+      if (fixationDepth != null) 'fixation_depth': fixationDepth,
+      if (shockCount != null) 'shock_count': shockCount,
+      if (shockJoules != null) 'shock_joules': shockJoules,
+      if (otherDescription != null) 'other_description': otherDescription,
+    });
+  }
+
+  AmbulanceTreatmentRecordItemsCompanion copyWith({
+    Value<int>? id,
+    Value<int>? recordId,
+    Value<int>? itemId,
+    Value<String?>? tubeSize,
+    Value<String?>? fixationDepth,
+    Value<String?>? shockCount,
+    Value<String?>? shockJoules,
+    Value<String?>? otherDescription,
+  }) {
+    return AmbulanceTreatmentRecordItemsCompanion(
+      id: id ?? this.id,
+      recordId: recordId ?? this.recordId,
+      itemId: itemId ?? this.itemId,
+      tubeSize: tubeSize ?? this.tubeSize,
+      fixationDepth: fixationDepth ?? this.fixationDepth,
+      shockCount: shockCount ?? this.shockCount,
+      shockJoules: shockJoules ?? this.shockJoules,
+      otherDescription: otherDescription ?? this.otherDescription,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (recordId.present) {
+      map['record_id'] = Variable<int>(recordId.value);
+    }
+    if (itemId.present) {
+      map['item_id'] = Variable<int>(itemId.value);
+    }
+    if (tubeSize.present) {
+      map['tube_size'] = Variable<String>(tubeSize.value);
+    }
+    if (fixationDepth.present) {
+      map['fixation_depth'] = Variable<String>(fixationDepth.value);
+    }
+    if (shockCount.present) {
+      map['shock_count'] = Variable<String>(shockCount.value);
+    }
+    if (shockJoules.present) {
+      map['shock_joules'] = Variable<String>(shockJoules.value);
+    }
+    if (otherDescription.present) {
+      map['other_description'] = Variable<String>(otherDescription.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AmbulanceTreatmentRecordItemsCompanion(')
+          ..write('id: $id, ')
+          ..write('recordId: $recordId, ')
+          ..write('itemId: $itemId, ')
+          ..write('tubeSize: $tubeSize, ')
+          ..write('fixationDepth: $fixationDepth, ')
+          ..write('shockCount: $shockCount, ')
+          ..write('shockJoules: $shockJoules, ')
+          ..write('otherDescription: $otherDescription')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $AmbulanceMedicationLogsTable extends AmbulanceMedicationLogs
+    with TableInfo<$AmbulanceMedicationLogsTable, AmbulanceMedicationLogData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $AmbulanceMedicationLogsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _recordIdMeta = const VerificationMeta(
+    'recordId',
+  );
+  @override
+  late final GeneratedColumn<int> recordId = GeneratedColumn<int>(
+    'record_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES ambulance_treatment_records (id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _timeMeta = const VerificationMeta('time');
+  @override
+  late final GeneratedColumn<String> time = GeneratedColumn<String>(
+    'time',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _drugNameMeta = const VerificationMeta(
+    'drugName',
+  );
+  @override
+  late final GeneratedColumn<String> drugName = GeneratedColumn<String>(
+    'drug_name',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _routeMeta = const VerificationMeta('route');
+  @override
+  late final GeneratedColumn<String> route = GeneratedColumn<String>(
+    'route',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _doseMeta = const VerificationMeta('dose');
+  @override
+  late final GeneratedColumn<String> dose = GeneratedColumn<String>(
+    'dose',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _emtNameMeta = const VerificationMeta(
+    'emtName',
+  );
+  @override
+  late final GeneratedColumn<String> emtName = GeneratedColumn<String>(
+    'emt_name',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    recordId,
+    time,
+    drugName,
+    route,
+    dose,
+    emtName,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'ambulance_medication_logs';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<AmbulanceMedicationLogData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('record_id')) {
+      context.handle(
+        _recordIdMeta,
+        recordId.isAcceptableOrUnknown(data['record_id']!, _recordIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_recordIdMeta);
+    }
+    if (data.containsKey('time')) {
+      context.handle(
+        _timeMeta,
+        time.isAcceptableOrUnknown(data['time']!, _timeMeta),
+      );
+    }
+    if (data.containsKey('drug_name')) {
+      context.handle(
+        _drugNameMeta,
+        drugName.isAcceptableOrUnknown(data['drug_name']!, _drugNameMeta),
+      );
+    }
+    if (data.containsKey('route')) {
+      context.handle(
+        _routeMeta,
+        route.isAcceptableOrUnknown(data['route']!, _routeMeta),
+      );
+    }
+    if (data.containsKey('dose')) {
+      context.handle(
+        _doseMeta,
+        dose.isAcceptableOrUnknown(data['dose']!, _doseMeta),
+      );
+    }
+    if (data.containsKey('emt_name')) {
+      context.handle(
+        _emtNameMeta,
+        emtName.isAcceptableOrUnknown(data['emt_name']!, _emtNameMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  AmbulanceMedicationLogData map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return AmbulanceMedicationLogData(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      recordId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}record_id'],
+      )!,
+      time: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}time'],
+      ),
+      drugName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}drug_name'],
+      ),
+      route: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}route'],
+      ),
+      dose: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}dose'],
+      ),
+      emtName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}emt_name'],
+      ),
+    );
+  }
+
+  @override
+  $AmbulanceMedicationLogsTable createAlias(String alias) {
+    return $AmbulanceMedicationLogsTable(attachedDatabase, alias);
+  }
+}
+
+class AmbulanceMedicationLogData extends DataClass
+    implements Insertable<AmbulanceMedicationLogData> {
+  final int id;
+  final int recordId;
+  final String? time;
+  final String? drugName;
+  final String? route;
+  final String? dose;
+  final String? emtName;
+  const AmbulanceMedicationLogData({
+    required this.id,
+    required this.recordId,
+    this.time,
+    this.drugName,
+    this.route,
+    this.dose,
+    this.emtName,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['record_id'] = Variable<int>(recordId);
+    if (!nullToAbsent || time != null) {
+      map['time'] = Variable<String>(time);
+    }
+    if (!nullToAbsent || drugName != null) {
+      map['drug_name'] = Variable<String>(drugName);
+    }
+    if (!nullToAbsent || route != null) {
+      map['route'] = Variable<String>(route);
+    }
+    if (!nullToAbsent || dose != null) {
+      map['dose'] = Variable<String>(dose);
+    }
+    if (!nullToAbsent || emtName != null) {
+      map['emt_name'] = Variable<String>(emtName);
+    }
+    return map;
+  }
+
+  AmbulanceMedicationLogsCompanion toCompanion(bool nullToAbsent) {
+    return AmbulanceMedicationLogsCompanion(
+      id: Value(id),
+      recordId: Value(recordId),
+      time: time == null && nullToAbsent ? const Value.absent() : Value(time),
+      drugName: drugName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(drugName),
+      route: route == null && nullToAbsent
+          ? const Value.absent()
+          : Value(route),
+      dose: dose == null && nullToAbsent ? const Value.absent() : Value(dose),
+      emtName: emtName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(emtName),
+    );
+  }
+
+  factory AmbulanceMedicationLogData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return AmbulanceMedicationLogData(
+      id: serializer.fromJson<int>(json['id']),
+      recordId: serializer.fromJson<int>(json['recordId']),
+      time: serializer.fromJson<String?>(json['time']),
+      drugName: serializer.fromJson<String?>(json['drugName']),
+      route: serializer.fromJson<String?>(json['route']),
+      dose: serializer.fromJson<String?>(json['dose']),
+      emtName: serializer.fromJson<String?>(json['emtName']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'recordId': serializer.toJson<int>(recordId),
+      'time': serializer.toJson<String?>(time),
+      'drugName': serializer.toJson<String?>(drugName),
+      'route': serializer.toJson<String?>(route),
+      'dose': serializer.toJson<String?>(dose),
+      'emtName': serializer.toJson<String?>(emtName),
+    };
+  }
+
+  AmbulanceMedicationLogData copyWith({
+    int? id,
+    int? recordId,
+    Value<String?> time = const Value.absent(),
+    Value<String?> drugName = const Value.absent(),
+    Value<String?> route = const Value.absent(),
+    Value<String?> dose = const Value.absent(),
+    Value<String?> emtName = const Value.absent(),
+  }) => AmbulanceMedicationLogData(
+    id: id ?? this.id,
+    recordId: recordId ?? this.recordId,
+    time: time.present ? time.value : this.time,
+    drugName: drugName.present ? drugName.value : this.drugName,
+    route: route.present ? route.value : this.route,
+    dose: dose.present ? dose.value : this.dose,
+    emtName: emtName.present ? emtName.value : this.emtName,
+  );
+  AmbulanceMedicationLogData copyWithCompanion(
+    AmbulanceMedicationLogsCompanion data,
+  ) {
+    return AmbulanceMedicationLogData(
+      id: data.id.present ? data.id.value : this.id,
+      recordId: data.recordId.present ? data.recordId.value : this.recordId,
+      time: data.time.present ? data.time.value : this.time,
+      drugName: data.drugName.present ? data.drugName.value : this.drugName,
+      route: data.route.present ? data.route.value : this.route,
+      dose: data.dose.present ? data.dose.value : this.dose,
+      emtName: data.emtName.present ? data.emtName.value : this.emtName,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AmbulanceMedicationLogData(')
+          ..write('id: $id, ')
+          ..write('recordId: $recordId, ')
+          ..write('time: $time, ')
+          ..write('drugName: $drugName, ')
+          ..write('route: $route, ')
+          ..write('dose: $dose, ')
+          ..write('emtName: $emtName')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, recordId, time, drugName, route, dose, emtName);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is AmbulanceMedicationLogData &&
+          other.id == this.id &&
+          other.recordId == this.recordId &&
+          other.time == this.time &&
+          other.drugName == this.drugName &&
+          other.route == this.route &&
+          other.dose == this.dose &&
+          other.emtName == this.emtName);
+}
+
+class AmbulanceMedicationLogsCompanion
+    extends UpdateCompanion<AmbulanceMedicationLogData> {
+  final Value<int> id;
+  final Value<int> recordId;
+  final Value<String?> time;
+  final Value<String?> drugName;
+  final Value<String?> route;
+  final Value<String?> dose;
+  final Value<String?> emtName;
+  const AmbulanceMedicationLogsCompanion({
+    this.id = const Value.absent(),
+    this.recordId = const Value.absent(),
+    this.time = const Value.absent(),
+    this.drugName = const Value.absent(),
+    this.route = const Value.absent(),
+    this.dose = const Value.absent(),
+    this.emtName = const Value.absent(),
+  });
+  AmbulanceMedicationLogsCompanion.insert({
+    this.id = const Value.absent(),
+    required int recordId,
+    this.time = const Value.absent(),
+    this.drugName = const Value.absent(),
+    this.route = const Value.absent(),
+    this.dose = const Value.absent(),
+    this.emtName = const Value.absent(),
+  }) : recordId = Value(recordId);
+  static Insertable<AmbulanceMedicationLogData> custom({
+    Expression<int>? id,
+    Expression<int>? recordId,
+    Expression<String>? time,
+    Expression<String>? drugName,
+    Expression<String>? route,
+    Expression<String>? dose,
+    Expression<String>? emtName,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (recordId != null) 'record_id': recordId,
+      if (time != null) 'time': time,
+      if (drugName != null) 'drug_name': drugName,
+      if (route != null) 'route': route,
+      if (dose != null) 'dose': dose,
+      if (emtName != null) 'emt_name': emtName,
+    });
+  }
+
+  AmbulanceMedicationLogsCompanion copyWith({
+    Value<int>? id,
+    Value<int>? recordId,
+    Value<String?>? time,
+    Value<String?>? drugName,
+    Value<String?>? route,
+    Value<String?>? dose,
+    Value<String?>? emtName,
+  }) {
+    return AmbulanceMedicationLogsCompanion(
+      id: id ?? this.id,
+      recordId: recordId ?? this.recordId,
+      time: time ?? this.time,
+      drugName: drugName ?? this.drugName,
+      route: route ?? this.route,
+      dose: dose ?? this.dose,
+      emtName: emtName ?? this.emtName,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (recordId.present) {
+      map['record_id'] = Variable<int>(recordId.value);
+    }
+    if (time.present) {
+      map['time'] = Variable<String>(time.value);
+    }
+    if (drugName.present) {
+      map['drug_name'] = Variable<String>(drugName.value);
+    }
+    if (route.present) {
+      map['route'] = Variable<String>(route.value);
+    }
+    if (dose.present) {
+      map['dose'] = Variable<String>(dose.value);
+    }
+    if (emtName.present) {
+      map['emt_name'] = Variable<String>(emtName.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AmbulanceMedicationLogsCompanion(')
+          ..write('id: $id, ')
+          ..write('recordId: $recordId, ')
+          ..write('time: $time, ')
+          ..write('drugName: $drugName, ')
+          ..write('route: $route, ')
+          ..write('dose: $dose, ')
+          ..write('emtName: $emtName')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $AmbulanceVitalSignsTable extends AmbulanceVitalSigns
+    with TableInfo<$AmbulanceVitalSignsTable, AmbulanceVitalSignData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $AmbulanceVitalSignsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _recordIdMeta = const VerificationMeta(
+    'recordId',
+  );
+  @override
+  late final GeneratedColumn<int> recordId = GeneratedColumn<int>(
+    'record_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES ambulance_treatment_records (id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _timeMeta = const VerificationMeta('time');
+  @override
+  late final GeneratedColumn<String> time = GeneratedColumn<String>(
+    'time',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _atHospitalMeta = const VerificationMeta(
+    'atHospital',
+  );
+  @override
+  late final GeneratedColumn<bool> atHospital = GeneratedColumn<bool>(
+    'at_hospital',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("at_hospital" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _avpuMeta = const VerificationMeta('avpu');
+  @override
+  late final GeneratedColumn<String> avpu = GeneratedColumn<String>(
+    'avpu',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _gcsEMeta = const VerificationMeta('gcsE');
+  @override
+  late final GeneratedColumn<String> gcsE = GeneratedColumn<String>(
+    'gcs_e',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _gcsVMeta = const VerificationMeta('gcsV');
+  @override
+  late final GeneratedColumn<String> gcsV = GeneratedColumn<String>(
+    'gcs_v',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _gcsMMeta = const VerificationMeta('gcsM');
+  @override
+  late final GeneratedColumn<String> gcsM = GeneratedColumn<String>(
+    'gcs_m',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _gcsTotalMeta = const VerificationMeta(
+    'gcsTotal',
+  );
+  @override
+  late final GeneratedColumn<String> gcsTotal = GeneratedColumn<String>(
+    'gcs_total',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _temperatureMeta = const VerificationMeta(
+    'temperature',
+  );
+  @override
+  late final GeneratedColumn<String> temperature = GeneratedColumn<String>(
+    'temperature',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _pulseMeta = const VerificationMeta('pulse');
+  @override
+  late final GeneratedColumn<String> pulse = GeneratedColumn<String>(
+    'pulse',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _respirationRateMeta = const VerificationMeta(
+    'respirationRate',
+  );
+  @override
+  late final GeneratedColumn<String> respirationRate = GeneratedColumn<String>(
+    'respiration_rate',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _bloodPressureMeta = const VerificationMeta(
+    'bloodPressure',
+  );
+  @override
+  late final GeneratedColumn<String> bloodPressure = GeneratedColumn<String>(
+    'blood_pressure',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _spo2Meta = const VerificationMeta('spo2');
+  @override
+  late final GeneratedColumn<String> spo2 = GeneratedColumn<String>(
+    'spo2',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    recordId,
+    time,
+    atHospital,
+    avpu,
+    gcsE,
+    gcsV,
+    gcsM,
+    gcsTotal,
+    temperature,
+    pulse,
+    respirationRate,
+    bloodPressure,
+    spo2,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'ambulance_vital_signs';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<AmbulanceVitalSignData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('record_id')) {
+      context.handle(
+        _recordIdMeta,
+        recordId.isAcceptableOrUnknown(data['record_id']!, _recordIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_recordIdMeta);
+    }
+    if (data.containsKey('time')) {
+      context.handle(
+        _timeMeta,
+        time.isAcceptableOrUnknown(data['time']!, _timeMeta),
+      );
+    }
+    if (data.containsKey('at_hospital')) {
+      context.handle(
+        _atHospitalMeta,
+        atHospital.isAcceptableOrUnknown(data['at_hospital']!, _atHospitalMeta),
+      );
+    }
+    if (data.containsKey('avpu')) {
+      context.handle(
+        _avpuMeta,
+        avpu.isAcceptableOrUnknown(data['avpu']!, _avpuMeta),
+      );
+    }
+    if (data.containsKey('gcs_e')) {
+      context.handle(
+        _gcsEMeta,
+        gcsE.isAcceptableOrUnknown(data['gcs_e']!, _gcsEMeta),
+      );
+    }
+    if (data.containsKey('gcs_v')) {
+      context.handle(
+        _gcsVMeta,
+        gcsV.isAcceptableOrUnknown(data['gcs_v']!, _gcsVMeta),
+      );
+    }
+    if (data.containsKey('gcs_m')) {
+      context.handle(
+        _gcsMMeta,
+        gcsM.isAcceptableOrUnknown(data['gcs_m']!, _gcsMMeta),
+      );
+    }
+    if (data.containsKey('gcs_total')) {
+      context.handle(
+        _gcsTotalMeta,
+        gcsTotal.isAcceptableOrUnknown(data['gcs_total']!, _gcsTotalMeta),
+      );
+    }
+    if (data.containsKey('temperature')) {
+      context.handle(
+        _temperatureMeta,
+        temperature.isAcceptableOrUnknown(
+          data['temperature']!,
+          _temperatureMeta,
+        ),
+      );
+    }
+    if (data.containsKey('pulse')) {
+      context.handle(
+        _pulseMeta,
+        pulse.isAcceptableOrUnknown(data['pulse']!, _pulseMeta),
+      );
+    }
+    if (data.containsKey('respiration_rate')) {
+      context.handle(
+        _respirationRateMeta,
+        respirationRate.isAcceptableOrUnknown(
+          data['respiration_rate']!,
+          _respirationRateMeta,
+        ),
+      );
+    }
+    if (data.containsKey('blood_pressure')) {
+      context.handle(
+        _bloodPressureMeta,
+        bloodPressure.isAcceptableOrUnknown(
+          data['blood_pressure']!,
+          _bloodPressureMeta,
+        ),
+      );
+    }
+    if (data.containsKey('spo2')) {
+      context.handle(
+        _spo2Meta,
+        spo2.isAcceptableOrUnknown(data['spo2']!, _spo2Meta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  AmbulanceVitalSignData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return AmbulanceVitalSignData(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      recordId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}record_id'],
+      )!,
+      time: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}time'],
+      ),
+      atHospital: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}at_hospital'],
+      )!,
+      avpu: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}avpu'],
+      ),
+      gcsE: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}gcs_e'],
+      ),
+      gcsV: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}gcs_v'],
+      ),
+      gcsM: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}gcs_m'],
+      ),
+      gcsTotal: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}gcs_total'],
+      ),
+      temperature: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}temperature'],
+      ),
+      pulse: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}pulse'],
+      ),
+      respirationRate: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}respiration_rate'],
+      ),
+      bloodPressure: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}blood_pressure'],
+      ),
+      spo2: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}spo2'],
+      ),
+    );
+  }
+
+  @override
+  $AmbulanceVitalSignsTable createAlias(String alias) {
+    return $AmbulanceVitalSignsTable(attachedDatabase, alias);
+  }
+}
+
+class AmbulanceVitalSignData extends DataClass
+    implements Insertable<AmbulanceVitalSignData> {
+  final int id;
+  final int recordId;
+  final String? time;
+  final bool atHospital;
+  final String? avpu;
+  final String? gcsE;
+  final String? gcsV;
+  final String? gcsM;
+  final String? gcsTotal;
+  final String? temperature;
+  final String? pulse;
+  final String? respirationRate;
+  final String? bloodPressure;
+  final String? spo2;
+  const AmbulanceVitalSignData({
+    required this.id,
+    required this.recordId,
+    this.time,
+    required this.atHospital,
+    this.avpu,
+    this.gcsE,
+    this.gcsV,
+    this.gcsM,
+    this.gcsTotal,
+    this.temperature,
+    this.pulse,
+    this.respirationRate,
+    this.bloodPressure,
+    this.spo2,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['record_id'] = Variable<int>(recordId);
+    if (!nullToAbsent || time != null) {
+      map['time'] = Variable<String>(time);
+    }
+    map['at_hospital'] = Variable<bool>(atHospital);
+    if (!nullToAbsent || avpu != null) {
+      map['avpu'] = Variable<String>(avpu);
+    }
+    if (!nullToAbsent || gcsE != null) {
+      map['gcs_e'] = Variable<String>(gcsE);
+    }
+    if (!nullToAbsent || gcsV != null) {
+      map['gcs_v'] = Variable<String>(gcsV);
+    }
+    if (!nullToAbsent || gcsM != null) {
+      map['gcs_m'] = Variable<String>(gcsM);
+    }
+    if (!nullToAbsent || gcsTotal != null) {
+      map['gcs_total'] = Variable<String>(gcsTotal);
+    }
+    if (!nullToAbsent || temperature != null) {
+      map['temperature'] = Variable<String>(temperature);
+    }
+    if (!nullToAbsent || pulse != null) {
+      map['pulse'] = Variable<String>(pulse);
+    }
+    if (!nullToAbsent || respirationRate != null) {
+      map['respiration_rate'] = Variable<String>(respirationRate);
+    }
+    if (!nullToAbsent || bloodPressure != null) {
+      map['blood_pressure'] = Variable<String>(bloodPressure);
+    }
+    if (!nullToAbsent || spo2 != null) {
+      map['spo2'] = Variable<String>(spo2);
+    }
+    return map;
+  }
+
+  AmbulanceVitalSignsCompanion toCompanion(bool nullToAbsent) {
+    return AmbulanceVitalSignsCompanion(
+      id: Value(id),
+      recordId: Value(recordId),
+      time: time == null && nullToAbsent ? const Value.absent() : Value(time),
+      atHospital: Value(atHospital),
+      avpu: avpu == null && nullToAbsent ? const Value.absent() : Value(avpu),
+      gcsE: gcsE == null && nullToAbsent ? const Value.absent() : Value(gcsE),
+      gcsV: gcsV == null && nullToAbsent ? const Value.absent() : Value(gcsV),
+      gcsM: gcsM == null && nullToAbsent ? const Value.absent() : Value(gcsM),
+      gcsTotal: gcsTotal == null && nullToAbsent
+          ? const Value.absent()
+          : Value(gcsTotal),
+      temperature: temperature == null && nullToAbsent
+          ? const Value.absent()
+          : Value(temperature),
+      pulse: pulse == null && nullToAbsent
+          ? const Value.absent()
+          : Value(pulse),
+      respirationRate: respirationRate == null && nullToAbsent
+          ? const Value.absent()
+          : Value(respirationRate),
+      bloodPressure: bloodPressure == null && nullToAbsent
+          ? const Value.absent()
+          : Value(bloodPressure),
+      spo2: spo2 == null && nullToAbsent ? const Value.absent() : Value(spo2),
+    );
+  }
+
+  factory AmbulanceVitalSignData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return AmbulanceVitalSignData(
+      id: serializer.fromJson<int>(json['id']),
+      recordId: serializer.fromJson<int>(json['recordId']),
+      time: serializer.fromJson<String?>(json['time']),
+      atHospital: serializer.fromJson<bool>(json['atHospital']),
+      avpu: serializer.fromJson<String?>(json['avpu']),
+      gcsE: serializer.fromJson<String?>(json['gcsE']),
+      gcsV: serializer.fromJson<String?>(json['gcsV']),
+      gcsM: serializer.fromJson<String?>(json['gcsM']),
+      gcsTotal: serializer.fromJson<String?>(json['gcsTotal']),
+      temperature: serializer.fromJson<String?>(json['temperature']),
+      pulse: serializer.fromJson<String?>(json['pulse']),
+      respirationRate: serializer.fromJson<String?>(json['respirationRate']),
+      bloodPressure: serializer.fromJson<String?>(json['bloodPressure']),
+      spo2: serializer.fromJson<String?>(json['spo2']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'recordId': serializer.toJson<int>(recordId),
+      'time': serializer.toJson<String?>(time),
+      'atHospital': serializer.toJson<bool>(atHospital),
+      'avpu': serializer.toJson<String?>(avpu),
+      'gcsE': serializer.toJson<String?>(gcsE),
+      'gcsV': serializer.toJson<String?>(gcsV),
+      'gcsM': serializer.toJson<String?>(gcsM),
+      'gcsTotal': serializer.toJson<String?>(gcsTotal),
+      'temperature': serializer.toJson<String?>(temperature),
+      'pulse': serializer.toJson<String?>(pulse),
+      'respirationRate': serializer.toJson<String?>(respirationRate),
+      'bloodPressure': serializer.toJson<String?>(bloodPressure),
+      'spo2': serializer.toJson<String?>(spo2),
+    };
+  }
+
+  AmbulanceVitalSignData copyWith({
+    int? id,
+    int? recordId,
+    Value<String?> time = const Value.absent(),
+    bool? atHospital,
+    Value<String?> avpu = const Value.absent(),
+    Value<String?> gcsE = const Value.absent(),
+    Value<String?> gcsV = const Value.absent(),
+    Value<String?> gcsM = const Value.absent(),
+    Value<String?> gcsTotal = const Value.absent(),
+    Value<String?> temperature = const Value.absent(),
+    Value<String?> pulse = const Value.absent(),
+    Value<String?> respirationRate = const Value.absent(),
+    Value<String?> bloodPressure = const Value.absent(),
+    Value<String?> spo2 = const Value.absent(),
+  }) => AmbulanceVitalSignData(
+    id: id ?? this.id,
+    recordId: recordId ?? this.recordId,
+    time: time.present ? time.value : this.time,
+    atHospital: atHospital ?? this.atHospital,
+    avpu: avpu.present ? avpu.value : this.avpu,
+    gcsE: gcsE.present ? gcsE.value : this.gcsE,
+    gcsV: gcsV.present ? gcsV.value : this.gcsV,
+    gcsM: gcsM.present ? gcsM.value : this.gcsM,
+    gcsTotal: gcsTotal.present ? gcsTotal.value : this.gcsTotal,
+    temperature: temperature.present ? temperature.value : this.temperature,
+    pulse: pulse.present ? pulse.value : this.pulse,
+    respirationRate: respirationRate.present
+        ? respirationRate.value
+        : this.respirationRate,
+    bloodPressure: bloodPressure.present
+        ? bloodPressure.value
+        : this.bloodPressure,
+    spo2: spo2.present ? spo2.value : this.spo2,
+  );
+  AmbulanceVitalSignData copyWithCompanion(AmbulanceVitalSignsCompanion data) {
+    return AmbulanceVitalSignData(
+      id: data.id.present ? data.id.value : this.id,
+      recordId: data.recordId.present ? data.recordId.value : this.recordId,
+      time: data.time.present ? data.time.value : this.time,
+      atHospital: data.atHospital.present
+          ? data.atHospital.value
+          : this.atHospital,
+      avpu: data.avpu.present ? data.avpu.value : this.avpu,
+      gcsE: data.gcsE.present ? data.gcsE.value : this.gcsE,
+      gcsV: data.gcsV.present ? data.gcsV.value : this.gcsV,
+      gcsM: data.gcsM.present ? data.gcsM.value : this.gcsM,
+      gcsTotal: data.gcsTotal.present ? data.gcsTotal.value : this.gcsTotal,
+      temperature: data.temperature.present
+          ? data.temperature.value
+          : this.temperature,
+      pulse: data.pulse.present ? data.pulse.value : this.pulse,
+      respirationRate: data.respirationRate.present
+          ? data.respirationRate.value
+          : this.respirationRate,
+      bloodPressure: data.bloodPressure.present
+          ? data.bloodPressure.value
+          : this.bloodPressure,
+      spo2: data.spo2.present ? data.spo2.value : this.spo2,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AmbulanceVitalSignData(')
+          ..write('id: $id, ')
+          ..write('recordId: $recordId, ')
+          ..write('time: $time, ')
+          ..write('atHospital: $atHospital, ')
+          ..write('avpu: $avpu, ')
+          ..write('gcsE: $gcsE, ')
+          ..write('gcsV: $gcsV, ')
+          ..write('gcsM: $gcsM, ')
+          ..write('gcsTotal: $gcsTotal, ')
+          ..write('temperature: $temperature, ')
+          ..write('pulse: $pulse, ')
+          ..write('respirationRate: $respirationRate, ')
+          ..write('bloodPressure: $bloodPressure, ')
+          ..write('spo2: $spo2')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    recordId,
+    time,
+    atHospital,
+    avpu,
+    gcsE,
+    gcsV,
+    gcsM,
+    gcsTotal,
+    temperature,
+    pulse,
+    respirationRate,
+    bloodPressure,
+    spo2,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is AmbulanceVitalSignData &&
+          other.id == this.id &&
+          other.recordId == this.recordId &&
+          other.time == this.time &&
+          other.atHospital == this.atHospital &&
+          other.avpu == this.avpu &&
+          other.gcsE == this.gcsE &&
+          other.gcsV == this.gcsV &&
+          other.gcsM == this.gcsM &&
+          other.gcsTotal == this.gcsTotal &&
+          other.temperature == this.temperature &&
+          other.pulse == this.pulse &&
+          other.respirationRate == this.respirationRate &&
+          other.bloodPressure == this.bloodPressure &&
+          other.spo2 == this.spo2);
+}
+
+class AmbulanceVitalSignsCompanion
+    extends UpdateCompanion<AmbulanceVitalSignData> {
+  final Value<int> id;
+  final Value<int> recordId;
+  final Value<String?> time;
+  final Value<bool> atHospital;
+  final Value<String?> avpu;
+  final Value<String?> gcsE;
+  final Value<String?> gcsV;
+  final Value<String?> gcsM;
+  final Value<String?> gcsTotal;
+  final Value<String?> temperature;
+  final Value<String?> pulse;
+  final Value<String?> respirationRate;
+  final Value<String?> bloodPressure;
+  final Value<String?> spo2;
+  const AmbulanceVitalSignsCompanion({
+    this.id = const Value.absent(),
+    this.recordId = const Value.absent(),
+    this.time = const Value.absent(),
+    this.atHospital = const Value.absent(),
+    this.avpu = const Value.absent(),
+    this.gcsE = const Value.absent(),
+    this.gcsV = const Value.absent(),
+    this.gcsM = const Value.absent(),
+    this.gcsTotal = const Value.absent(),
+    this.temperature = const Value.absent(),
+    this.pulse = const Value.absent(),
+    this.respirationRate = const Value.absent(),
+    this.bloodPressure = const Value.absent(),
+    this.spo2 = const Value.absent(),
+  });
+  AmbulanceVitalSignsCompanion.insert({
+    this.id = const Value.absent(),
+    required int recordId,
+    this.time = const Value.absent(),
+    this.atHospital = const Value.absent(),
+    this.avpu = const Value.absent(),
+    this.gcsE = const Value.absent(),
+    this.gcsV = const Value.absent(),
+    this.gcsM = const Value.absent(),
+    this.gcsTotal = const Value.absent(),
+    this.temperature = const Value.absent(),
+    this.pulse = const Value.absent(),
+    this.respirationRate = const Value.absent(),
+    this.bloodPressure = const Value.absent(),
+    this.spo2 = const Value.absent(),
+  }) : recordId = Value(recordId);
+  static Insertable<AmbulanceVitalSignData> custom({
+    Expression<int>? id,
+    Expression<int>? recordId,
+    Expression<String>? time,
+    Expression<bool>? atHospital,
+    Expression<String>? avpu,
+    Expression<String>? gcsE,
+    Expression<String>? gcsV,
+    Expression<String>? gcsM,
+    Expression<String>? gcsTotal,
+    Expression<String>? temperature,
+    Expression<String>? pulse,
+    Expression<String>? respirationRate,
+    Expression<String>? bloodPressure,
+    Expression<String>? spo2,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (recordId != null) 'record_id': recordId,
+      if (time != null) 'time': time,
+      if (atHospital != null) 'at_hospital': atHospital,
+      if (avpu != null) 'avpu': avpu,
+      if (gcsE != null) 'gcs_e': gcsE,
+      if (gcsV != null) 'gcs_v': gcsV,
+      if (gcsM != null) 'gcs_m': gcsM,
+      if (gcsTotal != null) 'gcs_total': gcsTotal,
+      if (temperature != null) 'temperature': temperature,
+      if (pulse != null) 'pulse': pulse,
+      if (respirationRate != null) 'respiration_rate': respirationRate,
+      if (bloodPressure != null) 'blood_pressure': bloodPressure,
+      if (spo2 != null) 'spo2': spo2,
+    });
+  }
+
+  AmbulanceVitalSignsCompanion copyWith({
+    Value<int>? id,
+    Value<int>? recordId,
+    Value<String?>? time,
+    Value<bool>? atHospital,
+    Value<String?>? avpu,
+    Value<String?>? gcsE,
+    Value<String?>? gcsV,
+    Value<String?>? gcsM,
+    Value<String?>? gcsTotal,
+    Value<String?>? temperature,
+    Value<String?>? pulse,
+    Value<String?>? respirationRate,
+    Value<String?>? bloodPressure,
+    Value<String?>? spo2,
+  }) {
+    return AmbulanceVitalSignsCompanion(
+      id: id ?? this.id,
+      recordId: recordId ?? this.recordId,
+      time: time ?? this.time,
+      atHospital: atHospital ?? this.atHospital,
+      avpu: avpu ?? this.avpu,
+      gcsE: gcsE ?? this.gcsE,
+      gcsV: gcsV ?? this.gcsV,
+      gcsM: gcsM ?? this.gcsM,
+      gcsTotal: gcsTotal ?? this.gcsTotal,
+      temperature: temperature ?? this.temperature,
+      pulse: pulse ?? this.pulse,
+      respirationRate: respirationRate ?? this.respirationRate,
+      bloodPressure: bloodPressure ?? this.bloodPressure,
+      spo2: spo2 ?? this.spo2,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (recordId.present) {
+      map['record_id'] = Variable<int>(recordId.value);
+    }
+    if (time.present) {
+      map['time'] = Variable<String>(time.value);
+    }
+    if (atHospital.present) {
+      map['at_hospital'] = Variable<bool>(atHospital.value);
+    }
+    if (avpu.present) {
+      map['avpu'] = Variable<String>(avpu.value);
+    }
+    if (gcsE.present) {
+      map['gcs_e'] = Variable<String>(gcsE.value);
+    }
+    if (gcsV.present) {
+      map['gcs_v'] = Variable<String>(gcsV.value);
+    }
+    if (gcsM.present) {
+      map['gcs_m'] = Variable<String>(gcsM.value);
+    }
+    if (gcsTotal.present) {
+      map['gcs_total'] = Variable<String>(gcsTotal.value);
+    }
+    if (temperature.present) {
+      map['temperature'] = Variable<String>(temperature.value);
+    }
+    if (pulse.present) {
+      map['pulse'] = Variable<String>(pulse.value);
+    }
+    if (respirationRate.present) {
+      map['respiration_rate'] = Variable<String>(respirationRate.value);
+    }
+    if (bloodPressure.present) {
+      map['blood_pressure'] = Variable<String>(bloodPressure.value);
+    }
+    if (spo2.present) {
+      map['spo2'] = Variable<String>(spo2.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AmbulanceVitalSignsCompanion(')
+          ..write('id: $id, ')
+          ..write('recordId: $recordId, ')
+          ..write('time: $time, ')
+          ..write('atHospital: $atHospital, ')
+          ..write('avpu: $avpu, ')
+          ..write('gcsE: $gcsE, ')
+          ..write('gcsV: $gcsV, ')
+          ..write('gcsM: $gcsM, ')
+          ..write('gcsTotal: $gcsTotal, ')
+          ..write('temperature: $temperature, ')
+          ..write('pulse: $pulse, ')
+          ..write('respirationRate: $respirationRate, ')
+          ..write('bloodPressure: $bloodPressure, ')
+          ..write('spo2: $spo2')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $AmbulanceEscortStaffTable extends AmbulanceEscortStaff
+    with TableInfo<$AmbulanceEscortStaffTable, AmbulanceEscortStaffData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $AmbulanceEscortStaffTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _recordIdMeta = const VerificationMeta(
+    'recordId',
+  );
+  @override
+  late final GeneratedColumn<int> recordId = GeneratedColumn<int>(
+    'record_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES ambulance_treatment_records (id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _signatureMeta = const VerificationMeta(
+    'signature',
+  );
+  @override
+  late final GeneratedColumn<Uint8List> signature = GeneratedColumn<Uint8List>(
+    'signature',
+    aliasedName,
+    true,
+    type: DriftSqlType.blob,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, recordId, name, signature];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'ambulance_escort_staff';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<AmbulanceEscortStaffData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('record_id')) {
+      context.handle(
+        _recordIdMeta,
+        recordId.isAcceptableOrUnknown(data['record_id']!, _recordIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_recordIdMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    }
+    if (data.containsKey('signature')) {
+      context.handle(
+        _signatureMeta,
+        signature.isAcceptableOrUnknown(data['signature']!, _signatureMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  AmbulanceEscortStaffData map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return AmbulanceEscortStaffData(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      recordId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}record_id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      ),
+      signature: attachedDatabase.typeMapping.read(
+        DriftSqlType.blob,
+        data['${effectivePrefix}signature'],
+      ),
+    );
+  }
+
+  @override
+  $AmbulanceEscortStaffTable createAlias(String alias) {
+    return $AmbulanceEscortStaffTable(attachedDatabase, alias);
+  }
+}
+
+class AmbulanceEscortStaffData extends DataClass
+    implements Insertable<AmbulanceEscortStaffData> {
+  final int id;
+  final int recordId;
+  final String? name;
+  final Uint8List? signature;
+  const AmbulanceEscortStaffData({
+    required this.id,
+    required this.recordId,
+    this.name,
+    this.signature,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['record_id'] = Variable<int>(recordId);
+    if (!nullToAbsent || name != null) {
+      map['name'] = Variable<String>(name);
+    }
+    if (!nullToAbsent || signature != null) {
+      map['signature'] = Variable<Uint8List>(signature);
+    }
+    return map;
+  }
+
+  AmbulanceEscortStaffCompanion toCompanion(bool nullToAbsent) {
+    return AmbulanceEscortStaffCompanion(
+      id: Value(id),
+      recordId: Value(recordId),
+      name: name == null && nullToAbsent ? const Value.absent() : Value(name),
+      signature: signature == null && nullToAbsent
+          ? const Value.absent()
+          : Value(signature),
+    );
+  }
+
+  factory AmbulanceEscortStaffData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return AmbulanceEscortStaffData(
+      id: serializer.fromJson<int>(json['id']),
+      recordId: serializer.fromJson<int>(json['recordId']),
+      name: serializer.fromJson<String?>(json['name']),
+      signature: serializer.fromJson<Uint8List?>(json['signature']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'recordId': serializer.toJson<int>(recordId),
+      'name': serializer.toJson<String?>(name),
+      'signature': serializer.toJson<Uint8List?>(signature),
+    };
+  }
+
+  AmbulanceEscortStaffData copyWith({
+    int? id,
+    int? recordId,
+    Value<String?> name = const Value.absent(),
+    Value<Uint8List?> signature = const Value.absent(),
+  }) => AmbulanceEscortStaffData(
+    id: id ?? this.id,
+    recordId: recordId ?? this.recordId,
+    name: name.present ? name.value : this.name,
+    signature: signature.present ? signature.value : this.signature,
+  );
+  AmbulanceEscortStaffData copyWithCompanion(
+    AmbulanceEscortStaffCompanion data,
+  ) {
+    return AmbulanceEscortStaffData(
+      id: data.id.present ? data.id.value : this.id,
+      recordId: data.recordId.present ? data.recordId.value : this.recordId,
+      name: data.name.present ? data.name.value : this.name,
+      signature: data.signature.present ? data.signature.value : this.signature,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AmbulanceEscortStaffData(')
+          ..write('id: $id, ')
+          ..write('recordId: $recordId, ')
+          ..write('name: $name, ')
+          ..write('signature: $signature')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, recordId, name, $driftBlobEquality.hash(signature));
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is AmbulanceEscortStaffData &&
+          other.id == this.id &&
+          other.recordId == this.recordId &&
+          other.name == this.name &&
+          $driftBlobEquality.equals(other.signature, this.signature));
+}
+
+class AmbulanceEscortStaffCompanion
+    extends UpdateCompanion<AmbulanceEscortStaffData> {
+  final Value<int> id;
+  final Value<int> recordId;
+  final Value<String?> name;
+  final Value<Uint8List?> signature;
+  const AmbulanceEscortStaffCompanion({
+    this.id = const Value.absent(),
+    this.recordId = const Value.absent(),
+    this.name = const Value.absent(),
+    this.signature = const Value.absent(),
+  });
+  AmbulanceEscortStaffCompanion.insert({
+    this.id = const Value.absent(),
+    required int recordId,
+    this.name = const Value.absent(),
+    this.signature = const Value.absent(),
+  }) : recordId = Value(recordId);
+  static Insertable<AmbulanceEscortStaffData> custom({
+    Expression<int>? id,
+    Expression<int>? recordId,
+    Expression<String>? name,
+    Expression<Uint8List>? signature,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (recordId != null) 'record_id': recordId,
+      if (name != null) 'name': name,
+      if (signature != null) 'signature': signature,
+    });
+  }
+
+  AmbulanceEscortStaffCompanion copyWith({
+    Value<int>? id,
+    Value<int>? recordId,
+    Value<String?>? name,
+    Value<Uint8List?>? signature,
+  }) {
+    return AmbulanceEscortStaffCompanion(
+      id: id ?? this.id,
+      recordId: recordId ?? this.recordId,
+      name: name ?? this.name,
+      signature: signature ?? this.signature,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (recordId.present) {
+      map['record_id'] = Variable<int>(recordId.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (signature.present) {
+      map['signature'] = Variable<Uint8List>(signature.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AmbulanceEscortStaffCompanion(')
+          ..write('id: $id, ')
+          ..write('recordId: $recordId, ')
+          ..write('name: $name, ')
+          ..write('signature: $signature')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -29614,6 +33095,20 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       $AmbulanceReferenceItemsTable(this);
   late final $AmbulanceSceneItemLinksTable ambulanceSceneItemLinks =
       $AmbulanceSceneItemLinksTable(this);
+  late final $AmbulanceTreatmentRecordsTable ambulanceTreatmentRecords =
+      $AmbulanceTreatmentRecordsTable(this);
+  late final $AmbulanceTreatmentCategoriesTable ambulanceTreatmentCategories =
+      $AmbulanceTreatmentCategoriesTable(this);
+  late final $AmbulanceTreatmentItemsTable ambulanceTreatmentItems =
+      $AmbulanceTreatmentItemsTable(this);
+  late final $AmbulanceTreatmentRecordItemsTable ambulanceTreatmentRecordItems =
+      $AmbulanceTreatmentRecordItemsTable(this);
+  late final $AmbulanceMedicationLogsTable ambulanceMedicationLogs =
+      $AmbulanceMedicationLogsTable(this);
+  late final $AmbulanceVitalSignsTable ambulanceVitalSigns =
+      $AmbulanceVitalSignsTable(this);
+  late final $AmbulanceEscortStaffTable ambulanceEscortStaff =
+      $AmbulanceEscortStaffTable(this);
   late final ReferenceDao referenceDao = ReferenceDao(this as AppDatabase);
   late final MedicalDao medicalDao = MedicalDao(this as AppDatabase);
   late final FlightDao flightDao = FlightDao(this as AppDatabase);
@@ -29632,6 +33127,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     this as AppDatabase,
   );
   late final AmbulanceDao ambulanceDao = AmbulanceDao(this as AppDatabase);
+  late final AmbulanceTreatmentDao ambulanceTreatmentDao =
+      AmbulanceTreatmentDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -29697,6 +33194,13 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     ambulanceSceneRecords,
     ambulanceReferenceItems,
     ambulanceSceneItemLinks,
+    ambulanceTreatmentRecords,
+    ambulanceTreatmentCategories,
+    ambulanceTreatmentItems,
+    ambulanceTreatmentRecordItems,
+    ambulanceMedicationLogs,
+    ambulanceVitalSigns,
+    ambulanceEscortStaff,
   ];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
@@ -29726,6 +33230,53 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       result: [
         TableUpdate('ambulance_scene_item_links', kind: UpdateKind.delete),
       ],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'ambulance_treatment_records',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [
+        TableUpdate(
+          'ambulance_treatment_record_items',
+          kind: UpdateKind.delete,
+        ),
+      ],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'ambulance_treatment_items',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [
+        TableUpdate(
+          'ambulance_treatment_record_items',
+          kind: UpdateKind.delete,
+        ),
+      ],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'ambulance_treatment_records',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [
+        TableUpdate('ambulance_medication_logs', kind: UpdateKind.delete),
+      ],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'ambulance_treatment_records',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('ambulance_vital_signs', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'ambulance_treatment_records',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('ambulance_escort_staff', kind: UpdateKind.delete)],
     ),
   ]);
 }
@@ -39116,6 +42667,38 @@ final class $$MedicalRecordTableReferences
       manager.$state.copyWith(prefetchedData: cache),
     );
   }
+
+  static MultiTypedResultKey<
+    $AmbulanceTreatmentRecordsTable,
+    List<AmbulanceTreatmentRecordData>
+  >
+  _ambulanceTreatmentRecordsRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.ambulanceTreatmentRecords,
+        aliasName: $_aliasNameGenerator(
+          db.medicalRecord.medicalId,
+          db.ambulanceTreatmentRecords.medicalId,
+        ),
+      );
+
+  $$AmbulanceTreatmentRecordsTableProcessedTableManager
+  get ambulanceTreatmentRecordsRefs {
+    final manager =
+        $$AmbulanceTreatmentRecordsTableTableManager(
+          $_db,
+          $_db.ambulanceTreatmentRecords,
+        ).filter(
+          (f) =>
+              f.medicalId.medicalId.sqlEquals($_itemColumn<int>('medical_id')!),
+        );
+
+    final cache = $_typedResult.readTableOrNull(
+      _ambulanceTreatmentRecordsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$MedicalRecordTableFilterComposer
@@ -39632,6 +43215,33 @@ class $$MedicalRecordTableFilterComposer
               }) => $$AmbulanceSceneRecordsTableFilterComposer(
                 $db: $db,
                 $table: $db.ambulanceSceneRecords,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<bool> ambulanceTreatmentRecordsRefs(
+    Expression<bool> Function($$AmbulanceTreatmentRecordsTableFilterComposer f)
+    f,
+  ) {
+    final $$AmbulanceTreatmentRecordsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.medicalId,
+          referencedTable: $db.ambulanceTreatmentRecords,
+          getReferencedColumn: (t) => t.medicalId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$AmbulanceTreatmentRecordsTableFilterComposer(
+                $db: $db,
+                $table: $db.ambulanceTreatmentRecords,
                 $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
                 joinBuilder: joinBuilder,
                 $removeJoinBuilderFromRootComposer:
@@ -40204,6 +43814,33 @@ class $$MedicalRecordTableAnnotationComposer
         );
     return f(composer);
   }
+
+  Expression<T> ambulanceTreatmentRecordsRefs<T extends Object>(
+    Expression<T> Function($$AmbulanceTreatmentRecordsTableAnnotationComposer a)
+    f,
+  ) {
+    final $$AmbulanceTreatmentRecordsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.medicalId,
+          referencedTable: $db.ambulanceTreatmentRecords,
+          getReferencedColumn: (t) => t.medicalId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$AmbulanceTreatmentRecordsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.ambulanceTreatmentRecords,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
 }
 
 class $$MedicalRecordTableTableManager
@@ -40239,6 +43876,7 @@ class $$MedicalRecordTableTableManager
             bool medicationsRefs,
             bool ambulancePersonalPropertyRefs,
             bool ambulanceSceneRecordsRefs,
+            bool ambulanceTreatmentRecordsRefs,
           })
         > {
   $$MedicalRecordTableTableManager(_$AppDatabase db, $MedicalRecordTable table)
@@ -40317,6 +43955,7 @@ class $$MedicalRecordTableTableManager
                 medicationsRefs = false,
                 ambulancePersonalPropertyRefs = false,
                 ambulanceSceneRecordsRefs = false,
+                ambulanceTreatmentRecordsRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
@@ -40341,6 +43980,8 @@ class $$MedicalRecordTableTableManager
                     if (ambulancePersonalPropertyRefs)
                       db.ambulancePersonalProperty,
                     if (ambulanceSceneRecordsRefs) db.ambulanceSceneRecords,
+                    if (ambulanceTreatmentRecordsRefs)
+                      db.ambulanceTreatmentRecords,
                   ],
                   addJoins: null,
                   getPrefetchedDataCallback: (items) async {
@@ -40744,6 +44385,27 @@ class $$MedicalRecordTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (ambulanceTreatmentRecordsRefs)
+                        await $_getPrefetchedData<
+                          MedicalRecordData,
+                          $MedicalRecordTable,
+                          AmbulanceTreatmentRecordData
+                        >(
+                          currentTable: table,
+                          referencedTable: $$MedicalRecordTableReferences
+                              ._ambulanceTreatmentRecordsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$MedicalRecordTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).ambulanceTreatmentRecordsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.medicalId == item.medicalId,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -40784,6 +44446,7 @@ typedef $$MedicalRecordTableProcessedTableManager =
         bool medicationsRefs,
         bool ambulancePersonalPropertyRefs,
         bool ambulanceSceneRecordsRefs,
+        bool ambulanceTreatmentRecordsRefs,
       })
     >;
 typedef $$VisitReasonTableCreateCompanionBuilder =
@@ -57157,6 +60820,3427 @@ typedef $$AmbulanceSceneItemLinksTableProcessedTableManager =
       AmbulanceSceneItemLinkData,
       PrefetchHooks Function({bool sceneRecordId, bool itemId})
     >;
+typedef $$AmbulanceTreatmentRecordsTableCreateCompanionBuilder =
+    AmbulanceTreatmentRecordsCompanion Function({
+      Value<int> id,
+      required int medicalId,
+      Value<String?> doctorInstructions,
+      Value<String?> receivingHospital,
+      Value<String?> receivingTime,
+      Value<bool> isRefusedHospital,
+      Value<String> relationship,
+      Value<String?> relativeName,
+      Value<String?> relativePhone,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+    });
+typedef $$AmbulanceTreatmentRecordsTableUpdateCompanionBuilder =
+    AmbulanceTreatmentRecordsCompanion Function({
+      Value<int> id,
+      Value<int> medicalId,
+      Value<String?> doctorInstructions,
+      Value<String?> receivingHospital,
+      Value<String?> receivingTime,
+      Value<bool> isRefusedHospital,
+      Value<String> relationship,
+      Value<String?> relativeName,
+      Value<String?> relativePhone,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+    });
+
+final class $$AmbulanceTreatmentRecordsTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $AmbulanceTreatmentRecordsTable,
+          AmbulanceTreatmentRecordData
+        > {
+  $$AmbulanceTreatmentRecordsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $MedicalRecordTable _medicalIdTable(_$AppDatabase db) =>
+      db.medicalRecord.createAlias(
+        $_aliasNameGenerator(
+          db.ambulanceTreatmentRecords.medicalId,
+          db.medicalRecord.medicalId,
+        ),
+      );
+
+  $$MedicalRecordTableProcessedTableManager get medicalId {
+    final $_column = $_itemColumn<int>('medical_id')!;
+
+    final manager = $$MedicalRecordTableTableManager(
+      $_db,
+      $_db.medicalRecord,
+    ).filter((f) => f.medicalId.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_medicalIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $AmbulanceTreatmentRecordItemsTable,
+    List<AmbulanceTreatmentRecordItemData>
+  >
+  _ambulanceTreatmentRecordItemsRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.ambulanceTreatmentRecordItems,
+        aliasName: $_aliasNameGenerator(
+          db.ambulanceTreatmentRecords.id,
+          db.ambulanceTreatmentRecordItems.recordId,
+        ),
+      );
+
+  $$AmbulanceTreatmentRecordItemsTableProcessedTableManager
+  get ambulanceTreatmentRecordItemsRefs {
+    final manager = $$AmbulanceTreatmentRecordItemsTableTableManager(
+      $_db,
+      $_db.ambulanceTreatmentRecordItems,
+    ).filter((f) => f.recordId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _ambulanceTreatmentRecordItemsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $AmbulanceMedicationLogsTable,
+    List<AmbulanceMedicationLogData>
+  >
+  _ambulanceMedicationLogsRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.ambulanceMedicationLogs,
+        aliasName: $_aliasNameGenerator(
+          db.ambulanceTreatmentRecords.id,
+          db.ambulanceMedicationLogs.recordId,
+        ),
+      );
+
+  $$AmbulanceMedicationLogsTableProcessedTableManager
+  get ambulanceMedicationLogsRefs {
+    final manager = $$AmbulanceMedicationLogsTableTableManager(
+      $_db,
+      $_db.ambulanceMedicationLogs,
+    ).filter((f) => f.recordId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _ambulanceMedicationLogsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $AmbulanceVitalSignsTable,
+    List<AmbulanceVitalSignData>
+  >
+  _ambulanceVitalSignsRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.ambulanceVitalSigns,
+        aliasName: $_aliasNameGenerator(
+          db.ambulanceTreatmentRecords.id,
+          db.ambulanceVitalSigns.recordId,
+        ),
+      );
+
+  $$AmbulanceVitalSignsTableProcessedTableManager get ambulanceVitalSignsRefs {
+    final manager = $$AmbulanceVitalSignsTableTableManager(
+      $_db,
+      $_db.ambulanceVitalSigns,
+    ).filter((f) => f.recordId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _ambulanceVitalSignsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $AmbulanceEscortStaffTable,
+    List<AmbulanceEscortStaffData>
+  >
+  _ambulanceEscortStaffRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.ambulanceEscortStaff,
+        aliasName: $_aliasNameGenerator(
+          db.ambulanceTreatmentRecords.id,
+          db.ambulanceEscortStaff.recordId,
+        ),
+      );
+
+  $$AmbulanceEscortStaffTableProcessedTableManager
+  get ambulanceEscortStaffRefs {
+    final manager = $$AmbulanceEscortStaffTableTableManager(
+      $_db,
+      $_db.ambulanceEscortStaff,
+    ).filter((f) => f.recordId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _ambulanceEscortStaffRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$AmbulanceTreatmentRecordsTableFilterComposer
+    extends Composer<_$AppDatabase, $AmbulanceTreatmentRecordsTable> {
+  $$AmbulanceTreatmentRecordsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get doctorInstructions => $composableBuilder(
+    column: $table.doctorInstructions,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get receivingHospital => $composableBuilder(
+    column: $table.receivingHospital,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get receivingTime => $composableBuilder(
+    column: $table.receivingTime,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isRefusedHospital => $composableBuilder(
+    column: $table.isRefusedHospital,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get relationship => $composableBuilder(
+    column: $table.relationship,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get relativeName => $composableBuilder(
+    column: $table.relativeName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get relativePhone => $composableBuilder(
+    column: $table.relativePhone,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$MedicalRecordTableFilterComposer get medicalId {
+    final $$MedicalRecordTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.medicalId,
+      referencedTable: $db.medicalRecord,
+      getReferencedColumn: (t) => t.medicalId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MedicalRecordTableFilterComposer(
+            $db: $db,
+            $table: $db.medicalRecord,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<bool> ambulanceTreatmentRecordItemsRefs(
+    Expression<bool> Function(
+      $$AmbulanceTreatmentRecordItemsTableFilterComposer f,
+    )
+    f,
+  ) {
+    final $$AmbulanceTreatmentRecordItemsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.ambulanceTreatmentRecordItems,
+          getReferencedColumn: (t) => t.recordId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$AmbulanceTreatmentRecordItemsTableFilterComposer(
+                $db: $db,
+                $table: $db.ambulanceTreatmentRecordItems,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<bool> ambulanceMedicationLogsRefs(
+    Expression<bool> Function($$AmbulanceMedicationLogsTableFilterComposer f) f,
+  ) {
+    final $$AmbulanceMedicationLogsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.ambulanceMedicationLogs,
+          getReferencedColumn: (t) => t.recordId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$AmbulanceMedicationLogsTableFilterComposer(
+                $db: $db,
+                $table: $db.ambulanceMedicationLogs,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<bool> ambulanceVitalSignsRefs(
+    Expression<bool> Function($$AmbulanceVitalSignsTableFilterComposer f) f,
+  ) {
+    final $$AmbulanceVitalSignsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.ambulanceVitalSigns,
+      getReferencedColumn: (t) => t.recordId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$AmbulanceVitalSignsTableFilterComposer(
+            $db: $db,
+            $table: $db.ambulanceVitalSigns,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> ambulanceEscortStaffRefs(
+    Expression<bool> Function($$AmbulanceEscortStaffTableFilterComposer f) f,
+  ) {
+    final $$AmbulanceEscortStaffTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.ambulanceEscortStaff,
+      getReferencedColumn: (t) => t.recordId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$AmbulanceEscortStaffTableFilterComposer(
+            $db: $db,
+            $table: $db.ambulanceEscortStaff,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$AmbulanceTreatmentRecordsTableOrderingComposer
+    extends Composer<_$AppDatabase, $AmbulanceTreatmentRecordsTable> {
+  $$AmbulanceTreatmentRecordsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get doctorInstructions => $composableBuilder(
+    column: $table.doctorInstructions,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get receivingHospital => $composableBuilder(
+    column: $table.receivingHospital,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get receivingTime => $composableBuilder(
+    column: $table.receivingTime,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isRefusedHospital => $composableBuilder(
+    column: $table.isRefusedHospital,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get relationship => $composableBuilder(
+    column: $table.relationship,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get relativeName => $composableBuilder(
+    column: $table.relativeName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get relativePhone => $composableBuilder(
+    column: $table.relativePhone,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$MedicalRecordTableOrderingComposer get medicalId {
+    final $$MedicalRecordTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.medicalId,
+      referencedTable: $db.medicalRecord,
+      getReferencedColumn: (t) => t.medicalId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MedicalRecordTableOrderingComposer(
+            $db: $db,
+            $table: $db.medicalRecord,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$AmbulanceTreatmentRecordsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $AmbulanceTreatmentRecordsTable> {
+  $$AmbulanceTreatmentRecordsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get doctorInstructions => $composableBuilder(
+    column: $table.doctorInstructions,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get receivingHospital => $composableBuilder(
+    column: $table.receivingHospital,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get receivingTime => $composableBuilder(
+    column: $table.receivingTime,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get isRefusedHospital => $composableBuilder(
+    column: $table.isRefusedHospital,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get relationship => $composableBuilder(
+    column: $table.relationship,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get relativeName => $composableBuilder(
+    column: $table.relativeName,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get relativePhone => $composableBuilder(
+    column: $table.relativePhone,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  $$MedicalRecordTableAnnotationComposer get medicalId {
+    final $$MedicalRecordTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.medicalId,
+      referencedTable: $db.medicalRecord,
+      getReferencedColumn: (t) => t.medicalId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MedicalRecordTableAnnotationComposer(
+            $db: $db,
+            $table: $db.medicalRecord,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<T> ambulanceTreatmentRecordItemsRefs<T extends Object>(
+    Expression<T> Function(
+      $$AmbulanceTreatmentRecordItemsTableAnnotationComposer a,
+    )
+    f,
+  ) {
+    final $$AmbulanceTreatmentRecordItemsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.ambulanceTreatmentRecordItems,
+          getReferencedColumn: (t) => t.recordId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$AmbulanceTreatmentRecordItemsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.ambulanceTreatmentRecordItems,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<T> ambulanceMedicationLogsRefs<T extends Object>(
+    Expression<T> Function($$AmbulanceMedicationLogsTableAnnotationComposer a)
+    f,
+  ) {
+    final $$AmbulanceMedicationLogsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.ambulanceMedicationLogs,
+          getReferencedColumn: (t) => t.recordId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$AmbulanceMedicationLogsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.ambulanceMedicationLogs,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<T> ambulanceVitalSignsRefs<T extends Object>(
+    Expression<T> Function($$AmbulanceVitalSignsTableAnnotationComposer a) f,
+  ) {
+    final $$AmbulanceVitalSignsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.ambulanceVitalSigns,
+          getReferencedColumn: (t) => t.recordId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$AmbulanceVitalSignsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.ambulanceVitalSigns,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<T> ambulanceEscortStaffRefs<T extends Object>(
+    Expression<T> Function($$AmbulanceEscortStaffTableAnnotationComposer a) f,
+  ) {
+    final $$AmbulanceEscortStaffTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.ambulanceEscortStaff,
+          getReferencedColumn: (t) => t.recordId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$AmbulanceEscortStaffTableAnnotationComposer(
+                $db: $db,
+                $table: $db.ambulanceEscortStaff,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+}
+
+class $$AmbulanceTreatmentRecordsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $AmbulanceTreatmentRecordsTable,
+          AmbulanceTreatmentRecordData,
+          $$AmbulanceTreatmentRecordsTableFilterComposer,
+          $$AmbulanceTreatmentRecordsTableOrderingComposer,
+          $$AmbulanceTreatmentRecordsTableAnnotationComposer,
+          $$AmbulanceTreatmentRecordsTableCreateCompanionBuilder,
+          $$AmbulanceTreatmentRecordsTableUpdateCompanionBuilder,
+          (
+            AmbulanceTreatmentRecordData,
+            $$AmbulanceTreatmentRecordsTableReferences,
+          ),
+          AmbulanceTreatmentRecordData,
+          PrefetchHooks Function({
+            bool medicalId,
+            bool ambulanceTreatmentRecordItemsRefs,
+            bool ambulanceMedicationLogsRefs,
+            bool ambulanceVitalSignsRefs,
+            bool ambulanceEscortStaffRefs,
+          })
+        > {
+  $$AmbulanceTreatmentRecordsTableTableManager(
+    _$AppDatabase db,
+    $AmbulanceTreatmentRecordsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$AmbulanceTreatmentRecordsTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$AmbulanceTreatmentRecordsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$AmbulanceTreatmentRecordsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> medicalId = const Value.absent(),
+                Value<String?> doctorInstructions = const Value.absent(),
+                Value<String?> receivingHospital = const Value.absent(),
+                Value<String?> receivingTime = const Value.absent(),
+                Value<bool> isRefusedHospital = const Value.absent(),
+                Value<String> relationship = const Value.absent(),
+                Value<String?> relativeName = const Value.absent(),
+                Value<String?> relativePhone = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+              }) => AmbulanceTreatmentRecordsCompanion(
+                id: id,
+                medicalId: medicalId,
+                doctorInstructions: doctorInstructions,
+                receivingHospital: receivingHospital,
+                receivingTime: receivingTime,
+                isRefusedHospital: isRefusedHospital,
+                relationship: relationship,
+                relativeName: relativeName,
+                relativePhone: relativePhone,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int medicalId,
+                Value<String?> doctorInstructions = const Value.absent(),
+                Value<String?> receivingHospital = const Value.absent(),
+                Value<String?> receivingTime = const Value.absent(),
+                Value<bool> isRefusedHospital = const Value.absent(),
+                Value<String> relationship = const Value.absent(),
+                Value<String?> relativeName = const Value.absent(),
+                Value<String?> relativePhone = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+              }) => AmbulanceTreatmentRecordsCompanion.insert(
+                id: id,
+                medicalId: medicalId,
+                doctorInstructions: doctorInstructions,
+                receivingHospital: receivingHospital,
+                receivingTime: receivingTime,
+                isRefusedHospital: isRefusedHospital,
+                relationship: relationship,
+                relativeName: relativeName,
+                relativePhone: relativePhone,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$AmbulanceTreatmentRecordsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({
+                medicalId = false,
+                ambulanceTreatmentRecordItemsRefs = false,
+                ambulanceMedicationLogsRefs = false,
+                ambulanceVitalSignsRefs = false,
+                ambulanceEscortStaffRefs = false,
+              }) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (ambulanceTreatmentRecordItemsRefs)
+                      db.ambulanceTreatmentRecordItems,
+                    if (ambulanceMedicationLogsRefs) db.ambulanceMedicationLogs,
+                    if (ambulanceVitalSignsRefs) db.ambulanceVitalSigns,
+                    if (ambulanceEscortStaffRefs) db.ambulanceEscortStaff,
+                  ],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (medicalId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.medicalId,
+                                    referencedTable:
+                                        $$AmbulanceTreatmentRecordsTableReferences
+                                            ._medicalIdTable(db),
+                                    referencedColumn:
+                                        $$AmbulanceTreatmentRecordsTableReferences
+                                            ._medicalIdTable(db)
+                                            .medicalId,
+                                  )
+                                  as T;
+                        }
+
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (ambulanceTreatmentRecordItemsRefs)
+                        await $_getPrefetchedData<
+                          AmbulanceTreatmentRecordData,
+                          $AmbulanceTreatmentRecordsTable,
+                          AmbulanceTreatmentRecordItemData
+                        >(
+                          currentTable: table,
+                          referencedTable:
+                              $$AmbulanceTreatmentRecordsTableReferences
+                                  ._ambulanceTreatmentRecordItemsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$AmbulanceTreatmentRecordsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).ambulanceTreatmentRecordItemsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.recordId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (ambulanceMedicationLogsRefs)
+                        await $_getPrefetchedData<
+                          AmbulanceTreatmentRecordData,
+                          $AmbulanceTreatmentRecordsTable,
+                          AmbulanceMedicationLogData
+                        >(
+                          currentTable: table,
+                          referencedTable:
+                              $$AmbulanceTreatmentRecordsTableReferences
+                                  ._ambulanceMedicationLogsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$AmbulanceTreatmentRecordsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).ambulanceMedicationLogsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.recordId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (ambulanceVitalSignsRefs)
+                        await $_getPrefetchedData<
+                          AmbulanceTreatmentRecordData,
+                          $AmbulanceTreatmentRecordsTable,
+                          AmbulanceVitalSignData
+                        >(
+                          currentTable: table,
+                          referencedTable:
+                              $$AmbulanceTreatmentRecordsTableReferences
+                                  ._ambulanceVitalSignsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$AmbulanceTreatmentRecordsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).ambulanceVitalSignsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.recordId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (ambulanceEscortStaffRefs)
+                        await $_getPrefetchedData<
+                          AmbulanceTreatmentRecordData,
+                          $AmbulanceTreatmentRecordsTable,
+                          AmbulanceEscortStaffData
+                        >(
+                          currentTable: table,
+                          referencedTable:
+                              $$AmbulanceTreatmentRecordsTableReferences
+                                  ._ambulanceEscortStaffRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$AmbulanceTreatmentRecordsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).ambulanceEscortStaffRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.recordId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$AmbulanceTreatmentRecordsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $AmbulanceTreatmentRecordsTable,
+      AmbulanceTreatmentRecordData,
+      $$AmbulanceTreatmentRecordsTableFilterComposer,
+      $$AmbulanceTreatmentRecordsTableOrderingComposer,
+      $$AmbulanceTreatmentRecordsTableAnnotationComposer,
+      $$AmbulanceTreatmentRecordsTableCreateCompanionBuilder,
+      $$AmbulanceTreatmentRecordsTableUpdateCompanionBuilder,
+      (
+        AmbulanceTreatmentRecordData,
+        $$AmbulanceTreatmentRecordsTableReferences,
+      ),
+      AmbulanceTreatmentRecordData,
+      PrefetchHooks Function({
+        bool medicalId,
+        bool ambulanceTreatmentRecordItemsRefs,
+        bool ambulanceMedicationLogsRefs,
+        bool ambulanceVitalSignsRefs,
+        bool ambulanceEscortStaffRefs,
+      })
+    >;
+typedef $$AmbulanceTreatmentCategoriesTableCreateCompanionBuilder =
+    AmbulanceTreatmentCategoriesCompanion Function({
+      Value<int> id,
+      required String code,
+      required String name,
+      Value<int> sortOrder,
+    });
+typedef $$AmbulanceTreatmentCategoriesTableUpdateCompanionBuilder =
+    AmbulanceTreatmentCategoriesCompanion Function({
+      Value<int> id,
+      Value<String> code,
+      Value<String> name,
+      Value<int> sortOrder,
+    });
+
+final class $$AmbulanceTreatmentCategoriesTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $AmbulanceTreatmentCategoriesTable,
+          AmbulanceTreatmentCategoryData
+        > {
+  $$AmbulanceTreatmentCategoriesTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static MultiTypedResultKey<
+    $AmbulanceTreatmentItemsTable,
+    List<AmbulanceTreatmentItemData>
+  >
+  _ambulanceTreatmentItemsRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.ambulanceTreatmentItems,
+        aliasName: $_aliasNameGenerator(
+          db.ambulanceTreatmentCategories.id,
+          db.ambulanceTreatmentItems.categoryId,
+        ),
+      );
+
+  $$AmbulanceTreatmentItemsTableProcessedTableManager
+  get ambulanceTreatmentItemsRefs {
+    final manager = $$AmbulanceTreatmentItemsTableTableManager(
+      $_db,
+      $_db.ambulanceTreatmentItems,
+    ).filter((f) => f.categoryId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _ambulanceTreatmentItemsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$AmbulanceTreatmentCategoriesTableFilterComposer
+    extends Composer<_$AppDatabase, $AmbulanceTreatmentCategoriesTable> {
+  $$AmbulanceTreatmentCategoriesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get code => $composableBuilder(
+    column: $table.code,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get sortOrder => $composableBuilder(
+    column: $table.sortOrder,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  Expression<bool> ambulanceTreatmentItemsRefs(
+    Expression<bool> Function($$AmbulanceTreatmentItemsTableFilterComposer f) f,
+  ) {
+    final $$AmbulanceTreatmentItemsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.ambulanceTreatmentItems,
+          getReferencedColumn: (t) => t.categoryId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$AmbulanceTreatmentItemsTableFilterComposer(
+                $db: $db,
+                $table: $db.ambulanceTreatmentItems,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+}
+
+class $$AmbulanceTreatmentCategoriesTableOrderingComposer
+    extends Composer<_$AppDatabase, $AmbulanceTreatmentCategoriesTable> {
+  $$AmbulanceTreatmentCategoriesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get code => $composableBuilder(
+    column: $table.code,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get sortOrder => $composableBuilder(
+    column: $table.sortOrder,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$AmbulanceTreatmentCategoriesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $AmbulanceTreatmentCategoriesTable> {
+  $$AmbulanceTreatmentCategoriesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get code =>
+      $composableBuilder(column: $table.code, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<int> get sortOrder =>
+      $composableBuilder(column: $table.sortOrder, builder: (column) => column);
+
+  Expression<T> ambulanceTreatmentItemsRefs<T extends Object>(
+    Expression<T> Function($$AmbulanceTreatmentItemsTableAnnotationComposer a)
+    f,
+  ) {
+    final $$AmbulanceTreatmentItemsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.ambulanceTreatmentItems,
+          getReferencedColumn: (t) => t.categoryId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$AmbulanceTreatmentItemsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.ambulanceTreatmentItems,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+}
+
+class $$AmbulanceTreatmentCategoriesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $AmbulanceTreatmentCategoriesTable,
+          AmbulanceTreatmentCategoryData,
+          $$AmbulanceTreatmentCategoriesTableFilterComposer,
+          $$AmbulanceTreatmentCategoriesTableOrderingComposer,
+          $$AmbulanceTreatmentCategoriesTableAnnotationComposer,
+          $$AmbulanceTreatmentCategoriesTableCreateCompanionBuilder,
+          $$AmbulanceTreatmentCategoriesTableUpdateCompanionBuilder,
+          (
+            AmbulanceTreatmentCategoryData,
+            $$AmbulanceTreatmentCategoriesTableReferences,
+          ),
+          AmbulanceTreatmentCategoryData,
+          PrefetchHooks Function({bool ambulanceTreatmentItemsRefs})
+        > {
+  $$AmbulanceTreatmentCategoriesTableTableManager(
+    _$AppDatabase db,
+    $AmbulanceTreatmentCategoriesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$AmbulanceTreatmentCategoriesTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$AmbulanceTreatmentCategoriesTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$AmbulanceTreatmentCategoriesTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> code = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<int> sortOrder = const Value.absent(),
+              }) => AmbulanceTreatmentCategoriesCompanion(
+                id: id,
+                code: code,
+                name: name,
+                sortOrder: sortOrder,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String code,
+                required String name,
+                Value<int> sortOrder = const Value.absent(),
+              }) => AmbulanceTreatmentCategoriesCompanion.insert(
+                id: id,
+                code: code,
+                name: name,
+                sortOrder: sortOrder,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$AmbulanceTreatmentCategoriesTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({ambulanceTreatmentItemsRefs = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [
+                if (ambulanceTreatmentItemsRefs) db.ambulanceTreatmentItems,
+              ],
+              addJoins: null,
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (ambulanceTreatmentItemsRefs)
+                    await $_getPrefetchedData<
+                      AmbulanceTreatmentCategoryData,
+                      $AmbulanceTreatmentCategoriesTable,
+                      AmbulanceTreatmentItemData
+                    >(
+                      currentTable: table,
+                      referencedTable:
+                          $$AmbulanceTreatmentCategoriesTableReferences
+                              ._ambulanceTreatmentItemsRefsTable(db),
+                      managerFromTypedResult: (p0) =>
+                          $$AmbulanceTreatmentCategoriesTableReferences(
+                            db,
+                            table,
+                            p0,
+                          ).ambulanceTreatmentItemsRefs,
+                      referencedItemsForCurrentItem: (item, referencedItems) =>
+                          referencedItems.where((e) => e.categoryId == item.id),
+                      typedResults: items,
+                    ),
+                ];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$AmbulanceTreatmentCategoriesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $AmbulanceTreatmentCategoriesTable,
+      AmbulanceTreatmentCategoryData,
+      $$AmbulanceTreatmentCategoriesTableFilterComposer,
+      $$AmbulanceTreatmentCategoriesTableOrderingComposer,
+      $$AmbulanceTreatmentCategoriesTableAnnotationComposer,
+      $$AmbulanceTreatmentCategoriesTableCreateCompanionBuilder,
+      $$AmbulanceTreatmentCategoriesTableUpdateCompanionBuilder,
+      (
+        AmbulanceTreatmentCategoryData,
+        $$AmbulanceTreatmentCategoriesTableReferences,
+      ),
+      AmbulanceTreatmentCategoryData,
+      PrefetchHooks Function({bool ambulanceTreatmentItemsRefs})
+    >;
+typedef $$AmbulanceTreatmentItemsTableCreateCompanionBuilder =
+    AmbulanceTreatmentItemsCompanion Function({
+      Value<int> id,
+      required int categoryId,
+      required String name,
+      Value<int> sortOrder,
+      Value<bool> isOther,
+    });
+typedef $$AmbulanceTreatmentItemsTableUpdateCompanionBuilder =
+    AmbulanceTreatmentItemsCompanion Function({
+      Value<int> id,
+      Value<int> categoryId,
+      Value<String> name,
+      Value<int> sortOrder,
+      Value<bool> isOther,
+    });
+
+final class $$AmbulanceTreatmentItemsTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $AmbulanceTreatmentItemsTable,
+          AmbulanceTreatmentItemData
+        > {
+  $$AmbulanceTreatmentItemsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $AmbulanceTreatmentCategoriesTable _categoryIdTable(
+    _$AppDatabase db,
+  ) => db.ambulanceTreatmentCategories.createAlias(
+    $_aliasNameGenerator(
+      db.ambulanceTreatmentItems.categoryId,
+      db.ambulanceTreatmentCategories.id,
+    ),
+  );
+
+  $$AmbulanceTreatmentCategoriesTableProcessedTableManager get categoryId {
+    final $_column = $_itemColumn<int>('category_id')!;
+
+    final manager = $$AmbulanceTreatmentCategoriesTableTableManager(
+      $_db,
+      $_db.ambulanceTreatmentCategories,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_categoryIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $AmbulanceTreatmentRecordItemsTable,
+    List<AmbulanceTreatmentRecordItemData>
+  >
+  _ambulanceTreatmentRecordItemsRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.ambulanceTreatmentRecordItems,
+        aliasName: $_aliasNameGenerator(
+          db.ambulanceTreatmentItems.id,
+          db.ambulanceTreatmentRecordItems.itemId,
+        ),
+      );
+
+  $$AmbulanceTreatmentRecordItemsTableProcessedTableManager
+  get ambulanceTreatmentRecordItemsRefs {
+    final manager = $$AmbulanceTreatmentRecordItemsTableTableManager(
+      $_db,
+      $_db.ambulanceTreatmentRecordItems,
+    ).filter((f) => f.itemId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _ambulanceTreatmentRecordItemsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$AmbulanceTreatmentItemsTableFilterComposer
+    extends Composer<_$AppDatabase, $AmbulanceTreatmentItemsTable> {
+  $$AmbulanceTreatmentItemsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get sortOrder => $composableBuilder(
+    column: $table.sortOrder,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isOther => $composableBuilder(
+    column: $table.isOther,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$AmbulanceTreatmentCategoriesTableFilterComposer get categoryId {
+    final $$AmbulanceTreatmentCategoriesTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.categoryId,
+          referencedTable: $db.ambulanceTreatmentCategories,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$AmbulanceTreatmentCategoriesTableFilterComposer(
+                $db: $db,
+                $table: $db.ambulanceTreatmentCategories,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+
+  Expression<bool> ambulanceTreatmentRecordItemsRefs(
+    Expression<bool> Function(
+      $$AmbulanceTreatmentRecordItemsTableFilterComposer f,
+    )
+    f,
+  ) {
+    final $$AmbulanceTreatmentRecordItemsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.ambulanceTreatmentRecordItems,
+          getReferencedColumn: (t) => t.itemId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$AmbulanceTreatmentRecordItemsTableFilterComposer(
+                $db: $db,
+                $table: $db.ambulanceTreatmentRecordItems,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+}
+
+class $$AmbulanceTreatmentItemsTableOrderingComposer
+    extends Composer<_$AppDatabase, $AmbulanceTreatmentItemsTable> {
+  $$AmbulanceTreatmentItemsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get sortOrder => $composableBuilder(
+    column: $table.sortOrder,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isOther => $composableBuilder(
+    column: $table.isOther,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$AmbulanceTreatmentCategoriesTableOrderingComposer get categoryId {
+    final $$AmbulanceTreatmentCategoriesTableOrderingComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.categoryId,
+          referencedTable: $db.ambulanceTreatmentCategories,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$AmbulanceTreatmentCategoriesTableOrderingComposer(
+                $db: $db,
+                $table: $db.ambulanceTreatmentCategories,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+}
+
+class $$AmbulanceTreatmentItemsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $AmbulanceTreatmentItemsTable> {
+  $$AmbulanceTreatmentItemsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<int> get sortOrder =>
+      $composableBuilder(column: $table.sortOrder, builder: (column) => column);
+
+  GeneratedColumn<bool> get isOther =>
+      $composableBuilder(column: $table.isOther, builder: (column) => column);
+
+  $$AmbulanceTreatmentCategoriesTableAnnotationComposer get categoryId {
+    final $$AmbulanceTreatmentCategoriesTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.categoryId,
+          referencedTable: $db.ambulanceTreatmentCategories,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$AmbulanceTreatmentCategoriesTableAnnotationComposer(
+                $db: $db,
+                $table: $db.ambulanceTreatmentCategories,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+
+  Expression<T> ambulanceTreatmentRecordItemsRefs<T extends Object>(
+    Expression<T> Function(
+      $$AmbulanceTreatmentRecordItemsTableAnnotationComposer a,
+    )
+    f,
+  ) {
+    final $$AmbulanceTreatmentRecordItemsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.ambulanceTreatmentRecordItems,
+          getReferencedColumn: (t) => t.itemId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$AmbulanceTreatmentRecordItemsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.ambulanceTreatmentRecordItems,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+}
+
+class $$AmbulanceTreatmentItemsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $AmbulanceTreatmentItemsTable,
+          AmbulanceTreatmentItemData,
+          $$AmbulanceTreatmentItemsTableFilterComposer,
+          $$AmbulanceTreatmentItemsTableOrderingComposer,
+          $$AmbulanceTreatmentItemsTableAnnotationComposer,
+          $$AmbulanceTreatmentItemsTableCreateCompanionBuilder,
+          $$AmbulanceTreatmentItemsTableUpdateCompanionBuilder,
+          (
+            AmbulanceTreatmentItemData,
+            $$AmbulanceTreatmentItemsTableReferences,
+          ),
+          AmbulanceTreatmentItemData,
+          PrefetchHooks Function({
+            bool categoryId,
+            bool ambulanceTreatmentRecordItemsRefs,
+          })
+        > {
+  $$AmbulanceTreatmentItemsTableTableManager(
+    _$AppDatabase db,
+    $AmbulanceTreatmentItemsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$AmbulanceTreatmentItemsTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$AmbulanceTreatmentItemsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$AmbulanceTreatmentItemsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> categoryId = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<int> sortOrder = const Value.absent(),
+                Value<bool> isOther = const Value.absent(),
+              }) => AmbulanceTreatmentItemsCompanion(
+                id: id,
+                categoryId: categoryId,
+                name: name,
+                sortOrder: sortOrder,
+                isOther: isOther,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int categoryId,
+                required String name,
+                Value<int> sortOrder = const Value.absent(),
+                Value<bool> isOther = const Value.absent(),
+              }) => AmbulanceTreatmentItemsCompanion.insert(
+                id: id,
+                categoryId: categoryId,
+                name: name,
+                sortOrder: sortOrder,
+                isOther: isOther,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$AmbulanceTreatmentItemsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({
+                categoryId = false,
+                ambulanceTreatmentRecordItemsRefs = false,
+              }) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (ambulanceTreatmentRecordItemsRefs)
+                      db.ambulanceTreatmentRecordItems,
+                  ],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (categoryId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.categoryId,
+                                    referencedTable:
+                                        $$AmbulanceTreatmentItemsTableReferences
+                                            ._categoryIdTable(db),
+                                    referencedColumn:
+                                        $$AmbulanceTreatmentItemsTableReferences
+                                            ._categoryIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (ambulanceTreatmentRecordItemsRefs)
+                        await $_getPrefetchedData<
+                          AmbulanceTreatmentItemData,
+                          $AmbulanceTreatmentItemsTable,
+                          AmbulanceTreatmentRecordItemData
+                        >(
+                          currentTable: table,
+                          referencedTable:
+                              $$AmbulanceTreatmentItemsTableReferences
+                                  ._ambulanceTreatmentRecordItemsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$AmbulanceTreatmentItemsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).ambulanceTreatmentRecordItemsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.itemId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$AmbulanceTreatmentItemsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $AmbulanceTreatmentItemsTable,
+      AmbulanceTreatmentItemData,
+      $$AmbulanceTreatmentItemsTableFilterComposer,
+      $$AmbulanceTreatmentItemsTableOrderingComposer,
+      $$AmbulanceTreatmentItemsTableAnnotationComposer,
+      $$AmbulanceTreatmentItemsTableCreateCompanionBuilder,
+      $$AmbulanceTreatmentItemsTableUpdateCompanionBuilder,
+      (AmbulanceTreatmentItemData, $$AmbulanceTreatmentItemsTableReferences),
+      AmbulanceTreatmentItemData,
+      PrefetchHooks Function({
+        bool categoryId,
+        bool ambulanceTreatmentRecordItemsRefs,
+      })
+    >;
+typedef $$AmbulanceTreatmentRecordItemsTableCreateCompanionBuilder =
+    AmbulanceTreatmentRecordItemsCompanion Function({
+      Value<int> id,
+      required int recordId,
+      required int itemId,
+      Value<String?> tubeSize,
+      Value<String?> fixationDepth,
+      Value<String?> shockCount,
+      Value<String?> shockJoules,
+      Value<String?> otherDescription,
+    });
+typedef $$AmbulanceTreatmentRecordItemsTableUpdateCompanionBuilder =
+    AmbulanceTreatmentRecordItemsCompanion Function({
+      Value<int> id,
+      Value<int> recordId,
+      Value<int> itemId,
+      Value<String?> tubeSize,
+      Value<String?> fixationDepth,
+      Value<String?> shockCount,
+      Value<String?> shockJoules,
+      Value<String?> otherDescription,
+    });
+
+final class $$AmbulanceTreatmentRecordItemsTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $AmbulanceTreatmentRecordItemsTable,
+          AmbulanceTreatmentRecordItemData
+        > {
+  $$AmbulanceTreatmentRecordItemsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $AmbulanceTreatmentRecordsTable _recordIdTable(_$AppDatabase db) =>
+      db.ambulanceTreatmentRecords.createAlias(
+        $_aliasNameGenerator(
+          db.ambulanceTreatmentRecordItems.recordId,
+          db.ambulanceTreatmentRecords.id,
+        ),
+      );
+
+  $$AmbulanceTreatmentRecordsTableProcessedTableManager get recordId {
+    final $_column = $_itemColumn<int>('record_id')!;
+
+    final manager = $$AmbulanceTreatmentRecordsTableTableManager(
+      $_db,
+      $_db.ambulanceTreatmentRecords,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_recordIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $AmbulanceTreatmentItemsTable _itemIdTable(_$AppDatabase db) =>
+      db.ambulanceTreatmentItems.createAlias(
+        $_aliasNameGenerator(
+          db.ambulanceTreatmentRecordItems.itemId,
+          db.ambulanceTreatmentItems.id,
+        ),
+      );
+
+  $$AmbulanceTreatmentItemsTableProcessedTableManager get itemId {
+    final $_column = $_itemColumn<int>('item_id')!;
+
+    final manager = $$AmbulanceTreatmentItemsTableTableManager(
+      $_db,
+      $_db.ambulanceTreatmentItems,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_itemIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$AmbulanceTreatmentRecordItemsTableFilterComposer
+    extends Composer<_$AppDatabase, $AmbulanceTreatmentRecordItemsTable> {
+  $$AmbulanceTreatmentRecordItemsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get tubeSize => $composableBuilder(
+    column: $table.tubeSize,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get fixationDepth => $composableBuilder(
+    column: $table.fixationDepth,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get shockCount => $composableBuilder(
+    column: $table.shockCount,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get shockJoules => $composableBuilder(
+    column: $table.shockJoules,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get otherDescription => $composableBuilder(
+    column: $table.otherDescription,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$AmbulanceTreatmentRecordsTableFilterComposer get recordId {
+    final $$AmbulanceTreatmentRecordsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.recordId,
+          referencedTable: $db.ambulanceTreatmentRecords,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$AmbulanceTreatmentRecordsTableFilterComposer(
+                $db: $db,
+                $table: $db.ambulanceTreatmentRecords,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+
+  $$AmbulanceTreatmentItemsTableFilterComposer get itemId {
+    final $$AmbulanceTreatmentItemsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.itemId,
+          referencedTable: $db.ambulanceTreatmentItems,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$AmbulanceTreatmentItemsTableFilterComposer(
+                $db: $db,
+                $table: $db.ambulanceTreatmentItems,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+}
+
+class $$AmbulanceTreatmentRecordItemsTableOrderingComposer
+    extends Composer<_$AppDatabase, $AmbulanceTreatmentRecordItemsTable> {
+  $$AmbulanceTreatmentRecordItemsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get tubeSize => $composableBuilder(
+    column: $table.tubeSize,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get fixationDepth => $composableBuilder(
+    column: $table.fixationDepth,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get shockCount => $composableBuilder(
+    column: $table.shockCount,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get shockJoules => $composableBuilder(
+    column: $table.shockJoules,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get otherDescription => $composableBuilder(
+    column: $table.otherDescription,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$AmbulanceTreatmentRecordsTableOrderingComposer get recordId {
+    final $$AmbulanceTreatmentRecordsTableOrderingComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.recordId,
+          referencedTable: $db.ambulanceTreatmentRecords,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$AmbulanceTreatmentRecordsTableOrderingComposer(
+                $db: $db,
+                $table: $db.ambulanceTreatmentRecords,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+
+  $$AmbulanceTreatmentItemsTableOrderingComposer get itemId {
+    final $$AmbulanceTreatmentItemsTableOrderingComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.itemId,
+          referencedTable: $db.ambulanceTreatmentItems,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$AmbulanceTreatmentItemsTableOrderingComposer(
+                $db: $db,
+                $table: $db.ambulanceTreatmentItems,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+}
+
+class $$AmbulanceTreatmentRecordItemsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $AmbulanceTreatmentRecordItemsTable> {
+  $$AmbulanceTreatmentRecordItemsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get tubeSize =>
+      $composableBuilder(column: $table.tubeSize, builder: (column) => column);
+
+  GeneratedColumn<String> get fixationDepth => $composableBuilder(
+    column: $table.fixationDepth,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get shockCount => $composableBuilder(
+    column: $table.shockCount,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get shockJoules => $composableBuilder(
+    column: $table.shockJoules,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get otherDescription => $composableBuilder(
+    column: $table.otherDescription,
+    builder: (column) => column,
+  );
+
+  $$AmbulanceTreatmentRecordsTableAnnotationComposer get recordId {
+    final $$AmbulanceTreatmentRecordsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.recordId,
+          referencedTable: $db.ambulanceTreatmentRecords,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$AmbulanceTreatmentRecordsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.ambulanceTreatmentRecords,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+
+  $$AmbulanceTreatmentItemsTableAnnotationComposer get itemId {
+    final $$AmbulanceTreatmentItemsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.itemId,
+          referencedTable: $db.ambulanceTreatmentItems,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$AmbulanceTreatmentItemsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.ambulanceTreatmentItems,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+}
+
+class $$AmbulanceTreatmentRecordItemsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $AmbulanceTreatmentRecordItemsTable,
+          AmbulanceTreatmentRecordItemData,
+          $$AmbulanceTreatmentRecordItemsTableFilterComposer,
+          $$AmbulanceTreatmentRecordItemsTableOrderingComposer,
+          $$AmbulanceTreatmentRecordItemsTableAnnotationComposer,
+          $$AmbulanceTreatmentRecordItemsTableCreateCompanionBuilder,
+          $$AmbulanceTreatmentRecordItemsTableUpdateCompanionBuilder,
+          (
+            AmbulanceTreatmentRecordItemData,
+            $$AmbulanceTreatmentRecordItemsTableReferences,
+          ),
+          AmbulanceTreatmentRecordItemData,
+          PrefetchHooks Function({bool recordId, bool itemId})
+        > {
+  $$AmbulanceTreatmentRecordItemsTableTableManager(
+    _$AppDatabase db,
+    $AmbulanceTreatmentRecordItemsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$AmbulanceTreatmentRecordItemsTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$AmbulanceTreatmentRecordItemsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$AmbulanceTreatmentRecordItemsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> recordId = const Value.absent(),
+                Value<int> itemId = const Value.absent(),
+                Value<String?> tubeSize = const Value.absent(),
+                Value<String?> fixationDepth = const Value.absent(),
+                Value<String?> shockCount = const Value.absent(),
+                Value<String?> shockJoules = const Value.absent(),
+                Value<String?> otherDescription = const Value.absent(),
+              }) => AmbulanceTreatmentRecordItemsCompanion(
+                id: id,
+                recordId: recordId,
+                itemId: itemId,
+                tubeSize: tubeSize,
+                fixationDepth: fixationDepth,
+                shockCount: shockCount,
+                shockJoules: shockJoules,
+                otherDescription: otherDescription,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int recordId,
+                required int itemId,
+                Value<String?> tubeSize = const Value.absent(),
+                Value<String?> fixationDepth = const Value.absent(),
+                Value<String?> shockCount = const Value.absent(),
+                Value<String?> shockJoules = const Value.absent(),
+                Value<String?> otherDescription = const Value.absent(),
+              }) => AmbulanceTreatmentRecordItemsCompanion.insert(
+                id: id,
+                recordId: recordId,
+                itemId: itemId,
+                tubeSize: tubeSize,
+                fixationDepth: fixationDepth,
+                shockCount: shockCount,
+                shockJoules: shockJoules,
+                otherDescription: otherDescription,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$AmbulanceTreatmentRecordItemsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({recordId = false, itemId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (recordId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.recordId,
+                                referencedTable:
+                                    $$AmbulanceTreatmentRecordItemsTableReferences
+                                        ._recordIdTable(db),
+                                referencedColumn:
+                                    $$AmbulanceTreatmentRecordItemsTableReferences
+                                        ._recordIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+                    if (itemId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.itemId,
+                                referencedTable:
+                                    $$AmbulanceTreatmentRecordItemsTableReferences
+                                        ._itemIdTable(db),
+                                referencedColumn:
+                                    $$AmbulanceTreatmentRecordItemsTableReferences
+                                        ._itemIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$AmbulanceTreatmentRecordItemsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $AmbulanceTreatmentRecordItemsTable,
+      AmbulanceTreatmentRecordItemData,
+      $$AmbulanceTreatmentRecordItemsTableFilterComposer,
+      $$AmbulanceTreatmentRecordItemsTableOrderingComposer,
+      $$AmbulanceTreatmentRecordItemsTableAnnotationComposer,
+      $$AmbulanceTreatmentRecordItemsTableCreateCompanionBuilder,
+      $$AmbulanceTreatmentRecordItemsTableUpdateCompanionBuilder,
+      (
+        AmbulanceTreatmentRecordItemData,
+        $$AmbulanceTreatmentRecordItemsTableReferences,
+      ),
+      AmbulanceTreatmentRecordItemData,
+      PrefetchHooks Function({bool recordId, bool itemId})
+    >;
+typedef $$AmbulanceMedicationLogsTableCreateCompanionBuilder =
+    AmbulanceMedicationLogsCompanion Function({
+      Value<int> id,
+      required int recordId,
+      Value<String?> time,
+      Value<String?> drugName,
+      Value<String?> route,
+      Value<String?> dose,
+      Value<String?> emtName,
+    });
+typedef $$AmbulanceMedicationLogsTableUpdateCompanionBuilder =
+    AmbulanceMedicationLogsCompanion Function({
+      Value<int> id,
+      Value<int> recordId,
+      Value<String?> time,
+      Value<String?> drugName,
+      Value<String?> route,
+      Value<String?> dose,
+      Value<String?> emtName,
+    });
+
+final class $$AmbulanceMedicationLogsTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $AmbulanceMedicationLogsTable,
+          AmbulanceMedicationLogData
+        > {
+  $$AmbulanceMedicationLogsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $AmbulanceTreatmentRecordsTable _recordIdTable(_$AppDatabase db) =>
+      db.ambulanceTreatmentRecords.createAlias(
+        $_aliasNameGenerator(
+          db.ambulanceMedicationLogs.recordId,
+          db.ambulanceTreatmentRecords.id,
+        ),
+      );
+
+  $$AmbulanceTreatmentRecordsTableProcessedTableManager get recordId {
+    final $_column = $_itemColumn<int>('record_id')!;
+
+    final manager = $$AmbulanceTreatmentRecordsTableTableManager(
+      $_db,
+      $_db.ambulanceTreatmentRecords,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_recordIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$AmbulanceMedicationLogsTableFilterComposer
+    extends Composer<_$AppDatabase, $AmbulanceMedicationLogsTable> {
+  $$AmbulanceMedicationLogsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get time => $composableBuilder(
+    column: $table.time,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get drugName => $composableBuilder(
+    column: $table.drugName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get route => $composableBuilder(
+    column: $table.route,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get dose => $composableBuilder(
+    column: $table.dose,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get emtName => $composableBuilder(
+    column: $table.emtName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$AmbulanceTreatmentRecordsTableFilterComposer get recordId {
+    final $$AmbulanceTreatmentRecordsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.recordId,
+          referencedTable: $db.ambulanceTreatmentRecords,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$AmbulanceTreatmentRecordsTableFilterComposer(
+                $db: $db,
+                $table: $db.ambulanceTreatmentRecords,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+}
+
+class $$AmbulanceMedicationLogsTableOrderingComposer
+    extends Composer<_$AppDatabase, $AmbulanceMedicationLogsTable> {
+  $$AmbulanceMedicationLogsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get time => $composableBuilder(
+    column: $table.time,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get drugName => $composableBuilder(
+    column: $table.drugName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get route => $composableBuilder(
+    column: $table.route,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get dose => $composableBuilder(
+    column: $table.dose,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get emtName => $composableBuilder(
+    column: $table.emtName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$AmbulanceTreatmentRecordsTableOrderingComposer get recordId {
+    final $$AmbulanceTreatmentRecordsTableOrderingComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.recordId,
+          referencedTable: $db.ambulanceTreatmentRecords,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$AmbulanceTreatmentRecordsTableOrderingComposer(
+                $db: $db,
+                $table: $db.ambulanceTreatmentRecords,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+}
+
+class $$AmbulanceMedicationLogsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $AmbulanceMedicationLogsTable> {
+  $$AmbulanceMedicationLogsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get time =>
+      $composableBuilder(column: $table.time, builder: (column) => column);
+
+  GeneratedColumn<String> get drugName =>
+      $composableBuilder(column: $table.drugName, builder: (column) => column);
+
+  GeneratedColumn<String> get route =>
+      $composableBuilder(column: $table.route, builder: (column) => column);
+
+  GeneratedColumn<String> get dose =>
+      $composableBuilder(column: $table.dose, builder: (column) => column);
+
+  GeneratedColumn<String> get emtName =>
+      $composableBuilder(column: $table.emtName, builder: (column) => column);
+
+  $$AmbulanceTreatmentRecordsTableAnnotationComposer get recordId {
+    final $$AmbulanceTreatmentRecordsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.recordId,
+          referencedTable: $db.ambulanceTreatmentRecords,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$AmbulanceTreatmentRecordsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.ambulanceTreatmentRecords,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+}
+
+class $$AmbulanceMedicationLogsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $AmbulanceMedicationLogsTable,
+          AmbulanceMedicationLogData,
+          $$AmbulanceMedicationLogsTableFilterComposer,
+          $$AmbulanceMedicationLogsTableOrderingComposer,
+          $$AmbulanceMedicationLogsTableAnnotationComposer,
+          $$AmbulanceMedicationLogsTableCreateCompanionBuilder,
+          $$AmbulanceMedicationLogsTableUpdateCompanionBuilder,
+          (
+            AmbulanceMedicationLogData,
+            $$AmbulanceMedicationLogsTableReferences,
+          ),
+          AmbulanceMedicationLogData,
+          PrefetchHooks Function({bool recordId})
+        > {
+  $$AmbulanceMedicationLogsTableTableManager(
+    _$AppDatabase db,
+    $AmbulanceMedicationLogsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$AmbulanceMedicationLogsTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$AmbulanceMedicationLogsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$AmbulanceMedicationLogsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> recordId = const Value.absent(),
+                Value<String?> time = const Value.absent(),
+                Value<String?> drugName = const Value.absent(),
+                Value<String?> route = const Value.absent(),
+                Value<String?> dose = const Value.absent(),
+                Value<String?> emtName = const Value.absent(),
+              }) => AmbulanceMedicationLogsCompanion(
+                id: id,
+                recordId: recordId,
+                time: time,
+                drugName: drugName,
+                route: route,
+                dose: dose,
+                emtName: emtName,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int recordId,
+                Value<String?> time = const Value.absent(),
+                Value<String?> drugName = const Value.absent(),
+                Value<String?> route = const Value.absent(),
+                Value<String?> dose = const Value.absent(),
+                Value<String?> emtName = const Value.absent(),
+              }) => AmbulanceMedicationLogsCompanion.insert(
+                id: id,
+                recordId: recordId,
+                time: time,
+                drugName: drugName,
+                route: route,
+                dose: dose,
+                emtName: emtName,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$AmbulanceMedicationLogsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({recordId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (recordId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.recordId,
+                                referencedTable:
+                                    $$AmbulanceMedicationLogsTableReferences
+                                        ._recordIdTable(db),
+                                referencedColumn:
+                                    $$AmbulanceMedicationLogsTableReferences
+                                        ._recordIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$AmbulanceMedicationLogsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $AmbulanceMedicationLogsTable,
+      AmbulanceMedicationLogData,
+      $$AmbulanceMedicationLogsTableFilterComposer,
+      $$AmbulanceMedicationLogsTableOrderingComposer,
+      $$AmbulanceMedicationLogsTableAnnotationComposer,
+      $$AmbulanceMedicationLogsTableCreateCompanionBuilder,
+      $$AmbulanceMedicationLogsTableUpdateCompanionBuilder,
+      (AmbulanceMedicationLogData, $$AmbulanceMedicationLogsTableReferences),
+      AmbulanceMedicationLogData,
+      PrefetchHooks Function({bool recordId})
+    >;
+typedef $$AmbulanceVitalSignsTableCreateCompanionBuilder =
+    AmbulanceVitalSignsCompanion Function({
+      Value<int> id,
+      required int recordId,
+      Value<String?> time,
+      Value<bool> atHospital,
+      Value<String?> avpu,
+      Value<String?> gcsE,
+      Value<String?> gcsV,
+      Value<String?> gcsM,
+      Value<String?> gcsTotal,
+      Value<String?> temperature,
+      Value<String?> pulse,
+      Value<String?> respirationRate,
+      Value<String?> bloodPressure,
+      Value<String?> spo2,
+    });
+typedef $$AmbulanceVitalSignsTableUpdateCompanionBuilder =
+    AmbulanceVitalSignsCompanion Function({
+      Value<int> id,
+      Value<int> recordId,
+      Value<String?> time,
+      Value<bool> atHospital,
+      Value<String?> avpu,
+      Value<String?> gcsE,
+      Value<String?> gcsV,
+      Value<String?> gcsM,
+      Value<String?> gcsTotal,
+      Value<String?> temperature,
+      Value<String?> pulse,
+      Value<String?> respirationRate,
+      Value<String?> bloodPressure,
+      Value<String?> spo2,
+    });
+
+final class $$AmbulanceVitalSignsTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $AmbulanceVitalSignsTable,
+          AmbulanceVitalSignData
+        > {
+  $$AmbulanceVitalSignsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $AmbulanceTreatmentRecordsTable _recordIdTable(_$AppDatabase db) =>
+      db.ambulanceTreatmentRecords.createAlias(
+        $_aliasNameGenerator(
+          db.ambulanceVitalSigns.recordId,
+          db.ambulanceTreatmentRecords.id,
+        ),
+      );
+
+  $$AmbulanceTreatmentRecordsTableProcessedTableManager get recordId {
+    final $_column = $_itemColumn<int>('record_id')!;
+
+    final manager = $$AmbulanceTreatmentRecordsTableTableManager(
+      $_db,
+      $_db.ambulanceTreatmentRecords,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_recordIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$AmbulanceVitalSignsTableFilterComposer
+    extends Composer<_$AppDatabase, $AmbulanceVitalSignsTable> {
+  $$AmbulanceVitalSignsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get time => $composableBuilder(
+    column: $table.time,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get atHospital => $composableBuilder(
+    column: $table.atHospital,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get avpu => $composableBuilder(
+    column: $table.avpu,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get gcsE => $composableBuilder(
+    column: $table.gcsE,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get gcsV => $composableBuilder(
+    column: $table.gcsV,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get gcsM => $composableBuilder(
+    column: $table.gcsM,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get gcsTotal => $composableBuilder(
+    column: $table.gcsTotal,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get temperature => $composableBuilder(
+    column: $table.temperature,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get pulse => $composableBuilder(
+    column: $table.pulse,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get respirationRate => $composableBuilder(
+    column: $table.respirationRate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get bloodPressure => $composableBuilder(
+    column: $table.bloodPressure,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get spo2 => $composableBuilder(
+    column: $table.spo2,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$AmbulanceTreatmentRecordsTableFilterComposer get recordId {
+    final $$AmbulanceTreatmentRecordsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.recordId,
+          referencedTable: $db.ambulanceTreatmentRecords,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$AmbulanceTreatmentRecordsTableFilterComposer(
+                $db: $db,
+                $table: $db.ambulanceTreatmentRecords,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+}
+
+class $$AmbulanceVitalSignsTableOrderingComposer
+    extends Composer<_$AppDatabase, $AmbulanceVitalSignsTable> {
+  $$AmbulanceVitalSignsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get time => $composableBuilder(
+    column: $table.time,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get atHospital => $composableBuilder(
+    column: $table.atHospital,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get avpu => $composableBuilder(
+    column: $table.avpu,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get gcsE => $composableBuilder(
+    column: $table.gcsE,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get gcsV => $composableBuilder(
+    column: $table.gcsV,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get gcsM => $composableBuilder(
+    column: $table.gcsM,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get gcsTotal => $composableBuilder(
+    column: $table.gcsTotal,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get temperature => $composableBuilder(
+    column: $table.temperature,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get pulse => $composableBuilder(
+    column: $table.pulse,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get respirationRate => $composableBuilder(
+    column: $table.respirationRate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get bloodPressure => $composableBuilder(
+    column: $table.bloodPressure,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get spo2 => $composableBuilder(
+    column: $table.spo2,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$AmbulanceTreatmentRecordsTableOrderingComposer get recordId {
+    final $$AmbulanceTreatmentRecordsTableOrderingComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.recordId,
+          referencedTable: $db.ambulanceTreatmentRecords,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$AmbulanceTreatmentRecordsTableOrderingComposer(
+                $db: $db,
+                $table: $db.ambulanceTreatmentRecords,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+}
+
+class $$AmbulanceVitalSignsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $AmbulanceVitalSignsTable> {
+  $$AmbulanceVitalSignsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get time =>
+      $composableBuilder(column: $table.time, builder: (column) => column);
+
+  GeneratedColumn<bool> get atHospital => $composableBuilder(
+    column: $table.atHospital,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get avpu =>
+      $composableBuilder(column: $table.avpu, builder: (column) => column);
+
+  GeneratedColumn<String> get gcsE =>
+      $composableBuilder(column: $table.gcsE, builder: (column) => column);
+
+  GeneratedColumn<String> get gcsV =>
+      $composableBuilder(column: $table.gcsV, builder: (column) => column);
+
+  GeneratedColumn<String> get gcsM =>
+      $composableBuilder(column: $table.gcsM, builder: (column) => column);
+
+  GeneratedColumn<String> get gcsTotal =>
+      $composableBuilder(column: $table.gcsTotal, builder: (column) => column);
+
+  GeneratedColumn<String> get temperature => $composableBuilder(
+    column: $table.temperature,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get pulse =>
+      $composableBuilder(column: $table.pulse, builder: (column) => column);
+
+  GeneratedColumn<String> get respirationRate => $composableBuilder(
+    column: $table.respirationRate,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get bloodPressure => $composableBuilder(
+    column: $table.bloodPressure,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get spo2 =>
+      $composableBuilder(column: $table.spo2, builder: (column) => column);
+
+  $$AmbulanceTreatmentRecordsTableAnnotationComposer get recordId {
+    final $$AmbulanceTreatmentRecordsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.recordId,
+          referencedTable: $db.ambulanceTreatmentRecords,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$AmbulanceTreatmentRecordsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.ambulanceTreatmentRecords,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+}
+
+class $$AmbulanceVitalSignsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $AmbulanceVitalSignsTable,
+          AmbulanceVitalSignData,
+          $$AmbulanceVitalSignsTableFilterComposer,
+          $$AmbulanceVitalSignsTableOrderingComposer,
+          $$AmbulanceVitalSignsTableAnnotationComposer,
+          $$AmbulanceVitalSignsTableCreateCompanionBuilder,
+          $$AmbulanceVitalSignsTableUpdateCompanionBuilder,
+          (AmbulanceVitalSignData, $$AmbulanceVitalSignsTableReferences),
+          AmbulanceVitalSignData,
+          PrefetchHooks Function({bool recordId})
+        > {
+  $$AmbulanceVitalSignsTableTableManager(
+    _$AppDatabase db,
+    $AmbulanceVitalSignsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$AmbulanceVitalSignsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$AmbulanceVitalSignsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$AmbulanceVitalSignsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> recordId = const Value.absent(),
+                Value<String?> time = const Value.absent(),
+                Value<bool> atHospital = const Value.absent(),
+                Value<String?> avpu = const Value.absent(),
+                Value<String?> gcsE = const Value.absent(),
+                Value<String?> gcsV = const Value.absent(),
+                Value<String?> gcsM = const Value.absent(),
+                Value<String?> gcsTotal = const Value.absent(),
+                Value<String?> temperature = const Value.absent(),
+                Value<String?> pulse = const Value.absent(),
+                Value<String?> respirationRate = const Value.absent(),
+                Value<String?> bloodPressure = const Value.absent(),
+                Value<String?> spo2 = const Value.absent(),
+              }) => AmbulanceVitalSignsCompanion(
+                id: id,
+                recordId: recordId,
+                time: time,
+                atHospital: atHospital,
+                avpu: avpu,
+                gcsE: gcsE,
+                gcsV: gcsV,
+                gcsM: gcsM,
+                gcsTotal: gcsTotal,
+                temperature: temperature,
+                pulse: pulse,
+                respirationRate: respirationRate,
+                bloodPressure: bloodPressure,
+                spo2: spo2,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int recordId,
+                Value<String?> time = const Value.absent(),
+                Value<bool> atHospital = const Value.absent(),
+                Value<String?> avpu = const Value.absent(),
+                Value<String?> gcsE = const Value.absent(),
+                Value<String?> gcsV = const Value.absent(),
+                Value<String?> gcsM = const Value.absent(),
+                Value<String?> gcsTotal = const Value.absent(),
+                Value<String?> temperature = const Value.absent(),
+                Value<String?> pulse = const Value.absent(),
+                Value<String?> respirationRate = const Value.absent(),
+                Value<String?> bloodPressure = const Value.absent(),
+                Value<String?> spo2 = const Value.absent(),
+              }) => AmbulanceVitalSignsCompanion.insert(
+                id: id,
+                recordId: recordId,
+                time: time,
+                atHospital: atHospital,
+                avpu: avpu,
+                gcsE: gcsE,
+                gcsV: gcsV,
+                gcsM: gcsM,
+                gcsTotal: gcsTotal,
+                temperature: temperature,
+                pulse: pulse,
+                respirationRate: respirationRate,
+                bloodPressure: bloodPressure,
+                spo2: spo2,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$AmbulanceVitalSignsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({recordId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (recordId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.recordId,
+                                referencedTable:
+                                    $$AmbulanceVitalSignsTableReferences
+                                        ._recordIdTable(db),
+                                referencedColumn:
+                                    $$AmbulanceVitalSignsTableReferences
+                                        ._recordIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$AmbulanceVitalSignsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $AmbulanceVitalSignsTable,
+      AmbulanceVitalSignData,
+      $$AmbulanceVitalSignsTableFilterComposer,
+      $$AmbulanceVitalSignsTableOrderingComposer,
+      $$AmbulanceVitalSignsTableAnnotationComposer,
+      $$AmbulanceVitalSignsTableCreateCompanionBuilder,
+      $$AmbulanceVitalSignsTableUpdateCompanionBuilder,
+      (AmbulanceVitalSignData, $$AmbulanceVitalSignsTableReferences),
+      AmbulanceVitalSignData,
+      PrefetchHooks Function({bool recordId})
+    >;
+typedef $$AmbulanceEscortStaffTableCreateCompanionBuilder =
+    AmbulanceEscortStaffCompanion Function({
+      Value<int> id,
+      required int recordId,
+      Value<String?> name,
+      Value<Uint8List?> signature,
+    });
+typedef $$AmbulanceEscortStaffTableUpdateCompanionBuilder =
+    AmbulanceEscortStaffCompanion Function({
+      Value<int> id,
+      Value<int> recordId,
+      Value<String?> name,
+      Value<Uint8List?> signature,
+    });
+
+final class $$AmbulanceEscortStaffTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $AmbulanceEscortStaffTable,
+          AmbulanceEscortStaffData
+        > {
+  $$AmbulanceEscortStaffTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $AmbulanceTreatmentRecordsTable _recordIdTable(_$AppDatabase db) =>
+      db.ambulanceTreatmentRecords.createAlias(
+        $_aliasNameGenerator(
+          db.ambulanceEscortStaff.recordId,
+          db.ambulanceTreatmentRecords.id,
+        ),
+      );
+
+  $$AmbulanceTreatmentRecordsTableProcessedTableManager get recordId {
+    final $_column = $_itemColumn<int>('record_id')!;
+
+    final manager = $$AmbulanceTreatmentRecordsTableTableManager(
+      $_db,
+      $_db.ambulanceTreatmentRecords,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_recordIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$AmbulanceEscortStaffTableFilterComposer
+    extends Composer<_$AppDatabase, $AmbulanceEscortStaffTable> {
+  $$AmbulanceEscortStaffTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<Uint8List> get signature => $composableBuilder(
+    column: $table.signature,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$AmbulanceTreatmentRecordsTableFilterComposer get recordId {
+    final $$AmbulanceTreatmentRecordsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.recordId,
+          referencedTable: $db.ambulanceTreatmentRecords,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$AmbulanceTreatmentRecordsTableFilterComposer(
+                $db: $db,
+                $table: $db.ambulanceTreatmentRecords,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+}
+
+class $$AmbulanceEscortStaffTableOrderingComposer
+    extends Composer<_$AppDatabase, $AmbulanceEscortStaffTable> {
+  $$AmbulanceEscortStaffTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<Uint8List> get signature => $composableBuilder(
+    column: $table.signature,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$AmbulanceTreatmentRecordsTableOrderingComposer get recordId {
+    final $$AmbulanceTreatmentRecordsTableOrderingComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.recordId,
+          referencedTable: $db.ambulanceTreatmentRecords,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$AmbulanceTreatmentRecordsTableOrderingComposer(
+                $db: $db,
+                $table: $db.ambulanceTreatmentRecords,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+}
+
+class $$AmbulanceEscortStaffTableAnnotationComposer
+    extends Composer<_$AppDatabase, $AmbulanceEscortStaffTable> {
+  $$AmbulanceEscortStaffTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<Uint8List> get signature =>
+      $composableBuilder(column: $table.signature, builder: (column) => column);
+
+  $$AmbulanceTreatmentRecordsTableAnnotationComposer get recordId {
+    final $$AmbulanceTreatmentRecordsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.recordId,
+          referencedTable: $db.ambulanceTreatmentRecords,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$AmbulanceTreatmentRecordsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.ambulanceTreatmentRecords,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+}
+
+class $$AmbulanceEscortStaffTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $AmbulanceEscortStaffTable,
+          AmbulanceEscortStaffData,
+          $$AmbulanceEscortStaffTableFilterComposer,
+          $$AmbulanceEscortStaffTableOrderingComposer,
+          $$AmbulanceEscortStaffTableAnnotationComposer,
+          $$AmbulanceEscortStaffTableCreateCompanionBuilder,
+          $$AmbulanceEscortStaffTableUpdateCompanionBuilder,
+          (AmbulanceEscortStaffData, $$AmbulanceEscortStaffTableReferences),
+          AmbulanceEscortStaffData,
+          PrefetchHooks Function({bool recordId})
+        > {
+  $$AmbulanceEscortStaffTableTableManager(
+    _$AppDatabase db,
+    $AmbulanceEscortStaffTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$AmbulanceEscortStaffTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$AmbulanceEscortStaffTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$AmbulanceEscortStaffTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> recordId = const Value.absent(),
+                Value<String?> name = const Value.absent(),
+                Value<Uint8List?> signature = const Value.absent(),
+              }) => AmbulanceEscortStaffCompanion(
+                id: id,
+                recordId: recordId,
+                name: name,
+                signature: signature,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int recordId,
+                Value<String?> name = const Value.absent(),
+                Value<Uint8List?> signature = const Value.absent(),
+              }) => AmbulanceEscortStaffCompanion.insert(
+                id: id,
+                recordId: recordId,
+                name: name,
+                signature: signature,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$AmbulanceEscortStaffTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({recordId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (recordId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.recordId,
+                                referencedTable:
+                                    $$AmbulanceEscortStaffTableReferences
+                                        ._recordIdTable(db),
+                                referencedColumn:
+                                    $$AmbulanceEscortStaffTableReferences
+                                        ._recordIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$AmbulanceEscortStaffTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $AmbulanceEscortStaffTable,
+      AmbulanceEscortStaffData,
+      $$AmbulanceEscortStaffTableFilterComposer,
+      $$AmbulanceEscortStaffTableOrderingComposer,
+      $$AmbulanceEscortStaffTableAnnotationComposer,
+      $$AmbulanceEscortStaffTableCreateCompanionBuilder,
+      $$AmbulanceEscortStaffTableUpdateCompanionBuilder,
+      (AmbulanceEscortStaffData, $$AmbulanceEscortStaffTableReferences),
+      AmbulanceEscortStaffData,
+      PrefetchHooks Function({bool recordId})
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -57302,4 +64386,35 @@ class $AppDatabaseManager {
         _db,
         _db.ambulanceSceneItemLinks,
       );
+  $$AmbulanceTreatmentRecordsTableTableManager get ambulanceTreatmentRecords =>
+      $$AmbulanceTreatmentRecordsTableTableManager(
+        _db,
+        _db.ambulanceTreatmentRecords,
+      );
+  $$AmbulanceTreatmentCategoriesTableTableManager
+  get ambulanceTreatmentCategories =>
+      $$AmbulanceTreatmentCategoriesTableTableManager(
+        _db,
+        _db.ambulanceTreatmentCategories,
+      );
+  $$AmbulanceTreatmentItemsTableTableManager get ambulanceTreatmentItems =>
+      $$AmbulanceTreatmentItemsTableTableManager(
+        _db,
+        _db.ambulanceTreatmentItems,
+      );
+  $$AmbulanceTreatmentRecordItemsTableTableManager
+  get ambulanceTreatmentRecordItems =>
+      $$AmbulanceTreatmentRecordItemsTableTableManager(
+        _db,
+        _db.ambulanceTreatmentRecordItems,
+      );
+  $$AmbulanceMedicationLogsTableTableManager get ambulanceMedicationLogs =>
+      $$AmbulanceMedicationLogsTableTableManager(
+        _db,
+        _db.ambulanceMedicationLogs,
+      );
+  $$AmbulanceVitalSignsTableTableManager get ambulanceVitalSigns =>
+      $$AmbulanceVitalSignsTableTableManager(_db, _db.ambulanceVitalSigns);
+  $$AmbulanceEscortStaffTableTableManager get ambulanceEscortStaff =>
+      $$AmbulanceEscortStaffTableTableManager(_db, _db.ambulanceEscortStaff);
 }
