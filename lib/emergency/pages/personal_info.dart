@@ -1,10 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import '../../data/db/database.dart';
+import '../../data/models/reference_service.dart';
 
-class EmergencyPersonalInfo extends StatelessWidget {
+class EmergencyPersonalInfo extends StatefulWidget {
   final int emergencyId;
 
   const EmergencyPersonalInfo({super.key, required this.emergencyId});
 
+  @override
+  State<EmergencyPersonalInfo> createState() => _EmergencyPersonalInfoState();
+}
+
+class _EmergencyPersonalInfoState extends State<EmergencyPersonalInfo> {
   // 顏色與樣式定義
   static const Color primaryColor = Color(0xFF007A8A);
   static const Color textDark = Color(0xFF1E293B);
@@ -12,8 +21,55 @@ class EmergencyPersonalInfo extends StatelessWidget {
   static const Color borderColor = Color(0xFFE2E8F0);
   static const Color bgReadOnly = Color(0xFFF8FAFC); // 稍微灰一點代表唯讀
 
+  PatientData? _patient;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPatient();
+  }
+
+  Future<void> _loadPatient() async {
+    try {
+      final dao = context.read<AppDatabase>().medicalDao;
+      final patient = await dao.getPatientByMedicalId(widget.emergencyId);
+      if (mounted) {
+        setState(() {
+          _patient = patient;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      debugPrint('Error loading patient: $e');
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    // Prepare display values
+    final idNo = _patient?.idNo ?? '';
+    final birthDate = _patient?.birthday != null
+        ? DateFormat('yyyy/MM/dd').format(_patient!.birthday!)
+        : '';
+    
+    final sexName = context
+            .read<ReferenceService>()
+            .getSexById(_patient?.sexId)
+            ?.name ??
+        '';
+        
+    final passportNo = _patient?.passportOrIdNo ?? '';
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -27,13 +83,13 @@ class EmergencyPersonalInfo extends StatelessWidget {
                 children: [
                   _buildFieldWrapper(
                     '身分證字號 ID Number',
-                    _buildReadOnlyField(value: ''), // 預設空白，之後帶入資料
+                    _buildReadOnlyField(value: idNo),
                   ),
                   const SizedBox(height: 24),
                   _buildFieldWrapper(
                     '出生日期 Birth Date',
                     _buildReadOnlyField(
-                      value: '', // 預設空白
+                      value: birthDate,
                       suffixIcon: Icons.calendar_today,
                     ),
                   ),
@@ -49,14 +105,14 @@ class EmergencyPersonalInfo extends StatelessWidget {
                   _buildFieldWrapper(
                     '性別 Gender',
                     _buildReadOnlyField(
-                      value: '', // 預設空白
+                      value: sexName,
                       suffixIcon: Icons.expand_more,
                     ),
                   ),
                   const SizedBox(height: 24),
                   _buildFieldWrapper(
                     '護照號碼 Passport Number',
-                    _buildReadOnlyField(value: ''), // 預設空白
+                    _buildReadOnlyField(value: passportNo),
                   ),
                 ],
               ),
