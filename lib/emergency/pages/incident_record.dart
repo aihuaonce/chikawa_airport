@@ -1,10 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import '../../data/db/dao/incident_dao.dart';
+import '../../data/db/database.dart';
 
-class EmergencyIncidentRecord extends StatelessWidget {
+class EmergencyIncidentRecord extends StatefulWidget {
   final int emergencyId;
 
   const EmergencyIncidentRecord({super.key, required this.emergencyId});
 
+  @override
+  State<EmergencyIncidentRecord> createState() =>
+      _EmergencyIncidentRecordState();
+}
+
+class _EmergencyIncidentRecordState extends State<EmergencyIncidentRecord> {
   // 顏色與樣式定義
   static const Color primaryColor = Color(0xFF007A8A);
   static const Color textDark = Color(0xFF1E293B);
@@ -12,8 +22,58 @@ class EmergencyIncidentRecord extends StatelessWidget {
   static const Color borderColor = Color(0xFFE2E8F0);
   static const Color bgReadOnly = Color(0xFFF8FAFC);
 
+  IncidentRecordWithDetails? _incidentWithDetails;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    try {
+      final dao = context.read<AppDatabase>().incidentDao;
+      final incident = await dao.getIncidentWithDetails(widget.emergencyId);
+
+      if (mounted) {
+        setState(() {
+          _incidentWithDetails = incident;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      debugPrint('Error loading incident record: $e');
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    final incident = _incidentWithDetails?.incident;
+    final category = _incidentWithDetails?.category;
+    final category2 = _incidentWithDetails?.category2;
+
+    // Format Data
+    final dateStr = incident?.incidentDate != null
+        ? DateFormat('yyyy/MM/dd HH:mm').format(incident!.incidentDate)
+        : '';
+
+    final locationStr = [
+      category?.name,
+      category2?.name,
+    ].where((s) => s != null && s.isNotEmpty).join(' - ');
+
+    final remarks = incident?.incidentPlaceFinal ?? '';
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -25,7 +85,10 @@ class EmergencyIncidentRecord extends StatelessWidget {
             Expanded(
               child: _buildFieldWrapper(
                 '事發日期與時間 INCIDENT DATE & TIME',
-                _buildReadOnlyField(value: '', suffixIcon: Icons.access_time),
+                _buildReadOnlyField(
+                  value: dateStr,
+                  suffixIcon: Icons.access_time,
+                ),
               ),
             ),
 
@@ -36,7 +99,7 @@ class EmergencyIncidentRecord extends StatelessWidget {
               child: _buildFieldWrapper(
                 '事故地點 INCIDENT LOCATION',
                 _buildReadOnlyField(
-                  value: '',
+                  value: locationStr,
                   suffixIcon: Icons.location_on_outlined,
                 ),
               ),
@@ -50,7 +113,7 @@ class EmergencyIncidentRecord extends StatelessWidget {
         _buildFieldWrapper(
           '地點備註 LOCATION REMARKS',
           _buildReadOnlyField(
-            value: '',
+            value: remarks,
             suffixIcon: Icons.notes,
             isMultiLine: true,
           ),
