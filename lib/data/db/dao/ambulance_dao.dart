@@ -10,6 +10,7 @@ part 'ambulance_dao.g.dart';
 @DriftAccessor(tables: [
   AmbulanceRecords,
   AmbulancePersonalProperty,
+  AmbulanceFees,
   AmbulanceSceneRecords,
   AmbulanceReferenceItems,
   AmbulanceSceneItemLinks,
@@ -181,6 +182,32 @@ class AmbulanceDao extends DatabaseAccessor<AppDatabase> with _$AmbulanceDaoMixi
     } else {
       // 如果不存在，執行插入
       return into(ambulancePersonalProperty).insert(data);
+    }
+  }
+
+  // --- 救護車收費相關 ---
+
+  // 取得救護車收費紀錄
+  Future<AmbulanceFeeData?> getAmbulanceFee(int medicalId) {
+    return (select(ambulanceFees)..where((t) => t.medicalId.equals(medicalId))).getSingleOrNull();
+  }
+
+  // 更新救護車收費紀錄
+  Future<int> updateAmbulanceFee(AmbulanceFeesCompanion data) async {
+    // 檢查是否已存在
+    final existing = await (select(ambulanceFees)
+      ..where((t) => t.medicalId.equals(data.medicalId.value)))
+      .getSingleOrNull();
+
+    if (existing != null) {
+      // 如果存在，執行更新
+      await (update(ambulanceFees)
+        ..where((t) => t.medicalId.equals(data.medicalId.value)))
+        .write(data);
+      return existing.feeId;
+    } else {
+      // 如果不存在，執行插入
+      return into(ambulanceFees).insert(data);
     }
   }
 

@@ -99,6 +99,7 @@ part 'database.g.dart';
     // 救護車
     AmbulanceRecords,
     AmbulancePersonalProperty,
+    AmbulanceFees,
     AmbulanceSceneRecords,
     AmbulanceReferenceItems,
     AmbulanceSceneItemLinks,

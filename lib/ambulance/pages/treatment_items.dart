@@ -6,7 +6,6 @@ import '../../data/db/database.dart';
 import '../widgets/ambulance_medication_dialog.dart';
 import '../widgets/ambulance_vital_sign_dialog.dart';
 import '../widgets/ambulance_staff_dialog.dart';
-import '../widgets/ambulance_treatment_item_dialog.dart';
 
 class AmbulanceTreatmentItems extends StatefulWidget {
   final int medicalId;
@@ -170,79 +169,20 @@ class _AmbulanceTreatmentItemsState extends State<AmbulanceTreatmentItems> {
     );
   }
 
-  bool _hasDetails(AmbulanceTreatmentItemData item) {
-    return item.name == '氣管內管' || item.name == '手動電擊器' || item.isOther;
-  }
-
-  Future<void> _editItemDetails(
-    int itemId,
-    AmbulanceTreatmentItemData item,
-  ) async {
-    final result = await showDialog<Map<String, dynamic>>(
-      context: context,
-      builder:
-          (context) => AmbulanceTreatmentItemDialog(
-            itemName: item.name,
-            isOther: item.isOther,
-            initialDetails: _itemDetails[itemId] ?? {},
-          ),
-    );
-
-    if (result != null) {
-      await _updateItemDetails(
-        itemId,
-        tubeSize: result['tubeSize'],
-        fixationDepth: result['fixationDepth'],
-        shockCount: result['shockCount'],
-        shockJoules: result['shockJoules'],
-        otherDescription: result['otherDescription'],
-      );
-      setState(() {}); // Refresh UI to show new details in list
-    }
-  }
-
   Future<void> _toggleItem(int catId, int itemId, bool selected) async {
     if (_recordId == null) return;
     final dao = context.read<AppDatabase>().ambulanceTreatmentDao;
 
-    // Find the item data
-    final item = _itemsByCategory[catId]?.firstWhere((i) => i.id == itemId);
-    if (item == null) return;
+    setState(() {
+      if (selected) {
+        _selectedItemIds.add(itemId);
+        // Ensure category is selected visually (though logic uses IDs)
+      } else {
+        _selectedItemIds.remove(itemId);
+      }
+    });
 
     if (selected) {
-      // Check if details required
-      if (_hasDetails(item)) {
-        final result = await showDialog<Map<String, dynamic>>(
-          context: context,
-          builder:
-              (context) => AmbulanceTreatmentItemDialog(
-                itemName: item.name,
-                isOther: item.isOther,
-                initialDetails: _itemDetails[itemId] ?? {},
-              ),
-        );
-
-        if (result == null) return; // Cancelled
-
-        setState(() {
-          _selectedItemIds.add(itemId);
-        });
-
-        await _updateItemDetails(
-          itemId,
-          tubeSize: result['tubeSize'],
-          fixationDepth: result['fixationDepth'],
-          shockCount: result['shockCount'],
-          shockJoules: result['shockJoules'],
-          otherDescription: result['otherDescription'],
-        );
-        return;
-      }
-
-      setState(() {
-        _selectedItemIds.add(itemId);
-      });
-
       await dao.addOrUpdateItemLink(
         AmbulanceTreatmentRecordItemsCompanion(
           recordId: drift.Value(_recordId!),
@@ -250,9 +190,6 @@ class _AmbulanceTreatmentItemsState extends State<AmbulanceTreatmentItems> {
         ),
       );
     } else {
-      setState(() {
-        _selectedItemIds.remove(itemId);
-      });
       await dao.removeItemLink(_recordId!, itemId);
       _itemDetails.remove(itemId); // Clear local details
     }
@@ -500,25 +437,45 @@ class _AmbulanceTreatmentItemsState extends State<AmbulanceTreatmentItems> {
                           ),
                         ),
                         Center(
-                            child: Text(data.avpu ?? '',
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(
-                                    fontSize: 13, color: textDark))),
+                          child: Text(
+                            data.avpu ?? '',
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              fontSize: 13,
+                              color: textDark,
+                            ),
+                          ),
+                        ),
                         Center(
-                            child: Text(data.gcsE ?? '',
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(
-                                    fontSize: 13, color: textDark))),
+                          child: Text(
+                            data.gcsE ?? '',
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              fontSize: 13,
+                              color: textDark,
+                            ),
+                          ),
+                        ),
                         Center(
-                            child: Text(data.gcsV ?? '',
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(
-                                    fontSize: 13, color: textDark))),
+                          child: Text(
+                            data.gcsV ?? '',
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              fontSize: 13,
+                              color: textDark,
+                            ),
+                          ),
+                        ),
                         Center(
-                            child: Text(data.gcsM ?? '',
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(
-                                    fontSize: 13, color: textDark))),
+                          child: Text(
+                            data.gcsM ?? '',
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              fontSize: 13,
+                              color: textDark,
+                            ),
+                          ),
+                        ),
                         Container(
                           alignment: Alignment.center,
                           child: Text(
@@ -530,30 +487,55 @@ class _AmbulanceTreatmentItemsState extends State<AmbulanceTreatmentItems> {
                           ),
                         ),
                         Center(
-                            child: Text(data.temperature ?? '',
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(
-                                    fontSize: 13, color: textDark))),
+                          child: Text(
+                            data.temperature ?? '',
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              fontSize: 13,
+                              color: textDark,
+                            ),
+                          ),
+                        ),
                         Center(
-                            child: Text(data.pulse ?? '',
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(
-                                    fontSize: 13, color: textDark))),
+                          child: Text(
+                            data.pulse ?? '',
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              fontSize: 13,
+                              color: textDark,
+                            ),
+                          ),
+                        ),
                         Center(
-                            child: Text(data.respirationRate ?? '',
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(
-                                    fontSize: 13, color: textDark))),
+                          child: Text(
+                            data.respirationRate ?? '',
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              fontSize: 13,
+                              color: textDark,
+                            ),
+                          ),
+                        ),
                         Center(
-                            child: Text(data.bloodPressure ?? '',
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(
-                                    fontSize: 13, color: textDark))),
+                          child: Text(
+                            data.bloodPressure ?? '',
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              fontSize: 13,
+                              color: textDark,
+                            ),
+                          ),
+                        ),
                         Center(
-                            child: Text(data.spo2 ?? '',
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(
-                                    fontSize: 13, color: textDark))),
+                          child: Text(
+                            data.spo2 ?? '',
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              fontSize: 13,
+                              color: textDark,
+                            ),
+                          ),
+                        ),
                         _buildDeleteBtn(() => _removeVitalSign(data.id)),
                       ],
                       onTap: () async {
@@ -600,21 +582,33 @@ class _AmbulanceTreatmentItemsState extends State<AmbulanceTreatmentItems> {
             [
               _buildCompactTimeField(data.time ?? '--:--'),
               Center(
-                  child: Text(data.drugName ?? '',
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(fontSize: 13, color: textDark))),
+                child: Text(
+                  data.drugName ?? '',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: 13, color: textDark),
+                ),
+              ),
               Center(
-                  child: Text(data.route ?? '',
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(fontSize: 13, color: textDark))),
+                child: Text(
+                  data.route ?? '',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: 13, color: textDark),
+                ),
+              ),
               Center(
-                  child: Text(data.dose ?? '',
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(fontSize: 13, color: textDark))),
+                child: Text(
+                  data.dose ?? '',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: 13, color: textDark),
+                ),
+              ),
               Center(
-                  child: Text(data.emtName ?? '',
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(fontSize: 13, color: textDark))),
+                child: Text(
+                  data.emtName ?? '',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: 13, color: textDark),
+                ),
+              ),
               _buildDeleteBtn(() => _removeMedicationLog(data.id)),
             ],
             onTap: () async {
@@ -648,9 +642,12 @@ class _AmbulanceTreatmentItemsState extends State<AmbulanceTreatmentItems> {
             flexes,
             [
               Center(
-                  child: Text(data.name ?? '',
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(fontSize: 13, color: textDark))),
+                child: Text(
+                  data.name ?? '',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: 13, color: textDark),
+                ),
+              ),
               const Center(
                 child: Text(
                   'Sign here',
@@ -713,8 +710,11 @@ class _AmbulanceTreatmentItemsState extends State<AmbulanceTreatmentItems> {
     );
   }
 
-  Widget _buildDataRow(List<int> flexes, List<Widget> children,
-      {VoidCallback? onTap}) {
+  Widget _buildDataRow(
+    List<int> flexes,
+    List<Widget> children, {
+    VoidCallback? onTap,
+  }) {
     return InkWell(
       onTap: onTap,
       child: Container(
@@ -881,11 +881,89 @@ class _AmbulanceTreatmentItemsState extends State<AmbulanceTreatmentItems> {
                 }).toList(),
               ),
 
-              // 2. Selected Items List (Table)
-              if (_selectedItemIds.any((id) => items.any((i) => i.id == id))) ...[
-                const SizedBox(height: 16),
-                _buildSelectedItemsList(items),
+              // 2. 核心連動：內嵌 ALS 詳細欄位
+
+              // 呼吸道處置 (AIRWAY) -> 氣管內管 (Check name)
+              if (cat.code == 'AIRWAY') ...[
+                ...items
+                    .where(
+                      (i) =>
+                          i.name == '氣管內管' && _selectedItemIds.contains(i.id),
+                    )
+                    .map(
+                      (i) => _buildEmbeddedDetailBox(
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _buildTextField(
+                                hint: '氣管內管號碼 Size',
+                                value: _itemDetails[i.id]?['tubeSize'],
+                                onChanged: (v) =>
+                                    _updateItemDetails(i.id, tubeSize: v),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: _buildTextField(
+                                hint: '固定公分數 (cm)',
+                                value: _itemDetails[i.id]?['fixationDepth'],
+                                onChanged: (v) =>
+                                    _updateItemDetails(i.id, fixationDepth: v),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
               ],
+
+              // 心肺復甦術 (CPR) -> 手動電擊器
+              if (cat.code == 'CPR') ...[
+                ...items
+                    .where(
+                      (i) =>
+                          i.name == '手動電擊器' && _selectedItemIds.contains(i.id),
+                    )
+                    .map(
+                      (i) => _buildEmbeddedDetailBox(
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _buildTextField(
+                                hint: '手動電擊次數',
+                                value: _itemDetails[i.id]?['shockCount'],
+                                onChanged: (v) =>
+                                    _updateItemDetails(i.id, shockCount: v),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: _buildTextField(
+                                hint: '手動電擊焦耳數 (J)',
+                                value: _itemDetails[i.id]?['shockJoules'],
+                                onChanged: (v) =>
+                                    _updateItemDetails(i.id, shockJoules: v),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+              ],
+
+              // 通用：其它 -> 輸入框 (Any item with isOther=true)
+              ...items
+                  .where((i) => i.isOther && _selectedItemIds.contains(i.id))
+                  .map(
+                    (i) => _buildEmbeddedDetailBox(
+                      _buildTextField(
+                        hint: '請輸入其它處置細節描述...',
+                        value: _itemDetails[i.id]?['otherDescription'],
+                        onChanged: (v) =>
+                            _updateItemDetails(i.id, otherDescription: v),
+                      ),
+                    ),
+                  ),
             ],
           ),
         );
@@ -893,98 +971,18 @@ class _AmbulanceTreatmentItemsState extends State<AmbulanceTreatmentItems> {
     );
   }
 
-  Widget _buildSelectedItemsList(
-    List<AmbulanceTreatmentItemData> categoryItems,
-  ) {
-    // Filter items that are selected AND belong to this category
-    final selectedItems =
-        categoryItems
-            .where((i) => _selectedItemIds.contains(i.id))
-            .toList();
-
-    if (selectedItems.isEmpty) return const SizedBox.shrink();
-
-    final flexes = [3, 4, 1];
-    final labels = ['項目 ITEM', '詳細資料 DETAILS', ''];
-
-    return Column(
-      children: [
-        _buildTableHeaderRow(labels, flexes),
-        ...selectedItems.asMap().entries.map((e) {
-          final item = e.value;
-          final details = _formatItemDetails(item);
-
-          return _buildDataRow(
-            flexes,
-            [
-              Padding(
-                padding: const EdgeInsets.only(left: 8.0),
-                child: Text(
-                  item.name,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.bold,
-                    color: textDark,
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left: 8.0),
-                child: Text(
-                  details,
-                  style: const TextStyle(fontSize: 13, color: textMuted),
-                ),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  if (_hasDetails(item))
-                    IconButton(
-                      icon: const Icon(
-                        Icons.edit_outlined,
-                        size: 18,
-                        color: primaryColor,
-                      ),
-                      onPressed: () => _editItemDetails(item.id, item),
-                      constraints: const BoxConstraints(),
-                      padding: EdgeInsets.zero,
-                      tooltip: '編輯 Edit',
-                    ),
-                  const SizedBox(width: 8),
-                  _buildDeleteBtn(
-                    () => _toggleItem(item.categoryId, item.id, false),
-                  ),
-                ],
-              ),
-            ],
-            onTap:
-                _hasDetails(item)
-                    ? () => _editItemDetails(item.id, item)
-                    : null,
-          );
-        }),
-      ],
+  // 輔助組件：內嵌的詳細資訊灰框
+  Widget _buildEmbeddedDetailBox(Widget child) {
+    return Container(
+      margin: const EdgeInsets.only(top: 12),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.5),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: borderColor.withValues(alpha: 0.5)),
+      ),
+      child: child,
     );
-  }
-
-  String _formatItemDetails(AmbulanceTreatmentItemData item) {
-    final d = _itemDetails[item.id];
-    if (d == null) return '--';
-
-    if (item.name == '氣管內管') {
-      final size = d['tubeSize'];
-      final depth = d['fixationDepth'];
-      if ((size == null || size.isEmpty) && (depth == null || depth.isEmpty)) return '--';
-      return 'Size: ${size ?? '-'}, Depth: ${depth ?? '-'} cm';
-    } else if (item.name == '手動電擊器') {
-      final count = d['shockCount'];
-      final joules = d['shockJoules'];
-      if ((count == null || count.isEmpty) && (joules == null || joules.isEmpty)) return '--';
-      return 'Count: ${count ?? '-'}, Joules: ${joules ?? '-'} J';
-    } else if (item.isOther) {
-      return d['otherDescription'] ?? '--';
-    }
-    return '--';
   }
 
   Widget _buildTableContainer({

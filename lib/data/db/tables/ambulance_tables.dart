@@ -74,3 +74,29 @@ class AmbulancePersonalProperty extends Table {
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
   DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
 }
+
+// 救護車收費紀錄表
+@DataClassName('AmbulanceFeeData')
+class AmbulanceFees extends Table {
+  IntColumn get feeId => integer().autoIncrement()();
+  
+  // 關聯到 MedicalRecord
+  IntColumn get medicalId => integer().unique().references(MedicalRecord, #medicalId)();
+
+  // 費用
+  RealColumn get ambulanceFee => real().withDefault(const Constant(0))();
+  RealColumn get oxygenFee => real().withDefault(const Constant(0))();
+
+  // 收費情形 (已收費, 聯新國際醫院代收, 未收費)
+  TextColumn get paymentStatus => text().nullable()();
+
+  // 已收費方式 (現金, 刷卡)
+  TextColumn get paymentMethod => text().nullable()();
+
+  // 未收費類別 (欠款, 匯款, 統一請款)
+  TextColumn get unpaidType => text().nullable()();
+
+  // 建立與更新時間
+  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+  DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
+}

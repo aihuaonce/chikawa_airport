@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:drift/drift.dart' show Value;
+import '../../data/db/database.dart';
+import 'dart:async';
 
 class AmbulanceFees extends StatefulWidget {
   final int medicalId;
@@ -20,9 +24,92 @@ class _AmbulanceFeesState extends State<AmbulanceFees> {
   double _ambulanceFee = 0;
   double _oxygenFee = 0;
 
+  // Controllers
+  final TextEditingController _ambulanceFeeCtrl = TextEditingController();
+  final TextEditingController _oxygenFeeCtrl = TextEditingController();
+  Timer? _debounce;
+
   // 收費情形狀態
   String _paymentStatus = '未收費'; // 已收費, 聯新國際醫院代收, 未收費
   String? _selectedSubOption; // 子選項狀態
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  @override
+  void dispose() {
+    _ambulanceFeeCtrl.dispose();
+    _oxygenFeeCtrl.dispose();
+    _debounce?.cancel();
+    super.dispose();
+  }
+
+  // 讀取資料
+  Future<void> _loadData() async {
+    final dao = context.read<AppDatabase>().ambulanceDao;
+    final data = await dao.getAmbulanceFee(widget.medicalId);
+
+    if (data != null && mounted) {
+      setState(() {
+        _ambulanceFee = data.ambulanceFee;
+        _oxygenFee = data.oxygenFee;
+        _ambulanceFeeCtrl.text = _formatNumber(data.ambulanceFee);
+        _oxygenFeeCtrl.text = _formatNumber(data.oxygenFee);
+        _paymentStatus = data.paymentStatus ?? '未收費';
+
+        if (_paymentStatus == '已收費') {
+          _selectedSubOption = data.paymentMethod;
+        } else if (_paymentStatus == '未收費') {
+          _selectedSubOption = data.unpaidType;
+        } else {
+          _selectedSubOption = null;
+        }
+      });
+    }
+  }
+
+  String _formatNumber(double value) {
+    if (value == 0) return '';
+    if (value == value.toInt()) return value.toInt().toString();
+    return value.toString();
+  }
+
+  // 儲存資料
+  void _saveData() {
+    final dao = context.read<AppDatabase>().ambulanceDao;
+    
+    // 根據 paymentStatus 決定 subOptions 的儲存位置
+    String? paymentMethod;
+    String? unpaidType;
+
+    if (_paymentStatus == '已收費') {
+      paymentMethod = _selectedSubOption;
+    } else if (_paymentStatus == '未收費') {
+      unpaidType = _selectedSubOption;
+    }
+
+    final companion = AmbulanceFeesCompanion(
+      medicalId: Value(widget.medicalId),
+      ambulanceFee: Value(_ambulanceFee),
+      oxygenFee: Value(_oxygenFee),
+      paymentStatus: Value(_paymentStatus),
+      paymentMethod: Value(paymentMethod),
+      unpaidType: Value(unpaidType),
+    );
+
+    dao.updateAmbulanceFee(companion);
+  }
+
+  // 延遲儲存 (用於輸入框)
+  void _debounceSave() {
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+    _debounce = Timer(const Duration(milliseconds: 500), () {
+      _saveData();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +125,11 @@ class _AmbulanceFeesState extends State<AmbulanceFees> {
               child: _buildFieldWrapper(
                 '救護車費用(含醫務人員) AMBULANCE FEE',
                 _buildNumberField(
-                  onChanged: (v) => setState(() => _ambulanceFee = v),
+                  controller: _ambulanceFeeCtrl,
+                  onChanged: (v) {
+                    setState(() => _ambulanceFee = double.tryParse(v) ?? 0);
+                    _debounceSave();
+                  },
                 ),
               ),
             ),
@@ -47,7 +138,11 @@ class _AmbulanceFeesState extends State<AmbulanceFees> {
               child: _buildFieldWrapper(
                 '氧氣使用費用 OXYGEN USAGE FEE',
                 _buildNumberField(
-                  onChanged: (v) => setState(() => _oxygenFee = v),
+                  controller: _oxygenFeeCtrl,
+                  onChanged: (v) {
+                    setState(() => _oxygenFee = double.tryParse(v) ?? 0);
+                    _debounceSave();
+                  },
                 ),
               ),
             ),
@@ -108,10 +203,13 @@ class _AmbulanceFeesState extends State<AmbulanceFees> {
           bool isSelected = _paymentStatus == opt;
           return Expanded(
             child: GestureDetector(
-              onTap: () => setState(() {
-                _paymentStatus = opt;
-                _selectedSubOption = null; // 切換主項時重置子項
-              }),
+              onTap: () {
+                setState(() {
+                  _paymentStatus = opt;
+                  _selectedSubOption = null; // 切換主項時重置子項
+                });
+                _saveData(); // 狀態切換立即儲存
+              },
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
                 alignment: Alignment.center,
@@ -176,8 +274,10 @@ class _AmbulanceFeesState extends State<AmbulanceFees> {
               return ChoiceChip(
                 label: Text(opt),
                 selected: isSel,
-                onSelected: (val) =>
-                    setState(() => _selectedSubOption = val ? opt : null),
+                onSelected: (val) {
+                  setState(() => _selectedSubOption = val ? opt : null);
+                  _saveData(); // 子選項選擇立即儲存
+                },
                 selectedColor: primaryColor.withValues(alpha: 0.1),
                 checkmarkColor: primaryColor,
                 backgroundColor: Colors.white,
@@ -267,13 +367,17 @@ class _AmbulanceFeesState extends State<AmbulanceFees> {
     );
   }
 
-  Widget _buildNumberField({required Function(double) onChanged}) {
+  Widget _buildNumberField({
+    required TextEditingController controller,
+    required Function(String) onChanged,
+  }) {
     return SizedBox(
       height: 44,
       child: TextField(
+        controller: controller,
         keyboardType: const TextInputType.numberWithOptions(decimal: true),
         style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-        onChanged: (v) => onChanged(double.tryParse(v) ?? 0.0),
+        onChanged: onChanged,
         decoration: InputDecoration(
           hintText: '0.00',
           prefixText: '\$ ',

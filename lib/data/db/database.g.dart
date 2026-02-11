@@ -27987,6 +27987,579 @@ class AmbulancePersonalPropertyCompanion
   }
 }
 
+class $AmbulanceFeesTable extends AmbulanceFees
+    with TableInfo<$AmbulanceFeesTable, AmbulanceFeeData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $AmbulanceFeesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _feeIdMeta = const VerificationMeta('feeId');
+  @override
+  late final GeneratedColumn<int> feeId = GeneratedColumn<int>(
+    'fee_id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _medicalIdMeta = const VerificationMeta(
+    'medicalId',
+  );
+  @override
+  late final GeneratedColumn<int> medicalId = GeneratedColumn<int>(
+    'medical_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'UNIQUE REFERENCES medical_record (medical_id)',
+    ),
+  );
+  static const VerificationMeta _ambulanceFeeMeta = const VerificationMeta(
+    'ambulanceFee',
+  );
+  @override
+  late final GeneratedColumn<double> ambulanceFee = GeneratedColumn<double>(
+    'ambulance_fee',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _oxygenFeeMeta = const VerificationMeta(
+    'oxygenFee',
+  );
+  @override
+  late final GeneratedColumn<double> oxygenFee = GeneratedColumn<double>(
+    'oxygen_fee',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _paymentStatusMeta = const VerificationMeta(
+    'paymentStatus',
+  );
+  @override
+  late final GeneratedColumn<String> paymentStatus = GeneratedColumn<String>(
+    'payment_status',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _paymentMethodMeta = const VerificationMeta(
+    'paymentMethod',
+  );
+  @override
+  late final GeneratedColumn<String> paymentMethod = GeneratedColumn<String>(
+    'payment_method',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _unpaidTypeMeta = const VerificationMeta(
+    'unpaidType',
+  );
+  @override
+  late final GeneratedColumn<String> unpaidType = GeneratedColumn<String>(
+    'unpaid_type',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    feeId,
+    medicalId,
+    ambulanceFee,
+    oxygenFee,
+    paymentStatus,
+    paymentMethod,
+    unpaidType,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'ambulance_fees';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<AmbulanceFeeData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('fee_id')) {
+      context.handle(
+        _feeIdMeta,
+        feeId.isAcceptableOrUnknown(data['fee_id']!, _feeIdMeta),
+      );
+    }
+    if (data.containsKey('medical_id')) {
+      context.handle(
+        _medicalIdMeta,
+        medicalId.isAcceptableOrUnknown(data['medical_id']!, _medicalIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_medicalIdMeta);
+    }
+    if (data.containsKey('ambulance_fee')) {
+      context.handle(
+        _ambulanceFeeMeta,
+        ambulanceFee.isAcceptableOrUnknown(
+          data['ambulance_fee']!,
+          _ambulanceFeeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('oxygen_fee')) {
+      context.handle(
+        _oxygenFeeMeta,
+        oxygenFee.isAcceptableOrUnknown(data['oxygen_fee']!, _oxygenFeeMeta),
+      );
+    }
+    if (data.containsKey('payment_status')) {
+      context.handle(
+        _paymentStatusMeta,
+        paymentStatus.isAcceptableOrUnknown(
+          data['payment_status']!,
+          _paymentStatusMeta,
+        ),
+      );
+    }
+    if (data.containsKey('payment_method')) {
+      context.handle(
+        _paymentMethodMeta,
+        paymentMethod.isAcceptableOrUnknown(
+          data['payment_method']!,
+          _paymentMethodMeta,
+        ),
+      );
+    }
+    if (data.containsKey('unpaid_type')) {
+      context.handle(
+        _unpaidTypeMeta,
+        unpaidType.isAcceptableOrUnknown(data['unpaid_type']!, _unpaidTypeMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {feeId};
+  @override
+  AmbulanceFeeData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return AmbulanceFeeData(
+      feeId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}fee_id'],
+      )!,
+      medicalId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}medical_id'],
+      )!,
+      ambulanceFee: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}ambulance_fee'],
+      )!,
+      oxygenFee: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}oxygen_fee'],
+      )!,
+      paymentStatus: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}payment_status'],
+      ),
+      paymentMethod: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}payment_method'],
+      ),
+      unpaidType: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}unpaid_type'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $AmbulanceFeesTable createAlias(String alias) {
+    return $AmbulanceFeesTable(attachedDatabase, alias);
+  }
+}
+
+class AmbulanceFeeData extends DataClass
+    implements Insertable<AmbulanceFeeData> {
+  final int feeId;
+  final int medicalId;
+  final double ambulanceFee;
+  final double oxygenFee;
+  final String? paymentStatus;
+  final String? paymentMethod;
+  final String? unpaidType;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  const AmbulanceFeeData({
+    required this.feeId,
+    required this.medicalId,
+    required this.ambulanceFee,
+    required this.oxygenFee,
+    this.paymentStatus,
+    this.paymentMethod,
+    this.unpaidType,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['fee_id'] = Variable<int>(feeId);
+    map['medical_id'] = Variable<int>(medicalId);
+    map['ambulance_fee'] = Variable<double>(ambulanceFee);
+    map['oxygen_fee'] = Variable<double>(oxygenFee);
+    if (!nullToAbsent || paymentStatus != null) {
+      map['payment_status'] = Variable<String>(paymentStatus);
+    }
+    if (!nullToAbsent || paymentMethod != null) {
+      map['payment_method'] = Variable<String>(paymentMethod);
+    }
+    if (!nullToAbsent || unpaidType != null) {
+      map['unpaid_type'] = Variable<String>(unpaidType);
+    }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  AmbulanceFeesCompanion toCompanion(bool nullToAbsent) {
+    return AmbulanceFeesCompanion(
+      feeId: Value(feeId),
+      medicalId: Value(medicalId),
+      ambulanceFee: Value(ambulanceFee),
+      oxygenFee: Value(oxygenFee),
+      paymentStatus: paymentStatus == null && nullToAbsent
+          ? const Value.absent()
+          : Value(paymentStatus),
+      paymentMethod: paymentMethod == null && nullToAbsent
+          ? const Value.absent()
+          : Value(paymentMethod),
+      unpaidType: unpaidType == null && nullToAbsent
+          ? const Value.absent()
+          : Value(unpaidType),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory AmbulanceFeeData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return AmbulanceFeeData(
+      feeId: serializer.fromJson<int>(json['feeId']),
+      medicalId: serializer.fromJson<int>(json['medicalId']),
+      ambulanceFee: serializer.fromJson<double>(json['ambulanceFee']),
+      oxygenFee: serializer.fromJson<double>(json['oxygenFee']),
+      paymentStatus: serializer.fromJson<String?>(json['paymentStatus']),
+      paymentMethod: serializer.fromJson<String?>(json['paymentMethod']),
+      unpaidType: serializer.fromJson<String?>(json['unpaidType']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'feeId': serializer.toJson<int>(feeId),
+      'medicalId': serializer.toJson<int>(medicalId),
+      'ambulanceFee': serializer.toJson<double>(ambulanceFee),
+      'oxygenFee': serializer.toJson<double>(oxygenFee),
+      'paymentStatus': serializer.toJson<String?>(paymentStatus),
+      'paymentMethod': serializer.toJson<String?>(paymentMethod),
+      'unpaidType': serializer.toJson<String?>(unpaidType),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  AmbulanceFeeData copyWith({
+    int? feeId,
+    int? medicalId,
+    double? ambulanceFee,
+    double? oxygenFee,
+    Value<String?> paymentStatus = const Value.absent(),
+    Value<String?> paymentMethod = const Value.absent(),
+    Value<String?> unpaidType = const Value.absent(),
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) => AmbulanceFeeData(
+    feeId: feeId ?? this.feeId,
+    medicalId: medicalId ?? this.medicalId,
+    ambulanceFee: ambulanceFee ?? this.ambulanceFee,
+    oxygenFee: oxygenFee ?? this.oxygenFee,
+    paymentStatus: paymentStatus.present
+        ? paymentStatus.value
+        : this.paymentStatus,
+    paymentMethod: paymentMethod.present
+        ? paymentMethod.value
+        : this.paymentMethod,
+    unpaidType: unpaidType.present ? unpaidType.value : this.unpaidType,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  AmbulanceFeeData copyWithCompanion(AmbulanceFeesCompanion data) {
+    return AmbulanceFeeData(
+      feeId: data.feeId.present ? data.feeId.value : this.feeId,
+      medicalId: data.medicalId.present ? data.medicalId.value : this.medicalId,
+      ambulanceFee: data.ambulanceFee.present
+          ? data.ambulanceFee.value
+          : this.ambulanceFee,
+      oxygenFee: data.oxygenFee.present ? data.oxygenFee.value : this.oxygenFee,
+      paymentStatus: data.paymentStatus.present
+          ? data.paymentStatus.value
+          : this.paymentStatus,
+      paymentMethod: data.paymentMethod.present
+          ? data.paymentMethod.value
+          : this.paymentMethod,
+      unpaidType: data.unpaidType.present
+          ? data.unpaidType.value
+          : this.unpaidType,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AmbulanceFeeData(')
+          ..write('feeId: $feeId, ')
+          ..write('medicalId: $medicalId, ')
+          ..write('ambulanceFee: $ambulanceFee, ')
+          ..write('oxygenFee: $oxygenFee, ')
+          ..write('paymentStatus: $paymentStatus, ')
+          ..write('paymentMethod: $paymentMethod, ')
+          ..write('unpaidType: $unpaidType, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    feeId,
+    medicalId,
+    ambulanceFee,
+    oxygenFee,
+    paymentStatus,
+    paymentMethod,
+    unpaidType,
+    createdAt,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is AmbulanceFeeData &&
+          other.feeId == this.feeId &&
+          other.medicalId == this.medicalId &&
+          other.ambulanceFee == this.ambulanceFee &&
+          other.oxygenFee == this.oxygenFee &&
+          other.paymentStatus == this.paymentStatus &&
+          other.paymentMethod == this.paymentMethod &&
+          other.unpaidType == this.unpaidType &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class AmbulanceFeesCompanion extends UpdateCompanion<AmbulanceFeeData> {
+  final Value<int> feeId;
+  final Value<int> medicalId;
+  final Value<double> ambulanceFee;
+  final Value<double> oxygenFee;
+  final Value<String?> paymentStatus;
+  final Value<String?> paymentMethod;
+  final Value<String?> unpaidType;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  const AmbulanceFeesCompanion({
+    this.feeId = const Value.absent(),
+    this.medicalId = const Value.absent(),
+    this.ambulanceFee = const Value.absent(),
+    this.oxygenFee = const Value.absent(),
+    this.paymentStatus = const Value.absent(),
+    this.paymentMethod = const Value.absent(),
+    this.unpaidType = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  });
+  AmbulanceFeesCompanion.insert({
+    this.feeId = const Value.absent(),
+    required int medicalId,
+    this.ambulanceFee = const Value.absent(),
+    this.oxygenFee = const Value.absent(),
+    this.paymentStatus = const Value.absent(),
+    this.paymentMethod = const Value.absent(),
+    this.unpaidType = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  }) : medicalId = Value(medicalId);
+  static Insertable<AmbulanceFeeData> custom({
+    Expression<int>? feeId,
+    Expression<int>? medicalId,
+    Expression<double>? ambulanceFee,
+    Expression<double>? oxygenFee,
+    Expression<String>? paymentStatus,
+    Expression<String>? paymentMethod,
+    Expression<String>? unpaidType,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+  }) {
+    return RawValuesInsertable({
+      if (feeId != null) 'fee_id': feeId,
+      if (medicalId != null) 'medical_id': medicalId,
+      if (ambulanceFee != null) 'ambulance_fee': ambulanceFee,
+      if (oxygenFee != null) 'oxygen_fee': oxygenFee,
+      if (paymentStatus != null) 'payment_status': paymentStatus,
+      if (paymentMethod != null) 'payment_method': paymentMethod,
+      if (unpaidType != null) 'unpaid_type': unpaidType,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+    });
+  }
+
+  AmbulanceFeesCompanion copyWith({
+    Value<int>? feeId,
+    Value<int>? medicalId,
+    Value<double>? ambulanceFee,
+    Value<double>? oxygenFee,
+    Value<String?>? paymentStatus,
+    Value<String?>? paymentMethod,
+    Value<String?>? unpaidType,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+  }) {
+    return AmbulanceFeesCompanion(
+      feeId: feeId ?? this.feeId,
+      medicalId: medicalId ?? this.medicalId,
+      ambulanceFee: ambulanceFee ?? this.ambulanceFee,
+      oxygenFee: oxygenFee ?? this.oxygenFee,
+      paymentStatus: paymentStatus ?? this.paymentStatus,
+      paymentMethod: paymentMethod ?? this.paymentMethod,
+      unpaidType: unpaidType ?? this.unpaidType,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (feeId.present) {
+      map['fee_id'] = Variable<int>(feeId.value);
+    }
+    if (medicalId.present) {
+      map['medical_id'] = Variable<int>(medicalId.value);
+    }
+    if (ambulanceFee.present) {
+      map['ambulance_fee'] = Variable<double>(ambulanceFee.value);
+    }
+    if (oxygenFee.present) {
+      map['oxygen_fee'] = Variable<double>(oxygenFee.value);
+    }
+    if (paymentStatus.present) {
+      map['payment_status'] = Variable<String>(paymentStatus.value);
+    }
+    if (paymentMethod.present) {
+      map['payment_method'] = Variable<String>(paymentMethod.value);
+    }
+    if (unpaidType.present) {
+      map['unpaid_type'] = Variable<String>(unpaidType.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AmbulanceFeesCompanion(')
+          ..write('feeId: $feeId, ')
+          ..write('medicalId: $medicalId, ')
+          ..write('ambulanceFee: $ambulanceFee, ')
+          ..write('oxygenFee: $oxygenFee, ')
+          ..write('paymentStatus: $paymentStatus, ')
+          ..write('paymentMethod: $paymentMethod, ')
+          ..write('unpaidType: $unpaidType, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $AmbulanceSceneRecordsTable extends AmbulanceSceneRecords
     with TableInfo<$AmbulanceSceneRecordsTable, AmbulanceSceneRecordData> {
   @override
@@ -33089,6 +33662,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   );
   late final $AmbulancePersonalPropertyTable ambulancePersonalProperty =
       $AmbulancePersonalPropertyTable(this);
+  late final $AmbulanceFeesTable ambulanceFees = $AmbulanceFeesTable(this);
   late final $AmbulanceSceneRecordsTable ambulanceSceneRecords =
       $AmbulanceSceneRecordsTable(this);
   late final $AmbulanceReferenceItemsTable ambulanceReferenceItems =
@@ -33191,6 +33765,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     contact,
     ambulanceRecords,
     ambulancePersonalProperty,
+    ambulanceFees,
     ambulanceSceneRecords,
     ambulanceReferenceItems,
     ambulanceSceneItemLinks,
@@ -42636,6 +43211,28 @@ final class $$MedicalRecordTableReferences
     );
   }
 
+  static MultiTypedResultKey<$AmbulanceFeesTable, List<AmbulanceFeeData>>
+  _ambulanceFeesRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.ambulanceFees,
+    aliasName: $_aliasNameGenerator(
+      db.medicalRecord.medicalId,
+      db.ambulanceFees.medicalId,
+    ),
+  );
+
+  $$AmbulanceFeesTableProcessedTableManager get ambulanceFeesRefs {
+    final manager = $$AmbulanceFeesTableTableManager($_db, $_db.ambulanceFees)
+        .filter(
+          (f) =>
+              f.medicalId.medicalId.sqlEquals($_itemColumn<int>('medical_id')!),
+        );
+
+    final cache = $_typedResult.readTableOrNull(_ambulanceFeesRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
   static MultiTypedResultKey<
     $AmbulanceSceneRecordsTable,
     List<AmbulanceSceneRecordData>
@@ -43195,6 +43792,31 @@ class $$MedicalRecordTableFilterComposer
                     $removeJoinBuilderFromRootComposer,
               ),
         );
+    return f(composer);
+  }
+
+  Expression<bool> ambulanceFeesRefs(
+    Expression<bool> Function($$AmbulanceFeesTableFilterComposer f) f,
+  ) {
+    final $$AmbulanceFeesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.medicalId,
+      referencedTable: $db.ambulanceFees,
+      getReferencedColumn: (t) => t.medicalId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$AmbulanceFeesTableFilterComposer(
+            $db: $db,
+            $table: $db.ambulanceFees,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
     return f(composer);
   }
 
@@ -43789,6 +44411,31 @@ class $$MedicalRecordTableAnnotationComposer
     return f(composer);
   }
 
+  Expression<T> ambulanceFeesRefs<T extends Object>(
+    Expression<T> Function($$AmbulanceFeesTableAnnotationComposer a) f,
+  ) {
+    final $$AmbulanceFeesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.medicalId,
+      referencedTable: $db.ambulanceFees,
+      getReferencedColumn: (t) => t.medicalId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$AmbulanceFeesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.ambulanceFees,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
   Expression<T> ambulanceSceneRecordsRefs<T extends Object>(
     Expression<T> Function($$AmbulanceSceneRecordsTableAnnotationComposer a) f,
   ) {
@@ -43875,6 +44522,7 @@ class $$MedicalRecordTableTableManager
             bool telexDocumentsRefs,
             bool medicationsRefs,
             bool ambulancePersonalPropertyRefs,
+            bool ambulanceFeesRefs,
             bool ambulanceSceneRecordsRefs,
             bool ambulanceTreatmentRecordsRefs,
           })
@@ -43954,6 +44602,7 @@ class $$MedicalRecordTableTableManager
                 telexDocumentsRefs = false,
                 medicationsRefs = false,
                 ambulancePersonalPropertyRefs = false,
+                ambulanceFeesRefs = false,
                 ambulanceSceneRecordsRefs = false,
                 ambulanceTreatmentRecordsRefs = false,
               }) {
@@ -43979,6 +44628,7 @@ class $$MedicalRecordTableTableManager
                     if (medicationsRefs) db.medications,
                     if (ambulancePersonalPropertyRefs)
                       db.ambulancePersonalProperty,
+                    if (ambulanceFeesRefs) db.ambulanceFees,
                     if (ambulanceSceneRecordsRefs) db.ambulanceSceneRecords,
                     if (ambulanceTreatmentRecordsRefs)
                       db.ambulanceTreatmentRecords,
@@ -44364,6 +45014,27 @@ class $$MedicalRecordTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (ambulanceFeesRefs)
+                        await $_getPrefetchedData<
+                          MedicalRecordData,
+                          $MedicalRecordTable,
+                          AmbulanceFeeData
+                        >(
+                          currentTable: table,
+                          referencedTable: $$MedicalRecordTableReferences
+                              ._ambulanceFeesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$MedicalRecordTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).ambulanceFeesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.medicalId == item.medicalId,
+                              ),
+                          typedResults: items,
+                        ),
                       if (ambulanceSceneRecordsRefs)
                         await $_getPrefetchedData<
                           MedicalRecordData,
@@ -44445,6 +45116,7 @@ typedef $$MedicalRecordTableProcessedTableManager =
         bool telexDocumentsRefs,
         bool medicationsRefs,
         bool ambulancePersonalPropertyRefs,
+        bool ambulanceFeesRefs,
         bool ambulanceSceneRecordsRefs,
         bool ambulanceTreatmentRecordsRefs,
       })
@@ -59427,6 +60099,411 @@ typedef $$AmbulancePersonalPropertyTableProcessedTableManager =
       AmbulancePersonalPropertyData,
       PrefetchHooks Function({bool medicalId})
     >;
+typedef $$AmbulanceFeesTableCreateCompanionBuilder =
+    AmbulanceFeesCompanion Function({
+      Value<int> feeId,
+      required int medicalId,
+      Value<double> ambulanceFee,
+      Value<double> oxygenFee,
+      Value<String?> paymentStatus,
+      Value<String?> paymentMethod,
+      Value<String?> unpaidType,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+    });
+typedef $$AmbulanceFeesTableUpdateCompanionBuilder =
+    AmbulanceFeesCompanion Function({
+      Value<int> feeId,
+      Value<int> medicalId,
+      Value<double> ambulanceFee,
+      Value<double> oxygenFee,
+      Value<String?> paymentStatus,
+      Value<String?> paymentMethod,
+      Value<String?> unpaidType,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+    });
+
+final class $$AmbulanceFeesTableReferences
+    extends
+        BaseReferences<_$AppDatabase, $AmbulanceFeesTable, AmbulanceFeeData> {
+  $$AmbulanceFeesTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $MedicalRecordTable _medicalIdTable(_$AppDatabase db) =>
+      db.medicalRecord.createAlias(
+        $_aliasNameGenerator(
+          db.ambulanceFees.medicalId,
+          db.medicalRecord.medicalId,
+        ),
+      );
+
+  $$MedicalRecordTableProcessedTableManager get medicalId {
+    final $_column = $_itemColumn<int>('medical_id')!;
+
+    final manager = $$MedicalRecordTableTableManager(
+      $_db,
+      $_db.medicalRecord,
+    ).filter((f) => f.medicalId.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_medicalIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$AmbulanceFeesTableFilterComposer
+    extends Composer<_$AppDatabase, $AmbulanceFeesTable> {
+  $$AmbulanceFeesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get feeId => $composableBuilder(
+    column: $table.feeId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get ambulanceFee => $composableBuilder(
+    column: $table.ambulanceFee,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get oxygenFee => $composableBuilder(
+    column: $table.oxygenFee,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get paymentStatus => $composableBuilder(
+    column: $table.paymentStatus,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get paymentMethod => $composableBuilder(
+    column: $table.paymentMethod,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get unpaidType => $composableBuilder(
+    column: $table.unpaidType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$MedicalRecordTableFilterComposer get medicalId {
+    final $$MedicalRecordTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.medicalId,
+      referencedTable: $db.medicalRecord,
+      getReferencedColumn: (t) => t.medicalId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MedicalRecordTableFilterComposer(
+            $db: $db,
+            $table: $db.medicalRecord,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$AmbulanceFeesTableOrderingComposer
+    extends Composer<_$AppDatabase, $AmbulanceFeesTable> {
+  $$AmbulanceFeesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get feeId => $composableBuilder(
+    column: $table.feeId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get ambulanceFee => $composableBuilder(
+    column: $table.ambulanceFee,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get oxygenFee => $composableBuilder(
+    column: $table.oxygenFee,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get paymentStatus => $composableBuilder(
+    column: $table.paymentStatus,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get paymentMethod => $composableBuilder(
+    column: $table.paymentMethod,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get unpaidType => $composableBuilder(
+    column: $table.unpaidType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$MedicalRecordTableOrderingComposer get medicalId {
+    final $$MedicalRecordTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.medicalId,
+      referencedTable: $db.medicalRecord,
+      getReferencedColumn: (t) => t.medicalId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MedicalRecordTableOrderingComposer(
+            $db: $db,
+            $table: $db.medicalRecord,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$AmbulanceFeesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $AmbulanceFeesTable> {
+  $$AmbulanceFeesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get feeId =>
+      $composableBuilder(column: $table.feeId, builder: (column) => column);
+
+  GeneratedColumn<double> get ambulanceFee => $composableBuilder(
+    column: $table.ambulanceFee,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get oxygenFee =>
+      $composableBuilder(column: $table.oxygenFee, builder: (column) => column);
+
+  GeneratedColumn<String> get paymentStatus => $composableBuilder(
+    column: $table.paymentStatus,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get paymentMethod => $composableBuilder(
+    column: $table.paymentMethod,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get unpaidType => $composableBuilder(
+    column: $table.unpaidType,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  $$MedicalRecordTableAnnotationComposer get medicalId {
+    final $$MedicalRecordTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.medicalId,
+      referencedTable: $db.medicalRecord,
+      getReferencedColumn: (t) => t.medicalId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MedicalRecordTableAnnotationComposer(
+            $db: $db,
+            $table: $db.medicalRecord,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$AmbulanceFeesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $AmbulanceFeesTable,
+          AmbulanceFeeData,
+          $$AmbulanceFeesTableFilterComposer,
+          $$AmbulanceFeesTableOrderingComposer,
+          $$AmbulanceFeesTableAnnotationComposer,
+          $$AmbulanceFeesTableCreateCompanionBuilder,
+          $$AmbulanceFeesTableUpdateCompanionBuilder,
+          (AmbulanceFeeData, $$AmbulanceFeesTableReferences),
+          AmbulanceFeeData,
+          PrefetchHooks Function({bool medicalId})
+        > {
+  $$AmbulanceFeesTableTableManager(_$AppDatabase db, $AmbulanceFeesTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$AmbulanceFeesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$AmbulanceFeesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$AmbulanceFeesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> feeId = const Value.absent(),
+                Value<int> medicalId = const Value.absent(),
+                Value<double> ambulanceFee = const Value.absent(),
+                Value<double> oxygenFee = const Value.absent(),
+                Value<String?> paymentStatus = const Value.absent(),
+                Value<String?> paymentMethod = const Value.absent(),
+                Value<String?> unpaidType = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+              }) => AmbulanceFeesCompanion(
+                feeId: feeId,
+                medicalId: medicalId,
+                ambulanceFee: ambulanceFee,
+                oxygenFee: oxygenFee,
+                paymentStatus: paymentStatus,
+                paymentMethod: paymentMethod,
+                unpaidType: unpaidType,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> feeId = const Value.absent(),
+                required int medicalId,
+                Value<double> ambulanceFee = const Value.absent(),
+                Value<double> oxygenFee = const Value.absent(),
+                Value<String?> paymentStatus = const Value.absent(),
+                Value<String?> paymentMethod = const Value.absent(),
+                Value<String?> unpaidType = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+              }) => AmbulanceFeesCompanion.insert(
+                feeId: feeId,
+                medicalId: medicalId,
+                ambulanceFee: ambulanceFee,
+                oxygenFee: oxygenFee,
+                paymentStatus: paymentStatus,
+                paymentMethod: paymentMethod,
+                unpaidType: unpaidType,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$AmbulanceFeesTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({medicalId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (medicalId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.medicalId,
+                                referencedTable: $$AmbulanceFeesTableReferences
+                                    ._medicalIdTable(db),
+                                referencedColumn: $$AmbulanceFeesTableReferences
+                                    ._medicalIdTable(db)
+                                    .medicalId,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$AmbulanceFeesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $AmbulanceFeesTable,
+      AmbulanceFeeData,
+      $$AmbulanceFeesTableFilterComposer,
+      $$AmbulanceFeesTableOrderingComposer,
+      $$AmbulanceFeesTableAnnotationComposer,
+      $$AmbulanceFeesTableCreateCompanionBuilder,
+      $$AmbulanceFeesTableUpdateCompanionBuilder,
+      (AmbulanceFeeData, $$AmbulanceFeesTableReferences),
+      AmbulanceFeeData,
+      PrefetchHooks Function({bool medicalId})
+    >;
 typedef $$AmbulanceSceneRecordsTableCreateCompanionBuilder =
     AmbulanceSceneRecordsCompanion Function({
       Value<int> id,
@@ -64374,6 +65451,8 @@ class $AppDatabaseManager {
         _db,
         _db.ambulancePersonalProperty,
       );
+  $$AmbulanceFeesTableTableManager get ambulanceFees =>
+      $$AmbulanceFeesTableTableManager(_db, _db.ambulanceFees);
   $$AmbulanceSceneRecordsTableTableManager get ambulanceSceneRecords =>
       $$AmbulanceSceneRecordsTableTableManager(_db, _db.ambulanceSceneRecords);
   $$AmbulanceReferenceItemsTableTableManager get ambulanceReferenceItems =>
