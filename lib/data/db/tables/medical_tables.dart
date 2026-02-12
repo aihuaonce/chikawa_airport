@@ -180,9 +180,13 @@ class MedicalAssessment extends Table {
   // 瞳孔反應
   IntColumn get leftPupilReactionId =>
       integer().nullable().references(PupilReactionRef, #id)();
+  TextColumn get leftPupilReaction => text().nullable()(); // 新增: 儲存 +, -, ± 等字串
   RealColumn get leftPupilSize => real().nullable()(); // mm（支援小數如 2.5）
+
   IntColumn get rightPupilReactionId =>
       integer().nullable().references(PupilReactionRef, #id)();
+  TextColumn get rightPupilReaction =>
+      text().nullable()(); // 新增: 儲存 +, -, ± 等字串
   RealColumn get rightPupilSize => real().nullable()(); // mm（支援小數如 2.5）
 
   // 理學檢查
@@ -250,7 +254,8 @@ class Treatment extends Table {
   TextColumn get transportMethod => text().nullable()();
   IntColumn get referralHospitalId => integer().nullable()();
   TextColumn get referralHospitalFinal => text().nullable()(); // 其它醫院名稱
-  IntColumn get ambulanceStaffId => integer().nullable().references(MedicalStaff, #id)(); // 隨車人員
+  IntColumn get ambulanceStaffId =>
+      integer().nullable().references(MedicalStaff, #id)(); // 隨車人員
 
   DateTimeColumn get arrivalTime => dateTime().nullable()();
   IntColumn get clearanceId => integer().nullable()();
@@ -322,8 +327,7 @@ class MedicalFees extends Table {
       integer().nullable().references(CollectionStatus, #id)();
   BoolColumn get receiptIssued =>
       boolean().withDefault(const Constant(false))();
-  BoolColumn get userAgreed =>
-      boolean().withDefault(const Constant(false))();
+  BoolColumn get userAgreed => boolean().withDefault(const Constant(false))();
   TextColumn get applicantName => text().nullable()();
   TextColumn get applicantUnit => text().nullable()();
   TextColumn get applicantPhone => text().nullable()();
@@ -432,4 +436,83 @@ class Medications extends Table {
   TextColumn get remarks => text().nullable()(); // 備註
 
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+}
+
+// --- Emergency Tables ---
+
+// 急救處置紀錄表
+@DataClassName('EmergencyTreatmentData')
+class EmergencyTreatment extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get medicalId =>
+      integer().unique().references(MedicalRecord, #medicalId)();
+
+  DateTimeColumn get startTime => dateTime().nullable()();
+  TextColumn get diagnosis => text().nullable()(); // 診斷
+  TextColumn get incidentContext => text().nullable()();
+
+  // FKs to MedicalAssessment
+  IntColumn get initialAssessmentId =>
+      integer().nullable().references(MedicalAssessment, #assessmentId)();
+  IntColumn get postAssessmentId =>
+      integer().nullable().references(MedicalAssessment, #assessmentId)();
+
+  // Intubation
+  DateTimeColumn get intubationStartTime => dateTime().nullable()();
+  TextColumn get intubationMethod => text().nullable()();
+  TextColumn get intubationSize => text().nullable()();
+  TextColumn get intubationNotes => text().nullable()();
+
+  // IV
+  DateTimeColumn get ivLineStartTime => dateTime().nullable()();
+  TextColumn get ivLineSize => text().nullable()();
+  TextColumn get ivLineNotes => text().nullable()();
+
+  // CPR
+  DateTimeColumn get cprStartTime => dateTime().nullable()();
+  DateTimeColumn get cprEndTime => dateTime().nullable()();
+  TextColumn get cprNotes => text().nullable()();
+
+  // Post Resuscitation
+  TextColumn get postRespirationMode => text().nullable()();
+  TextColumn get postRespirationOthers => text().nullable()();
+
+  // End
+  DateTimeColumn get endTime => dateTime().nullable()();
+  TextColumn get result => text().nullable()(); // 轉診, 死亡, 其它
+  TextColumn get endCareNotes => text().nullable()();
+
+  // Director
+  TextColumn get directorName => text().nullable()();
+
+  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+  DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
+}
+
+// 急救處置-急救藥物記錄表
+@DataClassName('FirstAidLogData')
+class FirstAidLog extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get emergencyTreatmentId =>
+      integer().references(EmergencyTreatment, #id)();
+
+  TextColumn get time => text().nullable()();
+  TextColumn get heartRate => text().nullable()();
+  TextColumn get bloodPressure => text().nullable()();
+  TextColumn get respirationRate => text().nullable()();
+  TextColumn get o2 => text().nullable()();
+  TextColumn get shock => text().nullable()();
+  TextColumn get epinephrine => text().nullable()();
+  TextColumn get otherMeds => text().nullable()(); // JSON
+
+  IntColumn get sortOrder => integer().withDefault(const Constant(0))();
+}
+
+// 急救處置-協助人員表
+@DataClassName('EmergencyAssistStaffData')
+class EmergencyAssistStaff extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get emergencyTreatmentId =>
+      integer().references(EmergencyTreatment, #id)();
+  TextColumn get name => text()();
 }

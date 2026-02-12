@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import 'package:drift/drift.dart' as drift;
+import '../../data/db/database.dart';
+import '../../data/models/reference_service.dart';
+import '../../medical/widgets/reference_search_sheet.dart';
+import '../../medical/widgets/signature_field.dart';
 
 class EmergencyTreatmentRecord extends StatefulWidget {
   final int emergencyId;
@@ -22,40 +28,385 @@ class _EmergencyTreatmentRecordState extends State<EmergencyTreatmentRecord> {
 
   // --- 2. 控制器定義 ---
   final TextEditingController _startTimeController = TextEditingController();
+  final TextEditingController _diagnosisController = TextEditingController();
+  final TextEditingController _contextController = TextEditingController();
   final TextEditingController _intubationTimeController =
       TextEditingController();
+  final TextEditingController _intubationSizeController =
+      TextEditingController();
+  final TextEditingController _intubationNotesController =
+      TextEditingController();
   final TextEditingController _ivLineTimeController = TextEditingController();
+  final TextEditingController _ivLineSizeController = TextEditingController();
+  final TextEditingController _ivLineNotesController = TextEditingController();
   final TextEditingController _cprStartTimeController = TextEditingController();
   final TextEditingController _cprEndTimeController = TextEditingController();
+  final TextEditingController _cprNotesController = TextEditingController();
   final TextEditingController _endTimeController = TextEditingController();
   final TextEditingController _endRecordController = TextEditingController();
   final TextEditingController _assistStaffInputController =
       TextEditingController();
+  final TextEditingController _postOthersController = TextEditingController();
 
   final TextEditingController _initEController = TextEditingController();
   final TextEditingController _initVController = TextEditingController();
   final TextEditingController _initMController = TextEditingController();
-  int? _initGcsTotal;
+  final TextEditingController _initHRController = TextEditingController();
+  final TextEditingController _initRRController = TextEditingController();
+  final TextEditingController _initBPController = TextEditingController();
+  final TextEditingController _initTempController = TextEditingController();
+  final TextEditingController _initLeftPupilSizeController =
+      TextEditingController();
+  final TextEditingController _initRightPupilSizeController =
+      TextEditingController();
+
   final TextEditingController _postEController = TextEditingController();
   final TextEditingController _postVController = TextEditingController();
   final TextEditingController _postMController = TextEditingController();
+  final TextEditingController _postHRController = TextEditingController();
+  final TextEditingController _postRRController = TextEditingController();
+  final TextEditingController _postBPController = TextEditingController();
+  final TextEditingController _postTempController = TextEditingController();
+  final TextEditingController _postLeftPupilSizeController =
+      TextEditingController();
+  final TextEditingController _postRightPupilSizeController =
+      TextEditingController();
+
+  int? _initGcsTotal;
   int? _postGcsTotal;
 
   // --- 3. 狀態變數與資料列表 ---
-  final List<Map<String, dynamic>> _firstAidMedsLogs = [];
-  final List<String> _assistStaffList = [];
+  EmergencyTreatmentData? _emergencyTreatment;
+  MedicalAssessmentData? _initialAssessment;
+  MedicalAssessmentData? _postAssessment;
+  List<FirstAidLogData> _firstAidLogs = [];
+  List<EmergencyAssistStaffData> _assistStaffList = [];
 
-  String _leftPupilReaction = '+';
-  String _rightPupilReaction = '+';
-  String? _tempStatus;
+  String _initLeftPupilReaction = '+';
+  String _initRightPupilReaction = '+';
   String? _intubationMethod;
   String _postLeftPupilReaction = '+';
   String _postRightPupilReaction = '+';
   String? _postRespirationMode;
   String _firstAidResult = '轉診';
-  String? _aidDoctor;
-  String? _aidNurse;
-  String? _aidEmt;
+
+  // Staff Assignments
+  MedicalStaffAssignmentData? _aidDoctor;
+  MedicalStaffAssignmentData? _aidNurse;
+  MedicalStaffAssignmentData? _aidEmt;
+
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _initialLoad();
+  }
+
+  // --- 資料載入與初始化 ---
+
+  Future<void> _initialLoad() async {
+    await _loadData(fullReload: true);
+  }
+
+  Future<void> _loadData({bool fullReload = false}) async {
+    try {
+      final db = context.read<AppDatabase>();
+      final dao = db.emergencyDao;
+      // Removed unused refService
+      // final refService = context.read<ReferenceService>();
+
+      // 1. 獲取 EmergencyTreatment
+      final treatment = await dao.getOrCreateEmergencyTreatment(
+        widget.emergencyId,
+      );
+      _emergencyTreatment = treatment;
+
+      // 2. 獲取 Assessments
+      _initialAssessment = await dao.getOrCreateAssessment(
+        treatment.initialAssessmentId,
+        widget.emergencyId,
+      );
+      _postAssessment = await dao.getOrCreateAssessment(
+        treatment.postAssessmentId,
+        widget.emergencyId,
+      );
+
+      // 如果剛創建，需要更新 EmergencyTreatment 的 FKs
+      if (treatment.initialAssessmentId == null ||
+          treatment.postAssessmentId == null) {
+        await dao.updateEmergencyTreatment(
+          EmergencyTreatmentCompanion(
+            id: drift.Value(treatment.id),
+            initialAssessmentId: drift.Value(_initialAssessment!.assessmentId),
+            postAssessmentId: drift.Value(_postAssessment!.assessmentId),
+          ),
+        );
+      }
+
+      // 3. 獲取 Logs 和 Staff
+      _firstAidLogs = await dao.getFirstAidLogs(treatment.id);
+      _assistStaffList = await dao.getAssistStaff(treatment.id);
+
+      // 4. 獲取 Staff Assignments (Doctor, Nurse, EMT)
+      final assignments = await (db.select(
+        db.medicalStaffAssignment,
+      )..where((t) => t.medicalId.equals(widget.emergencyId))).get();
+
+      // Filter by role codes
+      // Need to resolve role IDs from code. Fetch directly from DB to ensure reliability.
+      final roles = await db.select(db.medicalStaffRole).get();
+
+      final doctorRole = roles.where((r) => r.code == 'DOCTOR').firstOrNull?.id;
+      final nurseRole = roles.where((r) => r.code == 'NURSE').firstOrNull?.id;
+      final emtRole = roles.where((r) => r.code == 'EMT').firstOrNull?.id;
+
+      _aidDoctor = assignments
+          .where((a) => a.staffRoleId == doctorRole)
+          .firstOrNull;
+      _aidNurse = assignments
+          .where((a) => a.staffRoleId == nurseRole)
+          .firstOrNull;
+      _aidEmt = assignments.where((a) => a.staffRoleId == emtRole).firstOrNull;
+
+      // 5. 獲取 Diagnosis (from Treatment table)
+      final mainTreatment =
+          await (db.select(db.treatment)
+                ..where((t) => t.medicalId.equals(widget.emergencyId)))
+              .getSingleOrNull();
+      String diagnosisText = '';
+      if (mainTreatment?.tentativeCategoryId != null) {
+        // Fetch Category Name directly from DB
+        final category =
+            await (db.select(db.diagnosisCategory)..where(
+                  (t) => t.id.equals(mainTreatment!.tentativeCategoryId!),
+                ))
+                .getSingleOrNull();
+        diagnosisText = category?.name ?? '';
+      }
+
+      // --- 填充控制器 (Only on full reload) ---
+      if (fullReload) {
+        _populateControllers(diagnosisText);
+      }
+
+      setState(() {
+        _isLoading = false;
+      });
+    } catch (e) {
+      debugPrint('Error loading emergency data: $e');
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  void _populateControllers(String diagnosisFromTreatment) {
+    if (_emergencyTreatment == null) return;
+    final t = _emergencyTreatment!;
+
+    _startTimeController.text = t.startTime != null
+        ? DateFormat('HH:mm:ss').format(t.startTime!)
+        : '';
+    // Diagnosis: Display from Treatment table if available, else from Emergency table (if we decide to store it there too, but let's prefer Treatment table display)
+    _diagnosisController.text = diagnosisFromTreatment.isNotEmpty
+        ? diagnosisFromTreatment
+        : (t.diagnosis ?? '');
+    _contextController.text = t.incidentContext ?? '';
+
+    _intubationTimeController.text = t.intubationStartTime != null
+        ? DateFormat('HH:mm:ss').format(t.intubationStartTime!)
+        : '';
+    _intubationMethod = t.intubationMethod;
+    _intubationSizeController.text = t.intubationSize ?? '';
+    _intubationNotesController.text = t.intubationNotes ?? '';
+
+    _ivLineTimeController.text = t.ivLineStartTime != null
+        ? DateFormat('HH:mm:ss').format(t.ivLineStartTime!)
+        : '';
+    _ivLineSizeController.text = t.ivLineSize ?? '';
+    _ivLineNotesController.text = t.ivLineNotes ?? '';
+
+    _cprStartTimeController.text = t.cprStartTime != null
+        ? DateFormat('HH:mm:ss').format(t.cprStartTime!)
+        : '';
+    _cprEndTimeController.text = t.cprEndTime != null
+        ? DateFormat('HH:mm:ss').format(t.cprEndTime!)
+        : '';
+    _cprNotesController.text = t.cprNotes ?? '';
+
+    _postRespirationMode = t.postRespirationMode;
+    _postOthersController.text = t.postRespirationOthers ?? '';
+
+    _endTimeController.text = t.endTime != null
+        ? DateFormat('HH:mm:ss').format(t.endTime!)
+        : '';
+    if (t.result != null) _firstAidResult = t.result!;
+    _endRecordController.text = t.endCareNotes ?? '';
+
+    // Assessments
+    _populateAssessment(_initialAssessment, isPost: false);
+    _populateAssessment(_postAssessment, isPost: true);
+  }
+
+  void _populateAssessment(MedicalAssessmentData? a, {required bool isPost}) {
+    if (a == null) return;
+    final eCtrl = isPost ? _postEController : _initEController;
+    final vCtrl = isPost ? _postVController : _initVController;
+    final mCtrl = isPost ? _postMController : _initMController;
+    final hrCtrl = isPost ? _postHRController : _initHRController;
+    final rrCtrl = isPost ? _postRRController : _initRRController;
+    final bpCtrl = isPost ? _postBPController : _initBPController;
+    final tempCtrl = isPost ? _postTempController : _initTempController;
+    final leftSizeCtrl = isPost
+        ? _postLeftPupilSizeController
+        : _initLeftPupilSizeController;
+    final rightSizeCtrl = isPost
+        ? _postRightPupilSizeController
+        : _initRightPupilSizeController;
+
+    eCtrl.text = a.gcsE ?? '';
+    vCtrl.text = a.gcsV ?? '';
+    mCtrl.text = a.gcsM ?? '';
+    hrCtrl.text = a.pulse?.toString() ?? '';
+    rrCtrl.text = a.breath?.toString() ?? '';
+    bpCtrl.text = (a.systolic != null || a.diastolic != null)
+        ? '${a.systolic ?? ''}/${a.diastolic ?? ''}'
+        : '';
+    tempCtrl.text = a.temperature?.toString() ?? '';
+    leftSizeCtrl.text = a.leftPupilSize?.toString() ?? '';
+    rightSizeCtrl.text = a.rightPupilSize?.toString() ?? '';
+
+    // Calculate GCS Total
+    int e = int.tryParse(eCtrl.text) ?? 0;
+    int v = int.tryParse(vCtrl.text) ?? 0;
+    int m = int.tryParse(mCtrl.text) ?? 0;
+    int? total = (e > 0 && v > 0 && m > 0) ? (e + v + m) : null;
+
+    if (isPost) {
+      _postGcsTotal = total;
+      _postLeftPupilReaction = a.leftPupilReaction ?? '+';
+      _postRightPupilReaction = a.rightPupilReaction ?? '+';
+    } else {
+      _initGcsTotal = total;
+      _initLeftPupilReaction = a.leftPupilReaction ?? '+';
+      _initRightPupilReaction = a.rightPupilReaction ?? '+';
+    }
+  }
+
+  // --- 資料儲存 ---
+
+  Future<void> _saveEmergencyTreatment() async {
+    if (_emergencyTreatment == null) return;
+    final dao = context.read<AppDatabase>().emergencyDao;
+
+    await dao.updateEmergencyTreatment(
+      EmergencyTreatmentCompanion(
+        id: drift.Value(_emergencyTreatment!.id),
+        startTime: drift.Value(_parseTime(_startTimeController.text)),
+        diagnosis: drift.Value(_diagnosisController.text),
+        incidentContext: drift.Value(_contextController.text),
+        intubationStartTime: drift.Value(
+          _parseTime(_intubationTimeController.text),
+        ),
+        intubationMethod: drift.Value(_intubationMethod),
+        intubationSize: drift.Value(_intubationSizeController.text),
+        intubationNotes: drift.Value(_intubationNotesController.text),
+        ivLineStartTime: drift.Value(_parseTime(_ivLineTimeController.text)),
+        ivLineSize: drift.Value(_ivLineSizeController.text),
+        ivLineNotes: drift.Value(_ivLineNotesController.text),
+        cprStartTime: drift.Value(_parseTime(_cprStartTimeController.text)),
+        cprEndTime: drift.Value(_parseTime(_cprEndTimeController.text)),
+        cprNotes: drift.Value(_cprNotesController.text),
+        postRespirationMode: drift.Value(_postRespirationMode),
+        postRespirationOthers: drift.Value(_postOthersController.text),
+        endTime: drift.Value(_parseTime(_endTimeController.text)),
+        result: drift.Value(_firstAidResult),
+        endCareNotes: drift.Value(_endRecordController.text),
+        updatedAt: drift.Value(DateTime.now()),
+      ),
+    );
+  }
+
+  Future<void> _saveAssessment({required bool isPost}) async {
+    final dao = context.read<AppDatabase>().emergencyDao;
+    final a = isPost ? _postAssessment : _initialAssessment;
+    if (a == null) return;
+
+    final eCtrl = isPost ? _postEController : _initEController;
+    final vCtrl = isPost ? _postVController : _initVController;
+    final mCtrl = isPost ? _postMController : _initMController;
+    final hrCtrl = isPost ? _postHRController : _initHRController;
+    final rrCtrl = isPost ? _postRRController : _initRRController;
+    final bpCtrl = isPost ? _postBPController : _initBPController;
+    final tempCtrl = isPost ? _postTempController : _initTempController;
+    final leftSizeCtrl = isPost
+        ? _postLeftPupilSizeController
+        : _initLeftPupilSizeController;
+    final rightSizeCtrl = isPost
+        ? _postRightPupilSizeController
+        : _initRightPupilSizeController;
+
+    // Parse BP
+    int? systolic, diastolic;
+    if (bpCtrl.text.contains('/')) {
+      final parts = bpCtrl.text.split('/');
+      if (parts.length == 2) {
+        systolic = int.tryParse(parts[0]);
+        diastolic = int.tryParse(parts[1]);
+      }
+    } else {
+      systolic = int.tryParse(bpCtrl.text);
+    }
+
+    int e = int.tryParse(eCtrl.text) ?? 0;
+    int v = int.tryParse(vCtrl.text) ?? 0;
+    int m = int.tryParse(mCtrl.text) ?? 0;
+    int? gcsTotal = (e > 0 && v > 0 && m > 0) ? (e + v + m) : null;
+    
+    // Get pupil reactions
+    final leftReaction = isPost ? _postLeftPupilReaction : _initLeftPupilReaction;
+    final rightReaction = isPost ? _postRightPupilReaction : _initRightPupilReaction;
+
+    await dao.updateAssessment(
+      MedicalAssessmentCompanion(
+        assessmentId: drift.Value(a.assessmentId),
+        gcsE: drift.Value(eCtrl.text),
+        gcsM: drift.Value(mCtrl.text),
+        gcsV: drift.Value(vCtrl.text),
+        gcs: drift.Value(gcsTotal),
+        pulse: drift.Value(int.tryParse(hrCtrl.text)),
+        breath: drift.Value(int.tryParse(rrCtrl.text)),
+        systolic: drift.Value(systolic),
+        diastolic: drift.Value(diastolic),
+        temperature: drift.Value(double.tryParse(tempCtrl.text)),
+        leftPupilSize: drift.Value(double.tryParse(leftSizeCtrl.text)),
+        leftPupilReaction: drift.Value(leftReaction),
+        rightPupilSize: drift.Value(double.tryParse(rightSizeCtrl.text)),
+        rightPupilReaction: drift.Value(rightReaction),
+      ),
+    );
+  }
+
+  // Helper for time parsing (assuming HH:mm:ss for today)
+  DateTime? _parseTime(String timeStr) {
+    if (timeStr.isEmpty) return null;
+    try {
+      final now = DateTime.now();
+      final format = DateFormat('HH:mm:ss');
+      final dt = format.parse(timeStr);
+      return DateTime(
+        now.year,
+        now.month,
+        now.day,
+        dt.hour,
+        dt.minute,
+        dt.second,
+      );
+    } catch (_) {
+      return null;
+    }
+  }
+
+  // --- Logic Methods ---
 
   void _calculateGcs(bool isPost) {
     setState(() {
@@ -76,320 +427,343 @@ class _EmergencyTreatmentRecordState extends State<EmergencyTreatmentRecord> {
           0;
 
       if (e > 0 && v > 0 && m > 0) {
-        if (isPost)
+        if (isPost) {
           _postGcsTotal = e + v + m;
-        else
+        } else {
           _initGcsTotal = e + v + m;
+        }
       } else {
-        if (isPost)
+        if (isPost) {
           _postGcsTotal = null;
-        else
+        } else {
           _initGcsTotal = null;
+        }
       }
     });
+    _saveAssessment(isPost: isPost);
   }
 
-  @override
-  void initState() {
-    super.initState();
-    // 初始化時間
-    _startTimeController.text = DateFormat('HH:mm:ss').format(DateTime.now());
-  }
-
-  @override
-  void dispose() {
-    // 銷毀控制器，釋放記憶體
-    _startTimeController.dispose();
-    _intubationTimeController.dispose();
-    _ivLineTimeController.dispose();
-    _cprStartTimeController.dispose();
-    _cprEndTimeController.dispose();
-    _endRecordController.dispose();
-    _assistStaffInputController.dispose();
-    _initEController.dispose();
-    _initVController.dispose();
-    _initMController.dispose();
-    _postEController.dispose();
-    _postVController.dispose();
-    _postMController.dispose();
-    super.dispose();
-  }
-
-  // 格式化顯示其他藥物
-  String _formatOtherMeds(List<dynamic> meds) {
-    if (meds.isEmpty) return '--';
-    return meds.map((m) => "${m['name']}(${m['dose']})").join(", ");
-  }
+  // --- UI Building ---
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // 1. 頂部基本資訊
-        Row(
-          children: [
-            Expanded(
-              child: _buildFieldWrapper(
-                '急救開始時間 First Aid Start Time',
-                _buildTimePickerField(_startTimeController),
-              ),
-            ),
-            const SizedBox(width: 20),
-            Expanded(
-              child: _buildFieldWrapper(
-                '診斷 Diagnosis',
-                _buildTextField(hint: '例如: Sudden Cardiac Arrest'),
-              ),
-            ),
-            const SizedBox(width: 20),
-            Expanded(
-              child: _buildFieldWrapper(
-                '發生情境 Incident Context',
-                _buildTextField(hint: '例如: Collapsed near gate'),
-              ),
-            ),
-          ],
-        ),
+    if (_isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
 
-        const SizedBox(height: 32),
-        const Divider(color: borderColor),
-        const SizedBox(height: 32),
-
-        // 2. 病況
-        _buildSubTitle('病況 Patient Condition'),
-        const SizedBox(height: 16),
-        _buildLabel('GCS 指數評估'),
-        const SizedBox(height: 8),
-        Row(
-          children: [
-            Expanded(
-              child: _buildTextField(
-                hint: 'E',
-                controller: _initEController,
-                textAlign: TextAlign.center,
-                keyboardType: TextInputType.number,
-                onChanged: (_) => _calculateGcs(false),
-              ),
-            ),
-            const SizedBox(width: 8),
-
-            Expanded(
-              child: _buildTextField(
-                hint: 'V',
-                controller: _initVController,
-                textAlign: TextAlign.center,
-                keyboardType: TextInputType.number,
-                onChanged: (_) => _calculateGcs(false),
-              ),
-            ),
-            const SizedBox(width: 8),
-
-            Expanded(
-              child: _buildTextField(
-                hint: 'M',
-                controller: _initMController,
-                textAlign: TextAlign.center,
-                keyboardType: TextInputType.number,
-                onChanged: (_) => _calculateGcs(false),
-              ),
-            ),
-            const SizedBox(width: 8),
-            _buildGcsBox('Total', totalValue: _initGcsTotal, isTotal: true),
-            const Spacer(),
-          ],
-        ),
-        const SizedBox(height: 20),
-        Row(
-          children: [
-            Expanded(
-              child: _buildPupilSection(
-                '左瞳孔 Left Pupil',
-                _leftPupilReaction,
-                (v) => setState(() => _leftPupilReaction = v),
-              ),
-            ),
-            const SizedBox(width: 24),
-            Expanded(
-              child: _buildPupilSection(
-                '右瞳孔 Right Pupil',
-                _rightPupilReaction,
-                (v) => setState(() => _rightPupilReaction = v),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 20),
-        Row(
-          children: [
-            Expanded(
-              child: _buildFieldWrapper(
-                '心跳 Heart Rate (次/分)',
-                _buildTextField(hint: 'BPM'),
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: _buildFieldWrapper(
-                '呼吸 Respiration (次/分)',
-                _buildTextField(hint: 'RR'),
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: _buildFieldWrapper(
-                '血壓 Blood Pressure',
-                _buildTextField(hint: 'mm/Hg'),
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: _buildFieldWrapper(
-                '體溫/皮膚 Temp/Skin',
-                _buildDropdownField(
-                  hint: '選擇狀態',
-                  value: _tempStatus,
-                  items: ['溫暖 Warm', '冰冷 Cold'],
-                  onChanged: (v) => setState(() => _tempStatus = v),
-                ),
-              ),
-            ),
-          ],
-        ),
-
-        const SizedBox(height: 32),
-
-        // 3. 插管
-        _buildColoredSection(
-          title: '插管 Intubation',
-          color: bgField,
-          child: Row(
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // 1. 頂部基本資訊
+          Row(
             children: [
               Expanded(
                 child: _buildFieldWrapper(
-                  '開始時間',
-                  _buildTimePickerField(_intubationTimeController),
+                  '急救開始時間 First Aid Start Time',
+                  _buildTimePickerField(_startTimeController),
                 ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: 20),
               Expanded(
                 child: _buildFieldWrapper(
-                  '插管方式',
-                  _buildDropdownField(
-                    hint: '選擇方式',
-                    value: _intubationMethod,
-                    items: ['ET', 'LMA', 'I-GEL', 'Failure'],
-                    onChanged: (v) => setState(() => _intubationMethod = v),
+                  '診斷 Diagnosis',
+                  _buildTextField(
+                    hint: '例如: Sudden Cardiac Arrest',
+                    controller: _diagnosisController,
+                    readOnly: true, // Assuming read from DB only
+                  ),
+                ),
+              ),
+              const SizedBox(width: 20),
+              Expanded(
+                child: _buildFieldWrapper(
+                  '發生情境 Incident Context',
+                  _buildTextField(
+                    hint: '例如: Collapsed near gate',
+                    controller: _contextController,
+                    onChanged: (_) => _saveEmergencyTreatment(),
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 32),
+          const Divider(color: borderColor),
+          const SizedBox(height: 32),
+
+          // 2. 病況
+          _buildSubTitle('病況 Patient Condition'),
+          const SizedBox(height: 16),
+          _buildLabel('GCS 指數評估'),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Expanded(
+                child: _buildTextField(
+                  hint: 'E',
+                  controller: _initEController,
+                  textAlign: TextAlign.center,
+                  keyboardType: TextInputType.number,
+                  onChanged: (_) => _calculateGcs(false),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: _buildTextField(
+                  hint: 'V',
+                  controller: _initVController,
+                  textAlign: TextAlign.center,
+                  keyboardType: TextInputType.number,
+                  onChanged: (_) => _calculateGcs(false),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: _buildTextField(
+                  hint: 'M',
+                  controller: _initMController,
+                  textAlign: TextAlign.center,
+                  keyboardType: TextInputType.number,
+                  onChanged: (_) => _calculateGcs(false),
+                ),
+              ),
+              const SizedBox(width: 8),
+              _buildGcsBox('Total', totalValue: _initGcsTotal, isTotal: true),
+              const Spacer(),
+            ],
+          ),
+          const SizedBox(height: 20),
+          Row(
+            children: [
+              Expanded(
+                child: _buildPupilSection(
+                  '左瞳孔 Left Pupil',
+                  _initLeftPupilReaction,
+                  (v) => setState(() => _initLeftPupilReaction = v),
+                  _initLeftPupilSizeController,
+                  false,
+                ),
+              ),
+              const SizedBox(width: 24),
+              Expanded(
+                child: _buildPupilSection(
+                  '右瞳孔 Right Pupil',
+                  _initRightPupilReaction,
+                  (v) => setState(() => _initRightPupilReaction = v),
+                  _initRightPupilSizeController,
+                  false,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          Row(
+            children: [
+              Expanded(
+                child: _buildFieldWrapper(
+                  '心跳 Heart Rate (次/分)',
+                  _buildTextField(
+                    hint: 'BPM',
+                    controller: _initHRController,
+                    onChanged: (_) => _saveAssessment(isPost: false),
                   ),
                 ),
               ),
               const SizedBox(width: 16),
               Expanded(
                 child: _buildFieldWrapper(
-                  '管號 Size',
-                  _buildTextField(hint: 'Size'),
+                  '呼吸 Respiration (次/分)',
+                  _buildTextField(
+                    hint: 'RR',
+                    controller: _initRRController,
+                    onChanged: (_) => _saveAssessment(isPost: false),
+                  ),
                 ),
               ),
               const SizedBox(width: 16),
               Expanded(
                 child: _buildFieldWrapper(
-                  '備註 Notes',
-                  _buildTextField(hint: 'Remarks'),
+                  '血壓 Blood Pressure',
+                  _buildTextField(
+                    hint: 'mm/Hg',
+                    controller: _initBPController,
+                    onChanged: (_) => _saveAssessment(isPost: false),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: _buildFieldWrapper(
+                  '體溫 Temp',
+                  _buildTextField(
+                    hint: '°C',
+                    controller: _initTempController,
+                    onChanged: (_) => _saveAssessment(isPost: false),
+                  ),
                 ),
               ),
             ],
           ),
-        ),
 
-        const SizedBox(height: 32),
+          const SizedBox(height: 32),
 
-        // 4. 靜脈注射
-        _buildColoredSection(
-          title: '靜脈注射 IV Line',
-          color: bgField,
-          child: Row(
-            children: [
-              Expanded(
-                child: _buildFieldWrapper(
-                  '開始時間',
-                  _buildTimePickerField(_ivLineTimeController),
+          // 3. 插管
+          _buildColoredSection(
+            title: '插管 Intubation',
+            color: bgField,
+            child: Row(
+              children: [
+                Expanded(
+                  child: _buildFieldWrapper(
+                    '開始時間',
+                    _buildTimePickerField(_intubationTimeController),
+                  ),
                 ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _buildFieldWrapper(
-                  '針頭尺寸 Needle Size',
-                  _buildTextField(hint: 'Gauge'),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: _buildFieldWrapper(
+                    '插管方式',
+                    _buildDropdownField(
+                      hint: '選擇方式',
+                      value: _intubationMethod,
+                      items: ['ET', 'LMA', 'I-GEL', 'Failure'],
+                      onChanged: (v) {
+                        setState(() => _intubationMethod = v);
+                        _saveEmergencyTreatment();
+                      },
+                    ),
+                  ),
                 ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _buildFieldWrapper(
-                  '記錄 Notes',
-                  _buildTextField(hint: 'Location/Status'),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: _buildFieldWrapper(
+                    '管號 Size',
+                    _buildTextField(
+                      hint: 'Size',
+                      controller: _intubationSizeController,
+                      onChanged: (_) => _saveEmergencyTreatment(),
+                    ),
+                  ),
                 ),
-              ),
-            ],
+                const SizedBox(width: 16),
+                Expanded(
+                  child: _buildFieldWrapper(
+                    '備註 Notes',
+                    _buildTextField(
+                      hint: 'Remarks',
+                      controller: _intubationNotesController,
+                      onChanged: (_) => _saveEmergencyTreatment(),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
 
-        const SizedBox(height: 32),
+          const SizedBox(height: 32),
 
-        // 5. 胸外按壓
-        _buildColoredSection(
-          title: '胸外按壓 Cardiac Massage',
-          icon: Icons.favorite,
-          color: const Color(0xFFFEF2F2),
-          titleColor: const Color(0xFFDC2626),
-          child: Row(
-            children: [
-              Expanded(
-                child: _buildFieldWrapper(
-                  '開始時間',
-                  _buildTimePickerField(_cprStartTimeController),
+          // 4. 靜脈注射
+          _buildColoredSection(
+            title: '靜脈注射 IV Line',
+            color: bgField,
+            child: Row(
+              children: [
+                Expanded(
+                  child: _buildFieldWrapper(
+                    '開始時間',
+                    _buildTimePickerField(_ivLineTimeController),
+                  ),
                 ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _buildFieldWrapper(
-                  '結束時間',
-                  _buildTimePickerField(_cprEndTimeController),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: _buildFieldWrapper(
+                    '針頭尺寸 Needle Size',
+                    _buildTextField(
+                      hint: 'Gauge',
+                      controller: _ivLineSizeController,
+                      onChanged: (_) => _saveEmergencyTreatment(),
+                    ),
+                  ),
                 ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _buildFieldWrapper(
-                  '記錄 Notes',
-                  _buildTextField(hint: 'CPR Outcome'),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: _buildFieldWrapper(
+                    '記錄 Notes',
+                    _buildTextField(
+                      hint: 'Location/Status',
+                      controller: _ivLineNotesController,
+                      onChanged: (_) => _saveEmergencyTreatment(),
+                    ),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
 
-        const SizedBox(height: 32),
+          const SizedBox(height: 32),
 
-        // 6. 急救處置及用藥記錄表
-        _buildTableContainer(
-          title: '急救處置及用藥記錄表 FIRST AID & MEDS LOG',
-          onAdd: () => _showFirstAidLogModal(),
-          child: _buildFirstAidMedsTable(),
-        ),
+          // 5. 胸外按壓
+          _buildColoredSection(
+            title: '胸外按壓 Cardiac Massage',
+            icon: Icons.favorite,
+            color: const Color(0xFFFEF2F2),
+            titleColor: const Color(0xFFDC2626),
+            child: Row(
+              children: [
+                Expanded(
+                  child: _buildFieldWrapper(
+                    '開始時間',
+                    _buildTimePickerField(_cprStartTimeController),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: _buildFieldWrapper(
+                    '結束時間',
+                    _buildTimePickerField(_cprEndTimeController),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: _buildFieldWrapper(
+                    '記錄 Notes',
+                    _buildTextField(
+                      hint: 'CPR Outcome',
+                      controller: _cprNotesController,
+                      onChanged: (_) => _saveEmergencyTreatment(),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
 
-        const SizedBox(height: 32),
-        const Divider(color: borderColor),
-        const SizedBox(height: 32),
+          const SizedBox(height: 32),
 
-        // 7. 急救後病況
-        _buildPostFirstAidConditionSection(),
+          // 6. 急救處置及用藥記錄表
+          _buildTableContainer(
+            title: '急救處置及用藥記錄表 FIRST AID & MEDS LOG',
+            onAdd: () => _showFirstAidLogModal(),
+            child: _buildFirstAidMedsTable(),
+          ),
 
-        const SizedBox(height: 32),
+          const SizedBox(height: 32),
+          const Divider(color: borderColor),
+          const SizedBox(height: 32),
 
-        // 8. 急救結束與簽署區塊
-        _buildFinalSigningSection(),
+          // 7. 急救後病況
+          _buildPostFirstAidConditionSection(),
 
-        const SizedBox(height: 60),
-      ],
+          const SizedBox(height: 32),
+
+          // 8. 急救結束與簽署區塊
+          _buildFinalSigningSection(),
+
+          const SizedBox(height: 60),
+        ],
+      ),
     );
   }
 
@@ -416,39 +790,38 @@ class _EmergencyTreatmentRecordState extends State<EmergencyTreatmentRecord> {
         child: Column(
           children: [
             _buildTableHeaderRow(labels, flexes),
-            if (_firstAidMedsLogs.isEmpty) _buildEmptyRow(),
-            ..._firstAidMedsLogs.asMap().entries.map((entry) {
-              int idx = entry.key;
-              var data = entry.value;
+            if (_firstAidLogs.isEmpty) _buildEmptyRow(),
+            ..._firstAidLogs.asMap().entries.map((entry) {
+              final log = entry.value;
               return _buildDataRow(flexes, [
-                _buildCompactTimeField(data['time']),
+                _buildCompactTimeField(log.time ?? ''),
                 Center(
                   child: Text(
-                    data['hr'] ?? '--',
+                    log.heartRate ?? '--',
                     style: const TextStyle(fontSize: 13),
                   ),
                 ),
                 Center(
                   child: Text(
-                    data['bp'] ?? '--',
+                    log.bloodPressure ?? '--',
                     style: const TextStyle(fontSize: 13),
                   ),
                 ),
                 Center(
                   child: Text(
-                    data['rr'] ?? '--',
+                    log.respirationRate ?? '--',
                     style: const TextStyle(fontSize: 13),
                   ),
                 ),
                 Center(
                   child: Text(
-                    data['o2'] ?? '--',
+                    log.o2 ?? '--',
                     style: const TextStyle(fontSize: 13),
                   ),
                 ),
                 Center(
                   child: Text(
-                    data['shock'] ?? '--',
+                    log.shock ?? '--',
                     style: const TextStyle(
                       color: Colors.red,
                       fontWeight: FontWeight.bold,
@@ -457,7 +830,7 @@ class _EmergencyTreatmentRecordState extends State<EmergencyTreatmentRecord> {
                 ),
                 Center(
                   child: Text(
-                    data['epi'] ?? '--',
+                    log.epinephrine ?? '--',
                     style: const TextStyle(
                       color: primaryColor,
                       fontWeight: FontWeight.bold,
@@ -465,13 +838,18 @@ class _EmergencyTreatmentRecordState extends State<EmergencyTreatmentRecord> {
                   ),
                 ),
                 Text(
-                  _formatOtherMeds(data['otherMeds'] ?? []),
+                  // Display parsed JSON or raw text
+                  log.otherMeds ?? '--',
                   style: const TextStyle(fontSize: 11, color: textMuted),
                   overflow: TextOverflow.ellipsis,
                 ),
-                _buildDeleteBtn(
-                  () => setState(() => _firstAidMedsLogs.removeAt(idx)),
-                ),
+                _buildDeleteBtn(() async {
+                  await context
+                      .read<AppDatabase>()
+                      .emergencyDao
+                      .deleteFirstAidLog(log.id);
+                  _loadData();
+                }),
               ]);
             }),
           ],
@@ -654,22 +1032,33 @@ class _EmergencyTreatmentRecordState extends State<EmergencyTreatmentRecord> {
                               backgroundColor: primaryColor,
                               foregroundColor: Colors.white,
                             ),
-                            onPressed: () {
-                              setState(() {
-                                _firstAidMedsLogs.add({
-                                  'time': timeCtrl.text,
-                                  'hr': hrCtrl.text,
-                                  'bp': bpCtrl.text,
-                                  'rr': rrCtrl.text,
-                                  'o2': o2Ctrl.text,
-                                  'shock': shockCtrl.text,
-                                  'epi': epiCtrl.text,
-                                  'otherMeds': List<Map<String, String>>.from(
-                                    tempOtherMeds,
-                                  ),
-                                });
-                              });
-                              Navigator.pop(context);
+                            onPressed: () async {
+                              final dao = context
+                                  .read<AppDatabase>()
+                                  .emergencyDao;
+                              // Format meds to string
+                              String otherMedsStr = tempOtherMeds
+                                  .map(
+                                    (m) =>
+                                        "${m['name'] ?? ''}(${m['dose'] ?? ''})",
+                                  )
+                                  .join(", ");
+
+                              await dao.addFirstAidLog(
+                                FirstAidLogCompanion.insert(
+                                  emergencyTreatmentId: _emergencyTreatment!.id,
+                                  time: drift.Value(timeCtrl.text),
+                                  heartRate: drift.Value(hrCtrl.text),
+                                  bloodPressure: drift.Value(bpCtrl.text),
+                                  respirationRate: drift.Value(rrCtrl.text),
+                                  o2: drift.Value(o2Ctrl.text),
+                                  shock: drift.Value(shockCtrl.text),
+                                  epinephrine: drift.Value(epiCtrl.text),
+                                  otherMeds: drift.Value(otherMedsStr),
+                                ),
+                              );
+                              if (context.mounted) Navigator.pop(context);
+                              _loadData();
                             },
                             child: const Text('確認加入'),
                           ),
@@ -749,7 +1138,11 @@ class _EmergencyTreatmentRecordState extends State<EmergencyTreatmentRecord> {
     return Row(
       children: [
         Expanded(
-          child: _buildTextField(hint: 'HH:mm:ss', controller: controller),
+          child: _buildTextField(
+            hint: 'HH:mm:ss',
+            controller: controller,
+            onChanged: (_) => _saveEmergencyTreatment(),
+          ),
         ),
         const SizedBox(width: 8),
         _buildNowButton(controller),
@@ -775,9 +1168,13 @@ class _EmergencyTreatmentRecordState extends State<EmergencyTreatmentRecord> {
     return SizedBox(
       height: 44,
       child: OutlinedButton(
-        onPressed: () => setState(
-          () => controller.text = DateFormat('HH:mm:ss').format(DateTime.now()),
-        ),
+        onPressed: () {
+          setState(
+            () =>
+                controller.text = DateFormat('HH:mm:ss').format(DateTime.now()),
+          );
+          _saveEmergencyTreatment();
+        },
         style: OutlinedButton.styleFrom(
           backgroundColor: primaryColor.withValues(alpha: 0.05),
           side: const BorderSide(color: primaryColor),
@@ -803,6 +1200,7 @@ class _EmergencyTreatmentRecordState extends State<EmergencyTreatmentRecord> {
     TextAlign textAlign = TextAlign.start,
     int maxLines = 1,
     TextInputType? keyboardType,
+    bool readOnly = false,
   }) {
     return SizedBox(
       height: maxLines == 1 ? 44 : null,
@@ -812,6 +1210,7 @@ class _EmergencyTreatmentRecordState extends State<EmergencyTreatmentRecord> {
         textAlign: textAlign,
         maxLines: maxLines,
         keyboardType: keyboardType,
+        readOnly: readOnly,
         style: TextStyle(
           fontSize: 14,
           color: textColor ?? textDark,
@@ -985,6 +1384,8 @@ class _EmergencyTreatmentRecordState extends State<EmergencyTreatmentRecord> {
     String side,
     String currentReact,
     Function(String) onReact,
+    TextEditingController sizeController,
+    bool isPost,
   ) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
@@ -1029,7 +1430,12 @@ class _EmergencyTreatmentRecordState extends State<EmergencyTreatmentRecord> {
           ),
           const SizedBox(width: 8),
           Expanded(
-            child: _buildTextField(hint: 'mm', textAlign: TextAlign.center),
+            child: _buildTextField(
+              hint: 'mm',
+              textAlign: TextAlign.center,
+              controller: sizeController,
+              onChanged: (_) => _saveAssessment(isPost: isPost),
+            ),
           ),
         ],
       ),
@@ -1131,6 +1537,8 @@ class _EmergencyTreatmentRecordState extends State<EmergencyTreatmentRecord> {
                 '左瞳孔 Left Pupil',
                 _postLeftPupilReaction,
                 (v) => setState(() => _postLeftPupilReaction = v),
+                _postLeftPupilSizeController,
+                true,
               ),
             ),
             const SizedBox(width: 24),
@@ -1139,6 +1547,8 @@ class _EmergencyTreatmentRecordState extends State<EmergencyTreatmentRecord> {
                 '右瞳孔 Right Pupil',
                 _postRightPupilReaction,
                 (v) => setState(() => _postRightPupilReaction = v),
+                _postRightPupilSizeController,
+                true,
               ),
             ),
           ],
@@ -1152,7 +1562,11 @@ class _EmergencyTreatmentRecordState extends State<EmergencyTreatmentRecord> {
             Expanded(
               child: _buildFieldWrapper(
                 '心跳 Heart Rate',
-                _buildTextField(hint: 'BPM'),
+                _buildTextField(
+                  hint: 'BPM',
+                  controller: _postHRController,
+                  onChanged: (_) => _saveAssessment(isPost: true),
+                ),
               ),
             ),
             const SizedBox(width: 16),
@@ -1163,7 +1577,10 @@ class _EmergencyTreatmentRecordState extends State<EmergencyTreatmentRecord> {
                   hint: '選擇方式',
                   value: _postRespirationMode,
                   items: ['自發性呼吸', '呼吸器', 'Ambu'],
-                  onChanged: (v) => setState(() => _postRespirationMode = v),
+                  onChanged: (v) {
+                    setState(() => _postRespirationMode = v);
+                    _saveEmergencyTreatment();
+                  },
                 ),
               ),
             ),
@@ -1171,14 +1588,22 @@ class _EmergencyTreatmentRecordState extends State<EmergencyTreatmentRecord> {
             Expanded(
               child: _buildFieldWrapper(
                 '血壓 Blood Pressure',
-                _buildTextField(hint: 'mm/Hg'),
+                _buildTextField(
+                  hint: 'mm/Hg',
+                  controller: _postBPController,
+                  onChanged: (_) => _saveAssessment(isPost: true),
+                ),
               ),
             ),
             const SizedBox(width: 16),
             Expanded(
               child: _buildFieldWrapper(
                 '其它補充 Others',
-                _buildTextField(hint: '補充說明...'),
+                _buildTextField(
+                  hint: '補充說明...',
+                  controller: _postOthersController,
+                  onChanged: (_) => _saveEmergencyTreatment(),
+                ),
               ),
             ),
           ],
@@ -1229,6 +1654,11 @@ class _EmergencyTreatmentRecordState extends State<EmergencyTreatmentRecord> {
   }
 
   Widget _buildFinalSigningSection() {
+    final refService = context.read<ReferenceService>();
+    final doctors = refService.getStaffByRole('DOCTOR');
+    final nurses = refService.getStaffByRole('NURSE');
+    final emts = refService.getStaffByRole('EMT');
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -1250,11 +1680,12 @@ class _EmergencyTreatmentRecordState extends State<EmergencyTreatmentRecord> {
               flex: 3,
               child: _buildFieldWrapper(
                 '急救結果 Result',
-                _buildSegmentedControl(
-                  ['轉診', '死亡', '其它'],
-                  _firstAidResult,
-                  (v) => setState(() => _firstAidResult = v),
-                ),
+                _buildSegmentedControl(['轉診', '死亡', '其它'], _firstAidResult, (
+                  v,
+                ) {
+                  setState(() => _firstAidResult = v);
+                  _saveEmergencyTreatment();
+                }),
               ),
             ),
           ],
@@ -1268,6 +1699,7 @@ class _EmergencyTreatmentRecordState extends State<EmergencyTreatmentRecord> {
             hint: '請輸入急救結束時的總結紀錄...',
             maxLines: 3,
             controller: _endRecordController,
+            onChanged: (_) => _saveEmergencyTreatment(),
           ),
         ),
 
@@ -1278,11 +1710,11 @@ class _EmergencyTreatmentRecordState extends State<EmergencyTreatmentRecord> {
             Expanded(
               child: _buildFieldWrapper(
                 '急救醫師 Doctor',
-                _buildDropdownField(
-                  hint: '選擇醫師',
-                  value: _aidDoctor,
-                  items: const ['醫師 A', '醫師 B', '醫師 C'],
-                  onChanged: (v) => setState(() => _aidDoctor = v),
+                _buildStaffSelection(
+                  '選擇醫師',
+                  _aidDoctor,
+                  doctors,
+                  (staff) => _assignStaff(staff, 'DOCTOR'),
                 ),
               ),
             ),
@@ -1299,11 +1731,11 @@ class _EmergencyTreatmentRecordState extends State<EmergencyTreatmentRecord> {
             Expanded(
               child: _buildFieldWrapper(
                 '急救護理師 Nurse',
-                _buildDropdownField(
-                  hint: '選擇護理師',
-                  value: _aidNurse,
-                  items: const ['護理師 A', '護理師 B'],
-                  onChanged: (v) => setState(() => _aidNurse = v),
+                _buildStaffSelection(
+                  '選擇護理師',
+                  _aidNurse,
+                  nurses,
+                  (staff) => _assignStaff(staff, 'NURSE'),
                 ),
               ),
             ),
@@ -1311,7 +1743,16 @@ class _EmergencyTreatmentRecordState extends State<EmergencyTreatmentRecord> {
             Expanded(
               child: _buildFieldWrapper(
                 '護理師簽名 Nurse Signature',
-                _buildSignaturePad('護理師簽署'),
+                SignatureField(
+                  placeholder: '護理師簽署',
+                  value: _aidNurse?.signature,
+                  onChanged: (data) => _updateSignature(_aidNurse, data),
+                  onTap: _aidNurse == null
+                      ? () => ScaffoldMessenger.of(
+                          context,
+                        ).showSnackBar(const SnackBar(content: Text('請先選擇護理師')))
+                      : null,
+                ),
               ),
             ),
           ],
@@ -1325,11 +1766,11 @@ class _EmergencyTreatmentRecordState extends State<EmergencyTreatmentRecord> {
             Expanded(
               child: _buildFieldWrapper(
                 '急救 EMT',
-                _buildDropdownField(
-                  hint: '選擇 EMT',
-                  value: _aidEmt,
-                  items: const ['EMT A', 'EMT B'],
-                  onChanged: (v) => setState(() => _aidEmt = v),
+                _buildStaffSelection(
+                  '選擇 EMT',
+                  _aidEmt,
+                  emts,
+                  (staff) => _assignStaff(staff, 'EMT'),
                 ),
               ),
             ),
@@ -1337,7 +1778,16 @@ class _EmergencyTreatmentRecordState extends State<EmergencyTreatmentRecord> {
             Expanded(
               child: _buildFieldWrapper(
                 'EMT 簽名 EMT Signature',
-                _buildSignaturePad('EMT 簽署'),
+                SignatureField(
+                  placeholder: 'EMT 簽署',
+                  value: _aidEmt?.signature,
+                  onChanged: (data) => _updateSignature(_aidEmt, data),
+                  onTap: _aidEmt == null
+                      ? () => ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('請先選擇 EMT')),
+                        )
+                      : null,
+                ),
               ),
             ),
           ],
@@ -1359,12 +1809,19 @@ class _EmergencyTreatmentRecordState extends State<EmergencyTreatmentRecord> {
             SizedBox(
               height: 44,
               child: ElevatedButton.icon(
-                onPressed: () {
+                onPressed: () async {
                   if (_assistStaffInputController.text.isNotEmpty) {
-                    setState(() {
-                      _assistStaffList.add(_assistStaffInputController.text);
-                      _assistStaffInputController.clear();
-                    });
+                    await context
+                        .read<AppDatabase>()
+                        .emergencyDao
+                        .addAssistStaff(
+                          EmergencyAssistStaffCompanion.insert(
+                            emergencyTreatmentId: _emergencyTreatment!.id,
+                            name: _assistStaffInputController.text,
+                          ),
+                        );
+                    _assistStaffInputController.clear();
+                    _loadData();
                   }
                 },
                 icon: const Icon(Icons.person_add_alt_1, size: 18),
@@ -1388,9 +1845,9 @@ class _EmergencyTreatmentRecordState extends State<EmergencyTreatmentRecord> {
             runSpacing: 8,
             children: _assistStaffList
                 .map(
-                  (name) => Chip(
+                  (s) => Chip(
                     label: Text(
-                      name,
+                      s.name,
                       style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
@@ -1402,8 +1859,13 @@ class _EmergencyTreatmentRecordState extends State<EmergencyTreatmentRecord> {
                       size: 14,
                       color: Colors.red,
                     ),
-                    onDeleted: () =>
-                        setState(() => _assistStaffList.remove(name)),
+                    onDeleted: () async {
+                      await context
+                          .read<AppDatabase>()
+                          .emergencyDao
+                          .deleteAssistStaff(s.id);
+                      _loadData();
+                    },
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                       side: const BorderSide(color: borderColor),
@@ -1417,31 +1879,155 @@ class _EmergencyTreatmentRecordState extends State<EmergencyTreatmentRecord> {
     );
   }
 
-  Widget _buildSignaturePad(String placeholder) {
-    return Container(
-      height: 44,
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 14),
-      decoration: BoxDecoration(
-        color: bgField,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: borderColor),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(Icons.draw_outlined, size: 16, color: textMuted),
-          const SizedBox(width: 8),
-          Text(
-            placeholder,
-            style: TextStyle(
-              color: textMuted.withValues(alpha: 0.5),
-              fontSize: 12,
-              fontStyle: FontStyle.italic,
+  // --- Staff Logic ---
+
+  Widget _buildStaffSelection(
+    String hint,
+    MedicalStaffAssignmentData? currentAssignment,
+    List<MedicalStaffData> staffList,
+    Function(MedicalStaffData) onSelect,
+  ) {
+    return _buildSelectionField(
+      text: currentAssignment?.staffName ?? '',
+      hint: hint,
+      icon: Icons.person,
+      onTap: () async {
+        final result = await ReferenceSearchSheet.show<MedicalStaffData>(
+          context,
+          title: hint,
+          searchFunction: (query) async {
+            if (query.isEmpty) return staffList;
+            return staffList
+                .where(
+                  (s) =>
+                      s.name.contains(query) ||
+                      (s.employeeId?.contains(query) ?? false),
+                )
+                .toList();
+          },
+          initialSelection: currentAssignment != null
+              ? staffList
+                    .where((s) => s.id == currentAssignment.staffId)
+                    .firstOrNull
+              : null,
+          isSelectedComparator: (a, b) => a.id == b?.id,
+          itemBuilder: (context, item, isSelected) {
+            return ListTile(
+              title: Text(item.name),
+              subtitle: Text(item.employeeId ?? ''),
+              trailing: isSelected ? const Icon(Icons.check) : null,
+            );
+          },
+        );
+
+        if (result != null) {
+          onSelect(result);
+        }
+      },
+    );
+  }
+
+  Widget _buildSelectionField({
+    required String text,
+    required String hint,
+    required IconData icon,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: borderColor),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, size: 18, color: textMuted),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                text.isNotEmpty ? text : hint,
+                style: TextStyle(
+                  color: text.isNotEmpty
+                      ? textDark
+                      : textMuted.withValues(alpha: 0.5),
+                  fontSize: 14,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
-          ),
-        ],
+            const Icon(Icons.arrow_drop_down, color: textMuted),
+          ],
+        ),
       ),
     );
+  }
+
+  Future<void> _assignStaff(MedicalStaffData staff, String roleCode) async {
+    final db = context.read<AppDatabase>();
+
+    // Fetch role ID directly from DB
+    final role = await (db.select(
+      db.medicalStaffRole,
+    )..where((r) => r.code.equals(roleCode))).getSingleOrNull();
+    final roleId = role?.id;
+
+    if (roleId == null) return;
+
+    // Check if assignment exists for this role
+    final existing =
+        await (db.select(db.medicalStaffAssignment)..where(
+              (t) =>
+                  t.medicalId.equals(widget.emergencyId) &
+                  t.staffRoleId.equals(roleId),
+            ))
+            .getSingleOrNull();
+
+    if (existing != null) {
+      await (db.update(db.medicalStaffAssignment)..where(
+            (t) => t.staffAssignmentId.equals(existing.staffAssignmentId),
+          ))
+          .write(
+            MedicalStaffAssignmentCompanion(
+              staffId: drift.Value(staff.id),
+              staffName: drift.Value(staff.name),
+            ),
+          );
+    } else {
+      await db
+          .into(db.medicalStaffAssignment)
+          .insert(
+            MedicalStaffAssignmentCompanion(
+              medicalId: drift.Value(widget.emergencyId),
+              staffRoleId: drift.Value(roleId),
+              staffId: drift.Value(staff.id),
+              staffName: drift.Value(staff.name),
+              isPrimary: drift.Value(true),
+            ),
+          );
+    }
+    _loadData(); // Partial reload, won't overwrite controllers
+  }
+
+  Future<void> _updateSignature(
+    MedicalStaffAssignmentData? assignment,
+    drift.Uint8List? signature,
+  ) async {
+    if (assignment == null) return;
+    final db = context.read<AppDatabase>();
+    await (db.update(db.medicalStaffAssignment)..where(
+          (t) => t.staffAssignmentId.equals(assignment.staffAssignmentId),
+        ))
+        .write(
+          MedicalStaffAssignmentCompanion(
+            signature: drift.Value(signature),
+            signedAt: drift.Value(DateTime.now()),
+          ),
+        );
+    _loadData(); // Partial reload
   }
 }

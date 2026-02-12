@@ -15214,6 +15214,18 @@ class $MedicalAssessmentTable extends MedicalAssessment
       'REFERENCES pupil_reaction_ref (id)',
     ),
   );
+  static const VerificationMeta _leftPupilReactionMeta = const VerificationMeta(
+    'leftPupilReaction',
+  );
+  @override
+  late final GeneratedColumn<String> leftPupilReaction =
+      GeneratedColumn<String>(
+        'left_pupil_reaction',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
   static const VerificationMeta _leftPupilSizeMeta = const VerificationMeta(
     'leftPupilSize',
   );
@@ -15238,6 +15250,17 @@ class $MedicalAssessmentTable extends MedicalAssessment
       'REFERENCES pupil_reaction_ref (id)',
     ),
   );
+  static const VerificationMeta _rightPupilReactionMeta =
+      const VerificationMeta('rightPupilReaction');
+  @override
+  late final GeneratedColumn<String> rightPupilReaction =
+      GeneratedColumn<String>(
+        'right_pupil_reaction',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
   static const VerificationMeta _rightPupilSizeMeta = const VerificationMeta(
     'rightPupilSize',
   );
@@ -15346,8 +15369,10 @@ class $MedicalAssessmentTable extends MedicalAssessment
     gcsM,
     gcsV,
     leftPupilReactionId,
+    leftPupilReaction,
     leftPupilSize,
     rightPupilReactionId,
+    rightPupilReaction,
     rightPupilSize,
     headNeckExam,
     chestExam,
@@ -15473,6 +15498,15 @@ class $MedicalAssessmentTable extends MedicalAssessment
         ),
       );
     }
+    if (data.containsKey('left_pupil_reaction')) {
+      context.handle(
+        _leftPupilReactionMeta,
+        leftPupilReaction.isAcceptableOrUnknown(
+          data['left_pupil_reaction']!,
+          _leftPupilReactionMeta,
+        ),
+      );
+    }
     if (data.containsKey('left_pupil_size')) {
       context.handle(
         _leftPupilSizeMeta,
@@ -15488,6 +15522,15 @@ class $MedicalAssessmentTable extends MedicalAssessment
         rightPupilReactionId.isAcceptableOrUnknown(
           data['right_pupil_reaction_id']!,
           _rightPupilReactionIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('right_pupil_reaction')) {
+      context.handle(
+        _rightPupilReactionMeta,
+        rightPupilReaction.isAcceptableOrUnknown(
+          data['right_pupil_reaction']!,
+          _rightPupilReactionMeta,
         ),
       );
     }
@@ -15626,6 +15669,10 @@ class $MedicalAssessmentTable extends MedicalAssessment
         DriftSqlType.int,
         data['${effectivePrefix}left_pupil_reaction_id'],
       ),
+      leftPupilReaction: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}left_pupil_reaction'],
+      ),
       leftPupilSize: attachedDatabase.typeMapping.read(
         DriftSqlType.double,
         data['${effectivePrefix}left_pupil_size'],
@@ -15633,6 +15680,10 @@ class $MedicalAssessmentTable extends MedicalAssessment
       rightPupilReactionId: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}right_pupil_reaction_id'],
+      ),
+      rightPupilReaction: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}right_pupil_reaction'],
       ),
       rightPupilSize: attachedDatabase.typeMapping.read(
         DriftSqlType.double,
@@ -15692,8 +15743,10 @@ class MedicalAssessmentData extends DataClass
   final String? gcsM;
   final String? gcsV;
   final int? leftPupilReactionId;
+  final String? leftPupilReaction;
   final double? leftPupilSize;
   final int? rightPupilReactionId;
+  final String? rightPupilReaction;
   final double? rightPupilSize;
   final String? headNeckExam;
   final String? chestExam;
@@ -15718,8 +15771,10 @@ class MedicalAssessmentData extends DataClass
     this.gcsM,
     this.gcsV,
     this.leftPupilReactionId,
+    this.leftPupilReaction,
     this.leftPupilSize,
     this.rightPupilReactionId,
+    this.rightPupilReaction,
     this.rightPupilSize,
     this.headNeckExam,
     this.chestExam,
@@ -15773,11 +15828,17 @@ class MedicalAssessmentData extends DataClass
     if (!nullToAbsent || leftPupilReactionId != null) {
       map['left_pupil_reaction_id'] = Variable<int>(leftPupilReactionId);
     }
+    if (!nullToAbsent || leftPupilReaction != null) {
+      map['left_pupil_reaction'] = Variable<String>(leftPupilReaction);
+    }
     if (!nullToAbsent || leftPupilSize != null) {
       map['left_pupil_size'] = Variable<double>(leftPupilSize);
     }
     if (!nullToAbsent || rightPupilReactionId != null) {
       map['right_pupil_reaction_id'] = Variable<int>(rightPupilReactionId);
+    }
+    if (!nullToAbsent || rightPupilReaction != null) {
+      map['right_pupil_reaction'] = Variable<String>(rightPupilReaction);
     }
     if (!nullToAbsent || rightPupilSize != null) {
       map['right_pupil_size'] = Variable<double>(rightPupilSize);
@@ -15837,12 +15898,18 @@ class MedicalAssessmentData extends DataClass
       leftPupilReactionId: leftPupilReactionId == null && nullToAbsent
           ? const Value.absent()
           : Value(leftPupilReactionId),
+      leftPupilReaction: leftPupilReaction == null && nullToAbsent
+          ? const Value.absent()
+          : Value(leftPupilReaction),
       leftPupilSize: leftPupilSize == null && nullToAbsent
           ? const Value.absent()
           : Value(leftPupilSize),
       rightPupilReactionId: rightPupilReactionId == null && nullToAbsent
           ? const Value.absent()
           : Value(rightPupilReactionId),
+      rightPupilReaction: rightPupilReaction == null && nullToAbsent
+          ? const Value.absent()
+          : Value(rightPupilReaction),
       rightPupilSize: rightPupilSize == null && nullToAbsent
           ? const Value.absent()
           : Value(rightPupilSize),
@@ -15893,9 +15960,15 @@ class MedicalAssessmentData extends DataClass
       leftPupilReactionId: serializer.fromJson<int?>(
         json['leftPupilReactionId'],
       ),
+      leftPupilReaction: serializer.fromJson<String?>(
+        json['leftPupilReaction'],
+      ),
       leftPupilSize: serializer.fromJson<double?>(json['leftPupilSize']),
       rightPupilReactionId: serializer.fromJson<int?>(
         json['rightPupilReactionId'],
+      ),
+      rightPupilReaction: serializer.fromJson<String?>(
+        json['rightPupilReaction'],
       ),
       rightPupilSize: serializer.fromJson<double?>(json['rightPupilSize']),
       headNeckExam: serializer.fromJson<String?>(json['headNeckExam']),
@@ -15928,8 +16001,10 @@ class MedicalAssessmentData extends DataClass
       'gcsM': serializer.toJson<String?>(gcsM),
       'gcsV': serializer.toJson<String?>(gcsV),
       'leftPupilReactionId': serializer.toJson<int?>(leftPupilReactionId),
+      'leftPupilReaction': serializer.toJson<String?>(leftPupilReaction),
       'leftPupilSize': serializer.toJson<double?>(leftPupilSize),
       'rightPupilReactionId': serializer.toJson<int?>(rightPupilReactionId),
+      'rightPupilReaction': serializer.toJson<String?>(rightPupilReaction),
       'rightPupilSize': serializer.toJson<double?>(rightPupilSize),
       'headNeckExam': serializer.toJson<String?>(headNeckExam),
       'chestExam': serializer.toJson<String?>(chestExam),
@@ -15957,8 +16032,10 @@ class MedicalAssessmentData extends DataClass
     Value<String?> gcsM = const Value.absent(),
     Value<String?> gcsV = const Value.absent(),
     Value<int?> leftPupilReactionId = const Value.absent(),
+    Value<String?> leftPupilReaction = const Value.absent(),
     Value<double?> leftPupilSize = const Value.absent(),
     Value<int?> rightPupilReactionId = const Value.absent(),
+    Value<String?> rightPupilReaction = const Value.absent(),
     Value<double?> rightPupilSize = const Value.absent(),
     Value<String?> headNeckExam = const Value.absent(),
     Value<String?> chestExam = const Value.absent(),
@@ -15987,12 +16064,18 @@ class MedicalAssessmentData extends DataClass
     leftPupilReactionId: leftPupilReactionId.present
         ? leftPupilReactionId.value
         : this.leftPupilReactionId,
+    leftPupilReaction: leftPupilReaction.present
+        ? leftPupilReaction.value
+        : this.leftPupilReaction,
     leftPupilSize: leftPupilSize.present
         ? leftPupilSize.value
         : this.leftPupilSize,
     rightPupilReactionId: rightPupilReactionId.present
         ? rightPupilReactionId.value
         : this.rightPupilReactionId,
+    rightPupilReaction: rightPupilReaction.present
+        ? rightPupilReaction.value
+        : this.rightPupilReaction,
     rightPupilSize: rightPupilSize.present
         ? rightPupilSize.value
         : this.rightPupilSize,
@@ -16033,12 +16116,18 @@ class MedicalAssessmentData extends DataClass
       leftPupilReactionId: data.leftPupilReactionId.present
           ? data.leftPupilReactionId.value
           : this.leftPupilReactionId,
+      leftPupilReaction: data.leftPupilReaction.present
+          ? data.leftPupilReaction.value
+          : this.leftPupilReaction,
       leftPupilSize: data.leftPupilSize.present
           ? data.leftPupilSize.value
           : this.leftPupilSize,
       rightPupilReactionId: data.rightPupilReactionId.present
           ? data.rightPupilReactionId.value
           : this.rightPupilReactionId,
+      rightPupilReaction: data.rightPupilReaction.present
+          ? data.rightPupilReaction.value
+          : this.rightPupilReaction,
       rightPupilSize: data.rightPupilSize.present
           ? data.rightPupilSize.value
           : this.rightPupilSize,
@@ -16080,8 +16169,10 @@ class MedicalAssessmentData extends DataClass
           ..write('gcsM: $gcsM, ')
           ..write('gcsV: $gcsV, ')
           ..write('leftPupilReactionId: $leftPupilReactionId, ')
+          ..write('leftPupilReaction: $leftPupilReaction, ')
           ..write('leftPupilSize: $leftPupilSize, ')
           ..write('rightPupilReactionId: $rightPupilReactionId, ')
+          ..write('rightPupilReaction: $rightPupilReaction, ')
           ..write('rightPupilSize: $rightPupilSize, ')
           ..write('headNeckExam: $headNeckExam, ')
           ..write('chestExam: $chestExam, ')
@@ -16111,8 +16202,10 @@ class MedicalAssessmentData extends DataClass
     gcsM,
     gcsV,
     leftPupilReactionId,
+    leftPupilReaction,
     leftPupilSize,
     rightPupilReactionId,
+    rightPupilReaction,
     rightPupilSize,
     headNeckExam,
     chestExam,
@@ -16141,8 +16234,10 @@ class MedicalAssessmentData extends DataClass
           other.gcsM == this.gcsM &&
           other.gcsV == this.gcsV &&
           other.leftPupilReactionId == this.leftPupilReactionId &&
+          other.leftPupilReaction == this.leftPupilReaction &&
           other.leftPupilSize == this.leftPupilSize &&
           other.rightPupilReactionId == this.rightPupilReactionId &&
+          other.rightPupilReaction == this.rightPupilReaction &&
           other.rightPupilSize == this.rightPupilSize &&
           other.headNeckExam == this.headNeckExam &&
           other.chestExam == this.chestExam &&
@@ -16170,8 +16265,10 @@ class MedicalAssessmentCompanion
   final Value<String?> gcsM;
   final Value<String?> gcsV;
   final Value<int?> leftPupilReactionId;
+  final Value<String?> leftPupilReaction;
   final Value<double?> leftPupilSize;
   final Value<int?> rightPupilReactionId;
+  final Value<String?> rightPupilReaction;
   final Value<double?> rightPupilSize;
   final Value<String?> headNeckExam;
   final Value<String?> chestExam;
@@ -16196,8 +16293,10 @@ class MedicalAssessmentCompanion
     this.gcsM = const Value.absent(),
     this.gcsV = const Value.absent(),
     this.leftPupilReactionId = const Value.absent(),
+    this.leftPupilReaction = const Value.absent(),
     this.leftPupilSize = const Value.absent(),
     this.rightPupilReactionId = const Value.absent(),
+    this.rightPupilReaction = const Value.absent(),
     this.rightPupilSize = const Value.absent(),
     this.headNeckExam = const Value.absent(),
     this.chestExam = const Value.absent(),
@@ -16223,8 +16322,10 @@ class MedicalAssessmentCompanion
     this.gcsM = const Value.absent(),
     this.gcsV = const Value.absent(),
     this.leftPupilReactionId = const Value.absent(),
+    this.leftPupilReaction = const Value.absent(),
     this.leftPupilSize = const Value.absent(),
     this.rightPupilReactionId = const Value.absent(),
+    this.rightPupilReaction = const Value.absent(),
     this.rightPupilSize = const Value.absent(),
     this.headNeckExam = const Value.absent(),
     this.chestExam = const Value.absent(),
@@ -16250,8 +16351,10 @@ class MedicalAssessmentCompanion
     Expression<String>? gcsM,
     Expression<String>? gcsV,
     Expression<int>? leftPupilReactionId,
+    Expression<String>? leftPupilReaction,
     Expression<double>? leftPupilSize,
     Expression<int>? rightPupilReactionId,
+    Expression<String>? rightPupilReaction,
     Expression<double>? rightPupilSize,
     Expression<String>? headNeckExam,
     Expression<String>? chestExam,
@@ -16279,9 +16382,12 @@ class MedicalAssessmentCompanion
       if (gcsV != null) 'gcs_v': gcsV,
       if (leftPupilReactionId != null)
         'left_pupil_reaction_id': leftPupilReactionId,
+      if (leftPupilReaction != null) 'left_pupil_reaction': leftPupilReaction,
       if (leftPupilSize != null) 'left_pupil_size': leftPupilSize,
       if (rightPupilReactionId != null)
         'right_pupil_reaction_id': rightPupilReactionId,
+      if (rightPupilReaction != null)
+        'right_pupil_reaction': rightPupilReaction,
       if (rightPupilSize != null) 'right_pupil_size': rightPupilSize,
       if (headNeckExam != null) 'head_neck_exam': headNeckExam,
       if (chestExam != null) 'chest_exam': chestExam,
@@ -16309,8 +16415,10 @@ class MedicalAssessmentCompanion
     Value<String?>? gcsM,
     Value<String?>? gcsV,
     Value<int?>? leftPupilReactionId,
+    Value<String?>? leftPupilReaction,
     Value<double?>? leftPupilSize,
     Value<int?>? rightPupilReactionId,
+    Value<String?>? rightPupilReaction,
     Value<double?>? rightPupilSize,
     Value<String?>? headNeckExam,
     Value<String?>? chestExam,
@@ -16336,8 +16444,10 @@ class MedicalAssessmentCompanion
       gcsM: gcsM ?? this.gcsM,
       gcsV: gcsV ?? this.gcsV,
       leftPupilReactionId: leftPupilReactionId ?? this.leftPupilReactionId,
+      leftPupilReaction: leftPupilReaction ?? this.leftPupilReaction,
       leftPupilSize: leftPupilSize ?? this.leftPupilSize,
       rightPupilReactionId: rightPupilReactionId ?? this.rightPupilReactionId,
+      rightPupilReaction: rightPupilReaction ?? this.rightPupilReaction,
       rightPupilSize: rightPupilSize ?? this.rightPupilSize,
       headNeckExam: headNeckExam ?? this.headNeckExam,
       chestExam: chestExam ?? this.chestExam,
@@ -16397,6 +16507,9 @@ class MedicalAssessmentCompanion
     if (leftPupilReactionId.present) {
       map['left_pupil_reaction_id'] = Variable<int>(leftPupilReactionId.value);
     }
+    if (leftPupilReaction.present) {
+      map['left_pupil_reaction'] = Variable<String>(leftPupilReaction.value);
+    }
     if (leftPupilSize.present) {
       map['left_pupil_size'] = Variable<double>(leftPupilSize.value);
     }
@@ -16404,6 +16517,9 @@ class MedicalAssessmentCompanion
       map['right_pupil_reaction_id'] = Variable<int>(
         rightPupilReactionId.value,
       );
+    }
+    if (rightPupilReaction.present) {
+      map['right_pupil_reaction'] = Variable<String>(rightPupilReaction.value);
     }
     if (rightPupilSize.present) {
       map['right_pupil_size'] = Variable<double>(rightPupilSize.value);
@@ -16450,8 +16566,10 @@ class MedicalAssessmentCompanion
           ..write('gcsM: $gcsM, ')
           ..write('gcsV: $gcsV, ')
           ..write('leftPupilReactionId: $leftPupilReactionId, ')
+          ..write('leftPupilReaction: $leftPupilReaction, ')
           ..write('leftPupilSize: $leftPupilSize, ')
           ..write('rightPupilReactionId: $rightPupilReactionId, ')
+          ..write('rightPupilReaction: $rightPupilReaction, ')
           ..write('rightPupilSize: $rightPupilSize, ')
           ..write('headNeckExam: $headNeckExam, ')
           ..write('chestExam: $chestExam, ')
@@ -33566,6 +33684,2408 @@ class AmbulanceEscortStaffCompanion
   }
 }
 
+class $EmergencyTreatmentTable extends EmergencyTreatment
+    with TableInfo<$EmergencyTreatmentTable, EmergencyTreatmentData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $EmergencyTreatmentTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _medicalIdMeta = const VerificationMeta(
+    'medicalId',
+  );
+  @override
+  late final GeneratedColumn<int> medicalId = GeneratedColumn<int>(
+    'medical_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'UNIQUE REFERENCES medical_record (medical_id)',
+    ),
+  );
+  static const VerificationMeta _startTimeMeta = const VerificationMeta(
+    'startTime',
+  );
+  @override
+  late final GeneratedColumn<DateTime> startTime = GeneratedColumn<DateTime>(
+    'start_time',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _diagnosisMeta = const VerificationMeta(
+    'diagnosis',
+  );
+  @override
+  late final GeneratedColumn<String> diagnosis = GeneratedColumn<String>(
+    'diagnosis',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _incidentContextMeta = const VerificationMeta(
+    'incidentContext',
+  );
+  @override
+  late final GeneratedColumn<String> incidentContext = GeneratedColumn<String>(
+    'incident_context',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _initialAssessmentIdMeta =
+      const VerificationMeta('initialAssessmentId');
+  @override
+  late final GeneratedColumn<int> initialAssessmentId = GeneratedColumn<int>(
+    'initial_assessment_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES medical_assessment (assessment_id)',
+    ),
+  );
+  static const VerificationMeta _postAssessmentIdMeta = const VerificationMeta(
+    'postAssessmentId',
+  );
+  @override
+  late final GeneratedColumn<int> postAssessmentId = GeneratedColumn<int>(
+    'post_assessment_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES medical_assessment (assessment_id)',
+    ),
+  );
+  static const VerificationMeta _intubationStartTimeMeta =
+      const VerificationMeta('intubationStartTime');
+  @override
+  late final GeneratedColumn<DateTime> intubationStartTime =
+      GeneratedColumn<DateTime>(
+        'intubation_start_time',
+        aliasedName,
+        true,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _intubationMethodMeta = const VerificationMeta(
+    'intubationMethod',
+  );
+  @override
+  late final GeneratedColumn<String> intubationMethod = GeneratedColumn<String>(
+    'intubation_method',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _intubationSizeMeta = const VerificationMeta(
+    'intubationSize',
+  );
+  @override
+  late final GeneratedColumn<String> intubationSize = GeneratedColumn<String>(
+    'intubation_size',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _intubationNotesMeta = const VerificationMeta(
+    'intubationNotes',
+  );
+  @override
+  late final GeneratedColumn<String> intubationNotes = GeneratedColumn<String>(
+    'intubation_notes',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _ivLineStartTimeMeta = const VerificationMeta(
+    'ivLineStartTime',
+  );
+  @override
+  late final GeneratedColumn<DateTime> ivLineStartTime =
+      GeneratedColumn<DateTime>(
+        'iv_line_start_time',
+        aliasedName,
+        true,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _ivLineSizeMeta = const VerificationMeta(
+    'ivLineSize',
+  );
+  @override
+  late final GeneratedColumn<String> ivLineSize = GeneratedColumn<String>(
+    'iv_line_size',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _ivLineNotesMeta = const VerificationMeta(
+    'ivLineNotes',
+  );
+  @override
+  late final GeneratedColumn<String> ivLineNotes = GeneratedColumn<String>(
+    'iv_line_notes',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _cprStartTimeMeta = const VerificationMeta(
+    'cprStartTime',
+  );
+  @override
+  late final GeneratedColumn<DateTime> cprStartTime = GeneratedColumn<DateTime>(
+    'cpr_start_time',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _cprEndTimeMeta = const VerificationMeta(
+    'cprEndTime',
+  );
+  @override
+  late final GeneratedColumn<DateTime> cprEndTime = GeneratedColumn<DateTime>(
+    'cpr_end_time',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _cprNotesMeta = const VerificationMeta(
+    'cprNotes',
+  );
+  @override
+  late final GeneratedColumn<String> cprNotes = GeneratedColumn<String>(
+    'cpr_notes',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _postRespirationModeMeta =
+      const VerificationMeta('postRespirationMode');
+  @override
+  late final GeneratedColumn<String> postRespirationMode =
+      GeneratedColumn<String>(
+        'post_respiration_mode',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _postRespirationOthersMeta =
+      const VerificationMeta('postRespirationOthers');
+  @override
+  late final GeneratedColumn<String> postRespirationOthers =
+      GeneratedColumn<String>(
+        'post_respiration_others',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _endTimeMeta = const VerificationMeta(
+    'endTime',
+  );
+  @override
+  late final GeneratedColumn<DateTime> endTime = GeneratedColumn<DateTime>(
+    'end_time',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _resultMeta = const VerificationMeta('result');
+  @override
+  late final GeneratedColumn<String> result = GeneratedColumn<String>(
+    'result',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _endCareNotesMeta = const VerificationMeta(
+    'endCareNotes',
+  );
+  @override
+  late final GeneratedColumn<String> endCareNotes = GeneratedColumn<String>(
+    'end_care_notes',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _directorNameMeta = const VerificationMeta(
+    'directorName',
+  );
+  @override
+  late final GeneratedColumn<String> directorName = GeneratedColumn<String>(
+    'director_name',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    medicalId,
+    startTime,
+    diagnosis,
+    incidentContext,
+    initialAssessmentId,
+    postAssessmentId,
+    intubationStartTime,
+    intubationMethod,
+    intubationSize,
+    intubationNotes,
+    ivLineStartTime,
+    ivLineSize,
+    ivLineNotes,
+    cprStartTime,
+    cprEndTime,
+    cprNotes,
+    postRespirationMode,
+    postRespirationOthers,
+    endTime,
+    result,
+    endCareNotes,
+    directorName,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'emergency_treatment';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<EmergencyTreatmentData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('medical_id')) {
+      context.handle(
+        _medicalIdMeta,
+        medicalId.isAcceptableOrUnknown(data['medical_id']!, _medicalIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_medicalIdMeta);
+    }
+    if (data.containsKey('start_time')) {
+      context.handle(
+        _startTimeMeta,
+        startTime.isAcceptableOrUnknown(data['start_time']!, _startTimeMeta),
+      );
+    }
+    if (data.containsKey('diagnosis')) {
+      context.handle(
+        _diagnosisMeta,
+        diagnosis.isAcceptableOrUnknown(data['diagnosis']!, _diagnosisMeta),
+      );
+    }
+    if (data.containsKey('incident_context')) {
+      context.handle(
+        _incidentContextMeta,
+        incidentContext.isAcceptableOrUnknown(
+          data['incident_context']!,
+          _incidentContextMeta,
+        ),
+      );
+    }
+    if (data.containsKey('initial_assessment_id')) {
+      context.handle(
+        _initialAssessmentIdMeta,
+        initialAssessmentId.isAcceptableOrUnknown(
+          data['initial_assessment_id']!,
+          _initialAssessmentIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('post_assessment_id')) {
+      context.handle(
+        _postAssessmentIdMeta,
+        postAssessmentId.isAcceptableOrUnknown(
+          data['post_assessment_id']!,
+          _postAssessmentIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('intubation_start_time')) {
+      context.handle(
+        _intubationStartTimeMeta,
+        intubationStartTime.isAcceptableOrUnknown(
+          data['intubation_start_time']!,
+          _intubationStartTimeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('intubation_method')) {
+      context.handle(
+        _intubationMethodMeta,
+        intubationMethod.isAcceptableOrUnknown(
+          data['intubation_method']!,
+          _intubationMethodMeta,
+        ),
+      );
+    }
+    if (data.containsKey('intubation_size')) {
+      context.handle(
+        _intubationSizeMeta,
+        intubationSize.isAcceptableOrUnknown(
+          data['intubation_size']!,
+          _intubationSizeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('intubation_notes')) {
+      context.handle(
+        _intubationNotesMeta,
+        intubationNotes.isAcceptableOrUnknown(
+          data['intubation_notes']!,
+          _intubationNotesMeta,
+        ),
+      );
+    }
+    if (data.containsKey('iv_line_start_time')) {
+      context.handle(
+        _ivLineStartTimeMeta,
+        ivLineStartTime.isAcceptableOrUnknown(
+          data['iv_line_start_time']!,
+          _ivLineStartTimeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('iv_line_size')) {
+      context.handle(
+        _ivLineSizeMeta,
+        ivLineSize.isAcceptableOrUnknown(
+          data['iv_line_size']!,
+          _ivLineSizeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('iv_line_notes')) {
+      context.handle(
+        _ivLineNotesMeta,
+        ivLineNotes.isAcceptableOrUnknown(
+          data['iv_line_notes']!,
+          _ivLineNotesMeta,
+        ),
+      );
+    }
+    if (data.containsKey('cpr_start_time')) {
+      context.handle(
+        _cprStartTimeMeta,
+        cprStartTime.isAcceptableOrUnknown(
+          data['cpr_start_time']!,
+          _cprStartTimeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('cpr_end_time')) {
+      context.handle(
+        _cprEndTimeMeta,
+        cprEndTime.isAcceptableOrUnknown(
+          data['cpr_end_time']!,
+          _cprEndTimeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('cpr_notes')) {
+      context.handle(
+        _cprNotesMeta,
+        cprNotes.isAcceptableOrUnknown(data['cpr_notes']!, _cprNotesMeta),
+      );
+    }
+    if (data.containsKey('post_respiration_mode')) {
+      context.handle(
+        _postRespirationModeMeta,
+        postRespirationMode.isAcceptableOrUnknown(
+          data['post_respiration_mode']!,
+          _postRespirationModeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('post_respiration_others')) {
+      context.handle(
+        _postRespirationOthersMeta,
+        postRespirationOthers.isAcceptableOrUnknown(
+          data['post_respiration_others']!,
+          _postRespirationOthersMeta,
+        ),
+      );
+    }
+    if (data.containsKey('end_time')) {
+      context.handle(
+        _endTimeMeta,
+        endTime.isAcceptableOrUnknown(data['end_time']!, _endTimeMeta),
+      );
+    }
+    if (data.containsKey('result')) {
+      context.handle(
+        _resultMeta,
+        result.isAcceptableOrUnknown(data['result']!, _resultMeta),
+      );
+    }
+    if (data.containsKey('end_care_notes')) {
+      context.handle(
+        _endCareNotesMeta,
+        endCareNotes.isAcceptableOrUnknown(
+          data['end_care_notes']!,
+          _endCareNotesMeta,
+        ),
+      );
+    }
+    if (data.containsKey('director_name')) {
+      context.handle(
+        _directorNameMeta,
+        directorName.isAcceptableOrUnknown(
+          data['director_name']!,
+          _directorNameMeta,
+        ),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  EmergencyTreatmentData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return EmergencyTreatmentData(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      medicalId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}medical_id'],
+      )!,
+      startTime: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}start_time'],
+      ),
+      diagnosis: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}diagnosis'],
+      ),
+      incidentContext: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}incident_context'],
+      ),
+      initialAssessmentId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}initial_assessment_id'],
+      ),
+      postAssessmentId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}post_assessment_id'],
+      ),
+      intubationStartTime: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}intubation_start_time'],
+      ),
+      intubationMethod: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}intubation_method'],
+      ),
+      intubationSize: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}intubation_size'],
+      ),
+      intubationNotes: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}intubation_notes'],
+      ),
+      ivLineStartTime: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}iv_line_start_time'],
+      ),
+      ivLineSize: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}iv_line_size'],
+      ),
+      ivLineNotes: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}iv_line_notes'],
+      ),
+      cprStartTime: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}cpr_start_time'],
+      ),
+      cprEndTime: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}cpr_end_time'],
+      ),
+      cprNotes: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}cpr_notes'],
+      ),
+      postRespirationMode: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}post_respiration_mode'],
+      ),
+      postRespirationOthers: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}post_respiration_others'],
+      ),
+      endTime: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}end_time'],
+      ),
+      result: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}result'],
+      ),
+      endCareNotes: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}end_care_notes'],
+      ),
+      directorName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}director_name'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $EmergencyTreatmentTable createAlias(String alias) {
+    return $EmergencyTreatmentTable(attachedDatabase, alias);
+  }
+}
+
+class EmergencyTreatmentData extends DataClass
+    implements Insertable<EmergencyTreatmentData> {
+  final int id;
+  final int medicalId;
+  final DateTime? startTime;
+  final String? diagnosis;
+  final String? incidentContext;
+  final int? initialAssessmentId;
+  final int? postAssessmentId;
+  final DateTime? intubationStartTime;
+  final String? intubationMethod;
+  final String? intubationSize;
+  final String? intubationNotes;
+  final DateTime? ivLineStartTime;
+  final String? ivLineSize;
+  final String? ivLineNotes;
+  final DateTime? cprStartTime;
+  final DateTime? cprEndTime;
+  final String? cprNotes;
+  final String? postRespirationMode;
+  final String? postRespirationOthers;
+  final DateTime? endTime;
+  final String? result;
+  final String? endCareNotes;
+  final String? directorName;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  const EmergencyTreatmentData({
+    required this.id,
+    required this.medicalId,
+    this.startTime,
+    this.diagnosis,
+    this.incidentContext,
+    this.initialAssessmentId,
+    this.postAssessmentId,
+    this.intubationStartTime,
+    this.intubationMethod,
+    this.intubationSize,
+    this.intubationNotes,
+    this.ivLineStartTime,
+    this.ivLineSize,
+    this.ivLineNotes,
+    this.cprStartTime,
+    this.cprEndTime,
+    this.cprNotes,
+    this.postRespirationMode,
+    this.postRespirationOthers,
+    this.endTime,
+    this.result,
+    this.endCareNotes,
+    this.directorName,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['medical_id'] = Variable<int>(medicalId);
+    if (!nullToAbsent || startTime != null) {
+      map['start_time'] = Variable<DateTime>(startTime);
+    }
+    if (!nullToAbsent || diagnosis != null) {
+      map['diagnosis'] = Variable<String>(diagnosis);
+    }
+    if (!nullToAbsent || incidentContext != null) {
+      map['incident_context'] = Variable<String>(incidentContext);
+    }
+    if (!nullToAbsent || initialAssessmentId != null) {
+      map['initial_assessment_id'] = Variable<int>(initialAssessmentId);
+    }
+    if (!nullToAbsent || postAssessmentId != null) {
+      map['post_assessment_id'] = Variable<int>(postAssessmentId);
+    }
+    if (!nullToAbsent || intubationStartTime != null) {
+      map['intubation_start_time'] = Variable<DateTime>(intubationStartTime);
+    }
+    if (!nullToAbsent || intubationMethod != null) {
+      map['intubation_method'] = Variable<String>(intubationMethod);
+    }
+    if (!nullToAbsent || intubationSize != null) {
+      map['intubation_size'] = Variable<String>(intubationSize);
+    }
+    if (!nullToAbsent || intubationNotes != null) {
+      map['intubation_notes'] = Variable<String>(intubationNotes);
+    }
+    if (!nullToAbsent || ivLineStartTime != null) {
+      map['iv_line_start_time'] = Variable<DateTime>(ivLineStartTime);
+    }
+    if (!nullToAbsent || ivLineSize != null) {
+      map['iv_line_size'] = Variable<String>(ivLineSize);
+    }
+    if (!nullToAbsent || ivLineNotes != null) {
+      map['iv_line_notes'] = Variable<String>(ivLineNotes);
+    }
+    if (!nullToAbsent || cprStartTime != null) {
+      map['cpr_start_time'] = Variable<DateTime>(cprStartTime);
+    }
+    if (!nullToAbsent || cprEndTime != null) {
+      map['cpr_end_time'] = Variable<DateTime>(cprEndTime);
+    }
+    if (!nullToAbsent || cprNotes != null) {
+      map['cpr_notes'] = Variable<String>(cprNotes);
+    }
+    if (!nullToAbsent || postRespirationMode != null) {
+      map['post_respiration_mode'] = Variable<String>(postRespirationMode);
+    }
+    if (!nullToAbsent || postRespirationOthers != null) {
+      map['post_respiration_others'] = Variable<String>(postRespirationOthers);
+    }
+    if (!nullToAbsent || endTime != null) {
+      map['end_time'] = Variable<DateTime>(endTime);
+    }
+    if (!nullToAbsent || result != null) {
+      map['result'] = Variable<String>(result);
+    }
+    if (!nullToAbsent || endCareNotes != null) {
+      map['end_care_notes'] = Variable<String>(endCareNotes);
+    }
+    if (!nullToAbsent || directorName != null) {
+      map['director_name'] = Variable<String>(directorName);
+    }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  EmergencyTreatmentCompanion toCompanion(bool nullToAbsent) {
+    return EmergencyTreatmentCompanion(
+      id: Value(id),
+      medicalId: Value(medicalId),
+      startTime: startTime == null && nullToAbsent
+          ? const Value.absent()
+          : Value(startTime),
+      diagnosis: diagnosis == null && nullToAbsent
+          ? const Value.absent()
+          : Value(diagnosis),
+      incidentContext: incidentContext == null && nullToAbsent
+          ? const Value.absent()
+          : Value(incidentContext),
+      initialAssessmentId: initialAssessmentId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(initialAssessmentId),
+      postAssessmentId: postAssessmentId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(postAssessmentId),
+      intubationStartTime: intubationStartTime == null && nullToAbsent
+          ? const Value.absent()
+          : Value(intubationStartTime),
+      intubationMethod: intubationMethod == null && nullToAbsent
+          ? const Value.absent()
+          : Value(intubationMethod),
+      intubationSize: intubationSize == null && nullToAbsent
+          ? const Value.absent()
+          : Value(intubationSize),
+      intubationNotes: intubationNotes == null && nullToAbsent
+          ? const Value.absent()
+          : Value(intubationNotes),
+      ivLineStartTime: ivLineStartTime == null && nullToAbsent
+          ? const Value.absent()
+          : Value(ivLineStartTime),
+      ivLineSize: ivLineSize == null && nullToAbsent
+          ? const Value.absent()
+          : Value(ivLineSize),
+      ivLineNotes: ivLineNotes == null && nullToAbsent
+          ? const Value.absent()
+          : Value(ivLineNotes),
+      cprStartTime: cprStartTime == null && nullToAbsent
+          ? const Value.absent()
+          : Value(cprStartTime),
+      cprEndTime: cprEndTime == null && nullToAbsent
+          ? const Value.absent()
+          : Value(cprEndTime),
+      cprNotes: cprNotes == null && nullToAbsent
+          ? const Value.absent()
+          : Value(cprNotes),
+      postRespirationMode: postRespirationMode == null && nullToAbsent
+          ? const Value.absent()
+          : Value(postRespirationMode),
+      postRespirationOthers: postRespirationOthers == null && nullToAbsent
+          ? const Value.absent()
+          : Value(postRespirationOthers),
+      endTime: endTime == null && nullToAbsent
+          ? const Value.absent()
+          : Value(endTime),
+      result: result == null && nullToAbsent
+          ? const Value.absent()
+          : Value(result),
+      endCareNotes: endCareNotes == null && nullToAbsent
+          ? const Value.absent()
+          : Value(endCareNotes),
+      directorName: directorName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(directorName),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory EmergencyTreatmentData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return EmergencyTreatmentData(
+      id: serializer.fromJson<int>(json['id']),
+      medicalId: serializer.fromJson<int>(json['medicalId']),
+      startTime: serializer.fromJson<DateTime?>(json['startTime']),
+      diagnosis: serializer.fromJson<String?>(json['diagnosis']),
+      incidentContext: serializer.fromJson<String?>(json['incidentContext']),
+      initialAssessmentId: serializer.fromJson<int?>(
+        json['initialAssessmentId'],
+      ),
+      postAssessmentId: serializer.fromJson<int?>(json['postAssessmentId']),
+      intubationStartTime: serializer.fromJson<DateTime?>(
+        json['intubationStartTime'],
+      ),
+      intubationMethod: serializer.fromJson<String?>(json['intubationMethod']),
+      intubationSize: serializer.fromJson<String?>(json['intubationSize']),
+      intubationNotes: serializer.fromJson<String?>(json['intubationNotes']),
+      ivLineStartTime: serializer.fromJson<DateTime?>(json['ivLineStartTime']),
+      ivLineSize: serializer.fromJson<String?>(json['ivLineSize']),
+      ivLineNotes: serializer.fromJson<String?>(json['ivLineNotes']),
+      cprStartTime: serializer.fromJson<DateTime?>(json['cprStartTime']),
+      cprEndTime: serializer.fromJson<DateTime?>(json['cprEndTime']),
+      cprNotes: serializer.fromJson<String?>(json['cprNotes']),
+      postRespirationMode: serializer.fromJson<String?>(
+        json['postRespirationMode'],
+      ),
+      postRespirationOthers: serializer.fromJson<String?>(
+        json['postRespirationOthers'],
+      ),
+      endTime: serializer.fromJson<DateTime?>(json['endTime']),
+      result: serializer.fromJson<String?>(json['result']),
+      endCareNotes: serializer.fromJson<String?>(json['endCareNotes']),
+      directorName: serializer.fromJson<String?>(json['directorName']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'medicalId': serializer.toJson<int>(medicalId),
+      'startTime': serializer.toJson<DateTime?>(startTime),
+      'diagnosis': serializer.toJson<String?>(diagnosis),
+      'incidentContext': serializer.toJson<String?>(incidentContext),
+      'initialAssessmentId': serializer.toJson<int?>(initialAssessmentId),
+      'postAssessmentId': serializer.toJson<int?>(postAssessmentId),
+      'intubationStartTime': serializer.toJson<DateTime?>(intubationStartTime),
+      'intubationMethod': serializer.toJson<String?>(intubationMethod),
+      'intubationSize': serializer.toJson<String?>(intubationSize),
+      'intubationNotes': serializer.toJson<String?>(intubationNotes),
+      'ivLineStartTime': serializer.toJson<DateTime?>(ivLineStartTime),
+      'ivLineSize': serializer.toJson<String?>(ivLineSize),
+      'ivLineNotes': serializer.toJson<String?>(ivLineNotes),
+      'cprStartTime': serializer.toJson<DateTime?>(cprStartTime),
+      'cprEndTime': serializer.toJson<DateTime?>(cprEndTime),
+      'cprNotes': serializer.toJson<String?>(cprNotes),
+      'postRespirationMode': serializer.toJson<String?>(postRespirationMode),
+      'postRespirationOthers': serializer.toJson<String?>(
+        postRespirationOthers,
+      ),
+      'endTime': serializer.toJson<DateTime?>(endTime),
+      'result': serializer.toJson<String?>(result),
+      'endCareNotes': serializer.toJson<String?>(endCareNotes),
+      'directorName': serializer.toJson<String?>(directorName),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  EmergencyTreatmentData copyWith({
+    int? id,
+    int? medicalId,
+    Value<DateTime?> startTime = const Value.absent(),
+    Value<String?> diagnosis = const Value.absent(),
+    Value<String?> incidentContext = const Value.absent(),
+    Value<int?> initialAssessmentId = const Value.absent(),
+    Value<int?> postAssessmentId = const Value.absent(),
+    Value<DateTime?> intubationStartTime = const Value.absent(),
+    Value<String?> intubationMethod = const Value.absent(),
+    Value<String?> intubationSize = const Value.absent(),
+    Value<String?> intubationNotes = const Value.absent(),
+    Value<DateTime?> ivLineStartTime = const Value.absent(),
+    Value<String?> ivLineSize = const Value.absent(),
+    Value<String?> ivLineNotes = const Value.absent(),
+    Value<DateTime?> cprStartTime = const Value.absent(),
+    Value<DateTime?> cprEndTime = const Value.absent(),
+    Value<String?> cprNotes = const Value.absent(),
+    Value<String?> postRespirationMode = const Value.absent(),
+    Value<String?> postRespirationOthers = const Value.absent(),
+    Value<DateTime?> endTime = const Value.absent(),
+    Value<String?> result = const Value.absent(),
+    Value<String?> endCareNotes = const Value.absent(),
+    Value<String?> directorName = const Value.absent(),
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) => EmergencyTreatmentData(
+    id: id ?? this.id,
+    medicalId: medicalId ?? this.medicalId,
+    startTime: startTime.present ? startTime.value : this.startTime,
+    diagnosis: diagnosis.present ? diagnosis.value : this.diagnosis,
+    incidentContext: incidentContext.present
+        ? incidentContext.value
+        : this.incidentContext,
+    initialAssessmentId: initialAssessmentId.present
+        ? initialAssessmentId.value
+        : this.initialAssessmentId,
+    postAssessmentId: postAssessmentId.present
+        ? postAssessmentId.value
+        : this.postAssessmentId,
+    intubationStartTime: intubationStartTime.present
+        ? intubationStartTime.value
+        : this.intubationStartTime,
+    intubationMethod: intubationMethod.present
+        ? intubationMethod.value
+        : this.intubationMethod,
+    intubationSize: intubationSize.present
+        ? intubationSize.value
+        : this.intubationSize,
+    intubationNotes: intubationNotes.present
+        ? intubationNotes.value
+        : this.intubationNotes,
+    ivLineStartTime: ivLineStartTime.present
+        ? ivLineStartTime.value
+        : this.ivLineStartTime,
+    ivLineSize: ivLineSize.present ? ivLineSize.value : this.ivLineSize,
+    ivLineNotes: ivLineNotes.present ? ivLineNotes.value : this.ivLineNotes,
+    cprStartTime: cprStartTime.present ? cprStartTime.value : this.cprStartTime,
+    cprEndTime: cprEndTime.present ? cprEndTime.value : this.cprEndTime,
+    cprNotes: cprNotes.present ? cprNotes.value : this.cprNotes,
+    postRespirationMode: postRespirationMode.present
+        ? postRespirationMode.value
+        : this.postRespirationMode,
+    postRespirationOthers: postRespirationOthers.present
+        ? postRespirationOthers.value
+        : this.postRespirationOthers,
+    endTime: endTime.present ? endTime.value : this.endTime,
+    result: result.present ? result.value : this.result,
+    endCareNotes: endCareNotes.present ? endCareNotes.value : this.endCareNotes,
+    directorName: directorName.present ? directorName.value : this.directorName,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  EmergencyTreatmentData copyWithCompanion(EmergencyTreatmentCompanion data) {
+    return EmergencyTreatmentData(
+      id: data.id.present ? data.id.value : this.id,
+      medicalId: data.medicalId.present ? data.medicalId.value : this.medicalId,
+      startTime: data.startTime.present ? data.startTime.value : this.startTime,
+      diagnosis: data.diagnosis.present ? data.diagnosis.value : this.diagnosis,
+      incidentContext: data.incidentContext.present
+          ? data.incidentContext.value
+          : this.incidentContext,
+      initialAssessmentId: data.initialAssessmentId.present
+          ? data.initialAssessmentId.value
+          : this.initialAssessmentId,
+      postAssessmentId: data.postAssessmentId.present
+          ? data.postAssessmentId.value
+          : this.postAssessmentId,
+      intubationStartTime: data.intubationStartTime.present
+          ? data.intubationStartTime.value
+          : this.intubationStartTime,
+      intubationMethod: data.intubationMethod.present
+          ? data.intubationMethod.value
+          : this.intubationMethod,
+      intubationSize: data.intubationSize.present
+          ? data.intubationSize.value
+          : this.intubationSize,
+      intubationNotes: data.intubationNotes.present
+          ? data.intubationNotes.value
+          : this.intubationNotes,
+      ivLineStartTime: data.ivLineStartTime.present
+          ? data.ivLineStartTime.value
+          : this.ivLineStartTime,
+      ivLineSize: data.ivLineSize.present
+          ? data.ivLineSize.value
+          : this.ivLineSize,
+      ivLineNotes: data.ivLineNotes.present
+          ? data.ivLineNotes.value
+          : this.ivLineNotes,
+      cprStartTime: data.cprStartTime.present
+          ? data.cprStartTime.value
+          : this.cprStartTime,
+      cprEndTime: data.cprEndTime.present
+          ? data.cprEndTime.value
+          : this.cprEndTime,
+      cprNotes: data.cprNotes.present ? data.cprNotes.value : this.cprNotes,
+      postRespirationMode: data.postRespirationMode.present
+          ? data.postRespirationMode.value
+          : this.postRespirationMode,
+      postRespirationOthers: data.postRespirationOthers.present
+          ? data.postRespirationOthers.value
+          : this.postRespirationOthers,
+      endTime: data.endTime.present ? data.endTime.value : this.endTime,
+      result: data.result.present ? data.result.value : this.result,
+      endCareNotes: data.endCareNotes.present
+          ? data.endCareNotes.value
+          : this.endCareNotes,
+      directorName: data.directorName.present
+          ? data.directorName.value
+          : this.directorName,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('EmergencyTreatmentData(')
+          ..write('id: $id, ')
+          ..write('medicalId: $medicalId, ')
+          ..write('startTime: $startTime, ')
+          ..write('diagnosis: $diagnosis, ')
+          ..write('incidentContext: $incidentContext, ')
+          ..write('initialAssessmentId: $initialAssessmentId, ')
+          ..write('postAssessmentId: $postAssessmentId, ')
+          ..write('intubationStartTime: $intubationStartTime, ')
+          ..write('intubationMethod: $intubationMethod, ')
+          ..write('intubationSize: $intubationSize, ')
+          ..write('intubationNotes: $intubationNotes, ')
+          ..write('ivLineStartTime: $ivLineStartTime, ')
+          ..write('ivLineSize: $ivLineSize, ')
+          ..write('ivLineNotes: $ivLineNotes, ')
+          ..write('cprStartTime: $cprStartTime, ')
+          ..write('cprEndTime: $cprEndTime, ')
+          ..write('cprNotes: $cprNotes, ')
+          ..write('postRespirationMode: $postRespirationMode, ')
+          ..write('postRespirationOthers: $postRespirationOthers, ')
+          ..write('endTime: $endTime, ')
+          ..write('result: $result, ')
+          ..write('endCareNotes: $endCareNotes, ')
+          ..write('directorName: $directorName, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hashAll([
+    id,
+    medicalId,
+    startTime,
+    diagnosis,
+    incidentContext,
+    initialAssessmentId,
+    postAssessmentId,
+    intubationStartTime,
+    intubationMethod,
+    intubationSize,
+    intubationNotes,
+    ivLineStartTime,
+    ivLineSize,
+    ivLineNotes,
+    cprStartTime,
+    cprEndTime,
+    cprNotes,
+    postRespirationMode,
+    postRespirationOthers,
+    endTime,
+    result,
+    endCareNotes,
+    directorName,
+    createdAt,
+    updatedAt,
+  ]);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is EmergencyTreatmentData &&
+          other.id == this.id &&
+          other.medicalId == this.medicalId &&
+          other.startTime == this.startTime &&
+          other.diagnosis == this.diagnosis &&
+          other.incidentContext == this.incidentContext &&
+          other.initialAssessmentId == this.initialAssessmentId &&
+          other.postAssessmentId == this.postAssessmentId &&
+          other.intubationStartTime == this.intubationStartTime &&
+          other.intubationMethod == this.intubationMethod &&
+          other.intubationSize == this.intubationSize &&
+          other.intubationNotes == this.intubationNotes &&
+          other.ivLineStartTime == this.ivLineStartTime &&
+          other.ivLineSize == this.ivLineSize &&
+          other.ivLineNotes == this.ivLineNotes &&
+          other.cprStartTime == this.cprStartTime &&
+          other.cprEndTime == this.cprEndTime &&
+          other.cprNotes == this.cprNotes &&
+          other.postRespirationMode == this.postRespirationMode &&
+          other.postRespirationOthers == this.postRespirationOthers &&
+          other.endTime == this.endTime &&
+          other.result == this.result &&
+          other.endCareNotes == this.endCareNotes &&
+          other.directorName == this.directorName &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class EmergencyTreatmentCompanion
+    extends UpdateCompanion<EmergencyTreatmentData> {
+  final Value<int> id;
+  final Value<int> medicalId;
+  final Value<DateTime?> startTime;
+  final Value<String?> diagnosis;
+  final Value<String?> incidentContext;
+  final Value<int?> initialAssessmentId;
+  final Value<int?> postAssessmentId;
+  final Value<DateTime?> intubationStartTime;
+  final Value<String?> intubationMethod;
+  final Value<String?> intubationSize;
+  final Value<String?> intubationNotes;
+  final Value<DateTime?> ivLineStartTime;
+  final Value<String?> ivLineSize;
+  final Value<String?> ivLineNotes;
+  final Value<DateTime?> cprStartTime;
+  final Value<DateTime?> cprEndTime;
+  final Value<String?> cprNotes;
+  final Value<String?> postRespirationMode;
+  final Value<String?> postRespirationOthers;
+  final Value<DateTime?> endTime;
+  final Value<String?> result;
+  final Value<String?> endCareNotes;
+  final Value<String?> directorName;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  const EmergencyTreatmentCompanion({
+    this.id = const Value.absent(),
+    this.medicalId = const Value.absent(),
+    this.startTime = const Value.absent(),
+    this.diagnosis = const Value.absent(),
+    this.incidentContext = const Value.absent(),
+    this.initialAssessmentId = const Value.absent(),
+    this.postAssessmentId = const Value.absent(),
+    this.intubationStartTime = const Value.absent(),
+    this.intubationMethod = const Value.absent(),
+    this.intubationSize = const Value.absent(),
+    this.intubationNotes = const Value.absent(),
+    this.ivLineStartTime = const Value.absent(),
+    this.ivLineSize = const Value.absent(),
+    this.ivLineNotes = const Value.absent(),
+    this.cprStartTime = const Value.absent(),
+    this.cprEndTime = const Value.absent(),
+    this.cprNotes = const Value.absent(),
+    this.postRespirationMode = const Value.absent(),
+    this.postRespirationOthers = const Value.absent(),
+    this.endTime = const Value.absent(),
+    this.result = const Value.absent(),
+    this.endCareNotes = const Value.absent(),
+    this.directorName = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  });
+  EmergencyTreatmentCompanion.insert({
+    this.id = const Value.absent(),
+    required int medicalId,
+    this.startTime = const Value.absent(),
+    this.diagnosis = const Value.absent(),
+    this.incidentContext = const Value.absent(),
+    this.initialAssessmentId = const Value.absent(),
+    this.postAssessmentId = const Value.absent(),
+    this.intubationStartTime = const Value.absent(),
+    this.intubationMethod = const Value.absent(),
+    this.intubationSize = const Value.absent(),
+    this.intubationNotes = const Value.absent(),
+    this.ivLineStartTime = const Value.absent(),
+    this.ivLineSize = const Value.absent(),
+    this.ivLineNotes = const Value.absent(),
+    this.cprStartTime = const Value.absent(),
+    this.cprEndTime = const Value.absent(),
+    this.cprNotes = const Value.absent(),
+    this.postRespirationMode = const Value.absent(),
+    this.postRespirationOthers = const Value.absent(),
+    this.endTime = const Value.absent(),
+    this.result = const Value.absent(),
+    this.endCareNotes = const Value.absent(),
+    this.directorName = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  }) : medicalId = Value(medicalId);
+  static Insertable<EmergencyTreatmentData> custom({
+    Expression<int>? id,
+    Expression<int>? medicalId,
+    Expression<DateTime>? startTime,
+    Expression<String>? diagnosis,
+    Expression<String>? incidentContext,
+    Expression<int>? initialAssessmentId,
+    Expression<int>? postAssessmentId,
+    Expression<DateTime>? intubationStartTime,
+    Expression<String>? intubationMethod,
+    Expression<String>? intubationSize,
+    Expression<String>? intubationNotes,
+    Expression<DateTime>? ivLineStartTime,
+    Expression<String>? ivLineSize,
+    Expression<String>? ivLineNotes,
+    Expression<DateTime>? cprStartTime,
+    Expression<DateTime>? cprEndTime,
+    Expression<String>? cprNotes,
+    Expression<String>? postRespirationMode,
+    Expression<String>? postRespirationOthers,
+    Expression<DateTime>? endTime,
+    Expression<String>? result,
+    Expression<String>? endCareNotes,
+    Expression<String>? directorName,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (medicalId != null) 'medical_id': medicalId,
+      if (startTime != null) 'start_time': startTime,
+      if (diagnosis != null) 'diagnosis': diagnosis,
+      if (incidentContext != null) 'incident_context': incidentContext,
+      if (initialAssessmentId != null)
+        'initial_assessment_id': initialAssessmentId,
+      if (postAssessmentId != null) 'post_assessment_id': postAssessmentId,
+      if (intubationStartTime != null)
+        'intubation_start_time': intubationStartTime,
+      if (intubationMethod != null) 'intubation_method': intubationMethod,
+      if (intubationSize != null) 'intubation_size': intubationSize,
+      if (intubationNotes != null) 'intubation_notes': intubationNotes,
+      if (ivLineStartTime != null) 'iv_line_start_time': ivLineStartTime,
+      if (ivLineSize != null) 'iv_line_size': ivLineSize,
+      if (ivLineNotes != null) 'iv_line_notes': ivLineNotes,
+      if (cprStartTime != null) 'cpr_start_time': cprStartTime,
+      if (cprEndTime != null) 'cpr_end_time': cprEndTime,
+      if (cprNotes != null) 'cpr_notes': cprNotes,
+      if (postRespirationMode != null)
+        'post_respiration_mode': postRespirationMode,
+      if (postRespirationOthers != null)
+        'post_respiration_others': postRespirationOthers,
+      if (endTime != null) 'end_time': endTime,
+      if (result != null) 'result': result,
+      if (endCareNotes != null) 'end_care_notes': endCareNotes,
+      if (directorName != null) 'director_name': directorName,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+    });
+  }
+
+  EmergencyTreatmentCompanion copyWith({
+    Value<int>? id,
+    Value<int>? medicalId,
+    Value<DateTime?>? startTime,
+    Value<String?>? diagnosis,
+    Value<String?>? incidentContext,
+    Value<int?>? initialAssessmentId,
+    Value<int?>? postAssessmentId,
+    Value<DateTime?>? intubationStartTime,
+    Value<String?>? intubationMethod,
+    Value<String?>? intubationSize,
+    Value<String?>? intubationNotes,
+    Value<DateTime?>? ivLineStartTime,
+    Value<String?>? ivLineSize,
+    Value<String?>? ivLineNotes,
+    Value<DateTime?>? cprStartTime,
+    Value<DateTime?>? cprEndTime,
+    Value<String?>? cprNotes,
+    Value<String?>? postRespirationMode,
+    Value<String?>? postRespirationOthers,
+    Value<DateTime?>? endTime,
+    Value<String?>? result,
+    Value<String?>? endCareNotes,
+    Value<String?>? directorName,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+  }) {
+    return EmergencyTreatmentCompanion(
+      id: id ?? this.id,
+      medicalId: medicalId ?? this.medicalId,
+      startTime: startTime ?? this.startTime,
+      diagnosis: diagnosis ?? this.diagnosis,
+      incidentContext: incidentContext ?? this.incidentContext,
+      initialAssessmentId: initialAssessmentId ?? this.initialAssessmentId,
+      postAssessmentId: postAssessmentId ?? this.postAssessmentId,
+      intubationStartTime: intubationStartTime ?? this.intubationStartTime,
+      intubationMethod: intubationMethod ?? this.intubationMethod,
+      intubationSize: intubationSize ?? this.intubationSize,
+      intubationNotes: intubationNotes ?? this.intubationNotes,
+      ivLineStartTime: ivLineStartTime ?? this.ivLineStartTime,
+      ivLineSize: ivLineSize ?? this.ivLineSize,
+      ivLineNotes: ivLineNotes ?? this.ivLineNotes,
+      cprStartTime: cprStartTime ?? this.cprStartTime,
+      cprEndTime: cprEndTime ?? this.cprEndTime,
+      cprNotes: cprNotes ?? this.cprNotes,
+      postRespirationMode: postRespirationMode ?? this.postRespirationMode,
+      postRespirationOthers:
+          postRespirationOthers ?? this.postRespirationOthers,
+      endTime: endTime ?? this.endTime,
+      result: result ?? this.result,
+      endCareNotes: endCareNotes ?? this.endCareNotes,
+      directorName: directorName ?? this.directorName,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (medicalId.present) {
+      map['medical_id'] = Variable<int>(medicalId.value);
+    }
+    if (startTime.present) {
+      map['start_time'] = Variable<DateTime>(startTime.value);
+    }
+    if (diagnosis.present) {
+      map['diagnosis'] = Variable<String>(diagnosis.value);
+    }
+    if (incidentContext.present) {
+      map['incident_context'] = Variable<String>(incidentContext.value);
+    }
+    if (initialAssessmentId.present) {
+      map['initial_assessment_id'] = Variable<int>(initialAssessmentId.value);
+    }
+    if (postAssessmentId.present) {
+      map['post_assessment_id'] = Variable<int>(postAssessmentId.value);
+    }
+    if (intubationStartTime.present) {
+      map['intubation_start_time'] = Variable<DateTime>(
+        intubationStartTime.value,
+      );
+    }
+    if (intubationMethod.present) {
+      map['intubation_method'] = Variable<String>(intubationMethod.value);
+    }
+    if (intubationSize.present) {
+      map['intubation_size'] = Variable<String>(intubationSize.value);
+    }
+    if (intubationNotes.present) {
+      map['intubation_notes'] = Variable<String>(intubationNotes.value);
+    }
+    if (ivLineStartTime.present) {
+      map['iv_line_start_time'] = Variable<DateTime>(ivLineStartTime.value);
+    }
+    if (ivLineSize.present) {
+      map['iv_line_size'] = Variable<String>(ivLineSize.value);
+    }
+    if (ivLineNotes.present) {
+      map['iv_line_notes'] = Variable<String>(ivLineNotes.value);
+    }
+    if (cprStartTime.present) {
+      map['cpr_start_time'] = Variable<DateTime>(cprStartTime.value);
+    }
+    if (cprEndTime.present) {
+      map['cpr_end_time'] = Variable<DateTime>(cprEndTime.value);
+    }
+    if (cprNotes.present) {
+      map['cpr_notes'] = Variable<String>(cprNotes.value);
+    }
+    if (postRespirationMode.present) {
+      map['post_respiration_mode'] = Variable<String>(
+        postRespirationMode.value,
+      );
+    }
+    if (postRespirationOthers.present) {
+      map['post_respiration_others'] = Variable<String>(
+        postRespirationOthers.value,
+      );
+    }
+    if (endTime.present) {
+      map['end_time'] = Variable<DateTime>(endTime.value);
+    }
+    if (result.present) {
+      map['result'] = Variable<String>(result.value);
+    }
+    if (endCareNotes.present) {
+      map['end_care_notes'] = Variable<String>(endCareNotes.value);
+    }
+    if (directorName.present) {
+      map['director_name'] = Variable<String>(directorName.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('EmergencyTreatmentCompanion(')
+          ..write('id: $id, ')
+          ..write('medicalId: $medicalId, ')
+          ..write('startTime: $startTime, ')
+          ..write('diagnosis: $diagnosis, ')
+          ..write('incidentContext: $incidentContext, ')
+          ..write('initialAssessmentId: $initialAssessmentId, ')
+          ..write('postAssessmentId: $postAssessmentId, ')
+          ..write('intubationStartTime: $intubationStartTime, ')
+          ..write('intubationMethod: $intubationMethod, ')
+          ..write('intubationSize: $intubationSize, ')
+          ..write('intubationNotes: $intubationNotes, ')
+          ..write('ivLineStartTime: $ivLineStartTime, ')
+          ..write('ivLineSize: $ivLineSize, ')
+          ..write('ivLineNotes: $ivLineNotes, ')
+          ..write('cprStartTime: $cprStartTime, ')
+          ..write('cprEndTime: $cprEndTime, ')
+          ..write('cprNotes: $cprNotes, ')
+          ..write('postRespirationMode: $postRespirationMode, ')
+          ..write('postRespirationOthers: $postRespirationOthers, ')
+          ..write('endTime: $endTime, ')
+          ..write('result: $result, ')
+          ..write('endCareNotes: $endCareNotes, ')
+          ..write('directorName: $directorName, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $FirstAidLogTable extends FirstAidLog
+    with TableInfo<$FirstAidLogTable, FirstAidLogData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $FirstAidLogTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _emergencyTreatmentIdMeta =
+      const VerificationMeta('emergencyTreatmentId');
+  @override
+  late final GeneratedColumn<int> emergencyTreatmentId = GeneratedColumn<int>(
+    'emergency_treatment_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES emergency_treatment (id)',
+    ),
+  );
+  static const VerificationMeta _timeMeta = const VerificationMeta('time');
+  @override
+  late final GeneratedColumn<String> time = GeneratedColumn<String>(
+    'time',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _heartRateMeta = const VerificationMeta(
+    'heartRate',
+  );
+  @override
+  late final GeneratedColumn<String> heartRate = GeneratedColumn<String>(
+    'heart_rate',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _bloodPressureMeta = const VerificationMeta(
+    'bloodPressure',
+  );
+  @override
+  late final GeneratedColumn<String> bloodPressure = GeneratedColumn<String>(
+    'blood_pressure',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _respirationRateMeta = const VerificationMeta(
+    'respirationRate',
+  );
+  @override
+  late final GeneratedColumn<String> respirationRate = GeneratedColumn<String>(
+    'respiration_rate',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _o2Meta = const VerificationMeta('o2');
+  @override
+  late final GeneratedColumn<String> o2 = GeneratedColumn<String>(
+    'o2',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _shockMeta = const VerificationMeta('shock');
+  @override
+  late final GeneratedColumn<String> shock = GeneratedColumn<String>(
+    'shock',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _epinephrineMeta = const VerificationMeta(
+    'epinephrine',
+  );
+  @override
+  late final GeneratedColumn<String> epinephrine = GeneratedColumn<String>(
+    'epinephrine',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _otherMedsMeta = const VerificationMeta(
+    'otherMeds',
+  );
+  @override
+  late final GeneratedColumn<String> otherMeds = GeneratedColumn<String>(
+    'other_meds',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _sortOrderMeta = const VerificationMeta(
+    'sortOrder',
+  );
+  @override
+  late final GeneratedColumn<int> sortOrder = GeneratedColumn<int>(
+    'sort_order',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    emergencyTreatmentId,
+    time,
+    heartRate,
+    bloodPressure,
+    respirationRate,
+    o2,
+    shock,
+    epinephrine,
+    otherMeds,
+    sortOrder,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'first_aid_log';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<FirstAidLogData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('emergency_treatment_id')) {
+      context.handle(
+        _emergencyTreatmentIdMeta,
+        emergencyTreatmentId.isAcceptableOrUnknown(
+          data['emergency_treatment_id']!,
+          _emergencyTreatmentIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_emergencyTreatmentIdMeta);
+    }
+    if (data.containsKey('time')) {
+      context.handle(
+        _timeMeta,
+        time.isAcceptableOrUnknown(data['time']!, _timeMeta),
+      );
+    }
+    if (data.containsKey('heart_rate')) {
+      context.handle(
+        _heartRateMeta,
+        heartRate.isAcceptableOrUnknown(data['heart_rate']!, _heartRateMeta),
+      );
+    }
+    if (data.containsKey('blood_pressure')) {
+      context.handle(
+        _bloodPressureMeta,
+        bloodPressure.isAcceptableOrUnknown(
+          data['blood_pressure']!,
+          _bloodPressureMeta,
+        ),
+      );
+    }
+    if (data.containsKey('respiration_rate')) {
+      context.handle(
+        _respirationRateMeta,
+        respirationRate.isAcceptableOrUnknown(
+          data['respiration_rate']!,
+          _respirationRateMeta,
+        ),
+      );
+    }
+    if (data.containsKey('o2')) {
+      context.handle(_o2Meta, o2.isAcceptableOrUnknown(data['o2']!, _o2Meta));
+    }
+    if (data.containsKey('shock')) {
+      context.handle(
+        _shockMeta,
+        shock.isAcceptableOrUnknown(data['shock']!, _shockMeta),
+      );
+    }
+    if (data.containsKey('epinephrine')) {
+      context.handle(
+        _epinephrineMeta,
+        epinephrine.isAcceptableOrUnknown(
+          data['epinephrine']!,
+          _epinephrineMeta,
+        ),
+      );
+    }
+    if (data.containsKey('other_meds')) {
+      context.handle(
+        _otherMedsMeta,
+        otherMeds.isAcceptableOrUnknown(data['other_meds']!, _otherMedsMeta),
+      );
+    }
+    if (data.containsKey('sort_order')) {
+      context.handle(
+        _sortOrderMeta,
+        sortOrder.isAcceptableOrUnknown(data['sort_order']!, _sortOrderMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  FirstAidLogData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return FirstAidLogData(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      emergencyTreatmentId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}emergency_treatment_id'],
+      )!,
+      time: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}time'],
+      ),
+      heartRate: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}heart_rate'],
+      ),
+      bloodPressure: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}blood_pressure'],
+      ),
+      respirationRate: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}respiration_rate'],
+      ),
+      o2: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}o2'],
+      ),
+      shock: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}shock'],
+      ),
+      epinephrine: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}epinephrine'],
+      ),
+      otherMeds: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}other_meds'],
+      ),
+      sortOrder: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}sort_order'],
+      )!,
+    );
+  }
+
+  @override
+  $FirstAidLogTable createAlias(String alias) {
+    return $FirstAidLogTable(attachedDatabase, alias);
+  }
+}
+
+class FirstAidLogData extends DataClass implements Insertable<FirstAidLogData> {
+  final int id;
+  final int emergencyTreatmentId;
+  final String? time;
+  final String? heartRate;
+  final String? bloodPressure;
+  final String? respirationRate;
+  final String? o2;
+  final String? shock;
+  final String? epinephrine;
+  final String? otherMeds;
+  final int sortOrder;
+  const FirstAidLogData({
+    required this.id,
+    required this.emergencyTreatmentId,
+    this.time,
+    this.heartRate,
+    this.bloodPressure,
+    this.respirationRate,
+    this.o2,
+    this.shock,
+    this.epinephrine,
+    this.otherMeds,
+    required this.sortOrder,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['emergency_treatment_id'] = Variable<int>(emergencyTreatmentId);
+    if (!nullToAbsent || time != null) {
+      map['time'] = Variable<String>(time);
+    }
+    if (!nullToAbsent || heartRate != null) {
+      map['heart_rate'] = Variable<String>(heartRate);
+    }
+    if (!nullToAbsent || bloodPressure != null) {
+      map['blood_pressure'] = Variable<String>(bloodPressure);
+    }
+    if (!nullToAbsent || respirationRate != null) {
+      map['respiration_rate'] = Variable<String>(respirationRate);
+    }
+    if (!nullToAbsent || o2 != null) {
+      map['o2'] = Variable<String>(o2);
+    }
+    if (!nullToAbsent || shock != null) {
+      map['shock'] = Variable<String>(shock);
+    }
+    if (!nullToAbsent || epinephrine != null) {
+      map['epinephrine'] = Variable<String>(epinephrine);
+    }
+    if (!nullToAbsent || otherMeds != null) {
+      map['other_meds'] = Variable<String>(otherMeds);
+    }
+    map['sort_order'] = Variable<int>(sortOrder);
+    return map;
+  }
+
+  FirstAidLogCompanion toCompanion(bool nullToAbsent) {
+    return FirstAidLogCompanion(
+      id: Value(id),
+      emergencyTreatmentId: Value(emergencyTreatmentId),
+      time: time == null && nullToAbsent ? const Value.absent() : Value(time),
+      heartRate: heartRate == null && nullToAbsent
+          ? const Value.absent()
+          : Value(heartRate),
+      bloodPressure: bloodPressure == null && nullToAbsent
+          ? const Value.absent()
+          : Value(bloodPressure),
+      respirationRate: respirationRate == null && nullToAbsent
+          ? const Value.absent()
+          : Value(respirationRate),
+      o2: o2 == null && nullToAbsent ? const Value.absent() : Value(o2),
+      shock: shock == null && nullToAbsent
+          ? const Value.absent()
+          : Value(shock),
+      epinephrine: epinephrine == null && nullToAbsent
+          ? const Value.absent()
+          : Value(epinephrine),
+      otherMeds: otherMeds == null && nullToAbsent
+          ? const Value.absent()
+          : Value(otherMeds),
+      sortOrder: Value(sortOrder),
+    );
+  }
+
+  factory FirstAidLogData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return FirstAidLogData(
+      id: serializer.fromJson<int>(json['id']),
+      emergencyTreatmentId: serializer.fromJson<int>(
+        json['emergencyTreatmentId'],
+      ),
+      time: serializer.fromJson<String?>(json['time']),
+      heartRate: serializer.fromJson<String?>(json['heartRate']),
+      bloodPressure: serializer.fromJson<String?>(json['bloodPressure']),
+      respirationRate: serializer.fromJson<String?>(json['respirationRate']),
+      o2: serializer.fromJson<String?>(json['o2']),
+      shock: serializer.fromJson<String?>(json['shock']),
+      epinephrine: serializer.fromJson<String?>(json['epinephrine']),
+      otherMeds: serializer.fromJson<String?>(json['otherMeds']),
+      sortOrder: serializer.fromJson<int>(json['sortOrder']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'emergencyTreatmentId': serializer.toJson<int>(emergencyTreatmentId),
+      'time': serializer.toJson<String?>(time),
+      'heartRate': serializer.toJson<String?>(heartRate),
+      'bloodPressure': serializer.toJson<String?>(bloodPressure),
+      'respirationRate': serializer.toJson<String?>(respirationRate),
+      'o2': serializer.toJson<String?>(o2),
+      'shock': serializer.toJson<String?>(shock),
+      'epinephrine': serializer.toJson<String?>(epinephrine),
+      'otherMeds': serializer.toJson<String?>(otherMeds),
+      'sortOrder': serializer.toJson<int>(sortOrder),
+    };
+  }
+
+  FirstAidLogData copyWith({
+    int? id,
+    int? emergencyTreatmentId,
+    Value<String?> time = const Value.absent(),
+    Value<String?> heartRate = const Value.absent(),
+    Value<String?> bloodPressure = const Value.absent(),
+    Value<String?> respirationRate = const Value.absent(),
+    Value<String?> o2 = const Value.absent(),
+    Value<String?> shock = const Value.absent(),
+    Value<String?> epinephrine = const Value.absent(),
+    Value<String?> otherMeds = const Value.absent(),
+    int? sortOrder,
+  }) => FirstAidLogData(
+    id: id ?? this.id,
+    emergencyTreatmentId: emergencyTreatmentId ?? this.emergencyTreatmentId,
+    time: time.present ? time.value : this.time,
+    heartRate: heartRate.present ? heartRate.value : this.heartRate,
+    bloodPressure: bloodPressure.present
+        ? bloodPressure.value
+        : this.bloodPressure,
+    respirationRate: respirationRate.present
+        ? respirationRate.value
+        : this.respirationRate,
+    o2: o2.present ? o2.value : this.o2,
+    shock: shock.present ? shock.value : this.shock,
+    epinephrine: epinephrine.present ? epinephrine.value : this.epinephrine,
+    otherMeds: otherMeds.present ? otherMeds.value : this.otherMeds,
+    sortOrder: sortOrder ?? this.sortOrder,
+  );
+  FirstAidLogData copyWithCompanion(FirstAidLogCompanion data) {
+    return FirstAidLogData(
+      id: data.id.present ? data.id.value : this.id,
+      emergencyTreatmentId: data.emergencyTreatmentId.present
+          ? data.emergencyTreatmentId.value
+          : this.emergencyTreatmentId,
+      time: data.time.present ? data.time.value : this.time,
+      heartRate: data.heartRate.present ? data.heartRate.value : this.heartRate,
+      bloodPressure: data.bloodPressure.present
+          ? data.bloodPressure.value
+          : this.bloodPressure,
+      respirationRate: data.respirationRate.present
+          ? data.respirationRate.value
+          : this.respirationRate,
+      o2: data.o2.present ? data.o2.value : this.o2,
+      shock: data.shock.present ? data.shock.value : this.shock,
+      epinephrine: data.epinephrine.present
+          ? data.epinephrine.value
+          : this.epinephrine,
+      otherMeds: data.otherMeds.present ? data.otherMeds.value : this.otherMeds,
+      sortOrder: data.sortOrder.present ? data.sortOrder.value : this.sortOrder,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FirstAidLogData(')
+          ..write('id: $id, ')
+          ..write('emergencyTreatmentId: $emergencyTreatmentId, ')
+          ..write('time: $time, ')
+          ..write('heartRate: $heartRate, ')
+          ..write('bloodPressure: $bloodPressure, ')
+          ..write('respirationRate: $respirationRate, ')
+          ..write('o2: $o2, ')
+          ..write('shock: $shock, ')
+          ..write('epinephrine: $epinephrine, ')
+          ..write('otherMeds: $otherMeds, ')
+          ..write('sortOrder: $sortOrder')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    emergencyTreatmentId,
+    time,
+    heartRate,
+    bloodPressure,
+    respirationRate,
+    o2,
+    shock,
+    epinephrine,
+    otherMeds,
+    sortOrder,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is FirstAidLogData &&
+          other.id == this.id &&
+          other.emergencyTreatmentId == this.emergencyTreatmentId &&
+          other.time == this.time &&
+          other.heartRate == this.heartRate &&
+          other.bloodPressure == this.bloodPressure &&
+          other.respirationRate == this.respirationRate &&
+          other.o2 == this.o2 &&
+          other.shock == this.shock &&
+          other.epinephrine == this.epinephrine &&
+          other.otherMeds == this.otherMeds &&
+          other.sortOrder == this.sortOrder);
+}
+
+class FirstAidLogCompanion extends UpdateCompanion<FirstAidLogData> {
+  final Value<int> id;
+  final Value<int> emergencyTreatmentId;
+  final Value<String?> time;
+  final Value<String?> heartRate;
+  final Value<String?> bloodPressure;
+  final Value<String?> respirationRate;
+  final Value<String?> o2;
+  final Value<String?> shock;
+  final Value<String?> epinephrine;
+  final Value<String?> otherMeds;
+  final Value<int> sortOrder;
+  const FirstAidLogCompanion({
+    this.id = const Value.absent(),
+    this.emergencyTreatmentId = const Value.absent(),
+    this.time = const Value.absent(),
+    this.heartRate = const Value.absent(),
+    this.bloodPressure = const Value.absent(),
+    this.respirationRate = const Value.absent(),
+    this.o2 = const Value.absent(),
+    this.shock = const Value.absent(),
+    this.epinephrine = const Value.absent(),
+    this.otherMeds = const Value.absent(),
+    this.sortOrder = const Value.absent(),
+  });
+  FirstAidLogCompanion.insert({
+    this.id = const Value.absent(),
+    required int emergencyTreatmentId,
+    this.time = const Value.absent(),
+    this.heartRate = const Value.absent(),
+    this.bloodPressure = const Value.absent(),
+    this.respirationRate = const Value.absent(),
+    this.o2 = const Value.absent(),
+    this.shock = const Value.absent(),
+    this.epinephrine = const Value.absent(),
+    this.otherMeds = const Value.absent(),
+    this.sortOrder = const Value.absent(),
+  }) : emergencyTreatmentId = Value(emergencyTreatmentId);
+  static Insertable<FirstAidLogData> custom({
+    Expression<int>? id,
+    Expression<int>? emergencyTreatmentId,
+    Expression<String>? time,
+    Expression<String>? heartRate,
+    Expression<String>? bloodPressure,
+    Expression<String>? respirationRate,
+    Expression<String>? o2,
+    Expression<String>? shock,
+    Expression<String>? epinephrine,
+    Expression<String>? otherMeds,
+    Expression<int>? sortOrder,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (emergencyTreatmentId != null)
+        'emergency_treatment_id': emergencyTreatmentId,
+      if (time != null) 'time': time,
+      if (heartRate != null) 'heart_rate': heartRate,
+      if (bloodPressure != null) 'blood_pressure': bloodPressure,
+      if (respirationRate != null) 'respiration_rate': respirationRate,
+      if (o2 != null) 'o2': o2,
+      if (shock != null) 'shock': shock,
+      if (epinephrine != null) 'epinephrine': epinephrine,
+      if (otherMeds != null) 'other_meds': otherMeds,
+      if (sortOrder != null) 'sort_order': sortOrder,
+    });
+  }
+
+  FirstAidLogCompanion copyWith({
+    Value<int>? id,
+    Value<int>? emergencyTreatmentId,
+    Value<String?>? time,
+    Value<String?>? heartRate,
+    Value<String?>? bloodPressure,
+    Value<String?>? respirationRate,
+    Value<String?>? o2,
+    Value<String?>? shock,
+    Value<String?>? epinephrine,
+    Value<String?>? otherMeds,
+    Value<int>? sortOrder,
+  }) {
+    return FirstAidLogCompanion(
+      id: id ?? this.id,
+      emergencyTreatmentId: emergencyTreatmentId ?? this.emergencyTreatmentId,
+      time: time ?? this.time,
+      heartRate: heartRate ?? this.heartRate,
+      bloodPressure: bloodPressure ?? this.bloodPressure,
+      respirationRate: respirationRate ?? this.respirationRate,
+      o2: o2 ?? this.o2,
+      shock: shock ?? this.shock,
+      epinephrine: epinephrine ?? this.epinephrine,
+      otherMeds: otherMeds ?? this.otherMeds,
+      sortOrder: sortOrder ?? this.sortOrder,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (emergencyTreatmentId.present) {
+      map['emergency_treatment_id'] = Variable<int>(emergencyTreatmentId.value);
+    }
+    if (time.present) {
+      map['time'] = Variable<String>(time.value);
+    }
+    if (heartRate.present) {
+      map['heart_rate'] = Variable<String>(heartRate.value);
+    }
+    if (bloodPressure.present) {
+      map['blood_pressure'] = Variable<String>(bloodPressure.value);
+    }
+    if (respirationRate.present) {
+      map['respiration_rate'] = Variable<String>(respirationRate.value);
+    }
+    if (o2.present) {
+      map['o2'] = Variable<String>(o2.value);
+    }
+    if (shock.present) {
+      map['shock'] = Variable<String>(shock.value);
+    }
+    if (epinephrine.present) {
+      map['epinephrine'] = Variable<String>(epinephrine.value);
+    }
+    if (otherMeds.present) {
+      map['other_meds'] = Variable<String>(otherMeds.value);
+    }
+    if (sortOrder.present) {
+      map['sort_order'] = Variable<int>(sortOrder.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FirstAidLogCompanion(')
+          ..write('id: $id, ')
+          ..write('emergencyTreatmentId: $emergencyTreatmentId, ')
+          ..write('time: $time, ')
+          ..write('heartRate: $heartRate, ')
+          ..write('bloodPressure: $bloodPressure, ')
+          ..write('respirationRate: $respirationRate, ')
+          ..write('o2: $o2, ')
+          ..write('shock: $shock, ')
+          ..write('epinephrine: $epinephrine, ')
+          ..write('otherMeds: $otherMeds, ')
+          ..write('sortOrder: $sortOrder')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $EmergencyAssistStaffTable extends EmergencyAssistStaff
+    with TableInfo<$EmergencyAssistStaffTable, EmergencyAssistStaffData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $EmergencyAssistStaffTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _emergencyTreatmentIdMeta =
+      const VerificationMeta('emergencyTreatmentId');
+  @override
+  late final GeneratedColumn<int> emergencyTreatmentId = GeneratedColumn<int>(
+    'emergency_treatment_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES emergency_treatment (id)',
+    ),
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, emergencyTreatmentId, name];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'emergency_assist_staff';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<EmergencyAssistStaffData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('emergency_treatment_id')) {
+      context.handle(
+        _emergencyTreatmentIdMeta,
+        emergencyTreatmentId.isAcceptableOrUnknown(
+          data['emergency_treatment_id']!,
+          _emergencyTreatmentIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_emergencyTreatmentIdMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  EmergencyAssistStaffData map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return EmergencyAssistStaffData(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      emergencyTreatmentId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}emergency_treatment_id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+    );
+  }
+
+  @override
+  $EmergencyAssistStaffTable createAlias(String alias) {
+    return $EmergencyAssistStaffTable(attachedDatabase, alias);
+  }
+}
+
+class EmergencyAssistStaffData extends DataClass
+    implements Insertable<EmergencyAssistStaffData> {
+  final int id;
+  final int emergencyTreatmentId;
+  final String name;
+  const EmergencyAssistStaffData({
+    required this.id,
+    required this.emergencyTreatmentId,
+    required this.name,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['emergency_treatment_id'] = Variable<int>(emergencyTreatmentId);
+    map['name'] = Variable<String>(name);
+    return map;
+  }
+
+  EmergencyAssistStaffCompanion toCompanion(bool nullToAbsent) {
+    return EmergencyAssistStaffCompanion(
+      id: Value(id),
+      emergencyTreatmentId: Value(emergencyTreatmentId),
+      name: Value(name),
+    );
+  }
+
+  factory EmergencyAssistStaffData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return EmergencyAssistStaffData(
+      id: serializer.fromJson<int>(json['id']),
+      emergencyTreatmentId: serializer.fromJson<int>(
+        json['emergencyTreatmentId'],
+      ),
+      name: serializer.fromJson<String>(json['name']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'emergencyTreatmentId': serializer.toJson<int>(emergencyTreatmentId),
+      'name': serializer.toJson<String>(name),
+    };
+  }
+
+  EmergencyAssistStaffData copyWith({
+    int? id,
+    int? emergencyTreatmentId,
+    String? name,
+  }) => EmergencyAssistStaffData(
+    id: id ?? this.id,
+    emergencyTreatmentId: emergencyTreatmentId ?? this.emergencyTreatmentId,
+    name: name ?? this.name,
+  );
+  EmergencyAssistStaffData copyWithCompanion(
+    EmergencyAssistStaffCompanion data,
+  ) {
+    return EmergencyAssistStaffData(
+      id: data.id.present ? data.id.value : this.id,
+      emergencyTreatmentId: data.emergencyTreatmentId.present
+          ? data.emergencyTreatmentId.value
+          : this.emergencyTreatmentId,
+      name: data.name.present ? data.name.value : this.name,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('EmergencyAssistStaffData(')
+          ..write('id: $id, ')
+          ..write('emergencyTreatmentId: $emergencyTreatmentId, ')
+          ..write('name: $name')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, emergencyTreatmentId, name);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is EmergencyAssistStaffData &&
+          other.id == this.id &&
+          other.emergencyTreatmentId == this.emergencyTreatmentId &&
+          other.name == this.name);
+}
+
+class EmergencyAssistStaffCompanion
+    extends UpdateCompanion<EmergencyAssistStaffData> {
+  final Value<int> id;
+  final Value<int> emergencyTreatmentId;
+  final Value<String> name;
+  const EmergencyAssistStaffCompanion({
+    this.id = const Value.absent(),
+    this.emergencyTreatmentId = const Value.absent(),
+    this.name = const Value.absent(),
+  });
+  EmergencyAssistStaffCompanion.insert({
+    this.id = const Value.absent(),
+    required int emergencyTreatmentId,
+    required String name,
+  }) : emergencyTreatmentId = Value(emergencyTreatmentId),
+       name = Value(name);
+  static Insertable<EmergencyAssistStaffData> custom({
+    Expression<int>? id,
+    Expression<int>? emergencyTreatmentId,
+    Expression<String>? name,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (emergencyTreatmentId != null)
+        'emergency_treatment_id': emergencyTreatmentId,
+      if (name != null) 'name': name,
+    });
+  }
+
+  EmergencyAssistStaffCompanion copyWith({
+    Value<int>? id,
+    Value<int>? emergencyTreatmentId,
+    Value<String>? name,
+  }) {
+    return EmergencyAssistStaffCompanion(
+      id: id ?? this.id,
+      emergencyTreatmentId: emergencyTreatmentId ?? this.emergencyTreatmentId,
+      name: name ?? this.name,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (emergencyTreatmentId.present) {
+      map['emergency_treatment_id'] = Variable<int>(emergencyTreatmentId.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('EmergencyAssistStaffCompanion(')
+          ..write('id: $id, ')
+          ..write('emergencyTreatmentId: $emergencyTreatmentId, ')
+          ..write('name: $name')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -33683,6 +36203,11 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       $AmbulanceVitalSignsTable(this);
   late final $AmbulanceEscortStaffTable ambulanceEscortStaff =
       $AmbulanceEscortStaffTable(this);
+  late final $EmergencyTreatmentTable emergencyTreatment =
+      $EmergencyTreatmentTable(this);
+  late final $FirstAidLogTable firstAidLog = $FirstAidLogTable(this);
+  late final $EmergencyAssistStaffTable emergencyAssistStaff =
+      $EmergencyAssistStaffTable(this);
   late final ReferenceDao referenceDao = ReferenceDao(this as AppDatabase);
   late final MedicalDao medicalDao = MedicalDao(this as AppDatabase);
   late final FlightDao flightDao = FlightDao(this as AppDatabase);
@@ -33703,6 +36228,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final AmbulanceDao ambulanceDao = AmbulanceDao(this as AppDatabase);
   late final AmbulanceTreatmentDao ambulanceTreatmentDao =
       AmbulanceTreatmentDao(this as AppDatabase);
+  late final EmergencyDao emergencyDao = EmergencyDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -33776,6 +36302,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     ambulanceMedicationLogs,
     ambulanceVitalSigns,
     ambulanceEscortStaff,
+    emergencyTreatment,
+    firstAidLog,
+    emergencyAssistStaff,
   ];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
@@ -43296,6 +45825,37 @@ final class $$MedicalRecordTableReferences
       manager.$state.copyWith(prefetchedData: cache),
     );
   }
+
+  static MultiTypedResultKey<
+    $EmergencyTreatmentTable,
+    List<EmergencyTreatmentData>
+  >
+  _emergencyTreatmentRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.emergencyTreatment,
+        aliasName: $_aliasNameGenerator(
+          db.medicalRecord.medicalId,
+          db.emergencyTreatment.medicalId,
+        ),
+      );
+
+  $$EmergencyTreatmentTableProcessedTableManager get emergencyTreatmentRefs {
+    final manager =
+        $$EmergencyTreatmentTableTableManager(
+          $_db,
+          $_db.emergencyTreatment,
+        ).filter(
+          (f) =>
+              f.medicalId.medicalId.sqlEquals($_itemColumn<int>('medical_id')!),
+        );
+
+    final cache = $_typedResult.readTableOrNull(
+      _emergencyTreatmentRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$MedicalRecordTableFilterComposer
@@ -43870,6 +46430,31 @@ class $$MedicalRecordTableFilterComposer
                     $removeJoinBuilderFromRootComposer,
               ),
         );
+    return f(composer);
+  }
+
+  Expression<bool> emergencyTreatmentRefs(
+    Expression<bool> Function($$EmergencyTreatmentTableFilterComposer f) f,
+  ) {
+    final $$EmergencyTreatmentTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.medicalId,
+      referencedTable: $db.emergencyTreatment,
+      getReferencedColumn: (t) => t.medicalId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$EmergencyTreatmentTableFilterComposer(
+            $db: $db,
+            $table: $db.emergencyTreatment,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
     return f(composer);
   }
 }
@@ -44488,6 +47073,32 @@ class $$MedicalRecordTableAnnotationComposer
         );
     return f(composer);
   }
+
+  Expression<T> emergencyTreatmentRefs<T extends Object>(
+    Expression<T> Function($$EmergencyTreatmentTableAnnotationComposer a) f,
+  ) {
+    final $$EmergencyTreatmentTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.medicalId,
+          referencedTable: $db.emergencyTreatment,
+          getReferencedColumn: (t) => t.medicalId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$EmergencyTreatmentTableAnnotationComposer(
+                $db: $db,
+                $table: $db.emergencyTreatment,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
 }
 
 class $$MedicalRecordTableTableManager
@@ -44525,6 +47136,7 @@ class $$MedicalRecordTableTableManager
             bool ambulanceFeesRefs,
             bool ambulanceSceneRecordsRefs,
             bool ambulanceTreatmentRecordsRefs,
+            bool emergencyTreatmentRefs,
           })
         > {
   $$MedicalRecordTableTableManager(_$AppDatabase db, $MedicalRecordTable table)
@@ -44605,6 +47217,7 @@ class $$MedicalRecordTableTableManager
                 ambulanceFeesRefs = false,
                 ambulanceSceneRecordsRefs = false,
                 ambulanceTreatmentRecordsRefs = false,
+                emergencyTreatmentRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
@@ -44632,6 +47245,7 @@ class $$MedicalRecordTableTableManager
                     if (ambulanceSceneRecordsRefs) db.ambulanceSceneRecords,
                     if (ambulanceTreatmentRecordsRefs)
                       db.ambulanceTreatmentRecords,
+                    if (emergencyTreatmentRefs) db.emergencyTreatment,
                   ],
                   addJoins: null,
                   getPrefetchedDataCallback: (items) async {
@@ -45077,6 +47691,27 @@ class $$MedicalRecordTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (emergencyTreatmentRefs)
+                        await $_getPrefetchedData<
+                          MedicalRecordData,
+                          $MedicalRecordTable,
+                          EmergencyTreatmentData
+                        >(
+                          currentTable: table,
+                          referencedTable: $$MedicalRecordTableReferences
+                              ._emergencyTreatmentRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$MedicalRecordTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).emergencyTreatmentRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.medicalId == item.medicalId,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -45119,6 +47754,7 @@ typedef $$MedicalRecordTableProcessedTableManager =
         bool ambulanceFeesRefs,
         bool ambulanceSceneRecordsRefs,
         bool ambulanceTreatmentRecordsRefs,
+        bool emergencyTreatmentRefs,
       })
     >;
 typedef $$VisitReasonTableCreateCompanionBuilder =
@@ -49745,8 +52381,10 @@ typedef $$MedicalAssessmentTableCreateCompanionBuilder =
       Value<String?> gcsM,
       Value<String?> gcsV,
       Value<int?> leftPupilReactionId,
+      Value<String?> leftPupilReaction,
       Value<double?> leftPupilSize,
       Value<int?> rightPupilReactionId,
+      Value<String?> rightPupilReaction,
       Value<double?> rightPupilSize,
       Value<String?> headNeckExam,
       Value<String?> chestExam,
@@ -49773,8 +52411,10 @@ typedef $$MedicalAssessmentTableUpdateCompanionBuilder =
       Value<String?> gcsM,
       Value<String?> gcsV,
       Value<int?> leftPupilReactionId,
+      Value<String?> leftPupilReaction,
       Value<double?> leftPupilSize,
       Value<int?> rightPupilReactionId,
+      Value<String?> rightPupilReaction,
       Value<double?> rightPupilSize,
       Value<String?> headNeckExam,
       Value<String?> chestExam,
@@ -49961,8 +52601,18 @@ class $$MedicalAssessmentTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<String> get leftPupilReaction => $composableBuilder(
+    column: $table.leftPupilReaction,
+    builder: (column) => ColumnFilters(column),
+  );
+
   ColumnFilters<double> get leftPupilSize => $composableBuilder(
     column: $table.leftPupilSize,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get rightPupilReaction => $composableBuilder(
+    column: $table.rightPupilReaction,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -50169,8 +52819,18 @@ class $$MedicalAssessmentTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get leftPupilReaction => $composableBuilder(
+    column: $table.leftPupilReaction,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<double> get leftPupilSize => $composableBuilder(
     column: $table.leftPupilSize,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get rightPupilReaction => $composableBuilder(
+    column: $table.rightPupilReaction,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -50357,8 +53017,18 @@ class $$MedicalAssessmentTableAnnotationComposer
   GeneratedColumn<String> get gcsV =>
       $composableBuilder(column: $table.gcsV, builder: (column) => column);
 
+  GeneratedColumn<String> get leftPupilReaction => $composableBuilder(
+    column: $table.leftPupilReaction,
+    builder: (column) => column,
+  );
+
   GeneratedColumn<double> get leftPupilSize => $composableBuilder(
     column: $table.leftPupilSize,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get rightPupilReaction => $composableBuilder(
+    column: $table.rightPupilReaction,
     builder: (column) => column,
   );
 
@@ -50545,8 +53215,10 @@ class $$MedicalAssessmentTableTableManager
                 Value<String?> gcsM = const Value.absent(),
                 Value<String?> gcsV = const Value.absent(),
                 Value<int?> leftPupilReactionId = const Value.absent(),
+                Value<String?> leftPupilReaction = const Value.absent(),
                 Value<double?> leftPupilSize = const Value.absent(),
                 Value<int?> rightPupilReactionId = const Value.absent(),
+                Value<String?> rightPupilReaction = const Value.absent(),
                 Value<double?> rightPupilSize = const Value.absent(),
                 Value<String?> headNeckExam = const Value.absent(),
                 Value<String?> chestExam = const Value.absent(),
@@ -50571,8 +53243,10 @@ class $$MedicalAssessmentTableTableManager
                 gcsM: gcsM,
                 gcsV: gcsV,
                 leftPupilReactionId: leftPupilReactionId,
+                leftPupilReaction: leftPupilReaction,
                 leftPupilSize: leftPupilSize,
                 rightPupilReactionId: rightPupilReactionId,
+                rightPupilReaction: rightPupilReaction,
                 rightPupilSize: rightPupilSize,
                 headNeckExam: headNeckExam,
                 chestExam: chestExam,
@@ -50599,8 +53273,10 @@ class $$MedicalAssessmentTableTableManager
                 Value<String?> gcsM = const Value.absent(),
                 Value<String?> gcsV = const Value.absent(),
                 Value<int?> leftPupilReactionId = const Value.absent(),
+                Value<String?> leftPupilReaction = const Value.absent(),
                 Value<double?> leftPupilSize = const Value.absent(),
                 Value<int?> rightPupilReactionId = const Value.absent(),
+                Value<String?> rightPupilReaction = const Value.absent(),
                 Value<double?> rightPupilSize = const Value.absent(),
                 Value<String?> headNeckExam = const Value.absent(),
                 Value<String?> chestExam = const Value.absent(),
@@ -50625,8 +53301,10 @@ class $$MedicalAssessmentTableTableManager
                 gcsM: gcsM,
                 gcsV: gcsV,
                 leftPupilReactionId: leftPupilReactionId,
+                leftPupilReaction: leftPupilReaction,
                 leftPupilSize: leftPupilSize,
                 rightPupilReactionId: rightPupilReactionId,
+                rightPupilReaction: rightPupilReaction,
                 rightPupilSize: rightPupilSize,
                 headNeckExam: headNeckExam,
                 chestExam: chestExam,
@@ -65318,6 +67996,1893 @@ typedef $$AmbulanceEscortStaffTableProcessedTableManager =
       AmbulanceEscortStaffData,
       PrefetchHooks Function({bool recordId})
     >;
+typedef $$EmergencyTreatmentTableCreateCompanionBuilder =
+    EmergencyTreatmentCompanion Function({
+      Value<int> id,
+      required int medicalId,
+      Value<DateTime?> startTime,
+      Value<String?> diagnosis,
+      Value<String?> incidentContext,
+      Value<int?> initialAssessmentId,
+      Value<int?> postAssessmentId,
+      Value<DateTime?> intubationStartTime,
+      Value<String?> intubationMethod,
+      Value<String?> intubationSize,
+      Value<String?> intubationNotes,
+      Value<DateTime?> ivLineStartTime,
+      Value<String?> ivLineSize,
+      Value<String?> ivLineNotes,
+      Value<DateTime?> cprStartTime,
+      Value<DateTime?> cprEndTime,
+      Value<String?> cprNotes,
+      Value<String?> postRespirationMode,
+      Value<String?> postRespirationOthers,
+      Value<DateTime?> endTime,
+      Value<String?> result,
+      Value<String?> endCareNotes,
+      Value<String?> directorName,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+    });
+typedef $$EmergencyTreatmentTableUpdateCompanionBuilder =
+    EmergencyTreatmentCompanion Function({
+      Value<int> id,
+      Value<int> medicalId,
+      Value<DateTime?> startTime,
+      Value<String?> diagnosis,
+      Value<String?> incidentContext,
+      Value<int?> initialAssessmentId,
+      Value<int?> postAssessmentId,
+      Value<DateTime?> intubationStartTime,
+      Value<String?> intubationMethod,
+      Value<String?> intubationSize,
+      Value<String?> intubationNotes,
+      Value<DateTime?> ivLineStartTime,
+      Value<String?> ivLineSize,
+      Value<String?> ivLineNotes,
+      Value<DateTime?> cprStartTime,
+      Value<DateTime?> cprEndTime,
+      Value<String?> cprNotes,
+      Value<String?> postRespirationMode,
+      Value<String?> postRespirationOthers,
+      Value<DateTime?> endTime,
+      Value<String?> result,
+      Value<String?> endCareNotes,
+      Value<String?> directorName,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+    });
+
+final class $$EmergencyTreatmentTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $EmergencyTreatmentTable,
+          EmergencyTreatmentData
+        > {
+  $$EmergencyTreatmentTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $MedicalRecordTable _medicalIdTable(_$AppDatabase db) =>
+      db.medicalRecord.createAlias(
+        $_aliasNameGenerator(
+          db.emergencyTreatment.medicalId,
+          db.medicalRecord.medicalId,
+        ),
+      );
+
+  $$MedicalRecordTableProcessedTableManager get medicalId {
+    final $_column = $_itemColumn<int>('medical_id')!;
+
+    final manager = $$MedicalRecordTableTableManager(
+      $_db,
+      $_db.medicalRecord,
+    ).filter((f) => f.medicalId.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_medicalIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $MedicalAssessmentTable _initialAssessmentIdTable(_$AppDatabase db) =>
+      db.medicalAssessment.createAlias(
+        $_aliasNameGenerator(
+          db.emergencyTreatment.initialAssessmentId,
+          db.medicalAssessment.assessmentId,
+        ),
+      );
+
+  $$MedicalAssessmentTableProcessedTableManager? get initialAssessmentId {
+    final $_column = $_itemColumn<int>('initial_assessment_id');
+    if ($_column == null) return null;
+    final manager = $$MedicalAssessmentTableTableManager(
+      $_db,
+      $_db.medicalAssessment,
+    ).filter((f) => f.assessmentId.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_initialAssessmentIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $MedicalAssessmentTable _postAssessmentIdTable(_$AppDatabase db) =>
+      db.medicalAssessment.createAlias(
+        $_aliasNameGenerator(
+          db.emergencyTreatment.postAssessmentId,
+          db.medicalAssessment.assessmentId,
+        ),
+      );
+
+  $$MedicalAssessmentTableProcessedTableManager? get postAssessmentId {
+    final $_column = $_itemColumn<int>('post_assessment_id');
+    if ($_column == null) return null;
+    final manager = $$MedicalAssessmentTableTableManager(
+      $_db,
+      $_db.medicalAssessment,
+    ).filter((f) => f.assessmentId.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_postAssessmentIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static MultiTypedResultKey<$FirstAidLogTable, List<FirstAidLogData>>
+  _firstAidLogRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.firstAidLog,
+    aliasName: $_aliasNameGenerator(
+      db.emergencyTreatment.id,
+      db.firstAidLog.emergencyTreatmentId,
+    ),
+  );
+
+  $$FirstAidLogTableProcessedTableManager get firstAidLogRefs {
+    final manager = $$FirstAidLogTableTableManager($_db, $_db.firstAidLog)
+        .filter(
+          (f) => f.emergencyTreatmentId.id.sqlEquals($_itemColumn<int>('id')!),
+        );
+
+    final cache = $_typedResult.readTableOrNull(_firstAidLogRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $EmergencyAssistStaffTable,
+    List<EmergencyAssistStaffData>
+  >
+  _emergencyAssistStaffRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.emergencyAssistStaff,
+        aliasName: $_aliasNameGenerator(
+          db.emergencyTreatment.id,
+          db.emergencyAssistStaff.emergencyTreatmentId,
+        ),
+      );
+
+  $$EmergencyAssistStaffTableProcessedTableManager
+  get emergencyAssistStaffRefs {
+    final manager =
+        $$EmergencyAssistStaffTableTableManager(
+          $_db,
+          $_db.emergencyAssistStaff,
+        ).filter(
+          (f) => f.emergencyTreatmentId.id.sqlEquals($_itemColumn<int>('id')!),
+        );
+
+    final cache = $_typedResult.readTableOrNull(
+      _emergencyAssistStaffRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$EmergencyTreatmentTableFilterComposer
+    extends Composer<_$AppDatabase, $EmergencyTreatmentTable> {
+  $$EmergencyTreatmentTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get startTime => $composableBuilder(
+    column: $table.startTime,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get diagnosis => $composableBuilder(
+    column: $table.diagnosis,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get incidentContext => $composableBuilder(
+    column: $table.incidentContext,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get intubationStartTime => $composableBuilder(
+    column: $table.intubationStartTime,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get intubationMethod => $composableBuilder(
+    column: $table.intubationMethod,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get intubationSize => $composableBuilder(
+    column: $table.intubationSize,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get intubationNotes => $composableBuilder(
+    column: $table.intubationNotes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get ivLineStartTime => $composableBuilder(
+    column: $table.ivLineStartTime,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get ivLineSize => $composableBuilder(
+    column: $table.ivLineSize,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get ivLineNotes => $composableBuilder(
+    column: $table.ivLineNotes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get cprStartTime => $composableBuilder(
+    column: $table.cprStartTime,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get cprEndTime => $composableBuilder(
+    column: $table.cprEndTime,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get cprNotes => $composableBuilder(
+    column: $table.cprNotes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get postRespirationMode => $composableBuilder(
+    column: $table.postRespirationMode,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get postRespirationOthers => $composableBuilder(
+    column: $table.postRespirationOthers,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get endTime => $composableBuilder(
+    column: $table.endTime,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get result => $composableBuilder(
+    column: $table.result,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get endCareNotes => $composableBuilder(
+    column: $table.endCareNotes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get directorName => $composableBuilder(
+    column: $table.directorName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$MedicalRecordTableFilterComposer get medicalId {
+    final $$MedicalRecordTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.medicalId,
+      referencedTable: $db.medicalRecord,
+      getReferencedColumn: (t) => t.medicalId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MedicalRecordTableFilterComposer(
+            $db: $db,
+            $table: $db.medicalRecord,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$MedicalAssessmentTableFilterComposer get initialAssessmentId {
+    final $$MedicalAssessmentTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.initialAssessmentId,
+      referencedTable: $db.medicalAssessment,
+      getReferencedColumn: (t) => t.assessmentId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MedicalAssessmentTableFilterComposer(
+            $db: $db,
+            $table: $db.medicalAssessment,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$MedicalAssessmentTableFilterComposer get postAssessmentId {
+    final $$MedicalAssessmentTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.postAssessmentId,
+      referencedTable: $db.medicalAssessment,
+      getReferencedColumn: (t) => t.assessmentId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MedicalAssessmentTableFilterComposer(
+            $db: $db,
+            $table: $db.medicalAssessment,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<bool> firstAidLogRefs(
+    Expression<bool> Function($$FirstAidLogTableFilterComposer f) f,
+  ) {
+    final $$FirstAidLogTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.firstAidLog,
+      getReferencedColumn: (t) => t.emergencyTreatmentId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FirstAidLogTableFilterComposer(
+            $db: $db,
+            $table: $db.firstAidLog,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> emergencyAssistStaffRefs(
+    Expression<bool> Function($$EmergencyAssistStaffTableFilterComposer f) f,
+  ) {
+    final $$EmergencyAssistStaffTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.emergencyAssistStaff,
+      getReferencedColumn: (t) => t.emergencyTreatmentId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$EmergencyAssistStaffTableFilterComposer(
+            $db: $db,
+            $table: $db.emergencyAssistStaff,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$EmergencyTreatmentTableOrderingComposer
+    extends Composer<_$AppDatabase, $EmergencyTreatmentTable> {
+  $$EmergencyTreatmentTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get startTime => $composableBuilder(
+    column: $table.startTime,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get diagnosis => $composableBuilder(
+    column: $table.diagnosis,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get incidentContext => $composableBuilder(
+    column: $table.incidentContext,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get intubationStartTime => $composableBuilder(
+    column: $table.intubationStartTime,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get intubationMethod => $composableBuilder(
+    column: $table.intubationMethod,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get intubationSize => $composableBuilder(
+    column: $table.intubationSize,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get intubationNotes => $composableBuilder(
+    column: $table.intubationNotes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get ivLineStartTime => $composableBuilder(
+    column: $table.ivLineStartTime,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get ivLineSize => $composableBuilder(
+    column: $table.ivLineSize,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get ivLineNotes => $composableBuilder(
+    column: $table.ivLineNotes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get cprStartTime => $composableBuilder(
+    column: $table.cprStartTime,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get cprEndTime => $composableBuilder(
+    column: $table.cprEndTime,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get cprNotes => $composableBuilder(
+    column: $table.cprNotes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get postRespirationMode => $composableBuilder(
+    column: $table.postRespirationMode,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get postRespirationOthers => $composableBuilder(
+    column: $table.postRespirationOthers,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get endTime => $composableBuilder(
+    column: $table.endTime,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get result => $composableBuilder(
+    column: $table.result,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get endCareNotes => $composableBuilder(
+    column: $table.endCareNotes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get directorName => $composableBuilder(
+    column: $table.directorName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$MedicalRecordTableOrderingComposer get medicalId {
+    final $$MedicalRecordTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.medicalId,
+      referencedTable: $db.medicalRecord,
+      getReferencedColumn: (t) => t.medicalId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MedicalRecordTableOrderingComposer(
+            $db: $db,
+            $table: $db.medicalRecord,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$MedicalAssessmentTableOrderingComposer get initialAssessmentId {
+    final $$MedicalAssessmentTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.initialAssessmentId,
+      referencedTable: $db.medicalAssessment,
+      getReferencedColumn: (t) => t.assessmentId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MedicalAssessmentTableOrderingComposer(
+            $db: $db,
+            $table: $db.medicalAssessment,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$MedicalAssessmentTableOrderingComposer get postAssessmentId {
+    final $$MedicalAssessmentTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.postAssessmentId,
+      referencedTable: $db.medicalAssessment,
+      getReferencedColumn: (t) => t.assessmentId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MedicalAssessmentTableOrderingComposer(
+            $db: $db,
+            $table: $db.medicalAssessment,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$EmergencyTreatmentTableAnnotationComposer
+    extends Composer<_$AppDatabase, $EmergencyTreatmentTable> {
+  $$EmergencyTreatmentTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get startTime =>
+      $composableBuilder(column: $table.startTime, builder: (column) => column);
+
+  GeneratedColumn<String> get diagnosis =>
+      $composableBuilder(column: $table.diagnosis, builder: (column) => column);
+
+  GeneratedColumn<String> get incidentContext => $composableBuilder(
+    column: $table.incidentContext,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get intubationStartTime => $composableBuilder(
+    column: $table.intubationStartTime,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get intubationMethod => $composableBuilder(
+    column: $table.intubationMethod,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get intubationSize => $composableBuilder(
+    column: $table.intubationSize,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get intubationNotes => $composableBuilder(
+    column: $table.intubationNotes,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get ivLineStartTime => $composableBuilder(
+    column: $table.ivLineStartTime,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get ivLineSize => $composableBuilder(
+    column: $table.ivLineSize,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get ivLineNotes => $composableBuilder(
+    column: $table.ivLineNotes,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get cprStartTime => $composableBuilder(
+    column: $table.cprStartTime,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get cprEndTime => $composableBuilder(
+    column: $table.cprEndTime,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get cprNotes =>
+      $composableBuilder(column: $table.cprNotes, builder: (column) => column);
+
+  GeneratedColumn<String> get postRespirationMode => $composableBuilder(
+    column: $table.postRespirationMode,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get postRespirationOthers => $composableBuilder(
+    column: $table.postRespirationOthers,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get endTime =>
+      $composableBuilder(column: $table.endTime, builder: (column) => column);
+
+  GeneratedColumn<String> get result =>
+      $composableBuilder(column: $table.result, builder: (column) => column);
+
+  GeneratedColumn<String> get endCareNotes => $composableBuilder(
+    column: $table.endCareNotes,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get directorName => $composableBuilder(
+    column: $table.directorName,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  $$MedicalRecordTableAnnotationComposer get medicalId {
+    final $$MedicalRecordTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.medicalId,
+      referencedTable: $db.medicalRecord,
+      getReferencedColumn: (t) => t.medicalId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MedicalRecordTableAnnotationComposer(
+            $db: $db,
+            $table: $db.medicalRecord,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$MedicalAssessmentTableAnnotationComposer get initialAssessmentId {
+    final $$MedicalAssessmentTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.initialAssessmentId,
+          referencedTable: $db.medicalAssessment,
+          getReferencedColumn: (t) => t.assessmentId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$MedicalAssessmentTableAnnotationComposer(
+                $db: $db,
+                $table: $db.medicalAssessment,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+
+  $$MedicalAssessmentTableAnnotationComposer get postAssessmentId {
+    final $$MedicalAssessmentTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.postAssessmentId,
+          referencedTable: $db.medicalAssessment,
+          getReferencedColumn: (t) => t.assessmentId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$MedicalAssessmentTableAnnotationComposer(
+                $db: $db,
+                $table: $db.medicalAssessment,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+
+  Expression<T> firstAidLogRefs<T extends Object>(
+    Expression<T> Function($$FirstAidLogTableAnnotationComposer a) f,
+  ) {
+    final $$FirstAidLogTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.firstAidLog,
+      getReferencedColumn: (t) => t.emergencyTreatmentId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FirstAidLogTableAnnotationComposer(
+            $db: $db,
+            $table: $db.firstAidLog,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> emergencyAssistStaffRefs<T extends Object>(
+    Expression<T> Function($$EmergencyAssistStaffTableAnnotationComposer a) f,
+  ) {
+    final $$EmergencyAssistStaffTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.emergencyAssistStaff,
+          getReferencedColumn: (t) => t.emergencyTreatmentId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$EmergencyAssistStaffTableAnnotationComposer(
+                $db: $db,
+                $table: $db.emergencyAssistStaff,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+}
+
+class $$EmergencyTreatmentTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $EmergencyTreatmentTable,
+          EmergencyTreatmentData,
+          $$EmergencyTreatmentTableFilterComposer,
+          $$EmergencyTreatmentTableOrderingComposer,
+          $$EmergencyTreatmentTableAnnotationComposer,
+          $$EmergencyTreatmentTableCreateCompanionBuilder,
+          $$EmergencyTreatmentTableUpdateCompanionBuilder,
+          (EmergencyTreatmentData, $$EmergencyTreatmentTableReferences),
+          EmergencyTreatmentData,
+          PrefetchHooks Function({
+            bool medicalId,
+            bool initialAssessmentId,
+            bool postAssessmentId,
+            bool firstAidLogRefs,
+            bool emergencyAssistStaffRefs,
+          })
+        > {
+  $$EmergencyTreatmentTableTableManager(
+    _$AppDatabase db,
+    $EmergencyTreatmentTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$EmergencyTreatmentTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$EmergencyTreatmentTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$EmergencyTreatmentTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> medicalId = const Value.absent(),
+                Value<DateTime?> startTime = const Value.absent(),
+                Value<String?> diagnosis = const Value.absent(),
+                Value<String?> incidentContext = const Value.absent(),
+                Value<int?> initialAssessmentId = const Value.absent(),
+                Value<int?> postAssessmentId = const Value.absent(),
+                Value<DateTime?> intubationStartTime = const Value.absent(),
+                Value<String?> intubationMethod = const Value.absent(),
+                Value<String?> intubationSize = const Value.absent(),
+                Value<String?> intubationNotes = const Value.absent(),
+                Value<DateTime?> ivLineStartTime = const Value.absent(),
+                Value<String?> ivLineSize = const Value.absent(),
+                Value<String?> ivLineNotes = const Value.absent(),
+                Value<DateTime?> cprStartTime = const Value.absent(),
+                Value<DateTime?> cprEndTime = const Value.absent(),
+                Value<String?> cprNotes = const Value.absent(),
+                Value<String?> postRespirationMode = const Value.absent(),
+                Value<String?> postRespirationOthers = const Value.absent(),
+                Value<DateTime?> endTime = const Value.absent(),
+                Value<String?> result = const Value.absent(),
+                Value<String?> endCareNotes = const Value.absent(),
+                Value<String?> directorName = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+              }) => EmergencyTreatmentCompanion(
+                id: id,
+                medicalId: medicalId,
+                startTime: startTime,
+                diagnosis: diagnosis,
+                incidentContext: incidentContext,
+                initialAssessmentId: initialAssessmentId,
+                postAssessmentId: postAssessmentId,
+                intubationStartTime: intubationStartTime,
+                intubationMethod: intubationMethod,
+                intubationSize: intubationSize,
+                intubationNotes: intubationNotes,
+                ivLineStartTime: ivLineStartTime,
+                ivLineSize: ivLineSize,
+                ivLineNotes: ivLineNotes,
+                cprStartTime: cprStartTime,
+                cprEndTime: cprEndTime,
+                cprNotes: cprNotes,
+                postRespirationMode: postRespirationMode,
+                postRespirationOthers: postRespirationOthers,
+                endTime: endTime,
+                result: result,
+                endCareNotes: endCareNotes,
+                directorName: directorName,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int medicalId,
+                Value<DateTime?> startTime = const Value.absent(),
+                Value<String?> diagnosis = const Value.absent(),
+                Value<String?> incidentContext = const Value.absent(),
+                Value<int?> initialAssessmentId = const Value.absent(),
+                Value<int?> postAssessmentId = const Value.absent(),
+                Value<DateTime?> intubationStartTime = const Value.absent(),
+                Value<String?> intubationMethod = const Value.absent(),
+                Value<String?> intubationSize = const Value.absent(),
+                Value<String?> intubationNotes = const Value.absent(),
+                Value<DateTime?> ivLineStartTime = const Value.absent(),
+                Value<String?> ivLineSize = const Value.absent(),
+                Value<String?> ivLineNotes = const Value.absent(),
+                Value<DateTime?> cprStartTime = const Value.absent(),
+                Value<DateTime?> cprEndTime = const Value.absent(),
+                Value<String?> cprNotes = const Value.absent(),
+                Value<String?> postRespirationMode = const Value.absent(),
+                Value<String?> postRespirationOthers = const Value.absent(),
+                Value<DateTime?> endTime = const Value.absent(),
+                Value<String?> result = const Value.absent(),
+                Value<String?> endCareNotes = const Value.absent(),
+                Value<String?> directorName = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+              }) => EmergencyTreatmentCompanion.insert(
+                id: id,
+                medicalId: medicalId,
+                startTime: startTime,
+                diagnosis: diagnosis,
+                incidentContext: incidentContext,
+                initialAssessmentId: initialAssessmentId,
+                postAssessmentId: postAssessmentId,
+                intubationStartTime: intubationStartTime,
+                intubationMethod: intubationMethod,
+                intubationSize: intubationSize,
+                intubationNotes: intubationNotes,
+                ivLineStartTime: ivLineStartTime,
+                ivLineSize: ivLineSize,
+                ivLineNotes: ivLineNotes,
+                cprStartTime: cprStartTime,
+                cprEndTime: cprEndTime,
+                cprNotes: cprNotes,
+                postRespirationMode: postRespirationMode,
+                postRespirationOthers: postRespirationOthers,
+                endTime: endTime,
+                result: result,
+                endCareNotes: endCareNotes,
+                directorName: directorName,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$EmergencyTreatmentTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({
+                medicalId = false,
+                initialAssessmentId = false,
+                postAssessmentId = false,
+                firstAidLogRefs = false,
+                emergencyAssistStaffRefs = false,
+              }) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (firstAidLogRefs) db.firstAidLog,
+                    if (emergencyAssistStaffRefs) db.emergencyAssistStaff,
+                  ],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (medicalId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.medicalId,
+                                    referencedTable:
+                                        $$EmergencyTreatmentTableReferences
+                                            ._medicalIdTable(db),
+                                    referencedColumn:
+                                        $$EmergencyTreatmentTableReferences
+                                            ._medicalIdTable(db)
+                                            .medicalId,
+                                  )
+                                  as T;
+                        }
+                        if (initialAssessmentId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.initialAssessmentId,
+                                    referencedTable:
+                                        $$EmergencyTreatmentTableReferences
+                                            ._initialAssessmentIdTable(db),
+                                    referencedColumn:
+                                        $$EmergencyTreatmentTableReferences
+                                            ._initialAssessmentIdTable(db)
+                                            .assessmentId,
+                                  )
+                                  as T;
+                        }
+                        if (postAssessmentId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.postAssessmentId,
+                                    referencedTable:
+                                        $$EmergencyTreatmentTableReferences
+                                            ._postAssessmentIdTable(db),
+                                    referencedColumn:
+                                        $$EmergencyTreatmentTableReferences
+                                            ._postAssessmentIdTable(db)
+                                            .assessmentId,
+                                  )
+                                  as T;
+                        }
+
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (firstAidLogRefs)
+                        await $_getPrefetchedData<
+                          EmergencyTreatmentData,
+                          $EmergencyTreatmentTable,
+                          FirstAidLogData
+                        >(
+                          currentTable: table,
+                          referencedTable: $$EmergencyTreatmentTableReferences
+                              ._firstAidLogRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$EmergencyTreatmentTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).firstAidLogRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.emergencyTreatmentId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (emergencyAssistStaffRefs)
+                        await $_getPrefetchedData<
+                          EmergencyTreatmentData,
+                          $EmergencyTreatmentTable,
+                          EmergencyAssistStaffData
+                        >(
+                          currentTable: table,
+                          referencedTable: $$EmergencyTreatmentTableReferences
+                              ._emergencyAssistStaffRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$EmergencyTreatmentTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).emergencyAssistStaffRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.emergencyTreatmentId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$EmergencyTreatmentTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $EmergencyTreatmentTable,
+      EmergencyTreatmentData,
+      $$EmergencyTreatmentTableFilterComposer,
+      $$EmergencyTreatmentTableOrderingComposer,
+      $$EmergencyTreatmentTableAnnotationComposer,
+      $$EmergencyTreatmentTableCreateCompanionBuilder,
+      $$EmergencyTreatmentTableUpdateCompanionBuilder,
+      (EmergencyTreatmentData, $$EmergencyTreatmentTableReferences),
+      EmergencyTreatmentData,
+      PrefetchHooks Function({
+        bool medicalId,
+        bool initialAssessmentId,
+        bool postAssessmentId,
+        bool firstAidLogRefs,
+        bool emergencyAssistStaffRefs,
+      })
+    >;
+typedef $$FirstAidLogTableCreateCompanionBuilder =
+    FirstAidLogCompanion Function({
+      Value<int> id,
+      required int emergencyTreatmentId,
+      Value<String?> time,
+      Value<String?> heartRate,
+      Value<String?> bloodPressure,
+      Value<String?> respirationRate,
+      Value<String?> o2,
+      Value<String?> shock,
+      Value<String?> epinephrine,
+      Value<String?> otherMeds,
+      Value<int> sortOrder,
+    });
+typedef $$FirstAidLogTableUpdateCompanionBuilder =
+    FirstAidLogCompanion Function({
+      Value<int> id,
+      Value<int> emergencyTreatmentId,
+      Value<String?> time,
+      Value<String?> heartRate,
+      Value<String?> bloodPressure,
+      Value<String?> respirationRate,
+      Value<String?> o2,
+      Value<String?> shock,
+      Value<String?> epinephrine,
+      Value<String?> otherMeds,
+      Value<int> sortOrder,
+    });
+
+final class $$FirstAidLogTableReferences
+    extends BaseReferences<_$AppDatabase, $FirstAidLogTable, FirstAidLogData> {
+  $$FirstAidLogTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $EmergencyTreatmentTable _emergencyTreatmentIdTable(
+    _$AppDatabase db,
+  ) => db.emergencyTreatment.createAlias(
+    $_aliasNameGenerator(
+      db.firstAidLog.emergencyTreatmentId,
+      db.emergencyTreatment.id,
+    ),
+  );
+
+  $$EmergencyTreatmentTableProcessedTableManager get emergencyTreatmentId {
+    final $_column = $_itemColumn<int>('emergency_treatment_id')!;
+
+    final manager = $$EmergencyTreatmentTableTableManager(
+      $_db,
+      $_db.emergencyTreatment,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(
+      _emergencyTreatmentIdTable($_db),
+    );
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$FirstAidLogTableFilterComposer
+    extends Composer<_$AppDatabase, $FirstAidLogTable> {
+  $$FirstAidLogTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get time => $composableBuilder(
+    column: $table.time,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get heartRate => $composableBuilder(
+    column: $table.heartRate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get bloodPressure => $composableBuilder(
+    column: $table.bloodPressure,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get respirationRate => $composableBuilder(
+    column: $table.respirationRate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get o2 => $composableBuilder(
+    column: $table.o2,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get shock => $composableBuilder(
+    column: $table.shock,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get epinephrine => $composableBuilder(
+    column: $table.epinephrine,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get otherMeds => $composableBuilder(
+    column: $table.otherMeds,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get sortOrder => $composableBuilder(
+    column: $table.sortOrder,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$EmergencyTreatmentTableFilterComposer get emergencyTreatmentId {
+    final $$EmergencyTreatmentTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.emergencyTreatmentId,
+      referencedTable: $db.emergencyTreatment,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$EmergencyTreatmentTableFilterComposer(
+            $db: $db,
+            $table: $db.emergencyTreatment,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$FirstAidLogTableOrderingComposer
+    extends Composer<_$AppDatabase, $FirstAidLogTable> {
+  $$FirstAidLogTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get time => $composableBuilder(
+    column: $table.time,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get heartRate => $composableBuilder(
+    column: $table.heartRate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get bloodPressure => $composableBuilder(
+    column: $table.bloodPressure,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get respirationRate => $composableBuilder(
+    column: $table.respirationRate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get o2 => $composableBuilder(
+    column: $table.o2,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get shock => $composableBuilder(
+    column: $table.shock,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get epinephrine => $composableBuilder(
+    column: $table.epinephrine,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get otherMeds => $composableBuilder(
+    column: $table.otherMeds,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get sortOrder => $composableBuilder(
+    column: $table.sortOrder,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$EmergencyTreatmentTableOrderingComposer get emergencyTreatmentId {
+    final $$EmergencyTreatmentTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.emergencyTreatmentId,
+      referencedTable: $db.emergencyTreatment,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$EmergencyTreatmentTableOrderingComposer(
+            $db: $db,
+            $table: $db.emergencyTreatment,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$FirstAidLogTableAnnotationComposer
+    extends Composer<_$AppDatabase, $FirstAidLogTable> {
+  $$FirstAidLogTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get time =>
+      $composableBuilder(column: $table.time, builder: (column) => column);
+
+  GeneratedColumn<String> get heartRate =>
+      $composableBuilder(column: $table.heartRate, builder: (column) => column);
+
+  GeneratedColumn<String> get bloodPressure => $composableBuilder(
+    column: $table.bloodPressure,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get respirationRate => $composableBuilder(
+    column: $table.respirationRate,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get o2 =>
+      $composableBuilder(column: $table.o2, builder: (column) => column);
+
+  GeneratedColumn<String> get shock =>
+      $composableBuilder(column: $table.shock, builder: (column) => column);
+
+  GeneratedColumn<String> get epinephrine => $composableBuilder(
+    column: $table.epinephrine,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get otherMeds =>
+      $composableBuilder(column: $table.otherMeds, builder: (column) => column);
+
+  GeneratedColumn<int> get sortOrder =>
+      $composableBuilder(column: $table.sortOrder, builder: (column) => column);
+
+  $$EmergencyTreatmentTableAnnotationComposer get emergencyTreatmentId {
+    final $$EmergencyTreatmentTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.emergencyTreatmentId,
+          referencedTable: $db.emergencyTreatment,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$EmergencyTreatmentTableAnnotationComposer(
+                $db: $db,
+                $table: $db.emergencyTreatment,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+}
+
+class $$FirstAidLogTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $FirstAidLogTable,
+          FirstAidLogData,
+          $$FirstAidLogTableFilterComposer,
+          $$FirstAidLogTableOrderingComposer,
+          $$FirstAidLogTableAnnotationComposer,
+          $$FirstAidLogTableCreateCompanionBuilder,
+          $$FirstAidLogTableUpdateCompanionBuilder,
+          (FirstAidLogData, $$FirstAidLogTableReferences),
+          FirstAidLogData,
+          PrefetchHooks Function({bool emergencyTreatmentId})
+        > {
+  $$FirstAidLogTableTableManager(_$AppDatabase db, $FirstAidLogTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$FirstAidLogTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$FirstAidLogTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$FirstAidLogTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> emergencyTreatmentId = const Value.absent(),
+                Value<String?> time = const Value.absent(),
+                Value<String?> heartRate = const Value.absent(),
+                Value<String?> bloodPressure = const Value.absent(),
+                Value<String?> respirationRate = const Value.absent(),
+                Value<String?> o2 = const Value.absent(),
+                Value<String?> shock = const Value.absent(),
+                Value<String?> epinephrine = const Value.absent(),
+                Value<String?> otherMeds = const Value.absent(),
+                Value<int> sortOrder = const Value.absent(),
+              }) => FirstAidLogCompanion(
+                id: id,
+                emergencyTreatmentId: emergencyTreatmentId,
+                time: time,
+                heartRate: heartRate,
+                bloodPressure: bloodPressure,
+                respirationRate: respirationRate,
+                o2: o2,
+                shock: shock,
+                epinephrine: epinephrine,
+                otherMeds: otherMeds,
+                sortOrder: sortOrder,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int emergencyTreatmentId,
+                Value<String?> time = const Value.absent(),
+                Value<String?> heartRate = const Value.absent(),
+                Value<String?> bloodPressure = const Value.absent(),
+                Value<String?> respirationRate = const Value.absent(),
+                Value<String?> o2 = const Value.absent(),
+                Value<String?> shock = const Value.absent(),
+                Value<String?> epinephrine = const Value.absent(),
+                Value<String?> otherMeds = const Value.absent(),
+                Value<int> sortOrder = const Value.absent(),
+              }) => FirstAidLogCompanion.insert(
+                id: id,
+                emergencyTreatmentId: emergencyTreatmentId,
+                time: time,
+                heartRate: heartRate,
+                bloodPressure: bloodPressure,
+                respirationRate: respirationRate,
+                o2: o2,
+                shock: shock,
+                epinephrine: epinephrine,
+                otherMeds: otherMeds,
+                sortOrder: sortOrder,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$FirstAidLogTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({emergencyTreatmentId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (emergencyTreatmentId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.emergencyTreatmentId,
+                                referencedTable: $$FirstAidLogTableReferences
+                                    ._emergencyTreatmentIdTable(db),
+                                referencedColumn: $$FirstAidLogTableReferences
+                                    ._emergencyTreatmentIdTable(db)
+                                    .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$FirstAidLogTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $FirstAidLogTable,
+      FirstAidLogData,
+      $$FirstAidLogTableFilterComposer,
+      $$FirstAidLogTableOrderingComposer,
+      $$FirstAidLogTableAnnotationComposer,
+      $$FirstAidLogTableCreateCompanionBuilder,
+      $$FirstAidLogTableUpdateCompanionBuilder,
+      (FirstAidLogData, $$FirstAidLogTableReferences),
+      FirstAidLogData,
+      PrefetchHooks Function({bool emergencyTreatmentId})
+    >;
+typedef $$EmergencyAssistStaffTableCreateCompanionBuilder =
+    EmergencyAssistStaffCompanion Function({
+      Value<int> id,
+      required int emergencyTreatmentId,
+      required String name,
+    });
+typedef $$EmergencyAssistStaffTableUpdateCompanionBuilder =
+    EmergencyAssistStaffCompanion Function({
+      Value<int> id,
+      Value<int> emergencyTreatmentId,
+      Value<String> name,
+    });
+
+final class $$EmergencyAssistStaffTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $EmergencyAssistStaffTable,
+          EmergencyAssistStaffData
+        > {
+  $$EmergencyAssistStaffTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $EmergencyTreatmentTable _emergencyTreatmentIdTable(
+    _$AppDatabase db,
+  ) => db.emergencyTreatment.createAlias(
+    $_aliasNameGenerator(
+      db.emergencyAssistStaff.emergencyTreatmentId,
+      db.emergencyTreatment.id,
+    ),
+  );
+
+  $$EmergencyTreatmentTableProcessedTableManager get emergencyTreatmentId {
+    final $_column = $_itemColumn<int>('emergency_treatment_id')!;
+
+    final manager = $$EmergencyTreatmentTableTableManager(
+      $_db,
+      $_db.emergencyTreatment,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(
+      _emergencyTreatmentIdTable($_db),
+    );
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$EmergencyAssistStaffTableFilterComposer
+    extends Composer<_$AppDatabase, $EmergencyAssistStaffTable> {
+  $$EmergencyAssistStaffTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$EmergencyTreatmentTableFilterComposer get emergencyTreatmentId {
+    final $$EmergencyTreatmentTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.emergencyTreatmentId,
+      referencedTable: $db.emergencyTreatment,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$EmergencyTreatmentTableFilterComposer(
+            $db: $db,
+            $table: $db.emergencyTreatment,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$EmergencyAssistStaffTableOrderingComposer
+    extends Composer<_$AppDatabase, $EmergencyAssistStaffTable> {
+  $$EmergencyAssistStaffTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$EmergencyTreatmentTableOrderingComposer get emergencyTreatmentId {
+    final $$EmergencyTreatmentTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.emergencyTreatmentId,
+      referencedTable: $db.emergencyTreatment,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$EmergencyTreatmentTableOrderingComposer(
+            $db: $db,
+            $table: $db.emergencyTreatment,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$EmergencyAssistStaffTableAnnotationComposer
+    extends Composer<_$AppDatabase, $EmergencyAssistStaffTable> {
+  $$EmergencyAssistStaffTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  $$EmergencyTreatmentTableAnnotationComposer get emergencyTreatmentId {
+    final $$EmergencyTreatmentTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.emergencyTreatmentId,
+          referencedTable: $db.emergencyTreatment,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$EmergencyTreatmentTableAnnotationComposer(
+                $db: $db,
+                $table: $db.emergencyTreatment,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+}
+
+class $$EmergencyAssistStaffTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $EmergencyAssistStaffTable,
+          EmergencyAssistStaffData,
+          $$EmergencyAssistStaffTableFilterComposer,
+          $$EmergencyAssistStaffTableOrderingComposer,
+          $$EmergencyAssistStaffTableAnnotationComposer,
+          $$EmergencyAssistStaffTableCreateCompanionBuilder,
+          $$EmergencyAssistStaffTableUpdateCompanionBuilder,
+          (EmergencyAssistStaffData, $$EmergencyAssistStaffTableReferences),
+          EmergencyAssistStaffData,
+          PrefetchHooks Function({bool emergencyTreatmentId})
+        > {
+  $$EmergencyAssistStaffTableTableManager(
+    _$AppDatabase db,
+    $EmergencyAssistStaffTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$EmergencyAssistStaffTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$EmergencyAssistStaffTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$EmergencyAssistStaffTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> emergencyTreatmentId = const Value.absent(),
+                Value<String> name = const Value.absent(),
+              }) => EmergencyAssistStaffCompanion(
+                id: id,
+                emergencyTreatmentId: emergencyTreatmentId,
+                name: name,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int emergencyTreatmentId,
+                required String name,
+              }) => EmergencyAssistStaffCompanion.insert(
+                id: id,
+                emergencyTreatmentId: emergencyTreatmentId,
+                name: name,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$EmergencyAssistStaffTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({emergencyTreatmentId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (emergencyTreatmentId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.emergencyTreatmentId,
+                                referencedTable:
+                                    $$EmergencyAssistStaffTableReferences
+                                        ._emergencyTreatmentIdTable(db),
+                                referencedColumn:
+                                    $$EmergencyAssistStaffTableReferences
+                                        ._emergencyTreatmentIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$EmergencyAssistStaffTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $EmergencyAssistStaffTable,
+      EmergencyAssistStaffData,
+      $$EmergencyAssistStaffTableFilterComposer,
+      $$EmergencyAssistStaffTableOrderingComposer,
+      $$EmergencyAssistStaffTableAnnotationComposer,
+      $$EmergencyAssistStaffTableCreateCompanionBuilder,
+      $$EmergencyAssistStaffTableUpdateCompanionBuilder,
+      (EmergencyAssistStaffData, $$EmergencyAssistStaffTableReferences),
+      EmergencyAssistStaffData,
+      PrefetchHooks Function({bool emergencyTreatmentId})
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -65496,4 +70061,10 @@ class $AppDatabaseManager {
       $$AmbulanceVitalSignsTableTableManager(_db, _db.ambulanceVitalSigns);
   $$AmbulanceEscortStaffTableTableManager get ambulanceEscortStaff =>
       $$AmbulanceEscortStaffTableTableManager(_db, _db.ambulanceEscortStaff);
+  $$EmergencyTreatmentTableTableManager get emergencyTreatment =>
+      $$EmergencyTreatmentTableTableManager(_db, _db.emergencyTreatment);
+  $$FirstAidLogTableTableManager get firstAidLog =>
+      $$FirstAidLogTableTableManager(_db, _db.firstAidLog);
+  $$EmergencyAssistStaffTableTableManager get emergencyAssistStaff =>
+      $$EmergencyAssistStaffTableTableManager(_db, _db.emergencyAssistStaff);
 }

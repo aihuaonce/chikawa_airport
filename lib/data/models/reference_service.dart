@@ -86,6 +86,21 @@ class ReferenceService extends ChangeNotifier {
 
   ReferenceService(this.db);
 
+  List<MedicalStaffRoleData> get staffRoles => _medicalStaffRoleList;
+
+  List<MedicalStaffData> getStaffByRole(String roleCode) {
+    final roleRef = _medicalStaffRoleList
+        .where((r) => r.code == roleCode)
+        .firstOrNull;
+    
+    if (roleRef == null) return [];
+
+    // Based on seed data, MedicalStaff.role matches MedicalStaffRole.nameEn
+    final searchKey = roleRef.nameEn ?? roleRef.code;
+    
+    return _medicalStaffList.where((s) => s.role == searchKey).toList();
+  }
+
   /// 初始化所有參考資料
   Future<void> initialize() async {
     await init();

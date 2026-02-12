@@ -29,6 +29,7 @@ import 'dao/nursing_record_dao.dart';
 import 'dao/referral_form_dao.dart';
 import 'dao/contact_dao.dart';
 import 'dao/ambulance_treatment_dao.dart';
+import 'dao/emergency_dao.dart';
 
 part 'database.g.dart';
 
@@ -112,6 +113,10 @@ part 'database.g.dart';
     AmbulanceMedicationLogs,
     AmbulanceVitalSigns,
     AmbulanceEscortStaff,
+    // Emergency Tables
+    EmergencyTreatment,
+    FirstAidLog,
+    EmergencyAssistStaff,
   ],
   daos: [
     ReferenceDao,
@@ -127,6 +132,7 @@ part 'database.g.dart';
     ReferralFormDao,
     AmbulanceDao,
     AmbulanceTreatmentDao,
+    EmergencyDao,
   ],
 )
 class AppDatabase extends _$AppDatabase {

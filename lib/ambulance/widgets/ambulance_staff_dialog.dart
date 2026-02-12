@@ -46,9 +46,9 @@ class _AmbulanceStaffDialogState extends State<AmbulanceStaffDialog> {
       if (widget.initialData == null) {
         await dao.addEscortStaff(companion);
       } else {
-        await (dao.update(dao.ambulanceEscortStaff)
-              ..where((t) => t.id.equals(widget.initialData!.id)))
-            .write(companion);
+        await (dao.update(
+          dao.ambulanceEscortStaff,
+        )..where((t) => t.id.equals(widget.initialData!.id))).write(companion);
       }
 
       if (mounted) {
@@ -67,7 +67,7 @@ class _AmbulanceStaffDialogState extends State<AmbulanceStaffDialog> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       backgroundColor: Colors.white,
       elevation: 0,
-      child: Container(
+      child: SizedBox(
         width: 400,
         child: Column(
           mainAxisSize: MainAxisSize.min,
