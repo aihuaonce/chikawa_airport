@@ -56,6 +56,26 @@ class SpecialNoteRef extends Table {
   BoolColumn get isActive => boolean().withDefault(const Constant(true))();
 }
 
+
+
+// 14. 插管方式參考表 (IntubationMethodRef)
+class IntubationMethodRef extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get code => text()(); // ET / LMA / IGEL / FAILURE
+  TextColumn get name => text()(); // ET / LMA / I-GEL / Failure
+  IntColumn get sortOrder => integer().withDefault(const Constant(0))();
+  BoolColumn get isActive => boolean().withDefault(const Constant(true))();
+}
+
+// 15. 呼吸方式參考表 (RespirationModeRef)
+class RespirationModeRef extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get code => text()(); // spontaneous / ventilator / ambu
+  TextColumn get name => text()(); // 自發性呼吸 / 呼吸器 / Ambu
+  IntColumn get sortOrder => integer().withDefault(const Constant(0))();
+  BoolColumn get isActive => boolean().withDefault(const Constant(true))();
+}
+
 //事故-二級地點表
 class IncidentPlaceCategory2 extends Table {
   IntColumn get id => integer().autoIncrement()();

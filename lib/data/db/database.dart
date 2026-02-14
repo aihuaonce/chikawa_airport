@@ -66,6 +66,9 @@ part 'database.g.dart';
     PupilReactionRef,
     ConsciousnessLevelRef,
     DrugRef,
+    IntubationMethodRef,
+    RespirationModeRef,
+    VisitReason,
 
     //醫療表
     MedicalRecord,

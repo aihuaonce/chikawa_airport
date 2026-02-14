@@ -50,6 +50,15 @@ class EmergencyDao extends DatabaseAccessor<AppDatabase>
     )..where((t) => t.id.equals(companion.id.value))).write(companion);
   }
 
+  // 獲取最新的醫療評估 (By medicalId)
+  Future<MedicalAssessmentData?> getLatestAssessment(int medicalId) {
+    return (select(medicalAssessment)
+          ..where((t) => t.medicalId.equals(medicalId))
+          ..orderBy([(t) => OrderingTerm.desc(t.assessmentId)])
+          ..limit(1))
+        .getSingleOrNull();
+  }
+
   // 獲取或創建關聯的醫療評估 (Initial 或 Post)
   Future<MedicalAssessmentData> getOrCreateAssessment(
     int? assessmentId,

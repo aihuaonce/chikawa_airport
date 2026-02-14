@@ -9884,6 +9884,1036 @@ class DrugRefCompanion extends UpdateCompanion<DrugRefData> {
   }
 }
 
+class $IntubationMethodRefTable extends IntubationMethodRef
+    with TableInfo<$IntubationMethodRefTable, IntubationMethodRefData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $IntubationMethodRefTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _codeMeta = const VerificationMeta('code');
+  @override
+  late final GeneratedColumn<String> code = GeneratedColumn<String>(
+    'code',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sortOrderMeta = const VerificationMeta(
+    'sortOrder',
+  );
+  @override
+  late final GeneratedColumn<int> sortOrder = GeneratedColumn<int>(
+    'sort_order',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _isActiveMeta = const VerificationMeta(
+    'isActive',
+  );
+  @override
+  late final GeneratedColumn<bool> isActive = GeneratedColumn<bool>(
+    'is_active',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_active" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, code, name, sortOrder, isActive];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'intubation_method_ref';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<IntubationMethodRefData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('code')) {
+      context.handle(
+        _codeMeta,
+        code.isAcceptableOrUnknown(data['code']!, _codeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_codeMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('sort_order')) {
+      context.handle(
+        _sortOrderMeta,
+        sortOrder.isAcceptableOrUnknown(data['sort_order']!, _sortOrderMeta),
+      );
+    }
+    if (data.containsKey('is_active')) {
+      context.handle(
+        _isActiveMeta,
+        isActive.isAcceptableOrUnknown(data['is_active']!, _isActiveMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  IntubationMethodRefData map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return IntubationMethodRefData(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      code: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}code'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      sortOrder: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}sort_order'],
+      )!,
+      isActive: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_active'],
+      )!,
+    );
+  }
+
+  @override
+  $IntubationMethodRefTable createAlias(String alias) {
+    return $IntubationMethodRefTable(attachedDatabase, alias);
+  }
+}
+
+class IntubationMethodRefData extends DataClass
+    implements Insertable<IntubationMethodRefData> {
+  final int id;
+  final String code;
+  final String name;
+  final int sortOrder;
+  final bool isActive;
+  const IntubationMethodRefData({
+    required this.id,
+    required this.code,
+    required this.name,
+    required this.sortOrder,
+    required this.isActive,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['code'] = Variable<String>(code);
+    map['name'] = Variable<String>(name);
+    map['sort_order'] = Variable<int>(sortOrder);
+    map['is_active'] = Variable<bool>(isActive);
+    return map;
+  }
+
+  IntubationMethodRefCompanion toCompanion(bool nullToAbsent) {
+    return IntubationMethodRefCompanion(
+      id: Value(id),
+      code: Value(code),
+      name: Value(name),
+      sortOrder: Value(sortOrder),
+      isActive: Value(isActive),
+    );
+  }
+
+  factory IntubationMethodRefData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return IntubationMethodRefData(
+      id: serializer.fromJson<int>(json['id']),
+      code: serializer.fromJson<String>(json['code']),
+      name: serializer.fromJson<String>(json['name']),
+      sortOrder: serializer.fromJson<int>(json['sortOrder']),
+      isActive: serializer.fromJson<bool>(json['isActive']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'code': serializer.toJson<String>(code),
+      'name': serializer.toJson<String>(name),
+      'sortOrder': serializer.toJson<int>(sortOrder),
+      'isActive': serializer.toJson<bool>(isActive),
+    };
+  }
+
+  IntubationMethodRefData copyWith({
+    int? id,
+    String? code,
+    String? name,
+    int? sortOrder,
+    bool? isActive,
+  }) => IntubationMethodRefData(
+    id: id ?? this.id,
+    code: code ?? this.code,
+    name: name ?? this.name,
+    sortOrder: sortOrder ?? this.sortOrder,
+    isActive: isActive ?? this.isActive,
+  );
+  IntubationMethodRefData copyWithCompanion(IntubationMethodRefCompanion data) {
+    return IntubationMethodRefData(
+      id: data.id.present ? data.id.value : this.id,
+      code: data.code.present ? data.code.value : this.code,
+      name: data.name.present ? data.name.value : this.name,
+      sortOrder: data.sortOrder.present ? data.sortOrder.value : this.sortOrder,
+      isActive: data.isActive.present ? data.isActive.value : this.isActive,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('IntubationMethodRefData(')
+          ..write('id: $id, ')
+          ..write('code: $code, ')
+          ..write('name: $name, ')
+          ..write('sortOrder: $sortOrder, ')
+          ..write('isActive: $isActive')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, code, name, sortOrder, isActive);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is IntubationMethodRefData &&
+          other.id == this.id &&
+          other.code == this.code &&
+          other.name == this.name &&
+          other.sortOrder == this.sortOrder &&
+          other.isActive == this.isActive);
+}
+
+class IntubationMethodRefCompanion
+    extends UpdateCompanion<IntubationMethodRefData> {
+  final Value<int> id;
+  final Value<String> code;
+  final Value<String> name;
+  final Value<int> sortOrder;
+  final Value<bool> isActive;
+  const IntubationMethodRefCompanion({
+    this.id = const Value.absent(),
+    this.code = const Value.absent(),
+    this.name = const Value.absent(),
+    this.sortOrder = const Value.absent(),
+    this.isActive = const Value.absent(),
+  });
+  IntubationMethodRefCompanion.insert({
+    this.id = const Value.absent(),
+    required String code,
+    required String name,
+    this.sortOrder = const Value.absent(),
+    this.isActive = const Value.absent(),
+  }) : code = Value(code),
+       name = Value(name);
+  static Insertable<IntubationMethodRefData> custom({
+    Expression<int>? id,
+    Expression<String>? code,
+    Expression<String>? name,
+    Expression<int>? sortOrder,
+    Expression<bool>? isActive,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (code != null) 'code': code,
+      if (name != null) 'name': name,
+      if (sortOrder != null) 'sort_order': sortOrder,
+      if (isActive != null) 'is_active': isActive,
+    });
+  }
+
+  IntubationMethodRefCompanion copyWith({
+    Value<int>? id,
+    Value<String>? code,
+    Value<String>? name,
+    Value<int>? sortOrder,
+    Value<bool>? isActive,
+  }) {
+    return IntubationMethodRefCompanion(
+      id: id ?? this.id,
+      code: code ?? this.code,
+      name: name ?? this.name,
+      sortOrder: sortOrder ?? this.sortOrder,
+      isActive: isActive ?? this.isActive,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (code.present) {
+      map['code'] = Variable<String>(code.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (sortOrder.present) {
+      map['sort_order'] = Variable<int>(sortOrder.value);
+    }
+    if (isActive.present) {
+      map['is_active'] = Variable<bool>(isActive.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('IntubationMethodRefCompanion(')
+          ..write('id: $id, ')
+          ..write('code: $code, ')
+          ..write('name: $name, ')
+          ..write('sortOrder: $sortOrder, ')
+          ..write('isActive: $isActive')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $RespirationModeRefTable extends RespirationModeRef
+    with TableInfo<$RespirationModeRefTable, RespirationModeRefData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $RespirationModeRefTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _codeMeta = const VerificationMeta('code');
+  @override
+  late final GeneratedColumn<String> code = GeneratedColumn<String>(
+    'code',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sortOrderMeta = const VerificationMeta(
+    'sortOrder',
+  );
+  @override
+  late final GeneratedColumn<int> sortOrder = GeneratedColumn<int>(
+    'sort_order',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _isActiveMeta = const VerificationMeta(
+    'isActive',
+  );
+  @override
+  late final GeneratedColumn<bool> isActive = GeneratedColumn<bool>(
+    'is_active',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_active" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, code, name, sortOrder, isActive];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'respiration_mode_ref';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<RespirationModeRefData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('code')) {
+      context.handle(
+        _codeMeta,
+        code.isAcceptableOrUnknown(data['code']!, _codeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_codeMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('sort_order')) {
+      context.handle(
+        _sortOrderMeta,
+        sortOrder.isAcceptableOrUnknown(data['sort_order']!, _sortOrderMeta),
+      );
+    }
+    if (data.containsKey('is_active')) {
+      context.handle(
+        _isActiveMeta,
+        isActive.isAcceptableOrUnknown(data['is_active']!, _isActiveMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  RespirationModeRefData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return RespirationModeRefData(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      code: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}code'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      sortOrder: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}sort_order'],
+      )!,
+      isActive: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_active'],
+      )!,
+    );
+  }
+
+  @override
+  $RespirationModeRefTable createAlias(String alias) {
+    return $RespirationModeRefTable(attachedDatabase, alias);
+  }
+}
+
+class RespirationModeRefData extends DataClass
+    implements Insertable<RespirationModeRefData> {
+  final int id;
+  final String code;
+  final String name;
+  final int sortOrder;
+  final bool isActive;
+  const RespirationModeRefData({
+    required this.id,
+    required this.code,
+    required this.name,
+    required this.sortOrder,
+    required this.isActive,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['code'] = Variable<String>(code);
+    map['name'] = Variable<String>(name);
+    map['sort_order'] = Variable<int>(sortOrder);
+    map['is_active'] = Variable<bool>(isActive);
+    return map;
+  }
+
+  RespirationModeRefCompanion toCompanion(bool nullToAbsent) {
+    return RespirationModeRefCompanion(
+      id: Value(id),
+      code: Value(code),
+      name: Value(name),
+      sortOrder: Value(sortOrder),
+      isActive: Value(isActive),
+    );
+  }
+
+  factory RespirationModeRefData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return RespirationModeRefData(
+      id: serializer.fromJson<int>(json['id']),
+      code: serializer.fromJson<String>(json['code']),
+      name: serializer.fromJson<String>(json['name']),
+      sortOrder: serializer.fromJson<int>(json['sortOrder']),
+      isActive: serializer.fromJson<bool>(json['isActive']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'code': serializer.toJson<String>(code),
+      'name': serializer.toJson<String>(name),
+      'sortOrder': serializer.toJson<int>(sortOrder),
+      'isActive': serializer.toJson<bool>(isActive),
+    };
+  }
+
+  RespirationModeRefData copyWith({
+    int? id,
+    String? code,
+    String? name,
+    int? sortOrder,
+    bool? isActive,
+  }) => RespirationModeRefData(
+    id: id ?? this.id,
+    code: code ?? this.code,
+    name: name ?? this.name,
+    sortOrder: sortOrder ?? this.sortOrder,
+    isActive: isActive ?? this.isActive,
+  );
+  RespirationModeRefData copyWithCompanion(RespirationModeRefCompanion data) {
+    return RespirationModeRefData(
+      id: data.id.present ? data.id.value : this.id,
+      code: data.code.present ? data.code.value : this.code,
+      name: data.name.present ? data.name.value : this.name,
+      sortOrder: data.sortOrder.present ? data.sortOrder.value : this.sortOrder,
+      isActive: data.isActive.present ? data.isActive.value : this.isActive,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('RespirationModeRefData(')
+          ..write('id: $id, ')
+          ..write('code: $code, ')
+          ..write('name: $name, ')
+          ..write('sortOrder: $sortOrder, ')
+          ..write('isActive: $isActive')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, code, name, sortOrder, isActive);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is RespirationModeRefData &&
+          other.id == this.id &&
+          other.code == this.code &&
+          other.name == this.name &&
+          other.sortOrder == this.sortOrder &&
+          other.isActive == this.isActive);
+}
+
+class RespirationModeRefCompanion
+    extends UpdateCompanion<RespirationModeRefData> {
+  final Value<int> id;
+  final Value<String> code;
+  final Value<String> name;
+  final Value<int> sortOrder;
+  final Value<bool> isActive;
+  const RespirationModeRefCompanion({
+    this.id = const Value.absent(),
+    this.code = const Value.absent(),
+    this.name = const Value.absent(),
+    this.sortOrder = const Value.absent(),
+    this.isActive = const Value.absent(),
+  });
+  RespirationModeRefCompanion.insert({
+    this.id = const Value.absent(),
+    required String code,
+    required String name,
+    this.sortOrder = const Value.absent(),
+    this.isActive = const Value.absent(),
+  }) : code = Value(code),
+       name = Value(name);
+  static Insertable<RespirationModeRefData> custom({
+    Expression<int>? id,
+    Expression<String>? code,
+    Expression<String>? name,
+    Expression<int>? sortOrder,
+    Expression<bool>? isActive,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (code != null) 'code': code,
+      if (name != null) 'name': name,
+      if (sortOrder != null) 'sort_order': sortOrder,
+      if (isActive != null) 'is_active': isActive,
+    });
+  }
+
+  RespirationModeRefCompanion copyWith({
+    Value<int>? id,
+    Value<String>? code,
+    Value<String>? name,
+    Value<int>? sortOrder,
+    Value<bool>? isActive,
+  }) {
+    return RespirationModeRefCompanion(
+      id: id ?? this.id,
+      code: code ?? this.code,
+      name: name ?? this.name,
+      sortOrder: sortOrder ?? this.sortOrder,
+      isActive: isActive ?? this.isActive,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (code.present) {
+      map['code'] = Variable<String>(code.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (sortOrder.present) {
+      map['sort_order'] = Variable<int>(sortOrder.value);
+    }
+    if (isActive.present) {
+      map['is_active'] = Variable<bool>(isActive.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('RespirationModeRefCompanion(')
+          ..write('id: $id, ')
+          ..write('code: $code, ')
+          ..write('name: $name, ')
+          ..write('sortOrder: $sortOrder, ')
+          ..write('isActive: $isActive')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $VisitReasonTable extends VisitReason
+    with TableInfo<$VisitReasonTable, VisitReasonData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $VisitReasonTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _codeMeta = const VerificationMeta('code');
+  @override
+  late final GeneratedColumn<String> code = GeneratedColumn<String>(
+    'code',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sortOrderMeta = const VerificationMeta(
+    'sortOrder',
+  );
+  @override
+  late final GeneratedColumn<int> sortOrder = GeneratedColumn<int>(
+    'sort_order',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _isActiveMeta = const VerificationMeta(
+    'isActive',
+  );
+  @override
+  late final GeneratedColumn<bool> isActive = GeneratedColumn<bool>(
+    'is_active',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_active" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, code, name, sortOrder, isActive];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'visit_reason';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<VisitReasonData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('code')) {
+      context.handle(
+        _codeMeta,
+        code.isAcceptableOrUnknown(data['code']!, _codeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_codeMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('sort_order')) {
+      context.handle(
+        _sortOrderMeta,
+        sortOrder.isAcceptableOrUnknown(data['sort_order']!, _sortOrderMeta),
+      );
+    }
+    if (data.containsKey('is_active')) {
+      context.handle(
+        _isActiveMeta,
+        isActive.isAcceptableOrUnknown(data['is_active']!, _isActiveMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  VisitReasonData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return VisitReasonData(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      code: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}code'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      sortOrder: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}sort_order'],
+      )!,
+      isActive: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_active'],
+      )!,
+    );
+  }
+
+  @override
+  $VisitReasonTable createAlias(String alias) {
+    return $VisitReasonTable(attachedDatabase, alias);
+  }
+}
+
+class VisitReasonData extends DataClass implements Insertable<VisitReasonData> {
+  final int id;
+  final String code;
+  final String name;
+  final int sortOrder;
+  final bool isActive;
+  const VisitReasonData({
+    required this.id,
+    required this.code,
+    required this.name,
+    required this.sortOrder,
+    required this.isActive,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['code'] = Variable<String>(code);
+    map['name'] = Variable<String>(name);
+    map['sort_order'] = Variable<int>(sortOrder);
+    map['is_active'] = Variable<bool>(isActive);
+    return map;
+  }
+
+  VisitReasonCompanion toCompanion(bool nullToAbsent) {
+    return VisitReasonCompanion(
+      id: Value(id),
+      code: Value(code),
+      name: Value(name),
+      sortOrder: Value(sortOrder),
+      isActive: Value(isActive),
+    );
+  }
+
+  factory VisitReasonData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return VisitReasonData(
+      id: serializer.fromJson<int>(json['id']),
+      code: serializer.fromJson<String>(json['code']),
+      name: serializer.fromJson<String>(json['name']),
+      sortOrder: serializer.fromJson<int>(json['sortOrder']),
+      isActive: serializer.fromJson<bool>(json['isActive']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'code': serializer.toJson<String>(code),
+      'name': serializer.toJson<String>(name),
+      'sortOrder': serializer.toJson<int>(sortOrder),
+      'isActive': serializer.toJson<bool>(isActive),
+    };
+  }
+
+  VisitReasonData copyWith({
+    int? id,
+    String? code,
+    String? name,
+    int? sortOrder,
+    bool? isActive,
+  }) => VisitReasonData(
+    id: id ?? this.id,
+    code: code ?? this.code,
+    name: name ?? this.name,
+    sortOrder: sortOrder ?? this.sortOrder,
+    isActive: isActive ?? this.isActive,
+  );
+  VisitReasonData copyWithCompanion(VisitReasonCompanion data) {
+    return VisitReasonData(
+      id: data.id.present ? data.id.value : this.id,
+      code: data.code.present ? data.code.value : this.code,
+      name: data.name.present ? data.name.value : this.name,
+      sortOrder: data.sortOrder.present ? data.sortOrder.value : this.sortOrder,
+      isActive: data.isActive.present ? data.isActive.value : this.isActive,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('VisitReasonData(')
+          ..write('id: $id, ')
+          ..write('code: $code, ')
+          ..write('name: $name, ')
+          ..write('sortOrder: $sortOrder, ')
+          ..write('isActive: $isActive')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, code, name, sortOrder, isActive);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is VisitReasonData &&
+          other.id == this.id &&
+          other.code == this.code &&
+          other.name == this.name &&
+          other.sortOrder == this.sortOrder &&
+          other.isActive == this.isActive);
+}
+
+class VisitReasonCompanion extends UpdateCompanion<VisitReasonData> {
+  final Value<int> id;
+  final Value<String> code;
+  final Value<String> name;
+  final Value<int> sortOrder;
+  final Value<bool> isActive;
+  const VisitReasonCompanion({
+    this.id = const Value.absent(),
+    this.code = const Value.absent(),
+    this.name = const Value.absent(),
+    this.sortOrder = const Value.absent(),
+    this.isActive = const Value.absent(),
+  });
+  VisitReasonCompanion.insert({
+    this.id = const Value.absent(),
+    required String code,
+    required String name,
+    this.sortOrder = const Value.absent(),
+    this.isActive = const Value.absent(),
+  }) : code = Value(code),
+       name = Value(name);
+  static Insertable<VisitReasonData> custom({
+    Expression<int>? id,
+    Expression<String>? code,
+    Expression<String>? name,
+    Expression<int>? sortOrder,
+    Expression<bool>? isActive,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (code != null) 'code': code,
+      if (name != null) 'name': name,
+      if (sortOrder != null) 'sort_order': sortOrder,
+      if (isActive != null) 'is_active': isActive,
+    });
+  }
+
+  VisitReasonCompanion copyWith({
+    Value<int>? id,
+    Value<String>? code,
+    Value<String>? name,
+    Value<int>? sortOrder,
+    Value<bool>? isActive,
+  }) {
+    return VisitReasonCompanion(
+      id: id ?? this.id,
+      code: code ?? this.code,
+      name: name ?? this.name,
+      sortOrder: sortOrder ?? this.sortOrder,
+      isActive: isActive ?? this.isActive,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (code.present) {
+      map['code'] = Variable<String>(code.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (sortOrder.present) {
+      map['sort_order'] = Variable<int>(sortOrder.value);
+    }
+    if (isActive.present) {
+      map['is_active'] = Variable<bool>(isActive.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('VisitReasonCompanion(')
+          ..write('id: $id, ')
+          ..write('code: $code, ')
+          ..write('name: $name, ')
+          ..write('sortOrder: $sortOrder, ')
+          ..write('isActive: $isActive')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $MedicalRecordTable extends MedicalRecord
     with TableInfo<$MedicalRecordTable, MedicalRecordData> {
   @override
@@ -10360,347 +11390,6 @@ class MedicalRecordCompanion extends UpdateCompanion<MedicalRecordData> {
           ..write('screeningMethod: $screeningMethod, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
-          ..write(')'))
-        .toString();
-  }
-}
-
-class $VisitReasonTable extends VisitReason
-    with TableInfo<$VisitReasonTable, VisitReasonData> {
-  @override
-  final GeneratedDatabase attachedDatabase;
-  final String? _alias;
-  $VisitReasonTable(this.attachedDatabase, [this._alias]);
-  static const VerificationMeta _idMeta = const VerificationMeta('id');
-  @override
-  late final GeneratedColumn<int> id = GeneratedColumn<int>(
-    'id',
-    aliasedName,
-    false,
-    hasAutoIncrement: true,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'PRIMARY KEY AUTOINCREMENT',
-    ),
-  );
-  static const VerificationMeta _codeMeta = const VerificationMeta('code');
-  @override
-  late final GeneratedColumn<String> code = GeneratedColumn<String>(
-    'code',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-  );
-  static const VerificationMeta _nameMeta = const VerificationMeta('name');
-  @override
-  late final GeneratedColumn<String> name = GeneratedColumn<String>(
-    'name',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-  );
-  static const VerificationMeta _sortOrderMeta = const VerificationMeta(
-    'sortOrder',
-  );
-  @override
-  late final GeneratedColumn<int> sortOrder = GeneratedColumn<int>(
-    'sort_order',
-    aliasedName,
-    false,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
-    defaultValue: const Constant(0),
-  );
-  static const VerificationMeta _isActiveMeta = const VerificationMeta(
-    'isActive',
-  );
-  @override
-  late final GeneratedColumn<bool> isActive = GeneratedColumn<bool>(
-    'is_active',
-    aliasedName,
-    false,
-    type: DriftSqlType.bool,
-    requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'CHECK ("is_active" IN (0, 1))',
-    ),
-    defaultValue: const Constant(true),
-  );
-  @override
-  List<GeneratedColumn> get $columns => [id, code, name, sortOrder, isActive];
-  @override
-  String get aliasedName => _alias ?? actualTableName;
-  @override
-  String get actualTableName => $name;
-  static const String $name = 'visit_reason';
-  @override
-  VerificationContext validateIntegrity(
-    Insertable<VisitReasonData> instance, {
-    bool isInserting = false,
-  }) {
-    final context = VerificationContext();
-    final data = instance.toColumns(true);
-    if (data.containsKey('id')) {
-      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
-    }
-    if (data.containsKey('code')) {
-      context.handle(
-        _codeMeta,
-        code.isAcceptableOrUnknown(data['code']!, _codeMeta),
-      );
-    } else if (isInserting) {
-      context.missing(_codeMeta);
-    }
-    if (data.containsKey('name')) {
-      context.handle(
-        _nameMeta,
-        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
-      );
-    } else if (isInserting) {
-      context.missing(_nameMeta);
-    }
-    if (data.containsKey('sort_order')) {
-      context.handle(
-        _sortOrderMeta,
-        sortOrder.isAcceptableOrUnknown(data['sort_order']!, _sortOrderMeta),
-      );
-    }
-    if (data.containsKey('is_active')) {
-      context.handle(
-        _isActiveMeta,
-        isActive.isAcceptableOrUnknown(data['is_active']!, _isActiveMeta),
-      );
-    }
-    return context;
-  }
-
-  @override
-  Set<GeneratedColumn> get $primaryKey => {id};
-  @override
-  VisitReasonData map(Map<String, dynamic> data, {String? tablePrefix}) {
-    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return VisitReasonData(
-      id: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}id'],
-      )!,
-      code: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}code'],
-      )!,
-      name: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}name'],
-      )!,
-      sortOrder: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}sort_order'],
-      )!,
-      isActive: attachedDatabase.typeMapping.read(
-        DriftSqlType.bool,
-        data['${effectivePrefix}is_active'],
-      )!,
-    );
-  }
-
-  @override
-  $VisitReasonTable createAlias(String alias) {
-    return $VisitReasonTable(attachedDatabase, alias);
-  }
-}
-
-class VisitReasonData extends DataClass implements Insertable<VisitReasonData> {
-  final int id;
-  final String code;
-  final String name;
-  final int sortOrder;
-  final bool isActive;
-  const VisitReasonData({
-    required this.id,
-    required this.code,
-    required this.name,
-    required this.sortOrder,
-    required this.isActive,
-  });
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    map['id'] = Variable<int>(id);
-    map['code'] = Variable<String>(code);
-    map['name'] = Variable<String>(name);
-    map['sort_order'] = Variable<int>(sortOrder);
-    map['is_active'] = Variable<bool>(isActive);
-    return map;
-  }
-
-  VisitReasonCompanion toCompanion(bool nullToAbsent) {
-    return VisitReasonCompanion(
-      id: Value(id),
-      code: Value(code),
-      name: Value(name),
-      sortOrder: Value(sortOrder),
-      isActive: Value(isActive),
-    );
-  }
-
-  factory VisitReasonData.fromJson(
-    Map<String, dynamic> json, {
-    ValueSerializer? serializer,
-  }) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return VisitReasonData(
-      id: serializer.fromJson<int>(json['id']),
-      code: serializer.fromJson<String>(json['code']),
-      name: serializer.fromJson<String>(json['name']),
-      sortOrder: serializer.fromJson<int>(json['sortOrder']),
-      isActive: serializer.fromJson<bool>(json['isActive']),
-    );
-  }
-  @override
-  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return <String, dynamic>{
-      'id': serializer.toJson<int>(id),
-      'code': serializer.toJson<String>(code),
-      'name': serializer.toJson<String>(name),
-      'sortOrder': serializer.toJson<int>(sortOrder),
-      'isActive': serializer.toJson<bool>(isActive),
-    };
-  }
-
-  VisitReasonData copyWith({
-    int? id,
-    String? code,
-    String? name,
-    int? sortOrder,
-    bool? isActive,
-  }) => VisitReasonData(
-    id: id ?? this.id,
-    code: code ?? this.code,
-    name: name ?? this.name,
-    sortOrder: sortOrder ?? this.sortOrder,
-    isActive: isActive ?? this.isActive,
-  );
-  VisitReasonData copyWithCompanion(VisitReasonCompanion data) {
-    return VisitReasonData(
-      id: data.id.present ? data.id.value : this.id,
-      code: data.code.present ? data.code.value : this.code,
-      name: data.name.present ? data.name.value : this.name,
-      sortOrder: data.sortOrder.present ? data.sortOrder.value : this.sortOrder,
-      isActive: data.isActive.present ? data.isActive.value : this.isActive,
-    );
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('VisitReasonData(')
-          ..write('id: $id, ')
-          ..write('code: $code, ')
-          ..write('name: $name, ')
-          ..write('sortOrder: $sortOrder, ')
-          ..write('isActive: $isActive')
-          ..write(')'))
-        .toString();
-  }
-
-  @override
-  int get hashCode => Object.hash(id, code, name, sortOrder, isActive);
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is VisitReasonData &&
-          other.id == this.id &&
-          other.code == this.code &&
-          other.name == this.name &&
-          other.sortOrder == this.sortOrder &&
-          other.isActive == this.isActive);
-}
-
-class VisitReasonCompanion extends UpdateCompanion<VisitReasonData> {
-  final Value<int> id;
-  final Value<String> code;
-  final Value<String> name;
-  final Value<int> sortOrder;
-  final Value<bool> isActive;
-  const VisitReasonCompanion({
-    this.id = const Value.absent(),
-    this.code = const Value.absent(),
-    this.name = const Value.absent(),
-    this.sortOrder = const Value.absent(),
-    this.isActive = const Value.absent(),
-  });
-  VisitReasonCompanion.insert({
-    this.id = const Value.absent(),
-    required String code,
-    required String name,
-    this.sortOrder = const Value.absent(),
-    this.isActive = const Value.absent(),
-  }) : code = Value(code),
-       name = Value(name);
-  static Insertable<VisitReasonData> custom({
-    Expression<int>? id,
-    Expression<String>? code,
-    Expression<String>? name,
-    Expression<int>? sortOrder,
-    Expression<bool>? isActive,
-  }) {
-    return RawValuesInsertable({
-      if (id != null) 'id': id,
-      if (code != null) 'code': code,
-      if (name != null) 'name': name,
-      if (sortOrder != null) 'sort_order': sortOrder,
-      if (isActive != null) 'is_active': isActive,
-    });
-  }
-
-  VisitReasonCompanion copyWith({
-    Value<int>? id,
-    Value<String>? code,
-    Value<String>? name,
-    Value<int>? sortOrder,
-    Value<bool>? isActive,
-  }) {
-    return VisitReasonCompanion(
-      id: id ?? this.id,
-      code: code ?? this.code,
-      name: name ?? this.name,
-      sortOrder: sortOrder ?? this.sortOrder,
-      isActive: isActive ?? this.isActive,
-    );
-  }
-
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    if (id.present) {
-      map['id'] = Variable<int>(id.value);
-    }
-    if (code.present) {
-      map['code'] = Variable<String>(code.value);
-    }
-    if (name.present) {
-      map['name'] = Variable<String>(name.value);
-    }
-    if (sortOrder.present) {
-      map['sort_order'] = Variable<int>(sortOrder.value);
-    }
-    if (isActive.present) {
-      map['is_active'] = Variable<bool>(isActive.value);
-    }
-    return map;
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('VisitReasonCompanion(')
-          ..write('id: $id, ')
-          ..write('code: $code, ')
-          ..write('name: $name, ')
-          ..write('sortOrder: $sortOrder, ')
-          ..write('isActive: $isActive')
           ..write(')'))
         .toString();
   }
@@ -36143,8 +36832,12 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $ConsciousnessLevelRefTable consciousnessLevelRef =
       $ConsciousnessLevelRefTable(this);
   late final $DrugRefTable drugRef = $DrugRefTable(this);
-  late final $MedicalRecordTable medicalRecord = $MedicalRecordTable(this);
+  late final $IntubationMethodRefTable intubationMethodRef =
+      $IntubationMethodRefTable(this);
+  late final $RespirationModeRefTable respirationModeRef =
+      $RespirationModeRefTable(this);
   late final $VisitReasonTable visitReason = $VisitReasonTable(this);
+  late final $MedicalRecordTable medicalRecord = $MedicalRecordTable(this);
   late final $PatientTable patient = $PatientTable(this);
   late final $FlightRecordTable flightRecord = $FlightRecordTable(this);
   late final $FlightTransitLocationsTable flightTransitLocations =
@@ -36264,8 +36957,10 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     pupilReactionRef,
     consciousnessLevelRef,
     drugRef,
-    medicalRecord,
+    intubationMethodRef,
+    respirationModeRef,
     visitReason,
+    medicalRecord,
     patient,
     flightRecord,
     flightTransitLocations,
@@ -45270,6 +45965,723 @@ typedef $$DrugRefTableProcessedTableManager =
       DrugRefData,
       PrefetchHooks Function()
     >;
+typedef $$IntubationMethodRefTableCreateCompanionBuilder =
+    IntubationMethodRefCompanion Function({
+      Value<int> id,
+      required String code,
+      required String name,
+      Value<int> sortOrder,
+      Value<bool> isActive,
+    });
+typedef $$IntubationMethodRefTableUpdateCompanionBuilder =
+    IntubationMethodRefCompanion Function({
+      Value<int> id,
+      Value<String> code,
+      Value<String> name,
+      Value<int> sortOrder,
+      Value<bool> isActive,
+    });
+
+class $$IntubationMethodRefTableFilterComposer
+    extends Composer<_$AppDatabase, $IntubationMethodRefTable> {
+  $$IntubationMethodRefTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get code => $composableBuilder(
+    column: $table.code,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get sortOrder => $composableBuilder(
+    column: $table.sortOrder,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isActive => $composableBuilder(
+    column: $table.isActive,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$IntubationMethodRefTableOrderingComposer
+    extends Composer<_$AppDatabase, $IntubationMethodRefTable> {
+  $$IntubationMethodRefTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get code => $composableBuilder(
+    column: $table.code,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get sortOrder => $composableBuilder(
+    column: $table.sortOrder,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isActive => $composableBuilder(
+    column: $table.isActive,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$IntubationMethodRefTableAnnotationComposer
+    extends Composer<_$AppDatabase, $IntubationMethodRefTable> {
+  $$IntubationMethodRefTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get code =>
+      $composableBuilder(column: $table.code, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<int> get sortOrder =>
+      $composableBuilder(column: $table.sortOrder, builder: (column) => column);
+
+  GeneratedColumn<bool> get isActive =>
+      $composableBuilder(column: $table.isActive, builder: (column) => column);
+}
+
+class $$IntubationMethodRefTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $IntubationMethodRefTable,
+          IntubationMethodRefData,
+          $$IntubationMethodRefTableFilterComposer,
+          $$IntubationMethodRefTableOrderingComposer,
+          $$IntubationMethodRefTableAnnotationComposer,
+          $$IntubationMethodRefTableCreateCompanionBuilder,
+          $$IntubationMethodRefTableUpdateCompanionBuilder,
+          (
+            IntubationMethodRefData,
+            BaseReferences<
+              _$AppDatabase,
+              $IntubationMethodRefTable,
+              IntubationMethodRefData
+            >,
+          ),
+          IntubationMethodRefData,
+          PrefetchHooks Function()
+        > {
+  $$IntubationMethodRefTableTableManager(
+    _$AppDatabase db,
+    $IntubationMethodRefTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$IntubationMethodRefTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$IntubationMethodRefTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$IntubationMethodRefTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> code = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<int> sortOrder = const Value.absent(),
+                Value<bool> isActive = const Value.absent(),
+              }) => IntubationMethodRefCompanion(
+                id: id,
+                code: code,
+                name: name,
+                sortOrder: sortOrder,
+                isActive: isActive,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String code,
+                required String name,
+                Value<int> sortOrder = const Value.absent(),
+                Value<bool> isActive = const Value.absent(),
+              }) => IntubationMethodRefCompanion.insert(
+                id: id,
+                code: code,
+                name: name,
+                sortOrder: sortOrder,
+                isActive: isActive,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$IntubationMethodRefTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $IntubationMethodRefTable,
+      IntubationMethodRefData,
+      $$IntubationMethodRefTableFilterComposer,
+      $$IntubationMethodRefTableOrderingComposer,
+      $$IntubationMethodRefTableAnnotationComposer,
+      $$IntubationMethodRefTableCreateCompanionBuilder,
+      $$IntubationMethodRefTableUpdateCompanionBuilder,
+      (
+        IntubationMethodRefData,
+        BaseReferences<
+          _$AppDatabase,
+          $IntubationMethodRefTable,
+          IntubationMethodRefData
+        >,
+      ),
+      IntubationMethodRefData,
+      PrefetchHooks Function()
+    >;
+typedef $$RespirationModeRefTableCreateCompanionBuilder =
+    RespirationModeRefCompanion Function({
+      Value<int> id,
+      required String code,
+      required String name,
+      Value<int> sortOrder,
+      Value<bool> isActive,
+    });
+typedef $$RespirationModeRefTableUpdateCompanionBuilder =
+    RespirationModeRefCompanion Function({
+      Value<int> id,
+      Value<String> code,
+      Value<String> name,
+      Value<int> sortOrder,
+      Value<bool> isActive,
+    });
+
+class $$RespirationModeRefTableFilterComposer
+    extends Composer<_$AppDatabase, $RespirationModeRefTable> {
+  $$RespirationModeRefTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get code => $composableBuilder(
+    column: $table.code,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get sortOrder => $composableBuilder(
+    column: $table.sortOrder,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isActive => $composableBuilder(
+    column: $table.isActive,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$RespirationModeRefTableOrderingComposer
+    extends Composer<_$AppDatabase, $RespirationModeRefTable> {
+  $$RespirationModeRefTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get code => $composableBuilder(
+    column: $table.code,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get sortOrder => $composableBuilder(
+    column: $table.sortOrder,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isActive => $composableBuilder(
+    column: $table.isActive,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$RespirationModeRefTableAnnotationComposer
+    extends Composer<_$AppDatabase, $RespirationModeRefTable> {
+  $$RespirationModeRefTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get code =>
+      $composableBuilder(column: $table.code, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<int> get sortOrder =>
+      $composableBuilder(column: $table.sortOrder, builder: (column) => column);
+
+  GeneratedColumn<bool> get isActive =>
+      $composableBuilder(column: $table.isActive, builder: (column) => column);
+}
+
+class $$RespirationModeRefTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $RespirationModeRefTable,
+          RespirationModeRefData,
+          $$RespirationModeRefTableFilterComposer,
+          $$RespirationModeRefTableOrderingComposer,
+          $$RespirationModeRefTableAnnotationComposer,
+          $$RespirationModeRefTableCreateCompanionBuilder,
+          $$RespirationModeRefTableUpdateCompanionBuilder,
+          (
+            RespirationModeRefData,
+            BaseReferences<
+              _$AppDatabase,
+              $RespirationModeRefTable,
+              RespirationModeRefData
+            >,
+          ),
+          RespirationModeRefData,
+          PrefetchHooks Function()
+        > {
+  $$RespirationModeRefTableTableManager(
+    _$AppDatabase db,
+    $RespirationModeRefTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$RespirationModeRefTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$RespirationModeRefTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$RespirationModeRefTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> code = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<int> sortOrder = const Value.absent(),
+                Value<bool> isActive = const Value.absent(),
+              }) => RespirationModeRefCompanion(
+                id: id,
+                code: code,
+                name: name,
+                sortOrder: sortOrder,
+                isActive: isActive,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String code,
+                required String name,
+                Value<int> sortOrder = const Value.absent(),
+                Value<bool> isActive = const Value.absent(),
+              }) => RespirationModeRefCompanion.insert(
+                id: id,
+                code: code,
+                name: name,
+                sortOrder: sortOrder,
+                isActive: isActive,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$RespirationModeRefTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $RespirationModeRefTable,
+      RespirationModeRefData,
+      $$RespirationModeRefTableFilterComposer,
+      $$RespirationModeRefTableOrderingComposer,
+      $$RespirationModeRefTableAnnotationComposer,
+      $$RespirationModeRefTableCreateCompanionBuilder,
+      $$RespirationModeRefTableUpdateCompanionBuilder,
+      (
+        RespirationModeRefData,
+        BaseReferences<
+          _$AppDatabase,
+          $RespirationModeRefTable,
+          RespirationModeRefData
+        >,
+      ),
+      RespirationModeRefData,
+      PrefetchHooks Function()
+    >;
+typedef $$VisitReasonTableCreateCompanionBuilder =
+    VisitReasonCompanion Function({
+      Value<int> id,
+      required String code,
+      required String name,
+      Value<int> sortOrder,
+      Value<bool> isActive,
+    });
+typedef $$VisitReasonTableUpdateCompanionBuilder =
+    VisitReasonCompanion Function({
+      Value<int> id,
+      Value<String> code,
+      Value<String> name,
+      Value<int> sortOrder,
+      Value<bool> isActive,
+    });
+
+final class $$VisitReasonTableReferences
+    extends BaseReferences<_$AppDatabase, $VisitReasonTable, VisitReasonData> {
+  $$VisitReasonTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static MultiTypedResultKey<$PatientTable, List<PatientData>>
+  _patientRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.patient,
+    aliasName: $_aliasNameGenerator(
+      db.visitReason.id,
+      db.patient.visitReasonId,
+    ),
+  );
+
+  $$PatientTableProcessedTableManager get patientRefs {
+    final manager = $$PatientTableTableManager(
+      $_db,
+      $_db.patient,
+    ).filter((f) => f.visitReasonId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_patientRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$VisitReasonTableFilterComposer
+    extends Composer<_$AppDatabase, $VisitReasonTable> {
+  $$VisitReasonTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get code => $composableBuilder(
+    column: $table.code,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get sortOrder => $composableBuilder(
+    column: $table.sortOrder,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isActive => $composableBuilder(
+    column: $table.isActive,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  Expression<bool> patientRefs(
+    Expression<bool> Function($$PatientTableFilterComposer f) f,
+  ) {
+    final $$PatientTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.patient,
+      getReferencedColumn: (t) => t.visitReasonId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PatientTableFilterComposer(
+            $db: $db,
+            $table: $db.patient,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$VisitReasonTableOrderingComposer
+    extends Composer<_$AppDatabase, $VisitReasonTable> {
+  $$VisitReasonTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get code => $composableBuilder(
+    column: $table.code,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get sortOrder => $composableBuilder(
+    column: $table.sortOrder,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isActive => $composableBuilder(
+    column: $table.isActive,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$VisitReasonTableAnnotationComposer
+    extends Composer<_$AppDatabase, $VisitReasonTable> {
+  $$VisitReasonTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get code =>
+      $composableBuilder(column: $table.code, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<int> get sortOrder =>
+      $composableBuilder(column: $table.sortOrder, builder: (column) => column);
+
+  GeneratedColumn<bool> get isActive =>
+      $composableBuilder(column: $table.isActive, builder: (column) => column);
+
+  Expression<T> patientRefs<T extends Object>(
+    Expression<T> Function($$PatientTableAnnotationComposer a) f,
+  ) {
+    final $$PatientTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.patient,
+      getReferencedColumn: (t) => t.visitReasonId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PatientTableAnnotationComposer(
+            $db: $db,
+            $table: $db.patient,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$VisitReasonTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $VisitReasonTable,
+          VisitReasonData,
+          $$VisitReasonTableFilterComposer,
+          $$VisitReasonTableOrderingComposer,
+          $$VisitReasonTableAnnotationComposer,
+          $$VisitReasonTableCreateCompanionBuilder,
+          $$VisitReasonTableUpdateCompanionBuilder,
+          (VisitReasonData, $$VisitReasonTableReferences),
+          VisitReasonData,
+          PrefetchHooks Function({bool patientRefs})
+        > {
+  $$VisitReasonTableTableManager(_$AppDatabase db, $VisitReasonTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$VisitReasonTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$VisitReasonTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$VisitReasonTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> code = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<int> sortOrder = const Value.absent(),
+                Value<bool> isActive = const Value.absent(),
+              }) => VisitReasonCompanion(
+                id: id,
+                code: code,
+                name: name,
+                sortOrder: sortOrder,
+                isActive: isActive,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String code,
+                required String name,
+                Value<int> sortOrder = const Value.absent(),
+                Value<bool> isActive = const Value.absent(),
+              }) => VisitReasonCompanion.insert(
+                id: id,
+                code: code,
+                name: name,
+                sortOrder: sortOrder,
+                isActive: isActive,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$VisitReasonTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({patientRefs = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [if (patientRefs) db.patient],
+              addJoins: null,
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (patientRefs)
+                    await $_getPrefetchedData<
+                      VisitReasonData,
+                      $VisitReasonTable,
+                      PatientData
+                    >(
+                      currentTable: table,
+                      referencedTable: $$VisitReasonTableReferences
+                          ._patientRefsTable(db),
+                      managerFromTypedResult: (p0) =>
+                          $$VisitReasonTableReferences(
+                            db,
+                            table,
+                            p0,
+                          ).patientRefs,
+                      referencedItemsForCurrentItem: (item, referencedItems) =>
+                          referencedItems.where(
+                            (e) => e.visitReasonId == item.id,
+                          ),
+                      typedResults: items,
+                    ),
+                ];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$VisitReasonTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $VisitReasonTable,
+      VisitReasonData,
+      $$VisitReasonTableFilterComposer,
+      $$VisitReasonTableOrderingComposer,
+      $$VisitReasonTableAnnotationComposer,
+      $$VisitReasonTableCreateCompanionBuilder,
+      $$VisitReasonTableUpdateCompanionBuilder,
+      (VisitReasonData, $$VisitReasonTableReferences),
+      VisitReasonData,
+      PrefetchHooks Function({bool patientRefs})
+    >;
 typedef $$MedicalRecordTableCreateCompanionBuilder =
     MedicalRecordCompanion Function({
       Value<int> medicalId,
@@ -47756,306 +49168,6 @@ typedef $$MedicalRecordTableProcessedTableManager =
         bool ambulanceTreatmentRecordsRefs,
         bool emergencyTreatmentRefs,
       })
-    >;
-typedef $$VisitReasonTableCreateCompanionBuilder =
-    VisitReasonCompanion Function({
-      Value<int> id,
-      required String code,
-      required String name,
-      Value<int> sortOrder,
-      Value<bool> isActive,
-    });
-typedef $$VisitReasonTableUpdateCompanionBuilder =
-    VisitReasonCompanion Function({
-      Value<int> id,
-      Value<String> code,
-      Value<String> name,
-      Value<int> sortOrder,
-      Value<bool> isActive,
-    });
-
-final class $$VisitReasonTableReferences
-    extends BaseReferences<_$AppDatabase, $VisitReasonTable, VisitReasonData> {
-  $$VisitReasonTableReferences(super.$_db, super.$_table, super.$_typedResult);
-
-  static MultiTypedResultKey<$PatientTable, List<PatientData>>
-  _patientRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
-    db.patient,
-    aliasName: $_aliasNameGenerator(
-      db.visitReason.id,
-      db.patient.visitReasonId,
-    ),
-  );
-
-  $$PatientTableProcessedTableManager get patientRefs {
-    final manager = $$PatientTableTableManager(
-      $_db,
-      $_db.patient,
-    ).filter((f) => f.visitReasonId.id.sqlEquals($_itemColumn<int>('id')!));
-
-    final cache = $_typedResult.readTableOrNull(_patientRefsTable($_db));
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: cache),
-    );
-  }
-}
-
-class $$VisitReasonTableFilterComposer
-    extends Composer<_$AppDatabase, $VisitReasonTable> {
-  $$VisitReasonTableFilterComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  ColumnFilters<int> get id => $composableBuilder(
-    column: $table.id,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get code => $composableBuilder(
-    column: $table.code,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get name => $composableBuilder(
-    column: $table.name,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<int> get sortOrder => $composableBuilder(
-    column: $table.sortOrder,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<bool> get isActive => $composableBuilder(
-    column: $table.isActive,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  Expression<bool> patientRefs(
-    Expression<bool> Function($$PatientTableFilterComposer f) f,
-  ) {
-    final $$PatientTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.patient,
-      getReferencedColumn: (t) => t.visitReasonId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$PatientTableFilterComposer(
-            $db: $db,
-            $table: $db.patient,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
-}
-
-class $$VisitReasonTableOrderingComposer
-    extends Composer<_$AppDatabase, $VisitReasonTable> {
-  $$VisitReasonTableOrderingComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  ColumnOrderings<int> get id => $composableBuilder(
-    column: $table.id,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get code => $composableBuilder(
-    column: $table.code,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get name => $composableBuilder(
-    column: $table.name,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<int> get sortOrder => $composableBuilder(
-    column: $table.sortOrder,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<bool> get isActive => $composableBuilder(
-    column: $table.isActive,
-    builder: (column) => ColumnOrderings(column),
-  );
-}
-
-class $$VisitReasonTableAnnotationComposer
-    extends Composer<_$AppDatabase, $VisitReasonTable> {
-  $$VisitReasonTableAnnotationComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  GeneratedColumn<int> get id =>
-      $composableBuilder(column: $table.id, builder: (column) => column);
-
-  GeneratedColumn<String> get code =>
-      $composableBuilder(column: $table.code, builder: (column) => column);
-
-  GeneratedColumn<String> get name =>
-      $composableBuilder(column: $table.name, builder: (column) => column);
-
-  GeneratedColumn<int> get sortOrder =>
-      $composableBuilder(column: $table.sortOrder, builder: (column) => column);
-
-  GeneratedColumn<bool> get isActive =>
-      $composableBuilder(column: $table.isActive, builder: (column) => column);
-
-  Expression<T> patientRefs<T extends Object>(
-    Expression<T> Function($$PatientTableAnnotationComposer a) f,
-  ) {
-    final $$PatientTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.patient,
-      getReferencedColumn: (t) => t.visitReasonId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$PatientTableAnnotationComposer(
-            $db: $db,
-            $table: $db.patient,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
-}
-
-class $$VisitReasonTableTableManager
-    extends
-        RootTableManager<
-          _$AppDatabase,
-          $VisitReasonTable,
-          VisitReasonData,
-          $$VisitReasonTableFilterComposer,
-          $$VisitReasonTableOrderingComposer,
-          $$VisitReasonTableAnnotationComposer,
-          $$VisitReasonTableCreateCompanionBuilder,
-          $$VisitReasonTableUpdateCompanionBuilder,
-          (VisitReasonData, $$VisitReasonTableReferences),
-          VisitReasonData,
-          PrefetchHooks Function({bool patientRefs})
-        > {
-  $$VisitReasonTableTableManager(_$AppDatabase db, $VisitReasonTable table)
-    : super(
-        TableManagerState(
-          db: db,
-          table: table,
-          createFilteringComposer: () =>
-              $$VisitReasonTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () =>
-              $$VisitReasonTableOrderingComposer($db: db, $table: table),
-          createComputedFieldComposer: () =>
-              $$VisitReasonTableAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback:
-              ({
-                Value<int> id = const Value.absent(),
-                Value<String> code = const Value.absent(),
-                Value<String> name = const Value.absent(),
-                Value<int> sortOrder = const Value.absent(),
-                Value<bool> isActive = const Value.absent(),
-              }) => VisitReasonCompanion(
-                id: id,
-                code: code,
-                name: name,
-                sortOrder: sortOrder,
-                isActive: isActive,
-              ),
-          createCompanionCallback:
-              ({
-                Value<int> id = const Value.absent(),
-                required String code,
-                required String name,
-                Value<int> sortOrder = const Value.absent(),
-                Value<bool> isActive = const Value.absent(),
-              }) => VisitReasonCompanion.insert(
-                id: id,
-                code: code,
-                name: name,
-                sortOrder: sortOrder,
-                isActive: isActive,
-              ),
-          withReferenceMapper: (p0) => p0
-              .map(
-                (e) => (
-                  e.readTable(table),
-                  $$VisitReasonTableReferences(db, table, e),
-                ),
-              )
-              .toList(),
-          prefetchHooksCallback: ({patientRefs = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [if (patientRefs) db.patient],
-              addJoins: null,
-              getPrefetchedDataCallback: (items) async {
-                return [
-                  if (patientRefs)
-                    await $_getPrefetchedData<
-                      VisitReasonData,
-                      $VisitReasonTable,
-                      PatientData
-                    >(
-                      currentTable: table,
-                      referencedTable: $$VisitReasonTableReferences
-                          ._patientRefsTable(db),
-                      managerFromTypedResult: (p0) =>
-                          $$VisitReasonTableReferences(
-                            db,
-                            table,
-                            p0,
-                          ).patientRefs,
-                      referencedItemsForCurrentItem: (item, referencedItems) =>
-                          referencedItems.where(
-                            (e) => e.visitReasonId == item.id,
-                          ),
-                      typedResults: items,
-                    ),
-                ];
-              },
-            );
-          },
-        ),
-      );
-}
-
-typedef $$VisitReasonTableProcessedTableManager =
-    ProcessedTableManager<
-      _$AppDatabase,
-      $VisitReasonTable,
-      VisitReasonData,
-      $$VisitReasonTableFilterComposer,
-      $$VisitReasonTableOrderingComposer,
-      $$VisitReasonTableAnnotationComposer,
-      $$VisitReasonTableCreateCompanionBuilder,
-      $$VisitReasonTableUpdateCompanionBuilder,
-      (VisitReasonData, $$VisitReasonTableReferences),
-      VisitReasonData,
-      PrefetchHooks Function({bool patientRefs})
     >;
 typedef $$PatientTableCreateCompanionBuilder =
     PatientCompanion Function({
@@ -69949,10 +71061,14 @@ class $AppDatabaseManager {
       $$ConsciousnessLevelRefTableTableManager(_db, _db.consciousnessLevelRef);
   $$DrugRefTableTableManager get drugRef =>
       $$DrugRefTableTableManager(_db, _db.drugRef);
-  $$MedicalRecordTableTableManager get medicalRecord =>
-      $$MedicalRecordTableTableManager(_db, _db.medicalRecord);
+  $$IntubationMethodRefTableTableManager get intubationMethodRef =>
+      $$IntubationMethodRefTableTableManager(_db, _db.intubationMethodRef);
+  $$RespirationModeRefTableTableManager get respirationModeRef =>
+      $$RespirationModeRefTableTableManager(_db, _db.respirationModeRef);
   $$VisitReasonTableTableManager get visitReason =>
       $$VisitReasonTableTableManager(_db, _db.visitReason);
+  $$MedicalRecordTableTableManager get medicalRecord =>
+      $$MedicalRecordTableTableManager(_db, _db.medicalRecord);
   $$PatientTableTableManager get patient =>
       $$PatientTableTableManager(_db, _db.patient);
   $$FlightRecordTableTableManager get flightRecord =>

@@ -38,6 +38,9 @@ part 'reference_dao.g.dart';
     PupilReactionRef,
     ConsciousnessLevelRef,
     DrugRef,
+    IntubationMethodRef,
+    RespirationModeRef,
+    VisitReason,
   ],
 )
 class ReferenceDao extends DatabaseAccessor<AppDatabase>
@@ -796,6 +799,9 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
     await initializePupilReactions();
     await initializeConsciousnessLevels();
     await initializeDrugs();
+    await initializeIntubationMethods();
+    await initializeRespirationModes();
+    await initializeVisitReasons();
   }
 
   // 初始化性別資料
@@ -2089,6 +2095,89 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
             ),
           );
         }
+      });
+    }
+  }
+
+  // 初始化插管方式
+  Future<void> initializeIntubationMethods() async {
+    final count = await (select(intubationMethodRef).get()).then((list) => list.length);
+    if (count == 0) {
+      await batch((batch) {
+        batch.insertAll(intubationMethodRef, [
+          IntubationMethodRefCompanion.insert(
+            code: 'ET',
+            name: 'ET',
+            sortOrder: const Value(1),
+          ),
+          IntubationMethodRefCompanion.insert(
+            code: 'LMA',
+            name: 'LMA',
+            sortOrder: const Value(2),
+          ),
+          IntubationMethodRefCompanion.insert(
+            code: 'IGEL',
+            name: 'I-GEL',
+            sortOrder: const Value(3),
+          ),
+          IntubationMethodRefCompanion.insert(
+            code: 'FAILURE',
+            name: 'Failure',
+            sortOrder: const Value(4),
+          ),
+        ]);
+      });
+    }
+  }
+
+  // 初始化呼吸方式
+  Future<void> initializeRespirationModes() async {
+    final count = await (select(respirationModeRef).get()).then((list) => list.length);
+    if (count == 0) {
+      await batch((batch) {
+        batch.insertAll(respirationModeRef, [
+          RespirationModeRefCompanion.insert(
+            code: 'spontaneous',
+            name: '自發性呼吸',
+            sortOrder: const Value(1),
+          ),
+          RespirationModeRefCompanion.insert(
+            code: 'ventilator',
+            name: '呼吸器',
+            sortOrder: const Value(2),
+          ),
+          RespirationModeRefCompanion.insert(
+            code: 'ambu',
+            name: 'Ambu',
+            sortOrder: const Value(3),
+          ),
+        ]);
+      });
+    }
+  }
+
+  // 初始化為何至機場
+  Future<void> initializeVisitReasons() async {
+    final count = await (select(visitReason).get()).then((list) => list.length);
+    if (count == 0) {
+      await batch((batch) {
+        batch.insertAll(visitReason, [
+          VisitReasonCompanion.insert(
+            code: 'crew',
+            name: '航空公司機組員',
+            sortOrder: const Value(1),
+          ),
+          VisitReasonCompanion.insert(
+            code: 'passenger',
+            name: '旅客/民眾',
+            sortOrder: const Value(2),
+          ),
+          VisitReasonCompanion.insert(
+            code: 'staff',
+            name: '機場內部員工',
+            sortOrder: const Value(3),
+          ),
+        ]);
       });
     }
   }

@@ -123,10 +123,26 @@ class _EmergencyTreatmentRecordState extends State<EmergencyTreatmentRecord> {
       _emergencyTreatment = treatment;
 
       // 2. 獲取 Assessments
-      _initialAssessment = await dao.getOrCreateAssessment(
-        treatment.initialAssessmentId,
-        widget.emergencyId,
-      );
+      // Initial: Try to find existing assessment by medicalId if not linked
+      if (treatment.initialAssessmentId != null) {
+        _initialAssessment = await dao.getOrCreateAssessment(
+          treatment.initialAssessmentId,
+          widget.emergencyId,
+        );
+      } else {
+        // Try to find latest existing assessment (e.g. from Triage)
+        final existing = await dao.getLatestAssessment(widget.emergencyId);
+        if (existing != null) {
+          _initialAssessment = existing;
+        } else {
+          _initialAssessment = await dao.getOrCreateAssessment(
+            null,
+            widget.emergencyId,
+          );
+        }
+      }
+
+      // Post: Always specific to this treatment phase
       _postAssessment = await dao.getOrCreateAssessment(
         treatment.postAssessmentId,
         widget.emergencyId,
@@ -138,6 +154,8 @@ class _EmergencyTreatmentRecordState extends State<EmergencyTreatmentRecord> {
         await dao.updateEmergencyTreatment(
           EmergencyTreatmentCompanion(
             id: drift.Value(treatment.id),
+            // Add medicalId to be safe, although partial update shouldn't need it if we use write logic
+            // But let's keep it minimal for partial update
             initialAssessmentId: drift.Value(_initialAssessment!.assessmentId),
             postAssessmentId: drift.Value(_postAssessment!.assessmentId),
           ),
@@ -247,8 +265,23 @@ class _EmergencyTreatmentRecordState extends State<EmergencyTreatmentRecord> {
     _populateAssessment(_postAssessment, isPost: true);
   }
 
-  void _populateAssessment(MedicalAssessmentData? a, {required bool isPost}) {
+  Future<String> _getPupilReactionSymbol(int? id, String? text) async {
+    if (text != null && text.isNotEmpty) return text;
+    if (id == null) return '+'; // Default
+
+    final db = context.read<AppDatabase>();
+    final ref = await (db.select(
+      db.pupilReactionRef,
+    )..where((t) => t.id.equals(id))).getSingleOrNull();
+    return ref?.symbol ?? '+';
+  }
+
+  void _populateAssessment(
+    MedicalAssessmentData? a, {
+    required bool isPost,
+  }) async {
     if (a == null) return;
+    // ... existing controller population ...
     final eCtrl = isPost ? _postEController : _initEController;
     final vCtrl = isPost ? _postVController : _initVController;
     final mCtrl = isPost ? _postMController : _initMController;
@@ -281,15 +314,27 @@ class _EmergencyTreatmentRecordState extends State<EmergencyTreatmentRecord> {
     int m = int.tryParse(mCtrl.text) ?? 0;
     int? total = (e > 0 && v > 0 && m > 0) ? (e + v + m) : null;
 
-    if (isPost) {
-      _postGcsTotal = total;
-      _postLeftPupilReaction = a.leftPupilReaction ?? '+';
-      _postRightPupilReaction = a.rightPupilReaction ?? '+';
-    } else {
-      _initGcsTotal = total;
-      _initLeftPupilReaction = a.leftPupilReaction ?? '+';
-      _initRightPupilReaction = a.rightPupilReaction ?? '+';
-    }
+    // Async fetch pupil reactions if needed
+    final leftReaction = await _getPupilReactionSymbol(
+      a.leftPupilReactionId,
+      a.leftPupilReaction,
+    );
+    final rightReaction = await _getPupilReactionSymbol(
+      a.rightPupilReactionId,
+      a.rightPupilReaction,
+    );
+
+    setState(() {
+      if (isPost) {
+        _postGcsTotal = total;
+        _postLeftPupilReaction = leftReaction;
+        _postRightPupilReaction = rightReaction;
+      } else {
+        _initGcsTotal = total;
+        _initLeftPupilReaction = leftReaction;
+        _initRightPupilReaction = rightReaction;
+      }
+    });
   }
 
   // --- 資料儲存 ---
@@ -361,10 +406,14 @@ class _EmergencyTreatmentRecordState extends State<EmergencyTreatmentRecord> {
     int v = int.tryParse(vCtrl.text) ?? 0;
     int m = int.tryParse(mCtrl.text) ?? 0;
     int? gcsTotal = (e > 0 && v > 0 && m > 0) ? (e + v + m) : null;
-    
+
     // Get pupil reactions
-    final leftReaction = isPost ? _postLeftPupilReaction : _initLeftPupilReaction;
-    final rightReaction = isPost ? _postRightPupilReaction : _initRightPupilReaction;
+    final leftReaction = isPost
+        ? _postLeftPupilReaction
+        : _initLeftPupilReaction;
+    final rightReaction = isPost
+        ? _postRightPupilReaction
+        : _initRightPupilReaction;
 
     await dao.updateAssessment(
       MedicalAssessmentCompanion(
@@ -625,15 +674,7 @@ class _EmergencyTreatmentRecordState extends State<EmergencyTreatmentRecord> {
                 Expanded(
                   child: _buildFieldWrapper(
                     '插管方式',
-                    _buildDropdownField(
-                      hint: '選擇方式',
-                      value: _intubationMethod,
-                      items: ['ET', 'LMA', 'I-GEL', 'Failure'],
-                      onChanged: (v) {
-                        setState(() => _intubationMethod = v);
-                        _saveEmergencyTreatment();
-                      },
-                    ),
+                    _buildIntubationMethodSelection(),
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -1441,46 +1482,6 @@ class _EmergencyTreatmentRecordState extends State<EmergencyTreatmentRecord> {
       ),
     ],
   );
-  Widget _buildDropdownField({
-    required String hint,
-    required String? value,
-    required List<String> items,
-    required Function(String?) onChanged,
-  }) => Container(
-    height: 44,
-    padding: const EdgeInsets.symmetric(horizontal: 12),
-    decoration: BoxDecoration(
-      color: Colors.white,
-      border: Border.all(color: borderColor),
-      borderRadius: BorderRadius.circular(8),
-    ),
-    child: DropdownButtonHideUnderline(
-      child: DropdownButton<String>(
-        value: value,
-        isExpanded: true,
-        icon: const Icon(Icons.expand_more, size: 20, color: textMuted),
-        hint: Text(
-          hint,
-          style: TextStyle(
-            color: textMuted.withValues(alpha: 0.4),
-            fontSize: 13,
-          ),
-        ),
-        items: items
-            .map(
-              (s) => DropdownMenuItem(
-                value: s,
-                child: Text(
-                  s,
-                  style: const TextStyle(fontSize: 14, color: textDark),
-                ),
-              ),
-            )
-            .toList(),
-        onChanged: onChanged,
-      ),
-    ),
-  );
 
   Widget _buildPostFirstAidConditionSection() {
     return Column(
@@ -1573,15 +1574,7 @@ class _EmergencyTreatmentRecordState extends State<EmergencyTreatmentRecord> {
             Expanded(
               child: _buildFieldWrapper(
                 '呼吸 Respiration',
-                _buildDropdownField(
-                  hint: '選擇方式',
-                  value: _postRespirationMode,
-                  items: ['自發性呼吸', '呼吸器', 'Ambu'],
-                  onChanged: (v) {
-                    setState(() => _postRespirationMode = v);
-                    _saveEmergencyTreatment();
-                  },
-                ),
+                _buildRespirationModeSelection(),
               ),
             ),
             const SizedBox(width: 16),
@@ -1612,47 +1605,6 @@ class _EmergencyTreatmentRecordState extends State<EmergencyTreatmentRecord> {
     );
   }
 
-  Widget _buildSegmentedControl(
-    List<String> options,
-    String current,
-    Function(String) onSelect,
-  ) {
-    return Container(
-      height: 40,
-      decoration: BoxDecoration(
-        border: Border.all(color: borderColor),
-        borderRadius: BorderRadius.circular(8),
-        color: Colors.white,
-      ),
-      child: Row(
-        children: options.map((opt) {
-          bool isSel = current == opt;
-          return Expanded(
-            child: GestureDetector(
-              onTap: () => onSelect(opt),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: isSel ? primaryColor : Colors.transparent,
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Text(
-                  opt,
-                  style: TextStyle(
-                    color: isSel ? Colors.white : textMuted,
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
-          );
-        }).toList(),
-      ),
-    );
-  }
-
   Widget _buildFinalSigningSection() {
     final refService = context.read<ReferenceService>();
     final doctors = refService.getStaffByRole('DOCTOR');
@@ -1678,15 +1630,7 @@ class _EmergencyTreatmentRecordState extends State<EmergencyTreatmentRecord> {
             const SizedBox(width: 24),
             Expanded(
               flex: 3,
-              child: _buildFieldWrapper(
-                '急救結果 Result',
-                _buildSegmentedControl(['轉診', '死亡', '其它'], _firstAidResult, (
-                  v,
-                ) {
-                  setState(() => _firstAidResult = v);
-                  _saveEmergencyTreatment();
-                }),
-              ),
+              child: _buildFieldWrapper('急救結果 Result', _buildResultSelection()),
             ),
           ],
         ),
@@ -1876,6 +1820,118 @@ class _EmergencyTreatmentRecordState extends State<EmergencyTreatmentRecord> {
           ),
         ],
       ],
+    );
+  }
+
+  // --- 選擇欄位 Helper (Generic) ---
+  Widget _buildReferenceSelection<T>({
+    required String label,
+    required String? value, // Current Display Value
+    required IconData icon,
+    required String title,
+    required Future<List<T>> Function(String) searchFunction,
+    required String Function(T) getName,
+    required Function(T) onSelected,
+  }) {
+    return _buildSelectionField(
+      text: value ?? '',
+      hint: label,
+      icon: icon,
+      onTap: () async {
+        await ReferenceSearchSheet.show<T>(
+          context,
+          title: title,
+          searchFunction: searchFunction,
+          itemBuilder: (context, item, isSelected) {
+            return ListTile(
+              title: Text(getName(item)),
+              selected: isSelected,
+              trailing: isSelected
+                  ? const Icon(Icons.check, color: Colors.blue)
+                  : null,
+              onTap: () => Navigator.pop(context, item),
+            );
+          },
+        ).then((selected) {
+          if (selected != null) {
+            onSelected(selected);
+          }
+        });
+      },
+    );
+  }
+
+  // --- 重構後的 UI Components ---
+
+  // 1. 插管方式 (Replace Dropdown)
+  Widget _buildIntubationMethodSelection() {
+    return _buildReferenceSelection<IntubationMethodRefData>(
+      label: '插管方式',
+      value: _intubationMethod,
+      icon: Icons.medical_services,
+      title: '選擇插管方式',
+      searchFunction: (query) async {
+        final db = context.read<AppDatabase>();
+        return (db.select(db.intubationMethodRef)
+              ..where((t) => t.isActive.equals(true))
+              ..where((t) => t.name.contains(query)))
+            .get();
+      },
+      getName: (item) => item.name,
+      onSelected: (item) {
+        setState(() {
+          _intubationMethod = item.name;
+        });
+        _saveEmergencyTreatment();
+      },
+    );
+  }
+
+  // 2. 呼吸模式 (Replace Dropdown)
+  Widget _buildRespirationModeSelection() {
+    return _buildReferenceSelection<RespirationModeRefData>(
+      label: '選擇方式',
+      value: _postRespirationMode,
+      icon: Icons.air,
+      title: '選擇呼吸模式',
+      searchFunction: (query) async {
+        final db = context.read<AppDatabase>();
+        return (db.select(db.respirationModeRef)
+              ..where((t) => t.isActive.equals(true))
+              ..where((t) => t.name.contains(query)))
+            .get();
+      },
+      getName: (item) => item.name,
+      onSelected: (item) {
+        setState(() {
+          _postRespirationMode = item.name;
+        });
+        _saveEmergencyTreatment();
+      },
+    );
+  }
+
+  // 3. 處置結果 (Replace SegmentedControl)
+  Widget _buildResultSelection() {
+    return _buildReferenceSelection<TreatmentResultData>(
+      label: '選擇結果',
+      value: _firstAidResult,
+      icon: Icons.assignment_turned_in,
+      title: '選擇處置結果',
+      searchFunction: (query) async {
+        final db = context.read<AppDatabase>();
+        return (db.select(db.treatmentResult)
+              ..where((t) => t.isActive.equals(true))
+              ..where((t) => t.name.contains(query)))
+            .get();
+      },
+      getName: (item) => item.name,
+      onSelected: (item) {
+        setState(() {
+          _firstAidResult = item.name;
+        });
+        _saveEmergencyTreatment();
+      },
     );
   }
 

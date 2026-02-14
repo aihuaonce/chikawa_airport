@@ -60,7 +60,7 @@ class _AmbulanceStaffDialogState extends State<AmbulanceStaffDialog> {
   @override
   Widget build(BuildContext context) {
     const primaryColor = Color(0xFF007A8A);
-    const borderColor = Color(0xFFE2E8F0);
+    const borderColor = Color(0xFFE2E8F0);    
 
     return Dialog(
       insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
