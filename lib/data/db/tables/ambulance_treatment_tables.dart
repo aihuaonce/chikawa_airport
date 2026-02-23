@@ -32,6 +32,10 @@ class AmbulanceTreatmentRecords extends Table {
 
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
   DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
+
+  IntColumn get syncStatus => integer().withDefault(const Constant(0))();
+  TextColumn get remoteId => text().nullable()();
+  DateTimeColumn get lastModified => dateTime().nullable()();
 }
 
 // 處置大類 (Reference)

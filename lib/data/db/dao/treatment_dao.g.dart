@@ -38,4 +38,100 @@ mixin _$TreatmentDaoMixin on DatabaseAccessor<AppDatabase> {
   $SpecialNoteLinksTable get specialNoteLinks =>
       attachedDatabase.specialNoteLinks;
   $MedicationsTable get medications => attachedDatabase.medications;
+  TreatmentDaoManager get managers => TreatmentDaoManager(this);
+}
+
+class TreatmentDaoManager {
+  final _$TreatmentDaoMixin _db;
+  TreatmentDaoManager(this._db);
+  $$MedicalRecordTableTableManager get medicalRecord =>
+      $$MedicalRecordTableTableManager(_db.attachedDatabase, _db.medicalRecord);
+  $$HealthAssessmentFormTableTableManager get healthAssessmentForm =>
+      $$HealthAssessmentFormTableTableManager(
+        _db.attachedDatabase,
+        _db.healthAssessmentForm,
+      );
+  $$ChiefComplaintTableTableManager get chiefComplaint =>
+      $$ChiefComplaintTableTableManager(
+        _db.attachedDatabase,
+        _db.chiefComplaint,
+      );
+  $$MedicalMediaTableTableManager get medicalMedia =>
+      $$MedicalMediaTableTableManager(_db.attachedDatabase, _db.medicalMedia);
+  $$ConsciousnessLevelRefTableTableManager get consciousnessLevelRef =>
+      $$ConsciousnessLevelRefTableTableManager(
+        _db.attachedDatabase,
+        _db.consciousnessLevelRef,
+      );
+  $$PupilReactionRefTableTableManager get pupilReactionRef =>
+      $$PupilReactionRefTableTableManager(
+        _db.attachedDatabase,
+        _db.pupilReactionRef,
+      );
+  $$MedicalAssessmentTableTableManager get medicalAssessment =>
+      $$MedicalAssessmentTableTableManager(
+        _db.attachedDatabase,
+        _db.medicalAssessment,
+      );
+  $$HistoryStatusRefTableTableManager get historyStatusRef =>
+      $$HistoryStatusRefTableTableManager(
+        _db.attachedDatabase,
+        _db.historyStatusRef,
+      );
+  $$MedicalHistoryTableTableManager get medicalHistory =>
+      $$MedicalHistoryTableTableManager(
+        _db.attachedDatabase,
+        _db.medicalHistory,
+      );
+  $$MedicalStaffTableTableManager get medicalStaff =>
+      $$MedicalStaffTableTableManager(_db.attachedDatabase, _db.medicalStaff);
+  $$TreatmentTableTableManager get treatment =>
+      $$TreatmentTableTableManager(_db.attachedDatabase, _db.treatment);
+  $$MedicalStaffRoleTableTableManager get medicalStaffRole =>
+      $$MedicalStaffRoleTableTableManager(
+        _db.attachedDatabase,
+        _db.medicalStaffRole,
+      );
+  $$MedicalStaffAssignmentTableTableManager get medicalStaffAssignment =>
+      $$MedicalStaffAssignmentTableTableManager(
+        _db.attachedDatabase,
+        _db.medicalStaffAssignment,
+      );
+  $$SpecialNotesTableTableManager get specialNotes =>
+      $$SpecialNotesTableTableManager(_db.attachedDatabase, _db.specialNotes);
+  $$ChiefComplaintTypeTableTableManager get chiefComplaintType =>
+      $$ChiefComplaintTypeTableTableManager(
+        _db.attachedDatabase,
+        _db.chiefComplaintType,
+      );
+  $$ChiefComplaintDetailTableTableManager get chiefComplaintDetail =>
+      $$ChiefComplaintDetailTableTableManager(
+        _db.attachedDatabase,
+        _db.chiefComplaintDetail,
+      );
+  $$ChiefComplaintSymptomLinksTableTableManager
+  get chiefComplaintSymptomLinks =>
+      $$ChiefComplaintSymptomLinksTableTableManager(
+        _db.attachedDatabase,
+        _db.chiefComplaintSymptomLinks,
+      );
+  $$ActionItemTableTableManager get actionItem =>
+      $$ActionItemTableTableManager(_db.attachedDatabase, _db.actionItem);
+  $$TreatmentActionLinksTableTableManager get treatmentActionLinks =>
+      $$TreatmentActionLinksTableTableManager(
+        _db.attachedDatabase,
+        _db.treatmentActionLinks,
+      );
+  $$SpecialNoteRefTableTableManager get specialNoteRef =>
+      $$SpecialNoteRefTableTableManager(
+        _db.attachedDatabase,
+        _db.specialNoteRef,
+      );
+  $$SpecialNoteLinksTableTableManager get specialNoteLinks =>
+      $$SpecialNoteLinksTableTableManager(
+        _db.attachedDatabase,
+        _db.specialNoteLinks,
+      );
+  $$MedicationsTableTableManager get medications =>
+      $$MedicationsTableTableManager(_db.attachedDatabase, _db.medications);
 }

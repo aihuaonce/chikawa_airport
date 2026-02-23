@@ -16,4 +16,39 @@ mixin _$EmergencyDaoMixin on DatabaseAccessor<AppDatabase> {
   $FirstAidLogTable get firstAidLog => attachedDatabase.firstAidLog;
   $EmergencyAssistStaffTable get emergencyAssistStaff =>
       attachedDatabase.emergencyAssistStaff;
+  EmergencyDaoManager get managers => EmergencyDaoManager(this);
+}
+
+class EmergencyDaoManager {
+  final _$EmergencyDaoMixin _db;
+  EmergencyDaoManager(this._db);
+  $$MedicalRecordTableTableManager get medicalRecord =>
+      $$MedicalRecordTableTableManager(_db.attachedDatabase, _db.medicalRecord);
+  $$ConsciousnessLevelRefTableTableManager get consciousnessLevelRef =>
+      $$ConsciousnessLevelRefTableTableManager(
+        _db.attachedDatabase,
+        _db.consciousnessLevelRef,
+      );
+  $$PupilReactionRefTableTableManager get pupilReactionRef =>
+      $$PupilReactionRefTableTableManager(
+        _db.attachedDatabase,
+        _db.pupilReactionRef,
+      );
+  $$MedicalAssessmentTableTableManager get medicalAssessment =>
+      $$MedicalAssessmentTableTableManager(
+        _db.attachedDatabase,
+        _db.medicalAssessment,
+      );
+  $$EmergencyTreatmentTableTableManager get emergencyTreatment =>
+      $$EmergencyTreatmentTableTableManager(
+        _db.attachedDatabase,
+        _db.emergencyTreatment,
+      );
+  $$FirstAidLogTableTableManager get firstAidLog =>
+      $$FirstAidLogTableTableManager(_db.attachedDatabase, _db.firstAidLog);
+  $$EmergencyAssistStaffTableTableManager get emergencyAssistStaff =>
+      $$EmergencyAssistStaffTableTableManager(
+        _db.attachedDatabase,
+        _db.emergencyAssistStaff,
+      );
 }

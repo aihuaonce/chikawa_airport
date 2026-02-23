@@ -13,6 +13,7 @@ import 'tables/contact_tables.dart';
 import 'tables/ambulance_tables.dart';
 import 'tables/ambulance_scene_tables.dart';
 import 'tables/ambulance_treatment_tables.dart';
+import 'tables/sync_tables.dart';
 
 //匯入DAO
 import 'dao/reference_dao.dart';
@@ -120,6 +121,10 @@ part 'database.g.dart';
     EmergencyTreatment,
     FirstAidLog,
     EmergencyAssistStaff,
+
+    // Sync Tables
+    SyncLogTable,
+    SyncConfigTable,
   ],
   daos: [
     ReferenceDao,

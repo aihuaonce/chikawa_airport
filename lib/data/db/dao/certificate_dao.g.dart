@@ -9,4 +9,22 @@ mixin _$CertificateDaoMixin on DatabaseAccessor<AppDatabase> {
       attachedDatabase.diagnosisCategory;
   $MedicalCertificatesTable get medicalCertificates =>
       attachedDatabase.medicalCertificates;
+  CertificateDaoManager get managers => CertificateDaoManager(this);
+}
+
+class CertificateDaoManager {
+  final _$CertificateDaoMixin _db;
+  CertificateDaoManager(this._db);
+  $$MedicalRecordTableTableManager get medicalRecord =>
+      $$MedicalRecordTableTableManager(_db.attachedDatabase, _db.medicalRecord);
+  $$DiagnosisCategoryTableTableManager get diagnosisCategory =>
+      $$DiagnosisCategoryTableTableManager(
+        _db.attachedDatabase,
+        _db.diagnosisCategory,
+      );
+  $$MedicalCertificatesTableTableManager get medicalCertificates =>
+      $$MedicalCertificatesTableTableManager(
+        _db.attachedDatabase,
+        _db.medicalCertificates,
+      );
 }

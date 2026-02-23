@@ -9,4 +9,24 @@ mixin _$ReferralFormDaoMixin on DatabaseAccessor<AppDatabase> {
   $RelationshipTypeTable get relationshipType =>
       attachedDatabase.relationshipType;
   $ReferralFormsTable get referralForms => attachedDatabase.referralForms;
+  ReferralFormDaoManager get managers => ReferralFormDaoManager(this);
+}
+
+class ReferralFormDaoManager {
+  final _$ReferralFormDaoMixin _db;
+  ReferralFormDaoManager(this._db);
+  $$MedicalRecordTableTableManager get medicalRecord =>
+      $$MedicalRecordTableTableManager(_db.attachedDatabase, _db.medicalRecord);
+  $$ReferralPurposeTableTableManager get referralPurpose =>
+      $$ReferralPurposeTableTableManager(
+        _db.attachedDatabase,
+        _db.referralPurpose,
+      );
+  $$RelationshipTypeTableTableManager get relationshipType =>
+      $$RelationshipTypeTableTableManager(
+        _db.attachedDatabase,
+        _db.relationshipType,
+      );
+  $$ReferralFormsTableTableManager get referralForms =>
+      $$ReferralFormsTableTableManager(_db.attachedDatabase, _db.referralForms);
 }

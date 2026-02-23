@@ -49,6 +49,10 @@ class AmbulanceRecords extends Table {
   // 建立與更新時間
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
   DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
+
+  IntColumn get syncStatus => integer().withDefault(const Constant(0))();
+  TextColumn get remoteId => text().nullable()();
+  DateTimeColumn get lastModified => dateTime().nullable()();
 }
 
 // 救護車個人財物表
@@ -73,6 +77,10 @@ class AmbulancePersonalProperty extends Table {
 
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
   DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
+
+  IntColumn get syncStatus => integer().withDefault(const Constant(0))();
+  TextColumn get remoteId => text().nullable()();
+  DateTimeColumn get lastModified => dateTime().nullable()();
 }
 
 // 救護車收費紀錄表
@@ -99,4 +107,8 @@ class AmbulanceFees extends Table {
   // 建立與更新時間
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
   DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
+
+  IntColumn get syncStatus => integer().withDefault(const Constant(0))();
+  TextColumn get remoteId => text().nullable()();
+  DateTimeColumn get lastModified => dateTime().nullable()();
 }

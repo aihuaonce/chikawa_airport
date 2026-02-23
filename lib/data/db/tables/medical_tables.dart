@@ -17,6 +17,10 @@ class MedicalRecord extends Table {
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
 
   DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
+
+  IntColumn get syncStatus => integer().withDefault(const Constant(0))();
+  TextColumn get remoteId => text().nullable()();
+  DateTimeColumn get lastModified => dateTime().nullable()();
 }
 
 //病患基本資料表
@@ -46,6 +50,10 @@ class Patient extends Table {
   TextColumn get address => text().nullable()();
 
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+
+  IntColumn get syncStatus => integer().withDefault(const Constant(0))();
+  TextColumn get remoteId => text().nullable()();
+  DateTimeColumn get lastModified => dateTime().nullable()();
 }
 
 //飛航紀錄表
@@ -69,6 +77,10 @@ class FlightRecord extends Table {
       integer().nullable().references(Location, #locationId)();
 
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+
+  IntColumn get syncStatus => integer().withDefault(const Constant(0))();
+  TextColumn get remoteId => text().nullable()();
+  DateTimeColumn get lastModified => dateTime().nullable()();
 }
 
 //飛航-經過點表
@@ -114,6 +126,10 @@ class IncidentRecord extends Table {
   DateTimeColumn get landingTime => dateTime().nullable()();
   DateTimeColumn get medicalArrivalTime => dateTime().nullable()();
   DateTimeColumn get examinationTime => dateTime().nullable()();
+
+  IntColumn get syncStatus => integer().withDefault(const Constant(0))();
+  TextColumn get remoteId => text().nullable()();
+  DateTimeColumn get lastModified => dateTime().nullable()();
 }
 
 //處置-CDC健康評估表
@@ -270,6 +286,10 @@ class Treatment extends Table {
 
   DateTimeColumn get treatmentTime =>
       dateTime().withDefault(currentDateAndTime)();
+
+  IntColumn get syncStatus => integer().withDefault(const Constant(0))();
+  TextColumn get remoteId => text().nullable()();
+  DateTimeColumn get lastModified => dateTime().nullable()();
 }
 
 //處置-醫療人員指派表
@@ -309,6 +329,10 @@ class MedicalCertificates extends Table {
   TextColumn get englishAdvice => text().nullable()();
   DateTimeColumn get issuanceDate => dateTime().nullable()();
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+
+  IntColumn get syncStatus => integer().withDefault(const Constant(0))();
+  TextColumn get remoteId => text().nullable()();
+  DateTimeColumn get lastModified => dateTime().nullable()();
 }
 
 // 2. 醫療費用表 - MedicalFee
@@ -337,6 +361,10 @@ class MedicalFees extends Table {
   BlobColumn get witnessSignature => blob().nullable()();
   BlobColumn get counterSignature => blob().nullable()();
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+
+  IntColumn get syncStatus => integer().withDefault(const Constant(0))();
+  TextColumn get remoteId => text().nullable()();
+  DateTimeColumn get lastModified => dateTime().nullable()();
 }
 
 // 3. 護理記錄表 - NursingRecord
@@ -345,10 +373,14 @@ class NursingRecords extends Table {
   IntColumn get recordId => integer().autoIncrement()();
   IntColumn get medicalId => integer().references(MedicalRecord, #medicalId)();
   DateTimeColumn get recordTime => dateTime()();
-  TextColumn get content => text()();
+  TextColumn get content => text().nullable()();
   IntColumn get nurseId => integer().nullable().references(MedicalStaff, #id)();
   BlobColumn get signature => blob().nullable()();
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+
+  IntColumn get syncStatus => integer().withDefault(const Constant(0))();
+  TextColumn get remoteId => text().nullable()();
+  DateTimeColumn get lastModified => dateTime().nullable()();
 }
 
 // 4. 轉診單表 - ReferralForm
@@ -407,6 +439,10 @@ class ReferralForms extends Table {
   DateTimeColumn get consentDateTime => dateTime().nullable()();
 
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+
+  IntColumn get syncStatus => integer().withDefault(const Constant(0))();
+  TextColumn get remoteId => text().nullable()();
+  DateTimeColumn get lastModified => dateTime().nullable()();
 }
 
 // 5. TELEX 文件表 - TelexDocument
@@ -419,6 +455,10 @@ class TelexDocuments extends Table {
   IntColumn get fromStationId =>
       integer().nullable().references(StationRef, #id)();
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+
+  IntColumn get syncStatus => integer().withDefault(const Constant(0))();
+  TextColumn get remoteId => text().nullable()();
+  DateTimeColumn get lastModified => dateTime().nullable()();
 }
 
 // 6. 藥物記錄表 - Medications
