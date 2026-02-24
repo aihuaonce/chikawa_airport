@@ -29,17 +29,17 @@ class SyncDao extends DatabaseAccessor<AppDatabase> with _$SyncDaoMixin {
     );
   }
 
-  Future<List<SyncLogEntryData>> getPendingLogs() {
+  Future<List<SyncLogEntry>> getPendingLogs() {
     return (select(syncLogTable)
           ..where((t) => t.status.equals(SyncStatus.pending))
           ..orderBy([(t) => OrderingTerm.asc(t.createdAt)]))
         .get();
   }
 
-  Future<List<SyncLogEntryData>> getFailedLogs() {
+  Future<List<SyncLogEntry>> getFailedLogs() {
     return (select(syncLogTable)
           ..where((t) => t.status.equals(SyncStatus.failed))
-          ..where((t) => t.retryCount.isSmallerThan(3))
+          ..where((t) => t.retryCount.isSmallerThanValue(3))
           ..orderBy([(t) => OrderingTerm.asc(t.createdAt)]))
         .get();
   }

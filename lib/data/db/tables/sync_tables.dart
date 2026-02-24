@@ -3,7 +3,7 @@ import 'package:drift/drift.dart';
 @DataClassName('SyncLogEntry')
 class SyncLogTable extends Table {
   IntColumn get id => integer().autoIncrement()();
-  TextColumn get entityName => text()();
+  TextColumn get syncTableName => text()();
   IntColumn get recordId => integer()();
   TextColumn get operation => text()();
   TextColumn get payload => text()();

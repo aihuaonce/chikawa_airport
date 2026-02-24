@@ -39065,12 +39065,12 @@ class $SyncLogTableTable extends SyncLogTable
       'PRIMARY KEY AUTOINCREMENT',
     ),
   );
-  static const VerificationMeta _entityNameMeta = const VerificationMeta(
-    'entityName',
+  static const VerificationMeta _syncTableNameMeta = const VerificationMeta(
+    'syncTableName',
   );
   @override
-  late final GeneratedColumn<String> entityName = GeneratedColumn<String>(
-    'entity_name',
+  late final GeneratedColumn<String> syncTableName = GeneratedColumn<String>(
+    'sync_table_name',
     aliasedName,
     false,
     type: DriftSqlType.string,
@@ -39167,7 +39167,7 @@ class $SyncLogTableTable extends SyncLogTable
   @override
   List<GeneratedColumn> get $columns => [
     id,
-    entityName,
+    syncTableName,
     recordId,
     operation,
     payload,
@@ -39192,13 +39192,16 @@ class $SyncLogTableTable extends SyncLogTable
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
     }
-    if (data.containsKey('entity_name')) {
+    if (data.containsKey('sync_table_name')) {
       context.handle(
-        _entityNameMeta,
-        entityName.isAcceptableOrUnknown(data['entity_name']!, _entityNameMeta),
+        _syncTableNameMeta,
+        syncTableName.isAcceptableOrUnknown(
+          data['sync_table_name']!,
+          _syncTableNameMeta,
+        ),
       );
     } else if (isInserting) {
-      context.missing(_entityNameMeta);
+      context.missing(_syncTableNameMeta);
     }
     if (data.containsKey('record_id')) {
       context.handle(
@@ -39272,9 +39275,9 @@ class $SyncLogTableTable extends SyncLogTable
         DriftSqlType.int,
         data['${effectivePrefix}id'],
       )!,
-      entityName: attachedDatabase.typeMapping.read(
+      syncTableName: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
-        data['${effectivePrefix}entity_name'],
+        data['${effectivePrefix}sync_table_name'],
       )!,
       recordId: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
@@ -39319,7 +39322,7 @@ class $SyncLogTableTable extends SyncLogTable
 
 class SyncLogEntry extends DataClass implements Insertable<SyncLogEntry> {
   final int id;
-  final String entityName;
+  final String syncTableName;
   final int recordId;
   final String operation;
   final String payload;
@@ -39330,7 +39333,7 @@ class SyncLogEntry extends DataClass implements Insertable<SyncLogEntry> {
   final String? errorMessage;
   const SyncLogEntry({
     required this.id,
-    required this.entityName,
+    required this.syncTableName,
     required this.recordId,
     required this.operation,
     required this.payload,
@@ -39344,7 +39347,7 @@ class SyncLogEntry extends DataClass implements Insertable<SyncLogEntry> {
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
-    map['entity_name'] = Variable<String>(entityName);
+    map['sync_table_name'] = Variable<String>(syncTableName);
     map['record_id'] = Variable<int>(recordId);
     map['operation'] = Variable<String>(operation);
     map['payload'] = Variable<String>(payload);
@@ -39363,7 +39366,7 @@ class SyncLogEntry extends DataClass implements Insertable<SyncLogEntry> {
   SyncLogTableCompanion toCompanion(bool nullToAbsent) {
     return SyncLogTableCompanion(
       id: Value(id),
-      entityName: Value(entityName),
+      syncTableName: Value(syncTableName),
       recordId: Value(recordId),
       operation: Value(operation),
       payload: Value(payload),
@@ -39386,7 +39389,7 @@ class SyncLogEntry extends DataClass implements Insertable<SyncLogEntry> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return SyncLogEntry(
       id: serializer.fromJson<int>(json['id']),
-      entityName: serializer.fromJson<String>(json['entityName']),
+      syncTableName: serializer.fromJson<String>(json['syncTableName']),
       recordId: serializer.fromJson<int>(json['recordId']),
       operation: serializer.fromJson<String>(json['operation']),
       payload: serializer.fromJson<String>(json['payload']),
@@ -39402,7 +39405,7 @@ class SyncLogEntry extends DataClass implements Insertable<SyncLogEntry> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
-      'entityName': serializer.toJson<String>(entityName),
+      'syncTableName': serializer.toJson<String>(syncTableName),
       'recordId': serializer.toJson<int>(recordId),
       'operation': serializer.toJson<String>(operation),
       'payload': serializer.toJson<String>(payload),
@@ -39416,7 +39419,7 @@ class SyncLogEntry extends DataClass implements Insertable<SyncLogEntry> {
 
   SyncLogEntry copyWith({
     int? id,
-    String? entityName,
+    String? syncTableName,
     int? recordId,
     String? operation,
     String? payload,
@@ -39427,7 +39430,7 @@ class SyncLogEntry extends DataClass implements Insertable<SyncLogEntry> {
     Value<String?> errorMessage = const Value.absent(),
   }) => SyncLogEntry(
     id: id ?? this.id,
-    entityName: entityName ?? this.entityName,
+    syncTableName: syncTableName ?? this.syncTableName,
     recordId: recordId ?? this.recordId,
     operation: operation ?? this.operation,
     payload: payload ?? this.payload,
@@ -39440,9 +39443,9 @@ class SyncLogEntry extends DataClass implements Insertable<SyncLogEntry> {
   SyncLogEntry copyWithCompanion(SyncLogTableCompanion data) {
     return SyncLogEntry(
       id: data.id.present ? data.id.value : this.id,
-      entityName: data.entityName.present
-          ? data.entityName.value
-          : this.entityName,
+      syncTableName: data.syncTableName.present
+          ? data.syncTableName.value
+          : this.syncTableName,
       recordId: data.recordId.present ? data.recordId.value : this.recordId,
       operation: data.operation.present ? data.operation.value : this.operation,
       payload: data.payload.present ? data.payload.value : this.payload,
@@ -39462,7 +39465,7 @@ class SyncLogEntry extends DataClass implements Insertable<SyncLogEntry> {
   String toString() {
     return (StringBuffer('SyncLogEntry(')
           ..write('id: $id, ')
-          ..write('entityName: $entityName, ')
+          ..write('syncTableName: $syncTableName, ')
           ..write('recordId: $recordId, ')
           ..write('operation: $operation, ')
           ..write('payload: $payload, ')
@@ -39478,7 +39481,7 @@ class SyncLogEntry extends DataClass implements Insertable<SyncLogEntry> {
   @override
   int get hashCode => Object.hash(
     id,
-    entityName,
+    syncTableName,
     recordId,
     operation,
     payload,
@@ -39493,7 +39496,7 @@ class SyncLogEntry extends DataClass implements Insertable<SyncLogEntry> {
       identical(this, other) ||
       (other is SyncLogEntry &&
           other.id == this.id &&
-          other.entityName == this.entityName &&
+          other.syncTableName == this.syncTableName &&
           other.recordId == this.recordId &&
           other.operation == this.operation &&
           other.payload == this.payload &&
@@ -39506,7 +39509,7 @@ class SyncLogEntry extends DataClass implements Insertable<SyncLogEntry> {
 
 class SyncLogTableCompanion extends UpdateCompanion<SyncLogEntry> {
   final Value<int> id;
-  final Value<String> entityName;
+  final Value<String> syncTableName;
   final Value<int> recordId;
   final Value<String> operation;
   final Value<String> payload;
@@ -39517,7 +39520,7 @@ class SyncLogTableCompanion extends UpdateCompanion<SyncLogEntry> {
   final Value<String?> errorMessage;
   const SyncLogTableCompanion({
     this.id = const Value.absent(),
-    this.entityName = const Value.absent(),
+    this.syncTableName = const Value.absent(),
     this.recordId = const Value.absent(),
     this.operation = const Value.absent(),
     this.payload = const Value.absent(),
@@ -39529,7 +39532,7 @@ class SyncLogTableCompanion extends UpdateCompanion<SyncLogEntry> {
   });
   SyncLogTableCompanion.insert({
     this.id = const Value.absent(),
-    required String entityName,
+    required String syncTableName,
     required int recordId,
     required String operation,
     required String payload,
@@ -39538,14 +39541,14 @@ class SyncLogTableCompanion extends UpdateCompanion<SyncLogEntry> {
     this.syncedAt = const Value.absent(),
     this.retryCount = const Value.absent(),
     this.errorMessage = const Value.absent(),
-  }) : entityName = Value(entityName),
+  }) : syncTableName = Value(syncTableName),
        recordId = Value(recordId),
        operation = Value(operation),
        payload = Value(payload),
        createdAt = Value(createdAt);
   static Insertable<SyncLogEntry> custom({
     Expression<int>? id,
-    Expression<String>? entityName,
+    Expression<String>? syncTableName,
     Expression<int>? recordId,
     Expression<String>? operation,
     Expression<String>? payload,
@@ -39557,7 +39560,7 @@ class SyncLogTableCompanion extends UpdateCompanion<SyncLogEntry> {
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
-      if (entityName != null) 'entity_name': entityName,
+      if (syncTableName != null) 'sync_table_name': syncTableName,
       if (recordId != null) 'record_id': recordId,
       if (operation != null) 'operation': operation,
       if (payload != null) 'payload': payload,
@@ -39571,7 +39574,7 @@ class SyncLogTableCompanion extends UpdateCompanion<SyncLogEntry> {
 
   SyncLogTableCompanion copyWith({
     Value<int>? id,
-    Value<String>? entityName,
+    Value<String>? syncTableName,
     Value<int>? recordId,
     Value<String>? operation,
     Value<String>? payload,
@@ -39583,7 +39586,7 @@ class SyncLogTableCompanion extends UpdateCompanion<SyncLogEntry> {
   }) {
     return SyncLogTableCompanion(
       id: id ?? this.id,
-      entityName: entityName ?? this.entityName,
+      syncTableName: syncTableName ?? this.syncTableName,
       recordId: recordId ?? this.recordId,
       operation: operation ?? this.operation,
       payload: payload ?? this.payload,
@@ -39601,8 +39604,8 @@ class SyncLogTableCompanion extends UpdateCompanion<SyncLogEntry> {
     if (id.present) {
       map['id'] = Variable<int>(id.value);
     }
-    if (entityName.present) {
-      map['entity_name'] = Variable<String>(entityName.value);
+    if (syncTableName.present) {
+      map['sync_table_name'] = Variable<String>(syncTableName.value);
     }
     if (recordId.present) {
       map['record_id'] = Variable<int>(recordId.value);
@@ -39635,7 +39638,7 @@ class SyncLogTableCompanion extends UpdateCompanion<SyncLogEntry> {
   String toString() {
     return (StringBuffer('SyncLogTableCompanion(')
           ..write('id: $id, ')
-          ..write('entityName: $entityName, ')
+          ..write('syncTableName: $syncTableName, ')
           ..write('recordId: $recordId, ')
           ..write('operation: $operation, ')
           ..write('payload: $payload, ')
@@ -75090,7 +75093,7 @@ typedef $$EmergencyAssistStaffTableProcessedTableManager =
 typedef $$SyncLogTableTableCreateCompanionBuilder =
     SyncLogTableCompanion Function({
       Value<int> id,
-      required String entityName,
+      required String syncTableName,
       required int recordId,
       required String operation,
       required String payload,
@@ -75103,7 +75106,7 @@ typedef $$SyncLogTableTableCreateCompanionBuilder =
 typedef $$SyncLogTableTableUpdateCompanionBuilder =
     SyncLogTableCompanion Function({
       Value<int> id,
-      Value<String> entityName,
+      Value<String> syncTableName,
       Value<int> recordId,
       Value<String> operation,
       Value<String> payload,
@@ -75128,8 +75131,8 @@ class $$SyncLogTableTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get entityName => $composableBuilder(
-    column: $table.entityName,
+  ColumnFilters<String> get syncTableName => $composableBuilder(
+    column: $table.syncTableName,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -75188,8 +75191,8 @@ class $$SyncLogTableTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get entityName => $composableBuilder(
-    column: $table.entityName,
+  ColumnOrderings<String> get syncTableName => $composableBuilder(
+    column: $table.syncTableName,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -75246,8 +75249,8 @@ class $$SyncLogTableTableAnnotationComposer
   GeneratedColumn<int> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
 
-  GeneratedColumn<String> get entityName => $composableBuilder(
-    column: $table.entityName,
+  GeneratedColumn<String> get syncTableName => $composableBuilder(
+    column: $table.syncTableName,
     builder: (column) => column,
   );
 
@@ -75312,7 +75315,7 @@ class $$SyncLogTableTableTableManager
           updateCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
-                Value<String> entityName = const Value.absent(),
+                Value<String> syncTableName = const Value.absent(),
                 Value<int> recordId = const Value.absent(),
                 Value<String> operation = const Value.absent(),
                 Value<String> payload = const Value.absent(),
@@ -75323,7 +75326,7 @@ class $$SyncLogTableTableTableManager
                 Value<String?> errorMessage = const Value.absent(),
               }) => SyncLogTableCompanion(
                 id: id,
-                entityName: entityName,
+                syncTableName: syncTableName,
                 recordId: recordId,
                 operation: operation,
                 payload: payload,
@@ -75336,7 +75339,7 @@ class $$SyncLogTableTableTableManager
           createCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
-                required String entityName,
+                required String syncTableName,
                 required int recordId,
                 required String operation,
                 required String payload,
@@ -75347,7 +75350,7 @@ class $$SyncLogTableTableTableManager
                 Value<String?> errorMessage = const Value.absent(),
               }) => SyncLogTableCompanion.insert(
                 id: id,
-                entityName: entityName,
+                syncTableName: syncTableName,
                 recordId: recordId,
                 operation: operation,
                 payload: payload,

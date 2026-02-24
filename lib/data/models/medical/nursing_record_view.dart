@@ -95,7 +95,7 @@ class NursingRecordViewModel extends ChangeNotifier {
       if (index != -1) {
         _records[index] = _records[index].copyWith(
           recordTime: recordTime ?? _records[index].recordTime,
-          content: content ?? _records[index].content,
+          content: Value(content ?? _records[index].content),
           nurseId: nurseId != null
               ? Value(nurseId)
               : Value(_records[index].nurseId),
@@ -114,7 +114,7 @@ class NursingRecordViewModel extends ChangeNotifier {
     final index = _records.indexWhere((r) => r.recordId == recordId);
     if (index == -1) return;
 
-    _records[index] = _records[index].copyWith(content: content);
+    _records[index] = _records[index].copyWith(content: Value(content));
     notifyListeners();
 
     _debounceSave(

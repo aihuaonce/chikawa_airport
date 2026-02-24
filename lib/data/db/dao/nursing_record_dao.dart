@@ -29,7 +29,7 @@ class NursingRecordDao extends DatabaseAccessor<AppDatabase>
       NursingRecordsCompanion.insert(
         medicalId: medicalId,
         recordTime: recordTime,
-        content: content,
+        content: Value(content),
         nurseId: Value(nurseId),
         signature: Value(signature),
       ),

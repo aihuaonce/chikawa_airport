@@ -6,6 +6,7 @@ import 'widgets/header_bar.dart';
 import 'widgets/filter_bar.dart';
 import 'widgets/records_table.dart';
 import '../data/models/dashboard_view_model.dart';
+import '../medical/widgets/sync_status_bar.dart';
 
 class DashboardPage extends StatelessWidget {
   const DashboardPage({super.key});
@@ -28,34 +29,39 @@ class _DashboardView extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: const Color(0xFFF6F8FA),
-      body: SafeArea(
-        child: Row(
-          children: [
-            //  左側欄
-            Sidebar(
-              currentPage: viewModel.currentFilter,
-              onPageChanged: (page) {
-                viewModel.setFilter(page);
-              },
-            ),
+      body: Column(
+        children: [
+          const SyncStatusBar(),
+          Expanded(
+            child: Row(
+              children: [
+                //  左側欄
+                Sidebar(
+                  currentPage: viewModel.currentFilter,
+                  onPageChanged: (page) {
+                    viewModel.setFilter(page);
+                  },
+                ),
 
-            //  右側內容
-            Expanded(
-              child: Column(
-                children: [
-                  HeaderBar(currentPage: viewModel.currentFilter),
-                  const FilterBar(),
-                  const Expanded(
-                    child: Padding(
-                      padding: EdgeInsets.all(16),
-                      child: RecordsTable(),
-                    ),
+                //  右側內容
+                Expanded(
+                  child: Column(
+                    children: [
+                      HeaderBar(currentPage: viewModel.currentFilter),
+                      const FilterBar(),
+                      const Expanded(
+                        child: Padding(
+                          padding: EdgeInsets.all(16),
+                          child: RecordsTable(),
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

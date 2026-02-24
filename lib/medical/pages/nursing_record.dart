@@ -131,7 +131,7 @@ class _NursingRecordState extends State<NursingRecord> {
                 Expanded(
                   flex: 5,
                   child: _buildInlineTextField(
-                    initialValue: record.content,
+                    initialValue: record.content ?? '',
                     maxLines: null,
                     onChanged: (val) {
                       viewModel.updateRecordContent(record.recordId, val);
@@ -207,7 +207,9 @@ class _NursingRecordState extends State<NursingRecord> {
       context: context,
       builder: (context) {
         return Dialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
           child: Padding(
             padding: const EdgeInsets.all(24.0),
             child: Column(
@@ -335,79 +337,66 @@ class _NursingRecordState extends State<NursingRecord> {
                       child: Wrap(
                         spacing: 8,
                         runSpacing: 8,
-                        children:
-                            viewModel.phrases.map((phrase) {
-                              bool isSel = tempSelectedPhraseId == phrase.id;
-                              return InkWell(
-                                onTap: () async {
-                                  if (isSel) {
-                                    setModalState(() {
-                                      tempSelectedPhraseId = null;
-                                    });
-                                  } else {
-                                    setModalState(() {
-                                      tempSelectedPhraseId = phrase.id;
-                                    });
+                        children: viewModel.phrases.map((phrase) {
+                          bool isSel = tempSelectedPhraseId == phrase.id;
+                          return InkWell(
+                            onTap: () async {
+                              if (isSel) {
+                                setModalState(() {
+                                  tempSelectedPhraseId = null;
+                                });
+                              } else {
+                                setModalState(() {
+                                  tempSelectedPhraseId = phrase.id;
+                                });
 
-                                    // 處理片語變數替換
-                                    final processedContent =
-                                        await viewModel.applyTemplate(
-                                          phrase.content,
-                                        );
+                                // 處理片語變數替換
+                                final processedContent = await viewModel
+                                    .applyTemplate(phrase.content);
 
-                                    // 檢查元件是否還存在
-                                    if (context.mounted) {
-                                      contentCtrl.text = processedContent;
-                                    }
-                                  }
-                                },
+                                // 檢查元件是否還存在
+                                if (context.mounted) {
+                                  contentCtrl.text = processedContent;
+                                }
+                              }
+                            },
+                            borderRadius: BorderRadius.circular(20),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 8,
+                              ),
+                              decoration: BoxDecoration(
+                                color: isSel ? primaryColor : Colors.white,
                                 borderRadius: BorderRadius.circular(20),
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 16,
-                                    vertical: 8,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color:
-                                        isSel
-                                            ? primaryColor
-                                            : Colors.white,
-                                    borderRadius: BorderRadius.circular(20),
-                                    border: Border.all(
-                                      color:
-                                          isSel
-                                              ? primaryColor
-                                              : borderColor,
-                                    ),
-                                    boxShadow:
-                                        isSel
-                                            ? [
-                                              BoxShadow(
-                                                color: primaryColor
-                                                    .withValues(alpha: 0.3),
-                                                blurRadius: 4,
-                                                offset: const Offset(0, 2),
-                                              ),
-                                            ]
-                                            : null,
-                                  ),
-                                  child: Text(
-                                    phrase.title,
-                                    style: TextStyle(
-                                      color:
-                                          isSel
-                                              ? Colors.white
-                                              : textDark,
-                                      fontSize: 13,
-                                      fontWeight:
-                                          isSel
-                                              ? FontWeight.bold
-                                              : FontWeight.w500,
-                                    ),
-                                  ),
+                                border: Border.all(
+                                  color: isSel ? primaryColor : borderColor,
                                 ),
-                              );
-                            }).toList(),
+                                boxShadow: isSel
+                                    ? [
+                                        BoxShadow(
+                                          color: primaryColor.withValues(
+                                            alpha: 0.3,
+                                          ),
+                                          blurRadius: 4,
+                                          offset: const Offset(0, 2),
+                                        ),
+                                      ]
+                                    : null,
+                              ),
+                              child: Text(
+                                phrase.title,
+                                style: TextStyle(
+                                  color: isSel ? Colors.white : textDark,
+                                  fontSize: 13,
+                                  fontWeight: isSel
+                                      ? FontWeight.bold
+                                      : FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          );
+                        }).toList(),
                       ),
                     ),
 
@@ -578,8 +567,8 @@ class _NursingRecordState extends State<NursingRecord> {
                         });
                       },
                     ),
-                    // Container(...) was removed
 
+                    // Container(...) was removed
                     const SizedBox(height: 32),
                     Row(
                       children: [
@@ -718,7 +707,6 @@ class _NursingRecordState extends State<NursingRecord> {
       ),
     );
   }
-
 
   Widget _buildLabel(String text) => Text(
     text,
