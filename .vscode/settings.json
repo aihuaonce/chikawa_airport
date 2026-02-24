@@ -21,5 +21,6 @@
         "Symbolication",
         "Taoyuan",
         "trae"
-    ]
+    ],
+    "java.configuration.updateBuildConfiguration": "interactive"
 }

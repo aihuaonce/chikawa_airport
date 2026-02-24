@@ -60,11 +60,19 @@ class SyncStatusBar extends StatelessWidget {
                   ),
                 ),
               IconButton(
+                icon: const Icon(Icons.add_circle_outline, color: Colors.white, size: 18),
+                onPressed: () => _addTestData(context, provider),
+                tooltip: '添加测试数据',
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+              ),
+              const SizedBox(width: 8),
+              IconButton(
                 icon: const Icon(Icons.sync, color: Colors.white, size: 18),
                 onPressed: provider.state == SyncState.syncing
                     ? null
                     : () => provider.syncAll(),
-                tooltip: '手動同步',
+                tooltip: '手动同步',
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),
               ),
@@ -73,6 +81,28 @@ class SyncStatusBar extends StatelessWidget {
         );
       },
     );
+  }
+
+  Future<void> _addTestData(BuildContext context, SyncServiceProvider provider) async {
+    await provider.markAsPending(
+      tableName: 'patients',
+      recordId: DateTime.now().millisecondsSinceEpoch % 10000,
+      operation: 'insert',
+      data: {
+        'name': '测试病患',
+        'birthday': '1990-01-01',
+        'sexId': 1,
+      },
+    );
+    
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('已添加测试数据'),
+          duration: Duration(seconds: 1),
+        ),
+      );
+    }
   }
 
   Color _getBackgroundColor(SyncState state) {
