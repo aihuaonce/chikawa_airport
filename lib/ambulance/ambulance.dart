@@ -59,6 +59,8 @@ class _AmbulancePageState extends State<AmbulancePage> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isBodyMapSection = _currentSectionIndex == 5;
+
     return Scaffold(
       backgroundColor: bgLight,
       body: SafeArea(
@@ -77,7 +79,7 @@ class _AmbulancePageState extends State<AmbulancePage> {
 
             // 2. 中間內容區域
             Expanded(
-              child: SingleChildScrollView(
+              child: Padding(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 24,
                   vertical: 32,
@@ -86,7 +88,9 @@ class _AmbulancePageState extends State<AmbulancePage> {
                   duration: const Duration(milliseconds: 250),
                   child: Container(
                     key: ValueKey(_currentSectionIndex),
-                    child: _getCurrentPage(),
+                    child: isBodyMapSection
+                        ? _getCurrentPage()
+                        : SingleChildScrollView(child: _getCurrentPage()),
                   ),
                 ),
               ),
