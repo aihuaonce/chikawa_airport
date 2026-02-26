@@ -67,12 +67,13 @@ class SyncDao extends DatabaseAccessor<AppDatabase> with _$SyncDaoMixin {
   }
 
   Future<void> setConfig(String key, String value) async {
-    await into(syncConfigTable).insertOnConflictUpdate(
-      SyncConfigTableCompanion(
-        key: Value(key),
-        value: Value(value),
-        updatedAt: Value(DateTime.now().toUtc()),
+    await into(syncConfigTable).insert(
+      SyncConfigTableCompanion.insert(
+        key: key,
+        value: value,
+        updatedAt: DateTime.now().toUtc(),
       ),
+      mode: InsertMode.insertOrReplace,
     );
   }
 
