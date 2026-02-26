@@ -1,8 +1,35 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter_painter_v2/flutter_painter.dart';
 import 'package:provider/provider.dart';
 import '../../data/db/database.dart';
+
+class BodyMarker {
+  final String id;
+  double x;
+  double y;
+  String description;
+
+  BodyMarker({
+    required this.id,
+    required this.x,
+    required this.y,
+    required this.description,
+  });
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'x': x,
+        'y': y,
+        'description': description,
+      };
+
+  factory BodyMarker.fromJson(Map<String, dynamic> json) => BodyMarker(
+        id: json['id'] as String,
+        x: (json['x'] as num).toDouble(),
+        y: (json['y'] as num).toDouble(),
+        description: json['description'] as String,
+      );
+}
 
 class AmbulanceBodyMap extends StatefulWidget {
   final int medicalId;
@@ -14,440 +41,850 @@ class AmbulanceBodyMap extends StatefulWidget {
 }
 
 class _AmbulanceBodyMapState extends State<AmbulanceBodyMap> {
-  PainterController? _controller;
-  bool _loading = true;
-  String? _errorMessage;
+  static const Color primaryColor = Color(0xFF007A8A);
+  static const Color textDark = Color(0xFF1E293B);
+  static const Color textMuted = Color(0xFF64748B);
+  static const Color borderColor = Color(0xFFE2E8F0);
+  static const Color markerColor = Color(0xFFE53935);
+
+  List<BodyMarker> _markers = [];
+  bool _isLoading = true;
+  Size? _canvasSize;
+  BodyMarker? _editingMarker;
+  final TextEditingController _editController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    _initializePainter();
+    _loadData();
   }
 
-  @override
-  void dispose() {
-    _controller?.dispose();
-    super.dispose();
-  }
+  Future<void> _loadData() async {
+    final db = context.read<AppDatabase>();
+    final jsonStr = await db.ambulanceDao.getBodyMap(widget.medicalId);
 
-  Future<void> _initializePainter() async {
-    try {
-      final db = context.read<AppDatabase>();
-      final bodyMapJson = await db.ambulanceDao.getBodyMap(widget.medicalId);
+    if (jsonStr != null && jsonStr.isNotEmpty) {
+      try {
+        final Map<String, dynamic> data = json.decode(jsonStr);
+        final markerList = (data['markers'] as List<dynamic>?)
+                ?.map((e) => BodyMarker.fromJson(e as Map<String, dynamic>))
+                .toList() ??
+            [];
 
-      _controller = PainterController(
-        settings: PainterSettings(
-          freeStyle: FreeStyleSettings(color: Colors.red, strokeWidth: 2),
-          text: TextSettings(
-            textStyle: const TextStyle(
-              color: Colors.black,
-              fontSize: 18,
-              fontWeight: FontWeight.normal,
-            ),
-          ),
-        ),
-      );
-
-      if (bodyMapJson != null &&
-          bodyMapJson.isNotEmpty &&
-          bodyMapJson != 'null') {
-        _loadDrawablesFromJson(bodyMapJson);
-      }
-
-      _setupControllerListener();
-
-      if (mounted) {
-        setState(() => _loading = false);
-      }
-    } catch (e) {
-      if (mounted) {
         setState(() {
-          _errorMessage = e.toString();
-          _loading = false;
+          _markers = markerList;
         });
+      } catch (e) {
+        debugPrint('Error parsing body map JSON: $e');
       }
     }
-  }
 
-  void _setupControllerListener() {
-    _controller?.addListener(() {
-      if (mounted && _controller != null) {
-        _updateBodyMapData();
-      }
+    setState(() {
+      _isLoading = false;
     });
   }
 
-  void _updateBodyMapData() {
-    if (_controller == null || !mounted) return;
-
-    final drawables = _controller!.drawables;
-
-    final drawablesList = drawables
-        .map((d) => _drawableToJson(d))
-        .whereType<Map<String, dynamic>>()
-        .toList();
-
-    final jsonString = drawablesList.isEmpty ? null : jsonEncode(drawablesList);
-
-    _saveToDatabase(jsonString);
+  Future<void> _saveData() async {
+    final db = context.read<AppDatabase>();
+    final Map<String, dynamic> data = {
+      'markers': _markers.map((m) => m.toJson()).toList(),
+    };
+    await db.ambulanceDao.updateBodyMap(widget.medicalId, json.encode(data));
   }
 
-  Future<void> _saveToDatabase(String? jsonString) async {
-    try {
-      final db = context.read<AppDatabase>();
-      await db.ambulanceDao.updateBodyMap(widget.medicalId, jsonString);
-    } catch (e) {
-      debugPrint('儲存身體地圖失敗: $e');
-    }
+  void _onMarkerTap(BodyMarker marker) {
+    _showMarkerDetailDialog(marker);
   }
 
-  void _loadDrawablesFromJson(String jsonString) {
-    try {
-      final List<dynamic> jsonData = jsonDecode(jsonString);
-      final drawables = <Drawable>[];
+  void _showAddDescriptionDialog(double x, double y) {
+    final controller = TextEditingController();
 
-      for (var json in jsonData) {
-        try {
-          final d = _drawableFromJson(Map<String, dynamic>.from(json));
-          if (d != null) drawables.add(d);
-        } catch (e) {
-          debugPrint('解析單筆 Drawable 失敗: $e');
-        }
-      }
-
-      if (drawables.isNotEmpty) {
-        _controller!.addDrawables(drawables);
-      }
-    } catch (e) {
-      debugPrint('JSON 解析失敗: $e');
-    }
+    showDialog(
+      context: context,
+      builder: (dialogContext) => Dialog(
+        insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        child: SizedBox(
+          width: 400,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+                decoration: const BoxDecoration(
+                  border: Border(bottom: BorderSide(color: borderColor)),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: primaryColor.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Icon(
+                            Icons.add_location_alt_outlined,
+                            color: primaryColor,
+                            size: 24,
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        const Text(
+                          '新增標記',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: textDark,
+                          ),
+                        ),
+                      ],
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close),
+                      onPressed: () => Navigator.pop(dialogContext),
+                      color: textMuted,
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Row(
+                      children: [
+                        Icon(Icons.notes, size: 14, color: textMuted),
+                        SizedBox(width: 6),
+                        Text(
+                          '症狀描述',
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF475569),
+                          ),
+                        ),
+                        SizedBox(width: 6),
+                        Text(
+                          'SYMPTOM',
+                          style: TextStyle(fontSize: 11, color: textMuted),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    TextField(
+                      controller: controller,
+                      autofocus: true,
+                      maxLines: 3,
+                      style: const TextStyle(fontSize: 14),
+                      decoration: InputDecoration(
+                        hintText: '輸入症狀描述...',
+                        hintStyle: TextStyle(color: textMuted.withValues(alpha: 0.4)),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: const BorderSide(color: borderColor),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: const BorderSide(color: borderColor),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: const BorderSide(color: primaryColor),
+                        ),
+                        filled: true,
+                        fillColor: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+                decoration: const BoxDecoration(
+                  border: Border(top: BorderSide(color: borderColor)),
+                  color: Color(0xFFF8FAFC),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(dialogContext),
+                      style: TextButton.styleFrom(
+                        foregroundColor: textMuted,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 12,
+                        ),
+                      ),
+                      child: const Text('取消 Cancel'),
+                    ),
+                    const SizedBox(width: 12),
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        final description = controller.text.trim();
+                        final marker = BodyMarker(
+                          id: DateTime.now().millisecondsSinceEpoch.toString(),
+                          x: x,
+                          y: y,
+                          description: description,
+                        );
+                        setState(() {
+                          _markers.add(marker);
+                        });
+                        _saveData();
+                        Navigator.pop(dialogContext);
+                      },
+                      icon: const Icon(Icons.check_circle_outline, size: 18),
+                      label: const Text(
+                        '確認',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: primaryColor,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 12,
+                        ),
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
-  Drawable? _drawableFromJson(Map<String, dynamic> json) {
-    try {
-      final type = json['type'] as String?;
-      if (type == null) return null;
+  void _showMarkerDetailDialog(BodyMarker marker) {
+    final editController = TextEditingController(text: marker.description);
+    bool isEditing = false;
 
-      switch (type) {
-        case 'FreeStyleDrawable':
-          final pointsList = (json['path'] ?? json['points']) as List? ?? [];
-          final points = pointsList.map((point) {
-            final p = point as List;
-            return Offset((p[0] as num).toDouble(), (p[1] as num).toDouble());
-          }).toList();
-          final color = Color(json['color'] as int? ?? Colors.red.value);
-          final strokeWidth = (json['strokeWidth'] as num?)?.toDouble() ?? 3.0;
-          return FreeStyleDrawable(
-            path: points,
-            color: color,
-            strokeWidth: strokeWidth,
-          );
-
-        case 'TextDrawable':
-          final text = json['text'] as String? ?? "";
-          final positionList = (json['position'] as List?) ?? [0, 0];
-          final position = Offset(
-            (positionList[0] as num).toDouble(),
-            (positionList[1] as num).toDouble(),
-          );
-          final styleJson = (json['style'] as Map<String, dynamic>?) ?? {};
-          final textStyle = TextStyle(
-            color: Color(styleJson['color'] as int? ?? Colors.black.value),
-            fontSize: (styleJson['fontSize'] as num?)?.toDouble() ?? 18.0,
-            fontWeight:
-                FontWeight.values[styleJson['fontWeightIndex'] as int? ??
-                    FontWeight.normal.index],
-          );
-          return TextDrawable(text: text, position: position, style: textStyle);
-
-        default:
-          return null;
-      }
-    } catch (e) {
-      debugPrint('解析 drawable 失敗: $json, 錯誤: $e');
-      return null;
-    }
+    showDialog(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (context, setDialogState) => Dialog(
+          insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          backgroundColor: Colors.white,
+          elevation: 0,
+          child: SizedBox(
+            width: 400,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+                  decoration: const BoxDecoration(
+                    border: Border(bottom: BorderSide(color: borderColor)),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: markerColor.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: const Icon(
+                              Icons.location_on,
+                              color: markerColor,
+                              size: 24,
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Text(
+                            isEditing ? '編輯標記' : '標記詳情',
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: textDark,
+                            ),
+                          ),
+                        ],
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close),
+                        onPressed: () => Navigator.pop(dialogContext),
+                        color: textMuted,
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Row(
+                        children: [
+                          Icon(Icons.notes, size: 14, color: textMuted),
+                          SizedBox(width: 6),
+                          Text(
+                            '症狀描述',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF475569),
+                            ),
+                          ),
+                          SizedBox(width: 6),
+                          Text(
+                            'SYMPTOM',
+                            style: TextStyle(fontSize: 11, color: textMuted),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      if (isEditing)
+                        TextField(
+                          controller: editController,
+                          autofocus: true,
+                          maxLines: 3,
+                          style: const TextStyle(fontSize: 14),
+                          decoration: InputDecoration(
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 12,
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              borderSide: const BorderSide(color: borderColor),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              borderSide: const BorderSide(color: borderColor),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              borderSide: const BorderSide(color: primaryColor),
+                            ),
+                            filled: true,
+                            fillColor: Colors.white,
+                          ),
+                        )
+                      else
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF8FAFC),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: borderColor),
+                          ),
+                          child: Text(
+                            marker.description.isEmpty ? '（無描述）' : marker.description,
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: marker.description.isEmpty ? textMuted : textDark,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+                  decoration: const BoxDecoration(
+                    border: Border(top: BorderSide(color: borderColor)),
+                    color: Color(0xFFF8FAFC),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      if (isEditing) ...[
+                        TextButton(
+                          onPressed: () => setDialogState(() => isEditing = false),
+                          style: TextButton.styleFrom(
+                            foregroundColor: textMuted,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 12,
+                            ),
+                          ),
+                          child: const Text('取消 Cancel'),
+                        ),
+                        const SizedBox(width: 12),
+                        ElevatedButton.icon(
+                          onPressed: () {
+                            setState(() {
+                              marker.description = editController.text.trim();
+                            });
+                            _saveData();
+                            Navigator.pop(dialogContext);
+                          },
+                          icon: const Icon(Icons.check_circle_outline, size: 18),
+                          label: const Text(
+                            '儲存',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: primaryColor,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 24,
+                              vertical: 12,
+                            ),
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                        ),
+                      ] else ...[
+                        const SizedBox(width: 12),
+                        OutlinedButton.icon(
+                          onPressed: () => setDialogState(() => isEditing = true),
+                          icon: const Icon(Icons.edit_outlined, size: 18),
+                          label: const Text(
+                            '編輯',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: primaryColor,
+                            side: const BorderSide(color: primaryColor),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 24,
+                              vertical: 12,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        ElevatedButton.icon(
+                          onPressed: () {
+                            showDialog(
+                              context: dialogContext,
+                              builder: (confirmContext) => Dialog(
+                                insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                                backgroundColor: Colors.white,
+                                elevation: 0,
+                                child: SizedBox(
+                                  width: 300,
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.all(20),
+                                        child: Column(
+                                          children: [
+                                            Container(
+                                              padding: const EdgeInsets.all(12),
+                                              decoration: BoxDecoration(
+                                                color: Colors.red.withValues(alpha: 0.1),
+                                                shape: BoxShape.circle,
+                                              ),
+                                              child: const Icon(Icons.warning_amber_rounded, color: Colors.red, size: 32),
+                                            ),
+                                            const SizedBox(height: 16),
+                                            const Text(
+                                              '刪除確認',
+                                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: textDark),
+                                            ),
+                                            const SizedBox(height: 8),
+                                            const Text(
+                                              '確定要刪除此標記嗎？',
+                                              style: TextStyle(fontSize: 14, color: textMuted),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Container(
+                                        padding: const EdgeInsets.all(16),
+                                        decoration: const BoxDecoration(
+                                          border: Border(top: BorderSide(color: borderColor)),
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            Expanded(
+                                              child: TextButton(
+                                                onPressed: () => Navigator.pop(confirmContext),
+                                                child: const Text('取消'),
+                                              ),
+                                            ),
+                                            const SizedBox(width: 12),
+                                            Expanded(
+                                              child: ElevatedButton(
+                                                onPressed: () {
+                                                  Navigator.pop(confirmContext);
+                                                  setState(() {
+                                                    _markers.removeWhere((m) => m.id == marker.id);
+                                                  });
+                                                  _saveData();
+                                                  Navigator.pop(dialogContext);
+                                                },
+                                                style: ElevatedButton.styleFrom(
+                                                  backgroundColor: Colors.red,
+                                                  foregroundColor: Colors.white,
+                                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                                ),
+                                                child: const Text('刪除'),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                          icon: const Icon(Icons.delete_outline, size: 18),
+                          label: const Text(
+                            '刪除',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 24,
+                              vertical: 12,
+                            ),
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
-  Map<String, dynamic>? _drawableToJson(Drawable drawable) {
-    if (drawable is FreeStyleDrawable) {
-      return {
-        'type': 'FreeStyleDrawable',
-        'path': drawable.path.map((p) => [p.dx, p.dy]).toList(),
-        'color': drawable.color.value,
-        'strokeWidth': drawable.strokeWidth,
-      };
-    } else if (drawable is TextDrawable) {
-      return {
-        'type': 'TextDrawable',
-        'text': drawable.text,
-        'position': [drawable.position.dx, drawable.position.dy],
-        'style': {
-          'color': drawable.style.color?.value ?? Colors.black.value,
-          'fontSize': drawable.style.fontSize ?? 18.0,
-          'fontWeightIndex':
-              (drawable.style.fontWeight ?? FontWeight.normal).index,
-        },
-      };
-    }
-    return null;
+  void _clearAll() {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => Dialog(
+        insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        child: SizedBox(
+          width: 400,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+                decoration: const BoxDecoration(
+                  border: Border(bottom: BorderSide(color: borderColor)),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Colors.red.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Icon(
+                            Icons.delete_forever,
+                            color: Colors.red,
+                            size: 24,
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        const Text(
+                          '清除確認',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: textDark,
+                          ),
+                        ),
+                      ],
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close),
+                      onPressed: () => Navigator.pop(dialogContext),
+                      color: textMuted,
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(24),
+                child: Text(
+                  '確定要清除所有標記嗎？',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: textMuted,
+                  ),
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+                decoration: const BoxDecoration(
+                  border: Border(top: BorderSide(color: borderColor)),
+                  color: Color(0xFFF8FAFC),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(dialogContext),
+                      style: TextButton.styleFrom(
+                        foregroundColor: textMuted,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 12,
+                        ),
+                      ),
+                      child: const Text('取消 Cancel'),
+                    ),
+                    const SizedBox(width: 12),
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        setState(() {
+                          _markers.clear();
+                        });
+                        _saveData();
+                        Navigator.pop(dialogContext);
+                      },
+                      icon: const Icon(Icons.delete_forever, size: 18),
+                      label: const Text(
+                        '清除全部',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 12,
+                        ),
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_loading) {
+    if (_isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
 
-    if (_errorMessage != null) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              '載入失敗: $_errorMessage',
-              style: const TextStyle(color: Colors.red),
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {
-                setState(() => _loading = true);
-                _initializePainter();
-              },
-              child: const Text('重試'),
-            ),
-          ],
-        ),
-      );
-    }
-
-    if (_controller == null) {
-      return const Center(child: Text('初始化失敗'));
-    }
-
-    final bool isDrawing = _controller!.freeStyleMode == FreeStyleMode.draw;
-
-    return Stack(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Positioned.fill(
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              return Center(
-                child: Container(
-                  width: constraints.maxWidth * 0.95,
-                  height: constraints.maxHeight * 0.9,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    border: Border.all(color: Colors.grey.shade300),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: SingleChildScrollView(
-                    physics: isDrawing
-                        ? const NeverScrollableScrollPhysics()
-                        : const AlwaysScrollableScrollPhysics(),
-                    child: InteractiveViewer(
-                      boundaryMargin: const EdgeInsets.all(20),
-                      minScale: 0.5,
-                      maxScale: 3.0,
-                      panEnabled: !isDrawing,
-                      scaleEnabled: !isDrawing,
-                      child: SizedBox(
-                        width: constraints.maxWidth * 0.95,
-                        height: constraints.maxHeight * 0.9,
-                        child: FlutterPainter(controller: _controller!),
-                      ),
-                    ),
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
-        Positioned(
-          top: 16,
-          left: 8,
-          bottom: 16,
-          child: ValueListenableBuilder<PainterControllerValue>(
-            valueListenable: _controller!,
-            builder: (context, _, __) => _buildToolbar(),
-          ),
-        ),
+        _buildBodyCanvas(),
+        const SizedBox(height: 16),
+        _buildMarkerCount(),
+        const SizedBox(height: 24),
+        _buildClearButton(),
+        const SizedBox(height: 60),
       ],
     );
   }
 
-  Widget _buildToolbar() {
+  Widget _buildBodyCanvas() {
     return Container(
-      width: 52,
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.95),
-        borderRadius: const BorderRadius.only(
-          topRight: Radius.circular(12),
-          bottomRight: Radius.circular(12),
-        ),
-        boxShadow: const [
-          BoxShadow(color: Colors.black26, blurRadius: 6, offset: Offset(2, 2)),
-        ],
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: borderColor),
       ),
-      child: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            IconButton(
-              icon: Icon(
-                Icons.open_with,
-                color: _controller!.freeStyleMode == FreeStyleMode.none
-                    ? Theme.of(context).colorScheme.secondary
-                    : null,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final canvasWidth = constraints.maxWidth;
+            final canvasHeight = canvasWidth * 1.2;
+            _canvasSize = Size(canvasWidth, canvasHeight);
+
+            return SizedBox(
+              width: canvasWidth,
+              height: canvasHeight,
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  Image.asset(
+                    'assets/images/body_diagram_placeholder.jpg',
+                    fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        color: Colors.grey[200],
+                        child: const Center(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.image_not_supported,
+                                  size: 64, color: Colors.grey),
+                              SizedBox(height: 8),
+                              Text('找不到人形圖圖片',
+                                  style: TextStyle(color: Colors.grey)),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                  ..._buildMarkerWidgets(canvasWidth, canvasHeight),
+                  Positioned.fill(
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.translucent,
+                      onTapUp: (details) => _handleTap(
+                        details.localPosition,
+                        Size(canvasWidth, canvasHeight),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              onPressed: () {
-                setState(() {
-                  _controller!.freeStyleMode = FreeStyleMode.none;
-                });
-              },
-              tooltip: '平移/縮放',
-            ),
-            IconButton(
-              icon: Icon(
-                Icons.brush,
-                color: _controller!.freeStyleMode == FreeStyleMode.draw
-                    ? Theme.of(context).colorScheme.secondary
-                    : null,
-              ),
-              onPressed: () {
-                setState(() {
-                  _controller!.freeStyleMode = FreeStyleMode.draw;
-                });
-              },
-              tooltip: '繪圖',
-            ),
-            IconButton(
-              icon: const Icon(Icons.text_fields),
-              onPressed: () {
-                setState(() {
-                  _controller!.freeStyleMode = FreeStyleMode.none;
-                });
-                _controller!.addText();
-              },
-              tooltip: '新增文字',
-            ),
-            IconButton(
-              icon: const Icon(Icons.undo),
-              onPressed: _controller!.canUndo
-                  ? () => _controller!.undo()
-                  : null,
-              tooltip: '復原',
-            ),
-            IconButton(
-              icon: const Icon(Icons.redo),
-              onPressed: _controller!.canRedo
-                  ? () => _controller!.redo()
-                  : null,
-              tooltip: '重做',
-            ),
-            IconButton(
-              icon: const Icon(Icons.clear),
-              onPressed: () => _showClearConfirmationDialog(),
-              tooltip: '清除全部',
-            ),
-            _buildColorPicker(),
-            _buildStrokeWidthPicker(),
-          ],
+            );
+          },
         ),
       ),
     );
   }
 
-  void _showClearConfirmationDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('確認清除'),
-        content: const Text('確定要清除所有筆跡和文字嗎？此操作無法復原。'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('取消'),
+  List<Widget> _buildMarkerWidgets(double width, double height) {
+    return _markers.map((marker) {
+      return Positioned(
+        left: marker.x * width - 24,
+        top: marker.y * height - 24,
+        child: GestureDetector(
+          onTap: () => _onMarkerTap(marker),
+          onPanUpdate: (details) {
+            final newX = (marker.x * width + details.delta.dx) / width;
+            final newY = (marker.y * height + details.delta.dy) / height;
+
+            if (newX >= 0 && newX <= 1 && newY >= 0 && newY <= 1) {
+              setState(() {
+                marker.x = newX;
+                marker.y = newY;
+              });
+            }
+          },
+          onPanEnd: (details) {
+            _saveData();
+          },
+          child: Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              color: Colors.transparent,
+              shape: BoxShape.circle,
+              border: Border.all(color: markerColor, width: 5),
+            ),
           ),
-          TextButton(
-            onPressed: () {
-              _controller!.clearDrawables();
-              _updateBodyMapData();
-              Navigator.pop(context);
-            },
-            child: const Text('確認', style: TextStyle(color: Colors.red)),
+        ),
+      );
+    }).toList();
+  }
+
+  void _handleTap(Offset position, Size canvasSize) {
+    final x = position.dx / canvasSize.width;
+    final y = position.dy / canvasSize.height;
+
+    for (final marker in _markers) {
+      final markerX = marker.x;
+      final markerY = marker.y;
+      final distance =
+          ((x - markerX) * (x - markerX) + (y - markerY) * (y - markerY));
+      if (distance < 0.002) {
+        _onMarkerTap(marker);
+        return;
+      }
+    }
+
+    if (x >= 0 && x <= 1 && y >= 0 && y <= 1) {
+      _showAddDescriptionDialog(x, y);
+    }
+  }
+
+  Widget _buildMarkerCount() {
+    final count = _markers.length;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: borderColor),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            decoration: BoxDecoration(
+              color: count > 0
+                  ? primaryColor.withValues(alpha: 0.1)
+                  : Colors.transparent,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Text(
+              '已標示: $count 處',
+              style: TextStyle(
+                color: count > 0 ? primaryColor : textMuted,
+                fontWeight: count > 0 ? FontWeight.bold : FontWeight.normal,
+              ),
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildColorPicker() {
-    return PopupMenuButton<Color>(
-      icon: Icon(
-        Icons.color_lens,
-        color: _controller!.settings.freeStyle.color,
+  Widget _buildClearButton() {
+    return SizedBox(
+      width: double.infinity,
+      child: OutlinedButton.icon(
+        onPressed: _clearAll,
+        icon: const Icon(Icons.delete_forever, size: 18),
+        label: const Text('清除全部'),
+        style: OutlinedButton.styleFrom(
+          foregroundColor: Colors.red.shade400,
+          side: BorderSide(color: Colors.red.shade200),
+          padding: const EdgeInsets.symmetric(vertical: 14),
+        ),
       ),
-      tooltip: '顏色',
-      onSelected: (color) {
-        setState(() {
-          _controller!.settings = _controller!.settings.copyWith(
-            freeStyle: _controller!.settings.freeStyle.copyWith(color: color),
-            text: _controller!.settings.text.copyWith(
-              textStyle: _controller!.settings.text.textStyle.copyWith(
-                color: color,
-              ),
-            ),
-          );
-        });
-      },
-      itemBuilder: (context) =>
-          [
-                Colors.red,
-                Colors.blue,
-                Colors.green,
-                Colors.black,
-                Colors.orange,
-                Colors.purple,
-              ]
-              .map(
-                (color) => PopupMenuItem(
-                  value: color,
-                  child: Container(width: 100, height: 30, color: color),
-                ),
-              )
-              .toList(),
-    );
-  }
-
-  Widget _buildStrokeWidthPicker() {
-    final List<Map<String, dynamic>> strokeOptions = [
-      {'value': 2.0, 'label': '細'},
-      {'value': 4.0, 'label': '中'},
-      {'value': 6.0, 'label': '粗'},
-      {'value': 8.0, 'label': '特粗'},
-    ];
-
-    return PopupMenuButton<double>(
-      icon: const Icon(Icons.line_weight),
-      tooltip: '線條粗細',
-      onSelected: (width) => setState(() {
-        if (_controller != null) {
-          _controller!.settings = _controller!.settings.copyWith(
-            freeStyle: _controller!.settings.freeStyle.copyWith(
-              strokeWidth: width,
-            ),
-          );
-        }
-      }),
-      itemBuilder: (context) => strokeOptions
-          .map(
-            (opt) => PopupMenuItem<double>(
-              value: opt['value'] as double,
-              child: Text(opt['label'] as String),
-            ),
-          )
-          .toList(),
     );
   }
 }
