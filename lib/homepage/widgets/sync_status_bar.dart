@@ -25,7 +25,7 @@ class SyncStatusIndicator extends StatelessWidget {
           ),
           child: LayoutBuilder(
             builder: (context, constraints) {
-              final showText = constraints.maxWidth > 120;
+              final showText = constraints.maxWidth > 150;
 
               return Row(
                 mainAxisAlignment: MainAxisAlignment.center,

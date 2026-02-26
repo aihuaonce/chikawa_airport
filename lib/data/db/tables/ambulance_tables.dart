@@ -46,6 +46,9 @@ class AmbulanceRecords extends Table {
   // 返回待命時間
   DateTimeColumn get returnStandbyTime => dateTime().nullable()();
 
+  // 身體地圖 JSON 數據
+  TextColumn get bodyMapJson => text().nullable()();
+
   // 建立與更新時間
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
   DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();

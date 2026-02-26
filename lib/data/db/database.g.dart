@@ -29084,6 +29084,17 @@ class $AmbulanceRecordsTable extends AmbulanceRecords
         type: DriftSqlType.dateTime,
         requiredDuringInsert: false,
       );
+  static const VerificationMeta _bodyMapJsonMeta = const VerificationMeta(
+    'bodyMapJson',
+  );
+  @override
+  late final GeneratedColumn<String> bodyMapJson = GeneratedColumn<String>(
+    'body_map_json',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _createdAtMeta = const VerificationMeta(
     'createdAt',
   );
@@ -29158,6 +29169,7 @@ class $AmbulanceRecordsTable extends AmbulanceRecords
     arrivalHospitalTime,
     leavingHospitalTime,
     returnStandbyTime,
+    bodyMapJson,
     createdAt,
     updatedAt,
     syncStatus,
@@ -29296,6 +29308,15 @@ class $AmbulanceRecordsTable extends AmbulanceRecords
         ),
       );
     }
+    if (data.containsKey('body_map_json')) {
+      context.handle(
+        _bodyMapJsonMeta,
+        bodyMapJson.isAcceptableOrUnknown(
+          data['body_map_json']!,
+          _bodyMapJsonMeta,
+        ),
+      );
+    }
     if (data.containsKey('created_at')) {
       context.handle(
         _createdAtMeta,
@@ -29394,6 +29415,10 @@ class $AmbulanceRecordsTable extends AmbulanceRecords
         DriftSqlType.dateTime,
         data['${effectivePrefix}return_standby_time'],
       ),
+      bodyMapJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}body_map_json'],
+      ),
       createdAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}created_at'],
@@ -29438,6 +29463,7 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
   final DateTime? arrivalHospitalTime;
   final DateTime? leavingHospitalTime;
   final DateTime? returnStandbyTime;
+  final String? bodyMapJson;
   final DateTime createdAt;
   final DateTime updatedAt;
   final int syncStatus;
@@ -29458,6 +29484,7 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
     this.arrivalHospitalTime,
     this.leavingHospitalTime,
     this.returnStandbyTime,
+    this.bodyMapJson,
     required this.createdAt,
     required this.updatedAt,
     required this.syncStatus,
@@ -29506,6 +29533,9 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
     }
     if (!nullToAbsent || returnStandbyTime != null) {
       map['return_standby_time'] = Variable<DateTime>(returnStandbyTime);
+    }
+    if (!nullToAbsent || bodyMapJson != null) {
+      map['body_map_json'] = Variable<String>(bodyMapJson);
     }
     map['created_at'] = Variable<DateTime>(createdAt);
     map['updated_at'] = Variable<DateTime>(updatedAt);
@@ -29561,6 +29591,9 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
       returnStandbyTime: returnStandbyTime == null && nullToAbsent
           ? const Value.absent()
           : Value(returnStandbyTime),
+      bodyMapJson: bodyMapJson == null && nullToAbsent
+          ? const Value.absent()
+          : Value(bodyMapJson),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
       syncStatus: Value(syncStatus),
@@ -29603,6 +29636,7 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
       returnStandbyTime: serializer.fromJson<DateTime?>(
         json['returnStandbyTime'],
       ),
+      bodyMapJson: serializer.fromJson<String?>(json['bodyMapJson']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
       syncStatus: serializer.fromJson<int>(json['syncStatus']),
@@ -29628,6 +29662,7 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
       'arrivalHospitalTime': serializer.toJson<DateTime?>(arrivalHospitalTime),
       'leavingHospitalTime': serializer.toJson<DateTime?>(leavingHospitalTime),
       'returnStandbyTime': serializer.toJson<DateTime?>(returnStandbyTime),
+      'bodyMapJson': serializer.toJson<String?>(bodyMapJson),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
       'syncStatus': serializer.toJson<int>(syncStatus),
@@ -29651,6 +29686,7 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
     Value<DateTime?> arrivalHospitalTime = const Value.absent(),
     Value<DateTime?> leavingHospitalTime = const Value.absent(),
     Value<DateTime?> returnStandbyTime = const Value.absent(),
+    Value<String?> bodyMapJson = const Value.absent(),
     DateTime? createdAt,
     DateTime? updatedAt,
     int? syncStatus,
@@ -29687,6 +29723,7 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
     returnStandbyTime: returnStandbyTime.present
         ? returnStandbyTime.value
         : this.returnStandbyTime,
+    bodyMapJson: bodyMapJson.present ? bodyMapJson.value : this.bodyMapJson,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
     syncStatus: syncStatus ?? this.syncStatus,
@@ -29735,6 +29772,9 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
       returnStandbyTime: data.returnStandbyTime.present
           ? data.returnStandbyTime.value
           : this.returnStandbyTime,
+      bodyMapJson: data.bodyMapJson.present
+          ? data.bodyMapJson.value
+          : this.bodyMapJson,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
       syncStatus: data.syncStatus.present
@@ -29764,6 +29804,7 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
           ..write('arrivalHospitalTime: $arrivalHospitalTime, ')
           ..write('leavingHospitalTime: $leavingHospitalTime, ')
           ..write('returnStandbyTime: $returnStandbyTime, ')
+          ..write('bodyMapJson: $bodyMapJson, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('syncStatus: $syncStatus, ')
@@ -29789,6 +29830,7 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
     arrivalHospitalTime,
     leavingHospitalTime,
     returnStandbyTime,
+    bodyMapJson,
     createdAt,
     updatedAt,
     syncStatus,
@@ -29813,6 +29855,7 @@ class AmbulanceRecord extends DataClass implements Insertable<AmbulanceRecord> {
           other.arrivalHospitalTime == this.arrivalHospitalTime &&
           other.leavingHospitalTime == this.leavingHospitalTime &&
           other.returnStandbyTime == this.returnStandbyTime &&
+          other.bodyMapJson == this.bodyMapJson &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt &&
           other.syncStatus == this.syncStatus &&
@@ -29835,6 +29878,7 @@ class AmbulanceRecordsCompanion extends UpdateCompanion<AmbulanceRecord> {
   final Value<DateTime?> arrivalHospitalTime;
   final Value<DateTime?> leavingHospitalTime;
   final Value<DateTime?> returnStandbyTime;
+  final Value<String?> bodyMapJson;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
   final Value<int> syncStatus;
@@ -29855,6 +29899,7 @@ class AmbulanceRecordsCompanion extends UpdateCompanion<AmbulanceRecord> {
     this.arrivalHospitalTime = const Value.absent(),
     this.leavingHospitalTime = const Value.absent(),
     this.returnStandbyTime = const Value.absent(),
+    this.bodyMapJson = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.syncStatus = const Value.absent(),
@@ -29876,6 +29921,7 @@ class AmbulanceRecordsCompanion extends UpdateCompanion<AmbulanceRecord> {
     this.arrivalHospitalTime = const Value.absent(),
     this.leavingHospitalTime = const Value.absent(),
     this.returnStandbyTime = const Value.absent(),
+    this.bodyMapJson = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.syncStatus = const Value.absent(),
@@ -29897,6 +29943,7 @@ class AmbulanceRecordsCompanion extends UpdateCompanion<AmbulanceRecord> {
     Expression<DateTime>? arrivalHospitalTime,
     Expression<DateTime>? leavingHospitalTime,
     Expression<DateTime>? returnStandbyTime,
+    Expression<String>? bodyMapJson,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
     Expression<int>? syncStatus,
@@ -29922,6 +29969,7 @@ class AmbulanceRecordsCompanion extends UpdateCompanion<AmbulanceRecord> {
       if (leavingHospitalTime != null)
         'leaving_hospital_time': leavingHospitalTime,
       if (returnStandbyTime != null) 'return_standby_time': returnStandbyTime,
+      if (bodyMapJson != null) 'body_map_json': bodyMapJson,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (syncStatus != null) 'sync_status': syncStatus,
@@ -29945,6 +29993,7 @@ class AmbulanceRecordsCompanion extends UpdateCompanion<AmbulanceRecord> {
     Value<DateTime?>? arrivalHospitalTime,
     Value<DateTime?>? leavingHospitalTime,
     Value<DateTime?>? returnStandbyTime,
+    Value<String?>? bodyMapJson,
     Value<DateTime>? createdAt,
     Value<DateTime>? updatedAt,
     Value<int>? syncStatus,
@@ -29966,6 +30015,7 @@ class AmbulanceRecordsCompanion extends UpdateCompanion<AmbulanceRecord> {
       arrivalHospitalTime: arrivalHospitalTime ?? this.arrivalHospitalTime,
       leavingHospitalTime: leavingHospitalTime ?? this.leavingHospitalTime,
       returnStandbyTime: returnStandbyTime ?? this.returnStandbyTime,
+      bodyMapJson: bodyMapJson ?? this.bodyMapJson,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       syncStatus: syncStatus ?? this.syncStatus,
@@ -30023,6 +30073,9 @@ class AmbulanceRecordsCompanion extends UpdateCompanion<AmbulanceRecord> {
     if (returnStandbyTime.present) {
       map['return_standby_time'] = Variable<DateTime>(returnStandbyTime.value);
     }
+    if (bodyMapJson.present) {
+      map['body_map_json'] = Variable<String>(bodyMapJson.value);
+    }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
@@ -30058,6 +30111,7 @@ class AmbulanceRecordsCompanion extends UpdateCompanion<AmbulanceRecord> {
           ..write('arrivalHospitalTime: $arrivalHospitalTime, ')
           ..write('leavingHospitalTime: $leavingHospitalTime, ')
           ..write('returnStandbyTime: $returnStandbyTime, ')
+          ..write('bodyMapJson: $bodyMapJson, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('syncStatus: $syncStatus, ')
@@ -41303,6 +41357,52 @@ final class $$LocationTableReferences
     extends BaseReferences<_$AppDatabase, $LocationTable, LocationData> {
   $$LocationTableReferences(super.$_db, super.$_table, super.$_typedResult);
 
+  static MultiTypedResultKey<$FlightRecordTable, List<FlightRecordData>>
+  _departureLocationTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.flightRecord,
+    aliasName: $_aliasNameGenerator(
+      db.location.locationId,
+      db.flightRecord.departureLocationId,
+    ),
+  );
+
+  $$FlightRecordTableProcessedTableManager get departureLocation {
+    final manager = $$FlightRecordTableTableManager($_db, $_db.flightRecord)
+        .filter(
+          (f) => f.departureLocationId.locationId.sqlEquals(
+            $_itemColumn<int>('location_id')!,
+          ),
+        );
+
+    final cache = $_typedResult.readTableOrNull(_departureLocationTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$FlightRecordTable, List<FlightRecordData>>
+  _arrivalLocationTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.flightRecord,
+    aliasName: $_aliasNameGenerator(
+      db.location.locationId,
+      db.flightRecord.arrivalLocationId,
+    ),
+  );
+
+  $$FlightRecordTableProcessedTableManager get arrivalLocation {
+    final manager = $$FlightRecordTableTableManager($_db, $_db.flightRecord)
+        .filter(
+          (f) => f.arrivalLocationId.locationId.sqlEquals(
+            $_itemColumn<int>('location_id')!,
+          ),
+        );
+
+    final cache = $_typedResult.readTableOrNull(_arrivalLocationTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
   static MultiTypedResultKey<
     $FlightTransitLocationsTable,
     List<FlightTransitLocationData>
@@ -41360,6 +41460,56 @@ class $$LocationTableFilterComposer
     column: $table.name,
     builder: (column) => ColumnFilters(column),
   );
+
+  Expression<bool> departureLocation(
+    Expression<bool> Function($$FlightRecordTableFilterComposer f) f,
+  ) {
+    final $$FlightRecordTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.locationId,
+      referencedTable: $db.flightRecord,
+      getReferencedColumn: (t) => t.departureLocationId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FlightRecordTableFilterComposer(
+            $db: $db,
+            $table: $db.flightRecord,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> arrivalLocation(
+    Expression<bool> Function($$FlightRecordTableFilterComposer f) f,
+  ) {
+    final $$FlightRecordTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.locationId,
+      referencedTable: $db.flightRecord,
+      getReferencedColumn: (t) => t.arrivalLocationId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FlightRecordTableFilterComposer(
+            $db: $db,
+            $table: $db.flightRecord,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 
   Expression<bool> flightTransitLocationsRefs(
     Expression<bool> Function($$FlightTransitLocationsTableFilterComposer f) f,
@@ -41433,6 +41583,56 @@ class $$LocationTableAnnotationComposer
   GeneratedColumn<String> get name =>
       $composableBuilder(column: $table.name, builder: (column) => column);
 
+  Expression<T> departureLocation<T extends Object>(
+    Expression<T> Function($$FlightRecordTableAnnotationComposer a) f,
+  ) {
+    final $$FlightRecordTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.locationId,
+      referencedTable: $db.flightRecord,
+      getReferencedColumn: (t) => t.departureLocationId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FlightRecordTableAnnotationComposer(
+            $db: $db,
+            $table: $db.flightRecord,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> arrivalLocation<T extends Object>(
+    Expression<T> Function($$FlightRecordTableAnnotationComposer a) f,
+  ) {
+    final $$FlightRecordTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.locationId,
+      referencedTable: $db.flightRecord,
+      getReferencedColumn: (t) => t.arrivalLocationId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FlightRecordTableAnnotationComposer(
+            $db: $db,
+            $table: $db.flightRecord,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
   Expression<T> flightTransitLocationsRefs<T extends Object>(
     Expression<T> Function($$FlightTransitLocationsTableAnnotationComposer a) f,
   ) {
@@ -41473,7 +41673,11 @@ class $$LocationTableTableManager
           $$LocationTableUpdateCompanionBuilder,
           (LocationData, $$LocationTableReferences),
           LocationData,
-          PrefetchHooks Function({bool flightTransitLocationsRefs})
+          PrefetchHooks Function({
+            bool departureLocation,
+            bool arrivalLocation,
+            bool flightTransitLocationsRefs,
+          })
         > {
   $$LocationTableTableManager(_$AppDatabase db, $LocationTable table)
     : super(
@@ -41514,39 +41718,89 @@ class $$LocationTableTableManager
                 ),
               )
               .toList(),
-          prefetchHooksCallback: ({flightTransitLocationsRefs = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [
-                if (flightTransitLocationsRefs) db.flightTransitLocations,
-              ],
-              addJoins: null,
-              getPrefetchedDataCallback: (items) async {
-                return [
-                  if (flightTransitLocationsRefs)
-                    await $_getPrefetchedData<
-                      LocationData,
-                      $LocationTable,
-                      FlightTransitLocationData
-                    >(
-                      currentTable: table,
-                      referencedTable: $$LocationTableReferences
-                          ._flightTransitLocationsRefsTable(db),
-                      managerFromTypedResult: (p0) => $$LocationTableReferences(
-                        db,
-                        table,
-                        p0,
-                      ).flightTransitLocationsRefs,
-                      referencedItemsForCurrentItem: (item, referencedItems) =>
-                          referencedItems.where(
-                            (e) => e.locationId == item.locationId,
-                          ),
-                      typedResults: items,
-                    ),
-                ];
+          prefetchHooksCallback:
+              ({
+                departureLocation = false,
+                arrivalLocation = false,
+                flightTransitLocationsRefs = false,
+              }) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (departureLocation) db.flightRecord,
+                    if (arrivalLocation) db.flightRecord,
+                    if (flightTransitLocationsRefs) db.flightTransitLocations,
+                  ],
+                  addJoins: null,
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (departureLocation)
+                        await $_getPrefetchedData<
+                          LocationData,
+                          $LocationTable,
+                          FlightRecordData
+                        >(
+                          currentTable: table,
+                          referencedTable: $$LocationTableReferences
+                              ._departureLocationTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$LocationTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).departureLocation,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.departureLocationId == item.locationId,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (arrivalLocation)
+                        await $_getPrefetchedData<
+                          LocationData,
+                          $LocationTable,
+                          FlightRecordData
+                        >(
+                          currentTable: table,
+                          referencedTable: $$LocationTableReferences
+                              ._arrivalLocationTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$LocationTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).arrivalLocation,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.arrivalLocationId == item.locationId,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (flightTransitLocationsRefs)
+                        await $_getPrefetchedData<
+                          LocationData,
+                          $LocationTable,
+                          FlightTransitLocationData
+                        >(
+                          currentTable: table,
+                          referencedTable: $$LocationTableReferences
+                              ._flightTransitLocationsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$LocationTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).flightTransitLocationsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.locationId == item.locationId,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
               },
-            );
-          },
         ),
       );
 }
@@ -41563,7 +41817,11 @@ typedef $$LocationTableProcessedTableManager =
       $$LocationTableUpdateCompanionBuilder,
       (LocationData, $$LocationTableReferences),
       LocationData,
-      PrefetchHooks Function({bool flightTransitLocationsRefs})
+      PrefetchHooks Function({
+        bool departureLocation,
+        bool arrivalLocation,
+        bool flightTransitLocationsRefs,
+      })
     >;
 typedef $$IncidentPlaceCategoryTableCreateCompanionBuilder =
     IncidentPlaceCategoryCompanion Function({
@@ -66588,6 +66846,7 @@ typedef $$AmbulanceRecordsTableCreateCompanionBuilder =
       Value<DateTime?> arrivalHospitalTime,
       Value<DateTime?> leavingHospitalTime,
       Value<DateTime?> returnStandbyTime,
+      Value<String?> bodyMapJson,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
       Value<int> syncStatus,
@@ -66610,6 +66869,7 @@ typedef $$AmbulanceRecordsTableUpdateCompanionBuilder =
       Value<DateTime?> arrivalHospitalTime,
       Value<DateTime?> leavingHospitalTime,
       Value<DateTime?> returnStandbyTime,
+      Value<String?> bodyMapJson,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
       Value<int> syncStatus,
@@ -66756,6 +67016,11 @@ class $$AmbulanceRecordsTableFilterComposer
 
   ColumnFilters<DateTime> get returnStandbyTime => $composableBuilder(
     column: $table.returnStandbyTime,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get bodyMapJson => $composableBuilder(
+    column: $table.bodyMapJson,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -66920,6 +67185,11 @@ class $$AmbulanceRecordsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get bodyMapJson => $composableBuilder(
+    column: $table.bodyMapJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
     column: $table.createdAt,
     builder: (column) => ColumnOrderings(column),
@@ -67079,6 +67349,11 @@ class $$AmbulanceRecordsTableAnnotationComposer
     builder: (column) => column,
   );
 
+  GeneratedColumn<String> get bodyMapJson => $composableBuilder(
+    column: $table.bodyMapJson,
+    builder: (column) => column,
+  );
+
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
 
@@ -67218,6 +67493,7 @@ class $$AmbulanceRecordsTableTableManager
                 Value<DateTime?> arrivalHospitalTime = const Value.absent(),
                 Value<DateTime?> leavingHospitalTime = const Value.absent(),
                 Value<DateTime?> returnStandbyTime = const Value.absent(),
+                Value<String?> bodyMapJson = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
                 Value<int> syncStatus = const Value.absent(),
@@ -67238,6 +67514,7 @@ class $$AmbulanceRecordsTableTableManager
                 arrivalHospitalTime: arrivalHospitalTime,
                 leavingHospitalTime: leavingHospitalTime,
                 returnStandbyTime: returnStandbyTime,
+                bodyMapJson: bodyMapJson,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 syncStatus: syncStatus,
@@ -67260,6 +67537,7 @@ class $$AmbulanceRecordsTableTableManager
                 Value<DateTime?> arrivalHospitalTime = const Value.absent(),
                 Value<DateTime?> leavingHospitalTime = const Value.absent(),
                 Value<DateTime?> returnStandbyTime = const Value.absent(),
+                Value<String?> bodyMapJson = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
                 Value<int> syncStatus = const Value.absent(),
@@ -67280,6 +67558,7 @@ class $$AmbulanceRecordsTableTableManager
                 arrivalHospitalTime: arrivalHospitalTime,
                 leavingHospitalTime: leavingHospitalTime,
                 returnStandbyTime: returnStandbyTime,
+                bodyMapJson: bodyMapJson,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 syncStatus: syncStatus,

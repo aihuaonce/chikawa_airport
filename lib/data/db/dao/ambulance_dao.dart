@@ -286,4 +286,53 @@ class AmbulanceDao extends DatabaseAccessor<AppDatabase> with _$AmbulanceDaoMixi
   Future<TreatmentData?> getTreatmentByMedicalId(int medicalId) {
     return (select(treatment)..where((t) => t.medicalId.equals(medicalId))).getSingleOrNull();
   }
+
+  // --- 人形圖相關 ---
+
+  // 取得人形圖 JSON
+  Future<String?> getBodyMap(int medicalId) async {
+    final record = await (select(ambulanceRecords)
+      ..where((t) => t.medicalId.equals(medicalId)))
+      .getSingleOrNull();
+    return record?.bodyMapJson;
+  }
+
+  // 更新人形圖 JSON
+  Future<void> updateBodyMap(int medicalId, String? bodyMapJson) async {
+    // 檢查記錄是否存在
+    final existing = await (select(ambulanceRecords)
+      ..where((t) => t.medicalId.equals(medicalId)))
+      .getSingleOrNull();
+
+    if (existing != null) {
+      // 記錄存在，正常更新
+      await (update(ambulanceRecords)
+        ..where((t) => t.medicalId.equals(medicalId)))
+        .write(AmbulanceRecordsCompanion(
+          bodyMapJson: Value(bodyMapJson),
+          updatedAt: Value(DateTime.now()),
+        ));
+    } else {
+      // 記錄不存在，先建立新記錄
+      await into(ambulanceRecords).insert(AmbulanceRecordsCompanion.insert(
+        medicalId: Value(medicalId),
+        bodyMapJson: Value(bodyMapJson),
+        updatedAt: Value(DateTime.now()),
+      ));
+    }
+  }
+
+  // 確保救護車記錄存在
+  Future<void> ensureAmbulanceRecord(int medicalId) async {
+    final existing = await (select(ambulanceRecords)
+      ..where((t) => t.medicalId.equals(medicalId)))
+      .getSingleOrNull();
+
+    if (existing == null) {
+      await into(ambulanceRecords).insert(AmbulanceRecordsCompanion.insert(
+        medicalId: Value(medicalId),
+        updatedAt: Value(DateTime.now()),
+      ));
+    }
+  }
 }

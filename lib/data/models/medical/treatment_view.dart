@@ -11,6 +11,8 @@ class TreatmentViewModel extends ChangeNotifier {
   final ReferenceService refService;
   final int medicalId;
 
+  bool _isDisposed = false;
+
   // === 各種資料快取 ===
 
   // 醫療主表記錄
@@ -601,6 +603,7 @@ class TreatmentViewModel extends ChangeNotifier {
   }
 
   Future<void> _saveVitalSignsToDatabase() async {
+    if (_isDisposed) return;
     try {
       // 檢查是否有資料需要儲存
       final hasData =
@@ -774,6 +777,7 @@ class TreatmentViewModel extends ChangeNotifier {
   }
 
   Future<void> _saveConsciousnessAndExamToDatabase() async {
+    if (_isDisposed) return;
     try {
       // 檢查是否有資料需要儲存
       final hasData =
@@ -973,6 +977,7 @@ class TreatmentViewModel extends ChangeNotifier {
   }
 
   Future<void> _saveHistoryToDatabase() async {
+    if (_isDisposed) return;
     try {
       await updateMedicalHistory(
         pastHistoryStatusId: _cachedPastHistoryStatusId,
@@ -1926,6 +1931,7 @@ class TreatmentViewModel extends ChangeNotifier {
 
   Future<void> _saveReferralFormToDatabase() async {
     if (_referralForm == null) return;
+    if (_isDisposed) return;
     try {
       await db.referralFormDao.updateContactInfo(
         _referralForm!.formId,
@@ -1974,6 +1980,7 @@ class TreatmentViewModel extends ChangeNotifier {
   }
 
   Future<void> _saveToDatabase() async {
+    if (_isDisposed) return;
     try {
       if (_treatment != null) {
         await db.treatmentDao.updateTreatment(_treatment!.toCompanion(true));
@@ -2022,6 +2029,12 @@ class TreatmentViewModel extends ChangeNotifier {
       _historyDebounceTimer!.cancel();
       _saveHistoryToDatabase();
     }
+    // 轉診單/切結書儲存
+    if (_referralFormDebounceTimer?.isActive ?? false) {
+      _referralFormDebounceTimer!.cancel();
+      _saveReferralFormToDatabase();
+    }
+    _isDisposed = true;
     super.dispose();
   }
 }

@@ -70,6 +70,7 @@ class _RefusalOfReferralState extends State<RefusalOfReferral> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    if (!mounted) return;
     final viewModel = Provider.of<TreatmentViewModel>(context);
     _updateControllers(viewModel);
   }

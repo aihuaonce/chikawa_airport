@@ -51,7 +51,7 @@ class _AmbulancePageState extends State<AmbulancePage> {
       case 4:
         return AmbulanceFees(medicalId: widget.medicalId);
       case 5:
-        return _buildPlaceholder("人形圖內容區域 (Body Map)");
+        return AmbulanceBodyMap(medicalId: widget.medicalId);
       default:
         return DispatchInfo(medicalId: widget.medicalId);
     }

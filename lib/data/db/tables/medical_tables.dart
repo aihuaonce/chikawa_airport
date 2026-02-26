@@ -70,9 +70,11 @@ class FlightRecord extends Table {
   IntColumn get travelStatusId =>
       integer().nullable().references(TravelStatus, #travelStatusId)();
 
+  @ReferenceName('departureLocation')
   IntColumn get departureLocationId =>
       integer().nullable().references(Location, #locationId)();
 
+  @ReferenceName('arrivalLocation')
   IntColumn get arrivalLocationId =>
       integer().nullable().references(Location, #locationId)();
 
