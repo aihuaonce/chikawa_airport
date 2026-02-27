@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../data/models/record_page.dart';
-import 'sync_status_bar.dart';
 
 class Sidebar extends StatefulWidget {
   final RecordPage currentPage;
@@ -114,7 +113,6 @@ class _SidebarState extends State<Sidebar> {
   Widget _buildFooter() {
     return Column(
       children: [
-        const SyncStatusIndicator(),
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 16),
           child: IconButton(

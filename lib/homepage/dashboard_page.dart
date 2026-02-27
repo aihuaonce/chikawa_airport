@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'widgets/sidebar.dart';
-import 'widgets/header_bar.dart';
-import 'widgets/filter_bar.dart';
-import 'widgets/records_table.dart';
 import '../data/models/dashboard_view_model.dart';
+import 'widgets/filter_bar.dart';
+import 'widgets/header_bar.dart';
+import 'widgets/records_table.dart';
+import 'widgets/sidebar.dart';
 
 class DashboardPage extends StatelessWidget {
   const DashboardPage({super.key});
@@ -30,15 +30,12 @@ class _DashboardView extends StatelessWidget {
       backgroundColor: const Color(0xFFF6F8FA),
       body: Row(
         children: [
-          //  左側欄
           Sidebar(
             currentPage: viewModel.currentFilter,
             onPageChanged: (page) {
               viewModel.setFilter(page);
             },
           ),
-
-          //  右側內容
           Expanded(
             child: Column(
               children: [

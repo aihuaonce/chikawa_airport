@@ -113,7 +113,9 @@ class _TelexDocumentState extends State<TelexDocument> {
                         height: 24,
                         child: Radio<int>(
                           value: station.id,
+                          // ignore: deprecated_member_use
                           groupValue: selectedStation?.id,
+                          // ignore: deprecated_member_use
                           onChanged: (_) => onChanged(station),
                           activeColor: primaryColor,
                         ),

@@ -97,27 +97,4 @@ class _AmbulancePageState extends State<AmbulancePage> {
     );
   }
 
-  Widget _buildPlaceholder(String title) {
-    return Center(
-      child: Column(
-        children: [
-          const SizedBox(height: 100),
-          Icon(
-            Icons.construction_rounded,
-            size: 64,
-            color: Colors.grey.withValues(alpha: 0.3),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            title,
-            style: const TextStyle(
-              color: Colors.grey,
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }

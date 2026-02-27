@@ -4,11 +4,47 @@ import '../tables/sync_tables.dart';
 
 part 'sync_dao.g.dart';
 
-@DriftAccessor(
-  tables: [SyncLogTable, SyncConfigTable],
-)
+@DriftAccessor(tables: [SyncLogTable, SyncConfigTable])
 class SyncDao extends DatabaseAccessor<AppDatabase> with _$SyncDaoMixin {
   SyncDao(super.db);
+
+  /// Insert or update sync log - keeps only the latest state for each record
+  /// This prevents accumulating multiple pending logs for the same record
+  Future<int> upsertSyncLog(SyncLogTableCompanion entry) async {
+    final existingLogs =
+        await (select(syncLogTable)
+              ..where((t) => t.syncTableName.equals(entry.syncTableName.value))
+              ..where((t) => t.recordId.equals(entry.recordId.value))
+              ..where((t) => t.status.equals(SyncStatus.pending))
+              ..orderBy([(t) => OrderingTerm.desc(t.createdAt)]))
+            .get();
+
+    if (existingLogs.isNotEmpty) {
+      final keep = existingLogs.first;
+
+      // Update latest existing log with new payload.
+      await (update(syncLogTable)..where((t) => t.id.equals(keep.id))).write(
+        SyncLogTableCompanion(
+          operation: entry.operation,
+          payload: entry.payload,
+          createdAt: entry.createdAt,
+        ),
+      );
+
+      // Remove duplicate pending logs for the same table + record.
+      if (existingLogs.length > 1) {
+        final duplicateIds = existingLogs.skip(1).map((e) => e.id).toList();
+        await (delete(
+          syncLogTable,
+        )..where((t) => t.id.isIn(duplicateIds))).go();
+      }
+
+      return keep.id;
+    }
+
+    // Insert new log
+    return into(syncLogTable).insert(entry);
+  }
 
   Future<int> insertSyncLog(SyncLogTableCompanion entry) {
     return into(syncLogTable).insert(entry);
@@ -36,6 +72,30 @@ class SyncDao extends DatabaseAccessor<AppDatabase> with _$SyncDaoMixin {
         .get();
   }
 
+  Future<void> deduplicatePendingLogs() async {
+    final pending =
+        await (select(syncLogTable)
+              ..where((t) => t.status.equals(SyncStatus.pending))
+              ..orderBy([(t) => OrderingTerm.desc(t.createdAt)]))
+            .get();
+
+    final seen = <String>{};
+    final removeIds = <int>[];
+
+    for (final log in pending) {
+      final key = '${log.syncTableName}:${log.recordId}';
+      if (seen.contains(key)) {
+        removeIds.add(log.id);
+        continue;
+      }
+      seen.add(key);
+    }
+
+    if (removeIds.isNotEmpty) {
+      await (delete(syncLogTable)..where((t) => t.id.isIn(removeIds))).go();
+    }
+  }
+
   Future<List<SyncLogEntry>> getFailedLogs() {
     return (select(syncLogTable)
           ..where((t) => t.status.equals(SyncStatus.failed))
@@ -54,14 +114,13 @@ class SyncDao extends DatabaseAccessor<AppDatabase> with _$SyncDaoMixin {
   }
 
   Future<void> deleteSyncedLogs() {
-    return (delete(syncLogTable)
-          ..where((t) => t.status.equals(SyncStatus.synced)))
-        .go();
+    return (delete(
+      syncLogTable,
+    )..where((t) => t.status.equals(SyncStatus.synced))).go();
   }
 
   Future<String?> getConfig(String key) async {
-    final query = select(syncConfigTable)
-      ..where((t) => t.key.equals(key));
+    final query = select(syncConfigTable)..where((t) => t.key.equals(key));
     final result = await query.getSingleOrNull();
     return result?.value;
   }
@@ -106,9 +165,7 @@ class SyncDao extends DatabaseAccessor<AppDatabase> with _$SyncDaoMixin {
     final log = await query.getSingleOrNull();
     if (log != null) {
       await (update(syncLogTable)..where((t) => t.id.equals(id))).write(
-        SyncLogTableCompanion(
-          retryCount: Value(log.retryCount + 1),
-        ),
+        SyncLogTableCompanion(retryCount: Value(log.retryCount + 1)),
       );
     }
   }

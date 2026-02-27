@@ -940,7 +940,10 @@ class _AmbulanceBodyMapState extends State<AmbulanceBodyMap> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
                   color: count > 0
                       ? primaryColor.withValues(alpha: 0.1)

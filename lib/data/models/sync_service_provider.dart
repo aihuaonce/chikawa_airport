@@ -1,13 +1,21 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../db/database.dart';
 import '../services/network_service.dart';
 import '../services/api_client.dart';
 import '../services/sync_service.dart';
 import '../sync/models/sync_models.dart';
 
-class SyncServiceProvider extends ChangeNotifier {
+// API URL 配置
+const String kDefaultApiUrl = 'https://fb13-111-71-213-177.ngrok-free.app';
+
+// Background sync interval in minutes
+const int kBackgroundSyncIntervalMinutes = 5;
+
+class SyncServiceProvider extends ChangeNotifier with WidgetsBindingObserver {
   late final SyncService _syncService;
   bool _initialized = false;
+  DateTime? _pausedTime;
 
   SyncService get service => _syncService;
   bool get isInitialized => _initialized;
@@ -15,6 +23,7 @@ class SyncServiceProvider extends ChangeNotifier {
   SyncState get state => _syncService.state;
   bool get isOnline => _syncService.isOnline;
   int get pendingCount => _syncService.pendingCount;
+  int get conflictCount => _syncService.conflictCount;
   DateTime? get lastSyncTime => _syncService.lastSyncTime;
   String? get lastError => _syncService.lastError;
 
@@ -34,8 +43,15 @@ class SyncServiceProvider extends ChangeNotifier {
   Future<void> initialize(AppDatabase db) async {
     if (_initialized) return;
 
+    // Register lifecycle observer
+    WidgetsBinding.instance.addObserver(this);
+
+    final prefs = await SharedPreferences.getInstance();
+    final apiUrl = prefs.getString('sync_api_url') ?? kDefaultApiUrl;
+    debugPrint('🔗 Sync API URL: $apiUrl');
+
     final networkService = NetworkService();
-    final apiClient = ApiClient();
+    final apiClient = ApiClient(baseUrl: apiUrl);
 
     _syncService = SyncService(
       db: db,
@@ -49,12 +65,55 @@ class SyncServiceProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    switch (state) {
+      case AppLifecycleState.resumed:
+        // App comes to foreground
+        debugPrint('🔄 App resumed from background');
+        _onAppResumed();
+        break;
+      case AppLifecycleState.paused:
+        // App goes to background
+        debugPrint('🔄 App paused to background');
+        _pausedTime = DateTime.now();
+        break;
+      case AppLifecycleState.inactive:
+      case AppLifecycleState.detached:
+      case AppLifecycleState.hidden:
+        break;
+    }
+  }
+
+  void _onAppResumed() {
+    // Sync when app comes to foreground
+    if (_initialized && _syncService.isOnline) {
+      _syncService.syncAll();
+    }
+  }
+
+  Future<void> setApiUrl(String url) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('sync_api_url', url);
+    // Note: 需要重新建立 ApiClient 和 SyncService 才能生效
+  }
+
+  Future<String> getApiUrl() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('sync_api_url') ?? kDefaultApiUrl;
+  }
+
   void _onSyncStateChanged() {
     notifyListeners();
   }
 
   Future<void> syncAll() async {
     await _syncService.syncAll();
+  }
+
+  /// Sync triggered when user returns to home screen
+  Future<void> syncOnHomeReturn() async {
+    await _syncService.syncOnHomeReturn();
   }
 
   Future<void> markAsPending({
@@ -81,6 +140,7 @@ class SyncServiceProvider extends ChangeNotifier {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _syncService.removeListener(_onSyncStateChanged);
     _syncService.dispose();
     super.dispose();

@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../../data/models/sync_service_provider.dart';
+import '../../data/sync/models/sync_models.dart';
 
 class PaginationBar extends StatelessWidget {
   final int currentPage;
@@ -12,7 +16,6 @@ class PaginationBar extends StatelessWidget {
     required this.onPageChanged,
   });
 
-  // 顏色定義
   static const Color primaryColor = Color(0xFF007A8A);
   static const Color textDark = Color(0xFF1E293B);
   static const Color textMuted = Color(0xFF64748B);
@@ -21,7 +24,7 @@ class PaginationBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    List<int> pageNumbers = List.generate(totalPages, (index) => index + 1);
+    final pageNumbers = List<int>.generate(totalPages, (index) => index + 1);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
@@ -37,8 +40,6 @@ class PaginationBar extends StatelessWidget {
                 onTap: () => onPageChanged(currentPage - 1),
               ),
               const SizedBox(width: 8),
-
-              // 動態產生數字按鈕
               ...pageNumbers.map(
                 (page) => _buildPageButton(
                   page.toString(),
@@ -46,7 +47,6 @@ class PaginationBar extends StatelessWidget {
                   onTap: () => onPageChanged(page),
                 ),
               ),
-
               const SizedBox(width: 8),
               _buildNavButton(
                 '下一頁',
@@ -55,34 +55,12 @@ class PaginationBar extends StatelessWidget {
               ),
             ],
           ),
-
-          Row(
-            children: [
-              Container(
-                width: 8,
-                height: 8,
-                decoration: const BoxDecoration(
-                  color: Color(0xFF22C55E),
-                  shape: BoxShape.circle,
-                ),
-              ),
-              const SizedBox(width: 8),
-              const Text(
-                '雲端同步中',
-                style: TextStyle(
-                  color: textMuted,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ],
-          ),
+          _buildCloudSyncSection(),
         ],
       ),
     );
   }
 
-  // 上/下一頁按鈕
   Widget _buildNavButton(
     String text, {
     required bool isDisabled,
@@ -111,7 +89,6 @@ class PaginationBar extends StatelessWidget {
     );
   }
 
-  // 數字頁碼
   Widget _buildPageButton(
     String text, {
     required bool active,
@@ -142,5 +119,91 @@ class PaginationBar extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Widget _buildCloudSyncSection() {
+    return Consumer<SyncServiceProvider>(
+      builder: (context, provider, _) {
+        if (!provider.isInitialized) {
+          return const SizedBox.shrink();
+        }
+
+        final isSyncing = provider.state == SyncState.syncing;
+        final hasPending = provider.pendingCount > 0 && !isSyncing;
+        final statusText = hasPending
+            ? '${provider.pendingCount} 筆待同步'
+            : provider.statusText;
+        final statusColor = _statusColor(provider.state);
+
+        return Row(
+          children: [
+            if (isSyncing)
+              const SizedBox(
+                width: 12,
+                height: 12,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(primaryColor),
+                ),
+              )
+            else
+              Container(
+                width: 8,
+                height: 8,
+                decoration: BoxDecoration(
+                  color: statusColor,
+                  shape: BoxShape.circle,
+                ),
+              ),
+            const SizedBox(width: 8),
+            Text(
+              statusText,
+              style: TextStyle(
+                color: statusColor,
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            if (!isSyncing) ...[
+              const SizedBox(width: 10),
+              InkWell(
+                onTap: provider.syncOnHomeReturn,
+                borderRadius: BorderRadius.circular(4),
+                child: const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  child: Row(
+                    children: [
+                      Icon(Icons.refresh, size: 14, color: textMuted),
+                      SizedBox(width: 4),
+                      Text(
+                        '同步',
+                        style: TextStyle(
+                          color: textMuted,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ],
+        );
+      },
+    );
+  }
+
+  Color _statusColor(SyncState state) {
+    switch (state) {
+      case SyncState.idle:
+        return const Color(0xFF22C55E);
+      case SyncState.syncing:
+        return primaryColor;
+      case SyncState.error:
+        return Colors.red;
+      case SyncState.offline:
+        return textMuted;
+    }
   }
 }

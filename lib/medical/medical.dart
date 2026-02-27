@@ -1,5 +1,4 @@
 import 'package:chikawa_airport/data/db/database.dart';
-import 'package:chikawa_airport/data/models/medical/medical_view.dart';
 import 'package:chikawa_airport/data/models/medical/incident_view.dart';
 import '../data/models/medical/treatment_view.dart';
 import '../data/models/medical/medical_fee_view.dart';
@@ -7,6 +6,7 @@ import '../data/models/medical/certificate_view.dart';
 import '../data/models/medical/referral_form_view.dart';
 import '../data/models/medical/telex_view.dart';
 import '../data/models/medical/nursing_record_view.dart';
+import '../data/models/medical/medical_view.dart';
 import '../data/models/reference_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
