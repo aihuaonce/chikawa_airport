@@ -17,18 +17,18 @@ class BodyMarker {
   });
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'x': x,
-        'y': y,
-        'description': description,
-      };
+    'id': id,
+    'x': x,
+    'y': y,
+    'description': description,
+  };
 
   factory BodyMarker.fromJson(Map<String, dynamic> json) => BodyMarker(
-        id: json['id'] as String,
-        x: (json['x'] as num).toDouble(),
-        y: (json['y'] as num).toDouble(),
-        description: json['description'] as String,
-      );
+    id: json['id'] as String,
+    x: (json['x'] as num).toDouble(),
+    y: (json['y'] as num).toDouble(),
+    description: json['description'] as String,
+  );
 }
 
 class AmbulanceBodyMap extends StatefulWidget {
@@ -66,7 +66,8 @@ class _AmbulanceBodyMapState extends State<AmbulanceBodyMap> {
     if (jsonStr != null && jsonStr.isNotEmpty) {
       try {
         final Map<String, dynamic> data = json.decode(jsonStr);
-        final markerList = (data['markers'] as List<dynamic>?)
+        final markerList =
+            (data['markers'] as List<dynamic>?)
                 ?.map((e) => BodyMarker.fromJson(e as Map<String, dynamic>))
                 .toList() ??
             [];
@@ -112,7 +113,10 @@ class _AmbulanceBodyMapState extends State<AmbulanceBodyMap> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 20,
+                ),
                 decoration: const BoxDecoration(
                   border: Border(bottom: BorderSide(color: borderColor)),
                 ),
@@ -184,7 +188,9 @@ class _AmbulanceBodyMapState extends State<AmbulanceBodyMap> {
                       style: const TextStyle(fontSize: 14),
                       decoration: InputDecoration(
                         hintText: '輸入症狀描述...',
-                        hintStyle: TextStyle(color: textMuted.withValues(alpha: 0.4)),
+                        hintStyle: TextStyle(
+                          color: textMuted.withValues(alpha: 0.4),
+                        ),
                         contentPadding: const EdgeInsets.symmetric(
                           horizontal: 16,
                           vertical: 12,
@@ -209,7 +215,10 @@ class _AmbulanceBodyMapState extends State<AmbulanceBodyMap> {
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 20,
+                ),
                 decoration: const BoxDecoration(
                   border: Border(top: BorderSide(color: borderColor)),
                   color: Color(0xFFF8FAFC),
@@ -280,8 +289,13 @@ class _AmbulanceBodyMapState extends State<AmbulanceBodyMap> {
       context: context,
       builder: (dialogContext) => StatefulBuilder(
         builder: (context, setDialogState) => Dialog(
-          insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          insetPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 24,
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
           backgroundColor: Colors.white,
           elevation: 0,
           child: SizedBox(
@@ -290,7 +304,10 @@ class _AmbulanceBodyMapState extends State<AmbulanceBodyMap> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 20,
+                  ),
                   decoration: const BoxDecoration(
                     border: Border(bottom: BorderSide(color: borderColor)),
                   ),
@@ -392,10 +409,14 @@ class _AmbulanceBodyMapState extends State<AmbulanceBodyMap> {
                             border: Border.all(color: borderColor),
                           ),
                           child: Text(
-                            marker.description.isEmpty ? '（無描述）' : marker.description,
+                            marker.description.isEmpty
+                                ? '（無描述）'
+                                : marker.description,
                             style: TextStyle(
                               fontSize: 14,
-                              color: marker.description.isEmpty ? textMuted : textDark,
+                              color: marker.description.isEmpty
+                                  ? textMuted
+                                  : textDark,
                             ),
                           ),
                         ),
@@ -403,7 +424,10 @@ class _AmbulanceBodyMapState extends State<AmbulanceBodyMap> {
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 20,
+                  ),
                   decoration: const BoxDecoration(
                     border: Border(top: BorderSide(color: borderColor)),
                     color: Color(0xFFF8FAFC),
@@ -413,7 +437,8 @@ class _AmbulanceBodyMapState extends State<AmbulanceBodyMap> {
                     children: [
                       if (isEditing) ...[
                         TextButton(
-                          onPressed: () => setDialogState(() => isEditing = false),
+                          onPressed: () =>
+                              setDialogState(() => isEditing = false),
                           style: TextButton.styleFrom(
                             foregroundColor: textMuted,
                             padding: const EdgeInsets.symmetric(
@@ -432,7 +457,10 @@ class _AmbulanceBodyMapState extends State<AmbulanceBodyMap> {
                             _saveData();
                             Navigator.pop(dialogContext);
                           },
-                          icon: const Icon(Icons.check_circle_outline, size: 18),
+                          icon: const Icon(
+                            Icons.check_circle_outline,
+                            size: 18,
+                          ),
                           label: const Text(
                             '儲存',
                             style: TextStyle(fontWeight: FontWeight.bold),
@@ -453,7 +481,8 @@ class _AmbulanceBodyMapState extends State<AmbulanceBodyMap> {
                       ] else ...[
                         const SizedBox(width: 12),
                         OutlinedButton.icon(
-                          onPressed: () => setDialogState(() => isEditing = true),
+                          onPressed: () =>
+                              setDialogState(() => isEditing = true),
                           icon: const Icon(Icons.edit_outlined, size: 18),
                           label: const Text(
                             '編輯',
@@ -477,8 +506,13 @@ class _AmbulanceBodyMapState extends State<AmbulanceBodyMap> {
                             showDialog(
                               context: dialogContext,
                               builder: (confirmContext) => Dialog(
-                                insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                                insetPadding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 24,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
                                 backgroundColor: Colors.white,
                                 elevation: 0,
                                 child: SizedBox(
@@ -493,20 +527,33 @@ class _AmbulanceBodyMapState extends State<AmbulanceBodyMap> {
                                             Container(
                                               padding: const EdgeInsets.all(12),
                                               decoration: BoxDecoration(
-                                                color: Colors.red.withValues(alpha: 0.1),
+                                                color: Colors.red.withValues(
+                                                  alpha: 0.1,
+                                                ),
                                                 shape: BoxShape.circle,
                                               ),
-                                              child: const Icon(Icons.warning_amber_rounded, color: Colors.red, size: 32),
+                                              child: const Icon(
+                                                Icons.warning_amber_rounded,
+                                                color: Colors.red,
+                                                size: 32,
+                                              ),
                                             ),
                                             const SizedBox(height: 16),
                                             const Text(
                                               '刪除確認',
-                                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: textDark),
+                                              style: TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold,
+                                                color: textDark,
+                                              ),
                                             ),
                                             const SizedBox(height: 8),
                                             const Text(
                                               '確定要刪除此標記嗎？',
-                                              style: TextStyle(fontSize: 14, color: textMuted),
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                color: textMuted,
+                                              ),
                                             ),
                                           ],
                                         ),
@@ -514,13 +561,17 @@ class _AmbulanceBodyMapState extends State<AmbulanceBodyMap> {
                                       Container(
                                         padding: const EdgeInsets.all(16),
                                         decoration: const BoxDecoration(
-                                          border: Border(top: BorderSide(color: borderColor)),
+                                          border: Border(
+                                            top: BorderSide(color: borderColor),
+                                          ),
                                         ),
                                         child: Row(
                                           children: [
                                             Expanded(
                                               child: TextButton(
-                                                onPressed: () => Navigator.pop(confirmContext),
+                                                onPressed: () => Navigator.pop(
+                                                  confirmContext,
+                                                ),
                                                 child: const Text('取消'),
                                               ),
                                             ),
@@ -530,7 +581,9 @@ class _AmbulanceBodyMapState extends State<AmbulanceBodyMap> {
                                                 onPressed: () {
                                                   Navigator.pop(confirmContext);
                                                   setState(() {
-                                                    _markers.removeWhere((m) => m.id == marker.id);
+                                                    _markers.removeWhere(
+                                                      (m) => m.id == marker.id,
+                                                    );
                                                   });
                                                   _saveData();
                                                   Navigator.pop(dialogContext);
@@ -538,7 +591,12 @@ class _AmbulanceBodyMapState extends State<AmbulanceBodyMap> {
                                                 style: ElevatedButton.styleFrom(
                                                   backgroundColor: Colors.red,
                                                   foregroundColor: Colors.white,
-                                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          8,
+                                                        ),
+                                                  ),
                                                 ),
                                                 child: const Text('刪除'),
                                               ),
@@ -596,7 +654,10 @@ class _AmbulanceBodyMapState extends State<AmbulanceBodyMap> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 20,
+                ),
                 decoration: const BoxDecoration(
                   border: Border(bottom: BorderSide(color: borderColor)),
                 ),
@@ -640,14 +701,14 @@ class _AmbulanceBodyMapState extends State<AmbulanceBodyMap> {
                 padding: const EdgeInsets.all(24),
                 child: Text(
                   '確定要清除所有標記嗎？',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: textMuted,
-                  ),
+                  style: TextStyle(fontSize: 14, color: textMuted),
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 20,
+                ),
                 decoration: const BoxDecoration(
                   border: Border(top: BorderSide(color: borderColor)),
                   color: Color(0xFFF8FAFC),
@@ -753,11 +814,16 @@ class _AmbulanceBodyMapState extends State<AmbulanceBodyMap> {
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(Icons.image_not_supported,
-                                  size: 64, color: Colors.grey),
+                              Icon(
+                                Icons.image_not_supported,
+                                size: 64,
+                                color: Colors.grey,
+                              ),
                               SizedBox(height: 8),
-                              Text('找不到人形圖圖片',
-                                  style: TextStyle(color: Colors.grey)),
+                              Text(
+                                '找不到人形圖圖片',
+                                style: TextStyle(color: Colors.grey),
+                              ),
                             ],
                           ),
                         ),
@@ -784,7 +850,9 @@ class _AmbulanceBodyMapState extends State<AmbulanceBodyMap> {
   }
 
   List<Widget> _buildMarkerWidgets(double width, double height) {
-    return _markers.map((marker) {
+    return _markers.asMap().entries.map((entry) {
+      final index = entry.key;
+      final marker = entry.value;
       return Positioned(
         left: marker.x * width - 24,
         top: marker.y * height - 24,
@@ -808,9 +876,26 @@ class _AmbulanceBodyMapState extends State<AmbulanceBodyMap> {
             width: 48,
             height: 48,
             decoration: BoxDecoration(
-              color: Colors.transparent,
+              color: markerColor,
               shape: BoxShape.circle,
-              border: Border.all(color: markerColor, width: 5),
+              border: Border.all(color: Colors.white, width: 3),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.3),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Center(
+              child: Text(
+                '${index + 1}',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
           ),
         ),
@@ -848,25 +933,100 @@ class _AmbulanceBodyMapState extends State<AmbulanceBodyMap> {
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: borderColor),
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            decoration: BoxDecoration(
-              color: count > 0
-                  ? primaryColor.withValues(alpha: 0.1)
-                  : Colors.transparent,
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Text(
-              '已標示: $count 處',
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  color: count > 0
+                      ? primaryColor.withValues(alpha: 0.1)
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Text(
+                  '已標示: $count 處',
+                  style: TextStyle(
+                    color: count > 0 ? primaryColor : textMuted,
+                    fontWeight: count > 0 ? FontWeight.bold : FontWeight.normal,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          if (count > 0) ...[
+            const SizedBox(height: 12),
+            const Divider(height: 1, color: borderColor),
+            const SizedBox(height: 12),
+            const Text(
+              '標記內容',
               style: TextStyle(
-                color: count > 0 ? primaryColor : textMuted,
-                fontWeight: count > 0 ? FontWeight.bold : FontWeight.normal,
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+                color: textDark,
               ),
             ),
-          ),
+            const SizedBox(height: 8),
+            Container(
+              constraints: const BoxConstraints(maxHeight: 200),
+              child: ListView.separated(
+                shrinkWrap: true,
+                itemCount: _markers.length,
+                separatorBuilder: (context, index) => const SizedBox(height: 8),
+                itemBuilder: (context, index) {
+                  final marker = _markers[index];
+                  return Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF8FAFC),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: borderColor),
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          width: 24,
+                          height: 24,
+                          decoration: const BoxDecoration(
+                            color: markerColor,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Center(
+                            child: Text(
+                              '${index + 1}',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            marker.description.isEmpty
+                                ? '（無描述）'
+                                : marker.description,
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: marker.description.isEmpty
+                                  ? textMuted
+                                  : textDark,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
         ],
       ),
     );
