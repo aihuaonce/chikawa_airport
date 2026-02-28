@@ -770,15 +770,22 @@ class _AmbulanceBodyMapState extends State<AmbulanceBodyMap> {
       return const Center(child: CircularProgressIndicator());
     }
 
-    return Column(
+    return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildBodyCanvas(),
-        const SizedBox(height: 16),
-        _buildMarkerCount(),
-        const SizedBox(height: 24),
-        _buildClearButton(),
-        const SizedBox(height: 60),
+        Expanded(
+          child: Column(
+            children: [
+              // Header with count (left) and list (right)
+              _buildMarkerHeader(),
+              const SizedBox(height: 16),
+              _buildBodyCanvas(),
+              const SizedBox(height: 24),
+              _buildClearButton(),
+              const SizedBox(height: 60),
+            ],
+          ),
+        ),
       ],
     );
   }
@@ -845,6 +852,160 @@ class _AmbulanceBodyMapState extends State<AmbulanceBodyMap> {
             );
           },
         ),
+      ),
+    );
+  }
+
+  Widget _buildMarkerCountCompact() {
+    final count = _markers.length;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: borderColor),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: count > 0
+                  ? primaryColor.withValues(alpha: 0.1)
+                  : Colors.transparent,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Text(
+              '$count',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: count > 0 ? primaryColor : textMuted,
+              ),
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text('處', style: TextStyle(fontSize: 12, color: textMuted)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMarkerHeader() {
+    final count = _markers.length;
+
+    if (count == 0) {
+      return const SizedBox.shrink();
+    }
+
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: borderColor),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Left: count
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: primaryColor.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  '$count',
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: primaryColor,
+                  ),
+                ),
+                const SizedBox(width: 4),
+                const Text(
+                  '處',
+                  style: TextStyle(fontSize: 14, color: primaryColor),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 12),
+          // Right: marker descriptions
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  '標記內容',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: textDark,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 4,
+                  children: _markers.asMap().entries.map((entry) {
+                    final index = entry.key;
+                    final marker = entry.value;
+                    return Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 16,
+                          height: 16,
+                          decoration: const BoxDecoration(
+                            color: markerColor,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Center(
+                            child: Text(
+                              '${index + 1}',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 9,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          marker.description.isEmpty
+                              ? '（無描述）'
+                              : marker.description,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: marker.description.isEmpty
+                                ? textMuted
+                                : textDark,
+                          ),
+                        ),
+                        if (index < _markers.length - 1)
+                          Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 8),
+                            width: 1,
+                            height: 14,
+                            color: borderColor,
+                          ),
+                      ],
+                    );
+                  }).toList(),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -921,118 +1082,6 @@ class _AmbulanceBodyMapState extends State<AmbulanceBodyMap> {
     if (x >= 0 && x <= 1 && y >= 0 && y <= 1) {
       _showAddDescriptionDialog(x, y);
     }
-  }
-
-  Widget _buildMarkerCount() {
-    final count = _markers.length;
-
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: borderColor),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
-                ),
-                decoration: BoxDecoration(
-                  color: count > 0
-                      ? primaryColor.withValues(alpha: 0.1)
-                      : Colors.transparent,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Text(
-                  '已標示: $count 處',
-                  style: TextStyle(
-                    color: count > 0 ? primaryColor : textMuted,
-                    fontWeight: count > 0 ? FontWeight.bold : FontWeight.normal,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          if (count > 0) ...[
-            const SizedBox(height: 12),
-            const Divider(height: 1, color: borderColor),
-            const SizedBox(height: 12),
-            const Text(
-              '標記內容',
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.bold,
-                color: textDark,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Container(
-              constraints: const BoxConstraints(maxHeight: 200),
-              child: ListView.separated(
-                shrinkWrap: true,
-                itemCount: _markers.length,
-                separatorBuilder: (context, index) => const SizedBox(height: 8),
-                itemBuilder: (context, index) {
-                  final marker = _markers[index];
-                  return Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF8FAFC),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: borderColor),
-                    ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          width: 24,
-                          height: 24,
-                          decoration: const BoxDecoration(
-                            color: markerColor,
-                            shape: BoxShape.circle,
-                          ),
-                          child: Center(
-                            child: Text(
-                              '${index + 1}',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Text(
-                            marker.description.isEmpty
-                                ? '（無描述）'
-                                : marker.description,
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: marker.description.isEmpty
-                                  ? textMuted
-                                  : textDark,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
-            ),
-          ],
-        ],
-      ),
-    );
   }
 
   Widget _buildClearButton() {
