@@ -130,12 +130,12 @@ class SyncService extends ChangeNotifier {
     _periodicSyncTimer?.cancel();
     _periodicSyncTimer = Timer.periodic(_syncInterval, (_) {
       if (_networkService.isOnline) {
-        debugPrint('⏰ Periodic background sync triggered');
+        debugPrint('Periodic background sync triggered');
         syncAll();
       }
     });
     debugPrint(
-      '✅ Periodic background sync started (interval: ${_syncInterval.inMinutes} minutes)',
+      'Periodic background sync started (interval: ${_syncInterval.inMinutes} minutes)',
     );
   }
 
@@ -180,37 +180,33 @@ class SyncService extends ChangeNotifier {
 
     try {
       // Step 1: Build local snapshot
-      debugPrint('🔍 Building local snapshot...');
+      debugPrint('Building local snapshot...');
       final snapshot = await buildLocalSnapshot();
-      debugPrint('📸 Snapshot: ${snapshot.length} records');
+      debugPrint('Snapshot: ${snapshot.length} records');
 
       // Step 2: Compare with server
-      debugPrint('🔍 Comparing with server...');
+      debugPrint('Comparing with server...');
       final compareResponse = await _apiClient.compareSnapshot(
         CompareRequest(deviceId: _deviceId!, snapshot: snapshot),
       );
 
       // Step 3: Handle uploads (Flutter has newer data)
       if (compareResponse.toUpload.isNotEmpty) {
-        debugPrint(
-          '📤 Uploading ${compareResponse.toUpload.length} records...',
-        );
+        debugPrint('Uploading ${compareResponse.toUpload.length} records...');
         await _handleUploads(compareResponse.toUpload);
       }
 
       // Step 4: Handle downloads (Server has newer data)
       if (compareResponse.toDownload.isNotEmpty) {
         debugPrint(
-          '📥 Downloading ${compareResponse.toDownload.length} records...',
+          'Downloading ${compareResponse.toDownload.length} records...',
         );
         await _handleDownloads(compareResponse.toDownload);
       }
 
       // Step 5: Handle conflicts
       if (compareResponse.conflicts.isNotEmpty) {
-        debugPrint(
-          '⚠️  Handling ${compareResponse.conflicts.length} conflicts...',
-        );
+        debugPrint('Handling ${compareResponse.conflicts.length} conflicts...');
         await _handleConflicts(compareResponse.conflicts);
         _conflictCount = compareResponse.conflicts.length;
       }
@@ -247,7 +243,7 @@ class SyncService extends ChangeNotifier {
         final tableSnapshot = await _buildTableSnapshot(tableName);
         snapshot.addAll(tableSnapshot);
       } catch (e) {
-        debugPrint('⚠️ Error building snapshot for $tableName: $e');
+        debugPrint('Error building snapshot for $tableName: $e');
       }
     }
 
@@ -265,7 +261,9 @@ class SyncService extends ChangeNotifier {
             LocalSnapshot(
               table: 'medical_records',
               id: record.medicalId,
-              lastModified: record.updatedAt.millisecondsSinceEpoch,
+              lastModified:
+                  record.lastModified?.millisecondsSinceEpoch ??
+                  record.updatedAt.millisecondsSinceEpoch,
             ),
           );
         }
@@ -445,7 +443,6 @@ class SyncService extends ChangeNotifier {
 
   /// Handle uploads - push records that Flutter has but server doesn't
   Future<void> _handleUploads(List<UploadItem> toUpload) async {
-    // Resolve full record data for each upload item
     final pushChanges = <PushChange>[];
 
     for (final item in toUpload) {
@@ -464,7 +461,6 @@ class SyncService extends ChangeNotifier {
 
     if (pushChanges.isEmpty) return;
 
-    // Push to server
     final request = PushRequest(
       clientTimestamp: DateTime.now().toUtc(),
       deviceId: _deviceId!,
@@ -473,16 +469,19 @@ class SyncService extends ChangeNotifier {
 
     try {
       final response = await _apiClient.pushChanges(request);
+      final syncedAt = response.serverTimestamp.toUtc();
 
-      // Mark successfully synced records
       for (final result in response.results) {
         if (result.status == 'success') {
-          // Update local sync status
-          await _markAsSynced(result.localId, result.remoteId ?? '');
+          await _markAsSynced(
+            result.table,
+            result.localId,
+            result.remoteId ?? '',
+            syncedAt,
+          );
         }
       }
 
-      // Handle conflicts
       for (final conflict in response.conflicts) {
         await _resolvePushConflict(conflict);
       }
@@ -572,15 +571,290 @@ class SyncService extends ChangeNotifier {
           'doctorOrderEn': record.doctorOrderEn,
           'directorName': record.directorName,
           'assistStaff': record.assistStaff,
+          'treatmentTime': record.treatmentTime.millisecondsSinceEpoch,
           'lastModified':
               record.lastModified?.millisecondsSinceEpoch ??
               DateTime.now().millisecondsSinceEpoch,
         };
 
-      // Add other tables as needed...
+      case 'medical_certificates':
+        final record = await (_db.select(
+          _db.medicalCertificates,
+        )..where((t) => t.certificateId.equals(id))).getSingleOrNull();
+        if (record == null) return null;
+        return {
+          'certificateId': record.certificateId,
+          'medicalId': record.medicalId,
+          'diagnosisCategoryId': record.diagnosisCategoryId,
+          'diagnosisResult': record.diagnosisResult,
+          'chineseAdvice': record.chineseAdvice,
+          'englishAdvice': record.englishAdvice,
+          'issuanceDate': record.issuanceDate?.millisecondsSinceEpoch,
+          'lastModified':
+              record.lastModified?.millisecondsSinceEpoch ??
+              DateTime.now().millisecondsSinceEpoch,
+        };
+
+      case 'medical_fees':
+        final record = await (_db.select(
+          _db.medicalFees,
+        )..where((t) => t.feeId.equals(id))).getSingleOrNull();
+        if (record == null) return null;
+        return {
+          'feeId': record.feeId,
+          'medicalId': record.medicalId,
+          'paymentMethodId': record.paymentMethodId,
+          'paymentType': record.paymentType,
+          'consultFee': record.consultFee,
+          'ambulanceFee': record.ambulanceFee,
+          'currencyId': record.currencyId,
+          'collectionStatusId': record.collectionStatusId,
+          'receiptIssued': record.receiptIssued,
+          'userAgreed': record.userAgreed,
+          'applicantName': record.applicantName,
+          'applicantUnit': record.applicantUnit,
+          'applicantPhone': record.applicantPhone,
+          'abnormalReason': record.abnormalReason,
+          'remarks': record.remarks,
+          'consenterSignature': record.consenterSignature,
+          'witnessSignature': record.witnessSignature,
+          'counterSignature': record.counterSignature,
+          'lastModified':
+              record.lastModified?.millisecondsSinceEpoch ??
+              DateTime.now().millisecondsSinceEpoch,
+        };
+
+      case 'nursing_records':
+        final record = await (_db.select(
+          _db.nursingRecords,
+        )..where((t) => t.recordId.equals(id))).getSingleOrNull();
+        if (record == null) return null;
+        return {
+          'recordId': record.recordId,
+          'medicalId': record.medicalId,
+          'recordTime': record.recordTime.millisecondsSinceEpoch,
+          'content': record.content,
+          'nurseId': record.nurseId,
+          'signature': record.signature,
+          'lastModified':
+              record.lastModified?.millisecondsSinceEpoch ??
+              DateTime.now().millisecondsSinceEpoch,
+        };
+
+      case 'referral_forms':
+        final record = await (_db.select(
+          _db.referralForms,
+        )..where((t) => t.formId.equals(id))).getSingleOrNull();
+        if (record == null) return null;
+        return {
+          'formId': record.formId,
+          'medicalId': record.medicalId,
+          'contactName': record.contactName,
+          'contactIdNo': record.contactIdNo,
+          'contactPhone': record.contactPhone,
+          'contactAddress': record.contactAddress,
+          'primaryDiagnosis': record.primaryDiagnosis,
+          'secondaryDiagnosis1': record.secondaryDiagnosis1,
+          'secondaryDiagnosis2': record.secondaryDiagnosis2,
+          'recentExamResult': record.recentExamResult,
+          'examDate': record.examDate?.millisecondsSinceEpoch,
+          'recentMedication': record.recentMedication,
+          'medicationDate': record.medicationDate?.millisecondsSinceEpoch,
+          'referralPurposeId': record.referralPurposeId,
+          'otherPurpose': record.otherPurpose,
+          'doctorName': record.doctorName,
+          'doctorDepartment': record.doctorDepartment,
+          'doctorSignature': record.doctorSignature,
+          'orderDate': record.orderDate?.millisecondsSinceEpoch,
+          'notes': record.notes,
+          'hospitalName': record.hospitalName,
+          'hospitalDept': record.hospitalDept,
+          'hospitalDoctor': record.hospitalDoctor,
+          'hospitalPhone': record.hospitalPhone,
+          'hospitalAddress': record.hospitalAddress,
+          'scheduledDate': record.scheduledDate?.millisecondsSinceEpoch,
+          'scheduledDept': record.scheduledDept,
+          'scheduledRoom': record.scheduledRoom,
+          'scheduledNumber': record.scheduledNumber,
+          'relationshipId': record.relationshipId,
+          'otherRelationship': record.otherRelationship,
+          'consentSignature': record.consentSignature,
+          'consentDateTime': record.consentDateTime?.millisecondsSinceEpoch,
+          'lastModified':
+              record.lastModified?.millisecondsSinceEpoch ??
+              DateTime.now().millisecondsSinceEpoch,
+        };
+
+      case 'telex_documents':
+        final record = await (_db.select(
+          _db.telexDocuments,
+        )..where((t) => t.documentId.equals(id))).getSingleOrNull();
+        if (record == null) return null;
+        return {
+          'documentId': record.documentId,
+          'medicalId': record.medicalId,
+          'toStationId': record.toStationId,
+          'fromStationId': record.fromStationId,
+          'lastModified':
+              record.lastModified?.millisecondsSinceEpoch ??
+              DateTime.now().millisecondsSinceEpoch,
+        };
+
+      case 'flight_records':
+        final record = await (_db.select(
+          _db.flightRecord,
+        )..where((t) => t.flightRecordId.equals(id))).getSingleOrNull();
+        if (record == null) return null;
+        return {
+          'flightRecordId': record.flightRecordId,
+          'medicalId': record.medicalId,
+          'airlineId': record.airlineId,
+          'flightNumber': record.flightNumber,
+          'travelStatusId': record.travelStatusId,
+          'departureLocationId': record.departureLocationId,
+          'arrivalLocationId': record.arrivalLocationId,
+          'lastModified':
+              record.lastModified?.millisecondsSinceEpoch ??
+              DateTime.now().millisecondsSinceEpoch,
+        };
+
+      case 'incident_records':
+        final record = await (_db.select(
+          _db.incidentRecord,
+        )..where((t) => t.incidentId.equals(id))).getSingleOrNull();
+        if (record == null) return null;
+        return {
+          'incidentId': record.incidentId,
+          'medicalId': record.medicalId,
+          'incidentDate': record.incidentDate.millisecondsSinceEpoch,
+          'incidentPlaceCategoryId': record.incidentPlaceCategoryId,
+          'incidentPlaceCategory2Id': record.incidentPlaceCategory2Id,
+          'incidentPlaceFinal': record.incidentPlaceFinal,
+          'notificationTime': record.notificationTime?.millisecondsSinceEpoch,
+          'notificationPerson': record.notificationPerson,
+          'reportingUnitId': record.reportingUnitId,
+          'incomingPhone': record.incomingPhone,
+          'notificationToOccTime':
+              record.notificationToOccTime?.millisecondsSinceEpoch,
+          'teamDepartureTime': record.teamDepartureTime?.millisecondsSinceEpoch,
+          'occArrived': record.occArrived,
+          'beforeLanding': record.beforeLanding,
+          'landingTime': record.landingTime?.millisecondsSinceEpoch,
+          'medicalArrivalTime':
+              record.medicalArrivalTime?.millisecondsSinceEpoch,
+          'examinationTime': record.examinationTime?.millisecondsSinceEpoch,
+          'lastModified':
+              record.lastModified?.millisecondsSinceEpoch ??
+              DateTime.now().millisecondsSinceEpoch,
+        };
+
+      case 'ambulance_records':
+        final record = await (_db.select(
+          _db.ambulanceRecords,
+        )..where((t) => t.ambulanceId.equals(id))).getSingleOrNull();
+        if (record == null) return null;
+        return {
+          'ambulanceId': record.ambulanceId,
+          'medicalId': record.medicalId,
+          'licensePlate': record.licensePlate,
+          'incidentLocationId': record.incidentLocationId,
+          'incidentLocation2Id': record.incidentLocation2Id,
+          'locationRemarks': record.locationRemarks,
+          'dispatchTime': record.dispatchTime?.millisecondsSinceEpoch,
+          'arrivalTime': record.arrivalTime?.millisecondsSinceEpoch,
+          'hospitalId': record.hospitalId,
+          'transportReason': record.transportReason,
+          'leavingSceneTime': record.leavingSceneTime?.millisecondsSinceEpoch,
+          'arrivalHospitalTime':
+              record.arrivalHospitalTime?.millisecondsSinceEpoch,
+          'leavingHospitalTime':
+              record.leavingHospitalTime?.millisecondsSinceEpoch,
+          'returnStandbyTime': record.returnStandbyTime?.millisecondsSinceEpoch,
+          'bodyMapJson': record.bodyMapJson,
+          'lastModified':
+              record.lastModified?.millisecondsSinceEpoch ??
+              DateTime.now().millisecondsSinceEpoch,
+        };
+
+      case 'ambulance_personal_property':
+        final record = await (_db.select(
+          _db.ambulancePersonalProperty,
+        )..where((t) => t.id.equals(id))).getSingleOrNull();
+        if (record == null) return null;
+        return {
+          'id': record.id,
+          'medicalId': record.medicalId,
+          'financialDetails': record.financialDetails,
+          'isHandled': record.isHandled,
+          'custodianName': record.custodianName,
+          'custodianSignature': record.custodianSignature,
+          'lastModified':
+              record.lastModified?.millisecondsSinceEpoch ??
+              DateTime.now().millisecondsSinceEpoch,
+        };
+
+      case 'ambulance_fees':
+        final record = await (_db.select(
+          _db.ambulanceFees,
+        )..where((t) => t.feeId.equals(id))).getSingleOrNull();
+        if (record == null) return null;
+        return {
+          'feeId': record.feeId,
+          'medicalId': record.medicalId,
+          'ambulanceFee': record.ambulanceFee,
+          'oxygenFee': record.oxygenFee,
+          'paymentStatus': record.paymentStatus,
+          'paymentMethod': record.paymentMethod,
+          'unpaidType': record.unpaidType,
+          'lastModified':
+              record.lastModified?.millisecondsSinceEpoch ??
+              DateTime.now().millisecondsSinceEpoch,
+        };
+
+      case 'ambulance_treatment_records':
+        final record = await (_db.select(
+          _db.ambulanceTreatmentRecords,
+        )..where((t) => t.id.equals(id))).getSingleOrNull();
+        if (record == null) return null;
+        return {
+          'id': record.id,
+          'medicalId': record.medicalId,
+          'doctorInstructions': record.doctorInstructions,
+          'receivingHospital': record.receivingHospital,
+          'receivingTime': record.receivingTime,
+          'isRefusedHospital': record.isRefusedHospital,
+          'relationship': record.relationship,
+          'relativeName': record.relativeName,
+          'relativePhone': record.relativePhone,
+          'lastModified':
+              record.lastModified?.millisecondsSinceEpoch ??
+              DateTime.now().millisecondsSinceEpoch,
+        };
+
+      case 'ambulance_scene_records':
+        final record = await (_db.select(
+          _db.ambulanceSceneRecords,
+        )..where((t) => t.id.equals(id))).getSingleOrNull();
+        if (record == null) return null;
+        return {
+          'id': record.id,
+          'medicalId': record.medicalId,
+          'patientComplaint': record.patientComplaint,
+          'isProxyComplaint': record.isProxyComplaint,
+          'fallHeight': record.fallHeight,
+          'burnDegree': record.burnDegree,
+          'burnArea': record.burnArea,
+          'burnPercentage': record.burnPercentage,
+          'otherTraumaNote': record.otherTraumaNote,
+          'allergyStatus': record.allergyStatus,
+          'allergyNote': record.allergyNote,
+          'historyStatus': record.historyStatus,
+          'historyNote': record.historyNote,
+          'lastModified': record.updatedAt.millisecondsSinceEpoch,
+        };
 
       default:
-        debugPrint('⚠️ Unknown table for upload: $table');
+        debugPrint('Unknown table for upload: $table');
         return null;
     }
   }
@@ -596,37 +870,697 @@ class SyncService extends ChangeNotifier {
     }
   }
 
+  dynamic _rawValue(Map<String, dynamic> data, String camelKey) {
+    if (data.containsKey(camelKey)) return data[camelKey];
+    final snakeKey = camelKey.replaceAllMapped(
+      RegExp(r'([A-Z])'),
+      (m) => '_${m.group(1)!.toLowerCase()}',
+    );
+    if (data.containsKey(snakeKey)) return data[snakeKey];
+    return null;
+  }
+
+  int? _asInt(dynamic value) {
+    if (value == null) return null;
+    if (value is int) return value;
+    if (value is num) return value.toInt();
+    if (value is String) return int.tryParse(value.trim());
+    return null;
+  }
+
+  double? _asDouble(dynamic value) {
+    if (value == null) return null;
+    if (value is double) return value;
+    if (value is num) return value.toDouble();
+    if (value is String) return double.tryParse(value.trim());
+    return null;
+  }
+
+  bool? _asBool(dynamic value) {
+    if (value == null) return null;
+    if (value is bool) return value;
+    if (value is num) return value != 0;
+    if (value is String) {
+      final normalized = value.trim().toLowerCase();
+      if (normalized == 'true' || normalized == '1') return true;
+      if (normalized == 'false' || normalized == '0') return false;
+    }
+    return null;
+  }
+
+  String? _asString(dynamic value) {
+    if (value == null) return null;
+    if (value is String) return value;
+    return value.toString();
+  }
+
+  DateTime? _asDateTime(dynamic value) {
+    if (value == null) return null;
+    if (value is DateTime) return value.toUtc();
+    if (value is int) {
+      return DateTime.fromMillisecondsSinceEpoch(value, isUtc: true);
+    }
+    if (value is num) {
+      return DateTime.fromMillisecondsSinceEpoch(value.toInt(), isUtc: true);
+    }
+    if (value is String) {
+      final trimmed = value.trim();
+      if (trimmed.isEmpty) return null;
+      final asMs = int.tryParse(trimmed);
+      if (asMs != null) {
+        return DateTime.fromMillisecondsSinceEpoch(asMs, isUtc: true);
+      }
+      final parsed = DateTime.tryParse(trimmed);
+      return parsed?.toUtc();
+    }
+    return null;
+  }
+
+  Uint8List? _asBytes(dynamic value) {
+    if (value == null) return null;
+    if (value is Uint8List) return value;
+    if (value is List<int>) return Uint8List.fromList(value);
+    if (value is List) {
+      final values = <int>[];
+      for (final item in value) {
+        if (item is int) values.add(item);
+      }
+      return Uint8List.fromList(values);
+    }
+    if (value is String) {
+      final trimmed = value.trim();
+      if (trimmed.isEmpty) return null;
+      try {
+        return base64Decode(trimmed);
+      } catch (_) {
+        return null;
+      }
+    }
+    if (value is Map) {
+      final type = value['type'];
+      final data = value['data'];
+      if (type == 'Buffer' && data is List) {
+        final values = <int>[];
+        for (final item in data) {
+          if (item is int) values.add(item);
+        }
+        return Uint8List.fromList(values);
+      }
+    }
+    return null;
+  }
+
   /// Apply a remote change to local DB
   Future<void> _applyRemoteChange(
     String table,
     String remoteId,
     Map<String, dynamic> data,
   ) async {
-    final modifiedAt = DateTime.now().toUtc();
+    final modifiedAt =
+        _asDateTime(_rawValue(data, 'lastModified')) ?? DateTime.now().toUtc();
 
     switch (table) {
       case 'medical_records':
-        final medicalId = data['medicalId'] as int?;
+        final medicalId = _asInt(_rawValue(data, 'medicalId'));
         if (medicalId == null) return;
-        await (_db.update(
-          _db.medicalRecord,
-        )..where((t) => t.medicalId.equals(medicalId))).write(
-          MedicalRecordCompanion(
-            isEmergency: Value(data['isEmergency'] as bool? ?? false),
-            hasAmbulance: Value(data['hasAmbulance'] as bool? ?? false),
-            cdcPassed: Value(data['cdcPassed'] as bool?),
-            screeningMethod: Value(data['screeningMethod'] as String?),
-            syncStatus: const Value(0),
-            remoteId: Value(remoteId),
-            lastModified: Value(modifiedAt),
+        final companion = MedicalRecordCompanion(
+          medicalId: Value(medicalId),
+          isEmergency: Value(_asBool(_rawValue(data, 'isEmergency')) ?? false),
+          hasAmbulance: Value(
+            _asBool(_rawValue(data, 'hasAmbulance')) ?? false,
           ),
+          cdcPassed: Value(_asBool(_rawValue(data, 'cdcPassed'))),
+          screeningMethod: Value(_asString(_rawValue(data, 'screeningMethod'))),
+          syncStatus: const Value(SyncStatus.synced),
+          remoteId: Value(remoteId),
+          lastModified: Value(modifiedAt),
         );
+        final updated = await (_db.update(
+          _db.medicalRecord,
+        )..where((t) => t.medicalId.equals(medicalId))).write(companion);
+        if (updated == 0) {
+          await _db.into(_db.medicalRecord).insert(companion);
+        }
         break;
 
-      // Add other tables as needed...
+      case 'patients':
+        final patientId = _asInt(_rawValue(data, 'patientId'));
+        final patientMedicalId = _asInt(_rawValue(data, 'medicalId'));
+        if (patientId == null || patientMedicalId == null) return;
+        final patientCompanion = PatientCompanion(
+          patientId: Value(patientId),
+          medicalId: Value(patientMedicalId),
+          name: Value(_asString(_rawValue(data, 'name'))),
+          anonymizationName: Value(
+            _asString(_rawValue(data, 'anonymizationName')),
+          ),
+          birthday: Value(_asDateTime(_rawValue(data, 'birthday'))),
+          sexId: Value(_asInt(_rawValue(data, 'sexId')) ?? 1),
+          passportOrIdNo: Value(_asString(_rawValue(data, 'passportOrIdNo'))),
+          idNo: Value(_asString(_rawValue(data, 'idNo'))),
+          visitReasonId: Value(_asInt(_rawValue(data, 'visitReasonId')) ?? 1),
+          nationalityId: Value(_asInt(_rawValue(data, 'nationalityId'))),
+          telephone: Value(_asString(_rawValue(data, 'telephone'))),
+          address: Value(_asString(_rawValue(data, 'address'))),
+          syncStatus: const Value(SyncStatus.synced),
+          remoteId: Value(remoteId),
+          lastModified: Value(modifiedAt),
+        );
+        final patientUpdated = await (_db.update(
+          _db.patient,
+        )..where((t) => t.patientId.equals(patientId))).write(patientCompanion);
+        if (patientUpdated == 0) {
+          await _db.into(_db.patient).insert(patientCompanion);
+        }
+        break;
+      case 'treatments':
+        final treatmentId = _asInt(_rawValue(data, 'treatmentId'));
+        final treatmentMedicalId = _asInt(_rawValue(data, 'medicalId'));
+        if (treatmentId == null || treatmentMedicalId == null) return;
+        final treatmentCompanion = TreatmentCompanion(
+          treatmentId: Value(treatmentId),
+          medicalId: Value(treatmentMedicalId),
+          tentativeCategoryId: Value(
+            _asInt(_rawValue(data, 'tentativeCategoryId')),
+          ),
+          tentative: Value(_asString(_rawValue(data, 'tentative'))),
+          secondaryDiagnosis1: Value(
+            _asString(_rawValue(data, 'secondaryDiagnosis1')),
+          ),
+          secondaryDiagnosis2: Value(
+            _asString(_rawValue(data, 'secondaryDiagnosis2')),
+          ),
+          triageId: Value(_asInt(_rawValue(data, 'triageId'))),
+          treatmentOnSiteId: Value(
+            _asInt(_rawValue(data, 'treatmentOnSiteId')),
+          ),
+          actionSummary: Value(_asString(_rawValue(data, 'actionSummary'))),
+          actionSummaryOther: Value(
+            _asString(_rawValue(data, 'actionSummaryOther')),
+          ),
+          ekgInterpretation: Value(
+            _asString(_rawValue(data, 'ekgInterpretation')),
+          ),
+          glucose: Value(_asString(_rawValue(data, 'glucose'))),
+          intubationMethod: Value(
+            _asString(_rawValue(data, 'intubationMethod')),
+          ),
+          oxygenMethod: Value(_asString(_rawValue(data, 'oxygenMethod'))),
+          oxygenFlow: Value(_asDouble(_rawValue(data, 'oxygenFlow'))),
+          certificateLogs: Value(_asString(_rawValue(data, 'certificateLogs'))),
+          resultId: Value(_asInt(_rawValue(data, 'resultId'))),
+          transportRequired: Value(
+            _asBool(_rawValue(data, 'transportRequired')),
+          ),
+          transportMethod: Value(_asString(_rawValue(data, 'transportMethod'))),
+          referralHospitalId: Value(
+            _asInt(_rawValue(data, 'referralHospitalId')),
+          ),
+          referralHospitalFinal: Value(
+            _asString(_rawValue(data, 'referralHospitalFinal')),
+          ),
+          ambulanceStaffId: Value(_asInt(_rawValue(data, 'ambulanceStaffId'))),
+          arrivalTime: Value(_asDateTime(_rawValue(data, 'arrivalTime'))),
+          clearanceId: Value(_asInt(_rawValue(data, 'clearanceId'))),
+          expeditedClearanceId: Value(
+            _asInt(_rawValue(data, 'expeditedClearanceId')),
+          ),
+          doctorOrderCh: Value(_asString(_rawValue(data, 'doctorOrderCh'))),
+          doctorOrderEn: Value(_asString(_rawValue(data, 'doctorOrderEn'))),
+          directorName: Value(_asString(_rawValue(data, 'directorName'))),
+          assistStaff: Value(_asString(_rawValue(data, 'assistStaff'))),
+          treatmentTime: Value(
+            _asDateTime(_rawValue(data, 'treatmentTime')) ?? modifiedAt,
+          ),
+          syncStatus: const Value(SyncStatus.synced),
+          remoteId: Value(remoteId),
+          lastModified: Value(modifiedAt),
+        );
+        final treatmentUpdated =
+            await (_db.update(_db.treatment)
+                  ..where((t) => t.treatmentId.equals(treatmentId)))
+                .write(treatmentCompanion);
+        if (treatmentUpdated == 0) {
+          await _db.into(_db.treatment).insert(treatmentCompanion);
+        }
+        break;
+      case 'medical_certificates':
+        final certificateId = _asInt(_rawValue(data, 'certificateId'));
+        final certificateMedicalId = _asInt(_rawValue(data, 'medicalId'));
+        if (certificateId == null || certificateMedicalId == null) return;
+        final certificateCompanion = MedicalCertificatesCompanion(
+          certificateId: Value(certificateId),
+          medicalId: Value(certificateMedicalId),
+          diagnosisCategoryId: Value(
+            _asInt(_rawValue(data, 'diagnosisCategoryId')),
+          ),
+          diagnosisResult: Value(_asString(_rawValue(data, 'diagnosisResult'))),
+          chineseAdvice: Value(_asString(_rawValue(data, 'chineseAdvice'))),
+          englishAdvice: Value(_asString(_rawValue(data, 'englishAdvice'))),
+          issuanceDate: Value(_asDateTime(_rawValue(data, 'issuanceDate'))),
+          syncStatus: const Value(SyncStatus.synced),
+          remoteId: Value(remoteId),
+          lastModified: Value(modifiedAt),
+        );
+        final certificateUpdated =
+            await (_db.update(_db.medicalCertificates)
+                  ..where((t) => t.certificateId.equals(certificateId)))
+                .write(certificateCompanion);
+        if (certificateUpdated == 0) {
+          await _db.into(_db.medicalCertificates).insert(certificateCompanion);
+        }
+        break;
+      case 'medical_fees':
+        final feeId = _asInt(_rawValue(data, 'feeId'));
+        final feeMedicalId = _asInt(_rawValue(data, 'medicalId'));
+        if (feeId == null || feeMedicalId == null) return;
+        final feeCompanion = MedicalFeesCompanion(
+          feeId: Value(feeId),
+          medicalId: Value(feeMedicalId),
+          paymentMethodId: Value(_asInt(_rawValue(data, 'paymentMethodId'))),
+          paymentType: Value(_asString(_rawValue(data, 'paymentType'))),
+          consultFee: Value(_asDouble(_rawValue(data, 'consultFee')) ?? 0),
+          ambulanceFee: Value(_asDouble(_rawValue(data, 'ambulanceFee')) ?? 0),
+          currencyId: Value(_asInt(_rawValue(data, 'currencyId'))),
+          collectionStatusId: Value(
+            _asInt(_rawValue(data, 'collectionStatusId')),
+          ),
+          receiptIssued: Value(
+            _asBool(_rawValue(data, 'receiptIssued')) ?? false,
+          ),
+          userAgreed: Value(_asBool(_rawValue(data, 'userAgreed')) ?? false),
+          applicantName: Value(_asString(_rawValue(data, 'applicantName'))),
+          applicantUnit: Value(_asString(_rawValue(data, 'applicantUnit'))),
+          applicantPhone: Value(_asString(_rawValue(data, 'applicantPhone'))),
+          abnormalReason: Value(_asString(_rawValue(data, 'abnormalReason'))),
+          remarks: Value(_asString(_rawValue(data, 'remarks'))),
+          consenterSignature: Value(
+            _asBytes(_rawValue(data, 'consenterSignature')),
+          ),
+          witnessSignature: Value(
+            _asBytes(_rawValue(data, 'witnessSignature')),
+          ),
+          counterSignature: Value(
+            _asBytes(_rawValue(data, 'counterSignature')),
+          ),
+          syncStatus: const Value(SyncStatus.synced),
+          remoteId: Value(remoteId),
+          lastModified: Value(modifiedAt),
+        );
+        final feeUpdated = await (_db.update(
+          _db.medicalFees,
+        )..where((t) => t.feeId.equals(feeId))).write(feeCompanion);
+        if (feeUpdated == 0) {
+          await _db.into(_db.medicalFees).insert(feeCompanion);
+        }
+        break;
+      case 'nursing_records':
+        final recordId = _asInt(_rawValue(data, 'recordId'));
+        final nursingMedicalId = _asInt(_rawValue(data, 'medicalId'));
+        final recordTime = _asDateTime(_rawValue(data, 'recordTime'));
+        if (recordId == null ||
+            nursingMedicalId == null ||
+            recordTime == null) {
+          return;
+        }
+        final nursingCompanion = NursingRecordsCompanion(
+          recordId: Value(recordId),
+          medicalId: Value(nursingMedicalId),
+          recordTime: Value(recordTime),
+          content: Value(_asString(_rawValue(data, 'content'))),
+          nurseId: Value(_asInt(_rawValue(data, 'nurseId'))),
+          signature: Value(_asBytes(_rawValue(data, 'signature'))),
+          syncStatus: const Value(SyncStatus.synced),
+          remoteId: Value(remoteId),
+          lastModified: Value(modifiedAt),
+        );
+        final nursingUpdated = await (_db.update(
+          _db.nursingRecords,
+        )..where((t) => t.recordId.equals(recordId))).write(nursingCompanion);
+        if (nursingUpdated == 0) {
+          await _db.into(_db.nursingRecords).insert(nursingCompanion);
+        }
+        break;
+      case 'referral_forms':
+        final formId = _asInt(_rawValue(data, 'formId'));
+        final referralMedicalId = _asInt(_rawValue(data, 'medicalId'));
+        if (formId == null || referralMedicalId == null) return;
+        final referralCompanion = ReferralFormsCompanion(
+          formId: Value(formId),
+          medicalId: Value(referralMedicalId),
+          contactName: Value(_asString(_rawValue(data, 'contactName'))),
+          contactIdNo: Value(_asString(_rawValue(data, 'contactIdNo'))),
+          contactPhone: Value(_asString(_rawValue(data, 'contactPhone'))),
+          contactAddress: Value(_asString(_rawValue(data, 'contactAddress'))),
+          primaryDiagnosis: Value(
+            _asString(_rawValue(data, 'primaryDiagnosis')),
+          ),
+          secondaryDiagnosis1: Value(
+            _asString(_rawValue(data, 'secondaryDiagnosis1')),
+          ),
+          secondaryDiagnosis2: Value(
+            _asString(_rawValue(data, 'secondaryDiagnosis2')),
+          ),
+          recentExamResult: Value(
+            _asString(_rawValue(data, 'recentExamResult')),
+          ),
+          examDate: Value(_asDateTime(_rawValue(data, 'examDate'))),
+          recentMedication: Value(
+            _asString(_rawValue(data, 'recentMedication')),
+          ),
+          medicationDate: Value(_asDateTime(_rawValue(data, 'medicationDate'))),
+          referralPurposeId: Value(
+            _asInt(_rawValue(data, 'referralPurposeId')),
+          ),
+          otherPurpose: Value(_asString(_rawValue(data, 'otherPurpose'))),
+          doctorName: Value(_asString(_rawValue(data, 'doctorName'))),
+          doctorDepartment: Value(
+            _asString(_rawValue(data, 'doctorDepartment')),
+          ),
+          doctorSignature: Value(_asBytes(_rawValue(data, 'doctorSignature'))),
+          orderDate: Value(_asDateTime(_rawValue(data, 'orderDate'))),
+          notes: Value(_asString(_rawValue(data, 'notes'))),
+          hospitalName: Value(_asString(_rawValue(data, 'hospitalName'))),
+          hospitalDept: Value(_asString(_rawValue(data, 'hospitalDept'))),
+          hospitalDoctor: Value(_asString(_rawValue(data, 'hospitalDoctor'))),
+          hospitalPhone: Value(_asString(_rawValue(data, 'hospitalPhone'))),
+          hospitalAddress: Value(_asString(_rawValue(data, 'hospitalAddress'))),
+          scheduledDate: Value(_asDateTime(_rawValue(data, 'scheduledDate'))),
+          scheduledDept: Value(_asString(_rawValue(data, 'scheduledDept'))),
+          scheduledRoom: Value(_asString(_rawValue(data, 'scheduledRoom'))),
+          scheduledNumber: Value(_asString(_rawValue(data, 'scheduledNumber'))),
+          relationshipId: Value(_asInt(_rawValue(data, 'relationshipId'))),
+          otherRelationship: Value(
+            _asString(_rawValue(data, 'otherRelationship')),
+          ),
+          consentSignature: Value(
+            _asBytes(_rawValue(data, 'consentSignature')),
+          ),
+          consentDateTime: Value(
+            _asDateTime(_rawValue(data, 'consentDateTime')),
+          ),
+          syncStatus: const Value(SyncStatus.synced),
+          remoteId: Value(remoteId),
+          lastModified: Value(modifiedAt),
+        );
+        final referralUpdated = await (_db.update(
+          _db.referralForms,
+        )..where((t) => t.formId.equals(formId))).write(referralCompanion);
+        if (referralUpdated == 0) {
+          await _db.into(_db.referralForms).insert(referralCompanion);
+        }
+        break;
+      case 'telex_documents':
+        final documentId = _asInt(_rawValue(data, 'documentId'));
+        final telexMedicalId = _asInt(_rawValue(data, 'medicalId'));
+        if (documentId == null || telexMedicalId == null) return;
+        final telexCompanion = TelexDocumentsCompanion(
+          documentId: Value(documentId),
+          medicalId: Value(telexMedicalId),
+          toStationId: Value(_asInt(_rawValue(data, 'toStationId'))),
+          fromStationId: Value(_asInt(_rawValue(data, 'fromStationId'))),
+          syncStatus: const Value(SyncStatus.synced),
+          remoteId: Value(remoteId),
+          lastModified: Value(modifiedAt),
+        );
+        final telexUpdated = await (_db.update(
+          _db.telexDocuments,
+        )..where((t) => t.documentId.equals(documentId))).write(telexCompanion);
+        if (telexUpdated == 0) {
+          await _db.into(_db.telexDocuments).insert(telexCompanion);
+        }
+        break;
+      case 'flight_records':
+        final flightRecordId = _asInt(_rawValue(data, 'flightRecordId'));
+        final flightMedicalId = _asInt(_rawValue(data, 'medicalId'));
+        if (flightRecordId == null || flightMedicalId == null) return;
+        final flightCompanion = FlightRecordCompanion(
+          flightRecordId: Value(flightRecordId),
+          medicalId: Value(flightMedicalId),
+          airlineId: Value(_asInt(_rawValue(data, 'airlineId'))),
+          flightNumber: Value(_asString(_rawValue(data, 'flightNumber')) ?? ''),
+          travelStatusId: Value(_asInt(_rawValue(data, 'travelStatusId'))),
+          departureLocationId: Value(
+            _asInt(_rawValue(data, 'departureLocationId')),
+          ),
+          arrivalLocationId: Value(
+            _asInt(_rawValue(data, 'arrivalLocationId')),
+          ),
+          syncStatus: const Value(SyncStatus.synced),
+          remoteId: Value(remoteId),
+          lastModified: Value(modifiedAt),
+        );
+        final flightUpdated =
+            await (_db.update(_db.flightRecord)
+                  ..where((t) => t.flightRecordId.equals(flightRecordId)))
+                .write(flightCompanion);
+        if (flightUpdated == 0) {
+          await _db.into(_db.flightRecord).insert(flightCompanion);
+        }
+        break;
+      case 'incident_records':
+        final incidentId = _asInt(_rawValue(data, 'incidentId'));
+        final incidentMedicalId = _asInt(_rawValue(data, 'medicalId'));
+        final incidentDate = _asDateTime(_rawValue(data, 'incidentDate'));
+        final incidentPlaceCategoryId = _asInt(
+          _rawValue(data, 'incidentPlaceCategoryId'),
+        );
+        final reportingUnitId = _asInt(_rawValue(data, 'reportingUnitId'));
+        if (incidentId == null ||
+            incidentMedicalId == null ||
+            incidentDate == null ||
+            incidentPlaceCategoryId == null ||
+            reportingUnitId == null) {
+          return;
+        }
+        final incidentCompanion = IncidentRecordCompanion(
+          incidentId: Value(incidentId),
+          medicalId: Value(incidentMedicalId),
+          incidentDate: Value(incidentDate),
+          incidentPlaceCategoryId: Value(incidentPlaceCategoryId),
+          incidentPlaceCategory2Id: Value(
+            _asInt(_rawValue(data, 'incidentPlaceCategory2Id')),
+          ),
+          incidentPlaceFinal: Value(
+            _asString(_rawValue(data, 'incidentPlaceFinal')),
+          ),
+          notificationTime: Value(
+            _asDateTime(_rawValue(data, 'notificationTime')),
+          ),
+          notificationPerson: Value(
+            _asString(_rawValue(data, 'notificationPerson')),
+          ),
+          reportingUnitId: Value(reportingUnitId),
+          incomingPhone: Value(_asString(_rawValue(data, 'incomingPhone'))),
+          notificationToOccTime: Value(
+            _asDateTime(_rawValue(data, 'notificationToOccTime')),
+          ),
+          teamDepartureTime: Value(
+            _asDateTime(_rawValue(data, 'teamDepartureTime')),
+          ),
+          occArrived: Value(_asBool(_rawValue(data, 'occArrived')) ?? false),
+          beforeLanding: Value(
+            _asBool(_rawValue(data, 'beforeLanding')) ?? false,
+          ),
+          landingTime: Value(_asDateTime(_rawValue(data, 'landingTime'))),
+          medicalArrivalTime: Value(
+            _asDateTime(_rawValue(data, 'medicalArrivalTime')),
+          ),
+          examinationTime: Value(
+            _asDateTime(_rawValue(data, 'examinationTime')),
+          ),
+          syncStatus: const Value(SyncStatus.synced),
+          remoteId: Value(remoteId),
+          lastModified: Value(modifiedAt),
+        );
+        final incidentUpdated =
+            await (_db.update(_db.incidentRecord)
+                  ..where((t) => t.incidentId.equals(incidentId)))
+                .write(incidentCompanion);
+        if (incidentUpdated == 0) {
+          await _db.into(_db.incidentRecord).insert(incidentCompanion);
+        }
+        break;
+      case 'ambulance_records':
+        final ambulanceId = _asInt(_rawValue(data, 'ambulanceId'));
+        if (ambulanceId == null) return;
+        final ambulanceCompanion = AmbulanceRecordsCompanion(
+          ambulanceId: Value(ambulanceId),
+          medicalId: Value(_asInt(_rawValue(data, 'medicalId'))),
+          licensePlate: Value(_asString(_rawValue(data, 'licensePlate'))),
+          incidentLocationId: Value(
+            _asInt(_rawValue(data, 'incidentLocationId')),
+          ),
+          incidentLocation2Id: Value(
+            _asInt(_rawValue(data, 'incidentLocation2Id')),
+          ),
+          locationRemarks: Value(_asString(_rawValue(data, 'locationRemarks'))),
+          dispatchTime: Value(_asDateTime(_rawValue(data, 'dispatchTime'))),
+          arrivalTime: Value(_asDateTime(_rawValue(data, 'arrivalTime'))),
+          hospitalId: Value(_asInt(_rawValue(data, 'hospitalId'))),
+          transportReason: Value(_asString(_rawValue(data, 'transportReason'))),
+          leavingSceneTime: Value(
+            _asDateTime(_rawValue(data, 'leavingSceneTime')),
+          ),
+          arrivalHospitalTime: Value(
+            _asDateTime(_rawValue(data, 'arrivalHospitalTime')),
+          ),
+          leavingHospitalTime: Value(
+            _asDateTime(_rawValue(data, 'leavingHospitalTime')),
+          ),
+          returnStandbyTime: Value(
+            _asDateTime(_rawValue(data, 'returnStandbyTime')),
+          ),
+          bodyMapJson: Value(_asString(_rawValue(data, 'bodyMapJson'))),
+          syncStatus: const Value(SyncStatus.synced),
+          remoteId: Value(remoteId),
+          lastModified: Value(modifiedAt),
+        );
+        final ambulanceUpdated =
+            await (_db.update(_db.ambulanceRecords)
+                  ..where((t) => t.ambulanceId.equals(ambulanceId)))
+                .write(ambulanceCompanion);
+        if (ambulanceUpdated == 0) {
+          await _db.into(_db.ambulanceRecords).insert(ambulanceCompanion);
+        }
+        break;
+      case 'ambulance_personal_property':
+        final personalPropertyId = _asInt(_rawValue(data, 'id'));
+        final personalPropertyMedicalId = _asInt(_rawValue(data, 'medicalId'));
+        if (personalPropertyId == null || personalPropertyMedicalId == null) {
+          return;
+        }
+        final personalPropertyCompanion = AmbulancePersonalPropertyCompanion(
+          id: Value(personalPropertyId),
+          medicalId: Value(personalPropertyMedicalId),
+          financialDetails: Value(
+            _asString(_rawValue(data, 'financialDetails')),
+          ),
+          isHandled: Value(_asBool(_rawValue(data, 'isHandled')) ?? false),
+          custodianName: Value(_asString(_rawValue(data, 'custodianName'))),
+          custodianSignature: Value(
+            _asBytes(_rawValue(data, 'custodianSignature')),
+          ),
+          syncStatus: const Value(SyncStatus.synced),
+          remoteId: Value(remoteId),
+          lastModified: Value(modifiedAt),
+        );
+        final personalPropertyUpdated =
+            await (_db.update(_db.ambulancePersonalProperty)
+                  ..where((t) => t.id.equals(personalPropertyId)))
+                .write(personalPropertyCompanion);
+        if (personalPropertyUpdated == 0) {
+          await _db
+              .into(_db.ambulancePersonalProperty)
+              .insert(personalPropertyCompanion);
+        }
+        break;
+      case 'ambulance_fees':
+        final ambulanceFeeId = _asInt(_rawValue(data, 'feeId'));
+        final ambulanceFeeMedicalId = _asInt(_rawValue(data, 'medicalId'));
+        if (ambulanceFeeId == null || ambulanceFeeMedicalId == null) return;
+        final ambulanceFeeCompanion = AmbulanceFeesCompanion(
+          feeId: Value(ambulanceFeeId),
+          medicalId: Value(ambulanceFeeMedicalId),
+          ambulanceFee: Value(_asDouble(_rawValue(data, 'ambulanceFee')) ?? 0),
+          oxygenFee: Value(_asDouble(_rawValue(data, 'oxygenFee')) ?? 0),
+          paymentStatus: Value(_asString(_rawValue(data, 'paymentStatus'))),
+          paymentMethod: Value(_asString(_rawValue(data, 'paymentMethod'))),
+          unpaidType: Value(_asString(_rawValue(data, 'unpaidType'))),
+          syncStatus: const Value(SyncStatus.synced),
+          remoteId: Value(remoteId),
+          lastModified: Value(modifiedAt),
+        );
+        final ambulanceFeeUpdated =
+            await (_db.update(_db.ambulanceFees)
+                  ..where((t) => t.feeId.equals(ambulanceFeeId)))
+                .write(ambulanceFeeCompanion);
+        if (ambulanceFeeUpdated == 0) {
+          await _db.into(_db.ambulanceFees).insert(ambulanceFeeCompanion);
+        }
+        break;
+      case 'ambulance_treatment_records':
+        final ambulanceTreatmentId = _asInt(_rawValue(data, 'id'));
+        final ambulanceTreatmentMedicalId = _asInt(
+          _rawValue(data, 'medicalId'),
+        );
+        if (ambulanceTreatmentId == null ||
+            ambulanceTreatmentMedicalId == null) {
+          return;
+        }
+        final ambulanceTreatmentCompanion = AmbulanceTreatmentRecordsCompanion(
+          id: Value(ambulanceTreatmentId),
+          medicalId: Value(ambulanceTreatmentMedicalId),
+          doctorInstructions: Value(
+            _asString(_rawValue(data, 'doctorInstructions')),
+          ),
+          receivingHospital: Value(
+            _asString(_rawValue(data, 'receivingHospital')),
+          ),
+          receivingTime: Value(_asString(_rawValue(data, 'receivingTime'))),
+          isRefusedHospital: Value(
+            _asBool(_rawValue(data, 'isRefusedHospital')) ?? false,
+          ),
+          relationship: Value(
+            _asString(_rawValue(data, 'relationship')) ?? '病患 Patient',
+          ),
+          relativeName: Value(_asString(_rawValue(data, 'relativeName'))),
+          relativePhone: Value(_asString(_rawValue(data, 'relativePhone'))),
+          syncStatus: const Value(SyncStatus.synced),
+          remoteId: Value(remoteId),
+          lastModified: Value(modifiedAt),
+        );
+        final ambulanceTreatmentUpdated =
+            await (_db.update(_db.ambulanceTreatmentRecords)
+                  ..where((t) => t.id.equals(ambulanceTreatmentId)))
+                .write(ambulanceTreatmentCompanion);
+        if (ambulanceTreatmentUpdated == 0) {
+          await _db
+              .into(_db.ambulanceTreatmentRecords)
+              .insert(ambulanceTreatmentCompanion);
+        }
+        break;
+      case 'ambulance_scene_records':
+        final ambulanceSceneId = _asInt(_rawValue(data, 'id'));
+        final ambulanceSceneMedicalId = _asInt(_rawValue(data, 'medicalId'));
+        if (ambulanceSceneId == null || ambulanceSceneMedicalId == null) return;
+        final ambulanceSceneCompanion = AmbulanceSceneRecordsCompanion(
+          id: Value(ambulanceSceneId),
+          medicalId: Value(ambulanceSceneMedicalId),
+          patientComplaint: Value(
+            _asString(_rawValue(data, 'patientComplaint')),
+          ),
+          isProxyComplaint: Value(
+            _asBool(_rawValue(data, 'isProxyComplaint')) ?? false,
+          ),
+          fallHeight: Value(_asString(_rawValue(data, 'fallHeight'))),
+          burnDegree: Value(_asString(_rawValue(data, 'burnDegree'))),
+          burnArea: Value(_asString(_rawValue(data, 'burnArea'))),
+          burnPercentage: Value(_asString(_rawValue(data, 'burnPercentage'))),
+          otherTraumaNote: Value(_asString(_rawValue(data, 'otherTraumaNote'))),
+          allergyStatus: Value(
+            _asString(_rawValue(data, 'allergyStatus')) ?? '無',
+          ),
+          allergyNote: Value(_asString(_rawValue(data, 'allergyNote'))),
+          historyStatus: Value(
+            _asString(_rawValue(data, 'historyStatus')) ?? '無',
+          ),
+          historyNote: Value(_asString(_rawValue(data, 'historyNote'))),
+          updatedAt: Value(modifiedAt),
+        );
+        final ambulanceSceneUpdated =
+            await (_db.update(_db.ambulanceSceneRecords)
+                  ..where((t) => t.id.equals(ambulanceSceneId)))
+                .write(ambulanceSceneCompanion);
+        if (ambulanceSceneUpdated == 0) {
+          await _db
+              .into(_db.ambulanceSceneRecords)
+              .insert(ambulanceSceneCompanion);
+        }
+        break;
 
       default:
-        debugPrint('⚠️ Unknown table for download: $table');
+        debugPrint('Unknown table for download: $table');
     }
   }
 
@@ -637,7 +1571,7 @@ class SyncService extends ChangeNotifier {
       // For all others: accept server version (server wins)
       if (conflict.table == 'treatments') {
         // TODO: Mark for manual resolution
-        debugPrint('⚠️ Triage conflict for treatment ${conflict.id}');
+        debugPrint('Triage conflict for treatment ${conflict.id}');
       } else {
         // Server wins - apply server data
         await _applyServerWinsConflict(conflict);
@@ -665,8 +1599,175 @@ class SyncService extends ChangeNotifier {
   }
 
   /// Mark record as synced
-  Future<void> _markAsSynced(int localId, String remoteId) async {
-    // TODO: Update sync status in local DB
+  Future<void> _markAsSynced(
+    String table,
+    int localId,
+    String remoteId,
+    DateTime syncedAt,
+  ) async {
+    switch (table) {
+      case 'medical_records':
+        await (_db.update(
+          _db.medicalRecord,
+        )..where((t) => t.medicalId.equals(localId))).write(
+          MedicalRecordCompanion(
+            syncStatus: const Value(SyncStatus.synced),
+            remoteId: Value(remoteId),
+            lastModified: Value(syncedAt),
+          ),
+        );
+        break;
+      case 'patients':
+        await (_db.update(
+          _db.patient,
+        )..where((t) => t.patientId.equals(localId))).write(
+          PatientCompanion(
+            syncStatus: const Value(SyncStatus.synced),
+            remoteId: Value(remoteId),
+            lastModified: Value(syncedAt),
+          ),
+        );
+        break;
+      case 'treatments':
+        await (_db.update(
+          _db.treatment,
+        )..where((t) => t.treatmentId.equals(localId))).write(
+          TreatmentCompanion(
+            syncStatus: const Value(SyncStatus.synced),
+            remoteId: Value(remoteId),
+            lastModified: Value(syncedAt),
+          ),
+        );
+        break;
+      case 'medical_certificates':
+        await (_db.update(
+          _db.medicalCertificates,
+        )..where((t) => t.certificateId.equals(localId))).write(
+          MedicalCertificatesCompanion(
+            syncStatus: const Value(SyncStatus.synced),
+            remoteId: Value(remoteId),
+            lastModified: Value(syncedAt),
+          ),
+        );
+        break;
+      case 'medical_fees':
+        await (_db.update(
+          _db.medicalFees,
+        )..where((t) => t.feeId.equals(localId))).write(
+          MedicalFeesCompanion(
+            syncStatus: const Value(SyncStatus.synced),
+            remoteId: Value(remoteId),
+            lastModified: Value(syncedAt),
+          ),
+        );
+        break;
+      case 'nursing_records':
+        await (_db.update(
+          _db.nursingRecords,
+        )..where((t) => t.recordId.equals(localId))).write(
+          NursingRecordsCompanion(
+            syncStatus: const Value(SyncStatus.synced),
+            remoteId: Value(remoteId),
+            lastModified: Value(syncedAt),
+          ),
+        );
+        break;
+      case 'referral_forms':
+        await (_db.update(
+          _db.referralForms,
+        )..where((t) => t.formId.equals(localId))).write(
+          ReferralFormsCompanion(
+            syncStatus: const Value(SyncStatus.synced),
+            remoteId: Value(remoteId),
+            lastModified: Value(syncedAt),
+          ),
+        );
+        break;
+      case 'telex_documents':
+        await (_db.update(
+          _db.telexDocuments,
+        )..where((t) => t.documentId.equals(localId))).write(
+          TelexDocumentsCompanion(
+            syncStatus: const Value(SyncStatus.synced),
+            remoteId: Value(remoteId),
+            lastModified: Value(syncedAt),
+          ),
+        );
+        break;
+      case 'flight_records':
+        await (_db.update(
+          _db.flightRecord,
+        )..where((t) => t.flightRecordId.equals(localId))).write(
+          FlightRecordCompanion(
+            syncStatus: const Value(SyncStatus.synced),
+            remoteId: Value(remoteId),
+            lastModified: Value(syncedAt),
+          ),
+        );
+        break;
+      case 'incident_records':
+        await (_db.update(
+          _db.incidentRecord,
+        )..where((t) => t.incidentId.equals(localId))).write(
+          IncidentRecordCompanion(
+            syncStatus: const Value(SyncStatus.synced),
+            remoteId: Value(remoteId),
+            lastModified: Value(syncedAt),
+          ),
+        );
+        break;
+      case 'ambulance_records':
+        await (_db.update(
+          _db.ambulanceRecords,
+        )..where((t) => t.ambulanceId.equals(localId))).write(
+          AmbulanceRecordsCompanion(
+            syncStatus: const Value(SyncStatus.synced),
+            remoteId: Value(remoteId),
+            lastModified: Value(syncedAt),
+          ),
+        );
+        break;
+      case 'ambulance_personal_property':
+        await (_db.update(
+          _db.ambulancePersonalProperty,
+        )..where((t) => t.id.equals(localId))).write(
+          AmbulancePersonalPropertyCompanion(
+            syncStatus: const Value(SyncStatus.synced),
+            remoteId: Value(remoteId),
+            lastModified: Value(syncedAt),
+          ),
+        );
+        break;
+      case 'ambulance_fees':
+        await (_db.update(
+          _db.ambulanceFees,
+        )..where((t) => t.feeId.equals(localId))).write(
+          AmbulanceFeesCompanion(
+            syncStatus: const Value(SyncStatus.synced),
+            remoteId: Value(remoteId),
+            lastModified: Value(syncedAt),
+          ),
+        );
+        break;
+      case 'ambulance_treatment_records':
+        await (_db.update(
+          _db.ambulanceTreatmentRecords,
+        )..where((t) => t.id.equals(localId))).write(
+          AmbulanceTreatmentRecordsCompanion(
+            syncStatus: const Value(SyncStatus.synced),
+            remoteId: Value(remoteId),
+            lastModified: Value(syncedAt),
+          ),
+        );
+        break;
+      case 'ambulance_scene_records':
+        await (_db.update(_db.ambulanceSceneRecords)
+              ..where((t) => t.id.equals(localId)))
+            .write(AmbulanceSceneRecordsCompanion(updatedAt: Value(syncedAt)));
+        break;
+      default:
+        debugPrint('Unknown table for markAsSynced: $table');
+    }
   }
 
   /// Legacy pull method (kept for backward compatibility)
