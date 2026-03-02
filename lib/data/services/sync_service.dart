@@ -21,14 +21,6 @@ import 'network_service.dart';
 import 'api_client.dart';
 import '../sync/models/sync_models.dart';
 
-/// Compare-first sync service implementation
-///
-/// This service replaces the old push/pull mechanism with a compare-first approach:
-/// 1. Build local snapshot { table, id, lastModified }
-/// 2. POST /api/sync/compare - get toDownload/toUpload/conflicts
-/// 3. Upload missing records -> POST /api/sync/push
-/// 4. Download missing records from compare response
-/// 5. Handle conflicts (manual for triage_id, server wins for others)
 class SyncService extends ChangeNotifier {
   final AppDatabase _db;
   final NetworkService _networkService;

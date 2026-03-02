@@ -79,8 +79,8 @@ class _EmergencyTreatmentRecordState extends State<EmergencyTreatmentRecord> {
   EmergencyTreatmentData? _emergencyTreatment;
   MedicalAssessmentData? _initialAssessment;
   MedicalAssessmentData? _postAssessment;
-  List<FirstAidLogData> _firstAidLogs = [];
-  List<EmergencyAssistStaffData> _assistStaffList = [];
+  // _firstAidLogs 已移除，改用 StreamBuilder 訂閱
+  final List<EmergencyAssistStaffData> _assistStaffList = [];
 
   String _initLeftPupilReaction = '+';
   String _initRightPupilReaction = '+';
@@ -161,10 +161,6 @@ class _EmergencyTreatmentRecordState extends State<EmergencyTreatmentRecord> {
           ),
         );
       }
-
-      // 3. 獲取 Logs 和 Staff
-      _firstAidLogs = await dao.getFirstAidLogs(treatment.id);
-      _assistStaffList = await dao.getAssistStaff(treatment.id);
 
       // 4. 獲取 Staff Assignments (Doctor, Nurse, EMT)
       final assignments = await (db.select(
@@ -787,7 +783,18 @@ class _EmergencyTreatmentRecordState extends State<EmergencyTreatmentRecord> {
           _buildTableContainer(
             title: '急救處置及用藥記錄表 FIRST AID & MEDS LOG',
             onAdd: () => _showFirstAidLogModal(),
-            child: _buildFirstAidMedsTable(),
+            child: _emergencyTreatment != null
+                ? StreamBuilder<List<FirstAidLogData>>(
+                    stream: context
+                        .read<AppDatabase>()
+                        .emergencyDao
+                        .watchFirstAidLogs(_emergencyTreatment!.id),
+                    builder: (context, snapshot) {
+                      final logs = snapshot.data ?? [];
+                      return _buildFirstAidMedsTable(logs);
+                    },
+                  )
+                : const SizedBox.shrink(),
           ),
 
           const SizedBox(height: 32),
@@ -810,7 +817,7 @@ class _EmergencyTreatmentRecordState extends State<EmergencyTreatmentRecord> {
 
   // --- UI 元件實作 ---
 
-  Widget _buildFirstAidMedsTable() {
+  Widget _buildFirstAidMedsTable(List<FirstAidLogData> logs) {
     final flexes = [3, 2, 2, 2, 3, 2, 2, 3, 1];
     final labels = [
       '記錄時間',
@@ -831,8 +838,8 @@ class _EmergencyTreatmentRecordState extends State<EmergencyTreatmentRecord> {
         child: Column(
           children: [
             _buildTableHeaderRow(labels, flexes),
-            if (_firstAidLogs.isEmpty) _buildEmptyRow(),
-            ..._firstAidLogs.asMap().entries.map((entry) {
+            if (logs.isEmpty) _buildEmptyRow(),
+            ...logs.asMap().entries.map((entry) {
               final log = entry.value;
               return _buildDataRow(flexes, [
                 _buildCompactTimeField(log.time ?? ''),
@@ -879,7 +886,6 @@ class _EmergencyTreatmentRecordState extends State<EmergencyTreatmentRecord> {
                   ),
                 ),
                 Text(
-                  // Display parsed JSON or raw text
                   log.otherMeds ?? '--',
                   style: const TextStyle(fontSize: 11, color: textMuted),
                   overflow: TextOverflow.ellipsis,
@@ -889,7 +895,7 @@ class _EmergencyTreatmentRecordState extends State<EmergencyTreatmentRecord> {
                       .read<AppDatabase>()
                       .emergencyDao
                       .deleteFirstAidLog(log.id);
-                  _loadData();
+                  // Stream 會自動更新 UI，不需要手動呼叫 _loadData()
                 }),
               ]);
             }),
@@ -1099,6 +1105,7 @@ class _EmergencyTreatmentRecordState extends State<EmergencyTreatmentRecord> {
                                 ),
                               );
                               if (context.mounted) Navigator.pop(context);
+                              // 不需要 _loadData()，Stream 會自動更新 UI
                               _loadData();
                             },
                             child: const Text('確認加入'),

@@ -34,13 +34,13 @@ class Patient extends Table {
   TextColumn get anonymizationName => text().nullable()();
   DateTimeColumn get birthday => dateTime().nullable()();
 
-  IntColumn get sexId => integer().nullable().references(Sex, #sexId)();
+  IntColumn get sexId => integer().withDefault(const Constant(1)).references(Sex, #sexId)();
 
   TextColumn get passportOrIdNo => text().nullable()();
   TextColumn get idNo => text().nullable()(); // 新增身分證字號欄位
 
   IntColumn get visitReasonId =>
-      integer().nullable().references(VisitReason, #id)(); // 為何至機場
+      integer().withDefault(const Constant(1)).references(VisitReason, #id)(); // 為何至機場
 
   IntColumn get nationalityId =>
       integer().nullable().references(Nationality, #nationalityId)();
@@ -139,7 +139,7 @@ class HealthAssessmentForm extends Table {
   IntColumn get assessmentFormId => integer().autoIncrement()();
   IntColumn get medicalId => integer().references(MedicalRecord, #medicalId)();
   TextColumn get name => text()();
-  TextColumn get relation => text()(); // 關係
+  TextColumn get relation => text().nullable()(); // 關係
   RealColumn get temperature => real()(); // 體溫
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
 }

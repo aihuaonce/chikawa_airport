@@ -11617,12 +11617,13 @@ class $PatientTable extends Patient with TableInfo<$PatientTable, PatientData> {
   late final GeneratedColumn<int> sexId = GeneratedColumn<int>(
     'sex_id',
     aliasedName,
-    true,
+    false,
     type: DriftSqlType.int,
     requiredDuringInsert: false,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
       'REFERENCES sex (sex_id)',
     ),
+    defaultValue: const Constant(1),
   );
   static const VerificationMeta _passportOrIdNoMeta = const VerificationMeta(
     'passportOrIdNo',
@@ -11651,12 +11652,13 @@ class $PatientTable extends Patient with TableInfo<$PatientTable, PatientData> {
   late final GeneratedColumn<int> visitReasonId = GeneratedColumn<int>(
     'visit_reason_id',
     aliasedName,
-    true,
+    false,
     type: DriftSqlType.int,
     requiredDuringInsert: false,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
       'REFERENCES visit_reason (id)',
     ),
+    defaultValue: const Constant(1),
   );
   static const VerificationMeta _nationalityIdMeta = const VerificationMeta(
     'nationalityId',
@@ -11916,7 +11918,7 @@ class $PatientTable extends Patient with TableInfo<$PatientTable, PatientData> {
       sexId: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}sex_id'],
-      ),
+      )!,
       passportOrIdNo: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}passport_or_id_no'],
@@ -11928,7 +11930,7 @@ class $PatientTable extends Patient with TableInfo<$PatientTable, PatientData> {
       visitReasonId: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}visit_reason_id'],
-      ),
+      )!,
       nationalityId: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}nationality_id'],
@@ -11972,10 +11974,10 @@ class PatientData extends DataClass implements Insertable<PatientData> {
   final String? name;
   final String? anonymizationName;
   final DateTime? birthday;
-  final int? sexId;
+  final int sexId;
   final String? passportOrIdNo;
   final String? idNo;
-  final int? visitReasonId;
+  final int visitReasonId;
   final int? nationalityId;
   final String? telephone;
   final String? address;
@@ -11989,10 +11991,10 @@ class PatientData extends DataClass implements Insertable<PatientData> {
     this.name,
     this.anonymizationName,
     this.birthday,
-    this.sexId,
+    required this.sexId,
     this.passportOrIdNo,
     this.idNo,
-    this.visitReasonId,
+    required this.visitReasonId,
     this.nationalityId,
     this.telephone,
     this.address,
@@ -12015,18 +12017,14 @@ class PatientData extends DataClass implements Insertable<PatientData> {
     if (!nullToAbsent || birthday != null) {
       map['birthday'] = Variable<DateTime>(birthday);
     }
-    if (!nullToAbsent || sexId != null) {
-      map['sex_id'] = Variable<int>(sexId);
-    }
+    map['sex_id'] = Variable<int>(sexId);
     if (!nullToAbsent || passportOrIdNo != null) {
       map['passport_or_id_no'] = Variable<String>(passportOrIdNo);
     }
     if (!nullToAbsent || idNo != null) {
       map['id_no'] = Variable<String>(idNo);
     }
-    if (!nullToAbsent || visitReasonId != null) {
-      map['visit_reason_id'] = Variable<int>(visitReasonId);
-    }
+    map['visit_reason_id'] = Variable<int>(visitReasonId);
     if (!nullToAbsent || nationalityId != null) {
       map['nationality_id'] = Variable<int>(nationalityId);
     }
@@ -12058,16 +12056,12 @@ class PatientData extends DataClass implements Insertable<PatientData> {
       birthday: birthday == null && nullToAbsent
           ? const Value.absent()
           : Value(birthday),
-      sexId: sexId == null && nullToAbsent
-          ? const Value.absent()
-          : Value(sexId),
+      sexId: Value(sexId),
       passportOrIdNo: passportOrIdNo == null && nullToAbsent
           ? const Value.absent()
           : Value(passportOrIdNo),
       idNo: idNo == null && nullToAbsent ? const Value.absent() : Value(idNo),
-      visitReasonId: visitReasonId == null && nullToAbsent
-          ? const Value.absent()
-          : Value(visitReasonId),
+      visitReasonId: Value(visitReasonId),
       nationalityId: nationalityId == null && nullToAbsent
           ? const Value.absent()
           : Value(nationalityId),
@@ -12101,10 +12095,10 @@ class PatientData extends DataClass implements Insertable<PatientData> {
         json['anonymizationName'],
       ),
       birthday: serializer.fromJson<DateTime?>(json['birthday']),
-      sexId: serializer.fromJson<int?>(json['sexId']),
+      sexId: serializer.fromJson<int>(json['sexId']),
       passportOrIdNo: serializer.fromJson<String?>(json['passportOrIdNo']),
       idNo: serializer.fromJson<String?>(json['idNo']),
-      visitReasonId: serializer.fromJson<int?>(json['visitReasonId']),
+      visitReasonId: serializer.fromJson<int>(json['visitReasonId']),
       nationalityId: serializer.fromJson<int?>(json['nationalityId']),
       telephone: serializer.fromJson<String?>(json['telephone']),
       address: serializer.fromJson<String?>(json['address']),
@@ -12123,10 +12117,10 @@ class PatientData extends DataClass implements Insertable<PatientData> {
       'name': serializer.toJson<String?>(name),
       'anonymizationName': serializer.toJson<String?>(anonymizationName),
       'birthday': serializer.toJson<DateTime?>(birthday),
-      'sexId': serializer.toJson<int?>(sexId),
+      'sexId': serializer.toJson<int>(sexId),
       'passportOrIdNo': serializer.toJson<String?>(passportOrIdNo),
       'idNo': serializer.toJson<String?>(idNo),
-      'visitReasonId': serializer.toJson<int?>(visitReasonId),
+      'visitReasonId': serializer.toJson<int>(visitReasonId),
       'nationalityId': serializer.toJson<int?>(nationalityId),
       'telephone': serializer.toJson<String?>(telephone),
       'address': serializer.toJson<String?>(address),
@@ -12143,10 +12137,10 @@ class PatientData extends DataClass implements Insertable<PatientData> {
     Value<String?> name = const Value.absent(),
     Value<String?> anonymizationName = const Value.absent(),
     Value<DateTime?> birthday = const Value.absent(),
-    Value<int?> sexId = const Value.absent(),
+    int? sexId,
     Value<String?> passportOrIdNo = const Value.absent(),
     Value<String?> idNo = const Value.absent(),
-    Value<int?> visitReasonId = const Value.absent(),
+    int? visitReasonId,
     Value<int?> nationalityId = const Value.absent(),
     Value<String?> telephone = const Value.absent(),
     Value<String?> address = const Value.absent(),
@@ -12162,14 +12156,12 @@ class PatientData extends DataClass implements Insertable<PatientData> {
         ? anonymizationName.value
         : this.anonymizationName,
     birthday: birthday.present ? birthday.value : this.birthday,
-    sexId: sexId.present ? sexId.value : this.sexId,
+    sexId: sexId ?? this.sexId,
     passportOrIdNo: passportOrIdNo.present
         ? passportOrIdNo.value
         : this.passportOrIdNo,
     idNo: idNo.present ? idNo.value : this.idNo,
-    visitReasonId: visitReasonId.present
-        ? visitReasonId.value
-        : this.visitReasonId,
+    visitReasonId: visitReasonId ?? this.visitReasonId,
     nationalityId: nationalityId.present
         ? nationalityId.value
         : this.nationalityId,
@@ -12283,10 +12275,10 @@ class PatientCompanion extends UpdateCompanion<PatientData> {
   final Value<String?> name;
   final Value<String?> anonymizationName;
   final Value<DateTime?> birthday;
-  final Value<int?> sexId;
+  final Value<int> sexId;
   final Value<String?> passportOrIdNo;
   final Value<String?> idNo;
-  final Value<int?> visitReasonId;
+  final Value<int> visitReasonId;
   final Value<int?> nationalityId;
   final Value<String?> telephone;
   final Value<String?> address;
@@ -12374,10 +12366,10 @@ class PatientCompanion extends UpdateCompanion<PatientData> {
     Value<String?>? name,
     Value<String?>? anonymizationName,
     Value<DateTime?>? birthday,
-    Value<int?>? sexId,
+    Value<int>? sexId,
     Value<String?>? passportOrIdNo,
     Value<String?>? idNo,
-    Value<int?>? visitReasonId,
+    Value<int>? visitReasonId,
     Value<int?>? nationalityId,
     Value<String?>? telephone,
     Value<String?>? address,
@@ -15542,9 +15534,9 @@ class $HealthAssessmentFormTable extends HealthAssessmentForm
   late final GeneratedColumn<String> relation = GeneratedColumn<String>(
     'relation',
     aliasedName,
-    false,
+    true,
     type: DriftSqlType.string,
-    requiredDuringInsert: true,
+    requiredDuringInsert: false,
   );
   static const VerificationMeta _temperatureMeta = const VerificationMeta(
     'temperature',
@@ -15620,8 +15612,6 @@ class $HealthAssessmentFormTable extends HealthAssessmentForm
         _relationMeta,
         relation.isAcceptableOrUnknown(data['relation']!, _relationMeta),
       );
-    } else if (isInserting) {
-      context.missing(_relationMeta);
     }
     if (data.containsKey('temperature')) {
       context.handle(
@@ -15667,7 +15657,7 @@ class $HealthAssessmentFormTable extends HealthAssessmentForm
       relation: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}relation'],
-      )!,
+      ),
       temperature: attachedDatabase.typeMapping.read(
         DriftSqlType.double,
         data['${effectivePrefix}temperature'],
@@ -15690,14 +15680,14 @@ class HealthAssessmentFormData extends DataClass
   final int assessmentFormId;
   final int medicalId;
   final String name;
-  final String relation;
+  final String? relation;
   final double temperature;
   final DateTime createdAt;
   const HealthAssessmentFormData({
     required this.assessmentFormId,
     required this.medicalId,
     required this.name,
-    required this.relation,
+    this.relation,
     required this.temperature,
     required this.createdAt,
   });
@@ -15707,7 +15697,9 @@ class HealthAssessmentFormData extends DataClass
     map['assessment_form_id'] = Variable<int>(assessmentFormId);
     map['medical_id'] = Variable<int>(medicalId);
     map['name'] = Variable<String>(name);
-    map['relation'] = Variable<String>(relation);
+    if (!nullToAbsent || relation != null) {
+      map['relation'] = Variable<String>(relation);
+    }
     map['temperature'] = Variable<double>(temperature);
     map['created_at'] = Variable<DateTime>(createdAt);
     return map;
@@ -15718,7 +15710,9 @@ class HealthAssessmentFormData extends DataClass
       assessmentFormId: Value(assessmentFormId),
       medicalId: Value(medicalId),
       name: Value(name),
-      relation: Value(relation),
+      relation: relation == null && nullToAbsent
+          ? const Value.absent()
+          : Value(relation),
       temperature: Value(temperature),
       createdAt: Value(createdAt),
     );
@@ -15733,7 +15727,7 @@ class HealthAssessmentFormData extends DataClass
       assessmentFormId: serializer.fromJson<int>(json['assessmentFormId']),
       medicalId: serializer.fromJson<int>(json['medicalId']),
       name: serializer.fromJson<String>(json['name']),
-      relation: serializer.fromJson<String>(json['relation']),
+      relation: serializer.fromJson<String?>(json['relation']),
       temperature: serializer.fromJson<double>(json['temperature']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
     );
@@ -15745,7 +15739,7 @@ class HealthAssessmentFormData extends DataClass
       'assessmentFormId': serializer.toJson<int>(assessmentFormId),
       'medicalId': serializer.toJson<int>(medicalId),
       'name': serializer.toJson<String>(name),
-      'relation': serializer.toJson<String>(relation),
+      'relation': serializer.toJson<String?>(relation),
       'temperature': serializer.toJson<double>(temperature),
       'createdAt': serializer.toJson<DateTime>(createdAt),
     };
@@ -15755,14 +15749,14 @@ class HealthAssessmentFormData extends DataClass
     int? assessmentFormId,
     int? medicalId,
     String? name,
-    String? relation,
+    Value<String?> relation = const Value.absent(),
     double? temperature,
     DateTime? createdAt,
   }) => HealthAssessmentFormData(
     assessmentFormId: assessmentFormId ?? this.assessmentFormId,
     medicalId: medicalId ?? this.medicalId,
     name: name ?? this.name,
-    relation: relation ?? this.relation,
+    relation: relation.present ? relation.value : this.relation,
     temperature: temperature ?? this.temperature,
     createdAt: createdAt ?? this.createdAt,
   );
@@ -15822,7 +15816,7 @@ class HealthAssessmentFormCompanion
   final Value<int> assessmentFormId;
   final Value<int> medicalId;
   final Value<String> name;
-  final Value<String> relation;
+  final Value<String?> relation;
   final Value<double> temperature;
   final Value<DateTime> createdAt;
   const HealthAssessmentFormCompanion({
@@ -15837,12 +15831,11 @@ class HealthAssessmentFormCompanion
     this.assessmentFormId = const Value.absent(),
     required int medicalId,
     required String name,
-    required String relation,
+    this.relation = const Value.absent(),
     required double temperature,
     this.createdAt = const Value.absent(),
   }) : medicalId = Value(medicalId),
        name = Value(name),
-       relation = Value(relation),
        temperature = Value(temperature);
   static Insertable<HealthAssessmentFormData> custom({
     Expression<int>? assessmentFormId,
@@ -15866,7 +15859,7 @@ class HealthAssessmentFormCompanion
     Value<int>? assessmentFormId,
     Value<int>? medicalId,
     Value<String>? name,
-    Value<String>? relation,
+    Value<String?>? relation,
     Value<double>? temperature,
     Value<DateTime>? createdAt,
   }) {
@@ -52675,10 +52668,10 @@ typedef $$PatientTableCreateCompanionBuilder =
       Value<String?> name,
       Value<String?> anonymizationName,
       Value<DateTime?> birthday,
-      Value<int?> sexId,
+      Value<int> sexId,
       Value<String?> passportOrIdNo,
       Value<String?> idNo,
-      Value<int?> visitReasonId,
+      Value<int> visitReasonId,
       Value<int?> nationalityId,
       Value<String?> telephone,
       Value<String?> address,
@@ -52694,10 +52687,10 @@ typedef $$PatientTableUpdateCompanionBuilder =
       Value<String?> name,
       Value<String?> anonymizationName,
       Value<DateTime?> birthday,
-      Value<int?> sexId,
+      Value<int> sexId,
       Value<String?> passportOrIdNo,
       Value<String?> idNo,
-      Value<int?> visitReasonId,
+      Value<int> visitReasonId,
       Value<int?> nationalityId,
       Value<String?> telephone,
       Value<String?> address,
@@ -52733,9 +52726,9 @@ final class $$PatientTableReferences
   static $SexTable _sexIdTable(_$AppDatabase db) =>
       db.sex.createAlias($_aliasNameGenerator(db.patient.sexId, db.sex.sexId));
 
-  $$SexTableProcessedTableManager? get sexId {
-    final $_column = $_itemColumn<int>('sex_id');
-    if ($_column == null) return null;
+  $$SexTableProcessedTableManager get sexId {
+    final $_column = $_itemColumn<int>('sex_id')!;
+
     final manager = $$SexTableTableManager(
       $_db,
       $_db.sex,
@@ -52752,9 +52745,9 @@ final class $$PatientTableReferences
         $_aliasNameGenerator(db.patient.visitReasonId, db.visitReason.id),
       );
 
-  $$VisitReasonTableProcessedTableManager? get visitReasonId {
-    final $_column = $_itemColumn<int>('visit_reason_id');
-    if ($_column == null) return null;
+  $$VisitReasonTableProcessedTableManager get visitReasonId {
+    final $_column = $_itemColumn<int>('visit_reason_id')!;
+
     final manager = $$VisitReasonTableTableManager(
       $_db,
       $_db.visitReason,
@@ -53365,10 +53358,10 @@ class $$PatientTableTableManager
                 Value<String?> name = const Value.absent(),
                 Value<String?> anonymizationName = const Value.absent(),
                 Value<DateTime?> birthday = const Value.absent(),
-                Value<int?> sexId = const Value.absent(),
+                Value<int> sexId = const Value.absent(),
                 Value<String?> passportOrIdNo = const Value.absent(),
                 Value<String?> idNo = const Value.absent(),
-                Value<int?> visitReasonId = const Value.absent(),
+                Value<int> visitReasonId = const Value.absent(),
                 Value<int?> nationalityId = const Value.absent(),
                 Value<String?> telephone = const Value.absent(),
                 Value<String?> address = const Value.absent(),
@@ -53401,10 +53394,10 @@ class $$PatientTableTableManager
                 Value<String?> name = const Value.absent(),
                 Value<String?> anonymizationName = const Value.absent(),
                 Value<DateTime?> birthday = const Value.absent(),
-                Value<int?> sexId = const Value.absent(),
+                Value<int> sexId = const Value.absent(),
                 Value<String?> passportOrIdNo = const Value.absent(),
                 Value<String?> idNo = const Value.absent(),
-                Value<int?> visitReasonId = const Value.absent(),
+                Value<int> visitReasonId = const Value.absent(),
                 Value<int?> nationalityId = const Value.absent(),
                 Value<String?> telephone = const Value.absent(),
                 Value<String?> address = const Value.absent(),
@@ -56465,7 +56458,7 @@ typedef $$HealthAssessmentFormTableCreateCompanionBuilder =
       Value<int> assessmentFormId,
       required int medicalId,
       required String name,
-      required String relation,
+      Value<String?> relation,
       required double temperature,
       Value<DateTime> createdAt,
     });
@@ -56474,7 +56467,7 @@ typedef $$HealthAssessmentFormTableUpdateCompanionBuilder =
       Value<int> assessmentFormId,
       Value<int> medicalId,
       Value<String> name,
-      Value<String> relation,
+      Value<String?> relation,
       Value<double> temperature,
       Value<DateTime> createdAt,
     });
@@ -56722,7 +56715,7 @@ class $$HealthAssessmentFormTableTableManager
                 Value<int> assessmentFormId = const Value.absent(),
                 Value<int> medicalId = const Value.absent(),
                 Value<String> name = const Value.absent(),
-                Value<String> relation = const Value.absent(),
+                Value<String?> relation = const Value.absent(),
                 Value<double> temperature = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
               }) => HealthAssessmentFormCompanion(
@@ -56738,7 +56731,7 @@ class $$HealthAssessmentFormTableTableManager
                 Value<int> assessmentFormId = const Value.absent(),
                 required int medicalId,
                 required String name,
-                required String relation,
+                Value<String?> relation = const Value.absent(),
                 required double temperature,
                 Value<DateTime> createdAt = const Value.absent(),
               }) => HealthAssessmentFormCompanion.insert(

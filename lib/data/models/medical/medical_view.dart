@@ -113,13 +113,13 @@ class MedicalViewModel extends ChangeNotifier {
 
   void updateSexId(int sexId) {
     if (_patientCache == null) return;
-    _updatePatientCacheAndSave(_patientCache!.copyWith(sexId: Value(sexId)));
+    _updatePatientCacheAndSave(_patientCache!.copyWith(sexId: sexId));
   }
 
   void updateVisitReasonId(int visitReasonId) {
     if (_patientCache == null) return;
     _updatePatientCacheAndSave(
-      _patientCache!.copyWith(visitReasonId: Value(visitReasonId)),
+      _patientCache!.copyWith(visitReasonId: visitReasonId),
     );
   }
 

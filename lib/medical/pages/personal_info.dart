@@ -183,13 +183,11 @@ class _PersonalInfoState extends State<PersonalInfo> {
 
                       final optionNames = options.map((e) => e.name).toList();
                       int selectedIndex = 0;
-                      if (patient.sexId != null) {
-                        final index = options.indexWhere(
-                          (e) => e.sexId == patient.sexId,
-                        );
-                        if (index != -1) selectedIndex = index;
-                      }
-
+                      final index = options.indexWhere(
+                        (e) => e.sexId == patient.sexId,
+                      );
+                      if (index != -1) selectedIndex = index;
+                    
                       return SlidingToggle(
                         selectedIndex: selectedIndex,
                         options: optionNames,
@@ -218,13 +216,11 @@ class _PersonalInfoState extends State<PersonalInfo> {
 
                       final optionNames = options.map((e) => e.name).toList();
                       int selectedIndex = 0;
-                      if (patient.visitReasonId != null) {
-                        final index = options.indexWhere(
-                          (e) => e.id == patient.visitReasonId,
-                        );
-                        if (index != -1) selectedIndex = index;
-                      }
-
+                      final index = options.indexWhere(
+                        (e) => e.id == patient.visitReasonId,
+                      );
+                      if (index != -1) selectedIndex = index;
+                    
                       return SlidingToggle(
                         selectedIndex: selectedIndex,
                         options: optionNames,

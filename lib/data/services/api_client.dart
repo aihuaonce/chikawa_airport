@@ -9,7 +9,10 @@ class ApiClient {
   late final Dio _dio;
   bool _useMock = false; // Set to false for production
 
-  ApiClient({this.baseUrl = 'https://fb13-111-71-213-177.ngrok-free.app'}) {
+  ApiClient({
+    this.baseUrl =
+        'https://da90-2001-b400-e2c2-9519-a047-5561-8fc2-3bba.ngrok-free.app',
+  }) {
     _dio = Dio(
       BaseOptions(
         baseUrl: baseUrl,

@@ -213,7 +213,7 @@ class TreatmentViewModel extends ChangeNotifier {
         HealthAssessmentFormCompanion.insert(
           medicalId: medicalId,
           name: name,
-          relation: relation,
+          relation: Value(relation),
           temperature: temperature ?? 0.0,
         ),
       );
@@ -247,7 +247,7 @@ class TreatmentViewModel extends ChangeNotifier {
     if (index != -1) {
       _healthAssessments[index] = _healthAssessments[index].copyWith(
         name: name,
-        relation: relation,
+        relation: Value(relation),
         temperature: temperature,
       );
     }

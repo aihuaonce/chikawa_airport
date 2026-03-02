@@ -856,43 +856,6 @@ class _AmbulanceBodyMapState extends State<AmbulanceBodyMap> {
     );
   }
 
-  Widget _buildMarkerCountCompact() {
-    final count = _markers.length;
-
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: borderColor),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            decoration: BoxDecoration(
-              color: count > 0
-                  ? primaryColor.withValues(alpha: 0.1)
-                  : Colors.transparent,
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Text(
-              '$count',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: count > 0 ? primaryColor : textMuted,
-              ),
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text('處', style: TextStyle(fontSize: 12, color: textMuted)),
-        ],
-      ),
-    );
-  }
-
   Widget _buildMarkerHeader() {
     final count = _markers.length;
 

@@ -99,6 +99,14 @@ class EmergencyDao extends DatabaseAccessor<AppDatabase>
         .get();
   }
 
+  // 監聽急救藥物記錄 (Stream 版本)
+  Stream<List<FirstAidLogData>> watchFirstAidLogs(int emergencyTreatmentId) {
+    return (select(firstAidLog)
+          ..where((t) => t.emergencyTreatmentId.equals(emergencyTreatmentId))
+          ..orderBy([(t) => OrderingTerm.asc(t.sortOrder)]))
+        .watch();
+  }
+
   // 新增急救藥物記錄
   Future<int> addFirstAidLog(FirstAidLogCompanion companion) {
     return into(firstAidLog).insert(companion);

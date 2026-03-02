@@ -274,7 +274,7 @@ class ReferralFormViewModel extends ChangeNotifier {
         (_formCache!.otherRelationship ?? '').isEmpty) {
       final assessments = await db.treatmentDao.getHealthAssessments(medicalId);
       if (assessments.isNotEmpty) {
-        final relation = assessments.first.relation;
+        final relation = assessments.first.relation ?? '';
         if (relation.isNotEmpty) {
           // 嘗試匹配 RelationshipType
           try {
