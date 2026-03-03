@@ -221,13 +221,12 @@ class _ReferenceSettingsPageState extends State<ReferenceSettingsPage> {
   Future<Map<String, dynamic>?> _loadRowByPrimaryKey(
     AppDatabase db,
     String tableName,
+    String primaryKeyColumn,
     dynamic primaryKeyValue,
   ) async {
-    final pk = _primaryKeyColumn;
-    if (pk == null) return null;
     final rows = await db
         .customSelect(
-          'SELECT * FROM $tableName WHERE $pk = ? LIMIT 1',
+          'SELECT * FROM $tableName WHERE $primaryKeyColumn = ? LIMIT 1',
           variables: [Variable(primaryKeyValue)],
         )
         .get();
@@ -238,38 +237,55 @@ class _ReferenceSettingsPageState extends State<ReferenceSettingsPage> {
   Future<Map<String, dynamic>?> _loadLatestRow(
     AppDatabase db,
     String tableName,
+    String primaryKeyColumn,
   ) async {
-    final pk = _primaryKeyColumn;
-    if (pk == null) return null;
     final rows = await db
-        .customSelect('SELECT * FROM $tableName ORDER BY $pk DESC LIMIT 1')
+        .customSelect(
+          'SELECT * FROM $tableName ORDER BY $primaryKeyColumn DESC LIMIT 1',
+        )
         .get();
     if (rows.isEmpty) return null;
     return Map<String, dynamic>.from(rows.first.data);
   }
 
-  Future<void> _queueReferenceUpsert(Map<String, dynamic> row) async {
-    final pk = _primaryKeyColumn;
-    if (pk == null) return;
-    final recordId = _toInt(row[pk]);
-    if (recordId == null) return;
+  Future<void> _queueReferenceUpsert({
+    required String tableName,
+    required String primaryKeyColumn,
+    required Map<String, dynamic> row,
+  }) async {
+    final recordId = _toInt(row[primaryKeyColumn]);
+    if (recordId == null) {
+      debugPrint(
+        'Reference queue skip(upsert): $tableName.$primaryKeyColumn is null/invalid',
+      );
+      return;
+    }
     final payload = _buildSyncPayload(row);
+    debugPrint('Reference queue upsert: $tableName#$recordId');
     await context.read<SyncServiceProvider>().markAsPending(
-      tableName: _selectedTable.table,
+      tableName: tableName,
       recordId: recordId,
       operation: 'upsert',
       data: payload,
     );
   }
 
-  Future<void> _queueReferenceDelete(Map<String, dynamic> row) async {
-    final pk = _primaryKeyColumn;
-    if (pk == null) return;
-    final recordId = _toInt(row[pk]);
-    if (recordId == null) return;
+  Future<void> _queueReferenceDelete({
+    required String tableName,
+    required String primaryKeyColumn,
+    required Map<String, dynamic> row,
+  }) async {
+    final recordId = _toInt(row[primaryKeyColumn]);
+    if (recordId == null) {
+      debugPrint(
+        'Reference queue skip(delete): $tableName.$primaryKeyColumn is null/invalid',
+      );
+      return;
+    }
     final payload = _buildSyncPayload(row);
+    debugPrint('Reference queue delete: $tableName#$recordId');
     await context.read<SyncServiceProvider>().markAsPending(
-      tableName: _selectedTable.table,
+      tableName: tableName,
       recordId: recordId,
       operation: 'delete',
       data: payload,
@@ -330,6 +346,8 @@ class _ReferenceSettingsPageState extends State<ReferenceSettingsPage> {
 
   Future<void> _addOption() async {
     final tableName = _selectedTable.table;
+    final primaryKeyColumn = _primaryKeyColumn;
+    if (primaryKeyColumn == null) return;
     final result = await showDialog<Map<String, dynamic>>(
       context: context,
       builder: (_) => _AddReferenceOptionDialog(
@@ -352,10 +370,23 @@ class _ReferenceSettingsPageState extends State<ReferenceSettingsPage> {
         'VALUES ($placeholders)',
         args,
       );
-      final inserted = await _loadLatestRow(db, tableName);
+      final inserted = await _loadLatestRow(db, tableName, primaryKeyColumn);
       if (inserted != null) {
-        await _queueReferenceUpsert(inserted);
-        await _pushPendingReferenceChanges(showError: false);
+        await _queueReferenceUpsert(
+          tableName: tableName,
+          primaryKeyColumn: primaryKeyColumn,
+          row: inserted,
+        );
+        final pushed = await _pushPendingReferenceChanges();
+        if (!pushed && mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Added locally, upload pending')),
+          );
+        }
+      } else {
+        debugPrint(
+          'Reference add warning: unable to fetch inserted row for $tableName',
+        );
       }
       await _reloadReferencesAndRefreshTable();
       if (!mounted) return;
@@ -373,10 +404,10 @@ class _ReferenceSettingsPageState extends State<ReferenceSettingsPage> {
   Future<void> _toggleDisable(Map<String, dynamic> row) async {
     final db = context.read<AppDatabase>();
     final tableName = _selectedTable.table;
-    final pk = _primaryKeyColumn;
-    if (pk == null) return;
+    final primaryKeyColumn = _primaryKeyColumn;
+    if (primaryKeyColumn == null) return;
 
-    final pkValue = row[pk];
+    final pkValue = row[primaryKeyColumn];
     if (pkValue == null) return;
 
     try {
@@ -385,22 +416,50 @@ class _ReferenceSettingsPageState extends State<ReferenceSettingsPage> {
         final isActive = current == true || current == 1 || current == '1';
         final next = isActive ? 0 : 1;
         await db.customStatement(
-          'UPDATE $tableName SET is_active = ? WHERE $pk = ?',
+          'UPDATE $tableName SET is_active = ? WHERE $primaryKeyColumn = ?',
           [next, pkValue],
         );
-        final updatedRow = await _loadRowByPrimaryKey(db, tableName, pkValue);
+        final updatedRow = await _loadRowByPrimaryKey(
+          db,
+          tableName,
+          primaryKeyColumn,
+          pkValue,
+        );
         if (updatedRow != null) {
-          await _queueReferenceUpsert(updatedRow);
-          await _pushPendingReferenceChanges(showError: false);
+          await _queueReferenceUpsert(
+            tableName: tableName,
+            primaryKeyColumn: primaryKeyColumn,
+            row: updatedRow,
+          );
+          final pushed = await _pushPendingReferenceChanges();
+          if (!pushed && mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Updated locally, upload pending')),
+            );
+          }
+        } else {
+          debugPrint(
+            'Reference toggle warning: unable to fetch updated row for $tableName#$pkValue',
+          );
         }
       } else {
         final allowDelete = await _confirmDeleteFallback();
         if (!allowDelete) return;
-        await db.customStatement('DELETE FROM $tableName WHERE $pk = ?', [
-          pkValue,
-        ]);
-        await _queueReferenceDelete(row);
-        await _pushPendingReferenceChanges(showError: false);
+        await db.customStatement(
+          'DELETE FROM $tableName WHERE $primaryKeyColumn = ?',
+          [pkValue],
+        );
+        await _queueReferenceDelete(
+          tableName: tableName,
+          primaryKeyColumn: primaryKeyColumn,
+          row: row,
+        );
+        final pushed = await _pushPendingReferenceChanges();
+        if (!pushed && mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Deleted locally, upload pending')),
+          );
+        }
       }
 
       await _reloadReferencesAndRefreshTable();

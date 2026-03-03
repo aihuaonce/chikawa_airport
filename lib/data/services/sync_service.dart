@@ -1808,8 +1808,18 @@ class SyncService extends ChangeNotifier {
       final pendingLogs = await _syncDao.getPendingLogs();
 
       if (pendingLogs.isEmpty) {
+        debugPrint('Push skipped: no pending logs');
         return;
       }
+
+      final tables = pendingLogs
+          .map((log) => log.syncTableName)
+          .toSet()
+          .toList()
+        ..sort();
+      debugPrint(
+        'Push pending logs: ${pendingLogs.length} (${tables.join(', ')})',
+      );
 
       final deviceId = await _syncDao.getDeviceId() ?? 'unknown';
 

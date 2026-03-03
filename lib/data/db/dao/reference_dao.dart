@@ -818,8 +818,8 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
     if (count == 0) {
       await batch((batch) {
         batch.insertAll(sex, [
-          SexCompanion.insert(name: 'Male'),
-          SexCompanion.insert(name: 'Female'),
+          SexCompanion.insert(name: '男性'),
+          SexCompanion.insert(name: '女性'),
         ]);
       });
     }
@@ -2101,7 +2101,9 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
 
   // 初始化插管方式
   Future<void> initializeIntubationMethods() async {
-    final count = await (select(intubationMethodRef).get()).then((list) => list.length);
+    final count = await (select(
+      intubationMethodRef,
+    ).get()).then((list) => list.length);
     if (count == 0) {
       await batch((batch) {
         batch.insertAll(intubationMethodRef, [
@@ -2132,7 +2134,9 @@ class ReferenceDao extends DatabaseAccessor<AppDatabase>
 
   // 初始化呼吸方式
   Future<void> initializeRespirationModes() async {
-    final count = await (select(respirationModeRef).get()).then((list) => list.length);
+    final count = await (select(
+      respirationModeRef,
+    ).get()).then((list) => list.length);
     if (count == 0) {
       await batch((batch) {
         batch.insertAll(respirationModeRef, [

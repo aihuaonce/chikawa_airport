@@ -71,7 +71,7 @@ class _SidebarState extends State<Sidebar> {
                       const Spacer(),
                       _SidebarItem(
                         icon: Icons.settings,
-                        label: 'Settings',
+                        label: '列表維護',
                         isActive: false,
                         showText: showText,
                         onTap: () {
