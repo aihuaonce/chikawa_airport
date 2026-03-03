@@ -24,50 +24,38 @@ class _ReferenceSettingsPageState extends State<ReferenceSettingsPage> {
   static const Color textMuted = Color(0xFF64748B);
 
   static const List<_ReferenceTableConfig> _tables = [
-    _ReferenceTableConfig('sex', 'Sex'),
-    _ReferenceTableConfig('nationality', 'Nationality'),
-    _ReferenceTableConfig('airline', 'Airline'),
-    _ReferenceTableConfig('travel_status', 'Travel Status'),
-    _ReferenceTableConfig('location', 'Location'),
-    _ReferenceTableConfig('incident_place_category', 'Incident Place Category'),
-    _ReferenceTableConfig(
-      'incident_place_category2',
-      'Incident Place Category2',
-    ),
-    _ReferenceTableConfig('reporting_unit', 'Reporting Unit'),
-    _ReferenceTableConfig('chief_complaint_type', 'Chief Complaint Type'),
-    _ReferenceTableConfig('chief_complaint_detail', 'Chief Complaint Detail'),
-    _ReferenceTableConfig('diagnosis_category', 'Diagnosis Category'),
-    _ReferenceTableConfig('triage_level', 'Triage Level'),
-    _ReferenceTableConfig('treatment_on_site', 'Treatment On Site'),
-    _ReferenceTableConfig('treatment_result', 'Treatment Result'),
-    _ReferenceTableConfig('referral_hospital', 'Referral Hospital'),
-    _ReferenceTableConfig('action_item', 'Action Item'),
-    _ReferenceTableConfig('medical_staff', 'Medical Staff'),
-    _ReferenceTableConfig('nursing_phrase', 'Nursing Phrase'),
-    _ReferenceTableConfig('payment_method', 'Payment Method'),
-    _ReferenceTableConfig('collection_status', 'Collection Status'),
-    _ReferenceTableConfig('currency_ref', 'Currency'),
-    _ReferenceTableConfig('referral_purpose', 'Referral Purpose'),
-    _ReferenceTableConfig('station_ref', 'Station'),
-    _ReferenceTableConfig('relationship_type', 'Relationship Type'),
-    _ReferenceTableConfig('visit_reason', 'Visit Reason'),
-    _ReferenceTableConfig('drug_ref', 'Drug'),
-    _ReferenceTableConfig('special_note_ref', 'Special Note'),
-    _ReferenceTableConfig('intubation_method_ref', 'Intubation Method'),
-    _ReferenceTableConfig('respiration_mode_ref', 'Respiration Mode'),
-    _ReferenceTableConfig(
-      'ambulance_reference_items',
-      'Ambulance Reference Item',
-    ),
-    _ReferenceTableConfig(
-      'ambulance_treatment_categories',
-      'Ambulance Treatment Category',
-    ),
-    _ReferenceTableConfig(
-      'ambulance_treatment_items',
-      'Ambulance Treatment Item',
-    ),
+    _ReferenceTableConfig('sex', '性別'),
+    _ReferenceTableConfig('nationality', '國家'),
+    _ReferenceTableConfig('airline', '航空公司'),
+    _ReferenceTableConfig('travel_status', '旅行狀態'),
+    _ReferenceTableConfig('location', '地點'),
+    _ReferenceTableConfig('incident_place_category', '事故地點-1'),
+    _ReferenceTableConfig('incident_place_category2', '事故地點-2'),
+    _ReferenceTableConfig('reporting_unit', '報告單位'),
+    _ReferenceTableConfig('chief_complaint_type', '主訴類別'),
+    _ReferenceTableConfig('chief_complaint_detail', '主訴細項'),
+    _ReferenceTableConfig('diagnosis_category', '診斷類別'),
+    _ReferenceTableConfig('triage_level', '檢傷分類'),
+    _ReferenceTableConfig('treatment_on_site', '現場處置'),
+    _ReferenceTableConfig('treatment_result', '處置結果'),
+    _ReferenceTableConfig('referral_hospital', '轉診醫院'),
+    _ReferenceTableConfig('action_item', '處理摘要項目'),
+    _ReferenceTableConfig('medical_staff', '醫護人員'),
+    _ReferenceTableConfig('nursing_phrase', '護理紀錄用語'),
+    _ReferenceTableConfig('payment_method', '付款方式'),
+    _ReferenceTableConfig('collection_status', '收款狀態'),
+    _ReferenceTableConfig('currency_ref', '幣別'),
+    _ReferenceTableConfig('referral_purpose', '轉診目的'),
+    _ReferenceTableConfig('station_ref', '站點'),
+    _ReferenceTableConfig('relationship_type', '關係類型'),
+    _ReferenceTableConfig('visit_reason', '訪問原因'),
+    _ReferenceTableConfig('drug_ref', '藥物'),
+    _ReferenceTableConfig('special_note_ref', '特殊注意事項'),
+    _ReferenceTableConfig('intubation_method_ref', '氣管插管方式'),
+    _ReferenceTableConfig('respiration_mode_ref', '呼吸模式'),
+    _ReferenceTableConfig('ambulance_reference_items', '救護車參考項目'),
+    _ReferenceTableConfig('ambulance_treatment_categories', '救護車治療類別'),
+    _ReferenceTableConfig('ambulance_treatment_items', '救護車治療項目'),
   ];
 
   final TextEditingController _searchController = TextEditingController();
@@ -588,7 +576,7 @@ class _ReferenceSettingsPageState extends State<ReferenceSettingsPage> {
                       ),
                     )
                   : const Icon(Icons.sync),
-              label: Text(_isSyncing ? 'Syncing...' : 'Sync Reference'),
+              label: Text(_isSyncing ? '同步中...' : '同步資料'),
             ),
           ),
           const Divider(height: 1, color: borderColor),
@@ -653,14 +641,14 @@ class _ReferenceSettingsPageState extends State<ReferenceSettingsPage> {
               OutlinedButton.icon(
                 onPressed: _isLoading ? null : _loadSelectedTable,
                 icon: const Icon(Icons.refresh, size: 18),
-                label: const Text('Refresh'),
+                label: const Text('更新'),
               ),
               const SizedBox(width: 8),
               FilledButton.icon(
                 onPressed: _isLoading ? null : _addOption,
                 style: FilledButton.styleFrom(backgroundColor: primaryColor),
                 icon: const Icon(Icons.add),
-                label: const Text('Add Option'),
+                label: const Text('加入選項'),
               ),
             ],
           ),
@@ -673,7 +661,7 @@ class _ReferenceSettingsPageState extends State<ReferenceSettingsPage> {
           TextField(
             controller: _searchController,
             decoration: InputDecoration(
-              hintText: 'Search in current table',
+              hintText: '收尋選項...',
               prefixIcon: const Icon(Icons.search),
               filled: true,
               fillColor: Colors.white,
@@ -769,7 +757,7 @@ class _ReferenceSettingsPageState extends State<ReferenceSettingsPage> {
                         : Colors.green.withValues(alpha: 0.15),
                   ),
                   child: Text(
-                    disabled ? 'Disabled' : 'Active',
+                    disabled ? '禁用' : '啟用',
                     style: TextStyle(
                       fontSize: 12,
                       color: disabled
@@ -787,9 +775,7 @@ class _ReferenceSettingsPageState extends State<ReferenceSettingsPage> {
                       : Icons.delete_outline,
                 ),
                 label: Text(
-                  supportsSoftDisable
-                      ? (disabled ? 'Enable' : 'Disable')
-                      : 'Disable',
+                  supportsSoftDisable ? (disabled ? '啟用' : '禁用') : '刪除',
                 ),
               ),
             ],

@@ -214,7 +214,7 @@ class _AmbulanceSceneStatusState extends State<AmbulanceSceneStatus> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // 1. 案件分類 (可複選)
-        _buildLabel('案件分類 CATEGORY (可複選)'),
+        _buildLabel('病況分類 CATEGORY (可複選)'),
         const SizedBox(height: 10),
         Row(
           children: [

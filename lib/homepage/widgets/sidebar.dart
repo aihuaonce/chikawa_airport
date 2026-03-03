@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../data/models/record_page.dart';
-import '../pages/reference_settings_page.dart';
+import 'reference_settings_page.dart';
 
 class Sidebar extends StatefulWidget {
   final RecordPage currentPage;
