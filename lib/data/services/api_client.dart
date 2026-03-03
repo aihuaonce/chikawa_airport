@@ -11,7 +11,7 @@ class ApiClient {
 
   ApiClient({
     this.baseUrl =
-        'https://da90-2001-b400-e2c2-9519-a047-5561-8fc2-3bba.ngrok-free.app',
+        'https://3ab6-2001-b400-e2c2-9519-eda1-9e21-a9e2-848.ngrok-free.app',
   }) {
     _dio = Dio(
       BaseOptions(
@@ -65,6 +65,30 @@ class ApiClient {
     );
   }
 
+  Future<Map<String, dynamic>> getReferenceSnapshot({DateTime? since}) async {
+    if (_useMock) {
+      return {
+        'serverTimestamp': DateTime.now().toUtc().toIso8601String(),
+        'version': DateTime.now().toUtc().toIso8601String(),
+        'changed': false,
+        'tables': <String, dynamic>{},
+        'errors': <dynamic>[],
+      };
+    }
+
+    try {
+      final response = await _dio.get(
+        '/api/sync/reference',
+        queryParameters: since == null
+            ? null
+            : {'since': since.toUtc().toIso8601String()},
+      );
+      return Map<String, dynamic>.from(response.data as Map);
+    } on DioException catch (e) {
+      throw Exception('Failed to get reference snapshot: ${e.message}');
+    }
+  }
+
   Future<PullResponse> pullChanges(PullRequest request) async {
     if (_useMock) {
       return _mockPullChanges(request);
@@ -113,7 +137,23 @@ class ApiClient {
 
       return PushResponse.fromJson(response.data as Map<String, dynamic>);
     } on DioException catch (e) {
-      throw Exception('Failed to push changes: ${e.message}');
+      final statusCode = e.response?.statusCode;
+      final responseData = e.response?.data;
+
+      String details = e.message ?? 'unknown error';
+      if (responseData is Map<String, dynamic>) {
+        final reason = responseData['reason'] ?? responseData['error'];
+        if (reason != null && reason.toString().trim().isNotEmpty) {
+          details = reason.toString();
+        } else {
+          details = responseData.toString();
+        }
+      } else if (responseData != null) {
+        details = responseData.toString();
+      }
+
+      final codeText = statusCode == null ? 'unknown' : statusCode.toString();
+      throw Exception('Failed to push changes [$codeText]: $details');
     }
   }
 

@@ -8,7 +8,7 @@ import '../sync/models/sync_models.dart';
 
 // API URL 配置
 const String kDefaultApiUrl =
-    'https://da90-2001-b400-e2c2-9519-a047-5561-8fc2-3bba.ngrok-free.app';
+    'https://3ab6-2001-b400-e2c2-9519-eda1-9e21-a9e2-848.ngrok-free.app';
 
 // Background sync interval in minutes
 const int kBackgroundSyncIntervalMinutes = 5;
@@ -137,6 +137,10 @@ class SyncServiceProvider extends ChangeNotifier with WidgetsBindingObserver {
 
   Future<void> clearSyncedLogs() async {
     await _syncService.clearSyncedLogs();
+  }
+
+  Future<void> pushPendingChanges() async {
+    await _syncService.pushChanges();
   }
 
   @override

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../data/models/record_page.dart';
+import '../pages/reference_settings_page.dart';
 
 class Sidebar extends StatefulWidget {
   final RecordPage currentPage;
@@ -66,6 +67,20 @@ class _SidebarState extends State<Sidebar> {
                         isActive: widget.currentPage == RecordPage.firstAid,
                         showText: showText,
                         onTap: () => widget.onPageChanged(RecordPage.firstAid),
+                      ),
+                      const Spacer(),
+                      _SidebarItem(
+                        icon: Icons.settings,
+                        label: 'Settings',
+                        isActive: false,
+                        showText: showText,
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute<void>(
+                              builder: (_) => const ReferenceSettingsPage(),
+                            ),
+                          );
+                        },
                       ),
                     ],
                   ),
