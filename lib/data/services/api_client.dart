@@ -11,7 +11,7 @@ class ApiClient {
 
   ApiClient({
     this.baseUrl =
-        'https://3ab6-2001-b400-e2c2-9519-eda1-9e21-a9e2-848.ngrok-free.app',
+        'https://8d17-2001-b400-e2c2-9359-e9a6-a337-3252-1b9.ngrok-free.app',
   }) {
     _dio = Dio(
       BaseOptions(

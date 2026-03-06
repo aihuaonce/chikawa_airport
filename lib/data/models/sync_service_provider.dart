@@ -8,7 +8,7 @@ import '../sync/models/sync_models.dart';
 
 // API URL 配置
 const String kDefaultApiUrl =
-    'https://3ab6-2001-b400-e2c2-9519-eda1-9e21-a9e2-848.ngrok-free.app';
+    'https://8d17-2001-b400-e2c2-9359-e9a6-a337-3252-1b9.ngrok-free.app';
 
 // Background sync interval in minutes
 const int kBackgroundSyncIntervalMinutes = 5;

@@ -108,8 +108,18 @@ class _ReferenceSettingsPageState extends State<ReferenceSettingsPage> {
     };
 
     return _schema
-        .where((c) => !c.isPrimaryKey && !excluded.contains(c.name))
+        .where(
+          (c) =>
+              !c.isPrimaryKey &&
+              !excluded.contains(c.name) &&
+              !_isBlobColumn(c),
+        )
         .toList();
+  }
+
+  bool _isBlobColumn(_TableColumnSchema column) {
+    final type = column.type.toUpperCase();
+    return type.contains('BLOB') || type.contains('BYTEA');
   }
 
   Future<void> _loadSelectedTable() async {
@@ -301,11 +311,9 @@ class _ReferenceSettingsPageState extends State<ReferenceSettingsPage> {
       final pushed = await _pushPendingReferenceChanges(showError: false);
       if (!pushed) {
         if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Pending local changes push failed, sync canceled'),
-          ),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('本機待同步資料上傳失敗，已取消此次同步')));
         return;
       }
 
@@ -316,9 +324,9 @@ class _ReferenceSettingsPageState extends State<ReferenceSettingsPage> {
 
       final message = result.success
           ? (result.changed
-                ? 'Synced: ${result.tableCount} tables, ${result.rowCount} rows'
-                : 'No server changes')
-          : 'Sync failed: ${result.errorMessage ?? 'unknown error'}';
+                ? '同步完成：${result.tableCount} 張表、${result.rowCount} 筆資料'
+                : '沒有伺服器變更')
+          : '同步失敗：${result.errorMessage ?? '未知錯誤'}';
 
       if (!mounted) return;
 
@@ -336,11 +344,18 @@ class _ReferenceSettingsPageState extends State<ReferenceSettingsPage> {
     final tableName = _selectedTable.table;
     final primaryKeyColumn = _primaryKeyColumn;
     if (primaryKeyColumn == null) return;
+    if (_editableColumns.isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('此表沒有可編輯欄位')));
+      return;
+    }
     final result = await showDialog<Map<String, dynamic>>(
       context: context,
-      builder: (_) => _AddReferenceOptionDialog(
+      builder: (_) => _ReferenceOptionDialog(
         tableLabel: _selectedTable.label,
         columns: _editableColumns,
+        submitLabel: '新增',
       ),
     );
 
@@ -367,9 +382,9 @@ class _ReferenceSettingsPageState extends State<ReferenceSettingsPage> {
         );
         final pushed = await _pushPendingReferenceChanges();
         if (!pushed && mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Added locally, upload pending')),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(const SnackBar(content: Text('已新增到本機，等待上傳')));
         }
       } else {
         debugPrint(
@@ -380,12 +395,88 @@ class _ReferenceSettingsPageState extends State<ReferenceSettingsPage> {
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Added successfully')));
+      ).showSnackBar(const SnackBar(content: Text('新增成功')));
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('Add failed: $e')));
+      ).showSnackBar(SnackBar(content: Text('新增失敗：$e')));
+    }
+  }
+
+  Future<void> _editOption(Map<String, dynamic> row) async {
+    final db = context.read<AppDatabase>();
+    final tableName = _selectedTable.table;
+    final primaryKeyColumn = _primaryKeyColumn;
+    if (primaryKeyColumn == null) return;
+    if (_editableColumns.isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('此表沒有可編輯欄位')));
+      return;
+    }
+
+    final pkValue = row[primaryKeyColumn];
+    if (pkValue == null) return;
+
+    final initialValues = <String, dynamic>{};
+    for (final column in _editableColumns) {
+      initialValues[column.name] = row[column.name];
+    }
+
+    final result = await showDialog<Map<String, dynamic>>(
+      context: context,
+      builder: (_) => _ReferenceOptionDialog(
+        tableLabel: _selectedTable.label,
+        columns: _editableColumns,
+        initialValues: initialValues,
+        submitLabel: '儲存',
+      ),
+    );
+
+    if (result == null || result.isEmpty) return;
+    if (!mounted) return;
+
+    final columns = result.keys.toList();
+    final assignments = columns.map((c) => '$c = ?').join(', ');
+    final args = [...columns.map((key) => result[key]), pkValue];
+
+    try {
+      await db.customStatement(
+        'UPDATE $tableName SET $assignments WHERE $primaryKeyColumn = ?',
+        args,
+      );
+
+      final updatedRow = await _loadRowByPrimaryKey(
+        db,
+        tableName,
+        primaryKeyColumn,
+        pkValue,
+      );
+      if (updatedRow != null) {
+        await _queueReferenceUpsert(
+          tableName: tableName,
+          primaryKeyColumn: primaryKeyColumn,
+          row: updatedRow,
+        );
+        final pushed = await _pushPendingReferenceChanges();
+        if (!pushed && mounted) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(const SnackBar(content: Text('已更新到本機，等待上傳')));
+        }
+      }
+
+      await _reloadReferencesAndRefreshTable();
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('更新成功')));
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('更新失敗：$e')));
     }
   }
 
@@ -421,9 +512,9 @@ class _ReferenceSettingsPageState extends State<ReferenceSettingsPage> {
           );
           final pushed = await _pushPendingReferenceChanges();
           if (!pushed && mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Updated locally, upload pending')),
-            );
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(const SnackBar(content: Text('已更新到本機，等待上傳')));
           }
         } else {
           debugPrint(
@@ -444,9 +535,9 @@ class _ReferenceSettingsPageState extends State<ReferenceSettingsPage> {
         );
         final pushed = await _pushPendingReferenceChanges();
         if (!pushed && mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Deleted locally, upload pending')),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(const SnackBar(content: Text('已刪除本機資料，等待上傳')));
         }
       }
 
@@ -455,7 +546,7 @@ class _ReferenceSettingsPageState extends State<ReferenceSettingsPage> {
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('Disable failed: $e')));
+      ).showSnackBar(SnackBar(content: Text('操作失敗：$e')));
     }
   }
 
@@ -471,19 +562,19 @@ class _ReferenceSettingsPageState extends State<ReferenceSettingsPage> {
           context: context,
           builder: (context) {
             return AlertDialog(
-              title: const Text('Disable Option'),
+              title: const Text('禁用選項'),
               content: const Text(
-                'This table has no is_active column.\n'
-                'Disable will remove this row. Continue?',
+                '此表沒有 is_active 欄位。\n'
+                '禁用會直接刪除此筆資料，是否繼續？',
               ),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(false),
-                  child: const Text('Cancel'),
+                  child: const Text('取消'),
                 ),
                 FilledButton(
                   onPressed: () => Navigator.of(context).pop(true),
-                  child: const Text('Continue'),
+                  child: const Text('繼續'),
                 ),
               ],
             );
@@ -534,7 +625,7 @@ class _ReferenceSettingsPageState extends State<ReferenceSettingsPage> {
     return Scaffold(
       backgroundColor: pageBg,
       appBar: AppBar(
-        title: const Text('Reference Settings'),
+        title: const Text('參考表設定'),
         backgroundColor: Colors.white,
         foregroundColor: textDark,
         elevation: 0,
@@ -641,7 +732,7 @@ class _ReferenceSettingsPageState extends State<ReferenceSettingsPage> {
               OutlinedButton.icon(
                 onPressed: _isLoading ? null : _loadSelectedTable,
                 icon: const Icon(Icons.refresh, size: 18),
-                label: const Text('更新'),
+                label: const Text('重新整理'),
               ),
               const SizedBox(width: 8),
               FilledButton.icon(
@@ -658,10 +749,15 @@ class _ReferenceSettingsPageState extends State<ReferenceSettingsPage> {
             style: const TextStyle(color: textMuted, fontSize: 12),
           ),
           const SizedBox(height: 12),
+          const Text(
+            '提示：點選任一資料列可快速編輯',
+            style: TextStyle(color: textMuted, fontSize: 12),
+          ),
+          const SizedBox(height: 8),
           TextField(
             controller: _searchController,
             decoration: InputDecoration(
-              hintText: '收尋選項...',
+              hintText: '搜尋選項...',
               prefixIcon: const Icon(Icons.search),
               filled: true,
               fillColor: Colors.white,
@@ -698,9 +794,7 @@ class _ReferenceSettingsPageState extends State<ReferenceSettingsPage> {
     if (rows.isEmpty) {
       return Center(
         child: Text(
-          _rows.isEmpty
-              ? 'No data in this table'
-              : 'No matching data, clear search to view all',
+          _rows.isEmpty ? '此表目前沒有資料' : '找不到符合條件的資料，請清除搜尋',
           style: const TextStyle(color: textMuted),
         ),
       );
@@ -715,70 +809,93 @@ class _ReferenceSettingsPageState extends State<ReferenceSettingsPage> {
         final disabled = _isDisabledRow(row);
         final supportsSoftDisable = _hasIsActiveColumn;
 
-        return Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
+        return Material(
+          color: disabled
+              ? Colors.orange.withValues(alpha: 0.03)
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(12),
+          child: InkWell(
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: borderColor),
-          ),
-          child: Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      _titleForRow(row),
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
-                        color: disabled ? textMuted : textDark,
+            onTap: () => _editOption(row),
+            child: Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: borderColor),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          _titleForRow(row),
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700,
+                            color: disabled ? textMuted : textDark,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          _subtitleForRow(row),
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: textMuted,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  if (_hasIsActiveColumn)
+                    Container(
+                      margin: const EdgeInsets.only(right: 8),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(999),
+                        color: disabled
+                            ? Colors.orange.withValues(alpha: 0.15)
+                            : Colors.green.withValues(alpha: 0.15),
+                      ),
+                      child: Text(
+                        disabled ? '禁用' : '啟用',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: disabled
+                              ? Colors.orange.shade900
+                              : Colors.green.shade900,
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      _subtitleForRow(row),
-                      style: const TextStyle(fontSize: 12, color: textMuted),
+                  OutlinedButton.icon(
+                    onPressed: () => _editOption(row),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: primaryColor,
+                      side: const BorderSide(color: borderColor),
                     ),
-                  ],
-                ),
-              ),
-              if (_hasIsActiveColumn)
-                Container(
-                  margin: const EdgeInsets.only(right: 8),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 6,
+                    icon: const Icon(Icons.edit_outlined, size: 18),
+                    label: const Text('編輯'),
                   ),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(999),
-                    color: disabled
-                        ? Colors.orange.withValues(alpha: 0.15)
-                        : Colors.green.withValues(alpha: 0.15),
-                  ),
-                  child: Text(
-                    disabled ? '禁用' : '啟用',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: disabled
-                          ? Colors.orange.shade900
-                          : Colors.green.shade900,
-                      fontWeight: FontWeight.w700,
+                  const SizedBox(width: 8),
+                  TextButton.icon(
+                    onPressed: () => _toggleDisable(row),
+                    icon: Icon(
+                      supportsSoftDisable
+                          ? (disabled ? Icons.toggle_on : Icons.toggle_off)
+                          : Icons.delete_outline,
+                    ),
+                    label: Text(
+                      supportsSoftDisable ? (disabled ? '啟用' : '禁用') : '刪除',
                     ),
                   ),
-                ),
-              TextButton.icon(
-                onPressed: () => _toggleDisable(row),
-                icon: Icon(
-                  supportsSoftDisable
-                      ? (disabled ? Icons.toggle_on : Icons.toggle_off)
-                      : Icons.delete_outline,
-                ),
-                label: Text(
-                  supportsSoftDisable ? (disabled ? '啟用' : '禁用') : '刪除',
-                ),
+                ],
               ),
-            ],
+            ),
           ),
         );
       },
@@ -786,21 +903,30 @@ class _ReferenceSettingsPageState extends State<ReferenceSettingsPage> {
   }
 }
 
-class _AddReferenceOptionDialog extends StatefulWidget {
+class _ReferenceOptionDialog extends StatefulWidget {
   final String tableLabel;
   final List<_TableColumnSchema> columns;
+  final Map<String, dynamic> initialValues;
+  final String submitLabel;
 
-  const _AddReferenceOptionDialog({
+  const _ReferenceOptionDialog({
     required this.tableLabel,
     required this.columns,
+    this.initialValues = const {},
+    this.submitLabel = '儲存',
   });
 
   @override
-  State<_AddReferenceOptionDialog> createState() =>
-      _AddReferenceOptionDialogState();
+  State<_ReferenceOptionDialog> createState() => _ReferenceOptionDialogState();
 }
 
-class _AddReferenceOptionDialogState extends State<_AddReferenceOptionDialog> {
+class _ReferenceOptionDialogState extends State<_ReferenceOptionDialog> {
+  static const Color _primaryColor = Color(0xFF007A8A);
+  static const Color _cardBg = Colors.white;
+  static const Color _borderColor = Color(0xFFE2E8F0);
+  static const Color _textDark = Color(0xFF0F172A);
+  static const Color _textMuted = Color(0xFF64748B);
+
   final _formKey = GlobalKey<FormState>();
   final Map<String, TextEditingController> _controllers = {};
   final Map<String, bool> _boolValues = {};
@@ -809,10 +935,20 @@ class _AddReferenceOptionDialogState extends State<_AddReferenceOptionDialog> {
   void initState() {
     super.initState();
     for (final column in widget.columns) {
+      final initialValue = widget.initialValues[column.name];
       if (_isBoolColumn(column)) {
-        _boolValues[column.name] = column.name == 'is_active';
+        final boolValue =
+            initialValue == true ||
+            initialValue == 1 ||
+            initialValue == '1' ||
+            initialValue == 'true';
+        _boolValues[column.name] = widget.initialValues.containsKey(column.name)
+            ? boolValue
+            : column.name == 'is_active';
       } else {
-        _controllers[column.name] = TextEditingController();
+        _controllers[column.name] = TextEditingController(
+          text: initialValue?.toString() ?? '',
+        );
       }
     }
   }
@@ -852,6 +988,7 @@ class _AddReferenceOptionDialogState extends State<_AddReferenceOptionDialog> {
   void _submit() {
     if (!_formKey.currentState!.validate()) return;
 
+    final isEdit = widget.initialValues.isNotEmpty;
     final payload = <String, dynamic>{};
     for (final column in widget.columns) {
       if (_isBoolColumn(column)) {
@@ -864,6 +1001,11 @@ class _AddReferenceOptionDialogState extends State<_AddReferenceOptionDialog> {
 
       final raw = _controllers[column.name]?.text.trim() ?? '';
       if (raw.isEmpty) {
+        if (isEdit &&
+            column.isNullable &&
+            widget.initialValues.containsKey(column.name)) {
+          payload[column.name] = null;
+        }
         continue;
       }
 
@@ -887,74 +1029,194 @@ class _AddReferenceOptionDialogState extends State<_AddReferenceOptionDialog> {
     Navigator.of(context).pop(payload);
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Text('Add Option - ${widget.tableLabel}'),
-      content: SizedBox(
-        width: 520,
-        child: Form(
-          key: _formKey,
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: widget.columns.map((column) {
-                final required = !column.isNullable && !column.hasDefaultValue;
+  Widget _buildField(_TableColumnSchema column) {
+    final required = !column.isNullable && !column.hasDefaultValue;
 
-                if (_isBoolColumn(column)) {
-                  return SwitchListTile(
-                    title: Text(_label(column.name)),
-                    value: _boolValues[column.name] ?? false,
-                    onChanged: (value) {
-                      setState(() => _boolValues[column.name] = value);
-                    },
-                  );
-                }
-
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 10),
-                  child: TextFormField(
-                    controller: _controllers[column.name],
-                    keyboardType: _isIntColumn(column)
-                        ? TextInputType.number
-                        : (_isRealColumn(column)
-                              ? const TextInputType.numberWithOptions(
-                                  decimal: true,
-                                )
-                              : TextInputType.text),
-                    decoration: InputDecoration(
-                      labelText: _label(column.name),
-                      hintText: required ? 'Required' : 'Optional',
-                    ),
-                    validator: (value) {
-                      final text = (value ?? '').trim();
-                      if (required && text.isEmpty) {
-                        return '${_label(column.name)} is required';
-                      }
-                      if (text.isEmpty) return null;
-                      if (_isIntColumn(column) && int.tryParse(text) == null) {
-                        return 'Must be an integer';
-                      }
-                      if (_isRealColumn(column) &&
-                          double.tryParse(text) == null) {
-                        return 'Must be a number';
-                      }
-                      return null;
-                    },
-                  ),
-                );
-              }).toList(),
+    if (_isBoolColumn(column)) {
+      return Container(
+        margin: const EdgeInsets.only(bottom: 10),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: _borderColor),
+          color: _cardBg,
+        ),
+        child: SwitchListTile(
+          title: Text(
+            _label(column.name),
+            style: const TextStyle(
+              fontWeight: FontWeight.w600,
+              color: _textDark,
             ),
           ),
+          subtitle: Text(
+            '布林欄位',
+            style: TextStyle(color: _textMuted.withValues(alpha: 0.8)),
+          ),
+          value: _boolValues[column.name] ?? false,
+          activeThumbColor: _primaryColor,
+          activeTrackColor: _primaryColor.withValues(alpha: 0.35),
+          onChanged: (value) {
+            setState(() => _boolValues[column.name] = value);
+          },
+        ),
+      );
+    }
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: TextFormField(
+        controller: _controllers[column.name],
+        keyboardType: _isIntColumn(column)
+            ? TextInputType.number
+            : (_isRealColumn(column)
+                  ? const TextInputType.numberWithOptions(decimal: true)
+                  : TextInputType.text),
+        decoration: InputDecoration(
+          labelText: _label(column.name),
+          floatingLabelStyle: const TextStyle(color: _primaryColor),
+          hintText: required ? '必填' : '選填（可留空）',
+          filled: true,
+          fillColor: _cardBg,
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: _borderColor),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: _primaryColor, width: 1.4),
+          ),
+          suffixIcon: required
+              ? const Padding(
+                  padding: EdgeInsets.only(right: 10),
+                  child: Icon(
+                    Icons.error_outline,
+                    size: 18,
+                    color: _primaryColor,
+                  ),
+                )
+              : null,
+          suffixIconConstraints: const BoxConstraints(
+            minWidth: 24,
+            minHeight: 24,
+          ),
+        ),
+        validator: (value) {
+          final text = (value ?? '').trim();
+          if (required && text.isEmpty) {
+            return '${_label(column.name)} 為必填';
+          }
+          if (text.isEmpty) return null;
+          if (_isIntColumn(column) && int.tryParse(text) == null) {
+            return '必須為整數';
+          }
+          if (_isRealColumn(column) && double.tryParse(text) == null) {
+            return '必須為數字';
+          }
+          return null;
+        },
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isEdit = widget.initialValues.isNotEmpty;
+    return Dialog(
+      insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 640, maxHeight: 720),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.fromLTRB(20, 18, 20, 14),
+              decoration: const BoxDecoration(
+                border: Border(bottom: BorderSide(color: _borderColor)),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      color: _primaryColor.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Icon(
+                      isEdit ? Icons.edit_outlined : Icons.add,
+                      color: _primaryColor,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '${isEdit ? '編輯' : '新增'} ${widget.tableLabel}',
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                            color: _textDark,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          '請填寫欄位後按「${widget.submitLabel}」',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: _textMuted,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Flexible(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 14, 20, 12),
+                child: Form(
+                  key: _formKey,
+                  child: ListView(
+                    shrinkWrap: true,
+                    children: widget.columns.map(_buildField).toList(),
+                  ),
+                ),
+              ),
+            ),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.fromLTRB(20, 10, 20, 16),
+              decoration: const BoxDecoration(
+                border: Border(top: BorderSide(color: _borderColor)),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Text('取消'),
+                  ),
+                  const SizedBox(width: 8),
+                  FilledButton.icon(
+                    style: FilledButton.styleFrom(
+                      backgroundColor: _primaryColor,
+                      foregroundColor: Colors.white,
+                    ),
+                    onPressed: _submit,
+                    icon: Icon(isEdit ? Icons.save_outlined : Icons.add),
+                    label: Text(widget.submitLabel),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancel'),
-        ),
-        FilledButton(onPressed: _submit, child: const Text('Add')),
-      ],
     );
   }
 }
