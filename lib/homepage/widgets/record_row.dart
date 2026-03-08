@@ -188,7 +188,7 @@ class _RecordRowState extends State<RecordRow> {
                         DateFormat('yyyy/MM/dd').format(record.createdAt),
                         style: const TextStyle(
                           color: textDark,
-                          fontWeight: FontWeight.w700,
+                          fontWeight: FontWeight.w400,
                           fontSize: 14,
                         ),
                       ),
@@ -197,7 +197,7 @@ class _RecordRowState extends State<RecordRow> {
                         DateFormat('HH:mm').format(record.createdAt),
                         style: const TextStyle(
                           color: textDark,
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.w400,
                           fontSize: 12,
                         ),
                       ),
@@ -220,7 +220,7 @@ class _RecordRowState extends State<RecordRow> {
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
                                 color: textDark,
-                                fontWeight: FontWeight.w700,
+                                fontWeight: FontWeight.w400,
                                 fontSize: 14,
                               ),
                             ),
@@ -230,7 +230,7 @@ class _RecordRowState extends State<RecordRow> {
                               style: const TextStyle(
                                 color: textDark,
                                 fontSize: 12,
-                                fontWeight: FontWeight.w500,
+                                fontWeight: FontWeight.w400,
                               ),
                             ),
                           ],
@@ -248,7 +248,7 @@ class _RecordRowState extends State<RecordRow> {
                     style: const TextStyle(
                       color: textDark,
                       fontSize: 13,
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.w400,
                     ),
                   ),
                   2,
@@ -261,7 +261,7 @@ class _RecordRowState extends State<RecordRow> {
                     style: const TextStyle(
                       color: textDark,
                       fontSize: 13,
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.w400,
                     ),
                   ),
                   3,
@@ -274,7 +274,7 @@ class _RecordRowState extends State<RecordRow> {
                     style: const TextStyle(
                       color: textDark,
                       fontSize: 13,
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.w400,
                     ),
                   ),
                   2,

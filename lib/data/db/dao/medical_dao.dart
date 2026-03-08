@@ -45,35 +45,10 @@ class MedicalDao extends DatabaseAccessor<AppDatabase> with _$MedicalDaoMixin {
   }
 
   // 出診單監聽總筆數
-  Stream<int> watchTotalCount({bool? hasAmbulance, bool? isEmergency}) {
-    var query = select(medicalRecord);
-    if (hasAmbulance != null) {
-      query.where((t) => t.hasAmbulance.equals(hasAmbulance));
-    }
-    if (isEmergency != null) {
-      query.where((t) => t.isEmergency.equals(isEmergency));
-    }
-    // count() returns an expression, so we need to select it
-    return (selectOnly(medicalRecord)
-          ..addColumns([medicalRecord.medicalId.count()])
-          ..where(
-            (hasAmbulance != null
-                    ? medicalRecord.hasAmbulance.equals(hasAmbulance)
-                    : const Constant(true)) &
-                (isEmergency != null
-                    ? medicalRecord.isEmergency.equals(isEmergency)
-                    : const Constant(true)),
-          ))
-        .map((row) => row.read(medicalRecord.medicalId.count())!)
-        .watchSingle();
-  }
-
-  // 出診單分頁監聽記錄與病患資料
-  Stream<List<MedicalRecordWithPatient>> watchRecordsPaginated(
-    int limit,
-    int offset, {
+  Stream<int> watchTotalCount({
     bool? hasAmbulance,
     bool? isEmergency,
+    String? searchKeyword,
   }) {
     final query = select(medicalRecord).join([
       leftOuterJoin(
@@ -88,6 +63,33 @@ class MedicalDao extends DatabaseAccessor<AppDatabase> with _$MedicalDaoMixin {
     if (isEmergency != null) {
       query.where(medicalRecord.isEmergency.equals(isEmergency));
     }
+    _applySearchFilter(query, searchKeyword);
+
+    return query.watch().map((rows) => rows.length);
+  }
+
+  // 出診單分頁監聽記錄與病患資料
+  Stream<List<MedicalRecordWithPatient>> watchRecordsPaginated(
+    int limit,
+    int offset, {
+    bool? hasAmbulance,
+    bool? isEmergency,
+    String? searchKeyword,
+  }) {
+    final query = select(medicalRecord).join([
+      leftOuterJoin(
+        patient,
+        patient.medicalId.equalsExp(medicalRecord.medicalId),
+      ),
+    ]);
+
+    if (hasAmbulance != null) {
+      query.where(medicalRecord.hasAmbulance.equals(hasAmbulance));
+    }
+    if (isEmergency != null) {
+      query.where(medicalRecord.isEmergency.equals(isEmergency));
+    }
+    _applySearchFilter(query, searchKeyword);
 
     query
       ..limit(limit, offset: offset)
@@ -101,6 +103,23 @@ class MedicalDao extends DatabaseAccessor<AppDatabase> with _$MedicalDaoMixin {
         );
       }).toList();
     });
+  }
+
+  void _applySearchFilter(
+    JoinedSelectStatement<HasResultSet, dynamic> query,
+    String? searchKeyword,
+  ) {
+    final keyword = searchKeyword?.trim();
+    if (keyword == null || keyword.isEmpty) return;
+
+    final pattern = '%$keyword%';
+    query.where(
+      patient.name.like(pattern) |
+          patient.anonymizationName.like(pattern) |
+          patient.passportOrIdNo.like(pattern) |
+          patient.idNo.like(pattern) |
+          patient.telephone.like(pattern),
+    );
   }
 
   // 根據 medicalId 獲取病患資料

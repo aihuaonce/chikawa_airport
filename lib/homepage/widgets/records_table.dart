@@ -63,6 +63,7 @@ class RecordsTable extends StatelessWidget {
                     viewModel.offset,
                     hasAmbulance: hasAmbulance,
                     isEmergency: isEmergency,
+                    searchKeyword: viewModel.searchKeyword,
                   ),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
@@ -89,6 +90,7 @@ class RecordsTable extends StatelessWidget {
                 stream: database.medicalDao.watchTotalCount(
                   hasAmbulance: hasAmbulance,
                   isEmergency: isEmergency,
+                  searchKeyword: viewModel.searchKeyword,
                 ),
                 builder: (context, snapshot) {
                   final totalCount = snapshot.data ?? 0;

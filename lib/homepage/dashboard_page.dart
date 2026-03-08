@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../data/models/dashboard_view_model.dart';
-import 'widgets/filter_bar.dart';
 import 'widgets/header_bar.dart';
 import 'widgets/records_table.dart';
 import 'widgets/sidebar.dart';
@@ -40,7 +39,6 @@ class _DashboardView extends StatelessWidget {
             child: Column(
               children: [
                 HeaderBar(currentPage: viewModel.currentFilter),
-                const FilterBar(),
                 const Expanded(
                   child: Padding(
                     padding: EdgeInsets.all(16),

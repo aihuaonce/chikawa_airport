@@ -1,4 +1,5 @@
 import 'package:chikawa_airport/data/db/database.dart';
+import 'package:chikawa_airport/data/models/dashboard_view_model.dart';
 import 'package:chikawa_airport/data/models/medical/medical_view.dart';
 import 'package:chikawa_airport/data/models/reference_service.dart';
 import 'package:flutter/material.dart';
@@ -17,6 +18,7 @@ class HeaderBar extends StatefulWidget {
 
 class _HeaderBarState extends State<HeaderBar> {
   String _selectedLang = 'EN';
+  late final TextEditingController _searchController;
 
   // 顏色定義
   static const Color primaryColor = Color(0xFF007A8A);
@@ -24,6 +26,33 @@ class _HeaderBarState extends State<HeaderBar> {
   static const Color textMuted = Color(0xFF94A3B8);
   static const Color bgLight = Color(0xFFF8FAFC);
   static const Color borderColor = Color(0xFFE2E8F0);
+
+  @override
+  void initState() {
+    super.initState();
+    _searchController = TextEditingController();
+    _searchController.addListener(() {
+      if (mounted) setState(() {});
+    });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final keyword = context.read<DashboardViewModel>().searchKeyword;
+    if (_searchController.text != keyword) {
+      _searchController.value = TextEditingValue(
+        text: keyword,
+        selection: TextSelection.collapsed(offset: keyword.length),
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   // 根據頁面返回標題
   String _getPageTitle() {
@@ -65,6 +94,10 @@ class _HeaderBarState extends State<HeaderBar> {
             width: 280,
             height: 40,
             child: TextField(
+              controller: _searchController,
+              onChanged: (value) {
+                context.read<DashboardViewModel>().setSearchKeyword(value);
+              },
               decoration: InputDecoration(
                 hintText: 'Search...',
                 hintStyle: const TextStyle(color: textMuted, fontSize: 14),
@@ -73,6 +106,19 @@ class _HeaderBarState extends State<HeaderBar> {
                   size: 20,
                   color: textMuted,
                 ),
+                suffixIcon: _searchController.text.isEmpty
+                    ? null
+                    : IconButton(
+                        tooltip: 'Clear',
+                        onPressed: () {
+                          _searchController.clear();
+                          context.read<DashboardViewModel>().setSearchKeyword(
+                            '',
+                          );
+                        },
+                        icon: const Icon(Icons.close, size: 18),
+                        color: textMuted,
+                      ),
                 filled: true,
                 fillColor: bgLight,
                 contentPadding: const EdgeInsets.symmetric(vertical: 0),
