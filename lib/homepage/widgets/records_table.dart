@@ -1,15 +1,17 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
 import 'package:chikawa_airport/data/db/dao/medical_dao.dart';
 import 'package:chikawa_airport/data/db/database.dart';
 import 'package:chikawa_airport/data/models/dashboard_view_model.dart';
 import 'package:chikawa_airport/data/models/record_page.dart';
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'record_row.dart';
+
 import 'pagination_bar.dart';
+import 'record_row.dart';
 
 class RecordsTable extends StatelessWidget {
   const RecordsTable({super.key});
-  // 顏色定義
+
   static const Color borderColor = Color(0xFFE2E8F0);
   static const Color headerBg = Color(0xFFF8FAFC);
   static const Color textMuted = Color(0xFF64748B);
@@ -17,10 +19,8 @@ class RecordsTable extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final database = context.read<AppDatabase>();
-
     final viewModel = context.watch<DashboardViewModel>();
 
-    // 根據目前的 Filter 設定查詢條件
     bool? hasAmbulance;
     bool? isEmergency;
 
@@ -56,10 +56,8 @@ class RecordsTable extends StatelessWidget {
             children: [
               const _TableHeader(),
               const Divider(height: 1),
-
               Expanded(
                 child: StreamBuilder<List<MedicalRecordWithPatient>>(
-                  // 根據當前頁碼抓取資料
                   stream: database.medicalDao.watchRecordsPaginated(
                     viewModel.pageSize,
                     viewModel.offset,
@@ -70,9 +68,10 @@ class RecordsTable extends StatelessWidget {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const Center(child: CircularProgressIndicator());
                     }
+
                     final records = snapshot.data ?? [];
                     if (records.isEmpty) {
-                      return const Center(child: Text('目前尚無記錄'));
+                      return const Center(child: Text('目前尚無資料'));
                     }
 
                     return ListView.separated(
@@ -84,10 +83,7 @@ class RecordsTable extends StatelessWidget {
                   },
                 ),
               ),
-
               const Divider(height: 1),
-
-              // 這裡監聽總筆數，用來畫分頁按鈕
               StreamBuilder<int>(
                 stream: database.medicalDao.watchTotalCount(
                   hasAmbulance: hasAmbulance,
@@ -95,7 +91,6 @@ class RecordsTable extends StatelessWidget {
                 ),
                 builder: (context, snapshot) {
                   final totalCount = snapshot.data ?? 0;
-                  // 計算總頁數傳給 PaginationBar
                   final totalPages = (totalCount / viewModel.pageSize).ceil();
 
                   return PaginationBar(
@@ -113,7 +108,6 @@ class RecordsTable extends StatelessWidget {
   }
 }
 
-// 表格標題
 class _TableHeader extends StatelessWidget {
   const _TableHeader();
 
@@ -132,11 +126,10 @@ class _TableHeader extends StatelessWidget {
       child: Row(
         children: [
           _cell('日期與時間', 2, headerStyle),
-          _cell('病患名稱', 3, headerStyle),
-          _cell('航班 / 位置', 3, headerStyle),
-          _cell('主訴症狀', 5, headerStyle),
-          _cell('狀態', 2, headerStyle, textAlign: TextAlign.center),
-          _cell('操作', 1, headerStyle, textAlign: TextAlign.right),
+          _cell('病患名稱', 2, headerStyle),
+          _cell('國籍', 2, headerStyle),
+          _cell('事發地點', 3, headerStyle),
+          _cell('負責護理師', 2, headerStyle),
         ],
       ),
     );
@@ -150,7 +143,7 @@ class _TableHeader extends StatelessWidget {
   }) {
     return Expanded(
       flex: flex,
-      child: Text(text.toUpperCase(), style: style, textAlign: textAlign),
+      child: Text(text, style: style, textAlign: textAlign),
     );
   }
 }
