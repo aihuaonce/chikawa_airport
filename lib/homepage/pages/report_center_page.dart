@@ -128,6 +128,7 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
     final db = context.read<AppDatabase>();
     return Scaffold(
       backgroundColor: pageBg,
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         backgroundColor: Colors.white,
         foregroundColor: textDark,
@@ -190,7 +191,14 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
                     }
 
                     final allRecords = snapshot.data ?? [];
-                    final records = _applySearch(allRecords);
+                    final records = [..._applySearch(allRecords)]
+                      ..sort((a, b) {
+                        final createdAtCompare = b.record.createdAt.compareTo(
+                          a.record.createdAt,
+                        );
+                        if (createdAtCompare != 0) return createdAtCompare;
+                        return b.record.medicalId.compareTo(a.record.medicalId);
+                      });
                     if (records.isEmpty) {
                       return const Center(
                         child: Text(
@@ -267,14 +275,42 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
                               width: 220,
                               child: DropdownButtonFormField<PatientReportType>(
                                 initialValue: effectiveType,
+                                icon: const Icon(
+                                  Icons.expand_more_rounded,
+                                  color: textMuted,
+                                ),
+                                style: const TextStyle(
+                                  color: textDark,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                                dropdownColor: Colors.white,
                                 decoration: InputDecoration(
                                   isDense: true,
+                                  filled: true,
+                                  fillColor: const Color(0xFFF8FAFC),
                                   contentPadding: const EdgeInsets.symmetric(
-                                    horizontal: 10,
-                                    vertical: 10,
+                                    horizontal: 12,
+                                    vertical: 12,
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                    borderSide: const BorderSide(
+                                      color: borderColor,
+                                    ),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                    borderSide: const BorderSide(
+                                      color: primaryColor,
+                                      width: 1.4,
+                                    ),
                                   ),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(8),
+                                    borderSide: const BorderSide(
+                                      color: borderColor,
+                                    ),
                                   ),
                                 ),
                                 items: availableTypes.map((type) {

@@ -27,6 +27,7 @@ class _DashboardView extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: const Color(0xFFF6F8FA),
+      resizeToAvoidBottomInset: false,
       body: Row(
         children: [
           Sidebar(
