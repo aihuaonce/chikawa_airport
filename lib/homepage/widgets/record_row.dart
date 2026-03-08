@@ -26,6 +26,7 @@ class RecordRow extends StatefulWidget {
 class _RecordRowState extends State<RecordRow> {
   static const Color textDark = Color(0xFF1E293B);
   static const Color textMuted = Color(0xFF64748B);
+  static const Color primaryColor = Color(0xFF007A8A);
 
   late Future<_RecordExtraInfo> _extraInfoFuture;
 
@@ -51,14 +52,32 @@ class _RecordRowState extends State<RecordRow> {
     String incidentPlace = '未填寫';
     final incident = await db.incidentDao.getByMedicalId(medicalId);
     if (incident != null) {
-      final finalPlace = incident.incidentPlaceFinal?.trim();
-      if (finalPlace != null && finalPlace.isNotEmpty) {
-        incidentPlace = finalPlace;
+      final category1Name = refService
+          .getIncidentPlaceCategoryById(incident.incidentPlaceCategoryId)
+          ?.name
+          .trim();
+
+      final category2Id = incident.incidentPlaceCategory2Id;
+      final category2Name = category2Id == null
+          ? null
+          : (await db.referenceDao.getIncidentPlaceCategory2ById(
+              category2Id,
+            ))?.name.trim();
+
+      if (category1Name != null &&
+          category1Name.isNotEmpty &&
+          category2Name != null &&
+          category2Name.isNotEmpty) {
+        incidentPlace = '$category1Name / $category2Name';
+      } else if (category1Name != null && category1Name.isNotEmpty) {
+        incidentPlace = category1Name;
+      } else if (category2Name != null && category2Name.isNotEmpty) {
+        incidentPlace = category2Name;
       } else {
-        final category = refService.getIncidentPlaceCategoryById(
-          incident.incidentPlaceCategoryId,
-        );
-        incidentPlace = category?.name ?? '未填寫';
+        final finalPlace = incident.incidentPlaceFinal?.trim();
+        if (finalPlace != null && finalPlace.isNotEmpty) {
+          incidentPlace = finalPlace;
+        }
       }
     }
 
@@ -78,6 +97,17 @@ class _RecordRowState extends State<RecordRow> {
     }
 
     return _RecordExtraInfo(incidentPlace: incidentPlace, nurseName: nurseName);
+  }
+
+  int? _calculateAge(DateTime? birthday) {
+    if (birthday == null) return null;
+    final now = DateTime.now();
+    var age = now.year - birthday.year;
+    if (now.month < birthday.month ||
+        (now.month == birthday.month && now.day < birthday.day)) {
+      age--;
+    }
+    return age;
   }
 
   void _openRecordDetail(BuildContext context, int medicalId) {
@@ -130,6 +160,10 @@ class _RecordRowState extends State<RecordRow> {
         ? patient.name!
         : '未填寫';
 
+    final sexText = patient.sexId == 1 ? 'M' : (patient.sexId == 2 ? 'F' : '?');
+    final age = _calculateAge(patient.birthday);
+    final ageText = age == null ? '--' : '${age}y';
+
     return FutureBuilder<_RecordExtraInfo>(
       future: _extraInfoFuture,
       builder: (context, snapshot) {
@@ -143,7 +177,7 @@ class _RecordRowState extends State<RecordRow> {
         return InkWell(
           onTap: () => _openRecordDetail(context, record.medicalId),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
             child: Row(
               children: [
                 _cell(
@@ -155,28 +189,54 @@ class _RecordRowState extends State<RecordRow> {
                         style: const TextStyle(
                           color: textDark,
                           fontWeight: FontWeight.w700,
-                          fontSize: 13,
+                          fontSize: 14,
                         ),
                       ),
                       const SizedBox(height: 2),
                       Text(
                         DateFormat('HH:mm').format(record.createdAt),
-                        style: const TextStyle(color: textMuted, fontSize: 12),
+                        style: const TextStyle(
+                          color: textDark,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 12,
+                        ),
                       ),
                     ],
                   ),
                   2,
                 ),
                 _cell(
-                  Text(
-                    patientName,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: textDark,
-                      fontWeight: FontWeight.w700,
-                      fontSize: 13,
-                    ),
+                  Row(
+                    children: [
+                      _buildAvatar(patientName),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              patientName,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                color: textDark,
+                                fontWeight: FontWeight.w700,
+                                fontSize: 14,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              '$sexText / $ageText',
+                              style: const TextStyle(
+                                color: textDark,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                   2,
                 ),
@@ -185,7 +245,11 @@ class _RecordRowState extends State<RecordRow> {
                     nationality,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(color: textMuted, fontSize: 13),
+                    style: const TextStyle(
+                      color: textDark,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                   2,
                 ),
@@ -194,7 +258,11 @@ class _RecordRowState extends State<RecordRow> {
                     incidentPlace,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(color: textMuted, fontSize: 13),
+                    style: const TextStyle(
+                      color: textDark,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                   3,
                 ),
@@ -203,7 +271,11 @@ class _RecordRowState extends State<RecordRow> {
                     nurseName,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(color: textMuted, fontSize: 13),
+                    style: const TextStyle(
+                      color: textDark,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                   2,
                 ),
@@ -217,6 +289,26 @@ class _RecordRowState extends State<RecordRow> {
 
   Widget _cell(Widget child, int flex) {
     return Expanded(flex: flex, child: child);
+  }
+
+  Widget _buildAvatar(String name) {
+    return Container(
+      width: 34,
+      height: 34,
+      decoration: BoxDecoration(
+        color: primaryColor.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      alignment: Alignment.center,
+      child: Text(
+        name.isNotEmpty ? name[0].toUpperCase() : '?',
+        style: const TextStyle(
+          color: primaryColor,
+          fontWeight: FontWeight.w700,
+          fontSize: 12,
+        ),
+      ),
+    );
   }
 }
 
