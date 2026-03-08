@@ -1,11 +1,13 @@
-import 'package:chikawa_airport/data/db/database.dart';
-import 'package:chikawa_airport/data/models/dashboard_view_model.dart';
-import 'package:chikawa_airport/data/models/medical/medical_view.dart';
-import 'package:chikawa_airport/data/models/reference_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
+import '../../data/db/database.dart';
+import '../../data/models/dashboard_view_model.dart';
+import '../../data/models/medical/medical_view.dart';
 import '../../data/models/record_page.dart';
+import '../../data/models/reference_service.dart';
 import '../../medical/medical.dart';
+import '../pages/report_center_page.dart';
 
 class HeaderBar extends StatefulWidget {
   final RecordPage currentPage;
@@ -20,7 +22,6 @@ class _HeaderBarState extends State<HeaderBar> {
   String _selectedLang = 'EN';
   late final TextEditingController _searchController;
 
-  // 顏色定義
   static const Color primaryColor = Color(0xFF007A8A);
   static const Color textDark = Color(0xFF1E293B);
   static const Color textMuted = Color(0xFF94A3B8);
@@ -54,7 +55,6 @@ class _HeaderBarState extends State<HeaderBar> {
     super.dispose();
   }
 
-  // 根據頁面返回標題
   String _getPageTitle() {
     switch (widget.currentPage) {
       case RecordPage.primary:
@@ -86,10 +86,7 @@ class _HeaderBarState extends State<HeaderBar> {
               letterSpacing: -0.5,
             ),
           ),
-
           const Spacer(),
-
-          // 搜尋欄
           SizedBox(
             width: 280,
             height: 40,
@@ -129,17 +126,16 @@ class _HeaderBarState extends State<HeaderBar> {
               ),
             ),
           ),
-
           const SizedBox(width: 24),
-
-          // 中英切換
           _buildSlidingLangSelector(),
-
           const SizedBox(width: 16),
-
-          // 報表按鈕
           OutlinedButton.icon(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const ReportCenterPage()),
+              );
+            },
             icon: const Icon(Icons.bar_chart, size: 20, color: primaryColor),
             label: const Text('報表'),
             style: OutlinedButton.styleFrom(
@@ -155,10 +151,7 @@ class _HeaderBarState extends State<HeaderBar> {
               ),
             ),
           ),
-
           const SizedBox(width: 16),
-
-          // 新增病患按鈕
           Container(
             decoration: BoxDecoration(
               boxShadow: [
@@ -171,27 +164,22 @@ class _HeaderBarState extends State<HeaderBar> {
             ),
             child: ElevatedButton.icon(
               onPressed: () async {
-                // 1. 同時獲取 Database 和 ReferenceService
                 final database = context.read<AppDatabase>();
-                final refService = context.read<ReferenceService>(); // 新增這一行
-
-                // 2. 建立新紀錄
+                final refService = context.read<ReferenceService>();
                 final newId = await database.medicalDao
                     .createNewPatientRecord();
 
-                if (context.mounted) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ChangeNotifierProvider(
-                        create: (_) =>
-                            MedicalViewModel(database, refService, newId)
-                              ..init(),
-                        child: MedicalPage(medicalId: newId),
-                      ),
+                if (!context.mounted) return;
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ChangeNotifierProvider(
+                      create: (_) =>
+                          MedicalViewModel(database, refService, newId)..init(),
+                      child: MedicalPage(medicalId: newId),
                     ),
-                  );
-                }
+                  ),
+                );
               },
               icon: const Icon(Icons.person_add, size: 20, color: Colors.white),
               label: const Text('新增病患'),
@@ -215,7 +203,6 @@ class _HeaderBarState extends State<HeaderBar> {
     );
   }
 
-  // 中英切換動畫
   Widget _buildSlidingLangSelector() {
     return Container(
       width: 100,
@@ -261,7 +248,7 @@ class _HeaderBarState extends State<HeaderBar> {
   }
 
   Widget _buildLangText(String lang) {
-    final bool isActive = _selectedLang == lang;
+    final isActive = _selectedLang == lang;
     return GestureDetector(
       onTap: () => setState(() => _selectedLang = lang),
       behavior: HitTestBehavior.opaque,
