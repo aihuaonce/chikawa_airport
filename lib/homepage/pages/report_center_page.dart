@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'package:intl/intl.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
@@ -6,6 +7,8 @@ import 'package:provider/provider.dart';
 
 import '../../data/db/dao/medical_dao.dart';
 import '../../data/db/database.dart';
+import '../../data/models/reference_service.dart';
+import '../reports/telex_report.dart';
 
 class ReportCenterPage extends StatefulWidget {
   const ReportCenterPage({super.key});
@@ -63,6 +66,7 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
     final result = <PatientReportType>[
       PatientReportType.medical,
       PatientReportType.nursing,
+      PatientReportType.telex,
     ];
     if (record.isEmergency) {
       result.add(PatientReportType.emergency);
@@ -77,6 +81,8 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
     MedicalRecordWithPatient row,
     PatientReportType type,
   ) async {
+    final db = context.read<AppDatabase>();
+    final refService = context.read<ReferenceService>();
     final patientName = row.patient.name?.trim().isNotEmpty == true
         ? row.patient.name!
         : '未填寫姓名';
@@ -85,6 +91,19 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
     ).format(row.record.createdAt);
 
     try {
+      if (type == PatientReportType.telex) {
+        final reportData = await _buildTelexReportData(
+          db: db,
+          refService: refService,
+          row: row,
+        );
+        final pdfBytes = await buildTelexPdf(reportData);
+        await Printing.layoutPdf(
+          name: 'patient_${row.record.medicalId}_${type.code}.pdf',
+          onLayout: (_) async => pdfBytes,
+        );
+        return;
+      }
       await Printing.layoutPdf(
         name: 'patient_${row.record.medicalId}_${type.code}.pdf',
         onLayout: (format) async {
@@ -121,6 +140,293 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
         context,
       ).showSnackBar(SnackBar(content: Text('列印失敗：$e')));
     }
+  }
+
+  Future<TelexReportData> _buildTelexReportData({
+    required AppDatabase db,
+    required ReferenceService refService,
+    required MedicalRecordWithPatient row,
+  }) async {
+    final medicalId = row.record.medicalId;
+
+    final results = await Future.wait([
+      db.flightDao.getFlightByMedicalId(medicalId),
+      db.incidentDao.getByMedicalId(medicalId),
+      db.treatmentDao.getTreatment(medicalId),
+      db.medicalFeeDao.getFeeByMedicalId(medicalId),
+      db.telexDao.getTelexByMedicalId(medicalId),
+      db.treatmentDao.getStaffAssignments(medicalId),
+    ]);
+
+    final flight = results[0] as FlightRecordData?;
+    final incident = results[1] as IncidentRecordData?;
+    final treatment = results[2] as TreatmentData?;
+    final fee = results[3] as MedicalFeeData?;
+    final telex = results[4] as TelexDocumentData?;
+    final staffAssignments = results[5] as List<MedicalStaffAssignmentData>;
+
+    final patient = row.patient;
+    final birthday = patient.birthday;
+    final birthYear = birthday == null ? '' : birthday.year.toString();
+    final birthMonth = birthday == null ? '' : _twoDigits(birthday.month);
+    final birthDay = birthday == null ? '' : _twoDigits(birthday.day);
+
+    final sexName = refService.getSexById(patient.sexId)?.name ?? '';
+    final nationalityName = patient.nationalityId == null
+        ? ''
+        : refService.getNationalityById(patient.nationalityId)?.name ?? '';
+
+    final airlineName = flight?.airlineId == null
+        ? ''
+        : refService.getAirlineById(flight!.airlineId)?.name ?? '';
+    final flightNo = flight?.flightNumber.trim() ?? '';
+    final isAirline = airlineName.isNotEmpty || flightNo.isNotEmpty;
+
+    final travelStatusName = flight?.travelStatusId == null
+        ? ''
+        : refService.getTravelStatusById(flight!.travelStatusId)?.name ?? '';
+    final direction = _resolveDirection(travelStatusName);
+
+    final incidentDate = incident?.incidentDate;
+    final incidentYear = incidentDate == null
+        ? ''
+        : incidentDate.year.toString();
+    final incidentMonth = incidentDate == null
+        ? ''
+        : _twoDigits(incidentDate.month);
+    final incidentDay = incidentDate == null
+        ? ''
+        : _twoDigits(incidentDate.day);
+
+    final location = await _resolveIncidentLocation(
+      db: db,
+      refService: refService,
+      incident: incident,
+    );
+
+    final reportTime = incident?.notificationTime;
+    final treatTime = incident?.examinationTime ?? treatment?.treatmentTime;
+
+    final diagnosis = _buildDiagnosis(treatment);
+
+    final result = refService.getTreatmentResultById(treatment?.resultId);
+    final outcome = _mapOutcome(result?.name ?? '');
+    final transferTo = outcome == '轉送醫院'
+        ? _resolveTransferTo(refService, treatment, result)
+        : '';
+
+    final totalFee = (fee?.consultFee ?? 0) + (fee?.ambulanceFee ?? 0);
+    final chargedYes = totalFee > 0;
+    final chargedNo = !chargedYes;
+    final chargedAmount = chargedYes ? _formatFeeAmount(totalFee) : '';
+
+    final staffNames = _resolveStaffNames(
+      refService: refService,
+      staffAssignments: staffAssignments,
+      treatment: treatment,
+    );
+
+    final toStations =
+        refService.stationList.where((s) => s.code.endsWith('_OCC')).toList()
+          ..sort((a, b) => a.code.compareTo(b.code));
+    final fromStations =
+        refService.stationList.where((s) => s.code.endsWith('_MED')).toList()
+          ..sort((a, b) => a.code.compareTo(b.code));
+
+    final toLines = toStations
+        .map(
+          (station) => TelexFaxLine(
+            text: station.name,
+            checked: telex?.toStationId == station.id,
+          ),
+        )
+        .toList();
+    final fromLines = fromStations
+        .map(
+          (station) => TelexFaxLine(
+            text: station.name,
+            checked: telex?.fromStationId == station.id,
+          ),
+        )
+        .toList();
+
+    return TelexReportData(
+      patientName: patient.name?.trim().isNotEmpty == true
+          ? patient.name!.trim()
+          : patient.anonymizationName?.trim() ?? '',
+      nationality: nationalityName,
+      birthYear: birthYear,
+      birthMonth: birthMonth,
+      birthDay: birthDay,
+      gender: sexName,
+      isAirline: isAirline,
+      airline: airlineName,
+      flightNo: flightNo,
+      isOther: false,
+      otherDetail: '',
+      incidentYear: incidentYear,
+      incidentMonth: incidentMonth,
+      incidentDay: incidentDay,
+      location: location,
+      reporter: incident?.notificationPerson?.trim() ?? '',
+      direction: direction,
+      reportHour: _formatHour(reportTime),
+      reportMin: _formatMinute(reportTime),
+      treatHour: _formatHour(treatTime),
+      treatMin: _formatMinute(treatTime),
+      diagnosis: diagnosis,
+      outcome: outcome,
+      transferTo: transferTo,
+      chargedYes: chargedYes,
+      chargedNo: chargedNo,
+      chargedAmount: chargedAmount,
+      doctor: staffNames.doctor,
+      nurse: staffNames.nurse,
+      toTitle: 'TO：桃園國際機場股份有限公司營運安全處',
+      fromTitle: 'FROM：聯新國際醫院桃園國際機場醫療中心',
+      toLines: toLines,
+      fromLines: fromLines,
+    );
+  }
+
+  String _buildDiagnosis(TreatmentData? treatment) {
+    final parts = [
+      treatment?.tentative,
+      treatment?.secondaryDiagnosis1,
+      treatment?.secondaryDiagnosis2,
+    ].where((value) => value?.trim().isNotEmpty == true);
+    return parts.map((value) => value!.trim()).join('\n');
+  }
+
+  String _resolveDirection(String value) {
+    switch (value) {
+      case '出境':
+      case '入境':
+      case '過境':
+        return value;
+      default:
+        return '';
+    }
+  }
+
+  Future<String> _resolveIncidentLocation({
+    required AppDatabase db,
+    required ReferenceService refService,
+    required IncidentRecordData? incident,
+  }) async {
+    if (incident == null) return '';
+    final category = refService.getIncidentPlaceCategoryById(
+      incident.incidentPlaceCategoryId,
+    );
+    final category2 = incident.incidentPlaceCategory2Id == null
+        ? null
+        : await db.referenceDao.getIncidentPlaceCategory2ById(
+            incident.incidentPlaceCategory2Id!,
+          );
+    final parts = <String>[
+      if (category?.name.trim().isNotEmpty == true) category!.name.trim(),
+      if (category2?.name.trim().isNotEmpty == true) category2!.name.trim(),
+      if (incident.incidentPlaceFinal?.trim().isNotEmpty == true)
+        incident.incidentPlaceFinal!.trim(),
+    ];
+    return parts.join(' / ');
+  }
+
+  String _mapOutcome(String name) {
+    if (name.contains('自行')) {
+      return '自行返家';
+    }
+    if (name.contains('繼續搭機')) {
+      return '繼續搭機';
+    }
+    if (name.contains('轉送') || (name.contains('轉') && name.contains('醫院'))) {
+      return '轉送醫院';
+    }
+    if (name.contains('觀察')) {
+      return '醫療中心觀察';
+    }
+    if (name.contains('空跑')) {
+      return '空跑';
+    }
+    return name.isEmpty ? '' : '其他';
+  }
+
+  String _resolveTransferTo(
+    ReferenceService refService,
+    TreatmentData? treatment,
+    TreatmentResultData? result,
+  ) {
+    if (treatment?.referralHospitalId != null) {
+      return refService
+              .getReferralHospitalById(treatment!.referralHospitalId)
+              ?.name ??
+          '';
+    }
+    final fallback = treatment?.referralHospitalFinal?.trim();
+    if (fallback != null && fallback.isNotEmpty) {
+      return fallback;
+    }
+    final resultName = result?.name ?? '';
+    if (resultName.contains('醫院')) {
+      return resultName.replaceFirst('轉送', '').replaceFirst('轉', '').trim();
+    }
+    return '';
+  }
+
+  String _formatFeeAmount(double amount) {
+    final rounded = amount % 1 == 0;
+    return rounded ? amount.toStringAsFixed(0) : amount.toStringAsFixed(2);
+  }
+
+  String _twoDigits(int value) => value.toString().padLeft(2, '0');
+
+  String _formatHour(DateTime? time) {
+    return time == null ? '' : _twoDigits(time.hour);
+  }
+
+  String _formatMinute(DateTime? time) {
+    return time == null ? '' : _twoDigits(time.minute);
+  }
+
+  _StaffNames _resolveStaffNames({
+    required ReferenceService refService,
+    required List<MedicalStaffAssignmentData> staffAssignments,
+    required TreatmentData? treatment,
+  }) {
+    String doctor = '';
+    String nurse = '';
+
+    for (final assignment in staffAssignments) {
+      final role = _findStaffRole(refService, assignment.staffRoleId);
+      final roleCode = role?.code;
+      final name = assignment.staffName?.trim().isNotEmpty == true
+          ? assignment.staffName!.trim()
+          : refService.getMedicalStaffById(assignment.staffId)?.name ?? '';
+      if (name.isEmpty) continue;
+      if (roleCode == 'DOCTOR' && doctor.isEmpty) {
+        doctor = name;
+      }
+      if (roleCode == 'NURSE' && nurse.isEmpty) {
+        nurse = name;
+      }
+    }
+
+    if (doctor.isEmpty) {
+      doctor = treatment?.directorName?.trim() ?? '';
+    }
+
+    return _StaffNames(doctor: doctor, nurse: nurse);
+  }
+
+  MedicalStaffRoleData? _findStaffRole(
+    ReferenceService refService,
+    int? roleId,
+  ) {
+    if (roleId == null) return null;
+    for (final role in refService.medicalStaffRoleList) {
+      if (role.id == roleId) return role;
+    }
+    return null;
   }
 
   @override
@@ -354,7 +660,7 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
   }
 }
 
-enum PatientReportType { medical, emergency, ambulance, nursing }
+enum PatientReportType { medical, emergency, ambulance, nursing, telex }
 
 extension PatientReportTypeLabel on PatientReportType {
   String get label {
@@ -367,6 +673,8 @@ extension PatientReportTypeLabel on PatientReportType {
         return '救護車紀錄報表';
       case PatientReportType.nursing:
         return '護理紀錄報表';
+      case PatientReportType.telex:
+        return '出診診療服務電傳文件';
     }
   }
 
@@ -380,6 +688,8 @@ extension PatientReportTypeLabel on PatientReportType {
         return 'Ambulance Record';
       case PatientReportType.nursing:
         return 'Nursing Record';
+      case PatientReportType.telex:
+        return 'Telex Document';
     }
   }
 
@@ -393,6 +703,15 @@ extension PatientReportTypeLabel on PatientReportType {
         return 'ambulance';
       case PatientReportType.nursing:
         return 'nursing';
+      case PatientReportType.telex:
+        return 'telex';
     }
   }
+}
+
+class _StaffNames {
+  final String doctor;
+  final String nurse;
+
+  const _StaffNames({required this.doctor, required this.nurse});
 }
