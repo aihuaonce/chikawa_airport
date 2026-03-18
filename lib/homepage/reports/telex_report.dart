@@ -92,6 +92,26 @@ class TelexReportData {
   });
 }
 
+// ============================================================================
+// Constants & Theme
+// ============================================================================
+
+// PdfColor.fromHex is not const, so we use static colors
+final _primaryColor = PdfColor.fromHex('#0D6E6E'); // Teal 700
+final _sectionBgColor = PdfColor.fromHex('#F5F5F5');
+final _borderColor = PdfColor.fromHex('#BDBDBD');
+final _textDark = PdfColor.fromHex('#212121');
+final _textMuted = PdfColor.fromHex('#757575');
+
+const _spacerXs = 2.0;
+const _spacerSm = 4.0;
+const _spacerMd = 6.0;
+const _spacerLg = 10.0;
+
+// ============================================================================
+// Main Build Function
+// ============================================================================
+
 Future<Uint8List> buildTelexPdf(TelexReportData d) async {
   final pdf = pw.Document();
 
@@ -102,218 +122,79 @@ Future<Uint8List> buildTelexPdf(TelexReportData d) async {
     pw.Page(
       pageFormat: PdfPageFormat.a4,
       margin: const pw.EdgeInsets.symmetric(
-        horizontal: 25 * PdfPageFormat.mm,
-        vertical: 18 * PdfPageFormat.mm,
+        horizontal: 22 * PdfPageFormat.mm,
+        vertical: 15 * PdfPageFormat.mm,
       ),
       build: (ctx) => pw.Column(
         crossAxisAlignment: pw.CrossAxisAlignment.start,
         children: [
-          pw.Row(
-            crossAxisAlignment: pw.CrossAxisAlignment.end,
-            children: [
-              pw.Container(
-                width: 10 * PdfPageFormat.mm,
-                height: 10 * PdfPageFormat.mm,
-                decoration: pw.BoxDecoration(
-                  border: pw.Border.all(color: PdfColors.teal700),
-                  shape: pw.BoxShape.circle,
-                ),
-                child: pw.Center(
-                  child: pw.Text(
-                    '❖',
-                    style: pw.TextStyle(
-                      font: font,
-                      fontSize: 12,
-                      color: PdfColors.teal700,
-                    ),
-                  ),
-                ),
-              ),
-              pw.SizedBox(width: 4),
-              pw.Column(
-                crossAxisAlignment: pw.CrossAxisAlignment.start,
-                children: [
-                  pw.Text(
-                    '聯新國際醫院 桃園國際機場醫療中心',
-                    style: pw.TextStyle(font: fontB, fontSize: 14),
-                  ),
-                  pw.Text(
-                    'LANDSEED MEDICAL CLINIC AT TAIWAN TAOYUAN '
-                    'INTERNATIONAL AIRPORT',
-                    style: pw.TextStyle(font: font, fontSize: 6),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          pw.Divider(thickness: 0.5),
+          // ── Header ──────────────────────────────────────────────────────
+          _buildHeader(font, fontB),
+          pw.SizedBox(height: _spacerMd),
+          pw.Divider(thickness: 0.8, color: _primaryColor),
+          pw.SizedBox(height: _spacerMd),
+
+          // ── Title ───────────────────────────────────────────────────────
           pw.Center(
-            child: pw.Text(
-              '出 診 診 療 服 務 電 傳 文 件',
-              style: pw.TextStyle(font: fontB, fontSize: 15),
-            ),
-          ),
-          pw.SizedBox(height: 6),
-          pw.Text(d.toTitle, style: pw.TextStyle(font: fontB, fontSize: 9)),
-          _faxRow(d.toLines, font),
-          pw.SizedBox(height: 4),
-          pw.Text(d.fromTitle, style: pw.TextStyle(font: fontB, fontSize: 9)),
-          _faxRow(d.fromLines, font),
-          pw.Divider(thickness: 0.3),
-          _row2('病患姓名：', d.patientName, '國籍：', d.nationality, font, fontB),
-          _row2(
-            '生日：西元 ${d.birthYear} 年 ${d.birthMonth} 月 ${d.birthDay} 日',
-            '',
-            '性別：',
-            d.gender,
-            font,
-            fontB,
-            leftFlex: 3,
-          ),
-          pw.Row(
-            children: [
-              _checkbox(d.isAirline, font),
-              pw.Text('航空公司：', style: pw.TextStyle(font: fontB, fontSize: 9)),
-              _fillField(d.airline, font, width: 35 * PdfPageFormat.mm),
-              pw.SizedBox(width: 6),
-              pw.Text('班機：', style: pw.TextStyle(font: fontB, fontSize: 9)),
-              _fillField(d.flightNo, font, width: 28 * PdfPageFormat.mm),
-              pw.SizedBox(width: 6),
-              _checkbox(d.isOther, font),
-              pw.Text('其他：', style: pw.TextStyle(font: fontB, fontSize: 9)),
-              _fillField(d.otherDetail, font),
-            ],
-          ),
-          _row2(
-            '醫生日期：西元 ${d.incidentYear} 年 ${d.incidentMonth} 月 '
-                '${d.incidentDay} 日',
-            '',
-            '地點：',
-            d.location,
-            font,
-            fontB,
-            leftFlex: 3,
-          ),
-          pw.Row(
-            children: [
-              pw.Text('通報人員：', style: pw.TextStyle(font: fontB, fontSize: 9)),
-              _fillField(d.reporter, font, width: 50 * PdfPageFormat.mm),
-              pw.SizedBox(width: 8),
-              _checkLabel('出境', d.direction == '出境', font),
-              pw.SizedBox(width: 4),
-              _checkLabel('入境', d.direction == '入境', font),
-              pw.SizedBox(width: 4),
-              _checkLabel('過境', d.direction == '過境', font),
-            ],
-          ),
-          pw.Row(
-            children: [
-              pw.Text('通報時間：', style: pw.TextStyle(font: fontB, fontSize: 9)),
-              _fillField(d.reportHour, font, width: 12 * PdfPageFormat.mm),
-              pw.Text(' 時 ', style: pw.TextStyle(font: font, fontSize: 9)),
-              _fillField(d.reportMin, font, width: 12 * PdfPageFormat.mm),
-              pw.Text(' 分     ', style: pw.TextStyle(font: font, fontSize: 9)),
-              pw.Text('診療時間：', style: pw.TextStyle(font: fontB, fontSize: 9)),
-              _fillField(d.treatHour, font, width: 12 * PdfPageFormat.mm),
-              pw.Text(' 時 ', style: pw.TextStyle(font: font, fontSize: 9)),
-              _fillField(d.treatMin, font, width: 12 * PdfPageFormat.mm),
-              pw.Text(' 分', style: pw.TextStyle(font: font, fontSize: 9)),
-            ],
-          ),
-          pw.SizedBox(height: 4),
-          pw.Text('初步診斷（中文）：', style: pw.TextStyle(font: fontB, fontSize: 9)),
-          pw.Container(
-            width: double.infinity,
-            height: 24 * PdfPageFormat.mm,
-            decoration: pw.BoxDecoration(
-              border: pw.Border(
-                bottom: pw.BorderSide(width: 0.5, color: PdfColors.grey600),
+            child: pw.Container(
+              padding: const pw.EdgeInsets.symmetric(
+                horizontal: 20,
+                vertical: 6,
               ),
-            ),
-            child: pw.Padding(
-              padding: const pw.EdgeInsets.all(4),
+              decoration: pw.BoxDecoration(
+                color: _primaryColor,
+                borderRadius: pw.BorderRadius.circular(2),
+              ),
               child: pw.Text(
-                d.diagnosis,
-                style: pw.TextStyle(font: font, fontSize: 10),
+                '出 診 診 療 服 務 電 傳 文 件',
+                style: pw.TextStyle(
+                  font: fontB,
+                  fontSize: 14,
+                  color: PdfColors.white,
+                ),
               ),
             ),
           ),
-          pw.SizedBox(height: 6),
-          pw.Row(
-            crossAxisAlignment: pw.CrossAxisAlignment.center,
-            children: [
-              pw.Text(
-                '後續結果（中文）：',
-                style: pw.TextStyle(font: fontB, fontSize: 9),
-              ),
-              _checkLabel('自行返家', d.outcome == '自行返家', font),
-              pw.SizedBox(width: 4),
-              _checkLabel('繼續搭機', d.outcome == '繼續搭機', font),
-              pw.SizedBox(width: 4),
-              _checkLabel('轉送至', d.outcome == '轉送醫院', font),
-              pw.SizedBox(width: 2),
-              pw.Text('（', style: pw.TextStyle(font: font, fontSize: 9)),
-              _fillField(d.transferTo, font, width: 20 * PdfPageFormat.mm),
-              pw.Text('）醫院', style: pw.TextStyle(font: font, fontSize: 9)),
-            ],
-          ),
-          pw.Row(
-            children: [
-              pw.SizedBox(width: 8 * PdfPageFormat.mm),
-              _checkLabel('醫療中心觀察', d.outcome == '醫療中心觀察', font),
-              pw.SizedBox(width: 4),
-              _checkLabel('空跑', d.outcome == '空跑', font),
-              pw.SizedBox(width: 4),
-              _checkLabel('其他', d.outcome == '其他', font),
-            ],
-          ),
-          pw.SizedBox(height: 6),
-          pw.Row(
-            children: [
-              pw.Text(
-                '其他事宜：醫療費用收費',
-                style: pw.TextStyle(font: fontB, fontSize: 9),
-              ),
-              _checkbox(d.chargedYes, font),
-              pw.Text('是 ', style: pw.TextStyle(font: font, fontSize: 9)),
-              _checkbox(d.chargedNo, font),
-              pw.Text('否，金額', style: pw.TextStyle(font: font, fontSize: 9)),
-              _fillField(d.chargedAmount, font, width: 30 * PdfPageFormat.mm),
-            ],
-          ),
+          pw.SizedBox(height: _spacerLg),
+
+          // ── Fax Info Section ─────────────────────────────────────────────
+          _buildFaxSection(d.toTitle, d.toLines, d.fromTitle, d.fromLines, font, fontB),
+          pw.SizedBox(height: _spacerLg),
+
+          // ── Patient Info Section ─────────────────────────────────────────
+          _buildPatientSection(d, font, fontB),
+          pw.SizedBox(height: _spacerMd),
+
+          // ── Travel Info Section ──────────────────────────────────────────
+          _buildTravelSection(d, font, fontB),
+          pw.SizedBox(height: _spacerMd),
+
+          // ── Incident Info Section ────────────────────────────────────────
+          _buildIncidentSection(d, font, fontB),
+          pw.SizedBox(height: _spacerMd),
+
+          // ── Diagnosis Section ────────────────────────────────────────────
+          _buildDiagnosisSection(d, font, fontB),
+          pw.SizedBox(height: _spacerMd),
+
+          // ── Outcome Section ───────────────────────────────────────────────
+          _buildOutcomeSection(d, font, fontB),
+          pw.SizedBox(height: _spacerMd),
+
+          // ── Charges Section ─────────────────────────────────────────────
+          _buildChargesSection(d, font, fontB),
+
           pw.Expanded(child: pw.SizedBox()),
-          pw.Divider(thickness: 0.5),
-          pw.Row(
-            children: [
-              pw.Text('醫師：', style: pw.TextStyle(font: fontB, fontSize: 9)),
-              _fillField(d.doctor, font, width: 45 * PdfPageFormat.mm),
-              pw.SizedBox(width: 16),
-              pw.Text('護理師：', style: pw.TextStyle(font: fontB, fontSize: 9)),
-              _fillField(d.nurse, font, width: 45 * PdfPageFormat.mm),
-            ],
-          ),
-          pw.SizedBox(height: 8),
-          pw.Row(
-            mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-            children: [
-              pw.Text(
-                '51-P-002-002',
-                style: pw.TextStyle(
-                  font: font,
-                  fontSize: 7,
-                  color: PdfColors.grey600,
-                ),
-              ),
-              pw.Text(
-                '聯新(A364)2021/11x500張',
-                style: pw.TextStyle(
-                  font: font,
-                  fontSize: 7,
-                  color: PdfColors.grey600,
-                ),
-              ),
-            ],
-          ),
+
+          // ── Signature Section ────────────────────────────────────────────
+          pw.SizedBox(height: _spacerLg),
+          pw.Divider(thickness: 0.5, color: _borderColor),
+          pw.SizedBox(height: _spacerMd),
+          _buildSignatureSection(d, font, fontB),
+          pw.SizedBox(height: _spacerMd),
+
+          // ── Footer ───────────────────────────────────────────────────────
+          _buildFooter(font),
         ],
       ),
     ),
@@ -322,86 +203,117 @@ Future<Uint8List> buildTelexPdf(TelexReportData d) async {
   return Uint8List.fromList(await pdf.save());
 }
 
-pw.Widget _faxRow(List<TelexFaxLine> lines, pw.Font font) {
-  return pw.Padding(
-    padding: const pw.EdgeInsets.only(left: 16, bottom: 2),
-    child: pw.Column(
-      crossAxisAlignment: pw.CrossAxisAlignment.start,
-      children: lines.map((line) {
-        return pw.Row(
-          children: [
-            _checkbox(line.checked, font),
-            pw.Text(
-              '  ${line.text}',
-              style: pw.TextStyle(font: font, fontSize: 9),
+// ============================================================================
+// Section Builders
+// ============================================================================
+
+pw.Widget _buildHeader(pw.Font font, pw.Font fontB) {
+  return pw.Row(
+    crossAxisAlignment: pw.CrossAxisAlignment.center,
+    children: [
+      // Logo circle
+      pw.Container(
+        width: 12 * PdfPageFormat.mm,
+        height: 12 * PdfPageFormat.mm,
+        decoration: pw.BoxDecoration(
+          color: _primaryColor,
+          shape: pw.BoxShape.circle,
+        ),
+        child: pw.Center(
+          child: pw.Text(
+            '❖',
+            style: pw.TextStyle(
+              font: font,
+              fontSize: 14,
+              color: PdfColors.white,
             ),
-          ],
-        );
-      }).toList(),
-    ),
+          ),
+        ),
+      ),
+      pw.SizedBox(width: 8),
+      pw.Column(
+        crossAxisAlignment: pw.CrossAxisAlignment.start,
+        children: [
+          pw.Text(
+            '聯新國際醫院  桃園國際機場醫療中心',
+            style: pw.TextStyle(font: fontB, fontSize: 13, color: _textDark),
+          ),
+          pw.SizedBox(height: 1),
+          pw.Text(
+            'LANDSEED MEDICAL CLINIC AT TAIWAN TAOYUAN INTERNATIONAL AIRPORT',
+            style: pw.TextStyle(font: font, fontSize: 6, color: _textMuted),
+          ),
+        ],
+      ),
+    ],
   );
 }
 
-pw.Widget _row2(
-  String lLabel,
-  String lVal,
-  String rLabel,
-  String rVal,
+pw.Widget _buildFaxSection(
+  String toTitle,
+  List<TelexFaxLine> toLines,
+  String fromTitle,
+  List<TelexFaxLine> fromLines,
   pw.Font font,
-  pw.Font fontB, {
-  int leftFlex = 1,
-}) {
-  return pw.Padding(
-    padding: const pw.EdgeInsets.symmetric(vertical: 2),
-    child: pw.Row(
+  pw.Font fontB,
+) {
+  return pw.Container(
+    padding: const pw.EdgeInsets.all(_spacerMd),
+    decoration: pw.BoxDecoration(
+      color: _sectionBgColor,
+      border: pw.Border.all(color: _borderColor, width: 0.5),
+      borderRadius: pw.BorderRadius.circular(3),
+    ),
+    child: pw.Column(
+      crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
-        pw.Expanded(
-          flex: leftFlex,
-          child: pw.Row(
-            children: [
-              pw.Text(lLabel, style: pw.TextStyle(font: fontB, fontSize: 9)),
-              if (lVal.isNotEmpty)
-                pw.Expanded(
-                  child: pw.Container(
-                    decoration: const pw.BoxDecoration(
-                      border: pw.Border(
-                        bottom: pw.BorderSide(
-                          width: 0.5,
-                          color: PdfColors.grey600,
-                        ),
-                      ),
-                    ),
-                    child: pw.Text(
-                      lVal,
-                      style: pw.TextStyle(font: font, fontSize: 9),
-                    ),
-                  ),
-                ),
-            ],
+        // TO section
+        pw.Row(
+          children: [
+            pw.Container(
+              padding: const pw.EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              color: _primaryColor,
+              child: pw.Text(
+                'TO',
+                style: pw.TextStyle(font: fontB, fontSize: 8, color: PdfColors.white),
+              ),
+            ),
+            pw.SizedBox(width: _spacerSm),
+            pw.Text(toTitle, style: pw.TextStyle(font: fontB, fontSize: 9)),
+          ],
+        ),
+        pw.SizedBox(height: _spacerXs),
+        pw.Padding(
+          padding: const pw.EdgeInsets.only(left: 18),
+          child: pw.Wrap(
+            spacing: _spacerLg,
+            runSpacing: _spacerXs,
+            children: toLines.map((line) => _inlineCheckLabel(line.text, line.checked, font)).toList(),
           ),
         ),
-        pw.SizedBox(width: 8),
-        pw.Expanded(
-          child: pw.Row(
-            children: [
-              pw.Text(rLabel, style: pw.TextStyle(font: fontB, fontSize: 9)),
-              pw.Expanded(
-                child: pw.Container(
-                  decoration: const pw.BoxDecoration(
-                    border: pw.Border(
-                      bottom: pw.BorderSide(
-                        width: 0.5,
-                        color: PdfColors.grey600,
-                      ),
-                    ),
-                  ),
-                  child: pw.Text(
-                    rVal,
-                    style: pw.TextStyle(font: font, fontSize: 9),
-                  ),
-                ),
+        pw.SizedBox(height: _spacerMd),
+        // FROM section
+        pw.Row(
+          children: [
+            pw.Container(
+              padding: const pw.EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              color: _primaryColor,
+              child: pw.Text(
+                'FROM',
+                style: pw.TextStyle(font: fontB, fontSize: 8, color: PdfColors.white),
               ),
-            ],
+            ),
+            pw.SizedBox(width: _spacerSm),
+            pw.Text(fromTitle, style: pw.TextStyle(font: fontB, fontSize: 9)),
+          ],
+        ),
+        pw.SizedBox(height: _spacerXs),
+        pw.Padding(
+          padding: const pw.EdgeInsets.only(left: 18),
+          child: pw.Wrap(
+            spacing: _spacerLg,
+            runSpacing: _spacerXs,
+            children: fromLines.map((line) => _inlineCheckLabel(line.text, line.checked, font)).toList(),
           ),
         ),
       ],
@@ -409,48 +321,361 @@ pw.Widget _row2(
   );
 }
 
-pw.Widget _fillField(String value, pw.Font font, {double? width}) {
-  final inner = pw.Container(
-    width: width,
-    decoration: const pw.BoxDecoration(
+pw.Widget _buildPatientSection(TelexReportData d, pw.Font font, pw.Font fontB) {
+  return pw.Container(
+    padding: const pw.EdgeInsets.all(_spacerMd),
+    decoration: pw.BoxDecoration(
+      border: pw.Border.all(color: _borderColor, width: 0.5),
+      borderRadius: pw.BorderRadius.circular(3),
+    ),
+    child: pw.Column(
+      crossAxisAlignment: pw.CrossAxisAlignment.start,
+      children: [
+        _sectionLabel('病患資料', font, fontB),
+        pw.SizedBox(height: _spacerSm),
+        // Row 1: Name + Nationality
+        pw.Row(
+          children: [
+            pw.Text('姓名：', style: pw.TextStyle(font: fontB, fontSize: 9)),
+            _underlineBox(d.patientName, font, minWidth: 40),
+            pw.SizedBox(width: 12),
+            pw.Text('國籍：', style: pw.TextStyle(font: fontB, fontSize: 9)),
+            _underlineBox(d.nationality, font, minWidth: 35),
+            pw.SizedBox(width: 12),
+            pw.Text('性別：', style: pw.TextStyle(font: fontB, fontSize: 9)),
+            _checkbox(d.gender.isNotEmpty, font),
+            pw.SizedBox(width: 2),
+            pw.Text(d.gender, style: pw.TextStyle(font: font, fontSize: 9)),
+          ],
+        ),
+        pw.SizedBox(height: _spacerSm),
+        // Row 2: Birthdate
+        pw.Row(
+          children: [
+            pw.Text('出生日期：', style: pw.TextStyle(font: fontB, fontSize: 9)),
+            pw.Text('西元 ', style: pw.TextStyle(font: font, fontSize: 9)),
+            _underlineBox(d.birthYear, font, minWidth: 18, center: true),
+            pw.Text(' 年 ', style: pw.TextStyle(font: font, fontSize: 9)),
+            _underlineBox(d.birthMonth, font, minWidth: 14, center: true),
+            pw.Text(' 月 ', style: pw.TextStyle(font: font, fontSize: 9)),
+            _underlineBox(d.birthDay, font, minWidth: 14, center: true),
+            pw.Text(' 日', style: pw.TextStyle(font: font, fontSize: 9)),
+          ],
+        ),
+      ],
+    ),
+  );
+}
+
+pw.Widget _buildTravelSection(TelexReportData d, pw.Font font, pw.Font fontB) {
+  return pw.Container(
+    padding: const pw.EdgeInsets.all(_spacerMd),
+    decoration: pw.BoxDecoration(
+      border: pw.Border.all(color: _borderColor, width: 0.5),
+      borderRadius: pw.BorderRadius.circular(3),
+    ),
+    child: pw.Column(
+      crossAxisAlignment: pw.CrossAxisAlignment.start,
+      children: [
+        _sectionLabel('航班 / 交通資訊', font, fontB),
+        pw.SizedBox(height: _spacerSm),
+        pw.Row(
+          children: [
+            _checkbox(d.isAirline, font),
+            pw.SizedBox(width: 2),
+            pw.Text('航空公司：', style: pw.TextStyle(font: fontB, fontSize: 9)),
+            _underlineBox(d.airline, font, minWidth: 35),
+            pw.SizedBox(width: 10),
+            pw.Text('班機號碼：', style: pw.TextStyle(font: fontB, fontSize: 9)),
+            _underlineBox(d.flightNo, font, minWidth: 30),
+            pw.SizedBox(width: 10),
+            _checkbox(d.isOther, font),
+            pw.SizedBox(width: 2),
+            pw.Text('其他：', style: pw.TextStyle(font: fontB, fontSize: 9)),
+            _underlineBox(d.otherDetail, font),
+          ],
+        ),
+        pw.SizedBox(height: _spacerSm),
+        pw.Row(
+          children: [
+            pw.Text('航程方向：', style: pw.TextStyle(font: fontB, fontSize: 9)),
+            pw.SizedBox(width: _spacerSm),
+            _checkLabel('出境', d.direction == '出境', font),
+            pw.SizedBox(width: 10),
+            _checkLabel('入境', d.direction == '入境', font),
+            pw.SizedBox(width: 10),
+            _checkLabel('過境', d.direction == '過境', font),
+          ],
+        ),
+      ],
+    ),
+  );
+}
+
+pw.Widget _buildIncidentSection(TelexReportData d, pw.Font font, pw.Font fontB) {
+  return pw.Container(
+    padding: const pw.EdgeInsets.all(_spacerMd),
+    decoration: pw.BoxDecoration(
+      border: pw.Border.all(color: _borderColor, width: 0.5),
+      borderRadius: pw.BorderRadius.circular(3),
+    ),
+    child: pw.Column(
+      crossAxisAlignment: pw.CrossAxisAlignment.start,
+      children: [
+        _sectionLabel('事件資料', font, fontB),
+        pw.SizedBox(height: _spacerSm),
+        // Date and Location row
+        pw.Row(
+          children: [
+            pw.Text('就醫日期：', style: pw.TextStyle(font: fontB, fontSize: 9)),
+            pw.Text('西元 ', style: pw.TextStyle(font: font, fontSize: 9)),
+            _underlineBox(d.incidentYear, font, minWidth: 18, center: true),
+            pw.Text(' 年 ', style: pw.TextStyle(font: font, fontSize: 9)),
+            _underlineBox(d.incidentMonth, font, minWidth: 14, center: true),
+            pw.Text(' 月 ', style: pw.TextStyle(font: font, fontSize: 9)),
+            _underlineBox(d.incidentDay, font, minWidth: 14, center: true),
+            pw.Text(' 日', style: pw.TextStyle(font: font, fontSize: 9)),
+            pw.SizedBox(width: 12),
+            pw.Text('地點：', style: pw.TextStyle(font: fontB, fontSize: 9)),
+            _underlineBox(d.location, font, minWidth: 50),
+          ],
+        ),
+        pw.SizedBox(height: _spacerSm),
+        // Reporter and times row
+        pw.Row(
+          children: [
+            pw.Text('通報人員：', style: pw.TextStyle(font: fontB, fontSize: 9)),
+            _underlineBox(d.reporter, font, minWidth: 45),
+            pw.SizedBox(width: 14),
+            pw.Text('通報時間：', style: pw.TextStyle(font: fontB, fontSize: 9)),
+            _underlineBox(d.reportHour, font, minWidth: 14, center: true),
+            pw.Text(' 時 ', style: pw.TextStyle(font: font, fontSize: 9)),
+            _underlineBox(d.reportMin, font, minWidth: 14, center: true),
+            pw.Text(' 分', style: pw.TextStyle(font: font, fontSize: 9)),
+            pw.SizedBox(width: 14),
+            pw.Text('診療時間：', style: pw.TextStyle(font: fontB, fontSize: 9)),
+            _underlineBox(d.treatHour, font, minWidth: 14, center: true),
+            pw.Text(' 時 ', style: pw.TextStyle(font: font, fontSize: 9)),
+            _underlineBox(d.treatMin, font, minWidth: 14, center: true),
+            pw.Text(' 分', style: pw.TextStyle(font: font, fontSize: 9)),
+          ],
+        ),
+      ],
+    ),
+  );
+}
+
+pw.Widget _buildDiagnosisSection(TelexReportData d, pw.Font font, pw.Font fontB) {
+  return pw.Container(
+    padding: const pw.EdgeInsets.all(_spacerMd),
+    decoration: pw.BoxDecoration(
+      border: pw.Border.all(color: _borderColor, width: 0.5),
+      borderRadius: pw.BorderRadius.circular(3),
+    ),
+    child: pw.Column(
+      crossAxisAlignment: pw.CrossAxisAlignment.start,
+      children: [
+        _sectionLabel('初步診斷（中文）', font, fontB),
+        pw.SizedBox(height: _spacerSm),
+        pw.Container(
+          width: double.infinity,
+          height: 28 * PdfPageFormat.mm,
+          padding: const pw.EdgeInsets.all(_spacerSm),
+          decoration: pw.BoxDecoration(
+            color: PdfColors.white,
+            border: pw.Border.all(color: _borderColor, width: 0.5),
+            borderRadius: pw.BorderRadius.circular(2),
+          ),
+          child: pw.Text(
+            d.diagnosis,
+            style: pw.TextStyle(font: font, fontSize: 10),
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+pw.Widget _buildOutcomeSection(TelexReportData d, pw.Font font, pw.Font fontB) {
+  return pw.Container(
+    padding: const pw.EdgeInsets.all(_spacerMd),
+    decoration: pw.BoxDecoration(
+      border: pw.Border.all(color: _borderColor, width: 0.5),
+      borderRadius: pw.BorderRadius.circular(3),
+    ),
+    child: pw.Column(
+      crossAxisAlignment: pw.CrossAxisAlignment.start,
+      children: [
+        _sectionLabel('後續處置結果', font, fontB),
+        pw.SizedBox(height: _spacerSm),
+        pw.Row(
+          children: [
+            _checkLabel('自行返家', d.outcome == '自行返家', font),
+            pw.SizedBox(width: 14),
+            _checkLabel('繼續搭機', d.outcome == '繼續搭機', font),
+            pw.SizedBox(width: 14),
+            _checkLabel('醫療中心觀察', d.outcome == '醫療中心觀察', font),
+            pw.SizedBox(width: 14),
+            _checkLabel('空跑', d.outcome == '空跑', font),
+            pw.SizedBox(width: 14),
+            _checkLabel('其他', d.outcome == '其他', font),
+          ],
+        ),
+        pw.SizedBox(height: _spacerSm),
+        pw.Row(
+          children: [
+            _checkLabel('轉送至', d.outcome == '轉送醫院', font),
+            pw.SizedBox(width: _spacerSm),
+            pw.Text('（', style: pw.TextStyle(font: font, fontSize: 9)),
+            _underlineBox(d.transferTo, font, minWidth: 40),
+            pw.Text('）醫院', style: pw.TextStyle(font: font, fontSize: 9)),
+          ],
+        ),
+      ],
+    ),
+  );
+}
+
+pw.Widget _buildChargesSection(TelexReportData d, pw.Font font, pw.Font fontB) {
+  return pw.Container(
+    padding: const pw.EdgeInsets.all(_spacerMd),
+    decoration: pw.BoxDecoration(
+      border: pw.Border.all(color: _borderColor, width: 0.5),
+      borderRadius: pw.BorderRadius.circular(3),
+    ),
+    child: pw.Row(
+      children: [
+        pw.Text('醫療費用收費：', style: pw.TextStyle(font: fontB, fontSize: 9)),
+        pw.SizedBox(width: _spacerMd),
+        _checkLabel('是', d.chargedYes, font),
+        pw.SizedBox(width: 16),
+        _checkLabel('否', d.chargedNo, font),
+        pw.SizedBox(width: 14),
+        pw.Text('實收金額：', style: pw.TextStyle(font: fontB, fontSize: 9)),
+        _underlineBox(d.chargedAmount, font, minWidth: 35),
+        pw.Text(' 元', style: pw.TextStyle(font: font, fontSize: 9)),
+      ],
+    ),
+  );
+}
+
+pw.Widget _buildSignatureSection(TelexReportData d, pw.Font font, pw.Font fontB) {
+  return pw.Row(
+    children: [
+      pw.Expanded(
+        child: pw.Row(
+          children: [
+            pw.Text('醫師簽章：', style: pw.TextStyle(font: fontB, fontSize: 9)),
+            _underlineBox(d.doctor, font, minWidth: 50),
+          ],
+        ),
+      ),
+      pw.SizedBox(width: 20),
+      pw.Expanded(
+        child: pw.Row(
+          children: [
+            pw.Text('護理師簽章：', style: pw.TextStyle(font: fontB, fontSize: 9)),
+            _underlineBox(d.nurse, font, minWidth: 50),
+          ],
+        ),
+      ),
+    ],
+  );
+}
+
+pw.Widget _buildFooter(pw.Font font) {
+  return pw.Row(
+    mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+    children: [
+      pw.Text(
+        '51-P-002-002',
+        style: pw.TextStyle(font: font, fontSize: 7, color: _textMuted),
+      ),
+      pw.Text(
+        '聯新(A364)2021/11 × 500張',
+        style: pw.TextStyle(font: font, fontSize: 7, color: _textMuted),
+      ),
+    ],
+  );
+}
+
+// ============================================================================
+// Helper Widgets
+// ============================================================================
+
+pw.Widget _sectionLabel(String text, pw.Font font, pw.Font fontB) {
+  return pw.Container(
+    padding: const pw.EdgeInsets.only(bottom: _spacerXs),
+    decoration: pw.BoxDecoration(
       border: pw.Border(
-        bottom: pw.BorderSide(width: 0.5, color: PdfColors.grey600),
+        bottom: pw.BorderSide(color: _primaryColor, width: 1.5),
       ),
     ),
-    padding: const pw.EdgeInsets.only(bottom: 1),
-    child: pw.Text(value, style: pw.TextStyle(font: font, fontSize: 9)),
+    child: pw.Text(
+      text,
+      style: pw.TextStyle(font: fontB, fontSize: 10, color: _primaryColor),
+    ),
   );
-  return width == null ? pw.Expanded(child: inner) : inner;
+}
+
+pw.Widget _underlineBox(
+  String value,
+  pw.Font font, {
+  double? minWidth,
+  bool center = false,
+}) {
+  return pw.Container(
+    constraints: minWidth != null ? pw.BoxConstraints(minWidth: minWidth) : null,
+    decoration: pw.BoxDecoration(
+      border: pw.Border(
+        bottom: pw.BorderSide(width: 0.8, color: _textDark),
+      ),
+    ),
+    padding: const pw.EdgeInsets.symmetric(horizontal: 3, vertical: 1),
+    child: pw.Text(
+      value,
+      style: pw.TextStyle(font: font, fontSize: 9),
+      textAlign: center ? pw.TextAlign.center : pw.TextAlign.left,
+    ),
+  );
 }
 
 pw.Widget _checkbox(bool checked, pw.Font font) {
   return pw.Container(
-    width: 9,
-    height: 9,
-    margin: const pw.EdgeInsets.only(right: 2),
+    width: 10,
+    height: 10,
     decoration: pw.BoxDecoration(
-      border: pw.Border.all(width: 0.8, color: PdfColors.black),
+      border: pw.Border.all(width: 0.8, color: _textDark),
     ),
     child: checked
         ? pw.Center(
             child: pw.Text(
               '✓',
-              style: pw.TextStyle(
-                font: font,
-                fontSize: 7,
-                color: PdfColors.black,
-              ),
+              style: pw.TextStyle(font: font, fontSize: 8, color: _textDark),
             ),
           )
-        : null,
+        : pw.SizedBox(),
   );
 }
 
 pw.Widget _checkLabel(String label, bool checked, pw.Font font) {
   return pw.Row(
+    mainAxisSize: pw.MainAxisSize.min,
     children: [
       _checkbox(checked, font),
+      pw.SizedBox(width: 3),
       pw.Text(label, style: pw.TextStyle(font: font, fontSize: 9)),
+    ],
+  );
+}
+
+pw.Widget _inlineCheckLabel(String text, bool checked, pw.Font font) {
+  return pw.Row(
+    mainAxisSize: pw.MainAxisSize.min,
+    children: [
+      _checkbox(checked, font),
+      pw.SizedBox(width: 3),
+      pw.Text(text, style: pw.TextStyle(font: font, fontSize: 9)),
     ],
   );
 }
