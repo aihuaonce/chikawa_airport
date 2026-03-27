@@ -6,8 +6,13 @@ import 'package:printing/printing.dart';
 import 'package:provider/provider.dart';
 
 import '../../data/db/dao/medical_dao.dart';
+import '../../data/db/dao/ambulance_treatment_dao.dart';
 import '../../data/db/database.dart';
 import '../../data/models/reference_service.dart';
+import '../reports/chinese_diagnosis_report.dart';
+import '../reports/ambulance_report.dart';
+import '../reports/emergency_report.dart';
+import '../reports/english_diagnosis_report.dart';
 import '../reports/telex_report.dart';
 
 class ReportCenterPage extends StatefulWidget {
@@ -66,6 +71,8 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
     final result = <PatientReportType>[
       PatientReportType.medical,
       PatientReportType.nursing,
+      PatientReportType.diagnosisCertificate,
+      PatientReportType.englishDiagnosisCertificate,
       PatientReportType.telex,
     ];
     if (record.isEmergency) {
@@ -91,6 +98,58 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
     ).format(row.record.createdAt);
 
     try {
+      if (type == PatientReportType.emergency) {
+        final reportData = await _buildEmergencyReportData(
+          db: db,
+          refService: refService,
+          row: row,
+        );
+        final pdfBytes = await buildEmergencyReportPdf(reportData);
+        await Printing.layoutPdf(
+          name: 'patient_${row.record.medicalId}_${type.code}.pdf',
+          onLayout: (_) async => pdfBytes,
+        );
+        return;
+      }
+      if (type == PatientReportType.ambulance) {
+        final reportData = await _buildAmbulanceReportData(
+          db: db,
+          refService: refService,
+          row: row,
+        );
+        final pdfBytes = await buildAmbulanceReportPdf(reportData);
+        await Printing.layoutPdf(
+          name: 'patient_${row.record.medicalId}_${type.code}.pdf',
+          onLayout: (_) async => pdfBytes,
+        );
+        return;
+      }
+      if (type == PatientReportType.diagnosisCertificate) {
+        final reportData = await _buildDiagnosisCertificateReportData(
+          db: db,
+          refService: refService,
+          row: row,
+        );
+        final pdfBytes = await buildChineseDiagnosisPdf(reportData);
+        await Printing.layoutPdf(
+          name: 'patient_${row.record.medicalId}_${type.code}.pdf',
+          onLayout: (_) async => pdfBytes,
+        );
+        return;
+      }
+      if (type == PatientReportType.englishDiagnosisCertificate) {
+        final reportData = await _buildEnglishDiagnosisReportData(
+          db: db,
+          refService: refService,
+          row: row,
+        );
+        final pdfBytes = await buildEnglishDiagnosisPdf(reportData);
+        await Printing.layoutPdf(
+          name: 'patient_${row.record.medicalId}_${type.code}.pdf',
+          onLayout: (_) async => pdfBytes,
+        );
+        return;
+      }
       if (type == PatientReportType.telex) {
         final reportData = await _buildTelexReportData(
           db: db,
@@ -289,6 +348,820 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
     );
   }
 
+  Future<ChineseDiagnosisReportData> _buildDiagnosisCertificateReportData({
+    required AppDatabase db,
+    required ReferenceService refService,
+    required MedicalRecordWithPatient row,
+  }) async {
+    final medicalId = row.record.medicalId;
+
+    final results = await Future.wait([
+      db.certificateDao.getCertificateByMedicalId(medicalId),
+      db.treatmentDao.getTreatment(medicalId),
+      db.treatmentDao.getStaffAssignments(medicalId),
+    ]);
+
+    final certificate = results[0] as MedicalCertificateData?;
+    final treatment = results[1] as TreatmentData?;
+    final staffAssignments = results[2] as List<MedicalStaffAssignmentData>;
+
+    final patient = row.patient;
+    final birthday = patient.birthday;
+    final birthYear = birthday == null ? '' : birthday.year.toString();
+    final birthMonth = birthday == null ? '' : _twoDigits(birthday.month);
+    final birthDay = birthday == null ? '' : _twoDigits(birthday.day);
+
+    final sexName = refService.getSexById(patient.sexId)?.name ?? '';
+    final diagnosis = _buildCertificateDiagnosis(
+      refService: refService,
+      certificate: certificate,
+      treatment: treatment,
+    );
+    final doctorNotes = certificate?.chineseAdvice?.trim() ?? '';
+
+    final staffNames = _resolveStaffNames(
+      refService: refService,
+      staffAssignments: staffAssignments,
+      treatment: treatment,
+    );
+    final treatingDoctor = staffNames.doctor;
+    final directorName = treatment?.directorName?.trim();
+    final director = (directorName != null && directorName.isNotEmpty)
+        ? directorName
+        : treatingDoctor;
+
+    final issuanceDate = certificate?.issuanceDate ?? DateTime.now();
+
+    return ChineseDiagnosisReportData(
+      name: patient.name?.trim().isNotEmpty == true
+          ? patient.name!.trim()
+          : patient.anonymizationName?.trim() ?? '',
+      birthYear: birthYear,
+      birthMonth: birthMonth,
+      birthDay: birthDay,
+      gender: sexName,
+      idOrPassport: _resolveIdOrPassport(patient),
+      diagnosis: diagnosis,
+      doctorNotes: doctorNotes,
+      director: director,
+      treatingDoctor: treatingDoctor,
+      certYear: issuanceDate.year.toString(),
+      certMonth: _twoDigits(issuanceDate.month),
+      certDay: _twoDigits(issuanceDate.day),
+    );
+  }
+
+  Future<EmergencyReportData> _buildEmergencyReportData({
+    required AppDatabase db,
+    required ReferenceService refService,
+    required MedicalRecordWithPatient row,
+  }) async {
+    final medicalId = row.record.medicalId;
+
+    final results = await Future.wait([
+      db.flightDao.getFlightByMedicalId(medicalId),
+      db.incidentDao.getByMedicalId(medicalId),
+      db.treatmentDao.getTreatment(medicalId),
+      db.emergencyDao.getOrCreateEmergencyTreatment(medicalId),
+      db.treatmentDao.getStaffAssignments(medicalId),
+    ]);
+
+    final flight = results[0] as FlightRecordData?;
+    final incident = results[1] as IncidentRecordData?;
+    final treatment = results[2] as TreatmentData?;
+    final emergency = results[3] as EmergencyTreatmentData;
+    final staffAssignments = results[4] as List<MedicalStaffAssignmentData>;
+
+    final initialAssessment = await _getAssessmentById(
+      db,
+      emergency.initialAssessmentId,
+    );
+    final postAssessment = await _getAssessmentById(
+      db,
+      emergency.postAssessmentId,
+    );
+    final firstAidLogs = await db.emergencyDao.getFirstAidLogs(emergency.id);
+
+    final patient = row.patient;
+    final birthday = patient.birthday;
+    final birthDate = birthday == null ? '' : _formatDate(birthday);
+
+    final sexName = refService.getSexById(patient.sexId)?.name ?? '';
+    final nationality = patient.nationalityId == null
+        ? ''
+        : refService.getNationalityById(patient.nationalityId)?.name ?? '';
+
+    final airline = flight?.airlineId == null
+        ? ''
+        : refService.getAirlineById(flight!.airlineId)?.name ?? '';
+
+    final travelStatusName = flight?.travelStatusId == null
+        ? ''
+        : refService.getTravelStatusById(flight!.travelStatusId)?.name ?? '';
+    final source = _resolveEmergencySource(travelStatusName);
+
+    final incidentDate = incident?.incidentDate;
+    final incidentDateYear = incidentDate == null
+        ? ''
+        : incidentDate.year.toString();
+    final incidentDateMonth = incidentDate == null
+        ? ''
+        : _twoDigits(incidentDate.month);
+    final incidentDateDay = incidentDate == null
+        ? ''
+        : _twoDigits(incidentDate.day);
+    final incidentTime = _formatTime(incidentDate);
+
+    final emergencyStartTime = _formatTime(emergency.startTime);
+    final incidentSituation = emergency.incidentContext ?? '';
+
+    final diagnosis = _buildDiagnosis(treatment).isNotEmpty
+        ? _buildDiagnosis(treatment)
+        : (emergency.diagnosis ?? '');
+
+    final location = await _resolveIncidentLocation(
+      db: db,
+      refService: refService,
+      incident: incident,
+    );
+
+    final monitorTime = List.filled(10, '');
+    final monitorHR = List.filled(10, '');
+    final monitorBP = List.filled(10, '');
+    final monitorBreathing = List.filled(10, '');
+    final monitorO2 = List.filled(10, '');
+    final monitorDCShock = List.filled(10, '');
+    final monitorEpi = List.filled(10, '');
+    final monitorMeds = List.filled(10, '');
+    for (var i = 0; i < firstAidLogs.length && i < 10; i++) {
+      final log = firstAidLogs[i];
+      monitorTime[i] = log.time ?? '';
+      monitorHR[i] = log.heartRate ?? '';
+      monitorBP[i] = log.bloodPressure ?? '';
+      monitorBreathing[i] = log.respirationRate ?? '';
+      monitorO2[i] = log.o2 ?? '';
+      monitorDCShock[i] = log.shock ?? '';
+      monitorEpi[i] = log.epinephrine ?? '';
+      monitorMeds[i] = log.otherMeds ?? '';
+    }
+
+    final initBp = _formatBp(
+      initialAssessment?.systolic,
+      initialAssessment?.diastolic,
+    );
+    final postBp = _formatBp(
+      postAssessment?.systolic,
+      postAssessment?.diastolic,
+    );
+
+    final staff = _resolveEmergencyStaffNames(
+      refService: refService,
+      staffAssignments: staffAssignments,
+      treatment: treatment,
+    );
+
+    final outcomeType = emergency.result ?? '';
+    final endTime = emergency.endTime;
+    final endHour = _formatHour(endTime);
+    final endMin = _formatMinute(endTime);
+
+    final transferHospital = _resolveTransferHospital(treatment, refService);
+    final transferTime = outcomeType == '轉診' ? endTime : null;
+    final deathTime = outcomeType == '死亡' ? endTime : null;
+
+    return EmergencyReportData(
+      name: patient.name?.trim().isNotEmpty == true
+          ? patient.name!.trim()
+          : patient.anonymizationName?.trim() ?? '',
+      id: patient.idNo?.trim() ?? '',
+      gender: sexName,
+      birthDate: birthDate,
+      passportNo: patient.passportOrIdNo?.trim() ?? '',
+      source: source,
+      airline: airline,
+      incidentLocation: location,
+      nationality: nationality,
+      diagnosis: diagnosis,
+      incidentDateYear: incidentDateYear,
+      incidentDateMonth: incidentDateMonth,
+      incidentDateDay: incidentDateDay,
+      incidentTime: incidentTime,
+      emergencyStartTime: emergencyStartTime,
+      incidentSituation: incidentSituation,
+      consciousnessE: initialAssessment?.gcsE ?? '',
+      consciousnessM: initialAssessment?.gcsM ?? '',
+      consciousnessV: initialAssessment?.gcsV ?? '',
+      heartRate: initialAssessment?.pulse?.toString() ?? '',
+      breathingRate: initialAssessment?.breath?.toString() ?? '',
+      temperature: _mapTemperatureStatus(initialAssessment?.temperature),
+      bpSystolic: _splitBp(initBp).$1,
+      bpDiastolic: _splitBp(initBp).$2,
+      pupilSizeL: _formatPupilSize(initialAssessment?.leftPupilSize),
+      pupilSizeR: _formatPupilSize(initialAssessment?.rightPupilSize),
+      pupilLR: '',
+      onET: _mergeStrings(emergency.intubationMethod, emergency.intubationSize),
+      onIVLine: emergency.ivLineSize ?? '',
+      monitorTime: monitorTime,
+      monitorHR: monitorHR,
+      monitorBP: monitorBP,
+      monitorBreathing: monitorBreathing,
+      monitorO2: monitorO2,
+      monitorDCShock: monitorDCShock,
+      monitorEpi: monitorEpi,
+      monitorMeds: monitorMeds,
+      postConsciousnessE: postAssessment?.gcsE ?? '',
+      postConsciousnessM: postAssessment?.gcsM ?? '',
+      postConsciousnessV: postAssessment?.gcsV ?? '',
+      postHeartRate: postAssessment?.pulse?.toString() ?? '',
+      postBpSystolic: _splitBp(postBp).$1,
+      postBpDiastolic: _splitBp(postBp).$2,
+      postBreathing: emergency.postRespirationMode ?? '',
+      postBreathingRate: postAssessment?.breath?.toString() ?? '',
+      postPupilSizeL: _formatPupilSize(postAssessment?.leftPupilSize),
+      postPupilSizeR: _formatPupilSize(postAssessment?.rightPupilSize),
+      postOther: emergency.postRespirationOthers ?? '',
+      endTimeHour: endHour,
+      endTimeMin: endMin,
+      outcomeType: outcomeType,
+      transferHospital: transferHospital,
+      transferTimeHour: _formatHour(transferTime),
+      transferTimeMin: _formatMinute(transferTime),
+      deathTimeHour: _formatHour(deathTime),
+      deathTimeMin: _formatMinute(deathTime),
+      otherOutcome: emergency.endCareNotes ?? '',
+      doctor: staff.doctor,
+      nurse: staff.nurse,
+      emt: staff.emt,
+      );
+    }
+
+  Future<AmbulanceReportData> _buildAmbulanceReportData({
+    required AppDatabase db,
+    required ReferenceService refService,
+    required MedicalRecordWithPatient row,
+  }) async {
+    final medicalId = row.record.medicalId;
+
+    final results = await Future.wait([
+      db.ambulanceDao.getAmbulanceRecordByMedicalId(medicalId),
+      db.ambulanceDao.getSceneRecord(medicalId),
+      db.ambulanceDao.getPersonalProperty(medicalId),
+      db.ambulanceDao.getAmbulanceFee(medicalId),
+      db.ambulanceTreatmentDao.getRecord(medicalId),
+    ]);
+
+    final ambulanceRecord = results[0] as AmbulanceRecord?;
+    final sceneRecord = results[1] as AmbulanceSceneRecordData?;
+    final personalProperty = results[2] as AmbulancePersonalPropertyData?;
+    final fee = results[3] as AmbulanceFeeData?;
+    final treatmentRecord = results[4] as AmbulanceTreatmentRecordData?;
+
+    final treatmentRecordId = treatmentRecord?.id;
+    final joinedItems = treatmentRecordId == null
+        ? <JoinedTreatmentItem>[]
+        : await db.ambulanceTreatmentDao.getJoinedRecordItems(
+            treatmentRecordId,
+          );
+    final medicationLogs = treatmentRecordId == null
+        ? <AmbulanceMedicationLogData>[]
+        : await db.ambulanceTreatmentDao.getMedicationLogs(treatmentRecordId);
+    final vitalSigns = treatmentRecordId == null
+        ? <AmbulanceVitalSignData>[]
+        : await db.ambulanceTreatmentDao.getVitalSigns(treatmentRecordId);
+    final escortStaff = treatmentRecordId == null
+        ? <AmbulanceEscortStaffData>[]
+        : await db.ambulanceTreatmentDao.getEscortStaff(treatmentRecordId);
+
+    List<String> traumaGroup = [];
+    List<String> nonTraumaGroup = [];
+    List<String> generalTrauma = [];
+    List<String> mechanism = [];
+    List<String> acute = [];
+    List<String> generalDisease = [];
+    List<String> allergies = [];
+    List<String> histories = [];
+    if (sceneRecord != null) {
+      final sceneId = sceneRecord.id;
+      traumaGroup = await db.ambulanceDao.getSelectedLinkNames(
+        sceneId,
+        'TraumaGroup',
+      );
+      nonTraumaGroup = await db.ambulanceDao.getSelectedLinkNames(
+        sceneId,
+        'NonTraumaGroup',
+      );
+      generalTrauma = await db.ambulanceDao.getSelectedLinkNames(
+        sceneId,
+        'GeneralTrauma',
+      );
+      mechanism = await db.ambulanceDao.getSelectedLinkNames(
+        sceneId,
+        'Mechanism',
+      );
+      acute = await db.ambulanceDao.getSelectedLinkNames(sceneId, 'Acute');
+      generalDisease = await db.ambulanceDao.getSelectedLinkNames(
+        sceneId,
+        'GeneralDisease',
+      );
+      allergies = await db.ambulanceDao.getSelectedLinkNames(
+        sceneId,
+        'Allergy',
+      );
+      histories = await db.ambulanceDao.getSelectedLinkNames(
+        sceneId,
+        'History',
+      );
+    }
+
+    bool containsAny(List<String> values, List<String> keys) {
+      return values.any((value) {
+        final text = value.trim();
+        return keys.any((key) => text.contains(key));
+      });
+    }
+
+    bool containsKey(List<String> values, String key) {
+      return values.any((value) => value.trim().contains(key));
+    }
+
+    final patient = row.patient;
+    final patientName = patient.name?.trim().isNotEmpty == true
+        ? patient.name!.trim()
+        : patient.anonymizationName?.trim() ?? '';
+    final sexName = refService.getSexById(patient.sexId)?.name ?? '';
+    final age = _formatAge(patient.birthday);
+
+    final dispatchTime = ambulanceRecord?.dispatchTime;
+    final dispatchYear = dispatchTime == null
+        ? ''
+        : dispatchTime.year.toString();
+    final dispatchMonth = dispatchTime == null
+        ? ''
+        : _twoDigits(dispatchTime.month);
+    final dispatchDay = dispatchTime == null ? '' : _twoDigits(dispatchTime.day);
+
+    final incidentLocation = await _resolveAmbulanceIncidentLocation(
+      db: db,
+      refService: refService,
+      record: ambulanceRecord,
+    );
+
+    final hospitalName = ambulanceRecord?.hospitalId == null
+        ? ''
+        : refService
+                .getReferralHospitalById(ambulanceRecord!.hospitalId!)
+                ?.name ??
+            '';
+    final receivingUnit = treatmentRecord?.receivingHospital?.trim() ?? '';
+    final sendToHospital =
+        receivingUnit.isNotEmpty ? receivingUnit : hospitalName;
+
+    final transportReason = ambulanceRecord?.transportReason ?? '';
+    final sendReasonCondition =
+        transportReason.contains('病情') || transportReason.contains('需要');
+    final sendReasonPatientRequest = transportReason.contains('病人') ||
+        transportReason.contains('家屬') ||
+        transportReason.contains('家人');
+
+    final propertyHandled = personalProperty?.isHandled ?? false;
+    final guardian = personalProperty?.custodianName?.trim() ?? '';
+
+    final allergyStatus = sceneRecord?.allergyStatus ?? '';
+    final historyStatus = sceneRecord?.historyStatus ?? '';
+    final allergyNote = sceneRecord?.allergyNote?.trim() ?? '';
+    final historyNote = sceneRecord?.historyNote?.trim() ?? '';
+
+    final hasAcute = containsKey(nonTraumaGroup, '急');
+    final hasGeneralDisease = containsKey(nonTraumaGroup, '一般');
+
+    final hasNonTraumaOther = containsKey(acute, '其他');
+    final hasTraumaOther = containsKey(traumaGroup, '其他');
+    final hasGeneralTraumaOther = containsKey(generalTrauma, '其他');
+
+    final airwayItems = joinedItems
+        .where((item) => item.category.code == 'AIRWAY')
+        .toList();
+    final cprItems =
+        joinedItems.where((item) => item.category.code == 'CPR').toList();
+    final traumaItems =
+        joinedItems.where((item) => item.category.code == 'TRAUMA').toList();
+    final drugItems =
+        joinedItems.where((item) => item.category.code == 'DRUG').toList();
+    final otherItems =
+        joinedItems.where((item) => item.category.code == 'OTHER').toList();
+
+    final airwayNames = airwayItems.map((item) => item.item.name).toList();
+    final cprNames = cprItems.map((item) => item.item.name).toList();
+    final traumaNames = traumaItems.map((item) => item.item.name).toList();
+    final drugNames = drugItems.map((item) => item.item.name).toList();
+    final otherNames = otherItems.map((item) => item.item.name).toList();
+
+    JoinedTreatmentItem? findItem(
+      List<JoinedTreatmentItem> items,
+      String key,
+    ) {
+      for (final item in items) {
+        if (item.item.name.contains(key)) return item;
+      }
+      return null;
+    }
+
+    JoinedTreatmentItem? findOther(List<JoinedTreatmentItem> items) {
+      for (final item in items) {
+        if (item.item.isOther || item.item.name.contains('其他')) {
+          return item;
+        }
+      }
+      return null;
+    }
+
+    String detailText(JoinedTreatmentItem? item, String? value) {
+      if (item == null) return '';
+      return value?.trim() ?? '';
+    }
+
+    final airwayNasal = findItem(airwayItems, '鼻管');
+    final airwayMask = findItem(airwayItems, '面罩');
+    final airwayLma = findItem(airwayItems, 'LMA');
+    final airwayIgel = findItem(airwayItems, 'I-Gel');
+    final airwayEt = findItem(airwayItems, '氣管');
+    final airwayOther = findOther(airwayItems);
+
+    final cprShockItem = findItem(cprItems, '電擊');
+    final otherOtherItem = findOther(otherItems);
+
+    final medicationTime = List.filled(4, '');
+    final medicationName = List.filled(4, '');
+    final medicationRoute = List.filled(4, '');
+    final medicationExecutor = List.filled(4, '');
+    for (var i = 0; i < medicationLogs.length && i < 4; i++) {
+      final log = medicationLogs[i];
+      medicationTime[i] = log.time ?? '';
+      medicationName[i] = log.drugName ?? '';
+      medicationRoute[i] = _mergeStrings(log.route, log.dose);
+      medicationExecutor[i] = log.emtName ?? '';
+    }
+
+    final vsTime = List.filled(4, '');
+    final vsConsciousness = List.filled(4, '');
+    final vsTemp = List.filled(4, '');
+    final vsPulse = List.filled(4, '');
+    final vsBreathing = List.filled(4, '');
+    final vsBPSys = List.filled(4, '');
+    final vsBPDia = List.filled(4, '');
+    final vsSpO2 = List.filled(4, '');
+    final vsGcsE = List.filled(4, '');
+    final vsGcsV = List.filled(4, '');
+    final vsGcsM = List.filled(4, '');
+
+    for (var i = 0; i < vitalSigns.length && i < 4; i++) {
+      final vs = vitalSigns[i];
+      final bp = vs.bloodPressure ?? '';
+      final split = _splitBp(bp);
+      vsTime[i] = vs.time ?? '';
+      vsConsciousness[i] = vs.avpu ?? '';
+      vsTemp[i] = vs.temperature ?? '';
+      vsPulse[i] = vs.pulse ?? '';
+      vsBreathing[i] = vs.respirationRate ?? '';
+      vsBPSys[i] = split.$1;
+      vsBPDia[i] = split.$2;
+      vsSpO2[i] = vs.spo2 ?? '';
+      vsGcsE[i] = vs.gcsE ?? '';
+      vsGcsV[i] = vs.gcsV ?? '';
+      vsGcsM[i] = vs.gcsM ?? '';
+    }
+
+    final atHospital = vitalSigns.reversed
+        .firstWhere((vs) => vs.atHospital, orElse: () => AmbulanceVitalSignData(
+              id: -1,
+              recordId: -1,
+              atHospital: false,
+            ));
+    final avpu = atHospital.avpu ?? '';
+    final postAlert = avpu.contains('清') || avpu.toUpperCase() == 'A';
+    final postPain = avpu.contains('痛') || avpu.toUpperCase() == 'P';
+    final postArrested = avpu.contains('無') || avpu.toUpperCase() == 'U';
+
+    final emtNames = escortStaff
+        .map((staff) => staff.name?.trim() ?? '')
+        .where((name) => name.isNotEmpty)
+        .toList();
+
+    final ambulanceFee = fee?.ambulanceFee ?? 0;
+    final oxygenFee = fee?.oxygenFee ?? 0;
+    final totalFee = ambulanceFee + oxygenFee;
+    final ambulanceFeeText =
+        ambulanceFee == 0 ? '' : _formatFeeAmount(ambulanceFee);
+    final oxygenFeeText =
+        oxygenFee == 0 ? '' : _formatFeeAmount(oxygenFee);
+    final totalFeeText = totalFee == 0 ? '' : _formatFeeAmount(totalFee);
+
+    final paymentStatus = fee?.paymentStatus ?? '';
+    final paymentMethod = fee?.paymentMethod ?? '';
+    final unpaidType = fee?.unpaidType ?? '';
+    final paidCash = paymentStatus.contains('已收');
+    final paidCard = paymentStatus.contains('已收') &&
+        paymentMethod.contains('刷卡');
+    final paidHospital = paymentStatus.contains('代收');
+    final unpaid = paymentStatus.contains('未收');
+
+    final familySign = treatmentRecord?.relativeName?.trim().isNotEmpty == true
+        ? treatmentRecord!.relativeName!.trim()
+        : patientName;
+
+    final data = AmbulanceReportData()
+      ..licensePlate = ambulanceRecord?.licensePlate?.trim() ?? ''
+      ..dispatchDateYear = dispatchYear
+      ..dispatchDateMonth = dispatchMonth
+      ..dispatchDateDay = dispatchDay
+      ..departureHour = _formatHour(ambulanceRecord?.dispatchTime)
+      ..departureMin = _formatMinute(ambulanceRecord?.dispatchTime)
+      ..arrivalHour = _formatHour(ambulanceRecord?.arrivalTime)
+      ..arrivalMin = _formatMinute(ambulanceRecord?.arrivalTime)
+      ..leaveSceneHour = _formatHour(ambulanceRecord?.leavingSceneTime)
+      ..leaveSceneMin = _formatMinute(ambulanceRecord?.leavingSceneTime)
+      ..deliveryHour = _formatHour(ambulanceRecord?.arrivalHospitalTime)
+      ..deliveryMin = _formatMinute(ambulanceRecord?.arrivalHospitalTime)
+      ..leaveHospHour = _formatHour(ambulanceRecord?.leavingHospitalTime)
+      ..leaveHospMin = _formatMinute(ambulanceRecord?.leavingHospitalTime)
+      ..returnBaseHour = _formatHour(ambulanceRecord?.returnStandbyTime)
+      ..returnBaseMin = _formatMinute(ambulanceRecord?.returnStandbyTime)
+      ..incidentLocation = incidentLocation
+      ..sendToHospital = sendToHospital
+      ..sendReasonCondition = sendReasonCondition
+      ..sendReasonPatientRequest = sendReasonPatientRequest
+      ..patientName = patientName
+      ..gender = sexName
+      ..idOrPassport = _resolveIdOrPassport(patient)
+      ..age = age
+      ..guardian = guardian
+      ..address = patient.address?.trim() ?? ''
+      ..propertyNone = personalProperty != null && !propertyHandled
+      ..propertyHas = propertyHandled
+      ..ntiEmergency = hasAcute || containsKey(acute, '昏迷')
+      ..ntiBreathIssue = containsAny(acute, ['呼吸不順', '喘'])
+      ..ntiAirwayIssue = containsAny(acute, ['呼吸道', '梗阻', '阻塞'])
+      ..ntiChestPain = containsAny(acute, ['胸痛', '胸悶'])
+      ..ntiAbdomen = containsKey(acute, '腹痛')
+      ..ntiGeneral = hasGeneralDisease
+      ..ntiHeadache = containsAny(generalDisease, ['頭痛', '頭暈'])
+      ..ntiFaint = containsAny(generalDisease, ['昏厥', '昏倒'])
+      ..ntiFever = containsAny(generalDisease, ['發燒', '發熱'])
+      ..ntiNausea = containsAny(generalDisease, ['噁心', '嘔吐'])
+      ..ntiWeakness = containsAny(generalDisease, ['無力', '倦怠'])
+      ..ntiDrug = containsKey(acute, '中毒')
+      ..ntiCO = containsAny(acute, ['一氧化碳', 'CO'])
+      ..ntiSeizure = containsAny(acute, ['癲癇', '抽搐'])
+      ..ntiMental = containsKey(acute, '精神')
+      ..ntiFall = containsAny(acute, ['跌倒'])
+      ..ntiPregnancy = containsKey(acute, '孕')
+      ..ntiCardiacArrest = containsAny(acute, ['OHCA', '心肺'])
+      ..ntiOtherNT = hasNonTraumaOther
+      ..ntiOtherNTText = ''
+      ..trGeneral =
+          containsKey(traumaGroup, '一般') || generalTrauma.isNotEmpty
+      ..trHead = containsKey(generalTrauma, '頭')
+      ..trChest = containsKey(generalTrauma, '胸')
+      ..trAbdomen = containsKey(generalTrauma, '腹')
+      ..trBack = containsKey(generalTrauma, '背')
+      ..trLimb = containsAny(generalTrauma, ['肢', '四肢'])
+      ..trOtherT = hasGeneralTraumaOther
+      ..trDrown = containsKey(traumaGroup, '溺')
+      ..trFall = containsAny(traumaGroup, ['墜', '跌'])
+      ..trCrush = containsAny(traumaGroup, ['撞', '碾', '擠'])
+      ..trFracture = containsKey(traumaNames, '骨折')
+      ..trPenetrate = containsAny(traumaGroup, ['穿刺', '刺'])
+      ..trBurn = containsAny(traumaGroup, ['燒', '燙'])
+      ..trElectric = containsAny(traumaGroup, ['電'])
+      ..trBioStrike = containsAny(traumaGroup, ['咬', '生物'])
+      ..trCardiacArrest = containsAny(traumaGroup, ['心肺'])
+      ..trOtherT2 = hasTraumaOther
+      ..trBurnDegree = sceneRecord?.burnDegree ?? ''
+      ..trFallHeight = sceneRecord?.fallHeight ?? ''
+      ..trTrafficAcc = containsKey(mechanism, '交通')
+      ..trNonTrafficAcc = containsKey(mechanism, '非交通')
+      ..trOtherTText = hasGeneralTraumaOther
+          ? (sceneRecord?.otherTraumaNote ?? '')
+          : ''
+      ..trOtherT2Text =
+          hasTraumaOther ? (sceneRecord?.otherTraumaNote ?? '') : ''
+      ..allergyNone = allergyStatus.contains('無')
+      ..allergyUnknown = allergyStatus.contains('不詳')
+      ..allergyFood = containsKey(allergies, '食物') ? allergyNote : ''
+      ..allergyMeds = containsKey(allergies, '藥') ? allergyNote : ''
+      ..allergyOther = containsKey(allergies, '其他') ? allergyNote : ''
+      ..histNone = historyStatus.contains('無')
+      ..histUnknown = historyStatus.contains('不詳')
+      ..histHypertension = containsKey(histories, '高血壓')
+      ..histDiabetes = containsKey(histories, '糖尿病')
+      ..histHeart = containsKey(histories, '心')
+      ..histAsthma = containsKey(histories, '氣喘')
+      ..histOther = containsKey(histories, '其他') ? historyNote : ''
+      ..chiefByFamily = sceneRecord?.isProxyComplaint ?? false
+      ..chiefComplaint = sceneRecord?.patientComplaint ?? ''
+      ..airOralAirway = containsKey(
+        airwayNames,
+        '口咽',
+      )
+      ..airNasalAirway = containsKey(
+        airwayNames,
+        '鼻咽',
+      )
+      ..airSuction = containsKey(
+        airwayNames,
+        '抽吸',
+      )
+      ..airHeimlick = containsKey(
+        airwayNames,
+        '哈姆',
+      )
+      ..airNasalO2 = airwayNasal != null
+      ..airMaskO2 = airwayMask != null
+      ..airNonRebreather = containsKey(
+        airwayNames,
+        '非再呼吸',
+      )
+      ..airBVM = containsKey(
+        airwayNames,
+        'BVM',
+      )
+      ..airLMA = airwayLma != null
+      ..airIgel = airwayIgel != null
+      ..airEndotracheal = airwayEt != null
+      ..airOther = airwayOther != null
+      ..airLMANo = detailText(airwayLma, airwayLma?.link.tubeSize)
+      ..airIgelNo = detailText(airwayIgel, airwayIgel?.link.tubeSize)
+      ..airETNo = detailText(airwayEt, airwayEt?.link.tubeSize)
+      ..airOtherText = detailText(airwayOther, airwayOther?.link.otherDescription)
+      ..cprAuto = containsKey(
+        cprNames,
+        '自發',
+      )
+      ..cprCPR = containsKey(
+        cprNames,
+        'CPR',
+      )
+      ..cprAED = containsKey(
+        cprNames,
+        'AED',
+      )
+      ..cprElectricShock = cprShockItem != null
+      ..cprHandShock = cprShockItem != null
+      ..cprShockTimes = detailText(cprShockItem, cprShockItem?.link.shockCount)
+      ..trCleanWound = containsKey(
+        traumaNames,
+        '清洗傷口',
+      )
+      ..trHemostasis = containsAny(
+        traumaNames,
+        ['止血', '包紮'],
+      )
+      ..trBackboard = containsKey(
+        traumaNames,
+        '長背板',
+      )
+      ..trSplint = containsAny(
+        traumaNames,
+        ['擔架', '鏟式'],
+      )
+      ..otherKeepWarm = containsKey(
+        otherNames,
+        '保暖',
+      )
+      ..otherPsych = containsKey(
+        otherNames,
+        '心理',
+      )
+      ..otherBandage = containsKey(
+        otherNames,
+        '束帶',
+      )
+      ..otherO2Refuse = containsKey(
+        otherNames,
+        '拒絕',
+      )
+      ..otherVitalMonitor = containsKey(
+        otherNames,
+        '監測',
+      )
+      ..otherOther = otherOtherItem != null
+      ..otherOtherText =
+          detailText(otherOtherItem, otherOtherItem?.link.otherDescription)
+      ..medIV = containsKey(
+        drugNames,
+        '靜脈',
+      )
+      ..medGlucose = containsKey(
+        drugNames,
+        '葡萄糖',
+      )
+      ..medAspirin = containsKey(
+        drugNames,
+        'Aspirin',
+      )
+      ..medNTG = containsKey(
+        drugNames,
+        'NTG',
+      )
+      ..medBroncho = containsAny(
+        drugNames,
+        ['支氣管', '擴張'],
+      )
+      ..medTime = medicationTime
+      ..medName = medicationName
+      ..medRoute = medicationRoute
+      ..medExecutor = medicationExecutor
+      ..vsTime = vsTime
+      ..vsConsciousness = vsConsciousness
+      ..vsTemp = vsTemp
+      ..vsPulse = vsPulse
+      ..vsBreathing = vsBreathing
+      ..vsBPSys = vsBPSys
+      ..vsBPDia = vsBPDia
+      ..vsSpO2 = vsSpO2
+      ..vsGcsE = vsGcsE
+      ..vsGcsV = vsGcsV
+      ..vsGcsM = vsGcsM
+      ..postAlert = postAlert
+      ..postPain = postPain
+      ..postArrested = postArrested
+      ..emt1 = emtNames.isNotEmpty ? emtNames[0] : ''
+      ..emt2 = emtNames.length > 1 ? emtNames[1] : ''
+      ..emt3 = emtNames.length > 2 ? emtNames[2] : ''
+      ..receiveUnit = receivingUnit.isNotEmpty ? receivingUnit : hospitalName
+      ..patientFamilySign = familySign
+      ..ambulanceFee = ambulanceFeeText
+      ..o2Fee = oxygenFeeText
+      ..totalFee = totalFeeText
+      ..paidCash = paidCash
+      ..paidCard = paidCard
+      ..paidHospital = paidHospital
+      ..unpaid = unpaid
+      ..unpaidNote = unpaid ? unpaidType : ''
+      ..notes = treatmentRecord?.doctorInstructions?.trim() ?? '';
+
+    return data;
+  }
+
+  Future<EnglishDiagnosisReportData> _buildEnglishDiagnosisReportData({
+    required AppDatabase db,
+    required ReferenceService refService,
+    required MedicalRecordWithPatient row,
+  }) async {
+    final medicalId = row.record.medicalId;
+
+    final results = await Future.wait([
+      db.certificateDao.getCertificateByMedicalId(medicalId),
+      db.treatmentDao.getTreatment(medicalId),
+      db.treatmentDao.getStaffAssignments(medicalId),
+    ]);
+
+    final certificate = results[0] as MedicalCertificateData?;
+    final treatment = results[1] as TreatmentData?;
+    final staffAssignments = results[2] as List<MedicalStaffAssignmentData>;
+
+    final patient = row.patient;
+    final birthday = patient.birthday;
+    final dateOfBirth = birthday == null ? '' : _formatDate(birthday);
+
+    final sexName = refService.getSexById(patient.sexId)?.name ?? '';
+    final sex = _mapSexToEnglish(sexName);
+    final nationality = patient.nationalityId == null
+        ? ''
+        : refService.getNationalityById(patient.nationalityId)?.nameEn ??
+              refService.getNationalityById(patient.nationalityId)?.name ??
+              '';
+
+    final impression = _buildCertificateDiagnosis(
+      refService: refService,
+      certificate: certificate,
+      treatment: treatment,
+    );
+    final commentsAndAdvices = certificate?.englishAdvice?.trim() ?? '';
+
+    final staffNames = _resolveStaffNames(
+      refService: refService,
+      staffAssignments: staffAssignments,
+      treatment: treatment,
+    );
+
+    final issuanceDate = certificate?.issuanceDate ?? DateTime.now();
+
+    return EnglishDiagnosisReportData(
+      name: patient.name?.trim().isNotEmpty == true
+          ? patient.name!.trim()
+          : patient.anonymizationName?.trim() ?? '',
+      dateOfBirth: dateOfBirth,
+      sex: sex,
+      nationality: nationality,
+      idOrPassportNo: _resolveIdOrPassport(patient),
+      impression: impression,
+      commentsAndAdvices: commentsAndAdvices,
+      attendingPhysician: staffNames.doctor,
+      issuedDate: _formatDate(issuanceDate),
+    );
+  }
+
   String _buildDiagnosis(TreatmentData? treatment) {
     final parts = [
       treatment?.tentative,
@@ -296,6 +1169,36 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
       treatment?.secondaryDiagnosis2,
     ].where((value) => value?.trim().isNotEmpty == true);
     return parts.map((value) => value!.trim()).join('\n');
+  }
+
+  String _buildCertificateDiagnosis({
+    required ReferenceService refService,
+    required MedicalCertificateData? certificate,
+    required TreatmentData? treatment,
+  }) {
+    final parts = <String>[];
+    final category = refService.getDiagnosisCategoryById(
+      certificate?.diagnosisCategoryId,
+    );
+    if (category?.name.trim().isNotEmpty == true) {
+      parts.add('診斷分類：${category!.name.trim()}');
+    }
+    final result = certificate?.diagnosisResult?.trim();
+    if (result != null && result.isNotEmpty) {
+      parts.add(result);
+    }
+    if (parts.isEmpty && treatment?.tentative?.trim().isNotEmpty == true) {
+      parts.add(treatment!.tentative!.trim());
+    }
+    return parts.join('\n');
+  }
+
+  String _resolveIdOrPassport(PatientData patient) {
+    final idNo = patient.idNo?.trim();
+    if (idNo != null && idNo.isNotEmpty) {
+      return idNo;
+    }
+    return patient.passportOrIdNo?.trim() ?? '';
   }
 
   String _resolveDirection(String value) {
@@ -328,6 +1231,29 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
       if (category2?.name.trim().isNotEmpty == true) category2!.name.trim(),
       if (incident.incidentPlaceFinal?.trim().isNotEmpty == true)
         incident.incidentPlaceFinal!.trim(),
+    ];
+    return parts.join(' / ');
+  }
+
+  Future<String> _resolveAmbulanceIncidentLocation({
+    required AppDatabase db,
+    required ReferenceService refService,
+    required AmbulanceRecord? record,
+  }) async {
+    if (record == null) return '';
+    final category = refService.getIncidentPlaceCategoryById(
+      record.incidentLocationId,
+    );
+    final category2 = record.incidentLocation2Id == null
+        ? null
+        : await db.referenceDao.getIncidentPlaceCategory2ById(
+            record.incidentLocation2Id!,
+          );
+    final parts = <String>[
+      if (category?.name.trim().isNotEmpty == true) category!.name.trim(),
+      if (category2?.name.trim().isNotEmpty == true) category2!.name.trim(),
+      if (record.locationRemarks?.trim().isNotEmpty == true)
+        record.locationRemarks!.trim(),
     ];
     return parts.join(' / ');
   }
@@ -378,7 +1304,27 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
     return rounded ? amount.toStringAsFixed(0) : amount.toStringAsFixed(2);
   }
 
+  String _formatAge(DateTime? birthday) {
+    if (birthday == null) return '';
+    final now = DateTime.now();
+    var age = now.year - birthday.year;
+    if (now.month < birthday.month ||
+        (now.month == birthday.month && now.day < birthday.day)) {
+      age -= 1;
+    }
+    return age < 0 ? '' : age.toString();
+  }
+
   String _twoDigits(int value) => value.toString().padLeft(2, '0');
+
+  String _formatDate(DateTime date) {
+    return '${date.year}-${_twoDigits(date.month)}-${_twoDigits(date.day)}';
+  }
+
+  String _formatTime(DateTime? time) {
+    if (time == null) return '';
+    return DateFormat('HH:mm').format(time);
+  }
 
   String _formatHour(DateTime? time) {
     return time == null ? '' : _twoDigits(time.hour);
@@ -386,6 +1332,77 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
 
   String _formatMinute(DateTime? time) {
     return time == null ? '' : _twoDigits(time.minute);
+  }
+
+  String _resolveEmergencySource(String travelStatusName) {
+    if (travelStatusName == '出境' ||
+        travelStatusName == '入境' ||
+        travelStatusName == '過境') {
+      return travelStatusName;
+    }
+    return travelStatusName.isNotEmpty ? '其他' : '';
+  }
+
+  String _mapTemperatureStatus(double? temp) {
+    if (temp == null) return '';
+    return temp < 36 ? '冰冷' : '溫暖';
+  }
+
+  String _formatPupilSize(double? size) {
+    if (size == null) return '';
+    if (size % 1 == 0) return size.toInt().toString();
+    return size.toStringAsFixed(1);
+  }
+
+  String _formatBp(int? systolic, int? diastolic) {
+    if (systolic == null && diastolic == null) return '';
+    if (systolic != null && diastolic != null) {
+      return '$systolic/$diastolic';
+    }
+    return systolic?.toString() ?? '';
+  }
+
+  (String, String) _splitBp(String bp) {
+    if (bp.contains('/')) {
+      final parts = bp.split('/');
+      if (parts.length == 2) {
+        return (parts[0], parts[1]);
+      }
+    }
+    return (bp, '');
+  }
+
+  String _mergeStrings(String? first, String? second) {
+    final a = first?.trim();
+    final b = second?.trim();
+    if (a != null && a.isNotEmpty && b != null && b.isNotEmpty) {
+      return '$a $b';
+    }
+    if (a != null && a.isNotEmpty) return a;
+    return b ?? '';
+  }
+
+  String _resolveTransferHospital(
+    TreatmentData? treatment,
+    ReferenceService refService,
+  ) {
+    if (treatment?.referralHospitalId != null) {
+      return refService
+              .getReferralHospitalById(treatment!.referralHospitalId)
+              ?.name ??
+          '';
+    }
+    return treatment?.referralHospitalFinal?.trim() ?? '';
+  }
+
+  String _mapSexToEnglish(String value) {
+    if (value.contains('男')) {
+      return 'M';
+    }
+    if (value.contains('女')) {
+      return 'F';
+    }
+    return '';
   }
 
   _StaffNames _resolveStaffNames({
@@ -418,6 +1435,40 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
     return _StaffNames(doctor: doctor, nurse: nurse);
   }
 
+  _EmergencyStaffNames _resolveEmergencyStaffNames({
+    required ReferenceService refService,
+    required List<MedicalStaffAssignmentData> staffAssignments,
+    required TreatmentData? treatment,
+  }) {
+    String doctor = '';
+    String nurse = '';
+    String emt = '';
+
+    for (final assignment in staffAssignments) {
+      final role = _findStaffRole(refService, assignment.staffRoleId);
+      final roleCode = role?.code;
+      final name = assignment.staffName?.trim().isNotEmpty == true
+          ? assignment.staffName!.trim()
+          : refService.getMedicalStaffById(assignment.staffId)?.name ?? '';
+      if (name.isEmpty) continue;
+      if (roleCode == 'DOCTOR' && doctor.isEmpty) {
+        doctor = name;
+      }
+      if (roleCode == 'NURSE' && nurse.isEmpty) {
+        nurse = name;
+      }
+      if (roleCode == 'EMT' && emt.isEmpty) {
+        emt = name;
+      }
+    }
+
+    if (doctor.isEmpty) {
+      doctor = treatment?.directorName?.trim() ?? '';
+    }
+
+    return _EmergencyStaffNames(doctor: doctor, nurse: nurse, emt: emt);
+  }
+
   MedicalStaffRoleData? _findStaffRole(
     ReferenceService refService,
     int? roleId,
@@ -427,6 +1478,13 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
       if (role.id == roleId) return role;
     }
     return null;
+  }
+
+  Future<MedicalAssessmentData?> _getAssessmentById(AppDatabase db, int? id) {
+    if (id == null) return Future.value(null);
+    return (db.select(
+      db.medicalAssessment,
+    )..where((t) => t.assessmentId.equals(id))).getSingleOrNull();
   }
 
   @override
@@ -660,7 +1718,15 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
   }
 }
 
-enum PatientReportType { medical, emergency, ambulance, nursing, telex }
+enum PatientReportType {
+  medical,
+  emergency,
+  ambulance,
+  nursing,
+  diagnosisCertificate,
+  englishDiagnosisCertificate,
+  telex,
+}
 
 extension PatientReportTypeLabel on PatientReportType {
   String get label {
@@ -673,6 +1739,10 @@ extension PatientReportTypeLabel on PatientReportType {
         return '救護車紀錄報表';
       case PatientReportType.nursing:
         return '護理紀錄報表';
+      case PatientReportType.diagnosisCertificate:
+        return '中文診斷書';
+      case PatientReportType.englishDiagnosisCertificate:
+        return '英文診斷書';
       case PatientReportType.telex:
         return '出診診療服務電傳文件';
     }
@@ -688,6 +1758,10 @@ extension PatientReportTypeLabel on PatientReportType {
         return 'Ambulance Record';
       case PatientReportType.nursing:
         return 'Nursing Record';
+      case PatientReportType.diagnosisCertificate:
+        return 'Chinese Diagnosis Certificate';
+      case PatientReportType.englishDiagnosisCertificate:
+        return 'English Diagnosis Certificate';
       case PatientReportType.telex:
         return 'Telex Document';
     }
@@ -703,6 +1777,10 @@ extension PatientReportTypeLabel on PatientReportType {
         return 'ambulance';
       case PatientReportType.nursing:
         return 'nursing';
+      case PatientReportType.diagnosisCertificate:
+        return 'diagnosis_cn';
+      case PatientReportType.englishDiagnosisCertificate:
+        return 'diagnosis_en';
       case PatientReportType.telex:
         return 'telex';
     }
@@ -714,4 +1792,16 @@ class _StaffNames {
   final String nurse;
 
   const _StaffNames({required this.doctor, required this.nurse});
+}
+
+class _EmergencyStaffNames {
+  final String doctor;
+  final String nurse;
+  final String emt;
+
+  const _EmergencyStaffNames({
+    required this.doctor,
+    required this.nurse,
+    required this.emt,
+  });
 }
