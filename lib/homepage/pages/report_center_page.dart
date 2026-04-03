@@ -13,6 +13,7 @@ import '../reports/chinese_diagnosis_report.dart';
 import '../reports/ambulance_report.dart';
 import '../reports/emergency_report.dart';
 import '../reports/english_diagnosis_report.dart';
+import '../reports/referral_report.dart';
 import '../reports/telex_report.dart';
 
 class ReportCenterPage extends StatefulWidget {
@@ -80,6 +81,7 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
     }
     if (record.hasAmbulance) {
       result.add(PatientReportType.ambulance);
+      result.add(PatientReportType.referral);
     }
     return result;
   }
@@ -118,6 +120,19 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
           row: row,
         );
         final pdfBytes = await buildAmbulanceReportPdf(reportData);
+        await Printing.layoutPdf(
+          name: 'patient_${row.record.medicalId}_${type.code}.pdf',
+          onLayout: (_) async => pdfBytes,
+        );
+        return;
+      }
+      if (type == PatientReportType.referral) {
+        final reportData = await _buildReferralReportData(
+          db: db,
+          refService: refService,
+          row: row,
+        );
+        final pdfBytes = await buildReferralReportPdf(reportData);
         await Printing.layoutPdf(
           name: 'patient_${row.record.medicalId}_${type.code}.pdf',
           onLayout: (_) async => pdfBytes,
@@ -1103,6 +1118,238 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
     return data;
   }
 
+  Future<ReferralReportData> _buildReferralReportData({
+    required AppDatabase db,
+    required ReferenceService refService,
+    required MedicalRecordWithPatient row,
+  }) async {
+    final medicalId = row.record.medicalId;
+
+    final results = await Future.wait([
+      db.referralFormDao.getFormByMedicalId(medicalId),
+      db.treatmentDao.getTreatment(medicalId),
+      db.treatmentDao.getStaffAssignments(medicalId),
+      db.treatmentDao.getChiefComplaint(medicalId),
+      db.treatmentDao.getMedicalHistory(medicalId),
+    ]);
+
+    final form = results[0] as ReferralFormData?;
+    final treatment = results[1] as TreatmentData?;
+    final staffAssignments = results[2] as List<MedicalStaffAssignmentData>;
+    final chiefComplaint = results[3] as ChiefComplaintData?;
+    final medicalHistory = results[4] as MedicalHistoryData?;
+
+    final patient = row.patient;
+    final birthday = patient.birthday;
+    final birthYear = birthday == null ? '' : birthday.year.toString();
+    final birthMonth = birthday == null ? '' : _twoDigits(birthday.month);
+    final birthDay = birthday == null ? '' : _twoDigits(birthday.day);
+
+    final sexName = refService.getSexById(patient.sexId)?.name ?? '';
+    final staffNames = _resolveStaffNames(
+      refService: refService,
+      staffAssignments: staffAssignments,
+      treatment: treatment,
+    );
+
+    String findRelationshipName(int? id) {
+      if (id == null) return '';
+      for (final relation in refService.relationshipTypeList) {
+        if (relation.id == id) return relation.name;
+      }
+      return '';
+    }
+
+    HistoryStatusRefData? findHistoryStatus(int? id) {
+      if (id == null) return null;
+      for (final status in refService.historyStatusList) {
+        if (status.id == id) return status;
+      }
+      return null;
+    }
+
+    ReferralPurposeData? findReferralPurpose(int? id) {
+      if (id == null) return null;
+      for (final purpose in refService.referralPurposeList) {
+        if (purpose.id == id) return purpose;
+      }
+      return null;
+    }
+
+    String hospitalName = form?.hospitalName?.trim() ?? '';
+    String hospitalPhone = form?.hospitalPhone?.trim() ?? '';
+    String hospitalAddress = form?.hospitalAddress?.trim() ?? '';
+    if (hospitalName.isEmpty && treatment?.referralHospitalId != null) {
+      final hospital = refService.getReferralHospitalById(
+        treatment!.referralHospitalId,
+      );
+      hospitalName = hospital?.name ?? '';
+      if (hospitalPhone.isEmpty) hospitalPhone = hospital?.phone ?? '';
+      if (hospitalAddress.isEmpty) hospitalAddress = hospital?.address ?? '';
+    }
+    if (hospitalName.isEmpty) {
+      hospitalName = treatment?.referralHospitalFinal?.trim() ?? '';
+    }
+
+    final relationshipName = findRelationshipName(form?.relationshipId);
+    final consentRelationship =
+        relationshipName.isNotEmpty
+            ? relationshipName
+            : form?.otherRelationship?.trim() ?? '';
+
+    final consentDateTime = form?.consentDateTime ?? form?.orderDate;
+    final consentYear =
+        consentDateTime == null ? '' : consentDateTime.year.toString();
+    final consentMonth =
+        consentDateTime == null ? '' : _twoDigits(consentDateTime.month);
+    final consentDay =
+        consentDateTime == null ? '' : _twoDigits(consentDateTime.day);
+    final consentHour =
+        consentDateTime == null ? '' : _twoDigits(consentDateTime.hour);
+    final consentMin =
+        consentDateTime == null ? '' : _twoDigits(consentDateTime.minute);
+
+    final issueDate = form?.orderDate;
+    final issueDateYear = issueDate == null ? '' : issueDate.year.toString();
+    final issueDateMonth = issueDate == null ? '' : _twoDigits(issueDate.month);
+    final issueDateDay = issueDate == null ? '' : _twoDigits(issueDate.day);
+
+    final appointDate = form?.scheduledDate;
+    final appointDateYear =
+        appointDate == null ? '' : appointDate.year.toString();
+    final appointDateMonth =
+        appointDate == null ? '' : _twoDigits(appointDate.month);
+    final appointDateDay =
+        appointDate == null ? '' : _twoDigits(appointDate.day);
+
+    var appointDept = form?.scheduledDept?.trim() ?? '';
+    final scheduledRoom = form?.scheduledRoom?.trim() ?? '';
+    if (scheduledRoom.isNotEmpty) {
+      appointDept =
+          appointDept.isEmpty ? scheduledRoom : '$appointDept $scheduledRoom';
+    }
+
+    final referralPurpose = findReferralPurpose(form?.referralPurposeId);
+    final purposeCode = referralPurpose?.code ?? '';
+    final otherPurpose = form?.otherPurpose?.trim() ?? '';
+
+    final allergyStatus = findHistoryStatus(medicalHistory?.allergyStatusId);
+    final allergyCode = allergyStatus?.code ?? '';
+    final allergyNone = allergyCode == 'none';
+    final allergyHas = allergyCode == 'yes';
+
+    final contactName = form?.contactName?.trim().isNotEmpty == true
+        ? form!.contactName!.trim()
+        : patient.name?.trim().isNotEmpty == true
+            ? patient.name!.trim()
+            : patient.anonymizationName?.trim() ?? '';
+
+    final contactPhone = form?.contactPhone?.trim().isNotEmpty == true
+        ? form!.contactPhone!.trim()
+        : patient.telephone?.trim() ?? '';
+
+    final contactAddress = form?.contactAddress?.trim().isNotEmpty == true
+        ? form!.contactAddress!.trim()
+        : patient.address?.trim() ?? '';
+
+    final diagnosisPrimary = form?.primaryDiagnosis?.trim().isNotEmpty == true
+        ? form!.primaryDiagnosis!.trim()
+        : treatment?.tentative?.trim() ?? '';
+    final diagnosisSecondary1 =
+        form?.secondaryDiagnosis1?.trim().isNotEmpty == true
+            ? form!.secondaryDiagnosis1!.trim()
+            : treatment?.secondaryDiagnosis1?.trim() ?? '';
+    final diagnosisSecondary2 =
+        form?.secondaryDiagnosis2?.trim().isNotEmpty == true
+            ? form!.secondaryDiagnosis2!.trim()
+            : treatment?.secondaryDiagnosis2?.trim() ?? '';
+
+    final examDate = form?.examDate;
+    final medDate = form?.medicationDate;
+
+    final doctorName = form?.doctorName?.trim().isNotEmpty == true
+        ? form!.doctorName!.trim()
+        : staffNames.doctor;
+    final doctorDept = form?.doctorDepartment?.trim() ?? '';
+    final doctorHandoverNote = form?.notes?.trim().isNotEmpty == true
+        ? form!.notes!.trim()
+        : treatment?.doctorOrderCh?.trim() ?? '';
+
+    final summaryParts = <String>[];
+    final complaint = chiefComplaint?.chiefComplaintFinal?.trim();
+    if (complaint != null && complaint.isNotEmpty) {
+      summaryParts.add(complaint);
+    }
+    final supplementary = chiefComplaint?.supplementaryNotes?.trim();
+    if (supplementary != null && supplementary.isNotEmpty) {
+      summaryParts.add(supplementary);
+    }
+    final historyDetail = medicalHistory?.pastHistoryDetail?.trim();
+    if (historyDetail != null && historyDetail.isNotEmpty) {
+      summaryParts.add(historyDetail);
+    }
+
+    final data = ReferralReportData()
+      ..referToHospital = hospitalName
+      ..name = patient.name?.trim().isNotEmpty == true
+          ? patient.name!.trim()
+          : patient.anonymizationName?.trim() ?? ''
+      ..gender = sexName
+      ..birthYear = birthYear
+      ..birthMonth = birthMonth
+      ..birthDay = birthDay
+      ..idNo = _resolveIdOrPassport(patient)
+      ..contact = contactName
+      ..contactPhone = contactPhone
+      ..contactAddress = contactAddress
+      ..chiefComplaintHistory = summaryParts.join('\n')
+      ..diagnosisICD = diagnosisPrimary
+      ..diagnosisName1 = diagnosisPrimary
+      ..diagnosisName2 = diagnosisSecondary1
+      ..diagnosisName3 = diagnosisSecondary2
+      ..lastExamResult = form?.recentExamResult?.trim() ?? ''
+      ..lastExamDate = examDate == null ? '' : _formatDate(examDate)
+      ..lastExamReport = form?.recentExamResult?.trim() ?? ''
+      ..lastMedOrSurgery = form?.recentMedication?.trim() ?? ''
+      ..lastMedDate = medDate == null ? '' : _formatDate(medDate)
+      ..allergyNone = allergyNone
+      ..allergyHas = allergyHas
+      ..allergyDetail = medicalHistory?.allergyDetail?.trim() ?? ''
+      ..doctorHandoverNote = doctorHandoverNote
+      ..purposeEmergency = purposeCode == 'emergency'
+      ..purposeHospital = purposeCode == 'inpatient'
+      ..purposeClinic = purposeCode == 'outpatient'
+      ..purposeFurtherExam = purposeCode == 'further_exam'
+      ..furtherExamItems = purposeCode == 'further_exam' ? otherPurpose : ''
+      ..purposeFollowUp = purposeCode == 'followup'
+      ..purposeOther = purposeCode == 'other'
+      ..purposeOtherText = purposeCode == 'other' ? otherPurpose : ''
+      ..consentSignName = contactName
+      ..consentRelationship = consentRelationship
+      ..consentYear = consentYear
+      ..consentMonth = consentMonth
+      ..consentDay = consentDay
+      ..consentHour = consentHour
+      ..consentMin = consentMin
+      ..doctorName = doctorName
+      ..doctorDept = doctorDept
+      ..issueDateYear = issueDateYear
+      ..issueDateMonth = issueDateMonth
+      ..issueDateDay = issueDateDay
+      ..appointDateYear = appointDateYear
+      ..appointDateMonth = appointDateMonth
+      ..appointDateDay = appointDateDay
+      ..appointDept = appointDept
+      ..appointNo = form?.scheduledNumber?.trim() ?? ''
+      ..referHospital = hospitalName
+      ..referDept = form?.hospitalDept?.trim() ?? ''
+      ..referDoctor = form?.hospitalDoctor?.trim() ?? ''
+      ..referHospAddress = hospitalAddress
+      ..referHospPhone = hospitalPhone;
+
+    return data;
+  }
+
   Future<EnglishDiagnosisReportData> _buildEnglishDiagnosisReportData({
     required AppDatabase db,
     required ReferenceService refService,
@@ -1722,6 +1969,7 @@ enum PatientReportType {
   medical,
   emergency,
   ambulance,
+  referral,
   nursing,
   diagnosisCertificate,
   englishDiagnosisCertificate,
@@ -1737,6 +1985,8 @@ extension PatientReportTypeLabel on PatientReportType {
         return '急救紀錄報表';
       case PatientReportType.ambulance:
         return '救護車紀錄報表';
+      case PatientReportType.referral:
+        return '轉診單';
       case PatientReportType.nursing:
         return '護理紀錄報表';
       case PatientReportType.diagnosisCertificate:
@@ -1756,6 +2006,8 @@ extension PatientReportTypeLabel on PatientReportType {
         return 'Emergency Record';
       case PatientReportType.ambulance:
         return 'Ambulance Record';
+      case PatientReportType.referral:
+        return 'Referral Form';
       case PatientReportType.nursing:
         return 'Nursing Record';
       case PatientReportType.diagnosisCertificate:
@@ -1775,6 +2027,8 @@ extension PatientReportTypeLabel on PatientReportType {
         return 'emergency';
       case PatientReportType.ambulance:
         return 'ambulance';
+      case PatientReportType.referral:
+        return 'referral';
       case PatientReportType.nursing:
         return 'nursing';
       case PatientReportType.diagnosisCertificate:
