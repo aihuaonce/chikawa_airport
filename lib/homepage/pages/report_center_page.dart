@@ -1980,7 +1980,7 @@ extension PatientReportTypeLabel on PatientReportType {
   String get label {
     switch (this) {
       case PatientReportType.medical:
-        return '主診紀錄報表';
+        return '主診紀錄報表(沒做不要點)';
       case PatientReportType.emergency:
         return '急救紀錄報表';
       case PatientReportType.ambulance:
@@ -1988,7 +1988,7 @@ extension PatientReportTypeLabel on PatientReportType {
       case PatientReportType.referral:
         return '轉診單';
       case PatientReportType.nursing:
-        return '護理紀錄報表';
+        return '護理紀錄報表(沒做不要點)';
       case PatientReportType.diagnosisCertificate:
         return '中文診斷書';
       case PatientReportType.englishDiagnosisCertificate:
@@ -2001,7 +2001,7 @@ extension PatientReportTypeLabel on PatientReportType {
   String get labelEn {
     switch (this) {
       case PatientReportType.medical:
-        return 'Medical Record';
+        return 'Medical Record (Not Implemented)';
       case PatientReportType.emergency:
         return 'Emergency Record';
       case PatientReportType.ambulance:
@@ -2009,7 +2009,7 @@ extension PatientReportTypeLabel on PatientReportType {
       case PatientReportType.referral:
         return 'Referral Form';
       case PatientReportType.nursing:
-        return 'Nursing Record';
+        return 'Nursing Record (Not Implemented)';
       case PatientReportType.diagnosisCertificate:
         return 'Chinese Diagnosis Certificate';
       case PatientReportType.englishDiagnosisCertificate:
@@ -2022,7 +2022,7 @@ extension PatientReportTypeLabel on PatientReportType {
   String get code {
     switch (this) {
       case PatientReportType.medical:
-        return 'medical';
+        return 'medical (???)';
       case PatientReportType.emergency:
         return 'emergency';
       case PatientReportType.ambulance:
@@ -2030,7 +2030,7 @@ extension PatientReportTypeLabel on PatientReportType {
       case PatientReportType.referral:
         return 'referral';
       case PatientReportType.nursing:
-        return 'nursing';
+        return 'nursing (???)';
       case PatientReportType.diagnosisCertificate:
         return 'diagnosis_cn';
       case PatientReportType.englishDiagnosisCertificate:
