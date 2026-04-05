@@ -1,6 +1,5 @@
 import 'dart:math' as math;
 import 'dart:typed_data';
-
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
@@ -42,356 +41,273 @@ Future<Uint8List> buildChineseDiagnosisPdf(ChineseDiagnosisReportData d) async {
   final font = await PdfGoogleFonts.notoSansTCRegular();
   final fontB = await PdfGoogleFonts.notoSansTCBold();
 
-  const borderSide = pw.BorderSide(width: 0.6, color: PdfColors.black);
-  const cellBorder = pw.TableBorder(
-    top: borderSide,
-    bottom: borderSide,
-    left: borderSide,
-    right: borderSide,
-    horizontalInside: borderSide,
-    verticalInside: borderSide,
-  );
+  const borderSide = pw.BorderSide(width: 0.8, color: PdfColors.black);
 
-  pw.TextStyle ts({double size = 9, bool bold = false, PdfColor? color}) =>
-      pw.TextStyle(
-        font: bold ? fontB : font,
-        fontSize: size,
-        color: color ?? PdfColors.black,
-      );
+  pw.TextStyle ts({double size = 10, bool bold = false}) =>
+      pw.TextStyle(font: bold ? fontB : font, fontSize: size);
 
-  pw.Widget cell(pw.Widget child, {pw.EdgeInsets? padding, PdfColor? bg}) =>
-      pw.Container(
-        color: bg,
-        padding:
-            padding ??
-            const pw.EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-        child: child,
-      );
-
-  pw.Widget labelCell(String t, {double size = 9}) => cell(
-    pw.Text(
-      t,
-      style: ts(size: size, bold: true),
-      textAlign: pw.TextAlign.center,
-    ),
-  );
-
-  pw.Widget valueCell(String t, {pw.Alignment? align}) => cell(
-    pw.Align(
+  // 輔助方法：儲存格容器
+  pw.Widget _cell(pw.Widget child, {double? height, pw.Alignment? align}) {
+    return pw.Container(
+      height: height,
+      padding: const pw.EdgeInsets.all(6),
       alignment: align ?? pw.Alignment.centerLeft,
-      child: pw.Text(t, style: ts()),
-    ),
-  );
+      child: child,
+    );
+  }
+
+  // 輔助方法：純文字儲存格
+  pw.Widget _textCell(
+    String text, {
+    bool isLabel = false,
+    double? height,
+    pw.Alignment? align,
+    double? size,
+  }) {
+    return _cell(
+      pw.Text(
+        text,
+        style: ts(bold: isLabel, size: size ?? (isLabel ? 10 : 10)),
+        textAlign: pw.TextAlign.center,
+      ),
+      height: height,
+      align: align ?? (isLabel ? pw.Alignment.center : pw.Alignment.centerLeft),
+    );
+  }
 
   pdf.addPage(
     pw.Page(
       pageFormat: PdfPageFormat.a4,
-      margin: const pw.EdgeInsets.only(
-        left: 20 * PdfPageFormat.mm,
-        right: 25 * PdfPageFormat.mm,
-        top: 20 * PdfPageFormat.mm,
-        bottom: 15 * PdfPageFormat.mm,
-      ),
+      margin: const pw.EdgeInsets.all(20 * PdfPageFormat.mm),
       build: (ctx) {
-        final pageW = PdfPageFormat.a4.width - (20 + 25) * PdfPageFormat.mm;
-
-        return pw.Stack(
+        // 使用 Row 將主表格與側邊標語分開
+        return pw.Row(
+          crossAxisAlignment: pw.CrossAxisAlignment.stretch,
           children: [
-            pw.Positioned(
-              right: -18 * PdfPageFormat.mm,
-              top: 30 * PdfPageFormat.mm,
-              child: pw.Transform.rotate(
-                angle: -math.pi / 2,
-                child: pw.Text(
-                  '◎ 本 證 明 書 須 加 蓋 本 院 印 章 否 則 無 效 ◎',
-                  style: ts(size: 7),
-                ),
-              ),
-            ),
-            pw.Column(
-              crossAxisAlignment: pw.CrossAxisAlignment.start,
-              children: [
-                pw.Container(
-                  width: pageW,
-                  decoration: pw.BoxDecoration(
-                    border: pw.Border.all(width: 1.0),
+            // 左側：診斷書主體
+            pw.Expanded(
+              child: pw.Column(
+                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                children: [
+                  // 標題
+                  pw.Center(
+                    child: pw.Column(
+                      children: [
+                        pw.Text(
+                          '聯新國際醫院桃園國際機場醫療中心',
+                          style: ts(bold: true, size: 16),
+                        ),
+                        pw.SizedBox(height: 4),
+                        pw.Text('診 斷 證 明 書', style: ts(bold: true, size: 15)),
+                        pw.SizedBox(height: 15),
+                      ],
+                    ),
                   ),
-                  child: pw.Column(
+
+                  // Row 1：姓名
+                  pw.Table(
+                    border: const pw.TableBorder(
+                      top: borderSide,
+                      left: borderSide,
+                      right: borderSide,
+                      bottom: borderSide,
+                      verticalInside: borderSide,
+                    ),
+                    columnWidths: {
+                      0: const pw.FixedColumnWidth(25 * PdfPageFormat.mm),
+                      1: const pw.FlexColumnWidth(),
+                    },
                     children: [
-                      pw.Container(
-                        width: double.infinity,
-                        padding: const pw.EdgeInsets.symmetric(vertical: 10),
-                        decoration: const pw.BoxDecoration(
-                          border: pw.Border(bottom: pw.BorderSide(width: 0.6)),
-                        ),
-                        child: pw.Column(
-                          children: [
-                            pw.Text(
-                              '聯 新 國 際 醫 院 桃 園 國 際 機 場 醫 療 中 心',
-                              style: ts(size: 14, bold: true),
-                              textAlign: pw.TextAlign.center,
-                            ),
-                            pw.SizedBox(height: 6),
-                            pw.Text(
-                              '診 斷 證 明 書',
-                              style: ts(size: 13, bold: true),
-                              textAlign: pw.TextAlign.center,
-                            ),
-                          ],
-                        ),
-                      ),
-                      pw.Table(
-                        border: cellBorder,
-                        columnWidths: const {
-                          0: pw.FixedColumnWidth(22),
-                          1: pw.FlexColumnWidth(),
-                        },
+                      pw.TableRow(
                         children: [
-                          pw.TableRow(
-                            children: [labelCell('姓  名'), valueCell(d.name)],
+                          _textCell('姓  名', isLabel: true),
+                          _textCell(d.name),
+                        ],
+                      ),
+                    ],
+                  ),
+
+                  // Row 2：出生、性別、證件 (6欄)
+                  pw.Table(
+                    border: const pw.TableBorder(
+                      left: borderSide,
+                      right: borderSide,
+                      bottom: borderSide,
+                      verticalInside: borderSide,
+                    ),
+                    columnWidths: {
+                      0: const pw.FixedColumnWidth(25 * PdfPageFormat.mm),
+                      1: const pw.FlexColumnWidth(1.8),
+                      2: const pw.FixedColumnWidth(15 * PdfPageFormat.mm),
+                      3: const pw.FixedColumnWidth(25 * PdfPageFormat.mm),
+                      4: const pw.FixedColumnWidth(30 * PdfPageFormat.mm),
+                      5: const pw.FlexColumnWidth(1.5),
+                    },
+                    children: [
+                      pw.TableRow(
+                        children: [
+                          _textCell('出生日期', isLabel: true, size: 9),
+                          _textCell(
+                            '西元 ${d.birthYear} 年 ${d.birthMonth} 月 ${d.birthDay} 日',
+                            size: 9,
+                          ),
+                          _textCell('性別', isLabel: true),
+                          _cell(
+                            pw.Row(
+                              mainAxisAlignment:
+                                  pw.MainAxisAlignment.spaceAround,
+                              children: [
+                                _pdfCheckBox('男', d.gender == '男', font),
+                                _pdfCheckBox('女', d.gender == '女', font),
+                              ],
+                            ),
+                          ),
+                          _textCell('身份證號碼\n或護照號碼', isLabel: true, size: 8),
+                          _textCell(d.idOrPassport, size: 9),
+                        ],
+                      ),
+                    ],
+                  ),
+
+                  // Row 3：診斷
+                  pw.Table(
+                    border: const pw.TableBorder(
+                      left: borderSide,
+                      right: borderSide,
+                      bottom: borderSide,
+                      verticalInside: borderSide,
+                    ),
+                    columnWidths: {
+                      0: const pw.FixedColumnWidth(25 * PdfPageFormat.mm),
+                      1: const pw.FlexColumnWidth(),
+                    },
+                    children: [
+                      pw.TableRow(
+                        children: [
+                          _textCell(
+                            '\n診\n\n斷\n',
+                            isLabel: true,
+                            height: 60 * PdfPageFormat.mm,
+                          ),
+                          _textCell(
+                            d.diagnosis,
+                            height: 60 * PdfPageFormat.mm,
+                            align: pw.Alignment.topLeft,
                           ),
                         ],
                       ),
-                      pw.Table(
-                        border: cellBorder,
-                        columnWidths: const {
-                          0: pw.FixedColumnWidth(22),
-                          1: pw.FlexColumnWidth(3),
-                          2: pw.FixedColumnWidth(18),
-                          3: pw.FixedColumnWidth(28),
-                          4: pw.FixedColumnWidth(28),
-                          5: pw.FlexColumnWidth(2),
-                        },
+                    ],
+                  ),
+
+                  // Row 4：醫師囑言
+                  pw.Table(
+                    border: const pw.TableBorder(
+                      left: borderSide,
+                      right: borderSide,
+                      bottom: borderSide,
+                      verticalInside: borderSide,
+                    ),
+                    columnWidths: {
+                      0: const pw.FixedColumnWidth(25 * PdfPageFormat.mm),
+                      1: const pw.FlexColumnWidth(),
+                    },
+                    children: [
+                      pw.TableRow(
                         children: [
-                          pw.TableRow(
-                            children: [
-                              cell(
-                                pw.Center(
-                                  child: pw.Text(
-                                    '出生\n日期',
-                                    style: ts(size: 8, bold: true),
-                                    textAlign: pw.TextAlign.center,
-                                  ),
-                                ),
-                              ),
-                              cell(
+                          _textCell(
+                            '\n醫\n師\n囑\n言\n或\n備\n註\n',
+                            isLabel: true,
+                            height: 50 * PdfPageFormat.mm,
+                          ),
+                          _textCell(
+                            d.doctorNotes,
+                            height: 50 * PdfPageFormat.mm,
+                            align: pw.Alignment.topLeft,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+
+                  // Row 5：底部證明資訊 (包含在表格內)
+                  pw.Table(
+                    border: const pw.TableBorder(
+                      left: borderSide,
+                      right: borderSide,
+                      bottom: borderSide,
+                    ),
+                    columnWidths: {0: const pw.FlexColumnWidth()},
+                    children: [
+                      pw.TableRow(
+                        children: [
+                          pw.Container(
+                            padding: const pw.EdgeInsets.all(10),
+                            child: pw.Column(
+                              crossAxisAlignment: pw.CrossAxisAlignment.start,
+                              children: [
                                 pw.Text(
-                                  '西元 ${d.birthYear} 年 '
-                                  '${d.birthMonth} 月 ${d.birthDay} 日',
-                                  style: ts(),
+                                  '以上病人經本院醫師診斷屬實特予證明',
+                                  style: ts(size: 11),
                                 ),
-                              ),
-                              cell(
-                                pw.Center(
-                                  child: pw.Text(
-                                    '性\n別',
-                                    style: ts(size: 8, bold: true),
-                                    textAlign: pw.TextAlign.center,
-                                  ),
-                                ),
-                              ),
-                              cell(
-                                pw.Column(
-                                  mainAxisSize: pw.MainAxisSize.min,
-                                  crossAxisAlignment:
-                                      pw.CrossAxisAlignment.start,
+                                pw.SizedBox(height: 15),
+                                // 院長與醫師姓名 (無底線)
+                                pw.Row(
                                   children: [
-                                    _pdfCheckLabel('男', d.gender == '男', font),
-                                    pw.SizedBox(height: 2),
-                                    _pdfCheckLabel('女', d.gender == '女', font),
+                                    pw.Text('院長：', style: ts(bold: true)),
+                                    pw.Text(d.director, style: ts()),
+                                    pw.SizedBox(width: 25),
+                                    pw.Text('診治醫師：', style: ts(bold: true)),
+                                    pw.Text(d.treatingDoctor, style: ts()),
                                   ],
                                 ),
-                              ),
-                              cell(
-                                pw.Center(
-                                  child: pw.Text(
-                                    '身份證號碼\n或\n護照號碼',
-                                    style: ts(size: 7, bold: true),
-                                    textAlign: pw.TextAlign.center,
-                                  ),
+                                pw.SizedBox(height: 10),
+                                pw.Text(
+                                  '開業執照號碼：桃衛醫診字第3432060513號',
+                                  style: ts(),
                                 ),
-                              ),
-                              valueCell(d.idOrPassport),
-                            ],
-                          ),
-                        ],
-                      ),
-                      pw.Table(
-                        border: cellBorder,
-                        columnWidths: const {
-                          0: pw.FixedColumnWidth(22),
-                          1: pw.FlexColumnWidth(),
-                        },
-                        children: [
-                          pw.TableRow(
-                            children: [
-                              labelCell('診\n\n\n\n\n\n斷'),
-                              cell(
-                                pw.SizedBox(
-                                  height: 55 * PdfPageFormat.mm,
-                                  child: pw.Align(
-                                    alignment: pw.Alignment.topLeft,
-                                    child: pw.Text(d.diagnosis, style: ts()),
-                                  ),
+                                pw.SizedBox(height: 20),
+                                // 簽發日期 (無底線)
+                                pw.Row(
+                                  mainAxisAlignment:
+                                      pw.MainAxisAlignment.center,
+                                  children: [
+                                    pw.Text('西元 ', style: ts()),
+                                    pw.Text(d.certYear, style: ts()),
+                                    pw.Text(' 年 ', style: ts()),
+                                    pw.Text(d.certMonth, style: ts()),
+                                    pw.Text(' 月 ', style: ts()),
+                                    pw.Text(d.certDay, style: ts()),
+                                    pw.Text(' 日', style: ts()),
+                                  ],
                                 ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      pw.Table(
-                        border: cellBorder,
-                        columnWidths: const {
-                          0: pw.FixedColumnWidth(22),
-                          1: pw.FlexColumnWidth(),
-                        },
-                        children: [
-                          pw.TableRow(
-                            children: [
-                              labelCell('醫\n師\n囑\n言\n或\n備\n註'),
-                              cell(
-                                pw.SizedBox(
-                                  height: 45 * PdfPageFormat.mm,
-                                  child: pw.Align(
-                                    alignment: pw.Alignment.topLeft,
-                                    child: pw.Text(d.doctorNotes, style: ts()),
-                                  ),
-                                ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ],
                       ),
                     ],
                   ),
-                ),
-                pw.SizedBox(height: 8),
-                pw.Padding(
-                  padding: const pw.EdgeInsets.symmetric(horizontal: 4),
-                  child: pw.Column(
-                    crossAxisAlignment: pw.CrossAxisAlignment.start,
-                    children: [
-                      pw.Text(
-                        '以 上 病 人 經 本 院 醫 師 診 斷 屬 實 特 予 證 明',
-                        style: ts(size: 10),
-                      ),
-                      pw.SizedBox(height: 6),
-                      pw.Row(
-                        children: [
-                          pw.Text('院長：', style: ts(bold: true)),
-                          pw.SizedBox(width: 4),
-                          pw.Expanded(
-                            child: pw.Container(
-                              decoration: const pw.BoxDecoration(
-                                border: pw.Border(
-                                  bottom: pw.BorderSide(
-                                    width: 0.5,
-                                    color: PdfColors.grey600,
-                                  ),
-                                ),
-                              ),
-                              child: pw.Text(d.director, style: ts()),
-                            ),
-                          ),
-                          pw.SizedBox(width: 16),
-                          pw.Text('診治醫師：', style: ts(bold: true)),
-                          pw.SizedBox(width: 4),
-                          pw.Expanded(
-                            child: pw.Container(
-                              decoration: const pw.BoxDecoration(
-                                border: pw.Border(
-                                  bottom: pw.BorderSide(
-                                    width: 0.5,
-                                    color: PdfColors.grey600,
-                                  ),
-                                ),
-                              ),
-                              child: pw.Text(d.treatingDoctor, style: ts()),
-                            ),
-                          ),
-                        ],
-                      ),
-                      pw.SizedBox(height: 6),
-                      pw.Text('開業執照號碼：桃衛醫診字第3432060513號', style: ts()),
-                      pw.SizedBox(height: 6),
-                      pw.Row(
-                        mainAxisAlignment: pw.MainAxisAlignment.center,
-                        children: [
-                          pw.Text('西元', style: ts()),
-                          pw.SizedBox(width: 8),
-                          pw.Container(
-                            width: 18 * PdfPageFormat.mm,
-                            decoration: const pw.BoxDecoration(
-                              border: pw.Border(
-                                bottom: pw.BorderSide(
-                                  width: 0.5,
-                                  color: PdfColors.grey600,
-                                ),
-                              ),
-                            ),
-                            child: pw.Text(
-                              d.certYear,
-                              style: ts(),
-                              textAlign: pw.TextAlign.center,
-                            ),
-                          ),
-                          pw.Text('  年', style: ts()),
-                          pw.SizedBox(width: 8),
-                          pw.Container(
-                            width: 10 * PdfPageFormat.mm,
-                            decoration: const pw.BoxDecoration(
-                              border: pw.Border(
-                                bottom: pw.BorderSide(
-                                  width: 0.5,
-                                  color: PdfColors.grey600,
-                                ),
-                              ),
-                            ),
-                            child: pw.Text(
-                              d.certMonth,
-                              style: ts(),
-                              textAlign: pw.TextAlign.center,
-                            ),
-                          ),
-                          pw.Text('  月', style: ts()),
-                          pw.SizedBox(width: 8),
-                          pw.Container(
-                            width: 10 * PdfPageFormat.mm,
-                            decoration: const pw.BoxDecoration(
-                              border: pw.Border(
-                                bottom: pw.BorderSide(
-                                  width: 0.5,
-                                  color: PdfColors.grey600,
-                                ),
-                              ),
-                            ),
-                            child: pw.Text(
-                              d.certDay,
-                              style: ts(),
-                              textAlign: pw.TextAlign.center,
-                            ),
-                          ),
-                          pw.Text('  日', style: ts()),
-                        ],
-                      ),
-                    ],
+                ],
+              ),
+            ),
+
+            // 右側：警告標語 (表格外，獨立佈局)
+            pw.SizedBox(width: 8 * PdfPageFormat.mm),
+            pw.Container(
+              width: 10 * PdfPageFormat.mm,
+              child: pw.Column(
+                mainAxisAlignment: pw.MainAxisAlignment.center,
+                children: [
+                  pw.Transform.rotate(
+                    angle: -math.pi / 2,
+                    child: pw.Text(
+                      '◎ 本 證 明 書 須 加 蓋 本 院 印 章 否 則 無 效 ◎',
+                      style: ts(size: 8),
+                      softWrap: false,
+                    ),
                   ),
-                ),
-                pw.Expanded(child: pw.SizedBox()),
-                pw.Row(
-                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                  children: [
-                    pw.Text(
-                      '51-P-001-007',
-                      style: ts(size: 7, color: PdfColors.grey600),
-                    ),
-                    pw.Text(
-                      '聯新(A655)2019/12x1000張',
-                      style: ts(size: 7, color: PdfColors.grey600),
-                    ),
-                  ],
-                ),
-              ],
+                ],
+              ),
             ),
           ],
         );
@@ -402,30 +318,26 @@ Future<Uint8List> buildChineseDiagnosisPdf(ChineseDiagnosisReportData d) async {
   return Uint8List.fromList(await pdf.save());
 }
 
-pw.Widget _pdfCheckLabel(String label, bool checked, pw.Font font) {
+// 勾選框元件
+pw.Widget _pdfCheckBox(String label, bool checked, pw.Font font) {
   return pw.Row(
+    mainAxisSize: pw.MainAxisSize.min,
     children: [
       pw.Container(
-        width: 8,
-        height: 8,
-        decoration: pw.BoxDecoration(
-          border: pw.Border.all(width: 0.7, color: PdfColors.black),
-        ),
+        width: 10,
+        height: 10,
+        decoration: pw.BoxDecoration(border: pw.Border.all(width: 0.8)),
         child: checked
             ? pw.Center(
                 child: pw.Text(
-                  '✓',
-                  style: pw.TextStyle(
-                    font: font,
-                    fontSize: 6,
-                    color: PdfColors.black,
-                  ),
+                  'v',
+                  style: pw.TextStyle(font: font, fontSize: 8),
                 ),
               )
             : null,
       ),
-      pw.SizedBox(width: 2),
-      pw.Text(label, style: pw.TextStyle(font: font, fontSize: 8)),
+      pw.SizedBox(width: 4),
+      pw.Text(label, style: pw.TextStyle(font: font, fontSize: 10)),
     ],
   );
 }

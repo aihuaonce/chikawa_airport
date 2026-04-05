@@ -607,8 +607,8 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
       doctor: staff.doctor,
       nurse: staff.nurse,
       emt: staff.emt,
-      );
-    }
+    );
+  }
 
   Future<AmbulanceReportData> _buildAmbulanceReportData({
     required AppDatabase db,
@@ -713,7 +713,9 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
     final dispatchMonth = dispatchTime == null
         ? ''
         : _twoDigits(dispatchTime.month);
-    final dispatchDay = dispatchTime == null ? '' : _twoDigits(dispatchTime.day);
+    final dispatchDay = dispatchTime == null
+        ? ''
+        : _twoDigits(dispatchTime.day);
 
     final incidentLocation = await _resolveAmbulanceIncidentLocation(
       db: db,
@@ -724,17 +726,19 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
     final hospitalName = ambulanceRecord?.hospitalId == null
         ? ''
         : refService
-                .getReferralHospitalById(ambulanceRecord!.hospitalId!)
-                ?.name ??
-            '';
+                  .getReferralHospitalById(ambulanceRecord!.hospitalId!)
+                  ?.name ??
+              '';
     final receivingUnit = treatmentRecord?.receivingHospital?.trim() ?? '';
-    final sendToHospital =
-        receivingUnit.isNotEmpty ? receivingUnit : hospitalName;
+    final sendToHospital = receivingUnit.isNotEmpty
+        ? receivingUnit
+        : hospitalName;
 
     final transportReason = ambulanceRecord?.transportReason ?? '';
     final sendReasonCondition =
         transportReason.contains('病情') || transportReason.contains('需要');
-    final sendReasonPatientRequest = transportReason.contains('病人') ||
+    final sendReasonPatientRequest =
+        transportReason.contains('病人') ||
         transportReason.contains('家屬') ||
         transportReason.contains('家人');
 
@@ -756,14 +760,18 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
     final airwayItems = joinedItems
         .where((item) => item.category.code == 'AIRWAY')
         .toList();
-    final cprItems =
-        joinedItems.where((item) => item.category.code == 'CPR').toList();
-    final traumaItems =
-        joinedItems.where((item) => item.category.code == 'TRAUMA').toList();
-    final drugItems =
-        joinedItems.where((item) => item.category.code == 'DRUG').toList();
-    final otherItems =
-        joinedItems.where((item) => item.category.code == 'OTHER').toList();
+    final cprItems = joinedItems
+        .where((item) => item.category.code == 'CPR')
+        .toList();
+    final traumaItems = joinedItems
+        .where((item) => item.category.code == 'TRAUMA')
+        .toList();
+    final drugItems = joinedItems
+        .where((item) => item.category.code == 'DRUG')
+        .toList();
+    final otherItems = joinedItems
+        .where((item) => item.category.code == 'OTHER')
+        .toList();
 
     final airwayNames = airwayItems.map((item) => item.item.name).toList();
     final cprNames = cprItems.map((item) => item.item.name).toList();
@@ -771,10 +779,7 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
     final drugNames = drugItems.map((item) => item.item.name).toList();
     final otherNames = otherItems.map((item) => item.item.name).toList();
 
-    JoinedTreatmentItem? findItem(
-      List<JoinedTreatmentItem> items,
-      String key,
-    ) {
+    JoinedTreatmentItem? findItem(List<JoinedTreatmentItem> items, String key) {
       for (final item in items) {
         if (item.item.name.contains(key)) return item;
       }
@@ -846,12 +851,11 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
       vsGcsM[i] = vs.gcsM ?? '';
     }
 
-    final atHospital = vitalSigns.reversed
-        .firstWhere((vs) => vs.atHospital, orElse: () => AmbulanceVitalSignData(
-              id: -1,
-              recordId: -1,
-              atHospital: false,
-            ));
+    final atHospital = vitalSigns.reversed.firstWhere(
+      (vs) => vs.atHospital,
+      orElse: () =>
+          AmbulanceVitalSignData(id: -1, recordId: -1, atHospital: false),
+    );
     final avpu = atHospital.avpu ?? '';
     final postAlert = avpu.contains('清') || avpu.toUpperCase() == 'A';
     final postPain = avpu.contains('痛') || avpu.toUpperCase() == 'P';
@@ -865,18 +869,18 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
     final ambulanceFee = fee?.ambulanceFee ?? 0;
     final oxygenFee = fee?.oxygenFee ?? 0;
     final totalFee = ambulanceFee + oxygenFee;
-    final ambulanceFeeText =
-        ambulanceFee == 0 ? '' : _formatFeeAmount(ambulanceFee);
-    final oxygenFeeText =
-        oxygenFee == 0 ? '' : _formatFeeAmount(oxygenFee);
+    final ambulanceFeeText = ambulanceFee == 0
+        ? ''
+        : _formatFeeAmount(ambulanceFee);
+    final oxygenFeeText = oxygenFee == 0 ? '' : _formatFeeAmount(oxygenFee);
     final totalFeeText = totalFee == 0 ? '' : _formatFeeAmount(totalFee);
 
     final paymentStatus = fee?.paymentStatus ?? '';
     final paymentMethod = fee?.paymentMethod ?? '';
     final unpaidType = fee?.unpaidType ?? '';
     final paidCash = paymentStatus.contains('已收');
-    final paidCard = paymentStatus.contains('已收') &&
-        paymentMethod.contains('刷卡');
+    final paidCard =
+        paymentStatus.contains('已收') && paymentMethod.contains('刷卡');
     final paidHospital = paymentStatus.contains('代收');
     final unpaid = paymentStatus.contains('未收');
 
@@ -933,8 +937,7 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
       ..ntiCardiacArrest = containsAny(acute, ['OHCA', '心肺'])
       ..ntiOtherNT = hasNonTraumaOther
       ..ntiOtherNTText = ''
-      ..trGeneral =
-          containsKey(traumaGroup, '一般') || generalTrauma.isNotEmpty
+      ..trGeneral = containsKey(traumaGroup, '一般') || generalTrauma.isNotEmpty
       ..trHead = containsKey(generalTrauma, '頭')
       ..trChest = containsKey(generalTrauma, '胸')
       ..trAbdomen = containsKey(generalTrauma, '腹')
@@ -958,8 +961,9 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
       ..trOtherTText = hasGeneralTraumaOther
           ? (sceneRecord?.otherTraumaNote ?? '')
           : ''
-      ..trOtherT2Text =
-          hasTraumaOther ? (sceneRecord?.otherTraumaNote ?? '') : ''
+      ..trOtherT2Text = hasTraumaOther
+          ? (sceneRecord?.otherTraumaNote ?? '')
+          : ''
       ..allergyNone = allergyStatus.contains('無')
       ..allergyUnknown = allergyStatus.contains('不詳')
       ..allergyFood = containsKey(allergies, '食物') ? allergyNote : ''
@@ -974,32 +978,14 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
       ..histOther = containsKey(histories, '其他') ? historyNote : ''
       ..chiefByFamily = sceneRecord?.isProxyComplaint ?? false
       ..chiefComplaint = sceneRecord?.patientComplaint ?? ''
-      ..airOralAirway = containsKey(
-        airwayNames,
-        '口咽',
-      )
-      ..airNasalAirway = containsKey(
-        airwayNames,
-        '鼻咽',
-      )
-      ..airSuction = containsKey(
-        airwayNames,
-        '抽吸',
-      )
-      ..airHeimlick = containsKey(
-        airwayNames,
-        '哈姆',
-      )
+      ..airOralAirway = containsKey(airwayNames, '口咽')
+      ..airNasalAirway = containsKey(airwayNames, '鼻咽')
+      ..airSuction = containsKey(airwayNames, '抽吸')
+      ..airHeimlick = containsKey(airwayNames, '哈姆')
       ..airNasalO2 = airwayNasal != null
       ..airMaskO2 = airwayMask != null
-      ..airNonRebreather = containsKey(
-        airwayNames,
-        '非再呼吸',
-      )
-      ..airBVM = containsKey(
-        airwayNames,
-        'BVM',
-      )
+      ..airNonRebreather = containsKey(airwayNames, '非再呼吸')
+      ..airBVM = containsKey(airwayNames, 'BVM')
       ..airLMA = airwayLma != null
       ..airIgel = airwayIgel != null
       ..airEndotracheal = airwayEt != null
@@ -1007,81 +993,35 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
       ..airLMANo = detailText(airwayLma, airwayLma?.link.tubeSize)
       ..airIgelNo = detailText(airwayIgel, airwayIgel?.link.tubeSize)
       ..airETNo = detailText(airwayEt, airwayEt?.link.tubeSize)
-      ..airOtherText = detailText(airwayOther, airwayOther?.link.otherDescription)
-      ..cprAuto = containsKey(
-        cprNames,
-        '自發',
+      ..airOtherText = detailText(
+        airwayOther,
+        airwayOther?.link.otherDescription,
       )
-      ..cprCPR = containsKey(
-        cprNames,
-        'CPR',
-      )
-      ..cprAED = containsKey(
-        cprNames,
-        'AED',
-      )
+      ..cprAuto = containsKey(cprNames, '自發')
+      ..cprCPR = containsKey(cprNames, 'CPR')
+      ..cprAED = containsKey(cprNames, 'AED')
       ..cprElectricShock = cprShockItem != null
       ..cprHandShock = cprShockItem != null
       ..cprShockTimes = detailText(cprShockItem, cprShockItem?.link.shockCount)
-      ..trCleanWound = containsKey(
-        traumaNames,
-        '清洗傷口',
-      )
-      ..trHemostasis = containsAny(
-        traumaNames,
-        ['止血', '包紮'],
-      )
-      ..trBackboard = containsKey(
-        traumaNames,
-        '長背板',
-      )
-      ..trSplint = containsAny(
-        traumaNames,
-        ['擔架', '鏟式'],
-      )
-      ..otherKeepWarm = containsKey(
-        otherNames,
-        '保暖',
-      )
-      ..otherPsych = containsKey(
-        otherNames,
-        '心理',
-      )
-      ..otherBandage = containsKey(
-        otherNames,
-        '束帶',
-      )
-      ..otherO2Refuse = containsKey(
-        otherNames,
-        '拒絕',
-      )
-      ..otherVitalMonitor = containsKey(
-        otherNames,
-        '監測',
-      )
+      ..trCleanWound = containsKey(traumaNames, '清洗傷口')
+      ..trHemostasis = containsAny(traumaNames, ['止血', '包紮'])
+      ..trBackboard = containsKey(traumaNames, '長背板')
+      ..trSplint = containsAny(traumaNames, ['擔架', '鏟式'])
+      ..otherKeepWarm = containsKey(otherNames, '保暖')
+      ..otherPsych = containsKey(otherNames, '心理')
+      ..otherBandage = containsKey(otherNames, '束帶')
+      ..otherO2Refuse = containsKey(otherNames, '拒絕')
+      ..otherVitalMonitor = containsKey(otherNames, '監測')
       ..otherOther = otherOtherItem != null
-      ..otherOtherText =
-          detailText(otherOtherItem, otherOtherItem?.link.otherDescription)
-      ..medIV = containsKey(
-        drugNames,
-        '靜脈',
+      ..otherOtherText = detailText(
+        otherOtherItem,
+        otherOtherItem?.link.otherDescription,
       )
-      ..medGlucose = containsKey(
-        drugNames,
-        '葡萄糖',
-      )
-      ..medAspirin = containsKey(
-        drugNames,
-        'Aspirin',
-      )
-      ..medNTG = containsKey(
-        drugNames,
-        'NTG',
-      )
-      ..medBroncho = containsAny(
-        drugNames,
-        ['支氣管', '擴張'],
-      )
+      ..medIV = containsKey(drugNames, '靜脈')
+      ..medGlucose = containsKey(drugNames, '葡萄糖')
+      ..medAspirin = containsKey(drugNames, 'Aspirin')
+      ..medNTG = containsKey(drugNames, 'NTG')
+      ..medBroncho = containsAny(drugNames, ['支氣管', '擴張'])
       ..medTime = medicationTime
       ..medName = medicationName
       ..medRoute = medicationRoute
@@ -1192,22 +1132,26 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
     }
 
     final relationshipName = findRelationshipName(form?.relationshipId);
-    final consentRelationship =
-        relationshipName.isNotEmpty
-            ? relationshipName
-            : form?.otherRelationship?.trim() ?? '';
+    final consentRelationship = relationshipName.isNotEmpty
+        ? relationshipName
+        : form?.otherRelationship?.trim() ?? '';
 
     final consentDateTime = form?.consentDateTime ?? form?.orderDate;
-    final consentYear =
-        consentDateTime == null ? '' : consentDateTime.year.toString();
-    final consentMonth =
-        consentDateTime == null ? '' : _twoDigits(consentDateTime.month);
-    final consentDay =
-        consentDateTime == null ? '' : _twoDigits(consentDateTime.day);
-    final consentHour =
-        consentDateTime == null ? '' : _twoDigits(consentDateTime.hour);
-    final consentMin =
-        consentDateTime == null ? '' : _twoDigits(consentDateTime.minute);
+    final consentYear = consentDateTime == null
+        ? ''
+        : consentDateTime.year.toString();
+    final consentMonth = consentDateTime == null
+        ? ''
+        : _twoDigits(consentDateTime.month);
+    final consentDay = consentDateTime == null
+        ? ''
+        : _twoDigits(consentDateTime.day);
+    final consentHour = consentDateTime == null
+        ? ''
+        : _twoDigits(consentDateTime.hour);
+    final consentMin = consentDateTime == null
+        ? ''
+        : _twoDigits(consentDateTime.minute);
 
     final issueDate = form?.orderDate;
     final issueDateYear = issueDate == null ? '' : issueDate.year.toString();
@@ -1215,18 +1159,22 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
     final issueDateDay = issueDate == null ? '' : _twoDigits(issueDate.day);
 
     final appointDate = form?.scheduledDate;
-    final appointDateYear =
-        appointDate == null ? '' : appointDate.year.toString();
-    final appointDateMonth =
-        appointDate == null ? '' : _twoDigits(appointDate.month);
-    final appointDateDay =
-        appointDate == null ? '' : _twoDigits(appointDate.day);
+    final appointDateYear = appointDate == null
+        ? ''
+        : appointDate.year.toString();
+    final appointDateMonth = appointDate == null
+        ? ''
+        : _twoDigits(appointDate.month);
+    final appointDateDay = appointDate == null
+        ? ''
+        : _twoDigits(appointDate.day);
 
     var appointDept = form?.scheduledDept?.trim() ?? '';
     final scheduledRoom = form?.scheduledRoom?.trim() ?? '';
     if (scheduledRoom.isNotEmpty) {
-      appointDept =
-          appointDept.isEmpty ? scheduledRoom : '$appointDept $scheduledRoom';
+      appointDept = appointDept.isEmpty
+          ? scheduledRoom
+          : '$appointDept $scheduledRoom';
     }
 
     final referralPurpose = findReferralPurpose(form?.referralPurposeId);
@@ -1241,8 +1189,8 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
     final contactName = form?.contactName?.trim().isNotEmpty == true
         ? form!.contactName!.trim()
         : patient.name?.trim().isNotEmpty == true
-            ? patient.name!.trim()
-            : patient.anonymizationName?.trim() ?? '';
+        ? patient.name!.trim()
+        : patient.anonymizationName?.trim() ?? '';
 
     final contactPhone = form?.contactPhone?.trim().isNotEmpty == true
         ? form!.contactPhone!.trim()
@@ -1257,12 +1205,12 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
         : treatment?.tentative?.trim() ?? '';
     final diagnosisSecondary1 =
         form?.secondaryDiagnosis1?.trim().isNotEmpty == true
-            ? form!.secondaryDiagnosis1!.trim()
-            : treatment?.secondaryDiagnosis1?.trim() ?? '';
+        ? form!.secondaryDiagnosis1!.trim()
+        : treatment?.secondaryDiagnosis1?.trim() ?? '';
     final diagnosisSecondary2 =
         form?.secondaryDiagnosis2?.trim().isNotEmpty == true
-            ? form!.secondaryDiagnosis2!.trim()
-            : treatment?.secondaryDiagnosis2?.trim() ?? '';
+        ? form!.secondaryDiagnosis2!.trim()
+        : treatment?.secondaryDiagnosis2?.trim() ?? '';
 
     final examDate = form?.examDate;
     final medDate = form?.medicationDate;
@@ -1885,7 +1833,7 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
                             SizedBox(
                               width: 220,
                               child: DropdownButtonFormField<PatientReportType>(
-                                initialValue: effectiveType,
+                                value: effectiveType,
                                 icon: const Icon(
                                   Icons.expand_more_rounded,
                                   color: textMuted,

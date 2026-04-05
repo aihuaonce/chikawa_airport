@@ -282,7 +282,7 @@ class _AmbulancePersonalInfoState extends State<AmbulancePersonalInfo> {
               setState(() => _isHandled = v);
               _updatePropertyData(isHandled: drift.Value(v));
             },
-            activeThumbColor: primaryColor,
+            thumbColor: WidgetStateProperty.all(primaryColor),
           ),
         ],
       ),

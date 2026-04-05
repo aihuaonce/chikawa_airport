@@ -1,5 +1,5 @@
+import 'dart:math' as math;
 import 'dart:typed_data';
-
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
@@ -144,615 +144,521 @@ Future<Uint8List> buildEmergencyReportPdf(EmergencyReportData d) async {
   final font = await PdfGoogleFonts.notoSansTCRegular();
   final fontB = await PdfGoogleFonts.notoSansTCBold();
 
-  pw.TextStyle ts({double size = 7.5, bool bold = false, PdfColor? c}) =>
-      pw.TextStyle(
-        font: bold ? fontB : font,
-        fontSize: size,
-        color: c ?? PdfColors.black,
-      );
+  // 安全總寬度維持 182mm
+  final double totalW = 182.0;
+  final borderSide = pw.BorderSide(width: 0.6, color: PdfColors.black);
 
-  const bdr = pw.BorderSide(width: 0.5, color: PdfColors.black);
-  const tbl = pw.TableBorder(
-    top: bdr,
-    bottom: bdr,
-    left: bdr,
-    right: bdr,
-    horizontalInside: bdr,
-    verticalInside: bdr,
-  );
+  pw.TextStyle ts({double size = 8, bool bold = false}) =>
+      pw.TextStyle(font: bold ? fontB : font, fontSize: size);
 
-  pw.Widget c(
-    String t, {
-    bool bold = false,
+  // --- 核心儲存格方法：處理邊框與高度 ---
+  pw.Widget _cell(
+    pw.Widget child, {
+    required double width,
+    double minHeight = 10.0,
     pw.Alignment? align,
-    pw.EdgeInsets? pad,
-    double size = 7.5,
-    double? h,
-  }) => pw.Container(
-    height: h,
-    padding: pad ?? const pw.EdgeInsets.symmetric(horizontal: 3, vertical: 2),
-    alignment: align ?? pw.Alignment.centerLeft,
-    child: pw.Text(
-      t,
-      style: ts(bold: bold, size: size),
-    ),
-  );
-
-  pw.Widget chkbox(bool checked) => pw.Container(
-    width: 8,
-    height: 8,
-    margin: const pw.EdgeInsets.only(right: 2),
-    decoration: pw.BoxDecoration(border: pw.Border.all(width: 0.6)),
-    child: checked
-        ? pw.Center(
-            child: pw.Text('✓', style: pw.TextStyle(font: font, fontSize: 6)),
-          )
-        : null,
-  );
-
-  pw.Widget chkLabel(String label, bool checked) => pw.Row(
-    children: [
-      chkbox(checked),
-      pw.Text(label, style: ts()),
-      pw.SizedBox(width: 3),
-    ],
-  );
-
-  pw.Widget uv(String val, {double w = 20}) => pw.Container(
-    width: w * PdfPageFormat.mm,
-    decoration: const pw.BoxDecoration(
-      border: pw.Border(
-        bottom: pw.BorderSide(width: 0.5, color: PdfColors.grey600),
+    bool isFirstColumn = false, // 是否為該行最左格 (畫左線)
+    bool isFirstRow = false, // 是否為整表最頂行 (畫頂線)
+  }) {
+    return pw.Container(
+      width: width * PdfPageFormat.mm,
+      constraints: pw.BoxConstraints(minHeight: minHeight * PdfPageFormat.mm),
+      decoration: pw.BoxDecoration(
+        border: pw.Border(
+          top: isFirstRow ? borderSide : pw.BorderSide.none,
+          left: isFirstColumn ? borderSide : pw.BorderSide.none,
+          right: borderSide,
+          bottom: borderSide,
+        ),
       ),
-    ),
-    child: pw.Text(val, style: ts()),
+      padding: const pw.EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+      alignment: align ?? pw.Alignment.centerLeft,
+      child: child,
+    );
+  }
+
+  // --- 標籤格方法：統一參數命名 ---
+  pw.Widget _lb(
+    String t, {
+    required double width,
+    double minHeight = 10.0,
+    bool isFirstColumn = false,
+    bool isFirstRow = false,
+  }) => _cell(
+    pw.Text(t, style: ts(bold: true), textAlign: pw.TextAlign.center),
+    width: width,
+    minHeight: minHeight,
+    align: pw.Alignment.center,
+    isFirstColumn: isFirstColumn,
+    isFirstRow: isFirstRow,
   );
+
+  pw.Widget _chk(String label, bool checked) {
+    return pw.Row(
+      mainAxisSize: pw.MainAxisSize.min,
+      children: [
+        pw.Container(
+          width: 8.5,
+          height: 8.5,
+          decoration: pw.BoxDecoration(border: pw.Border.all(width: 0.6)),
+          child: checked
+              ? pw.Center(
+                  child: pw.Text(
+                    'v',
+                    style: pw.TextStyle(font: font, fontSize: 6.5),
+                  ),
+                )
+              : null,
+        ),
+        pw.SizedBox(width: 2.5),
+        pw.Text(label, style: ts(size: 8)),
+        pw.SizedBox(width: 3.5),
+      ],
+    );
+  }
 
   pdf.addPage(
-    pw.Page(
+    pw.MultiPage(
       pageFormat: PdfPageFormat.a4,
-      margin: const pw.EdgeInsets.symmetric(
-        horizontal: 10 * PdfPageFormat.mm,
-        vertical: 10 * PdfPageFormat.mm,
-      ),
+      margin: const pw.EdgeInsets.all(12 * PdfPageFormat.mm),
       build: (ctx) {
-        pw.FixedColumnWidth colW(double value) => pw.FixedColumnWidth(value);
-        pw.FlexColumnWidth flexW([double value = 1]) =>
-            pw.FlexColumnWidth(value);
+        return [
+          pw.Center(
+            child: pw.Text(
+              '聯新國際醫院桃園國際機場醫療中心急救記錄表',
+              style: ts(size: 13, bold: true),
+            ),
+          ),
+          pw.SizedBox(height: 6),
 
-        return pw.Column(
-          crossAxisAlignment: pw.CrossAxisAlignment.start,
-          children: [
-            pw.Center(
-              child: pw.Text(
-                '聯新國際醫院桃園國際機場醫療中心急救記錄表',
-                style: ts(size: 13, bold: true),
+          pw.Column(
+            children: [
+              // Row 1: 姓名/ID/性別/生日/護照 (整表最頂行 isFirstRow: true)
+              pw.Row(
+                children: [
+                  _lb('姓名', width: 12, isFirstColumn: true, isFirstRow: true),
+                  _cell(
+                    pw.Text(d.name, style: ts()),
+                    width: 28,
+                    isFirstRow: true,
+                  ),
+                  _lb('ID', width: 10, isFirstRow: true),
+                  _cell(
+                    pw.Text(d.id, style: ts()),
+                    width: 25,
+                    isFirstRow: true,
+                  ),
+                  _cell(
+                    pw.Row(
+                      children: [
+                        _chk('男', d.gender == '男'),
+                        _chk('女', d.gender == '女'),
+                      ],
+                    ),
+                    width: 20,
+                    isFirstRow: true,
+                  ),
+                  _lb('生日', width: 15, isFirstRow: true),
+                  _cell(
+                    pw.Text(d.birthDate, style: ts()),
+                    width: 25,
+                    isFirstRow: true,
+                  ),
+                  _lb('護照號碼', width: 15, isFirstRow: true),
+                  _cell(
+                    pw.Text(d.passportNo, style: ts()),
+                    width: 32,
+                    isFirstRow: true,
+                  ),
+                ],
               ),
-            ),
-            pw.SizedBox(height: 4),
-            pw.Table(
-              border: tbl,
-              columnWidths: {
-                0: colW(14),
-                1: flexW(2),
-                2: colW(10),
-                3: flexW(2),
-                4: colW(18),
-                5: colW(14),
-                6: flexW(2),
-              },
-              children: [
-                pw.TableRow(
-                  children: [
-                    c('姓名', bold: true),
-                    c(d.name),
-                    c('ID', bold: true),
-                    c(d.id),
-                    pw.Padding(
-                      padding: const pw.EdgeInsets.symmetric(
-                        horizontal: 3,
-                        vertical: 2,
-                      ),
-                      child: pw.Row(
+
+              // Row 2: 來源/航空公司/地點/國籍 (加高至 14mm)
+              pw.Row(
+                children: [
+                  _lb('來源', width: 12, minHeight: 14, isFirstColumn: true),
+                  _cell(
+                    pw.Wrap(
+                      runSpacing: 2,
+                      children: [
+                        _chk('出境', d.source == '出境'),
+                        _chk('入境', d.source == '入境'),
+                        _chk('過境', d.source == '過境'),
+                        _chk('其他', d.source == '其他'),
+                      ],
+                    ),
+                    width: 50,
+                    minHeight: 14,
+                  ),
+                  _lb('航空公司', width: 18, minHeight: 14),
+                  _cell(
+                    pw.Text(d.airline, style: ts()),
+                    width: 22,
+                    minHeight: 14,
+                  ),
+                  _lb('發生地點', width: 18, minHeight: 14),
+                  _cell(
+                    pw.Text(d.incidentLocation, style: ts()),
+                    width: 35,
+                    minHeight: 14,
+                  ),
+                  _lb('國籍', width: 10, minHeight: 14),
+                  _cell(
+                    pw.Text(d.nationality, style: ts()),
+                    width: 17,
+                    minHeight: 14,
+                  ),
+                ],
+              ),
+
+              // Row 3 & 4: 診斷區
+              pw.Row(
+                children: [
+                  _lb('診\n斷', width: 12, minHeight: 22, isFirstColumn: true),
+                  _cell(
+                    pw.Text(d.diagnosis, style: ts()),
+                    width: 110,
+                    minHeight: 22,
+                  ),
+                  pw.Column(
+                    children: [
+                      pw.Row(
                         children: [
-                          chkLabel('男', d.gender == '男'),
-                          chkLabel('女', d.gender == '女'),
-                        ],
-                      ),
-                    ),
-                    c('生日(西元)', bold: true),
-                    c(d.birthDate),
-                  ],
-                ),
-              ],
-            ),
-            pw.Table(
-              border: tbl,
-              columnWidths: {
-                0: colW(14),
-                1: flexW(1.5),
-                2: colW(14),
-                3: flexW(1.5),
-                4: colW(14),
-                5: flexW(1.5),
-              },
-              children: [
-                pw.TableRow(
-                  children: [
-                    c('護照號碼', bold: true),
-                    c(d.passportNo),
-                    c('來源', bold: true),
-                    pw.Padding(
-                      padding: const pw.EdgeInsets.symmetric(
-                        horizontal: 2,
-                        vertical: 2,
-                      ),
-                      child: pw.Wrap(
-                        spacing: 2,
-                        children: [
-                          chkLabel('出境', d.source == '出境'),
-                          chkLabel('入境', d.source == '入境'),
-                          chkLabel('過境', d.source == '過境'),
-                          chkLabel('其他', d.source == '其他'),
-                        ],
-                      ),
-                    ),
-                    c('航空公司', bold: true),
-                    c(d.airline),
-                  ],
-                ),
-              ],
-            ),
-            pw.Table(
-              border: tbl,
-              columnWidths: {
-                0: colW(14),
-                1: flexW(2),
-                2: colW(14),
-                3: flexW(1),
-              },
-              children: [
-                pw.TableRow(
-                  children: [
-                    c('發生地點', bold: true),
-                    c(d.incidentLocation),
-                    c('國籍', bold: true),
-                    c(d.nationality),
-                  ],
-                ),
-              ],
-            ),
-            pw.Table(
-              border: tbl,
-              columnWidths: {
-                0: colW(10),
-                1: flexW(2),
-                2: colW(18),
-                3: flexW(3),
-              },
-              children: [
-                pw.TableRow(
-                  children: [
-                    pw.Container(
-                      height: 28 * PdfPageFormat.mm,
-                      padding: const pw.EdgeInsets.all(3),
-                      child: pw.Center(
-                        child: pw.Text('診  斷', style: ts(bold: true)),
-                      ),
-                    ),
-                    pw.Container(
-                      height: 28 * PdfPageFormat.mm,
-                      padding: const pw.EdgeInsets.all(4),
-                      child: pw.Align(
-                        alignment: pw.Alignment.topLeft,
-                        child: pw.Text(d.diagnosis, style: ts()),
-                      ),
-                    ),
-                    pw.Container(
-                      padding: const pw.EdgeInsets.all(4),
-                      child: pw.Column(
-                        crossAxisAlignment: pw.CrossAxisAlignment.start,
-                        mainAxisAlignment: pw.MainAxisAlignment.spaceAround,
-                        children: [
-                          pw.Text('發生日期', style: ts(bold: true)),
-                          pw.Text('發生時間', style: ts(bold: true)),
-                          pw.Text('急救開始時間', style: ts(bold: true)),
-                        ],
-                      ),
-                    ),
-                    pw.Container(
-                      padding: const pw.EdgeInsets.all(4),
-                      child: pw.Column(
-                        crossAxisAlignment: pw.CrossAxisAlignment.start,
-                        mainAxisAlignment: pw.MainAxisAlignment.spaceAround,
-                        children: [
-                          pw.Text(
-                            '${d.incidentDateYear} 年 ${d.incidentDateMonth} 月 '
-                            '${d.incidentDateDay} 日',
-                            style: ts(),
-                          ),
-                          pw.Text(d.incidentTime, style: ts()),
-                          pw.Text(d.emergencyStartTime, style: ts()),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            pw.Table(
-              border: tbl,
-              columnWidths: {0: colW(14), 1: flexW(1)},
-              children: [
-                pw.TableRow(
-                  children: [
-                    c('發生情境', bold: true),
-                    c(d.incidentSituation, h: 14 * PdfPageFormat.mm),
-                  ],
-                ),
-              ],
-            ),
-            pw.Table(
-              border: tbl,
-              columnWidths: {
-                0: colW(10),
-                1: colW(10),
-                2: colW(30),
-                3: colW(30),
-                4: colW(10),
-                5: flexW(1),
-              },
-              children: [
-                pw.TableRow(
-                  children: [
-                    pw.Container(
-                      padding: const pw.EdgeInsets.all(2),
-                      child: pw.Text(
-                        '病\n況',
-                        style: ts(bold: true),
-                        textAlign: pw.TextAlign.center,
-                      ),
-                    ),
-                    pw.Container(
-                      padding: const pw.EdgeInsets.all(2),
-                      child: pw.Column(
-                        crossAxisAlignment: pw.CrossAxisAlignment.start,
-                        children: [
-                          pw.Text('意識', style: ts(bold: true)),
-                          pw.SizedBox(height: 3),
-                          pw.Text('呼吸', style: ts(bold: true)),
-                          pw.SizedBox(height: 3),
-                          pw.Text('溫度', style: ts(bold: true)),
-                        ],
-                      ),
-                    ),
-                    pw.Container(
-                      padding: const pw.EdgeInsets.all(3),
-                      child: pw.Column(
-                        crossAxisAlignment: pw.CrossAxisAlignment.start,
-                        children: [
-                          pw.Row(
-                            children: [
-                              pw.Text('E ', style: ts(bold: true)),
-                              pw.Text(d.consciousnessE, style: ts()),
-                              pw.Text('  M ', style: ts(bold: true)),
-                              pw.Text(d.consciousnessM, style: ts()),
-                              pw.Text('  V ', style: ts(bold: true)),
-                              pw.Text(d.consciousnessV, style: ts()),
-                            ],
-                          ),
-                          pw.SizedBox(height: 2),
-                          pw.Row(
-                            children: [
-                              pw.Text('${d.breathingRate} 次/分', style: ts()),
-                            ],
-                          ),
-                          pw.SizedBox(height: 2),
-                          pw.Row(
-                            children: [
-                              chkLabel('冰冷', d.temperature == '冰冷'),
-                              chkLabel('溫暖', d.temperature == '溫暖'),
-                            ],
+                          _lb('發生日期', width: 20, minHeight: 11),
+                          _cell(
+                            pw.Text(
+                              '${d.incidentDateYear}/${d.incidentDateMonth}/${d.incidentDateDay}',
+                              style: ts(),
+                            ),
+                            width: 40,
+                            minHeight: 11,
                           ),
                         ],
                       ),
-                    ),
-                    pw.Container(
-                      padding: const pw.EdgeInsets.all(3),
-                      child: pw.Column(
-                        crossAxisAlignment: pw.CrossAxisAlignment.start,
+                      pw.Row(
                         children: [
-                          pw.Text('心跳: ${d.heartRate} 次/分', style: ts()),
-                          pw.SizedBox(height: 2),
-                          pw.Text(
-                            '血壓: ${d.bpSystolic}/${d.bpDiastolic} mmHg',
-                            style: ts(),
+                          _lb('發生時間', width: 20, minHeight: 11),
+                          _cell(
+                            pw.Text(d.incidentTime, style: ts()),
+                            width: 40,
+                            minHeight: 11,
                           ),
                         ],
                       ),
-                    ),
-                    c('瞳孔', bold: true),
-                    pw.Container(
-                      padding: const pw.EdgeInsets.all(3),
-                      child: pw.Column(
-                        crossAxisAlignment: pw.CrossAxisAlignment.start,
+                    ],
+                  ),
+                ],
+              ),
+
+              // Row 5: 發生情境
+              pw.Row(
+                children: [
+                  _lb('發生情境', width: 12, minHeight: 12, isFirstColumn: true),
+                  _cell(
+                    pw.Text(d.incidentSituation, style: ts()),
+                    width: 110,
+                    minHeight: 12,
+                  ),
+                  _lb('急救開始', width: 20, minHeight: 12),
+                  _cell(
+                    pw.Text(d.emergencyStartTime, style: ts()),
+                    width: 40,
+                    minHeight: 12,
+                  ),
+                ],
+              ),
+
+              // Row 6: 病況
+              pw.Row(
+                children: [
+                  _lb('病\n況', width: 12, minHeight: 24, isFirstColumn: true),
+                  pw.Column(
+                    children: [
+                      pw.Row(
                         children: [
-                          pw.Text(
-                            'Size  左: ${d.pupilSizeL} mm  右: ${d.pupilSizeR} mm',
-                            style: ts(),
+                          _cell(
+                            pw.Text(
+                              '意識: E${d.consciousnessE} M${d.consciousnessM} V${d.consciousnessV}',
+                              style: ts(),
+                            ),
+                            width: 45,
+                            minHeight: 8,
                           ),
-                          pw.SizedBox(height: 2),
-                          pw.Text('L-R', style: ts(bold: true)),
+                          _cell(
+                            pw.Text('心跳: ${d.heartRate} 次/分', style: ts()),
+                            width: 45,
+                            minHeight: 8,
+                          ),
                         ],
                       ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            pw.Table(
-              border: tbl,
-              columnWidths: {
-                0: colW(20),
-                1: flexW(2),
-                2: colW(30),
-                3: flexW(2),
-              },
-              children: [
-                pw.TableRow(
-                  children: [
-                    c('急救處置', bold: true),
-                    c('時間及記錄', bold: true),
-                    c('急救處置', bold: true),
-                    c('時間及記錄', bold: true),
-                  ],
-                ),
-                pw.TableRow(
-                  children: [
-                    c('On E.T  # ${d.onET}'),
-                    c(''),
-                    c('Cardiac Massage'),
-                    c(''),
-                  ],
-                ),
-                pw.TableRow(
-                  children: [
-                    c('On IV Line  # ${d.onIVLine}'),
-                    c(''),
-                    c(''),
-                    c(''),
-                  ],
-                ),
-              ],
-            ),
-            pw.Table(
-              border: tbl,
-              columnWidths: {
-                0: colW(28),
-                ...{for (int i = 1; i <= 10; i++) i: flexW(1)},
-              },
-              children: [
-                pw.TableRow(
-                  decoration: const pw.BoxDecoration(color: PdfColors.grey200),
-                  children: [
-                    c('項目', bold: true),
-                    ...List.generate(
-                      10,
-                      (i) => pw.Center(
-                        child: pw.Text(
-                          '${i + 1}',
-                          style: ts(bold: true, size: 7),
+                      pw.Row(
+                        children: [
+                          _cell(
+                            pw.Text('呼吸: ${d.breathingRate} 次/分', style: ts()),
+                            width: 45,
+                            minHeight: 8,
+                          ),
+                          _cell(
+                            pw.Text(
+                              '血壓: ${d.bpSystolic}/${d.bpDiastolic}',
+                              style: ts(),
+                            ),
+                            width: 45,
+                            minHeight: 8,
+                          ),
+                        ],
+                      ),
+                      _cell(
+                        pw.Row(
+                          children: [
+                            pw.Text('溫度: ', style: ts()),
+                            _chk('冰冷', d.temperature == '冰冷'),
+                            _chk('溫暖', d.temperature == '溫暖'),
+                          ],
                         ),
+                        width: 90,
+                        minHeight: 8,
                       ),
-                    ),
-                  ],
-                ),
-                _monitorRow('時間(Time)', d.monitorTime, font, fontB),
-                _monitorRow('心跳 bpm', d.monitorHR, font, fontB),
-                _monitorRow('血壓 mmHg', d.monitorBP, font, fontB),
-                _monitorRow('呼吸 次/分', d.monitorBreathing, font, fontB),
-                _monitorRow('O2 (L/Min;%)', d.monitorO2, font, fontB),
-                _monitorRow('DC Shock (J)', d.monitorDCShock, font, fontB),
-                _monitorRow('Epinephrine(mg)', d.monitorEpi, font, fontB),
-                _monitorRow('用  藥', d.monitorMeds, font, fontB, rowH: 12),
-              ],
-            ),
-            pw.Table(
-              border: tbl,
-              columnWidths: {
-                0: colW(10),
-                1: colW(10),
-                2: flexW(2),
-                3: colW(8),
-                4: flexW(2),
-              },
-              children: [
-                pw.TableRow(
-                  children: [
-                    pw.Container(
-                      padding: const pw.EdgeInsets.all(2),
-                      child: pw.Text(
-                        '急\n救\n後\n病\n況',
-                        style: ts(bold: true),
-                        textAlign: pw.TextAlign.center,
+                    ],
+                  ),
+                  _lb('瞳\n孔', width: 10, minHeight: 24),
+                  pw.Column(
+                    children: [
+                      _cell(
+                        pw.Text(
+                          'Size L: ${d.pupilSizeL} R: ${d.pupilSizeR}',
+                          style: ts(),
+                        ),
+                        width: 70,
+                        minHeight: 12,
                       ),
-                    ),
-                    pw.Container(
-                      padding: const pw.EdgeInsets.all(2),
-                      child: pw.Column(
-                        crossAxisAlignment: pw.CrossAxisAlignment.start,
+                      _cell(
+                        pw.Text('L-R: ${d.pupilLR}', style: ts()),
+                        width: 70,
+                        minHeight: 12,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+
+              // Row 7, 8, 9: 處置
+              pw.Row(
+                children: [
+                  _lb('急救處置', width: 45.5, isFirstColumn: true),
+                  _lb('時間及記錄', width: 45.5),
+                  _lb('急救處置', width: 45.5),
+                  _lb('時間及記錄', width: 45.5),
+                ],
+              ),
+              pw.Row(
+                children: [
+                  _cell(
+                    pw.Text('On E.T # ${d.onET}', style: ts()),
+                    width: 45.5,
+                    isFirstColumn: true,
+                  ),
+                  _cell(pw.Text('', style: ts()), width: 45.5),
+                  _cell(pw.Text('Cardiac Massage', style: ts()), width: 45.5),
+                  _cell(pw.Text('', style: ts()), width: 45.5),
+                ],
+              ),
+              pw.Row(
+                children: [
+                  _cell(
+                    pw.Text('On IV Line # ${d.onIVLine}', style: ts()),
+                    width: 45.5,
+                    isFirstColumn: true,
+                  ),
+                  _cell(pw.Text('', style: ts()), width: 45.5),
+                  _cell(pw.Text('', style: ts()), width: 45.5),
+                  _cell(pw.Text('', style: ts()), width: 45.5),
+                ],
+              ),
+
+              // Row 10: 監測網格
+              pw.Row(
+                children: [
+                  _lb(
+                    '急救\n處置\n及\n用藥',
+                    width: 12,
+                    minHeight: 70,
+                    isFirstColumn: true,
+                  ),
+                  pw.Column(
+                    children: [
+                      _monitorRow(
+                        '項目 \\ 次數',
+                        List.generate(10, (i) => (i + 1).toString()),
+                        fontB,
+                        fontB,
+                        10,
+                        bg: PdfColors.grey200,
+                      ),
+                      _monitorRow('時間(Time)', d.monitorTime, font, fontB, 10),
+                      _monitorRow('心跳 bpm', d.monitorHR, font, fontB, 10),
+                      _monitorRow('血壓 mmHg', d.monitorBP, font, fontB, 10),
+                      _monitorRow(
+                        '呼吸 次/分',
+                        d.monitorBreathing,
+                        font,
+                        fontB,
+                        10,
+                      ),
+                      _monitorRow('O2 (L/Min)', d.monitorO2, font, fontB, 10),
+                      _monitorRow(
+                        'Shock(J)',
+                        d.monitorDCShock,
+                        font,
+                        fontB,
+                        10,
+                      ),
+                      _monitorRow('Epi (mg)', d.monitorEpi, font, fontB, 10),
+                      _monitorRow(
+                        '用藥',
+                        d.monitorMeds,
+                        font,
+                        fontB,
+                        10,
+                        height: 10,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+
+              // Row 11: 急救後病況
+              pw.Row(
+                children: [
+                  _lb(
+                    '急救\n後\n病況',
+                    width: 12,
+                    minHeight: 24,
+                    isFirstColumn: true,
+                  ),
+                  pw.Column(
+                    children: [
+                      pw.Row(
                         children: [
-                          pw.Text('意識', style: ts(bold: true)),
-                          pw.SizedBox(height: 4),
-                          pw.Text('呼吸', style: ts(bold: true)),
-                          pw.SizedBox(height: 4),
-                          pw.Text('其他', style: ts(bold: true)),
-                        ],
-                      ),
-                    ),
-                    pw.Container(
-                      padding: const pw.EdgeInsets.all(3),
-                      child: pw.Column(
-                        crossAxisAlignment: pw.CrossAxisAlignment.start,
-                        children: [
-                          pw.Row(
-                            children: [
-                              pw.Text('E ', style: ts(bold: true)),
-                              pw.Text(d.postConsciousnessE, style: ts()),
-                              pw.Text('  M ', style: ts(bold: true)),
-                              pw.Text(d.postConsciousnessM, style: ts()),
-                              pw.Text('  V ', style: ts(bold: true)),
-                              pw.Text(d.postConsciousnessV, style: ts()),
-                              pw.Text(
-                                '   心跳: ${d.postHeartRate} 次',
-                                style: ts(),
-                              ),
-                            ],
+                          _cell(
+                            pw.Text(
+                              '意識: E${d.postConsciousnessE} M${d.postConsciousnessM} V${d.postConsciousnessV}',
+                              style: ts(),
+                            ),
+                            width: 45,
+                            minHeight: 8,
                           ),
-                          pw.SizedBox(height: 3),
-                          pw.Row(
-                            children: [
-                              chkLabel('自發性呼吸', d.postBreathing == '自發性呼吸'),
-                              chkLabel('呼吸器', d.postBreathing == '呼吸器'),
-                              chkLabel('Ambu', d.postBreathing == 'Ambu'),
-                              pw.Text(
-                                ' ${d.postBreathingRate} 次/分 ',
-                                style: ts(),
-                              ),
-                              pw.Text(
-                                '血壓: ${d.postBpSystolic}/${d.postBpDiastolic} mmHg',
-                                style: ts(),
-                              ),
-                            ],
-                          ),
-                          pw.SizedBox(height: 3),
-                          pw.Text(d.postOther, style: ts()),
-                        ],
-                      ),
-                    ),
-                    c('瞳孔', bold: true),
-                    pw.Container(
-                      padding: const pw.EdgeInsets.all(3),
-                      child: pw.Column(
-                        crossAxisAlignment: pw.CrossAxisAlignment.start,
-                        children: [
-                          pw.Text(
-                            'Size 左: ${d.postPupilSizeL} mm  右: '
-                            '${d.postPupilSizeR} mm',
-                            style: ts(),
-                          ),
-                          pw.SizedBox(height: 2),
-                          pw.Text('L-R', style: ts(bold: true)),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            pw.SizedBox(height: 2),
-            pw.Table(
-              border: tbl,
-              columnWidths: {0: colW(14), 1: flexW(1)},
-              children: [
-                pw.TableRow(
-                  children: [
-                    c('結束時間', bold: true),
-                    pw.Padding(
-                      padding: const pw.EdgeInsets.symmetric(
-                        horizontal: 4,
-                        vertical: 3,
-                      ),
-                      child: pw.Row(
-                        children: [
-                          uv(d.endTimeHour, w: 12),
-                          pw.Text(' 時 ', style: ts()),
-                          uv(d.endTimeMin, w: 12),
-                          pw.Text(' 分', style: ts()),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            pw.Table(
-              border: tbl,
-              columnWidths: {0: colW(14), 1: flexW(1)},
-              children: [
-                pw.TableRow(
-                  children: [
-                    c('急救結果', bold: true),
-                    pw.Container(
-                      padding: const pw.EdgeInsets.symmetric(
-                        horizontal: 4,
-                        vertical: 3,
-                      ),
-                      child: pw.Column(
-                        crossAxisAlignment: pw.CrossAxisAlignment.start,
-                        children: [
-                          pw.Row(
-                            children: [
-                              chkLabel('轉診', d.outcomeType == '轉診'),
-                              pw.Text('醫院 ', style: ts()),
-                              uv(d.transferHospital, w: 45),
-                              pw.Text('  時間: ', style: ts()),
-                              uv(d.transferTimeHour, w: 10),
-                              pw.Text(' 時 ', style: ts()),
-                              uv(d.transferTimeMin, w: 10),
-                              pw.Text(' 分', style: ts()),
-                            ],
-                          ),
-                          pw.SizedBox(height: 2),
-                          pw.Row(
-                            children: [
-                              chkLabel('死亡', d.outcomeType == '死亡'),
-                              pw.Text('時間: ', style: ts()),
-                              uv(d.deathTimeHour, w: 10),
-                              pw.Text(' 時 ', style: ts()),
-                              uv(d.deathTimeMin, w: 10),
-                              pw.Text(' 分', style: ts()),
-                            ],
-                          ),
-                          pw.SizedBox(height: 2),
-                          pw.Row(
-                            children: [
-                              chkLabel('其他', d.outcomeType == '其他'),
-                              uv(d.otherOutcome, w: 40),
-                            ],
+                          _cell(
+                            pw.Text('心跳: ${d.postHeartRate}', style: ts()),
+                            width: 45,
+                            minHeight: 8,
                           ),
                         ],
                       ),
+                      pw.Row(
+                        children: [
+                          _cell(
+                            pw.Text('呼吸: ${d.postBreathing}', style: ts()),
+                            width: 45,
+                            minHeight: 8,
+                          ),
+                          _cell(
+                            pw.Text(
+                              '血壓: ${d.postBpSystolic}/${d.postBpDiastolic}',
+                              style: ts(),
+                            ),
+                            width: 45,
+                            minHeight: 8,
+                          ),
+                        ],
+                      ),
+                      _cell(
+                        pw.Text('其他: ${d.postOther}', style: ts()),
+                        width: 90,
+                        minHeight: 8,
+                      ),
+                    ],
+                  ),
+                  _lb('瞳\n孔', width: 10, minHeight: 24),
+                  pw.Column(
+                    children: [
+                      _cell(
+                        pw.Text(
+                          'Size L: ${d.postPupilSizeL} R: ${d.postPupilSizeR}',
+                          style: ts(),
+                        ),
+                        width: 70,
+                        minHeight: 12,
+                      ),
+                      _cell(
+                        pw.Text('L-R: ', style: ts()),
+                        width: 70,
+                        minHeight: 12,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+
+              // Row 12, 13, 14: 底部
+              pw.Row(
+                children: [
+                  _lb('結束時間', width: 30, isFirstColumn: true),
+                  _cell(
+                    pw.Text(
+                      '${d.endTimeHour} 時 ${d.endTimeMin} 分',
+                      style: ts(),
                     ),
-                  ],
-                ),
-              ],
-            ),
-            pw.Table(
-              border: tbl,
-              columnWidths: {
-                0: colW(14),
-                1: flexW(1),
-                2: colW(14),
-                3: flexW(1),
-                4: colW(14),
-                5: flexW(1),
-              },
-              children: [
-                pw.TableRow(
-                  children: [
-                    c('急救人員', bold: true),
-                    c(''),
-                    c('醫師: ${d.doctor}'),
-                    c('護理師: ${d.nurse}'),
-                    c('EMT:', bold: true),
-                    c(d.emt),
-                  ],
-                ),
-              ],
-            ),
-          ],
-        );
+                    width: 152,
+                  ),
+                ],
+              ),
+              pw.Row(
+                children: [
+                  _lb('急救結果', width: 30, minHeight: 12, isFirstColumn: true),
+                  _cell(
+                    pw.Column(
+                      crossAxisAlignment: pw.CrossAxisAlignment.start,
+                      children: [
+                        pw.Row(
+                          children: [
+                            _chk('轉診', d.outcomeType == '轉診'),
+                            pw.Text(
+                              '醫院: ${d.transferHospital}  時間: ${d.transferTimeHour}:${d.transferTimeMin}',
+                              style: ts(),
+                            ),
+                          ],
+                        ),
+                        pw.Row(
+                          children: [
+                            _chk('死亡', d.outcomeType == '死亡'),
+                            pw.Text(
+                              '時間: ${d.deathTimeHour}:${d.deathTimeMin}',
+                              style: ts(),
+                            ),
+                            pw.SizedBox(width: 10),
+                            _chk('其他', d.outcomeType == '其他'),
+                            pw.Text(d.otherOutcome, style: ts()),
+                          ],
+                        ),
+                      ],
+                    ),
+                    width: 152,
+                    minHeight: 12,
+                  ),
+                ],
+              ),
+              pw.Row(
+                children: [
+                  _lb('急救人員', width: 30, isFirstColumn: true),
+                  _cell(pw.Text('醫師: ${d.doctor}', style: ts()), width: 50),
+                  _cell(pw.Text('護理師: ${d.nurse}', style: ts()), width: 51),
+                  _cell(pw.Text('EMT: ${d.emt}', style: ts()), width: 51),
+                ],
+              ),
+            ],
+          ),
+        ];
       },
     ),
   );
@@ -760,36 +666,49 @@ Future<Uint8List> buildEmergencyReportPdf(EmergencyReportData d) async {
   return Uint8List.fromList(await pdf.save());
 }
 
-pw.TableRow _monitorRow(
+// 監測數據網格：同樣套用新邊框邏輯
+pw.Widget _monitorRow(
   String label,
-  List<String> vals,
+  List<String> data,
   pw.Font font,
-  pw.Font fontB, {
-  double rowH = 9,
+  pw.Font fontB,
+  int count, {
+  double? height,
+  PdfColor? bg,
 }) {
-  pw.TextStyle ts({bool bold = false}) =>
-      pw.TextStyle(font: bold ? fontB : font, fontSize: 7);
+  final double labelW = 25.0;
+  final double totalGridW = 170.0;
+  final double itemW = (totalGridW - labelW) / count;
+  final borderSide = pw.BorderSide(width: 0.6, color: PdfColors.black);
 
-  return pw.TableRow(
+  return pw.Row(
     children: [
       pw.Container(
-        height: rowH * PdfPageFormat.mm,
-        padding: const pw.EdgeInsets.symmetric(horizontal: 3, vertical: 2),
-        child: pw.Center(
-          child: pw.Text(
-            label,
-            style: ts(bold: true),
-            textAlign: pw.TextAlign.center,
+        width: labelW * PdfPageFormat.mm,
+        height: height != null
+            ? height * PdfPageFormat.mm
+            : 7.5 * PdfPageFormat.mm,
+        decoration: pw.BoxDecoration(
+          color: bg,
+          border: pw.Border(right: borderSide, bottom: borderSide),
+        ),
+        alignment: pw.Alignment.center,
+        child: pw.Text(label, style: pw.TextStyle(font: fontB, fontSize: 7)),
+      ),
+      ...List.generate(count, (index) {
+        String val = index < data.length ? data[index] : "";
+        return pw.Container(
+          width: itemW * PdfPageFormat.mm,
+          height: height != null
+              ? height * PdfPageFormat.mm
+              : 7.5 * PdfPageFormat.mm,
+          decoration: pw.BoxDecoration(
+            border: pw.Border(right: borderSide, bottom: borderSide),
           ),
-        ),
-      ),
-      ...List.generate(
-        10,
-        (i) => pw.Container(
-          padding: const pw.EdgeInsets.symmetric(horizontal: 2, vertical: 2),
-          child: pw.Center(child: pw.Text(vals[i], style: ts())),
-        ),
-      ),
+          alignment: pw.Alignment.center,
+          child: pw.Text(val, style: pw.TextStyle(font: font, fontSize: 7)),
+        );
+      }),
     ],
   );
 }

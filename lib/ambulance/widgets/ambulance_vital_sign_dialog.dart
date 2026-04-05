@@ -39,7 +39,8 @@ class _AmbulanceVitalSignDialogState extends State<AmbulanceVitalSignDialog> {
   void initState() {
     super.initState();
     _timeController = TextEditingController(
-      text: widget.initialData?.time ??
+      text:
+          widget.initialData?.time ??
           DateFormat('HH:mm:ss').format(DateTime.now()),
     );
     _gcsEController = TextEditingController(
@@ -106,9 +107,9 @@ class _AmbulanceVitalSignDialogState extends State<AmbulanceVitalSignDialog> {
       if (widget.initialData == null) {
         await dao.addVitalSign(companion);
       } else {
-        await (dao.update(dao.ambulanceVitalSigns)
-              ..where((t) => t.id.equals(widget.initialData!.id)))
-            .write(companion);
+        await (dao.update(
+          dao.ambulanceVitalSigns,
+        )..where((t) => t.id.equals(widget.initialData!.id))).write(companion);
       }
 
       if (mounted) {
@@ -162,9 +163,7 @@ class _AmbulanceVitalSignDialogState extends State<AmbulanceVitalSignDialog> {
                       ),
                       const SizedBox(width: 16),
                       Text(
-                        widget.initialData == null
-                            ? '新增生命徵象紀錄'
-                            : '編輯生命徵象紀錄',
+                        widget.initialData == null ? '新增生命徵象紀錄' : '編輯生命徵象紀錄',
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -217,8 +216,8 @@ class _AmbulanceVitalSignDialogState extends State<AmbulanceVitalSignDialog> {
                                 const SizedBox(height: 8),
                                 CheckboxListTile(
                                   value: _atHospital,
-                                  onChanged:
-                                      (v) => setState(() => _atHospital = v!),
+                                  onChanged: (v) =>
+                                      setState(() => _atHospital = v!),
                                   title: const Text('已到達醫院 At Hospital'),
                                   controlAffinity:
                                       ListTileControlAffinity.leading,
@@ -483,7 +482,7 @@ class _AmbulanceVitalSignDialogState extends State<AmbulanceVitalSignDialog> {
         ),
         const SizedBox(height: 8),
         DropdownButtonFormField<String>(
-          initialValue: value,
+          value: value,
           decoration: InputDecoration(
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 16,

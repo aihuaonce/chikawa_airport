@@ -1,5 +1,4 @@
 import 'dart:typed_data';
-
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
@@ -33,348 +32,208 @@ Future<Uint8List> buildEnglishDiagnosisPdf(EnglishDiagnosisReportData d) async {
   final font = await PdfGoogleFonts.notoSansRegular();
   final fontB = await PdfGoogleFonts.notoSansBold();
 
-  pw.TextStyle ts({double size = 10, bool bold = false, PdfColor? color}) =>
-      pw.TextStyle(
-        font: bold ? fontB : font,
-        fontSize: size,
-        color: color ?? PdfColors.black,
-      );
+  pw.TextStyle ts({double size = 10, bool bold = false}) =>
+      pw.TextStyle(font: bold ? fontB : font, fontSize: size);
 
-  const border = pw.BorderSide(width: 0.7, color: PdfColors.black);
-
-  pw.Widget splitRow({
-    required String lLabel,
-    required String lValue,
-    required String rLabel,
-    required String rValue,
-    double lLabelW = 28,
-    double rLabelW = 22,
+  // 輔助方法：建立單一 Cell
+  pw.Widget _cell(
+    String text, {
+    bool isLabel = false,
+    double? height,
+    pw.Alignment align = pw.Alignment.centerLeft,
   }) {
-    return pw.Row(
-      crossAxisAlignment: pw.CrossAxisAlignment.stretch,
-      children: [
-        pw.Container(
-          width: lLabelW * PdfPageFormat.mm,
-          padding: const pw.EdgeInsets.all(6),
-          decoration: const pw.BoxDecoration(border: pw.Border(right: border)),
-          child: pw.Center(
-            child: pw.Text(
-              lLabel,
-              style: pw.TextStyle(font: fontB, fontSize: 10),
-              textAlign: pw.TextAlign.center,
-            ),
-          ),
-        ),
-        pw.Expanded(
-          child: pw.Container(
-            padding: const pw.EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-            decoration: const pw.BoxDecoration(
-              border: pw.Border(right: border),
-            ),
-            child: pw.Text(lValue, style: ts()),
-          ),
-        ),
-        pw.Container(
-          width: rLabelW * PdfPageFormat.mm,
-          padding: const pw.EdgeInsets.all(6),
-          decoration: const pw.BoxDecoration(border: pw.Border(right: border)),
-          child: pw.Center(
-            child: pw.Text(
-              rLabel,
-              style: pw.TextStyle(font: fontB, fontSize: 10),
-              textAlign: pw.TextAlign.center,
-            ),
-          ),
-        ),
-        pw.Expanded(
-          child: pw.Container(
-            padding: const pw.EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-            child: pw.Text(rValue, style: ts()),
-          ),
-        ),
-      ],
+    return pw.Container(
+      height: height,
+      padding: const pw.EdgeInsets.all(6),
+      alignment: align,
+      child: pw.Text(text, style: ts(bold: isLabel)),
     );
   }
+
+  // 定義邊框樣式，避免重複線條
+  const borderSide = pw.BorderSide(width: 0.8, color: PdfColors.black);
 
   pdf.addPage(
     pw.Page(
       pageFormat: PdfPageFormat.a4,
-      margin: const pw.EdgeInsets.symmetric(
-        horizontal: 22 * PdfPageFormat.mm,
-        vertical: 20 * PdfPageFormat.mm,
-      ),
+      margin: const pw.EdgeInsets.all(20 * PdfPageFormat.mm),
       build: (ctx) {
         return pw.Column(
-          crossAxisAlignment: pw.CrossAxisAlignment.start,
           children: [
-            pw.Container(
-              width: double.infinity,
-              decoration: pw.BoxDecoration(
-                border: pw.Border.all(width: 1.0, color: PdfColors.black),
-              ),
+            // --- 標題 ---
+            pw.Center(
               child: pw.Column(
                 children: [
-                  pw.Container(
-                    width: double.infinity,
-                    padding: const pw.EdgeInsets.symmetric(vertical: 12),
-                    decoration: const pw.BoxDecoration(
-                      border: pw.Border(bottom: border),
-                    ),
-                    child: pw.Column(
-                      children: [
-                        pw.Text(
-                          'Landseed Medical Clinic at Taiwan Taoyuan Int\'l '
-                          'Airport',
-                          style: pw.TextStyle(font: fontB, fontSize: 13),
-                          textAlign: pw.TextAlign.center,
-                        ),
-                        pw.SizedBox(height: 4),
-                        pw.Text(
-                          'Medical Certificate',
-                          style: pw.TextStyle(font: fontB, fontSize: 12),
-                          textAlign: pw.TextAlign.center,
-                        ),
-                      ],
-                    ),
+                  pw.Text(
+                    'Landseed Medical Clinic at TaiwanTaoyuan Int\'l Airport',
+                    style: ts(bold: true, size: 13),
                   ),
-                  pw.Container(
-                    decoration: const pw.BoxDecoration(
-                      border: pw.Border(bottom: border),
-                    ),
-                    child: pw.Row(
-                      crossAxisAlignment: pw.CrossAxisAlignment.stretch,
-                      children: [
-                        pw.Container(
-                          width: 28 * PdfPageFormat.mm,
-                          padding: const pw.EdgeInsets.all(8),
-                          decoration: const pw.BoxDecoration(
-                            border: pw.Border(right: border),
-                          ),
-                          child: pw.Center(
-                            child: pw.Text(
-                              'Name',
-                              style: pw.TextStyle(font: fontB, fontSize: 10),
-                            ),
-                          ),
-                        ),
-                        pw.Expanded(
-                          child: pw.Container(
-                            padding: const pw.EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 12,
-                            ),
-                            child: pw.Text(d.name, style: ts()),
-                          ),
-                        ),
-                      ],
-                    ),
+                  pw.Text(
+                    'Medical Certificate',
+                    style: ts(bold: true, size: 12),
                   ),
-                  pw.Container(
-                    decoration: const pw.BoxDecoration(
-                      border: pw.Border(bottom: border),
+                  pw.SizedBox(height: 15),
+                ],
+              ),
+            ),
+
+            // --- Row 1: Name (獨立 2 欄表格) ---
+            pw.Table(
+              border: const pw.TableBorder(
+                top: borderSide,
+                left: borderSide,
+                right: borderSide,
+                bottom: borderSide,
+                verticalInside: borderSide,
+              ),
+              columnWidths: {
+                0: const pw.FixedColumnWidth(35 * PdfPageFormat.mm),
+                1: const pw.FlexColumnWidth(),
+              },
+              children: [
+                pw.TableRow(
+                  children: [_cell('Name', isLabel: true), _cell(d.name)],
+                ),
+              ],
+            ),
+
+            // --- Row 2 & 3: 4 欄位內容 (獨立 4 欄表格) ---
+            // 注意：頂部不畫線，避免跟上面的表格重疊變粗
+            pw.Table(
+              border: const pw.TableBorder(
+                left: borderSide,
+                right: borderSide,
+                bottom: borderSide,
+                verticalInside: borderSide,
+                horizontalInside: borderSide,
+              ),
+              columnWidths: {
+                0: const pw.FixedColumnWidth(35 * PdfPageFormat.mm),
+                1: const pw.FlexColumnWidth(),
+                2: const pw.FixedColumnWidth(30 * PdfPageFormat.mm),
+                3: const pw.FlexColumnWidth(),
+              },
+              children: [
+                pw.TableRow(
+                  children: [
+                    _cell('Date of Birth', isLabel: true),
+                    _cell(d.dateOfBirth),
+                    _cell('Sex', isLabel: true),
+                    _cell(d.sex),
+                  ],
+                ),
+                pw.TableRow(
+                  children: [
+                    _cell('Nationality', isLabel: true),
+                    _cell(d.nationality),
+                    _cell('ID No or\nPassport No', isLabel: true),
+                    _cell(d.idOrPassportNo),
+                  ],
+                ),
+              ],
+            ),
+
+            // --- Row 4 & 5: 大空間內容 (獨立 2 欄表格) ---
+            pw.Table(
+              border: const pw.TableBorder(
+                left: borderSide,
+                right: borderSide,
+                bottom: borderSide,
+                verticalInside: borderSide,
+                horizontalInside: borderSide,
+              ),
+              columnWidths: {
+                0: const pw.FixedColumnWidth(35 * PdfPageFormat.mm),
+                1: const pw.FlexColumnWidth(),
+              },
+              children: [
+                pw.TableRow(
+                  children: [
+                    _cell('Impression', isLabel: true, height: 100),
+                    _cell(
+                      d.impression,
+                      height: 100,
+                      align: pw.Alignment.topLeft,
                     ),
-                    child: splitRow(
-                      lLabel: 'Date of\nBirth',
-                      lValue: d.dateOfBirth,
-                      rLabel: 'Sex',
-                      rValue: d.sex,
+                  ],
+                ),
+                pw.TableRow(
+                  children: [
+                    _cell('Comments\nAnd Advices', isLabel: true, height: 160),
+                    _cell(
+                      d.commentsAndAdvices,
+                      height: 160,
+                      align: pw.Alignment.topLeft,
                     ),
-                  ),
-                  pw.Container(
-                    decoration: const pw.BoxDecoration(
-                      border: pw.Border(bottom: border),
-                    ),
-                    child: splitRow(
-                      lLabel: 'Nationality',
-                      lValue: d.nationality,
-                      rLabel: 'ID No or\nPassport No',
-                      rValue: d.idOrPassportNo,
-                      rLabelW: 25,
-                    ),
-                  ),
-                  pw.Container(
-                    decoration: const pw.BoxDecoration(
-                      border: pw.Border(bottom: border),
-                    ),
-                    child: pw.Row(
-                      crossAxisAlignment: pw.CrossAxisAlignment.stretch,
-                      children: [
-                        pw.Container(
-                          width: 28 * PdfPageFormat.mm,
-                          padding: const pw.EdgeInsets.all(8),
-                          decoration: const pw.BoxDecoration(
-                            border: pw.Border(right: border),
+                  ],
+                ),
+              ],
+            ),
+
+            // --- Row 6: 底部資訊 ---
+            pw.Container(
+              width: double.infinity,
+              padding: const pw.EdgeInsets.all(10),
+              decoration: const pw.BoxDecoration(
+                border: pw.Border(
+                  left: borderSide,
+                  right: borderSide,
+                  bottom: borderSide,
+                ),
+              ),
+              child: pw.Column(
+                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                children: [
+                  pw.Row(
+                    mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                    children: [
+                      pw.Text(
+                        'President: CHIN-YU LIU',
+                        style: ts(bold: true, size: 9),
+                      ),
+                      pw.Row(
+                        children: [
+                          pw.Text(
+                            'Attending physician: ',
+                            style: ts(bold: true, size: 9),
                           ),
-                          child: pw.Center(
-                            child: pw.Text(
-                              'Impression',
-                              style: pw.TextStyle(font: fontB, fontSize: 10),
-                            ),
-                          ),
-                        ),
-                        pw.Expanded(
-                          child: pw.Container(
-                            height: 38 * PdfPageFormat.mm,
-                            padding: const pw.EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 6,
-                            ),
-                            child: pw.Align(
-                              alignment: pw.Alignment.topLeft,
-                              child: pw.Text(d.impression, style: ts()),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  pw.Container(
-                    decoration: const pw.BoxDecoration(
-                      border: pw.Border(bottom: border),
-                    ),
-                    child: pw.Row(
-                      crossAxisAlignment: pw.CrossAxisAlignment.stretch,
-                      children: [
-                        pw.Container(
-                          width: 28 * PdfPageFormat.mm,
-                          padding: const pw.EdgeInsets.all(8),
-                          decoration: const pw.BoxDecoration(
-                            border: pw.Border(right: border),
-                          ),
-                          child: pw.Center(
-                            child: pw.Text(
-                              'Comments\nAnd\nAdvices',
-                              style: pw.TextStyle(font: fontB, fontSize: 10),
-                              textAlign: pw.TextAlign.center,
-                            ),
-                          ),
-                        ),
-                        pw.Expanded(
-                          child: pw.Container(
-                            height: 38 * PdfPageFormat.mm,
-                            padding: const pw.EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 6,
-                            ),
-                            child: pw.Align(
-                              alignment: pw.Alignment.topLeft,
-                              child: pw.Text(d.commentsAndAdvices, style: ts()),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  pw.Container(
-                    width: double.infinity,
-                    padding: const pw.EdgeInsets.all(10),
-                    child: pw.Column(
-                      crossAxisAlignment: pw.CrossAxisAlignment.start,
-                      children: [
-                        pw.Row(
-                          crossAxisAlignment: pw.CrossAxisAlignment.start,
-                          children: [
-                            pw.Expanded(
-                              child: pw.Column(
-                                crossAxisAlignment: pw.CrossAxisAlignment.start,
-                                children: [
-                                  pw.Text(
-                                    'President : CHIN-YU LIU',
-                                    style: pw.TextStyle(
-                                      font: fontB,
-                                      fontSize: 9,
-                                    ),
-                                  ),
-                                  pw.SizedBox(height: 3),
-                                  pw.Text(
-                                    'Address: No 15, Hangjan S.Rd, Dayuan '
-                                    'dist., Taoyuan, Taiwan.',
-                                    style: pw.TextStyle(
-                                      font: font,
-                                      fontSize: 8,
-                                    ),
-                                  ),
-                                  pw.SizedBox(height: 3),
-                                  pw.Text(
-                                    'TEL: +886-3-398-3456',
-                                    style: pw.TextStyle(
-                                      font: font,
-                                      fontSize: 8,
-                                    ),
-                                  ),
-                                ],
+                          pw.Container(
+                            width: 40 * PdfPageFormat.mm,
+                            decoration: const pw.BoxDecoration(
+                              border: pw.Border(
+                                bottom: pw.BorderSide(width: 0.5),
                               ),
                             ),
-                            pw.Expanded(
-                              child: pw.Column(
-                                crossAxisAlignment: pw.CrossAxisAlignment.start,
-                                children: [
-                                  pw.Row(
-                                    children: [
-                                      pw.Text(
-                                        'Attending physician: ',
-                                        style: pw.TextStyle(
-                                          font: fontB,
-                                          fontSize: 9,
-                                        ),
-                                      ),
-                                      pw.Expanded(
-                                        child: pw.Container(
-                                          decoration: const pw.BoxDecoration(
-                                            border: pw.Border(
-                                              bottom: pw.BorderSide(
-                                                width: 0.5,
-                                                color: PdfColors.grey600,
-                                              ),
-                                            ),
-                                          ),
-                                          child: pw.Text(
-                                            d.attendingPhysician,
-                                            style: pw.TextStyle(
-                                              font: font,
-                                              fontSize: 9,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  pw.SizedBox(height: 10),
-                                  pw.Row(
-                                    mainAxisAlignment:
-                                        pw.MainAxisAlignment.center,
-                                    children: [
-                                      pw.Text(
-                                        'Issued Date: ',
-                                        style: pw.TextStyle(
-                                          font: fontB,
-                                          fontSize: 9,
-                                        ),
-                                      ),
-                                      pw.Container(
-                                        width: 35 * PdfPageFormat.mm,
-                                        decoration: const pw.BoxDecoration(
-                                          border: pw.Border(
-                                            bottom: pw.BorderSide(
-                                              width: 0.5,
-                                              color: PdfColors.grey600,
-                                            ),
-                                          ),
-                                        ),
-                                        child: pw.Text(
-                                          d.issuedDate,
-                                          style: pw.TextStyle(
-                                            font: font,
-                                            fontSize: 9,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
+                            child: pw.Text(
+                              d.attendingPhysician,
+                              style: ts(size: 9),
                             ),
-                          ],
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  pw.SizedBox(height: 10),
+                  pw.Text(
+                    'Address: No 15, Hangjan S.Rd, Dayuan dist., Taoyuan, Taiwan.',
+                    style: ts(size: 8),
+                  ),
+                  pw.Text('TEL: +886-3-398-3456', style: ts(size: 8)),
+                  pw.SizedBox(height: 5),
+                  pw.Align(
+                    alignment: pw.Alignment.centerRight,
+                    child: pw.Row(
+                      mainAxisSize: pw.MainAxisSize.min,
+                      children: [
+                        pw.Text('Issue Date: ', style: ts(bold: true, size: 9)),
+                        pw.Container(
+                          width: 35 * PdfPageFormat.mm,
+                          decoration: const pw.BoxDecoration(
+                            border: pw.Border(
+                              bottom: pw.BorderSide(width: 0.5),
+                            ),
+                          ),
+                          child: pw.Text(d.issuedDate, style: ts(size: 9)),
                         ),
                       ],
                     ),
@@ -388,5 +247,5 @@ Future<Uint8List> buildEnglishDiagnosisPdf(EnglishDiagnosisReportData d) async {
     ),
   );
 
-  return Uint8List.fromList(await pdf.save());
+  return await pdf.save();
 }

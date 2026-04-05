@@ -1053,7 +1053,7 @@ class _ReferenceOptionDialogState extends State<_ReferenceOptionDialog> {
             style: TextStyle(color: _textMuted.withValues(alpha: 0.8)),
           ),
           value: _boolValues[column.name] ?? false,
-          activeThumbColor: _primaryColor,
+          thumbColor: WidgetStateProperty.all(_primaryColor),
           activeTrackColor: _primaryColor.withValues(alpha: 0.35),
           onChanged: (value) {
             setState(() => _boolValues[column.name] = value);
