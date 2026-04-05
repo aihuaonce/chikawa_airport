@@ -69,21 +69,16 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
   }
 
   List<PatientReportType> _availableTypes(MedicalRecordData record) {
-    final result = <PatientReportType>[
+    return <PatientReportType>[
       PatientReportType.medical,
       PatientReportType.nursing,
       PatientReportType.diagnosisCertificate,
       PatientReportType.englishDiagnosisCertificate,
       PatientReportType.telex,
+      PatientReportType.emergency,
+      PatientReportType.ambulance,
+      PatientReportType.referral,
     ];
-    if (record.isEmergency) {
-      result.add(PatientReportType.emergency);
-    }
-    if (record.hasAmbulance) {
-      result.add(PatientReportType.ambulance);
-      result.add(PatientReportType.referral);
-    }
-    return result;
   }
 
   Future<void> _onPrint(
