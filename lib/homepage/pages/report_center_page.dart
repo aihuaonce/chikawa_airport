@@ -375,6 +375,7 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
       db.medicalFeeDao.getFeeByMedicalId(medicalId),
       db.telexDao.getTelexByMedicalId(medicalId),
       db.treatmentDao.getStaffAssignments(medicalId),
+      db.treatmentDao.getSpecialNotes(medicalId),
     ]);
 
     final flight = results[0] as FlightRecordData?;
@@ -383,6 +384,7 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
     final fee = results[3] as MedicalFeeData?;
     final telex = results[4] as TelexDocumentData?;
     final staffAssignments = results[5] as List<MedicalStaffAssignmentData>;
+    final specialNotes = results[6] as SpecialNotesData?;
 
     final patient = row.patient;
     final birthday = patient.birthday;
@@ -426,10 +428,18 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
     final reportTime = incident?.notificationTime;
     final treatTime = incident?.examinationTime ?? treatment?.treatmentTime;
 
-    final diagnosis = _buildDiagnosis(treatment);
+    final diagnosis = await _buildDiagnosisWithIcdNames(db, treatment);
 
     final result = refService.getTreatmentResultById(treatment?.resultId);
-    final outcome = _mapOutcome(result?.name ?? '');
+    final resultName = result?.name ?? '';
+    final isEmptyRun = await _hasSpecialNoteByName(
+      db: db,
+      refService: refService,
+      medicalId: medicalId,
+      name: '空跑',
+      specialNotes: specialNotes,
+    );
+    final (outcome, otherOutcomeDetail) = _mapOutcomeWithDetail(resultName);
     final transferTo = outcome == '轉送醫院'
         ? _resolveTransferTo(refService, treatment, result)
         : '';
@@ -495,6 +505,8 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
       treatMin: _formatMinute(treatTime),
       diagnosis: diagnosis,
       outcome: outcome,
+      otherOutcomeDetail: otherOutcomeDetail,
+      isEmptyRun: isEmptyRun,
       transferTo: transferTo,
       chargedYes: chargedYes,
       chargedNo: chargedNo,
@@ -557,6 +569,8 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
       certificate: certificate,
       treatment: treatment,
     );
+    final diagnosisWithIcd =
+        await _appendIcdChineseNameToLines(db, diagnosis);
     final doctorNotes = certificate?.chineseAdvice?.trim() ?? '';
 
     final treatingDoctor = _resolvePrimaryDoctorName(
@@ -580,7 +594,7 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
       gender: _mapSexToChinese(sexName),
       idOrPassport: _resolveIdOrPassport(patient),
       diagnosisCategory: diagnosisCategory,
-      diagnosis: diagnosis,
+      diagnosis: diagnosisWithIcd,
       doctorNotes: doctorNotes,
       director: director,
       treatingDoctor: treatingDoctor,
@@ -1401,6 +1415,13 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
       summaryParts.add(historyDetail);
     }
 
+    final diagnosisPrimaryWithIcd =
+        await _appendIcdChineseName(db, diagnosisPrimary);
+    final diagnosisSecondary1WithIcd =
+        await _appendIcdChineseName(db, diagnosisSecondary1);
+    final diagnosisSecondary2WithIcd =
+        await _appendIcdChineseName(db, diagnosisSecondary2);
+
     final data = ReferralReportData()
       ..referToHospital = hospitalName
       ..name = patient.name?.trim().isNotEmpty == true
@@ -1415,10 +1436,10 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
       ..contactPhone = contactPhone
       ..contactAddress = contactAddress
       ..chiefComplaintHistory = summaryParts.join('\n')
-      ..diagnosisICD = diagnosisPrimary
-      ..diagnosisName1 = diagnosisPrimary
-      ..diagnosisName2 = diagnosisSecondary1
-      ..diagnosisName3 = diagnosisSecondary2
+      ..diagnosisICD = diagnosisPrimaryWithIcd
+      ..diagnosisName1 = diagnosisPrimaryWithIcd
+      ..diagnosisName2 = diagnosisSecondary1WithIcd
+      ..diagnosisName3 = diagnosisSecondary2WithIcd
       ..lastExamResult = form?.recentExamResult?.trim() ?? ''
       ..lastExamDate = examDate == null ? '' : _formatDate(examDate)
       ..lastExamReport = form?.recentExamResult?.trim() ?? ''
@@ -1537,6 +1558,72 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
     return parts.map((value) => value!.trim()).join('\n');
   }
 
+  Future<String> _buildDiagnosisWithIcdNames(
+    AppDatabase db,
+    TreatmentData? treatment,
+  ) async {
+    final parts = [
+      treatment?.tentative,
+      treatment?.secondaryDiagnosis1,
+      treatment?.secondaryDiagnosis2,
+    ].where((value) => value?.trim().isNotEmpty == true);
+
+    final lines = <String>[];
+    for (final value in parts) {
+      final line = await _appendIcdChineseName(db, value!.trim());
+      if (line.isNotEmpty) {
+        lines.add(line);
+      }
+    }
+    return lines.join('\n');
+  }
+
+  String _extractIcdCode(String value) {
+    final match =
+        RegExp(r'[A-Za-z]\d{2}(?:\.\d{1,4})?').firstMatch(value);
+    return match?.group(0) ?? '';
+  }
+
+  Future<String> _appendIcdChineseName(
+    AppDatabase db,
+    String value,
+  ) async {
+    final trimmed = value.trim();
+    if (trimmed.isEmpty) return '';
+    final code = _extractIcdCode(trimmed).toUpperCase();
+    if (code.isEmpty) return trimmed;
+
+    final row = await (db.select(
+      db.icd10Code,
+    )..where((c) => c.code.equals(code))).getSingleOrNull();
+    if (row == null) return trimmed;
+
+    final nameCh = row.nameCh.trim();
+    if (nameCh.isEmpty) return trimmed;
+    if (trimmed.contains(nameCh)) return trimmed;
+
+    final rest = trimmed.substring(code.length).trim();
+    if (rest.isEmpty) return '$code $nameCh';
+    return '$code $nameCh $rest';
+  }
+
+  Future<String> _appendIcdChineseNameToLines(
+    AppDatabase db,
+    String text,
+  ) async {
+    final raw = text.trim();
+    if (raw.isEmpty) return '';
+    final lines = raw.split('\n');
+    final output = <String>[];
+    for (final line in lines) {
+      final trimmed = line.trim();
+      if (trimmed.isEmpty) continue;
+      final withName = await _appendIcdChineseName(db, trimmed);
+      output.add(withName);
+    }
+    return output.join('\n');
+  }
+
   String _buildCertificateDiagnosis({
     required ReferenceService refService,
     required MedicalCertificateData? certificate,
@@ -1572,6 +1659,12 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
       case '出境':
       case '入境':
       case '過境':
+      case '轉機':
+      case '迫降':
+      case '轉降':
+      case '備降':
+      case '技術性降落':
+      case '其他':
         return value;
       default:
         return '';
@@ -1624,23 +1717,26 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
     return parts.join(' / ');
   }
 
-  String _mapOutcome(String name) {
-    if (name.contains('自行')) {
-      return '自行返家';
+  (String, String) _mapOutcomeWithDetail(String name) {
+    final trimmed = name.trim();
+    if (trimmed.isEmpty) return ('', '');
+    if (trimmed.contains('自行')) {
+      return ('自行返家', '');
     }
-    if (name.contains('繼續搭機')) {
-      return '繼續搭機';
+    if (trimmed.contains('繼續搭機') || trimmed.contains('搭機')) {
+      return ('繼續搭機', '');
     }
-    if (name.contains('轉送') || (name.contains('轉') && name.contains('醫院'))) {
-      return '轉送醫院';
+    if (trimmed.contains('轉送') ||
+        (trimmed.contains('轉') && trimmed.contains('醫院'))) {
+      return ('轉送醫院', '');
     }
-    if (name.contains('觀察')) {
-      return '醫療中心觀察';
+    if (trimmed.contains('觀察')) {
+      return ('醫療中心觀察', '');
     }
-    if (name.contains('空跑')) {
-      return '空跑';
+    if (trimmed.contains('空跑')) {
+      return ('空跑', '');
     }
-    return name.isEmpty ? '' : '其他';
+    return ('其他', trimmed);
   }
 
   String _resolveTransferTo(
@@ -1663,6 +1759,29 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
       return resultName.replaceFirst('轉送', '').replaceFirst('轉', '').trim();
     }
     return '';
+  }
+
+  Future<bool> _hasSpecialNoteByName({
+    required AppDatabase db,
+    required ReferenceService refService,
+    required int medicalId,
+    required String name,
+    SpecialNotesData? specialNotes,
+  }) async {
+    final note =
+        specialNotes ?? await db.treatmentDao.getSpecialNotes(medicalId);
+    if (note == null) return false;
+
+    SpecialNoteRefData? ref;
+    try {
+      ref = refService.specialNoteRefs.firstWhere((r) => r.name == name);
+    } catch (_) {
+      ref = null;
+    }
+    if (ref == null) return false;
+
+    final ids = await db.treatmentDao.getSpecialNoteIds(note.noteId);
+    return ids.contains(ref.id);
   }
 
   String _formatFeeAmount(double amount) {

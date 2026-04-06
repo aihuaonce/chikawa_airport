@@ -41,6 +41,8 @@ class TelexReportData {
   final String diagnosis;
 
   final String outcome;
+  final String otherOutcomeDetail;
+  final bool isEmptyRun;
   final String transferTo;
 
   final bool chargedYes;
@@ -79,6 +81,8 @@ class TelexReportData {
     required this.treatMin,
     required this.diagnosis,
     required this.outcome,
+    required this.otherOutcomeDetail,
+    required this.isEmptyRun,
     required this.transferTo,
     required this.chargedYes,
     required this.chargedNo,
@@ -158,7 +162,14 @@ Future<Uint8List> buildTelexPdf(TelexReportData d) async {
           pw.SizedBox(height: _spacerLg),
 
           // ── Fax Info Section ─────────────────────────────────────────────
-          _buildFaxSection(d.toTitle, d.toLines, d.fromTitle, d.fromLines, font, fontB),
+          _buildFaxSection(
+            d.toTitle,
+            d.toLines,
+            d.fromTitle,
+            d.fromLines,
+            font,
+            fontB,
+          ),
           pw.SizedBox(height: _spacerLg),
 
           // ── Patient Info Section ─────────────────────────────────────────
@@ -270,15 +281,6 @@ pw.Widget _buildFaxSection(
         // TO section
         pw.Row(
           children: [
-            pw.Container(
-              padding: const pw.EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              color: _primaryColor,
-              child: pw.Text(
-                'TO',
-                style: pw.TextStyle(font: fontB, fontSize: 8, color: PdfColors.white),
-              ),
-            ),
-            pw.SizedBox(width: _spacerSm),
             pw.Text(toTitle, style: pw.TextStyle(font: fontB, fontSize: 9)),
           ],
         ),
@@ -288,22 +290,15 @@ pw.Widget _buildFaxSection(
           child: pw.Wrap(
             spacing: _spacerLg,
             runSpacing: _spacerXs,
-            children: toLines.map((line) => _inlineCheckLabel(line.text, line.checked, font)).toList(),
+            children: toLines
+                .map((line) => _inlineCheckLabel(line.text, line.checked, font))
+                .toList(),
           ),
         ),
         pw.SizedBox(height: _spacerMd),
         // FROM section
         pw.Row(
           children: [
-            pw.Container(
-              padding: const pw.EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              color: _primaryColor,
-              child: pw.Text(
-                'FROM',
-                style: pw.TextStyle(font: fontB, fontSize: 8, color: PdfColors.white),
-              ),
-            ),
-            pw.SizedBox(width: _spacerSm),
             pw.Text(fromTitle, style: pw.TextStyle(font: fontB, fontSize: 9)),
           ],
         ),
@@ -313,7 +308,9 @@ pw.Widget _buildFaxSection(
           child: pw.Wrap(
             spacing: _spacerLg,
             runSpacing: _spacerXs,
-            children: fromLines.map((line) => _inlineCheckLabel(line.text, line.checked, font)).toList(),
+            children: fromLines
+                .map((line) => _inlineCheckLabel(line.text, line.checked, font))
+                .toList(),
           ),
         ),
       ],
@@ -345,8 +342,10 @@ pw.Widget _buildPatientSection(TelexReportData d, pw.Font font, pw.Font fontB) {
             pw.Text('性別：', style: pw.TextStyle(font: fontB, fontSize: 9)),
             _checkbox(d.gender.isNotEmpty, font),
             pw.SizedBox(width: 2),
-            pw.Text(_displayGender(d.gender),
-                style: pw.TextStyle(font: font, fontSize: 9)),
+            pw.Text(
+              _displayGender(d.gender),
+              style: pw.TextStyle(font: font, fontSize: 9),
+            ),
           ],
         ),
         pw.SizedBox(height: _spacerSm),
@@ -397,15 +396,19 @@ pw.Widget _buildTravelSection(TelexReportData d, pw.Font font, pw.Font fontB) {
           ],
         ),
         pw.SizedBox(height: _spacerSm),
-        pw.Row(
+        pw.Wrap(
+          spacing: 10,
+          runSpacing: _spacerXs,
           children: [
-            pw.Text('航程方向：', style: pw.TextStyle(font: fontB, fontSize: 9)),
-            pw.SizedBox(width: _spacerSm),
             _checkLabel('出境', d.direction == '出境', font),
-            pw.SizedBox(width: 10),
             _checkLabel('入境', d.direction == '入境', font),
-            pw.SizedBox(width: 10),
             _checkLabel('過境', d.direction == '過境', font),
+            _checkLabel('轉機', d.direction == '轉機', font),
+            _checkLabel('迫降', d.direction == '迫降', font),
+            _checkLabel('轉降', d.direction == '轉降', font),
+            _checkLabel('備降', d.direction == '備降', font),
+            _checkLabel('技術性降落', d.direction == '技術性降落', font),
+            _checkLabel('其他', d.direction == '其他', font),
           ],
         ),
       ],
@@ -413,7 +416,11 @@ pw.Widget _buildTravelSection(TelexReportData d, pw.Font font, pw.Font fontB) {
   );
 }
 
-pw.Widget _buildIncidentSection(TelexReportData d, pw.Font font, pw.Font fontB) {
+pw.Widget _buildIncidentSection(
+  TelexReportData d,
+  pw.Font font,
+  pw.Font fontB,
+) {
   return pw.Container(
     padding: const pw.EdgeInsets.all(_spacerMd),
     decoration: pw.BoxDecoration(
@@ -466,7 +473,11 @@ pw.Widget _buildIncidentSection(TelexReportData d, pw.Font font, pw.Font fontB) 
   );
 }
 
-pw.Widget _buildDiagnosisSection(TelexReportData d, pw.Font font, pw.Font fontB) {
+pw.Widget _buildDiagnosisSection(
+  TelexReportData d,
+  pw.Font font,
+  pw.Font fontB,
+) {
   return pw.Container(
     padding: const pw.EdgeInsets.all(_spacerMd),
     decoration: pw.BoxDecoration(
@@ -517,9 +528,14 @@ pw.Widget _buildOutcomeSection(TelexReportData d, pw.Font font, pw.Font fontB) {
             pw.SizedBox(width: 14),
             _checkLabel('醫療中心觀察', d.outcome == '醫療中心觀察', font),
             pw.SizedBox(width: 14),
-            _checkLabel('空跑', d.outcome == '空跑', font),
+            _checkLabel('空跑', d.isEmptyRun, font),
             pw.SizedBox(width: 14),
             _checkLabel('其他', d.outcome == '其他', font),
+            if (d.outcome == '其他' &&
+                d.otherOutcomeDetail.trim().isNotEmpty) ...[
+              pw.Text('：', style: pw.TextStyle(font: fontB, fontSize: 9)),
+              _underlineBox(d.otherOutcomeDetail, font, minWidth: 30),
+            ],
           ],
         ),
         pw.SizedBox(height: _spacerSm),
@@ -560,7 +576,11 @@ pw.Widget _buildChargesSection(TelexReportData d, pw.Font font, pw.Font fontB) {
   );
 }
 
-pw.Widget _buildSignatureSection(TelexReportData d, pw.Font font, pw.Font fontB) {
+pw.Widget _buildSignatureSection(
+  TelexReportData d,
+  pw.Font font,
+  pw.Font fontB,
+) {
   return pw.Row(
     children: [
       pw.Expanded(
@@ -639,12 +659,9 @@ pw.Widget _underlineBox(
   bool center = false,
 }) {
   return pw.Container(
-    constraints: minWidth != null ? pw.BoxConstraints(minWidth: minWidth) : null,
-    decoration: pw.BoxDecoration(
-      border: pw.Border(
-        bottom: pw.BorderSide(width: 0.8, color: _textDark),
-      ),
-    ),
+    constraints: minWidth != null
+        ? pw.BoxConstraints(minWidth: minWidth)
+        : null,
     padding: const pw.EdgeInsets.symmetric(horizontal: 3, vertical: 1),
     child: pw.Text(
       value,
