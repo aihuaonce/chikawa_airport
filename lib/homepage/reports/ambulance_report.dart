@@ -169,7 +169,7 @@ Future<Uint8List> buildAmbulanceReportPdf(AmbulanceReportData d) async {
         width: 7, height: 7,
         margin: const pw.EdgeInsets.only(right: 1, top: 1),
         decoration: pw.BoxDecoration(border: pw.Border.all(width: 0.5)),
-        child: checked ? pw.Center(child: pw.Text('✓', style: ts(sz: 5))) : null,
+        child: checked ? pw.Container(color: PdfColors.black) : null,
       );
 
   pw.Widget ck(String label, bool checked) => pw.Row(children: [
@@ -336,7 +336,7 @@ Future<Uint8List> buildAmbulanceReportPdf(AmbulanceReportData d) async {
             cell(d.patientName),
             cell('性別', bold: true),
             pw.Container(padding: const pw.EdgeInsets.all(2),
-              child: pw.Row(children: [ck('男', d.gender == '男'), ck('女', d.gender == '女')])),
+              child: pw.Row(children: [ck('男性', d.gender == '男'), ck('女性', d.gender == '女')])),
             cell('病患財物明細：', bold: true),
             pw.Container(padding: const pw.EdgeInsets.all(2),
               child: pw.Row(children: [ck('未經手', d.propertyNone), ck('有', d.propertyHas)])),

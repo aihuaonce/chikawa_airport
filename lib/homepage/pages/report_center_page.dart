@@ -1,6 +1,12 @@
+import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 
 import 'package:intl/intl.dart';
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
+import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import 'package:provider/provider.dart';
@@ -211,6 +217,156 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
     }
   }
 
+  Future<void> _onExport(
+    MedicalRecordWithPatient row,
+    PatientReportType type,
+  ) async {
+    final db = context.read<AppDatabase>();
+    final refService = context.read<ReferenceService>();
+
+    try {
+      final (fileName, pdfBytes) = await _buildPdfBytes(
+        db: db,
+        refService: refService,
+        row: row,
+        type: type,
+      );
+
+      final filePath = await _resolveExportPath(fileName);
+      final file = File(filePath);
+      await file.writeAsBytes(pdfBytes, flush: true);
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('已匯出PDF：$filePath')),
+      );
+
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('匯出PDF失敗：$e')),
+      );
+    }
+  }
+
+  Future<String> _resolveExportPath(String fileName) async {
+    if (Platform.isAndroid) {
+      final downloadDir = Directory('/storage/emulated/0/Download');
+      if (await downloadDir.exists()) {
+        return p.join(downloadDir.path, fileName);
+      }
+      final fallback = await getExternalStorageDirectory();
+      if (fallback != null) {
+        return p.join(fallback.path, fileName);
+      }
+      final appDir = await getApplicationDocumentsDirectory();
+      return p.join(appDir.path, fileName);
+    }
+
+    final downloads = await getDownloadsDirectory();
+    if (downloads != null) {
+      return p.join(downloads.path, fileName);
+    }
+    final appDir = await getApplicationDocumentsDirectory();
+    return p.join(appDir.path, fileName);
+  }
+
+  Future<(String, Uint8List)> _buildPdfBytes({
+    required AppDatabase db,
+    required ReferenceService refService,
+    required MedicalRecordWithPatient row,
+    required PatientReportType type,
+  }) async {
+    final fileName = 'patient_${row.record.medicalId}_${type.code}.pdf';
+
+    if (type == PatientReportType.emergency) {
+      final reportData = await _buildEmergencyReportData(
+        db: db,
+        refService: refService,
+        row: row,
+      );
+      final pdfBytes = await buildEmergencyReportPdf(reportData);
+      return (fileName, pdfBytes);
+    }
+    if (type == PatientReportType.ambulance) {
+      final reportData = await _buildAmbulanceReportData(
+        db: db,
+        refService: refService,
+        row: row,
+      );
+      final pdfBytes = await buildAmbulanceReportPdf(reportData);
+      return (fileName, pdfBytes);
+    }
+    if (type == PatientReportType.referral) {
+      final reportData = await _buildReferralReportData(
+        db: db,
+        refService: refService,
+        row: row,
+      );
+      final pdfBytes = await buildReferralReportPdf(reportData);
+      return (fileName, pdfBytes);
+    }
+    if (type == PatientReportType.diagnosisCertificate) {
+      final reportData = await _buildDiagnosisCertificateReportData(
+        db: db,
+        refService: refService,
+        row: row,
+      );
+      final pdfBytes = await buildChineseDiagnosisPdf(reportData);
+      return (fileName, pdfBytes);
+    }
+    if (type == PatientReportType.englishDiagnosisCertificate) {
+      final reportData = await _buildEnglishDiagnosisReportData(
+        db: db,
+        refService: refService,
+        row: row,
+      );
+      final pdfBytes = await buildEnglishDiagnosisPdf(reportData);
+      return (fileName, pdfBytes);
+    }
+    if (type == PatientReportType.telex) {
+      final reportData = await _buildTelexReportData(
+        db: db,
+        refService: refService,
+        row: row,
+      );
+      final pdfBytes = await buildTelexPdf(reportData);
+      return (fileName, pdfBytes);
+    }
+
+    final patientName = row.patient.name?.trim().isNotEmpty == true
+        ? row.patient.name!
+        : '未填寫姓名';
+    final createdAt = DateFormat('yyyy/MM/dd HH:mm').format(
+      row.record.createdAt,
+    );
+
+    final doc = pw.Document();
+    doc.addPage(
+      pw.MultiPage(
+        pageFormat: PdfPageFormat.a4,
+        build: (_) => [
+          pw.Text(
+            'Patient Report',
+            style: pw.TextStyle(
+              fontSize: 24,
+              fontWeight: pw.FontWeight.bold,
+            ),
+          ),
+          pw.SizedBox(height: 12),
+          pw.Text('Report Type: ${type.labelEn}'),
+          pw.Text('Medical ID: ${row.record.medicalId}'),
+          pw.Text('Patient Name: $patientName'),
+          pw.Text('Created At: $createdAt'),
+          pw.SizedBox(height: 16),
+          pw.Text('Note: Replace this template with full report content.'),
+        ],
+      ),
+    );
+
+    return (fileName, await doc.save());
+  }
+
   Future<TelexReportData> _buildTelexReportData({
     required AppDatabase db,
     required ReferenceService refService,
@@ -327,7 +483,7 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
       birthYear: birthYear,
       birthMonth: birthMonth,
       birthDay: birthDay,
-      gender: sexName,
+      gender: _mapSexToChinese(sexName),
       isAirline: isAirline,
       airline: airlineName,
       flightNo: flightNo,
@@ -409,7 +565,7 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
       birthYear: birthYear,
       birthMonth: birthMonth,
       birthDay: birthDay,
-      gender: sexName,
+      gender: _mapSexToChinese(sexName),
       idOrPassport: _resolveIdOrPassport(patient),
       diagnosis: diagnosis,
       doctorNotes: doctorNotes,
@@ -544,7 +700,7 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
           ? patient.name!.trim()
           : patient.anonymizationName?.trim() ?? '',
       id: patient.idNo?.trim() ?? '',
-      gender: sexName,
+      gender: _mapSexToChinese(sexName),
       birthDate: birthDate,
       passportNo: patient.passportOrIdNo?.trim() ?? '',
       source: source,
@@ -905,7 +1061,7 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
       ..sendReasonCondition = sendReasonCondition
       ..sendReasonPatientRequest = sendReasonPatientRequest
       ..patientName = patientName
-      ..gender = sexName
+      ..gender = _mapSexToChinese(sexName)
       ..idOrPassport = _resolveIdOrPassport(patient)
       ..age = age
       ..guardian = guardian
@@ -1237,7 +1393,7 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
       ..name = patient.name?.trim().isNotEmpty == true
           ? patient.name!.trim()
           : patient.anonymizationName?.trim() ?? ''
-      ..gender = sexName
+      ..gender = _mapSexToChinese(sexName)
       ..birthYear = birthYear
       ..birthMonth = birthMonth
       ..birthDay = birthDay
@@ -1585,11 +1741,27 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
     return treatment?.referralHospitalFinal?.trim() ?? '';
   }
 
+  String _mapSexToChinese(String value) {
+    final trimmed = value.trim();
+    if (trimmed.isEmpty) return '';
+    final lower = trimmed.toLowerCase();
+    if (lower == 'm' || lower == 'male') return '男';
+    if (lower == 'f' || lower == 'female') return '女';
+    if (trimmed.contains('男')) return '男';
+    if (trimmed.contains('女')) return '女';
+    return trimmed;
+  }
+
   String _mapSexToEnglish(String value) {
-    if (value.contains('男')) {
+    final trimmed = value.trim();
+    if (trimmed.isEmpty) return '';
+    final lower = trimmed.toLowerCase();
+    if (lower == 'm' || lower == 'male') return 'M';
+    if (lower == 'f' || lower == 'female') return 'F';
+    if (trimmed.contains('男')) {
       return 'M';
     }
-    if (value.contains('女')) {
+    if (trimmed.contains('女')) {
       return 'F';
     }
     return '';
@@ -1880,6 +2052,18 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
                                   });
                                 },
                               ),
+                            ),
+                            const SizedBox(width: 8),
+                            OutlinedButton.icon(
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: primaryColor,
+                                side: const BorderSide(color: primaryColor),
+                              ),
+                              onPressed: () {
+                                _onExport(row, effectiveType);
+                              },
+                              icon: const Icon(Icons.download, size: 18),
+                              label: const Text('匯出'),
                             ),
                             const SizedBox(width: 8),
                             FilledButton.icon(

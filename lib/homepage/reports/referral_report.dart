@@ -134,9 +134,7 @@ Future<Uint8List> buildReferralReportPdf(ReferralReportData d) async {
           width: 8, height: 8,
           margin: const pw.EdgeInsets.only(right: 2),
           decoration: pw.BoxDecoration(border: pw.Border.all(width: 0.5)),
-          child: checked
-              ? pw.Center(child: pw.Text('✓', style: ts(sz: 5)))
-              : null,
+          child: checked ? pw.Container(color: PdfColors.black) : null,
         ),
         pw.Text(label, style: ts()),
         pw.SizedBox(width: 3),
@@ -208,7 +206,7 @@ Future<Uint8List> buildReferralReportPdf(ReferralReportData d) async {
             pw.Container(
               padding: const pw.EdgeInsets.all(3),
               child: pw.Column(children: [
-                pw.Row(children: [chk(d.gender == '男', '男'), chk(d.gender == '女', '女')]),
+                pw.Row(children: [chk(d.gender == '男', '男性'), chk(d.gender == '女', '女性')]),
                 pw.SizedBox(height: 4),
                 pw.Text(d.contactPhone, style: ts()),
               ]),

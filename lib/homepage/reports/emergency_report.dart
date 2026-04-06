@@ -201,14 +201,7 @@ Future<Uint8List> buildEmergencyReportPdf(EmergencyReportData d) async {
           width: 8.5,
           height: 8.5,
           decoration: pw.BoxDecoration(border: pw.Border.all(width: 0.6)),
-          child: checked
-              ? pw.Center(
-                  child: pw.Text(
-                    'v',
-                    style: pw.TextStyle(font: font, fontSize: 6.5),
-                  ),
-                )
-              : null,
+          child: checked ? pw.Container(color: PdfColors.black) : null,
         ),
         pw.SizedBox(width: 2.5),
         pw.Text(label, style: ts(size: 8)),
@@ -251,8 +244,8 @@ Future<Uint8List> buildEmergencyReportPdf(EmergencyReportData d) async {
                   _cell(
                     pw.Row(
                       children: [
-                        _chk('男', d.gender == '男'),
-                        _chk('女', d.gender == '女'),
+                        _chk('男性', d.gender == '男'),
+                        _chk('女性', d.gender == '女'),
                       ],
                     ),
                     width: 20,

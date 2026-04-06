@@ -345,7 +345,8 @@ pw.Widget _buildPatientSection(TelexReportData d, pw.Font font, pw.Font fontB) {
             pw.Text('性別：', style: pw.TextStyle(font: fontB, fontSize: 9)),
             _checkbox(d.gender.isNotEmpty, font),
             pw.SizedBox(width: 2),
-            pw.Text(d.gender, style: pw.TextStyle(font: font, fontSize: 9)),
+            pw.Text(_displayGender(d.gender),
+                style: pw.TextStyle(font: font, fontSize: 9)),
           ],
         ),
         pw.SizedBox(height: _spacerSm),
@@ -603,6 +604,19 @@ pw.Widget _buildFooter(pw.Font font) {
 // Helper Widgets
 // ============================================================================
 
+String _displayGender(String value) {
+  final trimmed = value.trim();
+  if (trimmed.isEmpty) return '';
+  final lower = trimmed.toLowerCase();
+  if (lower == 'm' || lower == 'male' || trimmed.contains('男')) {
+    return '男性';
+  }
+  if (lower == 'f' || lower == 'female' || trimmed.contains('女')) {
+    return '女性';
+  }
+  return trimmed;
+}
+
 pw.Widget _sectionLabel(String text, pw.Font font, pw.Font fontB) {
   return pw.Container(
     padding: const pw.EdgeInsets.only(bottom: _spacerXs),
@@ -647,14 +661,7 @@ pw.Widget _checkbox(bool checked, pw.Font font) {
     decoration: pw.BoxDecoration(
       border: pw.Border.all(width: 0.8, color: _textDark),
     ),
-    child: checked
-        ? pw.Center(
-            child: pw.Text(
-              '✓',
-              style: pw.TextStyle(font: font, fontSize: 8, color: _textDark),
-            ),
-          )
-        : pw.SizedBox(),
+    child: checked ? pw.Container(color: PdfColors.black) : pw.SizedBox(),
   );
 }
 

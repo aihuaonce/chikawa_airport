@@ -157,8 +157,8 @@ Future<Uint8List> buildChineseDiagnosisPdf(ChineseDiagnosisReportData d) async {
                               mainAxisAlignment:
                                   pw.MainAxisAlignment.spaceAround,
                               children: [
-                                _pdfCheckBox('男', d.gender == '男', font),
-                                _pdfCheckBox('女', d.gender == '女', font),
+                                _pdfCheckBox('男性', d.gender == '男', font),
+                                _pdfCheckBox('女性', d.gender == '女', font),
                               ],
                             ),
                           ),
@@ -327,14 +327,7 @@ pw.Widget _pdfCheckBox(String label, bool checked, pw.Font font) {
         width: 10,
         height: 10,
         decoration: pw.BoxDecoration(border: pw.Border.all(width: 0.8)),
-        child: checked
-            ? pw.Center(
-                child: pw.Text(
-                  'v',
-                  style: pw.TextStyle(font: font, fontSize: 8),
-                ),
-              )
-            : null,
+        child: checked ? pw.Container(color: PdfColors.black) : null,
       ),
       pw.SizedBox(width: 4),
       pw.Text(label, style: pw.TextStyle(font: font, fontSize: 10)),
