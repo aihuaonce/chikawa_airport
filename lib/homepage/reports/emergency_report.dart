@@ -218,6 +218,31 @@ Future<Uint8List> buildEmergencyReportPdf(EmergencyReportData d) async {
     );
   }
 
+  pw.Widget _lineBox(String text, double width) {
+    return pw.Container(
+      width: width * PdfPageFormat.mm,
+      padding: const pw.EdgeInsets.only(bottom: 1),
+      child: pw.Text(text, style: ts()),
+    );
+  }
+
+  pw.Widget _chkSmall(String label, bool checked) {
+    return pw.Row(
+      mainAxisSize: pw.MainAxisSize.min,
+      children: [
+        pw.Container(
+          width: 8.5,
+          height: 8.5,
+          decoration: pw.BoxDecoration(border: pw.Border.all(width: 0.6)),
+          child: checked ? pw.Container(color: PdfColors.black) : null,
+        ),
+        pw.SizedBox(width: 2.5),
+        pw.Text(label, style: ts(size: 7)),
+        pw.SizedBox(width: 3.5),
+      ],
+    );
+  }
+
   bool _hasBreathingMode(String value, String keyword) {
     return value.contains(keyword);
   }
@@ -473,10 +498,13 @@ Future<Uint8List> buildEmergencyReportPdf(EmergencyReportData d) async {
                       pw.Row(
                         children: [
                           _cell(
+                            pw.Text('意識', style: ts()),
+                            width: 12,
+                            minHeight: 8,
+                          ),
+                          _cell(
                             pw.Row(
                               children: [
-                                pw.Text('意識:', style: ts()),
-                                pw.SizedBox(width: 6),
                                 pw.Text('E', style: ts(bold: true)),
                                 pw.Text(': ${d.consciousnessE}', style: ts()),
                                 pw.SizedBox(width: 6),
@@ -487,12 +515,12 @@ Future<Uint8List> buildEmergencyReportPdf(EmergencyReportData d) async {
                                 pw.Text(': ${d.consciousnessV}', style: ts()),
                               ],
                             ),
-                            width: 45,
+                            width: 40,
                             minHeight: 8,
                           ),
                           _cell(
                             pw.Text('心跳: ${d.heartRate} 次/分', style: ts()),
-                            width: 45,
+                            width: 38,
                             minHeight: 8,
                           ),
                         ],
@@ -500,16 +528,21 @@ Future<Uint8List> buildEmergencyReportPdf(EmergencyReportData d) async {
                       pw.Row(
                         children: [
                           _cell(
-                            pw.Text('呼吸: ${d.breathingRate} 次/分', style: ts()),
-                            width: 45,
+                            pw.Text('呼吸', style: ts()),
+                            width: 12,
+                            minHeight: 8,
+                          ),
+                          _cell(
+                            pw.Text('${d.breathingRate} 次/分', style: ts()),
+                            width: 40,
                             minHeight: 8,
                           ),
                           _cell(
                             pw.Text(
-                              '血壓: ${d.bpSystolic}/${d.bpDiastolic}',
+                              '血壓: ${d.bpSystolic}/${d.bpDiastolic} mmHg',
                               style: ts(),
                             ),
-                            width: 45,
+                            width: 38,
                             minHeight: 8,
                           ),
                         ],
@@ -672,7 +705,7 @@ Future<Uint8List> buildEmergencyReportPdf(EmergencyReportData d) async {
                         children: [
                           _cell(
                             pw.Text('意識', style: ts()),
-                            width: 12,
+                            width: 10,
                             minHeight: 8,
                           ),
                           _cell(
@@ -697,12 +730,12 @@ Future<Uint8List> buildEmergencyReportPdf(EmergencyReportData d) async {
                                 ),
                               ],
                             ),
-                            width: 54,
+                            width: 57,
                             minHeight: 8,
                           ),
                           _cell(
                             pw.Text('心跳: ${d.postHeartRate} 次/分', style: ts()),
-                            width: 24,
+                            width: 29,
                             minHeight: 8,
                           ),
                         ],
@@ -711,7 +744,7 @@ Future<Uint8List> buildEmergencyReportPdf(EmergencyReportData d) async {
                         children: [
                           _cell(
                             pw.Text('呼吸', style: ts()),
-                            width: 12,
+                            width: 10,
                             minHeight: 8,
                           ),
                           _cell(
@@ -719,22 +752,22 @@ Future<Uint8List> buildEmergencyReportPdf(EmergencyReportData d) async {
                               spacing: 2,
                               runSpacing: 1,
                               children: [
-                                _chk(
+                                _chkSmall(
                                   '自發性呼吸',
                                   _hasBreathingMode(d.postBreathing, '自發'),
                                 ),
-                                _chk(
+                                _chkSmall(
                                   '呼吸器',
                                   _hasBreathingMode(d.postBreathing, '呼吸器'),
                                 ),
-                                _chk('Ambu', _hasAmbu(d.postBreathing)),
+                                _chkSmall('Ambu', _hasAmbu(d.postBreathing)),
                                 pw.Text(
                                   '${d.postBreathingRate} 次/分',
-                                  style: ts(),
+                                  style: ts(size: 7),
                                 ),
                               ],
                             ),
-                            width: 54,
+                            width: 57,
                             minHeight: 8,
                           ),
                           _cell(
@@ -742,14 +775,14 @@ Future<Uint8List> buildEmergencyReportPdf(EmergencyReportData d) async {
                               '血壓: ${d.postBpSystolic}/${d.postBpDiastolic} mmHg',
                               style: ts(),
                             ),
-                            width: 24,
+                            width: 29,
                             minHeight: 8,
                           ),
                         ],
                       ),
                       _cell(
                         pw.Text('其他: ${d.postOther}', style: ts()),
-                        width: 90,
+                        width: 96,
                         minHeight: 8,
                       ),
                     ],
@@ -761,17 +794,17 @@ Future<Uint8List> buildEmergencyReportPdf(EmergencyReportData d) async {
                         children: [
                           _cell(
                             pw.Text('Size', style: ts()),
-                            width: 12,
+                            width: 8,
                             minHeight: 12,
                           ),
                           _cell(
                             _pupilSizeSide('左', d.postPupilSizeL),
-                            width: 29,
+                            width: 28,
                             minHeight: 12,
                           ),
                           _cell(
                             _pupilSizeSide('右', d.postPupilSizeR),
-                            width: 29,
+                            width: 28,
                             minHeight: 12,
                           ),
                         ],
@@ -780,17 +813,17 @@ Future<Uint8List> buildEmergencyReportPdf(EmergencyReportData d) async {
                         children: [
                           _cell(
                             pw.Text('L-R', style: ts()),
-                            width: 12,
+                            width: 8,
                             minHeight: 12,
                           ),
                           _cell(
                             _pupilLrSide('左', d.postPupilReactionL),
-                            width: 29,
+                            width: 28,
                             minHeight: 12,
                           ),
                           _cell(
                             _pupilLrSide('右', d.postPupilReactionR),
-                            width: 29,
+                            width: 28,
                             minHeight: 12,
                           ),
                         ],
@@ -823,22 +856,31 @@ Future<Uint8List> buildEmergencyReportPdf(EmergencyReportData d) async {
                         pw.Row(
                           children: [
                             _chk('轉診', d.outcomeType == '轉診'),
-                            pw.Text(
-                              '醫院: ${d.transferHospital}  時間: ${d.transferTimeHour}:${d.transferTimeMin}',
-                              style: ts(),
-                            ),
+                            pw.Text('醫院', style: ts()),
+                            pw.SizedBox(width: 3),
+                            _lineBox(d.transferHospital, 40),
+                            pw.SizedBox(width: 6),
+                            pw.Text('時間：', style: ts()),
+                            _lineBox(d.transferTimeHour, 10),
+                            pw.Text('時', style: ts()),
+                            _lineBox(d.transferTimeMin, 10),
+                            pw.Text('分', style: ts()),
                           ],
                         ),
                         pw.Row(
                           children: [
                             _chk('死亡', d.outcomeType == '死亡'),
-                            pw.Text(
-                              '時間: ${d.deathTimeHour}:${d.deathTimeMin}',
-                              style: ts(),
-                            ),
-                            pw.SizedBox(width: 10),
+                            pw.Text('時間：', style: ts()),
+                            _lineBox(d.deathTimeHour, 10),
+                            pw.Text('時', style: ts()),
+                            _lineBox(d.deathTimeMin, 10),
+                            pw.Text('分', style: ts()),
+                          ],
+                        ),
+                        pw.Row(
+                          children: [
                             _chk('其他', d.outcomeType == '其他'),
-                            pw.Text(d.otherOutcome, style: ts()),
+                            _lineBox(d.otherOutcome, 60),
                           ],
                         ),
                       ],
