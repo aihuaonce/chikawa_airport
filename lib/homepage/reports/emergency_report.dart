@@ -136,6 +136,10 @@ class EmergencyReportData {
     required this.doctor,
     required this.nurse,
     required this.emt,
+    required String pupilReactionL,
+    required String pupilReactionR,
+    required String postPupilReactionL,
+    required String postPupilReactionR,
   });
 }
 
@@ -144,14 +148,14 @@ Future<Uint8List> buildEmergencyReportPdf(EmergencyReportData d) async {
   final font = await PdfGoogleFonts.notoSansTCRegular();
   final fontB = await PdfGoogleFonts.notoSansTCBold();
 
-  // 安全總寬度維持 182mm
+  // 安全總寬度維持182mm
   final double totalW = 182.0;
   final borderSide = pw.BorderSide(width: 0.6, color: PdfColors.black);
 
   pw.TextStyle ts({double size = 8, bool bold = false}) =>
       pw.TextStyle(font: bold ? fontB : font, fontSize: size);
 
-  // --- 核心儲存格方法：處理邊框與高度 ---
+  // --- 核心儲存格方法：處理邊框與高度---
   pw.Widget _cell(
     pw.Widget child, {
     required double width,
@@ -232,7 +236,7 @@ Future<Uint8List> buildEmergencyReportPdf(EmergencyReportData d) async {
                   _lb('姓名', width: 12, isFirstColumn: true, isFirstRow: true),
                   _cell(
                     pw.Text(d.name, style: ts()),
-                    width: 28,
+                    width: 24,
                     isFirstRow: true,
                   ),
                   _lb('ID', width: 10, isFirstRow: true),
@@ -248,7 +252,7 @@ Future<Uint8List> buildEmergencyReportPdf(EmergencyReportData d) async {
                         _chk('女性', d.gender == '女'),
                       ],
                     ),
-                    width: 20,
+                    width: 24,
                     isFirstRow: true,
                   ),
                   _lb('生日', width: 15, isFirstRow: true),
@@ -280,7 +284,7 @@ Future<Uint8List> buildEmergencyReportPdf(EmergencyReportData d) async {
                         _chk('其他', d.source == '其他'),
                       ],
                     ),
-                    width: 50,
+                    width: 45,
                     minHeight: 14,
                   ),
                   _lb('航空公司', width: 18, minHeight: 14),
@@ -298,7 +302,7 @@ Future<Uint8List> buildEmergencyReportPdf(EmergencyReportData d) async {
                   _lb('國籍', width: 10, minHeight: 14),
                   _cell(
                     pw.Text(d.nationality, style: ts()),
-                    width: 17,
+                    width: 22,
                     minHeight: 14,
                   ),
                 ],
@@ -524,7 +528,7 @@ Future<Uint8List> buildEmergencyReportPdf(EmergencyReportData d) async {
               pw.Row(
                 children: [
                   _lb(
-                    '急救\n後\n病況',
+                    '急\n救\n後\n病\n況',
                     width: 12,
                     minHeight: 24,
                     isFirstColumn: true,

@@ -571,8 +571,7 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
       certificate: certificate,
       treatment: treatment,
     );
-    final diagnosisWithIcd =
-        await _appendIcdChineseNameToLines(db, diagnosis);
+    final diagnosisWithIcd = await _appendIcdChineseNameToLines(db, diagnosis);
     final doctorNotes = certificate?.chineseAdvice?.trim() ?? '';
 
     final treatingDoctor = _resolvePrimaryDoctorName(
@@ -670,9 +669,17 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
     final emergencyStartTime = _formatTime(emergency.startTime);
     final incidentSituation = emergency.incidentContext ?? '';
 
-    final diagnosis = _buildDiagnosis(treatment).isNotEmpty
-        ? _buildDiagnosis(treatment)
-        : (emergency.diagnosis ?? '');
+    final diagnosisFromTreatment = await _buildDiagnosisWithIcdNames(
+      db,
+      treatment,
+    );
+    final emergencyDiagnosisRaw = emergency.diagnosis?.trim() ?? '';
+    final diagnosisFromEmergency = emergencyDiagnosisRaw.isEmpty
+        ? ''
+        : await _appendIcdChineseNameToLines(db, emergencyDiagnosisRaw);
+    final diagnosis = diagnosisFromTreatment.isNotEmpty
+        ? diagnosisFromTreatment
+        : diagnosisFromEmergency;
 
     final location = await _resolveIncidentLocation(
       db: db,
@@ -699,6 +706,27 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
       monitorEpi[i] = log.epinephrine ?? '';
       monitorMeds[i] = log.otherMeds ?? '';
     }
+
+    final leftPupilReaction = await _resolvePupilReactionSymbol(
+      db,
+      initialAssessment?.leftPupilReactionId,
+      initialAssessment?.leftPupilReaction,
+    );
+    final rightPupilReaction = await _resolvePupilReactionSymbol(
+      db,
+      initialAssessment?.rightPupilReactionId,
+      initialAssessment?.rightPupilReaction,
+    );
+    final postLeftPupilReaction = await _resolvePupilReactionSymbol(
+      db,
+      postAssessment?.leftPupilReactionId,
+      postAssessment?.leftPupilReaction,
+    );
+    final postRightPupilReaction = await _resolvePupilReactionSymbol(
+      db,
+      postAssessment?.rightPupilReactionId,
+      postAssessment?.rightPupilReaction,
+    );
 
     final initBp = _formatBp(
       initialAssessment?.systolic,
@@ -754,6 +782,8 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
       pupilSizeL: _formatPupilSize(initialAssessment?.leftPupilSize),
       pupilSizeR: _formatPupilSize(initialAssessment?.rightPupilSize),
       pupilLR: '',
+      pupilReactionL: leftPupilReaction,
+      pupilReactionR: rightPupilReaction,
       onET: _mergeStrings(emergency.intubationMethod, emergency.intubationSize),
       onIVLine: emergency.ivLineSize ?? '',
       monitorTime: monitorTime,
@@ -775,6 +805,8 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
       postPupilSizeL: _formatPupilSize(postAssessment?.leftPupilSize),
       postPupilSizeR: _formatPupilSize(postAssessment?.rightPupilSize),
       postOther: emergency.postRespirationOthers ?? '',
+      postPupilReactionL: postLeftPupilReaction,
+      postPupilReactionR: postRightPupilReaction,
       endTimeHour: endHour,
       endTimeMin: endMin,
       outcomeType: outcomeType,
@@ -1417,12 +1449,18 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
       summaryParts.add(historyDetail);
     }
 
-    final diagnosisPrimaryWithIcd =
-        await _appendIcdChineseName(db, diagnosisPrimary);
-    final diagnosisSecondary1WithIcd =
-        await _appendIcdChineseName(db, diagnosisSecondary1);
-    final diagnosisSecondary2WithIcd =
-        await _appendIcdChineseName(db, diagnosisSecondary2);
+    final diagnosisPrimaryWithIcd = await _appendIcdChineseName(
+      db,
+      diagnosisPrimary,
+    );
+    final diagnosisSecondary1WithIcd = await _appendIcdChineseName(
+      db,
+      diagnosisSecondary1,
+    );
+    final diagnosisSecondary2WithIcd = await _appendIcdChineseName(
+      db,
+      diagnosisSecondary2,
+    );
 
     final data = ReferralReportData()
       ..referToHospital = hospitalName
@@ -1581,15 +1619,11 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
   }
 
   String _extractIcdCode(String value) {
-    final match =
-        RegExp(r'[A-Za-z]\d{2}(?:\.\d{1,4})?').firstMatch(value);
+    final match = RegExp(r'[A-Za-z]\d{2}(?:\.\d{1,4})?').firstMatch(value);
     return match?.group(0) ?? '';
   }
 
-  Future<String> _appendIcdChineseName(
-    AppDatabase db,
-    String value,
-  ) async {
+  Future<String> _appendIcdChineseName(AppDatabase db, String value) async {
     final trimmed = value.trim();
     if (trimmed.isEmpty) return '';
     final code = _extractIcdCode(trimmed).toUpperCase();
@@ -1822,12 +1856,22 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
   }
 
   String _resolveEmergencySource(String travelStatusName) {
-    if (travelStatusName == '出境' ||
-        travelStatusName == '入境' ||
-        travelStatusName == '過境') {
-      return travelStatusName;
-    }
-    return travelStatusName.isNotEmpty ? '其他' : '';
+    final trimmed = travelStatusName.trim();
+    return trimmed.isEmpty ? '' : trimmed;
+  }
+
+  Future<String> _resolvePupilReactionSymbol(
+    AppDatabase db,
+    int? reactionId,
+    String? reactionText,
+  ) async {
+    final text = reactionText?.trim();
+    if (text != null && text.isNotEmpty) return text;
+    if (reactionId == null) return '';
+    final ref = await (db.select(
+      db.pupilReactionRef,
+    )..where((t) => t.id.equals(reactionId))).getSingleOrNull();
+    return ref?.symbol ?? '';
   }
 
   String _mapTemperatureStatus(double? temp) {
