@@ -1924,6 +1924,7 @@ class TreatmentViewModel extends ChangeNotifier {
     _referralFormSaveStatus = SaveStatus.saving;
 
     _referralFormDebounceTimer = Timer(const Duration(seconds: 2), () async {
+      if (_isDisposed) return;
       debugPrint('系統:正在自動儲存轉診單/切結書...');
       await _saveReferralFormToDatabase();
     });
@@ -1953,13 +1954,16 @@ class TreatmentViewModel extends ChangeNotifier {
       }
 
       debugPrint('系統:轉診單/切結書自動存檔成功');
+      if (_isDisposed || !hasListeners) return;
       _referralFormSaveStatus = SaveStatus.success;
       notifyListeners();
       await Future.delayed(const Duration(seconds: 3));
+      if (_isDisposed || !hasListeners) return;
       _referralFormSaveStatus = SaveStatus.idle;
       notifyListeners();
     } catch (e) {
       debugPrint('系統:轉診單/切結書自動存檔失敗 - $e');
+      if (_isDisposed || !hasListeners) return;
       _referralFormSaveStatus = SaveStatus.idle;
       notifyListeners();
     }

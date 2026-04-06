@@ -76,8 +76,6 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
 
   List<PatientReportType> _availableTypes(MedicalRecordData record) {
     return <PatientReportType>[
-      PatientReportType.medical,
-      PatientReportType.nursing,
       PatientReportType.diagnosisCertificate,
       PatientReportType.englishDiagnosisCertificate,
       PatientReportType.telex,
@@ -538,8 +536,17 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
     final birthDay = birthday == null ? '' : _twoDigits(birthday.day);
 
     final sexName = refService.getSexById(patient.sexId)?.name ?? '';
-    final diagnosis = _buildCertificateDiagnosis(
-      refService: refService,
+    final diagnosisCategoryId = certificate?.diagnosisCategoryId;
+    var diagnosisCategory =
+        refService.getDiagnosisCategoryById(diagnosisCategoryId)?.name.trim() ??
+            '';
+    if (diagnosisCategory.isEmpty && diagnosisCategoryId != null) {
+      final categoryRow = await (db.select(
+        db.diagnosisCategory,
+      )..where((c) => c.id.equals(diagnosisCategoryId))).getSingleOrNull();
+      diagnosisCategory = categoryRow?.name.trim() ?? '';
+    }
+    final diagnosis = _buildCertificateDiagnosisText(
       certificate: certificate,
       treatment: treatment,
     );
@@ -567,6 +574,7 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
       birthDay: birthDay,
       gender: _mapSexToChinese(sexName),
       idOrPassport: _resolveIdOrPassport(patient),
+      diagnosisCategory: diagnosisCategory,
       diagnosis: diagnosis,
       doctorNotes: doctorNotes,
       director: director,
@@ -1752,6 +1760,20 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
     return trimmed;
   }
 
+  String _buildCertificateDiagnosisText({
+    required MedicalCertificateData? certificate,
+    required TreatmentData? treatment,
+  }) {
+    final result = certificate?.diagnosisResult?.trim();
+    if (result != null && result.isNotEmpty) {
+      return result;
+    }
+    if (treatment?.tentative?.trim().isNotEmpty == true) {
+      return treatment!.tentative!.trim();
+    }
+    return '';
+  }
+
   String _mapSexToEnglish(String value) {
     final trimmed = value.trim();
     if (trimmed.isEmpty) return '';
@@ -2093,11 +2115,9 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
 }
 
 enum PatientReportType {
-  medical,
   emergency,
   ambulance,
   referral,
-  nursing,
   diagnosisCertificate,
   englishDiagnosisCertificate,
   telex,
@@ -2106,16 +2126,12 @@ enum PatientReportType {
 extension PatientReportTypeLabel on PatientReportType {
   String get label {
     switch (this) {
-      case PatientReportType.medical:
-        return '主診紀錄報表(沒做不要點)';
       case PatientReportType.emergency:
         return '急救紀錄報表';
       case PatientReportType.ambulance:
         return '救護車紀錄報表';
       case PatientReportType.referral:
         return '轉診單';
-      case PatientReportType.nursing:
-        return '護理紀錄報表(沒做不要點)';
       case PatientReportType.diagnosisCertificate:
         return '中文診斷書';
       case PatientReportType.englishDiagnosisCertificate:
@@ -2127,16 +2143,12 @@ extension PatientReportTypeLabel on PatientReportType {
 
   String get labelEn {
     switch (this) {
-      case PatientReportType.medical:
-        return 'Medical Record (Not Implemented)';
       case PatientReportType.emergency:
         return 'Emergency Record';
       case PatientReportType.ambulance:
         return 'Ambulance Record';
       case PatientReportType.referral:
         return 'Referral Form';
-      case PatientReportType.nursing:
-        return 'Nursing Record (Not Implemented)';
       case PatientReportType.diagnosisCertificate:
         return 'Chinese Diagnosis Certificate';
       case PatientReportType.englishDiagnosisCertificate:
@@ -2148,16 +2160,12 @@ extension PatientReportTypeLabel on PatientReportType {
 
   String get code {
     switch (this) {
-      case PatientReportType.medical:
-        return 'medical (???)';
       case PatientReportType.emergency:
         return 'emergency';
       case PatientReportType.ambulance:
         return 'ambulance';
       case PatientReportType.referral:
         return 'referral';
-      case PatientReportType.nursing:
-        return 'nursing (???)';
       case PatientReportType.diagnosisCertificate:
         return 'diagnosis_cn';
       case PatientReportType.englishDiagnosisCertificate:

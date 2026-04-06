@@ -15,25 +15,25 @@ class MedicalViewModel extends ChangeNotifier {
   final int medicalId;
   final SyncServiceProvider? syncProvider;
 
-  //  ??????
+  //  病患資料快取
   PatientData? _patientCache;
   PatientData? get patient => _patientCache;
 
-  //  ??????
+  //  飛航記錄快取
   FlightRecordData? _flightCache;
   FlightRecordData? get flightRecord => _flightCache;
 
   List<TransitLocationWithData> _transitLocations = [];
   List<TransitLocationWithData> get transitLocations => _transitLocations;
 
-  //?? refService
+  //  使用 refService
   List<NationalityData> get nationalityOptions => refService.nationalityList;
   List<SexData> get sexOptions => refService.sexList;
   List<VisitReasonData> get visitReasonOptions => refService.visitReasonList;
   List<AirlineData> get airlineOptions => refService.airlineList;
   List<TravelStatusData> get travelStatusOptions => refService.travelStatusList;
   List<LocationData> get locationOptions => refService.locationList;
-  //  ???????
+  //  延遲存檔與狀態
   Timer? _debounceTimer;
   SaveStatus _saveStatus = SaveStatus.idle;
   SaveStatus get saveStatus => _saveStatus;
@@ -45,9 +45,9 @@ class MedicalViewModel extends ChangeNotifier {
     this.syncProvider,
   });
 
-  // ???
+  //  初始化
   Future<void> init() async {
-    // ????????????????
+    // 並行載入病患與飛航資料，速度更快
     final results = await Future.wait([
       db.medicalDao.getPatientByMedicalId(medicalId),
       db.flightDao.getFlightByMedicalId(medicalId),
@@ -57,7 +57,7 @@ class MedicalViewModel extends ChangeNotifier {
     _flightCache = results[1] as FlightRecordData?;
 
     if (_flightCache == null) {
-      debugPrint('?????????????????');
+      debugPrint('系統：飛航記錄不存在，建立預設記錄');
       await _createDefaultFlightRecord();
       _flightCache = await db.flightDao.getFlightByMedicalId(medicalId);
     }
@@ -75,13 +75,13 @@ class MedicalViewModel extends ChangeNotifier {
       _transitLocations = await db.flightDao.getTransitLocations(
         _flightCache!.flightRecordId,
       );
-      debugPrint('?????? ${_transitLocations.length} ????');
+      debugPrint('系統：已載入 ${_transitLocations.length} 個經過點');
     } catch (e) {
-      debugPrint('?????????? - $e');
+      debugPrint('系統：載入經過點時發生錯誤 - $e');
     }
   }
 
-  //????????
+  //  建立預設飛航記錄
   Future<void> _createDefaultFlightRecord() async {
     try {
       await db.flightDao.createFlightRecord(
@@ -93,13 +93,13 @@ class MedicalViewModel extends ChangeNotifier {
         arrivalLocationId: null,
       );
 
-      debugPrint('????????????');
+      debugPrint('系統：已建立預設飛航記錄');
     } catch (e) {
-      debugPrint('????????????? - $e');
+      debugPrint('系統：建立預設飛航記錄時發生錯誤 - $e');
     }
   }
 
-  //  ??????
+  //  病患資料更新
   void _updatePatientCacheAndSave(PatientData newData) {
     _patientCache = newData;
     notifyListeners();
@@ -162,7 +162,7 @@ class MedicalViewModel extends ChangeNotifier {
     _updatePatientCacheAndSave(_patientCache!.copyWith(birthday: Value(date)));
   }
 
-  //  ??????
+  //  飛航記錄更新
   void _updateFlightCacheAndSave(FlightRecordData newData) {
     _flightCache = newData;
     notifyListeners();
@@ -216,9 +216,9 @@ class MedicalViewModel extends ChangeNotifier {
 
       await _loadTransitLocations();
       notifyListeners();
-      debugPrint('?????????');
+      debugPrint('系統：已新增經過點');
     } catch (e) {
-      debugPrint('?????????? - $e');
+      debugPrint('系統：新增經過點時發生錯誤 - $e');
     }
   }
 
@@ -229,13 +229,13 @@ class MedicalViewModel extends ChangeNotifier {
 
       await _loadTransitLocations();
       notifyListeners();
-      debugPrint('?????????');
+      debugPrint('系統：已刪除經過點');
     } catch (e) {
-      debugPrint('?????????? - $e');
+      debugPrint('系統：刪除經過點時發生錯誤 - $e');
     }
   }
 
-  //  ?????? (?????? refService ????)
+  //  查詢輔助方法 (優化後直接對 refService 進行查詢)
   NationalityData? getNationalityById(int? id) {
     if (id == null) return null;
     try {
@@ -295,37 +295,37 @@ class MedicalViewModel extends ChangeNotifier {
   }
 
   Future<List<LocationData>> searchLocations(String keyword) async {
-    // ??????????????????????????
+    // 搜尋時如果沒有關鍵字，直接回傳快取的地點列表
     if (keyword.isEmpty) return refService.locationList;
     try {
       return await db.referenceDao.searchLocation(keyword);
     } catch (e) {
-      debugPrint('????????? - $e');
+      debugPrint('系統：搜尋地點時發生錯誤 - $e');
       return [];
     }
   }
 
-  // === ?????? (??) ===
+  // 搜尋輔助方法
 
   Future<List<AirlineData>> searchAirlines(String keyword) async {
-    // ???????
-    // 1. ? keyword ??????????? (isOther=false)
-    // 2. ? keyword ??????????????? (?? isOther)
-    // ???UI ???????? "??????" ??
+    // 預設搜尋邏輯：
+    // 1. 若 keyword 為空：回傳常用航空公司 (isOther=false)
+    // 2. 2. 若 keyword 不為空：回傳所有匹配的航空公司 (不分 isOther)
+    // 注意：UI 層可能會手動加入 "其他航空公司" 選項
 
     try {
       if (keyword.isEmpty) {
-        // ?????
+        // 只回傳常用
         return await db.referenceDao.getAllAirline(isOther: false);
       } else {
-        // ????
+        // 搜尋全部
         return await db.referenceDao.searchAirline(keyword);
       }
     } catch (e) {
-      debugPrint('??????????? - $e');
-      // ?????????
-      // ???refService.airlineList ???????? (?? importAirlines ?????)
-      // ?????? isOther
+      debugPrint('系統：搜尋航空公司時發生錯誤 - $e');
+      // 降級：使用快取過濾
+      // 注意：refService.airlineList 目前包含所有資料 (因為 importAirlines 會匯入全部)
+      // 我們需要檢查 isOther
       final lower = keyword.toLowerCase();
       if (keyword.isEmpty) {
         return refService.airlineList.where((a) => !a.isOther).toList();
@@ -340,7 +340,7 @@ class MedicalViewModel extends ChangeNotifier {
     }
   }
 
-  // ????????????????
+  // 專門用於取得「其他航空公司」列表
   Future<List<AirlineData>> getOtherAirlines() async {
     try {
       return await db.referenceDao.getAllAirline(isOther: true);
@@ -354,7 +354,7 @@ class MedicalViewModel extends ChangeNotifier {
     try {
       return await db.referenceDao.searchNationality(keyword);
     } catch (e) {
-      debugPrint('????????? - $e');
+      debugPrint('系統：搜尋國籍時發生錯誤 - $e');
       final lower = keyword.toLowerCase();
       return refService.nationalityList
           .where(
@@ -378,13 +378,13 @@ class MedicalViewModel extends ChangeNotifier {
         .toList();
   }
 
-  //  ??????
+  //  延遲存檔邏輯
   void _autoSave() {
     if (_debounceTimer?.isActive ?? false) _debounceTimer!.cancel();
     _saveStatus = SaveStatus.saving;
 
     _debounceTimer = Timer(const Duration(seconds: 2), () async {
-      debugPrint('?????????????...');
+      debugPrint('系統：正在自動存檔至資料庫...');
       unawaited(_saveToDatabase());
     });
   }
@@ -400,9 +400,7 @@ class MedicalViewModel extends ChangeNotifier {
         }
       });
 
-      debugPrint('????????');
-
-      // ??????
+      debugPrint('系統：資料已儲存');
 
       if (!hasListeners) return;
 
@@ -416,7 +414,7 @@ class MedicalViewModel extends ChangeNotifier {
       _saveStatus = SaveStatus.idle;
       notifyListeners();
     } catch (e) {
-      debugPrint('????????? - $e');
+      debugPrint('系統：自動存檔時發生錯誤 - $e');
       if (!hasListeners) return;
     }
   }
@@ -425,7 +423,7 @@ class MedicalViewModel extends ChangeNotifier {
   void dispose() {
     if (_debounceTimer?.isActive ?? false) {
       _debounceTimer!.cancel();
-      // ???dispose ????????? db ????
+      // 注意：dispose 時執行存檔需要確保 db 還沒關閉
       _saveToDatabase();
     }
     super.dispose();
