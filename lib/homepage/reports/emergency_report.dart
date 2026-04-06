@@ -259,6 +259,16 @@ Future<Uint8List> buildEmergencyReportPdf(EmergencyReportData d) async {
     );
   }
 
+  pw.Widget _rightUnitRow(String leftText, String unit, {double size = 8}) {
+    return pw.Row(
+      children: [
+        pw.Text(leftText, style: ts(size: size)),
+        pw.Spacer(),
+        pw.Text(unit, style: ts(size: size)),
+      ],
+    );
+  }
+
   bool _hasBreathingMode(String value, String keyword) {
     return value.contains(keyword);
   }
@@ -285,7 +295,7 @@ Future<Uint8List> buildEmergencyReportPdf(EmergencyReportData d) async {
         pw.Text('$label:', style: ts()),
         pw.SizedBox(width: 1.5),
         pw.Text(value, style: ts()),
-        pw.SizedBox(width: 1.5),
+        pw.Spacer(),
         pw.Text('mm', style: ts()),
       ],
     );
@@ -535,7 +545,10 @@ Future<Uint8List> buildEmergencyReportPdf(EmergencyReportData d) async {
                             minHeight: 8,
                           ),
                           _cell(
-                            pw.Text('心跳: ${d.heartRate} 次/分', style: ts()),
+                            _rightUnitRow(
+                              '心跳: ${d.heartRate}',
+                              '次/分',
+                            ),
                             width: 38,
                             minHeight: 8,
                           ),
@@ -549,14 +562,17 @@ Future<Uint8List> buildEmergencyReportPdf(EmergencyReportData d) async {
                             minHeight: 8,
                           ),
                           _cell(
-                            pw.Text('${d.breathingRate} 次/分', style: ts()),
+                            _rightUnitRow(
+                              '${d.breathingRate}',
+                              '次/分',
+                            ),
                             width: 40,
                             minHeight: 8,
                           ),
                           _cell(
-                            pw.Text(
-                              '血壓: ${d.bpSystolic}/${d.bpDiastolic} mmHg',
-                              style: ts(),
+                            _rightUnitRow(
+                              '血壓: ${d.bpSystolic}/${d.bpDiastolic}',
+                              'mmHg',
                             ),
                             width: 38,
                             minHeight: 8,
@@ -750,7 +766,10 @@ Future<Uint8List> buildEmergencyReportPdf(EmergencyReportData d) async {
                             minHeight: 8,
                           ),
                           _cell(
-                            pw.Text('心跳: ${d.postHeartRate} 次/分', style: ts()),
+                            _rightUnitRow(
+                              '心跳: ${d.postHeartRate}',
+                              '次/分',
+                            ),
                             width: 29,
                             minHeight: 8,
                           ),
@@ -764,32 +783,49 @@ Future<Uint8List> buildEmergencyReportPdf(EmergencyReportData d) async {
                             minHeight: 8,
                           ),
                           _cell(
-                            pw.Wrap(
-                              spacing: 2,
-                              runSpacing: 1,
+                            pw.Row(
                               children: [
-                                _chkSmall(
-                                  '自發性呼吸',
-                                  _hasBreathingMode(d.postBreathing, '自發'),
+                                pw.Expanded(
+                                  child: pw.Wrap(
+                                    spacing: 2,
+                                    runSpacing: 1,
+                                    children: [
+                                      _chkSmall(
+                                        '自發性呼吸',
+                                        _hasBreathingMode(
+                                          d.postBreathing,
+                                          '自發',
+                                        ),
+                                      ),
+                                      _chkSmall(
+                                        '呼吸器',
+                                        _hasBreathingMode(
+                                          d.postBreathing,
+                                          '呼吸器',
+                                        ),
+                                      ),
+                                      _chkSmall(
+                                        'Ambu',
+                                        _hasAmbu(d.postBreathing),
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                                _chkSmall(
-                                  '呼吸器',
-                                  _hasBreathingMode(d.postBreathing, '呼吸器'),
-                                ),
-                                _chkSmall('Ambu', _hasAmbu(d.postBreathing)),
                                 pw.Text(
-                                  '${d.postBreathingRate} 次/分',
+                                  '${d.postBreathingRate}',
                                   style: ts(size: 7),
                                 ),
+                                pw.SizedBox(width: 1.5),
+                                pw.Text('次/分', style: ts(size: 7)),
                               ],
                             ),
                             width: 57,
                             minHeight: 8,
                           ),
                           _cell(
-                            pw.Text(
-                              '血壓: ${d.postBpSystolic}/${d.postBpDiastolic} mmHg',
-                              style: ts(),
+                            _rightUnitRow(
+                              '血壓: ${d.postBpSystolic}/${d.postBpDiastolic}',
+                              'mmHg',
                             ),
                             width: 29,
                             minHeight: 8,
