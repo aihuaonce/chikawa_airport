@@ -513,6 +513,8 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
       chargedAmount: chargedAmount,
       doctor: staffNames.doctor,
       nurse: staffNames.nurse,
+      doctorSignature: staffNames.doctorSignature,
+      nurseSignature: staffNames.nurseSignature,
       toTitle: 'TO：桃園國際機場股份有限公司營運安全處',
       fromTitle: 'FROM：聯新國際醫院桃園國際機場醫療中心',
       toLines: toLines,
@@ -1927,6 +1929,15 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
   }) {
     String doctor = '';
     String nurse = '';
+    Uint8List? doctorSignature;
+    Uint8List? nurseSignature;
+
+    Uint8List? resolveSignature(MedicalStaffAssignmentData assignment) {
+      final signature = assignment.signature;
+      if (signature != null && signature.isNotEmpty) return signature;
+      if (assignment.staffId == null) return null;
+      return refService.getMedicalStaffById(assignment.staffId)?.signature;
+    }
 
     for (final assignment in staffAssignments) {
       final role = _findStaffRole(refService, assignment.staffRoleId);
@@ -1934,12 +1945,17 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
       final name = assignment.staffName?.trim().isNotEmpty == true
           ? assignment.staffName!.trim()
           : refService.getMedicalStaffById(assignment.staffId)?.name ?? '';
-      if (name.isEmpty) continue;
-      if (roleCode == 'DOCTOR' && doctor.isEmpty) {
-        doctor = name;
+      if (roleCode == 'DOCTOR') {
+        if (doctor.isEmpty && name.isNotEmpty) {
+          doctor = name;
+        }
+        doctorSignature ??= resolveSignature(assignment);
       }
-      if (roleCode == 'NURSE' && nurse.isEmpty) {
-        nurse = name;
+      if (roleCode == 'NURSE') {
+        if (nurse.isEmpty && name.isNotEmpty) {
+          nurse = name;
+        }
+        nurseSignature ??= resolveSignature(assignment);
       }
     }
 
@@ -1947,7 +1963,12 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
       doctor = treatment?.directorName?.trim() ?? '';
     }
 
-    return _StaffNames(doctor: doctor, nurse: nurse);
+    return _StaffNames(
+      doctor: doctor,
+      nurse: nurse,
+      doctorSignature: doctorSignature,
+      nurseSignature: nurseSignature,
+    );
   }
 
   String _resolvePrimaryDoctorName({
@@ -2337,8 +2358,15 @@ extension PatientReportTypeLabel on PatientReportType {
 class _StaffNames {
   final String doctor;
   final String nurse;
+  final Uint8List? doctorSignature;
+  final Uint8List? nurseSignature;
 
-  const _StaffNames({required this.doctor, required this.nurse});
+  const _StaffNames({
+    required this.doctor,
+    required this.nurse,
+    this.doctorSignature,
+    this.nurseSignature,
+  });
 }
 
 class _EmergencyStaffNames {

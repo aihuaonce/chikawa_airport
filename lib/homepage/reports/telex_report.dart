@@ -51,6 +51,8 @@ class TelexReportData {
 
   final String doctor;
   final String nurse;
+  final Uint8List? doctorSignature;
+  final Uint8List? nurseSignature;
 
   final String toTitle;
   final String fromTitle;
@@ -89,6 +91,8 @@ class TelexReportData {
     required this.chargedAmount,
     required this.doctor,
     required this.nurse,
+    required this.doctorSignature,
+    required this.nurseSignature,
     required this.toTitle,
     required this.fromTitle,
     required this.toLines,
@@ -587,7 +591,7 @@ pw.Widget _buildSignatureSection(
         child: pw.Row(
           children: [
             pw.Text('醫師簽章：', style: pw.TextStyle(font: fontB, fontSize: 9)),
-            _underlineBox(d.doctor, font, minWidth: 50),
+            _signatureBox(d.doctorSignature),
           ],
         ),
       ),
@@ -596,7 +600,7 @@ pw.Widget _buildSignatureSection(
         child: pw.Row(
           children: [
             pw.Text('護理師簽章：', style: pw.TextStyle(font: fontB, fontSize: 9)),
-            _underlineBox(d.nurse, font, minWidth: 50),
+            _signatureBox(d.nurseSignature),
           ],
         ),
       ),
@@ -668,6 +672,30 @@ pw.Widget _underlineBox(
       style: pw.TextStyle(font: font, fontSize: 9),
       textAlign: center ? pw.TextAlign.center : pw.TextAlign.left,
     ),
+  );
+}
+
+pw.Widget _signatureBox(
+  Uint8List? data, {
+  double width = 50,
+  double height = 12,
+}) {
+  final hasData = data != null && data.isNotEmpty;
+  return pw.Container(
+    width: width,
+    height: height,
+    decoration: pw.BoxDecoration(
+      border: pw.Border(
+        bottom: pw.BorderSide(color: _textDark, width: 0.8),
+      ),
+    ),
+    alignment: pw.Alignment.centerLeft,
+    child: hasData
+        ? pw.Image(
+            pw.MemoryImage(data!),
+            fit: pw.BoxFit.contain,
+          )
+        : pw.SizedBox(),
   );
 }
 
