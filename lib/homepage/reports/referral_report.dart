@@ -162,24 +162,19 @@ Future<Uint8List> buildReferralReportPdf(ReferralReportData d) async {
     ],
   );
 
-  pw.Widget uv(String val, {double w = 20, bool center = false}) =>
+  pw.Widget uv(
+    String val, {
+    double w = 20,
+    bool center = false,
+    double sz = 7.5,
+  }) =>
       pw.Container(
         width: w * PdfPageFormat.mm,
-        decoration: const pw.BoxDecoration(
-          border: pw.Border(
-            bottom: pw.BorderSide(width: 0.4, color: PdfColors.grey600),
-          ),
-        ),
         alignment: center ? pw.Alignment.center : pw.Alignment.centerLeft,
-        child: pw.Text(val, style: ts()),
+        child: pw.Text(val, style: ts(sz: sz)),
       );
   pw.Widget uvLine(String val, double width) => pw.Container(
     width: width,
-    decoration: const pw.BoxDecoration(
-      border: pw.Border(
-        bottom: pw.BorderSide(width: 0.4, color: PdfColors.grey600),
-      ),
-    ),
     child: pw.Text(val, style: ts()),
   );
 
@@ -258,7 +253,7 @@ Future<Uint8List> buildReferralReportPdf(ReferralReportData d) async {
   pw.FlexColumnWidth flexW([double value = 1]) => pw.FlexColumnWidth(value);
   final contentWidth =
       PdfPageFormat.a4.width - 20 * PdfPageFormat.mm; // page minus margins
-  final leftColW = 6 * PdfPageFormat.mm;
+  final leftColW = 8 * PdfPageFormat.mm;
   final midColW = 8 * PdfPageFormat.mm;
   final rightColW = contentWidth - leftColW - midColW;
   final mainRightWidth = rightColW;
@@ -291,6 +286,9 @@ Future<Uint8List> buildReferralReportPdf(ReferralReportData d) async {
   final hRecvProcess = 36 * PdfPageFormat.mm;
   final hRecvSummary = 25 * PdfPageFormat.mm;
   final hRecvInfo = 22 * PdfPageFormat.mm;
+  final topSectionH =
+      hBasic + hHistory + hSummary + hPurpose + hConsent + hDoctor;
+  final recvSectionH = hRecvProcess + hRecvSummary + hRecvInfo;
 
   pdf.addPage(
     pw.Page(
@@ -315,20 +313,23 @@ Future<Uint8List> buildReferralReportPdf(ReferralReportData d) async {
             children: [
               pw.Text('（轉診至', style: ts(sz: 10, bold: true)),
               pw.SizedBox(width: 4),
-              uv(d.referToHospital, w: 60, center: true),
+              uv(d.referToHospital, w: 60, center: true, sz: 11),
               pw.Text('院所）', style: ts(sz: 10, bold: true)),
             ],
           ),
           pw.SizedBox(height: 2),
           pw.Text('保險醫事服務機構代碼：3432060513', style: ts(sz: 9, bold: true)),
           pw.SizedBox(height: 4),
-          pw.Divider(thickness: 1),
           pw.SizedBox(height: 2),
 
           // ── 原診治醫院診所（含基本資料/摘要/目的/同意/醫師） ────────────────
           pw.Table(
             border: tbl,
-            columnWidths: {0: colW(6), 1: colW(8), 2: flexW(1)},
+            columnWidths: {
+              0: colW(leftColW),
+              1: colW(midColW),
+              2: flexW(1),
+            },
             children: [
               pw.TableRow(
                 children: [
@@ -856,14 +857,16 @@ Future<Uint8List> buildReferralReportPdf(ReferralReportData d) async {
             ],
           ),
 
-          pw.SizedBox(height: 4),
-          pw.Divider(thickness: 1.5),
           pw.SizedBox(height: 2),
 
           // ── 接受轉診醫院 ─────────────────────────────────────────────────
           pw.Table(
             border: tbl,
-            columnWidths: {0: colW(8), 1: colW(8), 2: flexW(1)},
+            columnWidths: {
+              0: colW(leftColW),
+              1: colW(midColW),
+              2: flexW(1),
+            },
             children: [
               pw.TableRow(
                 children: [
