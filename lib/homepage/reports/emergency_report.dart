@@ -214,11 +214,44 @@ Future<Uint8List> buildEmergencyReportPdf(EmergencyReportData d) async {
     );
   }
 
+  bool _isStandardSource(String value) {
+    switch (value.trim()) {
+      case '出境':
+      case '入境':
+      case '過境':
+        return true;
+      default:
+        return false;
+    }
+  }
+
+  bool _isSpecialSource(String value) {
+    const special = {
+      '轉機',
+      '迫降',
+      '轉降',
+      '備降',
+      '技術性降落',
+    };
+    return special.contains(value.trim());
+  }
+
+  String _otherSourceLabel(String source) {
+    final trimmed = source.trim();
+    if (_isSpecialSource(trimmed)) {
+      return '其他：$trimmed';
+    }
+    return '其他';
+  }
+
   pdf.addPage(
     pw.MultiPage(
       pageFormat: PdfPageFormat.a4,
       margin: const pw.EdgeInsets.all(12 * PdfPageFormat.mm),
       build: (ctx) {
+        final otherSourceLabel = _otherSourceLabel(d.source);
+        final isOtherSource =
+            d.source.trim().isNotEmpty && !_isStandardSource(d.source);
         return [
           pw.Center(
             child: pw.Text(
@@ -281,7 +314,7 @@ Future<Uint8List> buildEmergencyReportPdf(EmergencyReportData d) async {
                         _chk('出境', d.source == '出境'),
                         _chk('入境', d.source == '入境'),
                         _chk('過境', d.source == '過境'),
-                        _chk('其他', d.source == '其他'),
+                        _chk(otherSourceLabel, isOtherSource),
                       ],
                     ),
                     width: 45,
@@ -374,9 +407,19 @@ Future<Uint8List> buildEmergencyReportPdf(EmergencyReportData d) async {
                       pw.Row(
                         children: [
                           _cell(
-                            pw.Text(
-                              '意識: E${d.consciousnessE} M${d.consciousnessM} V${d.consciousnessV}',
-                              style: ts(),
+                            pw.Row(
+                              children: [
+                                pw.Text('意識:', style: ts()),
+                                pw.SizedBox(width: 6),
+                                pw.Text('E', style: ts(bold: true)),
+                                pw.Text(': ${d.consciousnessE}', style: ts()),
+                                pw.SizedBox(width: 6),
+                                pw.Text('M', style: ts(bold: true)),
+                                pw.Text(': ${d.consciousnessM}', style: ts()),
+                                pw.SizedBox(width: 6),
+                                pw.Text('V', style: ts(bold: true)),
+                                pw.Text(': ${d.consciousnessV}', style: ts()),
+                              ],
                             ),
                             width: 45,
                             minHeight: 8,
@@ -538,9 +581,28 @@ Future<Uint8List> buildEmergencyReportPdf(EmergencyReportData d) async {
                       pw.Row(
                         children: [
                           _cell(
-                            pw.Text(
-                              '意識: E${d.postConsciousnessE} M${d.postConsciousnessM} V${d.postConsciousnessV}',
-                              style: ts(),
+                            pw.Row(
+                              children: [
+                                pw.Text('意識:', style: ts()),
+                                pw.SizedBox(width: 6),
+                                pw.Text('E', style: ts(bold: true)),
+                                pw.Text(
+                                  ': ${d.postConsciousnessE}',
+                                  style: ts(),
+                                ),
+                                pw.SizedBox(width: 6),
+                                pw.Text('M', style: ts(bold: true)),
+                                pw.Text(
+                                  ': ${d.postConsciousnessM}',
+                                  style: ts(),
+                                ),
+                                pw.SizedBox(width: 6),
+                                pw.Text('V', style: ts(bold: true)),
+                                pw.Text(
+                                  ': ${d.postConsciousnessV}',
+                                  style: ts(),
+                                ),
+                              ],
                             ),
                             width: 45,
                             minHeight: 8,
