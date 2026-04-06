@@ -218,6 +218,22 @@ Future<Uint8List> buildEmergencyReportPdf(EmergencyReportData d) async {
     );
   }
 
+  bool _hasOutcomeData(String outcomeType, EmergencyReportData d) {
+    switch (outcomeType) {
+      case '轉診':
+        return d.transferHospital.trim().isNotEmpty ||
+            d.transferTimeHour.trim().isNotEmpty ||
+            d.transferTimeMin.trim().isNotEmpty;
+      case '死亡':
+        return d.deathTimeHour.trim().isNotEmpty ||
+            d.deathTimeMin.trim().isNotEmpty;
+      case '其他':
+        return d.otherOutcome.trim().isNotEmpty;
+      default:
+        return false;
+    }
+  }
+
   pw.Widget _lineBox(String text, double width) {
     return pw.Container(
       width: width * PdfPageFormat.mm,
@@ -848,15 +864,18 @@ Future<Uint8List> buildEmergencyReportPdf(EmergencyReportData d) async {
               ),
               pw.Row(
                 children: [
-                  _lb('急救結果', width: 30, minHeight: 12, isFirstColumn: true),
+                  _lb('急救結果', width: 30, minHeight: 16, isFirstColumn: true),
                   _cell(
                     pw.Column(
                       crossAxisAlignment: pw.CrossAxisAlignment.start,
                       children: [
                         pw.Row(
                           children: [
-                            _chk('轉診', d.outcomeType == '轉診'),
-                            pw.Text('醫院', style: ts()),
+                            _chk(
+                              '轉診：',
+                              d.outcomeType == '轉診' ||
+                                  _hasOutcomeData('轉診', d),
+                            ),
                             pw.SizedBox(width: 3),
                             _lineBox(d.transferHospital, 40),
                             pw.SizedBox(width: 6),
@@ -869,7 +888,11 @@ Future<Uint8List> buildEmergencyReportPdf(EmergencyReportData d) async {
                         ),
                         pw.Row(
                           children: [
-                            _chk('死亡', d.outcomeType == '死亡'),
+                            _chk(
+                              '死亡',
+                              d.outcomeType == '死亡' ||
+                                  _hasOutcomeData('死亡', d),
+                            ),
                             pw.Text('時間：', style: ts()),
                             _lineBox(d.deathTimeHour, 10),
                             pw.Text('時', style: ts()),
@@ -879,14 +902,18 @@ Future<Uint8List> buildEmergencyReportPdf(EmergencyReportData d) async {
                         ),
                         pw.Row(
                           children: [
-                            _chk('其他', d.outcomeType == '其他'),
+                            _chk(
+                              '其他：',
+                              d.outcomeType == '其他' ||
+                                  _hasOutcomeData('其他', d),
+                            ),
                             _lineBox(d.otherOutcome, 60),
                           ],
                         ),
                       ],
                     ),
                     width: 152,
-                    minHeight: 12,
+                    minHeight: 16,
                   ),
                 ],
               ),
