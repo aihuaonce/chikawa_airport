@@ -36,6 +36,8 @@ class EmergencyReportData {
   final String pupilSizeL;
   final String pupilSizeR;
   final String pupilLR;
+  final String pupilReactionL;
+  final String pupilReactionR;
 
   final String onET;
   final String onIVLine;
@@ -59,6 +61,8 @@ class EmergencyReportData {
   final String postBreathingRate;
   final String postPupilSizeL;
   final String postPupilSizeR;
+  final String postPupilReactionL;
+  final String postPupilReactionR;
   final String postOther;
 
   final String endTimeHour;
@@ -103,6 +107,8 @@ class EmergencyReportData {
     required this.pupilSizeL,
     required this.pupilSizeR,
     required this.pupilLR,
+    required this.pupilReactionL,
+    required this.pupilReactionR,
     required this.onET,
     required this.onIVLine,
     required this.monitorTime,
@@ -123,6 +129,8 @@ class EmergencyReportData {
     required this.postBreathingRate,
     required this.postPupilSizeL,
     required this.postPupilSizeR,
+    required this.postPupilReactionL,
+    required this.postPupilReactionR,
     required this.postOther,
     required this.endTimeHour,
     required this.endTimeMin,
@@ -136,10 +144,6 @@ class EmergencyReportData {
     required this.doctor,
     required this.nurse,
     required this.emt,
-    required String pupilReactionL,
-    required String pupilReactionR,
-    required String postPupilReactionL,
-    required String postPupilReactionR,
   });
 }
 
@@ -210,6 +214,66 @@ Future<Uint8List> buildEmergencyReportPdf(EmergencyReportData d) async {
         pw.SizedBox(width: 2.5),
         pw.Text(label, style: ts(size: 8)),
         pw.SizedBox(width: 3.5),
+      ],
+    );
+  }
+
+  pw.Widget _emptyBox({double size = 8, bool filled = false}) {
+    return pw.Container(
+      width: size,
+      height: size,
+      decoration: pw.BoxDecoration(
+        border: pw.Border.all(width: 0.6),
+        color: filled ? PdfColors.black : PdfColors.white,
+      ),
+    );
+  }
+
+  pw.Widget _pupilSizeSide(String label, String value) {
+    return pw.Row(
+      mainAxisSize: pw.MainAxisSize.min,
+      children: [
+        pw.Text('$label:', style: ts()),
+        pw.SizedBox(width: 1.5),
+        pw.Text(value, style: ts()),
+        pw.SizedBox(width: 1.5),
+        pw.Text('mm', style: ts()),
+      ],
+    );
+  }
+
+  String _normalizeReaction(String value) {
+    final trimmed = value.trim();
+    if (trimmed.isEmpty) return '';
+    if (trimmed.contains('±')) return '±';
+    if (trimmed.contains('+/-')) return '±';
+    if (trimmed.contains('+') || trimmed.contains('＋')) return '+';
+    if (trimmed.contains('-') || trimmed.contains('－')) return '-';
+    return trimmed;
+  }
+
+  pw.Widget _pupilLrSide(String label, String reaction) {
+    final normalized = _normalizeReaction(reaction);
+    final isPlus = normalized == '+';
+    final isMinus = normalized == '-';
+    final isPlusMinus = normalized == '±';
+    final signStyle = ts(size: 9, bold: true);
+    return pw.Row(
+      mainAxisSize: pw.MainAxisSize.min,
+      children: [
+        pw.Text('$label:', style: ts()),
+        pw.SizedBox(width: 1.5),
+        _emptyBox(filled: isPlus),
+        pw.SizedBox(width: 1.5),
+        pw.Text('+', style: signStyle),
+        pw.SizedBox(width: 1.5),
+        _emptyBox(filled: isMinus),
+        pw.SizedBox(width: 1.5),
+        pw.Text('-', style: signStyle),
+        pw.SizedBox(width: 1.5),
+        _emptyBox(filled: isPlusMinus),
+        pw.SizedBox(width: 1.5),
+        pw.Text('±', style: signStyle),
       ],
     );
   }
@@ -461,21 +525,46 @@ Future<Uint8List> buildEmergencyReportPdf(EmergencyReportData d) async {
                       ),
                     ],
                   ),
-                  _lb('瞳\n孔', width: 10, minHeight: 24),
+                  _lb('瞳孔', width: 10, minHeight: 24),
                   pw.Column(
                     children: [
-                      _cell(
-                        pw.Text(
-                          'Size L: ${d.pupilSizeL} R: ${d.pupilSizeR}',
-                          style: ts(),
-                        ),
-                        width: 70,
-                        minHeight: 12,
+                      pw.Row(
+                        children: [
+                          _cell(
+                            pw.Text('Size', style: ts()),
+                            width: 12,
+                            minHeight: 12,
+                          ),
+                          _cell(
+                            _pupilSizeSide('左', d.pupilSizeL),
+                            width: 29,
+                            minHeight: 12,
+                          ),
+                          _cell(
+                            _pupilSizeSide('右', d.pupilSizeR),
+                            width: 29,
+                            minHeight: 12,
+                          ),
+                        ],
                       ),
-                      _cell(
-                        pw.Text('L-R: ${d.pupilLR}', style: ts()),
-                        width: 70,
-                        minHeight: 12,
+                      pw.Row(
+                        children: [
+                          _cell(
+                            pw.Text('L-R', style: ts()),
+                            width: 12,
+                            minHeight: 12,
+                          ),
+                          _cell(
+                            _pupilLrSide('左', d.pupilReactionL),
+                            width: 29,
+                            minHeight: 12,
+                          ),
+                          _cell(
+                            _pupilLrSide('右', d.pupilReactionR),
+                            width: 29,
+                            minHeight: 12,
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -638,21 +727,46 @@ Future<Uint8List> buildEmergencyReportPdf(EmergencyReportData d) async {
                       ),
                     ],
                   ),
-                  _lb('瞳\n孔', width: 10, minHeight: 24),
+                  _lb('瞳孔', width: 10, minHeight: 24),
                   pw.Column(
                     children: [
-                      _cell(
-                        pw.Text(
-                          'Size L: ${d.postPupilSizeL} R: ${d.postPupilSizeR}',
-                          style: ts(),
-                        ),
-                        width: 70,
-                        minHeight: 12,
+                      pw.Row(
+                        children: [
+                          _cell(
+                            pw.Text('Size', style: ts()),
+                            width: 12,
+                            minHeight: 12,
+                          ),
+                          _cell(
+                            _pupilSizeSide('左', d.postPupilSizeL),
+                            width: 29,
+                            minHeight: 12,
+                          ),
+                          _cell(
+                            _pupilSizeSide('右', d.postPupilSizeR),
+                            width: 29,
+                            minHeight: 12,
+                          ),
+                        ],
                       ),
-                      _cell(
-                        pw.Text('L-R: ', style: ts()),
-                        width: 70,
-                        minHeight: 12,
+                      pw.Row(
+                        children: [
+                          _cell(
+                            pw.Text('L-R', style: ts()),
+                            width: 12,
+                            minHeight: 12,
+                          ),
+                          _cell(
+                            _pupilLrSide('左', d.postPupilReactionL),
+                            width: 29,
+                            minHeight: 12,
+                          ),
+                          _cell(
+                            _pupilLrSide('右', d.postPupilReactionR),
+                            width: 29,
+                            minHeight: 12,
+                          ),
+                        ],
                       ),
                     ],
                   ),
