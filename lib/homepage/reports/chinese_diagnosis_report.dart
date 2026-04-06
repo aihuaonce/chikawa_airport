@@ -226,17 +226,18 @@ Future<Uint8List> buildChineseDiagnosisPdf(ChineseDiagnosisReportData d) async {
                       isLabel: true,
                       height: 60 * PdfPageFormat.mm,
                     ),
-                          _cell(
-                            pw.Text(
-                              d.diagnosisCategory.isNotEmpty
-                                  ? '診斷分類：${d.diagnosisCategory}\n'
-                                      '${d.diagnosis}'
-                                  : d.diagnosis,
-                              style: ts(),
-                            ),
-                            height: 60 * PdfPageFormat.mm,
-                            align: pw.Alignment.topLeft,
-                          ),
+                    _cell(
+                      pw.Text(
+                        d.diagnosisCategory.isNotEmpty
+                            ? '${d.diagnosisCategory}\n\n'
+                                  '${d.diagnosis}'
+                            : d.diagnosis,
+                        style: ts(),
+                        textAlign: pw.TextAlign.left,
+                      ),
+                      height: 60 * PdfPageFormat.mm,
+                      align: pw.Alignment.topLeft,
+                    ),
                   ],
                 ),
               ],
@@ -262,11 +263,15 @@ Future<Uint8List> buildChineseDiagnosisPdf(ChineseDiagnosisReportData d) async {
                       isLabel: true,
                       height: 50 * PdfPageFormat.mm,
                     ),
-                    _textCell(
-                      d.doctorNotes,
-                      height: 50 * PdfPageFormat.mm,
-                      align: pw.Alignment.topLeft,
-                    ),
+                          _cell(
+                            pw.Text(
+                              d.doctorNotes,
+                              style: ts(),
+                              textAlign: pw.TextAlign.left,
+                            ),
+                            height: 50 * PdfPageFormat.mm,
+                            align: pw.Alignment.topLeft,
+                          ),
                   ],
                 ),
               ],

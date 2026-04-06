@@ -235,15 +235,14 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
       await file.writeAsBytes(pdfBytes, flush: true);
 
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('已匯出PDF：$filePath')),
-      );
-
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('已匯出PDF：$filePath')));
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('匯出PDF失敗：$e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('匯出PDF失敗：$e')));
     }
   }
 
@@ -335,9 +334,9 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
     final patientName = row.patient.name?.trim().isNotEmpty == true
         ? row.patient.name!
         : '未填寫姓名';
-    final createdAt = DateFormat('yyyy/MM/dd HH:mm').format(
-      row.record.createdAt,
-    );
+    final createdAt = DateFormat(
+      'yyyy/MM/dd HH:mm',
+    ).format(row.record.createdAt);
 
     final doc = pw.Document();
     doc.addPage(
@@ -346,10 +345,7 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
         build: (_) => [
           pw.Text(
             'Patient Report',
-            style: pw.TextStyle(
-              fontSize: 24,
-              fontWeight: pw.FontWeight.bold,
-            ),
+            style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold),
           ),
           pw.SizedBox(height: 12),
           pw.Text('Report Type: ${type.labelEn}'),
@@ -539,12 +535,23 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
     final diagnosisCategoryId = certificate?.diagnosisCategoryId;
     var diagnosisCategory =
         refService.getDiagnosisCategoryById(diagnosisCategoryId)?.name.trim() ??
-            '';
+        '';
     if (diagnosisCategory.isEmpty && diagnosisCategoryId != null) {
       final categoryRow = await (db.select(
         db.diagnosisCategory,
       )..where((c) => c.id.equals(diagnosisCategoryId))).getSingleOrNull();
       diagnosisCategory = categoryRow?.name.trim() ?? '';
+    }
+    if (diagnosisCategory.isEmpty && treatment?.tentativeCategoryId != null) {
+      final fallbackId = treatment!.tentativeCategoryId;
+      diagnosisCategory =
+          refService.getDiagnosisCategoryById(fallbackId)?.name.trim() ?? '';
+      if (diagnosisCategory.isEmpty) {
+        final categoryRow = await (db.select(
+          db.diagnosisCategory,
+        )..where((c) => c.id.equals(fallbackId!))).getSingleOrNull();
+        diagnosisCategory = categoryRow?.name.trim() ?? '';
+      }
     }
     final diagnosis = _buildCertificateDiagnosisText(
       certificate: certificate,

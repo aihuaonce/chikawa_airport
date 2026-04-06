@@ -238,16 +238,17 @@ class _MedicalCertificateState extends State<MedicalCertificate> {
     MedicalCertificateViewModel viewModel,
     ReferenceService refService,
   ) {
-    // 改用 TreatmentViewModel 的資料 (直接綁定)
     final treatmentViewModel = context.watch<TreatmentViewModel>();
     final treatment = treatmentViewModel.treatment;
-    
-    // 取得目前的分類資料
-    final selectedCategory = treatment?.tentativeCategoryId != null
-        ? treatmentViewModel.getDiagnosisCategoryById(treatment!.tentativeCategoryId)
+    final certificateCategory = viewModel.selectedCategory;
+    final treatmentCategory = treatment?.tentativeCategoryId != null
+        ? treatmentViewModel.getDiagnosisCategoryById(
+            treatment!.tentativeCategoryId,
+          )
         : null;
-        
-    final text = selectedCategory != null ? selectedCategory.name : '';
+    final selectedCategory = certificateCategory ?? treatmentCategory;
+
+    final text = selectedCategory?.name ?? '';
 
     return _buildSelectionField(
       text: text,
@@ -277,6 +278,7 @@ class _MedicalCertificateState extends State<MedicalCertificate> {
         );
 
         if (result != null) {
+          viewModel.updateDiagnosisCategoryId(result.id);
           treatmentViewModel.updateTentativeCategoryId(result.id);
         }
       },
