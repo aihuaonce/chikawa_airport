@@ -559,12 +559,10 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
     );
     final doctorNotes = certificate?.chineseAdvice?.trim() ?? '';
 
-    final staffNames = _resolveStaffNames(
+    final treatingDoctor = _resolvePrimaryDoctorName(
       refService: refService,
       staffAssignments: staffAssignments,
-      treatment: treatment,
     );
-    final treatingDoctor = staffNames.doctor;
     final directorName = treatment?.directorName?.trim();
     final director = (directorName != null && directorName.isNotEmpty)
         ? directorName
@@ -1500,13 +1498,19 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
     );
     final commentsAndAdvices = certificate?.englishAdvice?.trim() ?? '';
 
-    final staffNames = _resolveStaffNames(
-      refService: refService,
-      staffAssignments: staffAssignments,
-      treatment: treatment,
-    );
+    final directorName = treatment?.directorName?.trim();
+    final director = (directorName != null && directorName.isNotEmpty)
+        ? directorName
+        : _resolvePrimaryDoctorName(
+            refService: refService,
+            staffAssignments: staffAssignments,
+          );
 
     final issuanceDate = certificate?.issuanceDate ?? DateTime.now();
+    final attendingPhysician = _resolvePrimaryDoctorName(
+      refService: refService,
+      staffAssignments: staffAssignments,
+    );
 
     return EnglishDiagnosisReportData(
       name: patient.name?.trim().isNotEmpty == true
@@ -1518,7 +1522,8 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
       idOrPassportNo: _resolveIdOrPassport(patient),
       impression: impression,
       commentsAndAdvices: commentsAndAdvices,
-      attendingPhysician: staffNames.doctor,
+      director: director,
+      attendingPhysician: attendingPhysician,
       issuedDate: _formatDate(issuanceDate),
     );
   }
@@ -1542,7 +1547,7 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
       certificate?.diagnosisCategoryId,
     );
     if (category?.name.trim().isNotEmpty == true) {
-      parts.add('診斷分類：${category!.name.trim()}');
+      parts.add(category!.name.trim());
     }
     final result = certificate?.diagnosisResult?.trim();
     if (result != null && result.isNotEmpty) {
@@ -1824,6 +1829,33 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
     }
 
     return _StaffNames(doctor: doctor, nurse: nurse);
+  }
+
+  String _resolvePrimaryDoctorName({
+    required ReferenceService refService,
+    required List<MedicalStaffAssignmentData> staffAssignments,
+  }) {
+    String resolveName(MedicalStaffAssignmentData assignment) {
+      final name = assignment.staffName?.trim();
+      if (name != null && name.isNotEmpty) return name;
+      if (assignment.staffId != null) {
+        return refService.getMedicalStaffById(assignment.staffId)?.name ?? '';
+      }
+      return '';
+    }
+
+    final doctorAssignments = staffAssignments.where((assignment) {
+      final role = _findStaffRole(refService, assignment.staffRoleId);
+      return role?.code == 'DOCTOR';
+    }).toList();
+
+    for (final assignment in doctorAssignments) {
+      if (!assignment.isPrimary) continue;
+      final name = resolveName(assignment);
+      if (name.isNotEmpty) return name;
+    }
+
+    return '';
   }
 
   _EmergencyStaffNames _resolveEmergencyStaffNames({
