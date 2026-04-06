@@ -218,6 +218,14 @@ Future<Uint8List> buildEmergencyReportPdf(EmergencyReportData d) async {
     );
   }
 
+  bool _hasBreathingMode(String value, String keyword) {
+    return value.contains(keyword);
+  }
+
+  bool _hasAmbu(String value) {
+    return value.toLowerCase().contains('ambu');
+  }
+
   pw.Widget _emptyBox({double size = 8, bool filled = false}) {
     return pw.Container(
       width: size,
@@ -290,13 +298,7 @@ Future<Uint8List> buildEmergencyReportPdf(EmergencyReportData d) async {
   }
 
   bool _isSpecialSource(String value) {
-    const special = {
-      '轉機',
-      '迫降',
-      '轉降',
-      '備降',
-      '技術性降落',
-    };
+    const special = {'轉機', '迫降', '轉降', '備降', '技術性降落'};
     return special.contains(value.trim());
   }
 
@@ -609,7 +611,7 @@ Future<Uint8List> buildEmergencyReportPdf(EmergencyReportData d) async {
               pw.Row(
                 children: [
                   _lb(
-                    '急救\n處置\n及\n用藥',
+                    '急\n救\n處\n置\n及\n用\n藥',
                     width: 12,
                     minHeight: 70,
                     isFirstColumn: true,
@@ -622,7 +624,6 @@ Future<Uint8List> buildEmergencyReportPdf(EmergencyReportData d) async {
                         fontB,
                         fontB,
                         10,
-                        bg: PdfColors.grey200,
                       ),
                       _monitorRow('時間(Time)', d.monitorTime, font, fontB, 10),
                       _monitorRow('心跳 bpm', d.monitorHR, font, fontB, 10),
@@ -670,10 +671,13 @@ Future<Uint8List> buildEmergencyReportPdf(EmergencyReportData d) async {
                       pw.Row(
                         children: [
                           _cell(
+                            pw.Text('意識', style: ts()),
+                            width: 12,
+                            minHeight: 8,
+                          ),
+                          _cell(
                             pw.Row(
                               children: [
-                                pw.Text('意識:', style: ts()),
-                                pw.SizedBox(width: 6),
                                 pw.Text('E', style: ts(bold: true)),
                                 pw.Text(
                                   ': ${d.postConsciousnessE}',
@@ -693,12 +697,12 @@ Future<Uint8List> buildEmergencyReportPdf(EmergencyReportData d) async {
                                 ),
                               ],
                             ),
-                            width: 45,
+                            width: 54,
                             minHeight: 8,
                           ),
                           _cell(
-                            pw.Text('心跳: ${d.postHeartRate}', style: ts()),
-                            width: 45,
+                            pw.Text('心跳: ${d.postHeartRate} 次/分', style: ts()),
+                            width: 24,
                             minHeight: 8,
                           ),
                         ],
@@ -706,16 +710,39 @@ Future<Uint8List> buildEmergencyReportPdf(EmergencyReportData d) async {
                       pw.Row(
                         children: [
                           _cell(
-                            pw.Text('呼吸: ${d.postBreathing}', style: ts()),
-                            width: 45,
+                            pw.Text('呼吸', style: ts()),
+                            width: 12,
+                            minHeight: 8,
+                          ),
+                          _cell(
+                            pw.Wrap(
+                              spacing: 2,
+                              runSpacing: 1,
+                              children: [
+                                _chk(
+                                  '自發性呼吸',
+                                  _hasBreathingMode(d.postBreathing, '自發'),
+                                ),
+                                _chk(
+                                  '呼吸器',
+                                  _hasBreathingMode(d.postBreathing, '呼吸器'),
+                                ),
+                                _chk('Ambu', _hasAmbu(d.postBreathing)),
+                                pw.Text(
+                                  '${d.postBreathingRate} 次/分',
+                                  style: ts(),
+                                ),
+                              ],
+                            ),
+                            width: 54,
                             minHeight: 8,
                           ),
                           _cell(
                             pw.Text(
-                              '血壓: ${d.postBpSystolic}/${d.postBpDiastolic}',
+                              '血壓: ${d.postBpSystolic}/${d.postBpDiastolic} mmHg',
                               style: ts(),
                             ),
-                            width: 45,
+                            width: 24,
                             minHeight: 8,
                           ),
                         ],
