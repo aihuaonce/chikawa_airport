@@ -856,9 +856,6 @@ Future<Uint8List> buildReferralReportPdf(ReferralReportData d) async {
               ),
             ],
           ),
-
-          pw.SizedBox(height: 2),
-
           // ── 接受轉診醫院 ─────────────────────────────────────────────────
           pw.Table(
             border: tbl,
