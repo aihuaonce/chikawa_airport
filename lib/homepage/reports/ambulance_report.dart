@@ -271,31 +271,37 @@ Future<Uint8List> buildAmbulanceReportPdf(AmbulanceReportData d) async {
               children: [
                 // ==================== 1. 標題列 ====================
                 pw.Container(
-                  height: 12 * PdfPageFormat.mm,
                   width: totalW * PdfPageFormat.mm,
+                  height: 12 * PdfPageFormat.mm,
                   child: pw.Stack(
-                    alignment: pw.Alignment.center, // Stack 預設內容在中央
                     children: [
-                      // 大標題：自動置於 Stack 的中央
-                      pw.Text(
-                        '聯 新 國 際 醫 院 桃 園 國 際 機 場 醫 療 中 心 救 護 紀 錄 表',
-                        style: ts(sz: 12, bold: true),
+                      pw.Center(
+                        child: pw.Text(
+                          '聯 新 國 際 醫 院 桃 園 國 際 機 場 醫 療 中 心 救 護 紀 錄 表',
+                          style: ts(sz: 12, bold: true),
+                          textAlign: pw.TextAlign.center,
+                        ),
                       ),
-                      // 車牌號碼：定位在 Stack 的最右邊
                       pw.Positioned(
+                        top: 0,
                         right: 0,
-                        child: pw.Center(
-                          // 垂直置中
-                          child: pw.Text(
-                            '車牌號碼：${d.licensePlate}',
-                            style: ts(sz: 9, bold: true),
-                          ),
+                        child: pw.Row(
+                          mainAxisSize: pw.MainAxisSize.min,
+                          crossAxisAlignment:
+                              pw.CrossAxisAlignment.center, // 垂直置中於其位置
+                          children: [
+                            pw.SizedBox(width: 5 * PdfPageFormat.mm), // 間隔
+                            pw.Text(
+                              '車牌：${d.licensePlate}', // 車牌號碼
+                              style: ts(sz: 9, bold: true),
+                            ),
+                          ],
                         ),
                       ),
                     ],
                   ),
                 ),
-                pw.SizedBox(height: 3), // 原本的間距保留
+                pw.SizedBox(height: 3),
                 // ==================== 2. 主內容 (左右兩半) ====================
                 pw.Row(
                   crossAxisAlignment: pw.CrossAxisAlignment.start,
