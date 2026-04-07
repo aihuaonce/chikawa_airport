@@ -119,14 +119,6 @@ Future<Uint8List> buildReferralReportPdf(ReferralReportData d) async {
       );
 
   const bdr = pw.BorderSide(width: 0.5, color: PdfColors.black);
-  const tbl = pw.TableBorder(
-    top: bdr,
-    bottom: bdr,
-    left: bdr,
-    right: bdr,
-    horizontalInside: bdr,
-    verticalInside: bdr,
-  );
   const tblNoLeft = pw.TableBorder(
     top: bdr,
     bottom: bdr,
@@ -196,52 +188,7 @@ Future<Uint8List> buildReferralReportPdf(ReferralReportData d) async {
   pw.Widget gridCellWidgetW(
     pw.Widget child,
     double width, {
-    bool left = false,
-    bool right = true,
-    bool top = false,
-    bool bottom = true,
-    pw.EdgeInsets? pad,
-    pw.Alignment? align,
-  }) => pw.Container(
-    width: width,
-    padding: pad ?? const pw.EdgeInsets.symmetric(horizontal: 2, vertical: 2),
-    alignment: align ?? pw.Alignment.centerLeft,
-    decoration: pw.BoxDecoration(
-      border: pw.Border(
-        left: left ? bdr : pw.BorderSide.none,
-        right: right ? bdr : pw.BorderSide.none,
-        top: top ? bdr : pw.BorderSide.none,
-        bottom: bottom ? bdr : pw.BorderSide.none,
-      ),
-    ),
-    child: child,
-  );
-
-  pw.Widget gridCellTextW(
-    String text,
-    double width, {
-    bool bold = false,
-    bool left = false,
-    bool right = true,
-    bool top = false,
-    bool bottom = true,
-    pw.EdgeInsets? pad,
-    pw.Alignment? align,
-  }) => gridCellWidgetW(
-    pw.Text(text, style: ts(bold: bold)),
-    width,
-    left: left,
-    right: right,
-    top: top,
-    bottom: bottom,
-    pad: pad,
-    align: align,
-  );
-
-  pw.Widget box(
-    pw.Widget child, {
-    required double width,
-    required double height,
+    double? height,
     bool left = false,
     bool right = true,
     bool top = false,
@@ -262,6 +209,29 @@ Future<Uint8List> buildReferralReportPdf(ReferralReportData d) async {
       ),
     ),
     child: child,
+  );
+
+  pw.Widget gridCellTextW(
+    String text,
+    double width, {
+    bool bold = false,
+    double? height,
+    bool left = false,
+    bool right = true,
+    bool top = false,
+    bool bottom = true,
+    pw.EdgeInsets? pad,
+    pw.Alignment? align,
+  }) => gridCellWidgetW(
+    pw.Text(text, style: ts(bold: bold)),
+    width,
+    height: height,
+    left: left,
+    right: right,
+    top: top,
+    bottom: bottom,
+    pad: pad,
+    align: align,
   );
 
   pw.FixedColumnWidth colW(double value) => pw.FixedColumnWidth(value);
@@ -293,6 +263,7 @@ Future<Uint8List> buildReferralReportPdf(ReferralReportData d) async {
   final w9 = docUnit * 9;
 
   final hBasic = 24 * PdfPageFormat.mm;
+  final basicRowH = hBasic / 4;
   final hHistory = 35 * PdfPageFormat.mm;
   final hSummary = 28 * PdfPageFormat.mm;
   final hPurpose = 22 * PdfPageFormat.mm;
@@ -377,8 +348,6 @@ Future<Uint8List> buildReferralReportPdf(ReferralReportData d) async {
                               height: hBasic,
                               padding: pw.EdgeInsets.zero,
                               child: pw.Column(
-                                mainAxisAlignment:
-                                    pw.MainAxisAlignment.spaceBetween,
                                 children: [
                                   pw.Row(
                                     children: [
@@ -386,6 +355,7 @@ Future<Uint8List> buildReferralReportPdf(ReferralReportData d) async {
                                         '姓名',
                                         basicNameW,
                                         bold: true,
+                                        height: basicRowH,
                                         left: true,
                                         top: true,
                                         align: pw.Alignment.center,
@@ -394,6 +364,7 @@ Future<Uint8List> buildReferralReportPdf(ReferralReportData d) async {
                                         '性別',
                                         basicGenderW,
                                         bold: true,
+                                        height: basicRowH,
                                         top: true,
                                         align: pw.Alignment.center,
                                       ),
@@ -401,6 +372,7 @@ Future<Uint8List> buildReferralReportPdf(ReferralReportData d) async {
                                         '出生日期',
                                         basicBirthW,
                                         bold: true,
+                                        height: basicRowH,
                                         top: true,
                                         align: pw.Alignment.center,
                                       ),
@@ -408,6 +380,7 @@ Future<Uint8List> buildReferralReportPdf(ReferralReportData d) async {
                                         '身分證字號',
                                         basicIdW,
                                         bold: true,
+                                        height: basicRowH,
                                         top: true,
                                         align: pw.Alignment.center,
                                       ),
@@ -418,6 +391,7 @@ Future<Uint8List> buildReferralReportPdf(ReferralReportData d) async {
                                       gridCellTextW(
                                         d.name,
                                         basicNameW,
+                                        height: basicRowH,
                                         left: true,
                                         align: pw.Alignment.center,
                                       ),
@@ -431,10 +405,13 @@ Future<Uint8List> buildReferralReportPdf(ReferralReportData d) async {
                                           ],
                                         ),
                                         basicGenderW,
+                                        height: basicRowH,
                                         align: pw.Alignment.center,
                                       ),
                                       gridCellWidgetW(
                                         pw.Row(
+                                          mainAxisAlignment:
+                                              pw.MainAxisAlignment.center,
                                           children: [
                                             pw.Text('西元', style: ts()),
                                             pw.SizedBox(width: 2),
@@ -457,11 +434,13 @@ Future<Uint8List> buildReferralReportPdf(ReferralReportData d) async {
                                           ],
                                         ),
                                         basicBirthW,
+                                        height: basicRowH,
                                         align: pw.Alignment.center,
                                       ),
                                       gridCellTextW(
                                         d.idNo,
                                         basicIdW,
+                                        height: basicRowH,
                                         align: pw.Alignment.center,
                                       ),
                                     ],
@@ -472,6 +451,7 @@ Future<Uint8List> buildReferralReportPdf(ReferralReportData d) async {
                                         '聯絡人',
                                         basicNameW,
                                         bold: true,
+                                        height: basicRowH,
                                         left: true,
                                         align: pw.Alignment.center,
                                       ),
@@ -479,12 +459,14 @@ Future<Uint8List> buildReferralReportPdf(ReferralReportData d) async {
                                         '聯絡電話',
                                         basicGenderW,
                                         bold: true,
+                                        height: basicRowH,
                                         align: pw.Alignment.center,
                                       ),
                                       gridCellTextW(
                                         '聯絡地址',
                                         basicAddrW,
                                         bold: true,
+                                        height: basicRowH,
                                         align: pw.Alignment.center,
                                       ),
                                     ],
@@ -494,17 +476,20 @@ Future<Uint8List> buildReferralReportPdf(ReferralReportData d) async {
                                       gridCellTextW(
                                         d.contact,
                                         basicNameW,
+                                        height: basicRowH,
                                         left: true,
                                         align: pw.Alignment.center,
                                       ),
                                       gridCellTextW(
                                         d.contactPhone,
                                         basicGenderW,
+                                        height: basicRowH,
                                         align: pw.Alignment.center,
                                       ),
                                       gridCellTextW(
                                         d.contactAddress,
                                         basicAddrW,
+                                        height: basicRowH,
                                         align: pw.Alignment.center,
                                       ),
                                     ],
