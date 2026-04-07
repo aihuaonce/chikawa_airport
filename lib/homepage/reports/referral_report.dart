@@ -344,7 +344,7 @@ Future<Uint8List> buildReferralReportPdf(ReferralReportData d) async {
   final hConsent = 12 * PdfPageFormat.mm;
   final hDoctor = 34 * PdfPageFormat.mm;
   final hRecvProcess = 32 * PdfPageFormat.mm;
-  final hRecvSummary = 22 * PdfPageFormat.mm;
+  final hRecvSummary = 24 * PdfPageFormat.mm;
   final hRecvInfo = 22 * PdfPageFormat.mm;
   final topSectionH =
       hBasic + hHistory + hSummary + hPurpose + hConsent + hDoctor;
@@ -1311,14 +1311,15 @@ Future<Uint8List> buildReferralReportPdf(ReferralReportData d) async {
                                 children: [
                                   pw.TableRow(
                                     children: [
-                                      cell('1. 主診斷', bold: true),
-                                      cell('2. 治療藥物或手術名稱', bold: true),
-                                      cell('3. 輔助診斷之檢查結果', bold: true),
+                                      cell('1. 主診斷', bold: true, h: hRecvSummary / 3),
+                                      cell('2. 治療藥物或手術名稱', bold: true, h: hRecvSummary / 3),
+                                      cell('3. 輔助診斷之檢查結果', bold: true, h: hRecvSummary / 3),
                                     ],
                                   ),
                                   pw.TableRow(
                                     children: [
                                       pw.Container(
+                                        height: hRecvSummary / 3 * 2,
                                         padding: const pw.EdgeInsets.all(3),
                                         child: pw.Column(
                                           crossAxisAlignment:
@@ -1337,6 +1338,7 @@ Future<Uint8List> buildReferralReportPdf(ReferralReportData d) async {
                                         ),
                                       ),
                                       pw.Container(
+                                        height: hRecvSummary / 3 * 2,
                                         padding: const pw.EdgeInsets.all(3),
                                         child: pw.Text(
                                           d.recvTreatmentMed,
@@ -1344,6 +1346,7 @@ Future<Uint8List> buildReferralReportPdf(ReferralReportData d) async {
                                         ),
                                       ),
                                       pw.Container(
+                                        height: hRecvSummary / 3 * 2,
                                         padding: const pw.EdgeInsets.all(3),
                                         child: pw.Text(
                                           d.recvAuxExamResult,
