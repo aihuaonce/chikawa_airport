@@ -270,21 +270,32 @@ Future<Uint8List> buildAmbulanceReportPdf(AmbulanceReportData d) async {
               crossAxisAlignment: pw.CrossAxisAlignment.start,
               children: [
                 // ==================== 1. 標題列 ====================
-                pw.Row(
-                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                  children: [
-                    pw.Text(
-                      '聯新國際醫院桃園國際機場醫療中心救護紀錄表',
-                      style: ts(sz: 12, bold: true),
-                    ),
-                    pw.Text(
-                      '車牌：${d.licensePlate}　　單據號碼：________________',
-                      style: ts(sz: 9, bold: true),
-                    ),
-                  ],
+                pw.Container(
+                  height: 12 * PdfPageFormat.mm,
+                  width: totalW * PdfPageFormat.mm,
+                  child: pw.Stack(
+                    alignment: pw.Alignment.center, // Stack 預設內容在中央
+                    children: [
+                      // 大標題：自動置於 Stack 的中央
+                      pw.Text(
+                        '聯 新 國 際 醫 院 桃 園 國 際 機 場 醫 療 中 心 救 護 紀 錄 表',
+                        style: ts(sz: 12, bold: true),
+                      ),
+                      // 車牌號碼：定位在 Stack 的最右邊
+                      pw.Positioned(
+                        right: 0,
+                        child: pw.Center(
+                          // 垂直置中
+                          child: pw.Text(
+                            '車牌號碼：${d.licensePlate}',
+                            style: ts(sz: 9, bold: true),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-                pw.SizedBox(height: 3),
-
+                pw.SizedBox(height: 3), // 原本的間距保留
                 // ==================== 2. 主內容 (左右兩半) ====================
                 pw.Row(
                   crossAxisAlignment: pw.CrossAxisAlignment.start,
@@ -295,13 +306,19 @@ Future<Uint8List> buildAmbulanceReportPdf(AmbulanceReportData d) async {
                       child: pw.Column(
                         children: [
                           // --- 派遣資料 ---
-                          // 1. 第一列：派遣資料、出勤日期、西元年月日 (比例 118:248:398)
+                          // 1. 第一列：派遣資料、出勤日期、西元年月日
                           pw.Table(
                             border: tbFull,
                             columnWidths: {
-                              0: pw.FixedColumnWidth(22.1 * PdfPageFormat.mm),
-                              1: pw.FixedColumnWidth(46.4 * PdfPageFormat.mm),
-                              2: pw.FixedColumnWidth(74.5 * PdfPageFormat.mm),
+                              0: pw.FixedColumnWidth(
+                                74.45 * PdfPageFormat.mm,
+                              ), // 派遣資料 (來自398px比例)
+                              1: pw.FixedColumnWidth(
+                                22.09 * PdfPageFormat.mm,
+                              ), // 出勤日期 (來自118px比例)
+                              2: pw.FixedColumnWidth(
+                                46.46 * PdfPageFormat.mm,
+                              ), // 西元年月日 (來自248px比例，微調0.04mm補足總和)
                             },
                             children: [
                               pw.TableRow(

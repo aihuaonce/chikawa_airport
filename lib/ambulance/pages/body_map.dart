@@ -70,22 +70,27 @@ class _AmbulanceBodyMapState extends State<AmbulanceBodyMap> {
   bool get isLoading => _isLoading;
 
   BodyMapProvider? _bodyMapProvider;
+  AppDatabase? _db;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     _bodyMapProvider = context.read<BodyMapProvider>();
+    _db = context.read<AppDatabase>();
   }
 
   @override
   void initState() {
     super.initState();
+    // initState runs before didChangeDependencies, so we need to get db here too
+    _bodyMapProvider = context.read<BodyMapProvider>();
+    _db = context.read<AppDatabase>();
     _initializeAndLoadPainter();
   }
 
   @override
   void dispose() {
-    _saveToCache();
+    _saveToDatabase();
     _controller?.dispose();
     _backgroundImage?.dispose();
     super.dispose();
@@ -95,8 +100,35 @@ class _AmbulanceBodyMapState extends State<AmbulanceBodyMap> {
   void didUpdateWidget(AmbulanceBodyMap oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.medicalId != widget.medicalId) {
-      _saveToCache();
+      _saveToDatabase();
       _initializeAndLoadPainter();
+    }
+  }
+
+  /// 儲存到資料庫（離開頁面時呼叫）
+  Future<void> _saveToDatabase() async {
+    if (_controller == null) return;
+
+    try {
+      final drawables = _controller!.drawables;
+      final drawablesList = drawables
+          .map((d) => _drawableToJson(d))
+          .whereType<Map<String, dynamic>>()
+          .toList();
+
+      final jsonString = drawablesList.isEmpty
+          ? null
+          : jsonEncode(drawablesList);
+
+      if (_db != null) {
+        await _db!.ambulanceDao.updateBodyMap(widget.medicalId, jsonString);
+      }
+
+      _bodyMapProvider?.updateCache(jsonString);
+      _bodyMapProvider?.markAsSaved();
+      debugPrint('BodyMap 已儲存到資料庫');
+    } catch (e) {
+      debugPrint('儲存 BodyMap 到資料庫失敗: $e');
     }
   }
 
@@ -106,8 +138,8 @@ class _AmbulanceBodyMapState extends State<AmbulanceBodyMap> {
       // 設定 Provider 的 medicalId
       _bodyMapProvider?.setMedicalId(widget.medicalId);
 
-      final db = context.read<AppDatabase>();
-      final jsonStr = await db.ambulanceDao.getBodyMap(widget.medicalId);
+      final jsonStr = await _db?.ambulanceDao.getBodyMap(widget.medicalId);
+      debugPrint('從資料庫取得 jsonStr: $jsonStr');
 
       // 更新快取
       _bodyMapProvider?.updateCache(jsonStr);
@@ -134,15 +166,25 @@ class _AmbulanceBodyMapState extends State<AmbulanceBodyMap> {
       // 設定背景圖片
       _controller!.background = _backgroundImage!.backgroundDrawable;
 
+      debugPrint('Controller drawables 數量 (載入前): ${_controller!.drawables.length}');
+
       // 載入現有資料
       if (jsonStr != null && jsonStr.isNotEmpty && jsonStr != 'null' && jsonStr != '[]') {
+        debugPrint('載入 BodyMap 資料: $jsonStr');
         _loadDrawablesFromJson(jsonStr);
+        debugPrint('Controller drawables 數量 (載入後): ${_controller!.drawables.length}');
       }
 
       // 設置監聽
       _setupControllerListener();
 
-      setState(() {});
+      // 使用 postFrameCallback 確保 controller 完全初始化後再觸發 rebuild
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        debugPrint('PostFrameCallback - drawables 數量: ${_controller?.drawables.length}');
+        if (mounted) {
+          setState(() {});
+        }
+      });
 
       setState(() => _isLoading = false);
     } catch (e) {
@@ -210,8 +252,7 @@ class _AmbulanceBodyMapState extends State<AmbulanceBodyMap> {
         jsonString = jsonEncode(drawablesList);
       }
 
-      final db = context.read<AppDatabase>();
-      await db.ambulanceDao.updateBodyMap(widget.medicalId, jsonString);
+      await _db?.ambulanceDao.updateBodyMap(widget.medicalId, jsonString);
 
       // 更新 Provider 狀態
       _bodyMapProvider?.updateCache(jsonString);
@@ -274,19 +315,26 @@ class _AmbulanceBodyMapState extends State<AmbulanceBodyMap> {
   void _loadDrawablesFromJson(String jsonString) {
     try {
       final List<dynamic> jsonData = jsonDecode(jsonString);
+      debugPrint('JSON 解析後，資料筆數: ${jsonData.length}');
       final drawables = <Drawable>[];
 
       for (var json in jsonData) {
         try {
           final d = _drawableFromJson(Map<String, dynamic>.from(json));
-          if (d != null) drawables.add(d);
+          if (d != null) {
+            debugPrint('成功解析 Drawable: ${d.runtimeType}');
+            drawables.add(d);
+          }
         } catch (e) {
           debugPrint('解析單筆 Drawable 失敗: $e');
         }
       }
 
+      debugPrint('總共解析出 ${drawables.length} 個 drawables');
+
       if (drawables.isNotEmpty) {
         _controller!.addDrawables(drawables);
+        debugPrint('已添加到 controller');
       }
     } catch (e) {
       debugPrint('JSON 解析失敗: $e');
