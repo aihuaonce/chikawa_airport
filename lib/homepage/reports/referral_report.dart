@@ -1473,50 +1473,107 @@ Future<Uint8List> buildReferralReportPdf(ReferralReportData d) async {
                                   child: pw.Table(
                                     columnWidths: {
                                       0: colW(12 * PdfPageFormat.mm),
-                                      1: colW(12 * PdfPageFormat.mm),
-                                      2: colW(10 * PdfPageFormat.mm),
-                                      3: colW(10 * PdfPageFormat.mm),
-                                      4: colW(10 * PdfPageFormat.mm),
+                                      1: colW(30 * PdfPageFormat.mm),
+                                      2: colW(12 * PdfPageFormat.mm),
+                                      3: colW(30 * PdfPageFormat.mm),
+                                      4: colW(12 * PdfPageFormat.mm),
                                       5: flexW(1),
                                     },
                                     children: [
                                       pw.TableRow(
                                         children: [
-                                          cell(
-                                            '醫師\n簽章',
-                                            bold: true,
-                                            sz: 9,
-                                            h: hRecvInfo / 2,
-                                          ),
-                                          cell(
-                                            '',
-                                            bold: false,
-                                            h: hRecvInfo / 2,
-                                          ),
-                                          cell(
-                                            '科別',
-                                            bold: true,
-                                            sz: 9,
-                                            h: hRecvInfo / 2,
-                                          ),
-                                          cell(
-                                            '',
-                                            bold: false,
-                                            h: hRecvInfo / 2,
-                                          ),
-                                          cell(
-                                            '回覆\n日期',
-                                            bold: true,
-                                            sz: 9,
-                                            h: hRecvInfo / 2,
-                                          ),
+                                          // 醫師簽章（有上、右框線）
                                           pw.Container(
                                             height: hRecvInfo / 2,
-                                            padding: const pw.EdgeInsets.all(2),
-                                            alignment: pw.Alignment.centerLeft,
+                                            decoration: const pw.BoxDecoration(
+                                              border: pw.Border(
+                                                top: bdr,
+                                                right: bdr,
+                                              ),
+                                            ),
+                                            alignment: pw.Alignment.center,
                                             child: pw.Text(
-                                              '',
-                                              style: ts(sz: 8),
+                                              '醫師\n簽章',
+                                              style: ts(bold: true, sz: 9),
+                                            ),
+                                          ),
+                                          // 空白格（有上、右框線）
+                                          pw.Container(
+                                            height: hRecvInfo / 2,
+                                            decoration: const pw.BoxDecoration(
+                                              border: pw.Border(
+                                                top: bdr,
+                                                right: bdr,
+                                              ),
+                                            ),
+                                          ),
+                                          // 科別（有上、右框線）
+                                          pw.Container(
+                                            height: hRecvInfo / 2,
+                                            decoration: const pw.BoxDecoration(
+                                              border: pw.Border(
+                                                top: bdr,
+                                                right: bdr,
+                                              ),
+                                            ),
+                                            alignment: pw.Alignment.center,
+                                            child: pw.Text(
+                                              '科別',
+                                              style: ts(bold: true, sz: 9),
+                                            ),
+                                          ),
+                                          // 空白格（有上、右框線）
+                                          pw.Container(
+                                            height: hRecvInfo / 2,
+                                            decoration: const pw.BoxDecoration(
+                                              border: pw.Border(
+                                                top: bdr,
+                                                right: bdr,
+                                              ),
+                                            ),
+                                          ),
+                                          // 回覆日期（有上、右框線）
+                                          pw.Container(
+                                            height: hRecvInfo / 2,
+                                            decoration: const pw.BoxDecoration(
+                                              border: pw.Border(
+                                                top: bdr,
+                                                right: bdr,
+                                              ),
+                                            ),
+                                            alignment: pw.Alignment.center,
+                                            child: pw.Text(
+                                              '回覆\n日期',
+                                              style: ts(bold: true, sz: 9),
+                                            ),
+                                          ),
+                                          // 年月日內容格（有上框線）
+                                          pw.Container(
+                                            height: hRecvInfo / 2,
+                                            decoration: const pw.BoxDecoration(
+                                              border: pw.Border(top: bdr),
+                                            ),
+                                            padding:
+                                                const pw.EdgeInsets.symmetric(
+                                                  horizontal: 2,
+                                                ),
+                                            child: pw.Row(
+                                              mainAxisAlignment:
+                                                  pw.MainAxisAlignment.center,
+                                              children: [
+                                                pw.Text(
+                                                  '     年',
+                                                  style: ts(sz: 8),
+                                                ),
+                                                pw.Text(
+                                                  '     月',
+                                                  style: ts(sz: 8),
+                                                ),
+                                                pw.Text(
+                                                  '     日',
+                                                  style: ts(sz: 8),
+                                                ),
+                                              ],
                                             ),
                                           ),
                                         ],
