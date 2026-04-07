@@ -3,9 +3,246 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 
-// 資料模型：預留給資料庫對接
+class MedicalServiceHealthAssessmentEntry {
+  final String name;
+  final String relation;
+  final String temperature;
+
+  const MedicalServiceHealthAssessmentEntry({
+    this.name = '',
+    this.relation = '',
+    this.temperature = '',
+  });
+}
+
 class MedicalServiceApplicationData {
-  const MedicalServiceApplicationData();
+  final bool isCrew;
+  final bool isPassenger;
+  final bool isStaff;
+  final bool isOtherVisitReason;
+  final String otherVisitReason;
+  final String patientName;
+  final String birthYear;
+  final String birthMonth;
+  final String birthDay;
+  final bool isMale;
+  final bool isFemale;
+  final String idOrPassportNo;
+  final String nationality;
+  final String airline;
+  final String flightNo;
+  final bool isArrival;
+  final bool isTransfer;
+  final bool isDeparture;
+  final bool isOtherTravelStatus;
+  final String otherTravelStatus;
+  final String dateYear;
+  final String dateMonth;
+  final String dateDay;
+  final String address;
+  final String telephone;
+  final bool departureIsTpe;
+  final String departureLocation;
+  final bool transitIsTpe;
+  final String transitLocation;
+  final bool destinationIsTpe;
+  final String destinationLocation;
+  final bool beforeLanding;
+  final String landingTime;
+  final String notificationTime;
+  final String notificationReporter;
+  final String notificationPhone;
+  final String notificationToOccTime;
+  final bool occArrived;
+  final bool occNotArrived;
+  final bool incidentAtT1;
+  final String incidentT1Detail;
+  final bool incidentAtT2;
+  final String incidentT2Detail;
+  final String incidentOtherLocation;
+  final String medicalArrivalTime;
+  final bool arrivedWithin10Minutes;
+  final bool notArrivedWithin10Minutes;
+  final String delayedReason;
+  final String examinationTime;
+  final bool cdcScreening;
+  final bool assistSampling;
+  final bool throatSampling;
+  final bool bloodSampling;
+  final bool otherSampling;
+  final String otherSamplingDetail;
+  final bool healthAssessment;
+  final List<MedicalServiceHealthAssessmentEntry> healthAssessments;
+  final bool generalClearance;
+  final bool emergencyClearance;
+  final bool emergencyPublicGate;
+  final bool emergencyApron;
+  final bool ambulanceClinic;
+  final String ambulanceClinicDetail;
+  final bool ambulancePrivate;
+  final String ambulancePrivateDetail;
+  final bool ambulanceFireDepartment;
+  final String ambulanceFireDepartmentDetail;
+  final String transferHospital;
+  final String escortStaff;
+  final String outreachFee;
+  final String ambulanceFee;
+  final bool selfPay;
+  final String selfPayAmount;
+  final bool unifiedBilling;
+  final String unifiedBillingAmount;
+  final bool payByCash;
+  final bool payInTwd;
+  final bool payInOtherCurrency;
+  final String otherCurrency;
+  final bool payByCard;
+  final bool abnormalCharge;
+  final String abnormalReason;
+  final String applicantName;
+  final String applicantUnit;
+  final String applicantPhone;
+  final String chiefComplaint;
+  final String temperature;
+  final String pulse;
+  final String breath;
+  final String bloodPressure;
+  final bool consciousnessClear;
+  final bool consciousnessGcs;
+  final String gcsE;
+  final String gcsV;
+  final String gcsM;
+  final String pupilRight;
+  final String pupilLeft;
+  final String history;
+  final bool allergyNone;
+  final bool allergyHas;
+  final String allergyDetail;
+  final String heent;
+  final String chest;
+  final String abdomen;
+  final String extremity;
+  final String tentativeDiagnosis;
+  final bool signedFourCopy;
+  final bool advisedReferral;
+  final String doctorName;
+  final String nurseName;
+  final String emtName;
+  final String refusalRelationship;
+
+  const MedicalServiceApplicationData({
+    this.isCrew = false,
+    this.isPassenger = false,
+    this.isStaff = false,
+    this.isOtherVisitReason = false,
+    this.otherVisitReason = '',
+    this.patientName = '',
+    this.birthYear = '',
+    this.birthMonth = '',
+    this.birthDay = '',
+    this.isMale = false,
+    this.isFemale = false,
+    this.idOrPassportNo = '',
+    this.nationality = '',
+    this.airline = '',
+    this.flightNo = '',
+    this.isArrival = false,
+    this.isTransfer = false,
+    this.isDeparture = false,
+    this.isOtherTravelStatus = false,
+    this.otherTravelStatus = '',
+    this.dateYear = '',
+    this.dateMonth = '',
+    this.dateDay = '',
+    this.address = '',
+    this.telephone = '',
+    this.departureIsTpe = false,
+    this.departureLocation = '',
+    this.transitIsTpe = false,
+    this.transitLocation = '',
+    this.destinationIsTpe = false,
+    this.destinationLocation = '',
+    this.beforeLanding = false,
+    this.landingTime = '',
+    this.notificationTime = '',
+    this.notificationReporter = '',
+    this.notificationPhone = '',
+    this.notificationToOccTime = '',
+    this.occArrived = false,
+    this.occNotArrived = false,
+    this.incidentAtT1 = false,
+    this.incidentT1Detail = '',
+    this.incidentAtT2 = false,
+    this.incidentT2Detail = '',
+    this.incidentOtherLocation = '',
+    this.medicalArrivalTime = '',
+    this.arrivedWithin10Minutes = false,
+    this.notArrivedWithin10Minutes = false,
+    this.delayedReason = '',
+    this.examinationTime = '',
+    this.cdcScreening = false,
+    this.assistSampling = false,
+    this.throatSampling = false,
+    this.bloodSampling = false,
+    this.otherSampling = false,
+    this.otherSamplingDetail = '',
+    this.healthAssessment = false,
+    this.healthAssessments = const [],
+    this.generalClearance = false,
+    this.emergencyClearance = false,
+    this.emergencyPublicGate = false,
+    this.emergencyApron = false,
+    this.ambulanceClinic = false,
+    this.ambulanceClinicDetail = '',
+    this.ambulancePrivate = false,
+    this.ambulancePrivateDetail = '',
+    this.ambulanceFireDepartment = false,
+    this.ambulanceFireDepartmentDetail = '',
+    this.transferHospital = '',
+    this.escortStaff = '',
+    this.outreachFee = '',
+    this.ambulanceFee = '',
+    this.selfPay = false,
+    this.selfPayAmount = '',
+    this.unifiedBilling = false,
+    this.unifiedBillingAmount = '',
+    this.payByCash = false,
+    this.payInTwd = false,
+    this.payInOtherCurrency = false,
+    this.otherCurrency = '',
+    this.payByCard = false,
+    this.abnormalCharge = false,
+    this.abnormalReason = '',
+    this.applicantName = '',
+    this.applicantUnit = '',
+    this.applicantPhone = '',
+    this.chiefComplaint = '',
+    this.temperature = '',
+    this.pulse = '',
+    this.breath = '',
+    this.bloodPressure = '',
+    this.consciousnessClear = false,
+    this.consciousnessGcs = false,
+    this.gcsE = '',
+    this.gcsV = '',
+    this.gcsM = '',
+    this.pupilRight = '',
+    this.pupilLeft = '',
+    this.history = '',
+    this.allergyNone = false,
+    this.allergyHas = false,
+    this.allergyDetail = '',
+    this.heent = '',
+    this.chest = '',
+    this.abdomen = '',
+    this.extremity = '',
+    this.tentativeDiagnosis = '',
+    this.signedFourCopy = false,
+    this.advisedReferral = false,
+    this.doctorName = '',
+    this.nurseName = '',
+    this.emtName = '',
+    this.refusalRelationship = '',
+  });
 }
 
 Future<Uint8List> buildMedicalServiceApplicationPdf(MedicalServiceApplicationData d) async {
@@ -16,13 +253,13 @@ Future<Uint8List> buildMedicalServiceApplicationPdf(MedicalServiceApplicationDat
   final tealColor = PdfColor.fromInt(0xFF007A7A);
   final black = PdfColors.black;
 
-  // 1. 統一字體樣式
-  pw.TextStyle ts({double sz = 10, bool bold = false, PdfColor? color}) =>
+  // 1. 統一字體樣式（略微縮小以放更多內容）
+  pw.TextStyle ts({double sz = 9, bool bold = false, PdfColor? color}) =>
       pw.TextStyle(
         font: bold ? fontB : font,
         fontSize: sz,
         color: color ?? black,
-        lineSpacing: 4, // 加大行距
+        lineSpacing: 2,
       );
 
   // 2. 輔助元件：勾選框
@@ -31,8 +268,8 @@ Future<Uint8List> buildMedicalServiceApplicationPdf(MedicalServiceApplicationDat
       mainAxisSize: pw.MainAxisSize.min,
       children: [
         pw.Container(
-          width: 11,
-          height: 11,
+          width: 9,
+          height: 9,
           decoration: pw.BoxDecoration(border: pw.Border.all(width: 0.8)),
           child: checked ? pw.Center(child: pw.Text('v', style: pw.TextStyle(font: font, fontSize: 8))) : null,
         ),
@@ -80,7 +317,7 @@ Future<Uint8List> buildMedicalServiceApplicationPdf(MedicalServiceApplicationDat
     pdf.addPage(
     pw.Page(
       pageFormat: PdfPageFormat.a4,
-      margin: const pw.EdgeInsets.all(12 * PdfPageFormat.mm),
+      margin: const pw.EdgeInsets.all(8 * PdfPageFormat.mm),
       build: (ctx) {
         return pw.Column(
           crossAxisAlignment: pw.CrossAxisAlignment.start,
@@ -99,147 +336,155 @@ Future<Uint8List> buildMedicalServiceApplicationPdf(MedicalServiceApplicationDat
             // --- 基本資料 (Personal Data) ---
             buildSectionTitle('基本資料', 'Personal Data'),
             pw.Row(children: [
-              buildCheckBox('組員(Crew)', false), buildCheckBox('旅客', false),
-              buildCheckBox('員工', false), buildCheckBox('其他', false), buildUnderline('', 60),
+              buildCheckBox('組員(Crew)', d.isCrew), buildCheckBox('旅客', d.isPassenger),
+              buildCheckBox('員工', d.isStaff), buildCheckBox('其他', d.isOtherVisitReason), buildUnderline(d.otherVisitReason, 60),
             ]),
             pw.SizedBox(height: 4),
             pw.Row(children: [
-              pw.Text('病人姓名(Name)', style: ts()), buildUnderline('', 120),
+              pw.Text('病人姓名(Name)', style: ts()), buildUnderline(d.patientName, 120),
               pw.SizedBox(width: 10),
               pw.Text('生日(Date of Birth)', style: ts()), 
-              buildUnderline('', 25), pw.Text('(Y)/', style: ts()),
-              buildUnderline('', 15), pw.Text('(M)/', style: ts()),
-              buildUnderline('', 15), pw.Text('(D)', style: ts()),
+              buildUnderline(d.birthYear, 25), pw.Text('(Y)/', style: ts()),
+              buildUnderline(d.birthMonth, 15), pw.Text('(M)/', style: ts()),
+              buildUnderline(d.birthDay, 15), pw.Text('(D)', style: ts()),
               pw.Spacer(),
-              pw.Column(children: [buildCheckBox('男(Male)', false), buildCheckBox('女(Female)', false)]),
+              pw.Column(children: [buildCheckBox('男(Male)', d.isMale), buildCheckBox('女(Female)', d.isFemale)]),
             ]),
             pw.Row(children: [
-              pw.Text('I.D. No(Passport No.)', style: ts()), buildUnderline('', 130),
+              pw.Text('I.D. No(Passport No.)', style: ts()), buildUnderline(d.idOrPassportNo, 130),
               pw.SizedBox(width: 10),
-              pw.Text('國籍(Nationality)', style: ts()), buildUnderline('', 100),
+              pw.Text('國籍(Nationality)', style: ts()), buildUnderline(d.nationality, 100),
             ]),
             pw.SizedBox(height: 4),
             pw.Row(children: [
-              pw.Text('航空公司(Airline)', style: ts()), buildUnderline('', 70),
-              pw.Text('班機(Flight No)', style: ts()), buildUnderline('', 70),
+              pw.Text('航空公司(Airline)', style: ts()), buildUnderline(d.airline, 70),
+              pw.Text('班機(Flight No)', style: ts()), buildUnderline(d.flightNo, 70),
               pw.Column(crossAxisAlignment: pw.CrossAxisAlignment.start, children: [
-                pw.Row(children: [buildCheckBox('入境(Arrival)', false), buildCheckBox('過境(Transfer)', false)]),
-                pw.Row(children: [buildCheckBox('出境(Departure)', false), buildCheckBox('其他(others)', false)]),
+                pw.Row(children: [buildCheckBox('入境(Arrival)', d.isArrival), buildCheckBox('過境(Transfer)', d.isTransfer)]),
+                pw.Row(children: [buildCheckBox('出境(Departure)', d.isDeparture), buildCheckBox('其他(others)', d.isOtherTravelStatus), buildUnderline(d.otherTravelStatus, 35)]),
               ]),
               pw.Spacer(),
-              pw.Text('日期(Date)      /      /\n西元 年(Y)月(M)日(D)', style: ts(sz: 7)),
+              pw.Text('日期(Date)   ${d.dateYear} / ${d.dateMonth} / ${d.dateDay}\n西元 年(Y)月(M)日(D)', style: ts(sz: 7)),
             ]),
-            pw.Row(children: [pw.Text('地址(Address)：', style: ts()), buildUnderline('', 450)]),
-            pw.Row(children: [pw.Text('聯絡電話(Telephone)：', style: ts()), buildUnderline('', 150)]),
+            pw.Row(children: [pw.Text('地址(Address)：', style: ts()), buildUnderline(d.address, 300)]),
+            pw.Row(children: [pw.Text('聯絡電話(Telephone)：', style: ts()), buildUnderline(d.telephone, 100)]),
             
-            // 出發地、經過地、目的地 (修正為 TPE 或 填寫欄位 兩選項)
+            // 出發地、經過地、目的地
             pw.SizedBox(height: 4),
             ...['出發地', '經過地', '目的地'].map((label) => pw.Padding(
               padding: const pw.EdgeInsets.only(bottom: 2),
               child: pw.Row(children: [
                 pw.Container(width: 40, child: pw.Text('$label：', style: ts())),
-                buildCheckBox('台灣 TPE', false),
-                buildCheckBox('', false), buildUnderline('', 120),
+                buildCheckBox('台灣 TPE', label == '出發地' ? d.departureIsTpe : label == '經過地' ? d.transitIsTpe : d.destinationIsTpe),
+                buildCheckBox('', label == '出發地'
+                    ? !d.departureIsTpe && d.departureLocation.isNotEmpty
+                    : label == '經過地'
+                        ? !d.transitIsTpe && d.transitLocation.isNotEmpty
+                        : !d.destinationIsTpe && d.destinationLocation.isNotEmpty),
+                buildUnderline(
+                  label == '出發地'
+                      ? d.departureLocation
+                      : label == '經過地'
+                          ? d.transitLocation
+                          : d.destinationLocation,
+                  120,
+                ),
               ]),
             )).toList(),
 
             // --- 通報作業 (Notification) ---
             buildSectionTitle('通報作業', 'Notification'),
             pw.Row(children: [
-              buildCheckBox('落地前通知，落地時間：', false), buildUnderline('', 80),
+              buildCheckBox('落地前通知，落地時間：', d.beforeLanding), buildUnderline(d.landingTime, 80),
             ]),
             pw.Row(children: [
-              pw.Text('通報時間：', style: ts()), buildUnderline('', 60),
+              pw.Text('通報時間：', style: ts()), buildUnderline(d.notificationTime, 60),
               pw.SizedBox(width: 8),
-              pw.Text('通報單位/人員：', style: ts()), buildUnderline('', 80),
+              pw.Text('通報單位/人員：', style: ts()), buildUnderline(d.notificationReporter, 80),
               pw.SizedBox(width: 8),
-              pw.Text('電話：', style: ts()), buildUnderline('', 80),
+              pw.Text('電話：', style: ts()), buildUnderline(d.notificationPhone, 80),
             ]),
             pw.Row(children: [
-              pw.Text('通知營安處時間：', style: ts()), buildUnderline('', 100),
-              pw.Text('，到達現場：', style: ts()), buildCheckBox('有', false), buildCheckBox('無', false),
+              pw.Text('通知營安處時間：', style: ts()), buildUnderline(d.notificationToOccTime, 100),
+              pw.Text('，到達現場：', style: ts()), buildCheckBox('有', d.occArrived), buildCheckBox('無', d.occNotArrived),
             ]),
             pw.Row(children: [
               pw.Text('通報事故地點：', style: ts()), 
-              buildCheckBox('T1', false), buildUnderline('', 30), 
-              buildCheckBox('T2', false), buildUnderline('', 30),
-              pw.Text('其他', style: ts()), buildUnderline('', 100),
+              buildCheckBox('T1', d.incidentAtT1), buildUnderline(d.incidentT1Detail, 60), 
+              buildCheckBox('T2', d.incidentAtT2), buildUnderline(d.incidentT2Detail, 60),
+              pw.Text('其他', style: ts()), buildUnderline(d.incidentOtherLocation, 100),
             ]),
             pw.Row(children: [
-              pw.Text('醫護抵達時間：', style: ts()), buildUnderline('', 60),
-              pw.Text(' 10分鐘內到達：', style: ts()), buildCheckBox('是', false), buildCheckBox('否', false),
-              pw.Text('，原因：', style: ts()), buildUnderline('', 80),
-              pw.Text('檢查時間：', style: ts()), buildUnderline('', 60),
+              pw.Text('醫護抵達時間：', style: ts()), buildUnderline(d.medicalArrivalTime, 60),
+              pw.Text(' 10分鐘內到達：', style: ts()), buildCheckBox('是', d.arrivedWithin10Minutes), buildCheckBox('否', d.notArrivedWithin10Minutes),
+              pw.Text('，原因：', style: ts()), buildUnderline(d.delayedReason, 80),
+              pw.Text('檢查時間：', style: ts()), buildUnderline(d.examinationTime, 60),
             ]),
 
             // --- 醫療收費 (Medical Charge) ---
             buildSectionTitle('醫療收費', 'Medical Charge'),
-            pw.Text('■ 疾病管制署篩檢', style: ts(bold: true)),
+            pw.Text('${d.cdcScreening ? '■' : '□'} 疾病管制署篩檢', style: ts(bold: true)),
             pw.Row(crossAxisAlignment: pw.CrossAxisAlignment.start, children: [
-              pw.SizedBox(width: 15),
               pw.Column(crossAxisAlignment: pw.CrossAxisAlignment.start, children: [
-                buildCheckBox('協助採檢', false),
-                pw.Row(children: [pw.SizedBox(width: 15), buildCheckBox('喉頭採檢', false), buildCheckBox('抽血檢驗', false)]),
-                // 修正：其他與喉頭採檢貼齊
-                pw.Row(children: [pw.SizedBox(width: 15), buildCheckBox('其他', false), buildUnderline('', 60)]),
+                buildCheckBox('協助採檢', d.assistSampling),
+                pw.Row(children: [pw.SizedBox(width: 15), buildCheckBox('喉頭採檢', d.throatSampling), buildCheckBox('抽血檢驗', d.bloodSampling)]),
+                pw.Row(children: [pw.SizedBox(width: 15), buildCheckBox('其他', d.otherSampling), buildUnderline(d.otherSamplingDetail, 60)]),
               ]),
               pw.SizedBox(width: 25),
               pw.Column(crossAxisAlignment: pw.CrossAxisAlignment.start, children: [
-                buildCheckBox('健康評估', false),
-                pw.Text('1.姓名：_________ /關係：_______ /體溫：_______℃', style: ts()),
-                pw.Text('2.姓名：_________ /關係：_______ /體溫：_______℃', style: ts()),
+                buildCheckBox('健康評估', d.healthAssessment),
+                pw.Text('1.姓名：${d.healthAssessments.isNotEmpty ? d.healthAssessments[0].name : ''} /關係：${d.healthAssessments.isNotEmpty ? d.healthAssessments[0].relation : ''} /體溫：${d.healthAssessments.isNotEmpty ? d.healthAssessments[0].temperature : ''}℃', style: ts()),
+                pw.Text('2.姓名：${d.healthAssessments.length > 1 ? d.healthAssessments[1].name : ''} /關係：${d.healthAssessments.length > 1 ? d.healthAssessments[1].relation : ''} /體溫：${d.healthAssessments.length > 1 ? d.healthAssessments[1].temperature : ''}℃', style: ts()),
               ]),
             ]),
             pw.SizedBox(height: 4),
             pw.Text('■ 轉診後送', style: ts(bold: true)),
             pw.Padding(padding: const pw.EdgeInsets.only(left: 15), child: pw.Column(children: [
               pw.Row(children: [
-                buildCheckBox('一般通關', false), 
-                buildCheckBox('緊急通關 (', false), buildCheckBox('公務門', false), buildCheckBox('機坪)', false),
+                buildCheckBox('一般通關', d.generalClearance), 
+                buildCheckBox('緊急通關 (', d.emergencyClearance), buildCheckBox('公務門', d.emergencyPublicGate), buildCheckBox('機坪)', d.emergencyApron),
               ]),
               pw.Row(children: [
-                pw.Text('救護車：', style: ts()), buildCheckBox('醫療中心', false), buildUnderline('', 40),
-                buildCheckBox('民間', false), buildUnderline('', 40),
-                buildCheckBox('消防隊：', false), buildUnderline('', 40),
+                pw.Text('救護車：', style: ts()), buildCheckBox('醫療中心', d.ambulanceClinic), buildUnderline(d.ambulanceClinicDetail, 40),
+                buildCheckBox('民間', d.ambulancePrivate), buildUnderline(d.ambulancePrivateDetail, 40),
+                buildCheckBox('消防隊：', d.ambulanceFireDepartment), buildUnderline(d.ambulanceFireDepartmentDetail, 40),
               ]),
               pw.Row(children: [
-                pw.Text('轉送醫院：', style: ts()), buildUnderline('', 130),
+                pw.Text('轉送醫院：', style: ts()), buildUnderline(d.transferHospital, 130),
                 pw.SizedBox(width: 15),
-                pw.Text('隨車人員：', style: ts()), buildUnderline('', 130),
+                pw.Text('隨車人員：', style: ts()), buildUnderline(d.escortStaff, 130),
               ]),
             ])),
             pw.SizedBox(height: 4),
             pw.Text('■ 醫療費用', style: ts(bold: true)),
             pw.Padding(padding: const pw.EdgeInsets.only(left: 15), child: pw.Column(children: [
               pw.Row(children: [
-                pw.Text('出診費(Outreach)', style: ts()), buildUnderline('', 120),
+                pw.Text('出診費(Outreach)', style: ts()), buildUnderline(d.outreachFee, 120),
                 pw.SizedBox(width: 10),
-                pw.Text('救護車費用(Ambulance)', style: ts()), buildUnderline('', 120),
+                pw.Text('救護車費用(Ambulance)', style: ts()), buildUnderline(d.ambulanceFee, 120),
               ]),
-              // 修正：自付與請款費用後方留填寫空間
               pw.Row(children: [
-                buildCheckBox('自付(Total)', false), buildUnderline('', 80),
+                buildCheckBox('自付(Total)', d.selfPay), buildUnderline(d.selfPayAmount, 80),
                 pw.SizedBox(width: 20),
-                buildCheckBox('請款費用', false), buildUnderline('', 80),
+                buildCheckBox('請款費用', d.unifiedBilling), buildUnderline(d.unifiedBillingAmount, 80),
               ]),
             ])),
             pw.Row(crossAxisAlignment: pw.CrossAxisAlignment.start, children: [
               pw.Expanded(child: pw.Column(crossAxisAlignment: pw.CrossAxisAlignment.start, children: [
                 pw.Text('■ 自付', style: ts(bold: true)),
-                // 修正：現金台幣/其他幣別勾選
                 pw.Row(children: [
-                  buildCheckBox('現金', false),
-                  buildCheckBox('台幣', false),
-                  buildCheckBox('其他幣別', false), buildUnderline('', 40),
+                  buildCheckBox('現金', d.payByCash),
+                  buildCheckBox('台幣', d.payInTwd),
+                  buildCheckBox('其他幣別', d.payInOtherCurrency), buildUnderline(d.otherCurrency, 40),
                 ]),
                 pw.Text('   ( 兌換後=台幣_______________ )', style: ts(sz: 6.5)),
-                pw.Row(children: [buildCheckBox('刷卡', false), buildCheckBox('收費異常，原因：', false), buildUnderline('', 80)]),
+                pw.Row(children: [buildCheckBox('刷卡', d.payByCard), buildCheckBox('收費異常，原因：', d.abnormalCharge), buildUnderline(d.abnormalReason, 80)]),
               ])),
               pw.Expanded(child: pw.Column(crossAxisAlignment: pw.CrossAxisAlignment.start, children: [
                 pw.Text('■ 統一請款', style: ts(bold: true)),
-                pw.Row(children: [pw.Text('申請人(Applicant)', style: ts()), buildUnderline('', 100)]),
-                pw.Row(children: [pw.Text('申請單位(Department)', style: ts()), buildUnderline('', 100)]),
-                pw.Row(children: [pw.Text('聯絡電話(Telephone)', style: ts()), buildUnderline('', 100)]),
+                pw.Row(children: [pw.Text('申請人(Applicant)', style: ts()), buildUnderline(d.applicantName, 100)]),
+                pw.Row(children: [pw.Text('申請單位(Department)', style: ts()), buildUnderline(d.applicantUnit, 100)]),
+                pw.Row(children: [pw.Text('聯絡電話(Telephone)', style: ts()), buildUnderline(d.applicantPhone, 100)]),
               ])),
             ]),
 
@@ -278,9 +523,9 @@ Future<Uint8List> buildMedicalServiceApplicationPdf(MedicalServiceApplicationDat
             pw.Row(
               mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
               children: [
-                pw.Text('醫師：____________________', style: ts()),
-                pw.Text('護理師：____________________', style: ts()),
-                pw.Text('EMT：____________________', style: ts()),
+                pw.Text('醫師：${d.doctorName.isEmpty ? "____________________" : d.doctorName}', style: ts()),
+                pw.Text('護理師：${d.nurseName.isEmpty ? "____________________" : d.nurseName}', style: ts()),
+                pw.Text('EMT：${d.emtName.isEmpty ? "____________________" : d.emtName}', style: ts()),
               ],
             ),
 
@@ -305,7 +550,7 @@ Future<Uint8List> buildMedicalServiceApplicationPdf(MedicalServiceApplicationDat
   pdf.addPage(
     pw.Page(
       pageFormat: PdfPageFormat.a4,
-      margin: const pw.EdgeInsets.all(12 * PdfPageFormat.mm),
+      margin: const pw.EdgeInsets.all(8 * PdfPageFormat.mm),
       build: (ctx) {
         return pw.Column(
           crossAxisAlignment: pw.CrossAxisAlignment.start,
@@ -317,7 +562,7 @@ Future<Uint8List> buildMedicalServiceApplicationPdf(MedicalServiceApplicationDat
             pw.SizedBox(height: 10),
             pw.Row(children: [
               pw.SizedBox(width: 45 * PdfPageFormat.mm, child: pw.Text('  1. 主訴(Chief Complaints)：', style: ts())),
-              buildUnderline('', 120 * PdfPageFormat.mm),
+              buildUnderline(d.chiefComplaint, 120 * PdfPageFormat.mm),
             ]),
             pw.SizedBox(height: 15),
 
@@ -328,30 +573,30 @@ Future<Uint8List> buildMedicalServiceApplicationPdf(MedicalServiceApplicationDat
                 crossAxisAlignment: pw.CrossAxisAlignment.start,
                 children: [
                   pw.Row(children: [
-                    pw.SizedBox(width: 35 * PdfPageFormat.mm, child: pw.Text('體溫(Temp)：', style: ts())), buildUnderline('', 30 * PdfPageFormat.mm), pw.Text(' ℃', style: ts()),
+                    pw.SizedBox(width: 35 * PdfPageFormat.mm, child: pw.Text('體溫(Temp)：', style: ts())), buildUnderline(d.temperature, 30 * PdfPageFormat.mm), pw.Text(' ℃', style: ts()),
                     pw.SizedBox(width: 20 * PdfPageFormat.mm),
-                    pw.SizedBox(width: 25 * PdfPageFormat.mm, child: pw.Text('脈搏(Pulse)：', style: ts())), buildUnderline('', 30 * PdfPageFormat.mm), pw.Text(' 次/min', style: ts()),
+                    pw.SizedBox(width: 25 * PdfPageFormat.mm, child: pw.Text('脈搏(Pulse)：', style: ts())), buildUnderline(d.pulse, 30 * PdfPageFormat.mm), pw.Text(' 次/min', style: ts()),
                   ]),
                   pw.SizedBox(height: 12),
                   pw.Row(children: [
-                    pw.SizedBox(width: 35 * PdfPageFormat.mm, child: pw.Text('呼吸(Breath)：', style: ts())), buildUnderline('', 30 * PdfPageFormat.mm), pw.Text(' 次/min', style: ts()),
+                    pw.SizedBox(width: 35 * PdfPageFormat.mm, child: pw.Text('呼吸(Breath)：', style: ts())), buildUnderline(d.breath, 30 * PdfPageFormat.mm), pw.Text(' 次/min', style: ts()),
                     pw.SizedBox(width: 20 * PdfPageFormat.mm),
-                    pw.SizedBox(width: 25 * PdfPageFormat.mm, child: pw.Text('血壓(BP)：', style: ts())), buildUnderline('', 45 * PdfPageFormat.mm), pw.Text(' mmHg', style: ts()),
+                    pw.SizedBox(width: 25 * PdfPageFormat.mm, child: pw.Text('血壓(BP)：', style: ts())), buildUnderline(d.bloodPressure, 45 * PdfPageFormat.mm), pw.Text(' mmHg', style: ts()),
                   ]),
                   pw.SizedBox(height: 12),
                   pw.Row(children: [
                     pw.SizedBox(width: 35 * PdfPageFormat.mm, child: pw.Text('意識(Cons)：', style: ts())),
-                    buildCheckBox('Clear', false), buildCheckBox('GCS：', false),
-                    pw.Text('(E', style: ts()), buildUnderline('', 12 * PdfPageFormat.mm),
-                    pw.Text('V', style: ts()), buildUnderline('', 12 * PdfPageFormat.mm),
-                    pw.Text('M', style: ts()), buildUnderline('', 12 * PdfPageFormat.mm), pw.Text(')', style: ts()),
+                    buildCheckBox('Clear', d.consciousnessClear), buildCheckBox('GCS：', d.consciousnessGcs),
+                    pw.Text('(E', style: ts()), buildUnderline(d.gcsE, 12 * PdfPageFormat.mm),
+                    pw.Text('V', style: ts()), buildUnderline(d.gcsV, 12 * PdfPageFormat.mm),
+                    pw.Text('M', style: ts()), buildUnderline(d.gcsM, 12 * PdfPageFormat.mm), pw.Text(')', style: ts()),
                   ]),
                   pw.SizedBox(height: 12),
                   pw.Row(children: [
                     pw.SizedBox(width: 35 * PdfPageFormat.mm, child: pw.Text('瞳孔(Pupil)：', style: ts())),
-                    pw.Text('R ', style: ts()), buildUnderline('', 25 * PdfPageFormat.mm),
+                    pw.Text('R ', style: ts()), buildUnderline(d.pupilRight, 25 * PdfPageFormat.mm),
                     pw.SizedBox(width: 15),
-                    pw.Text('L ', style: ts()), buildUnderline('', 25 * PdfPageFormat.mm), pw.Text(' )', style: ts()),
+                    pw.Text('L ', style: ts()), buildUnderline(d.pupilLeft, 25 * PdfPageFormat.mm), pw.Text(' )', style: ts()),
                   ]),
                 ],
               ),
@@ -360,12 +605,12 @@ Future<Uint8List> buildMedicalServiceApplicationPdf(MedicalServiceApplicationDat
             pw.SizedBox(height: 20),
             pw.Row(children: [
               pw.SizedBox(width: 45 * PdfPageFormat.mm, child: pw.Text('  3. 過去病史(History)：', style: ts())),
-              buildUnderline('', 120 * PdfPageFormat.mm),
+              buildUnderline(d.history, 120 * PdfPageFormat.mm),
             ]),
             pw.SizedBox(height: 10),
             pw.Row(children: [
               pw.SizedBox(width: 45 * PdfPageFormat.mm, child: pw.Text('  藥物過敏(Allergy)：', style: ts())),
-              buildCheckBox('無', false), buildCheckBox('有', false), buildUnderline('', 80 * PdfPageFormat.mm),
+              buildCheckBox('無', d.allergyNone), buildCheckBox('有', d.allergyHas), buildUnderline(d.allergyDetail, 80 * PdfPageFormat.mm),
             ]),
 
             pw.SizedBox(height: 20),
@@ -374,13 +619,13 @@ Future<Uint8List> buildMedicalServiceApplicationPdf(MedicalServiceApplicationDat
               padding: const pw.EdgeInsets.only(left: 10 * PdfPageFormat.mm, top: 10),
               child: pw.Column(children: [
                 pw.Row(children: [
-                  pw.Expanded(child: pw.Row(children: [pw.Text('頭頸(HEENT)：', style: ts()), buildUnderline('', 50 * PdfPageFormat.mm)])),
-                  pw.Expanded(child: pw.Row(children: [pw.Text('胸部(Chest)：', style: ts()), buildUnderline('', 50 * PdfPageFormat.mm)])),
+                  pw.Expanded(child: pw.Row(children: [pw.Text('頭頸(HEENT)：', style: ts()), buildUnderline(d.heent, 50 * PdfPageFormat.mm)])),
+                  pw.Expanded(child: pw.Row(children: [pw.Text('胸部(Chest)：', style: ts()), buildUnderline(d.chest, 50 * PdfPageFormat.mm)])),
                 ]),
                 pw.SizedBox(height: 12),
                 pw.Row(children: [
-                  pw.Expanded(child: pw.Row(children: [pw.Text('腹部(Abdomen)：', style: ts()), buildUnderline('', 50 * PdfPageFormat.mm)])),
-                  pw.Expanded(child: pw.Row(children: [pw.Text('四肢(Extremity)：', style: ts()), buildUnderline('', 50 * PdfPageFormat.mm)])),
+                  pw.Expanded(child: pw.Row(children: [pw.Text('腹部(Abdomen)：', style: ts()), buildUnderline(d.abdomen, 50 * PdfPageFormat.mm)])),
+                  pw.Expanded(child: pw.Row(children: [pw.Text('四肢(Extremity)：', style: ts()), buildUnderline(d.extremity, 50 * PdfPageFormat.mm)])),
                 ]),
               ]),
             ),
@@ -388,18 +633,18 @@ Future<Uint8List> buildMedicalServiceApplicationPdf(MedicalServiceApplicationDat
             pw.SizedBox(height: 25),
             pw.Row(children: [
               pw.Text('■ 初步診斷(Tentative)：', style: ts(bold: true, sz: 11)),
-              buildUnderline('', 130 * PdfPageFormat.mm),
+              buildUnderline(d.tentativeDiagnosis, 130 * PdfPageFormat.mm),
             ]),
             pw.SizedBox(height: 20),
             pw.Row(children: [
               pw.Text('■ 處理摘要(Summary)：', style: ts(bold: true, sz: 11)),
-              buildCheckBox('簽四聯單', false), buildCheckBox('建議轉診', false),
+              buildCheckBox('簽四聯單', d.signedFourCopy), buildCheckBox('建議轉診', d.advisedReferral),
             ]),
 
             pw.SizedBox(height: 20),
             pw.Align(alignment: pw.Alignment.centerRight, child: pw.Row(
               mainAxisAlignment: pw.MainAxisAlignment.end,
-              children: [pw.Text('醫師：', style: ts(bold: true, sz: 11)), buildUnderline('', 50 * PdfPageFormat.mm)]
+              children: [pw.Text('醫師：', style: ts(bold: true, sz: 11)), buildUnderline(d.doctorName, 50 * PdfPageFormat.mm)]
             )),
             
             pw.SizedBox(height: 15),
@@ -426,63 +671,55 @@ Future<Uint8List> buildMedicalServiceApplicationPdf(MedicalServiceApplicationDat
                           pw.SizedBox(height: 4),
                           pw.RichText(text: pw.TextSpan(style: ts(sz: 6), children: [
                             const pw.TextSpan(text: 'I (Name:'),
-                            pw.WidgetSpan(child: buildInlineUnderline(35)),
+                            pw.WidgetSpan(child: buildUnderline(d.patientName, 35 * PdfPageFormat.mm)),
                             const pw.TextSpan(text: ', Date of Birth: '),
-                            pw.WidgetSpan(child: buildInlineUnderline(8)), const pw.TextSpan(text: '/'),
-                            pw.WidgetSpan(child: buildInlineUnderline(8)), const pw.TextSpan(text: '/'),
-                            pw.WidgetSpan(child: buildInlineUnderline(8)),
+                            pw.WidgetSpan(child: buildUnderline(d.birthYear, 8 * PdfPageFormat.mm)), const pw.TextSpan(text: '/'),
+                            pw.WidgetSpan(child: buildUnderline(d.birthMonth, 8 * PdfPageFormat.mm)), const pw.TextSpan(text: '/'),
+                            pw.WidgetSpan(child: buildUnderline(d.birthDay, 8 * PdfPageFormat.mm)),
                             const pw.TextSpan(text: ', Passport /I.D. No: '),
-                            pw.WidgetSpan(child: buildInlineUnderline(40)),
+                            pw.WidgetSpan(child: buildUnderline(d.idOrPassportNo, 40 * PdfPageFormat.mm)),
                             const pw.TextSpan(text: ') here by clarified that I / my family patient had been notified by Dr. '),
-                            pw.WidgetSpan(child: buildInlineUnderline(30)),
+                            pw.WidgetSpan(child: buildUnderline(d.doctorName, 30 * PdfPageFormat.mm)),
                             const pw.TextSpan(text: ' of Landseed Medical Clinic at Taiwan Taoyuan Int\'l Airport, I am/my family patient is now in illness/necessary condition which needed to be transported to an advanced hospital facilities for further test & treatment. But under my/our personal status/consideration. I/we decided to handle this situation by myself/ourselves against any further medical advice I hereby signing this consent clarified that I am /& my family are willing to take all the risks &hold all the responsibilities of any consequences, even hazardous to my/my family member\'s health or life integrity unexpectedly.'),
                           ])),
                           pw.SizedBox(height: 10),
-                          pw.Text('Signature: ____________________', style: ts(sz: 7)),
-                          pw.Text('Date: ____________________', style: ts(sz: 7)),
+                          pw.Text('Signature: ${d.patientName.isEmpty ? "____________________" : d.patientName}', style: ts(sz: 7)),
+                          pw.Text('Date: ${d.dateYear.isEmpty ? "____________________" : "${d.dateYear}/${d.dateMonth}/${d.dateDay}"}', style: ts(sz: 7)),
                         ],
                       ),
                     ),
                     // 右半部：中文
-pw.Container(
-  padding: const pw.EdgeInsets.all(5),
-  child: pw.Column(
-    crossAxisAlignment: pw.CrossAxisAlignment.start,
-    children: [
-      pw.Center(child: pw.Text('拒絕轉診治療切結書', style: ts(bold: true, sz: 8.5))),
-      pw.SizedBox(height: 4),
-      pw.RichText(
-        text: pw.TextSpan(
-          style: ts(sz: 6.8),
-          children: [
-            const pw.TextSpan(text: '本人'),
-            pw.WidgetSpan(child: buildInlineUnderline(25)), // 縮短填寫名子空間
-            const pw.TextSpan(text: '身分證字號'),
-            pw.WidgetSpan(child: buildInlineUnderline(35)), // 縮短填寫證號空間
-            const pw.TextSpan(text: '，\n'), // 加入逗號並強制換行
-            pw.WidgetSpan(child: buildInlineUnderline(12)),
-            const pw.TextSpan(text: '年'),
-            pw.WidgetSpan(child: buildInlineUnderline(10)),
-            const pw.TextSpan(text: '月'),
-            pw.WidgetSpan(child: buildInlineUnderline(10)),
-            const pw.TextSpan(text: '日於桃園國際機場接受聯新國際醫院桃園國際機場醫療中心醫師'),
-            pw.WidgetSpan(child: buildInlineUnderline(35)),
-            const pw.TextSpan(
-              text: '診視，醫師建議轉診至醫院繼續治療，但本人因個人因素拒絕醫師「繼續治療」之建議，致生一切後果願自行負責，與聯新國際醫院桃園國際機場醫療中心無涉。',
-            ),
-          ],
-        ),
-      ),
-      pw.SizedBox(height: 8),
-      pw.Text('立切結書人: ________________', style: ts(sz: 7)),
-      pw.Text('身分證字號: ________________', style: ts(sz: 7)),
-      pw.Text('與病患關係: ________________', style: ts(sz: 7)),
-      pw.SizedBox(height: 4),
-      pw.Text('住址: ________________________', style: ts(sz: 6.5)),
-      pw.Text('電話: ________________', style: ts(sz: 7)),
-    ],
-  ),
-),
+                    pw.Column(
+  crossAxisAlignment: pw.CrossAxisAlignment.start,
+  children: [
+    pw.Center(child: pw.Text('拒絕轉診治療切結書', style: ts(bold: true, sz: 10))),
+    pw.SizedBox(height: 8),
+    // 第一行：本人 + 證號
+    pw.Row(children: [
+      pw.Text('本人', style: ts(sz: 9)),
+      buildUnderline(d.patientName, 25 * PdfPageFormat.mm),
+      pw.Text('身分證字號', style: ts(sz: 9)),
+      buildUnderline(d.idOrPassportNo, 35 * PdfPageFormat.mm),
+      pw.Text('，', style: ts(sz: 9)),
+    ]),
+    pw.SizedBox(height: 6), // 這裡控制日期換行
+    // 第二行：日期
+    pw.Row(children: [
+      buildUnderline(d.dateYear, 12 * PdfPageFormat.mm),
+      pw.Text('年', style: ts(sz: 9)),
+      buildUnderline(d.dateMonth, 10 * PdfPageFormat.mm),
+      pw.Text('月', style: ts(sz: 9)),
+      buildUnderline(d.dateDay, 10 * PdfPageFormat.mm),
+      pw.Text('日於桃園機場接受醫師', style: ts(sz: 9)),
+    ]),
+    pw.SizedBox(height: 4),
+    // 第三行：內文
+    pw.Text(
+      '${d.doctorName.isEmpty ? "________" : d.doctorName} 診視，醫師建議轉診至醫院繼續治療，但本人因個人因素拒絕醫師「繼續治療」之建議，致生一切後果願自行負責。',
+      style: ts(sz: 9),
+    ),
+  ],
+)
                   ],
                 ),
               ],

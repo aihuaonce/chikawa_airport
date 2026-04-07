@@ -1616,13 +1616,344 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
   }
 
   Future<MedicalServiceApplicationData> _buildMedicalServiceApplicationReportData({
-  required AppDatabase db,
-  required ReferenceService refService,
-  required MedicalRecordWithPatient row,
-}) async {
-  // 這裡之後要像其他方法一樣，從 db 撈取相關資料並填入物件中
-  return const MedicalServiceApplicationData(); 
-}
+    required AppDatabase db,
+    required ReferenceService refService,
+    required MedicalRecordWithPatient row,
+  }) async {
+    final medicalId = row.record.medicalId;
+
+    final results = await Future.wait([
+      db.flightDao.getFlightByMedicalId(medicalId),
+      db.incidentDao.getByMedicalId(medicalId),
+      db.treatmentDao.getTreatment(medicalId),
+      db.medicalFeeDao.getFeeByMedicalId(medicalId),
+      db.treatmentDao.getStaffAssignments(medicalId),
+      db.treatmentDao.getChiefComplaint(medicalId),
+      db.treatmentDao.getMedicalAssessments(medicalId),
+      db.treatmentDao.getMedicalHistory(medicalId),
+      db.treatmentDao.getHealthAssessments(medicalId),
+    ]);
+
+    final flight = results[0] as FlightRecordData?;
+    final incident = results[1] as IncidentRecordData?;
+    final treatment = results[2] as TreatmentData?;
+    final fee = results[3] as MedicalFeeData?;
+    final staffAssignments = results[4] as List<MedicalStaffAssignmentData>;
+    final chiefComplaint = results[5] as ChiefComplaintData?;
+    final assessments = results[6] as List<MedicalAssessmentData>;
+    final medicalHistory = results[7] as MedicalHistoryData?;
+    final healthAssessments = results[8] as List<HealthAssessmentFormData>;
+
+    final transitLocations = flight == null
+        ? []
+        : await db.flightDao.getTransitLocations(flight.flightRecordId);
+
+    final patient = row.patient;
+    final birthday = patient.birthday;
+    final sexName = refService.getSexById(patient.sexId)?.name ?? '';
+    final visitReason = refService.visitReasonList.where((v) {
+      return v.id == patient.visitReasonId;
+    }).firstOrNull;
+    final visitReasonCode = visitReason?.code ?? '';
+
+    final nationality = patient.nationalityId == null
+        ? ''
+        : refService.getNationalityById(patient.nationalityId)?.name ?? '';
+
+    final airline = flight?.airlineId == null
+        ? ''
+        : refService.getAirlineById(flight!.airlineId)?.name ?? '';
+    final travelStatusName = flight?.travelStatusId == null
+        ? ''
+        : refService.getTravelStatusById(flight!.travelStatusId)?.name ?? '';
+    final direction = _resolveDirection(travelStatusName);
+
+    final departureLocation = refService.getLocationById(
+      flight?.departureLocationId,
+    );
+    final destinationLocation = refService.getLocationById(
+      flight?.arrivalLocationId,
+    );
+    final transitLocation = transitLocations.isEmpty
+        ? null
+        : transitLocations.first.location;
+
+    final incidentDate = incident?.incidentDate ?? row.record.createdAt;
+    final incidentLocation = await _resolveIncidentLocation(
+      db: db,
+      refService: refService,
+      incident: incident,
+    );
+    final reportingUnit = refService.getReportingUnitById(incident?.reportingUnitId);
+
+    final paymentMethod = refService.paymentMethodList
+        .where((m) => m.id == fee?.paymentMethodId)
+        .firstOrNull;
+    final paymentMethodCode = paymentMethod?.code ?? '';
+    final paymentType = fee?.paymentType?.trim() ?? '';
+    final currency = refService.currencyList
+        .where((c) => c.id == fee?.currencyId)
+        .firstOrNull;
+    final currencyCode = currency?.code ?? '';
+
+    final historyStatus = refService.historyStatusList
+        .where((h) => h.id == medicalHistory?.allergyStatusId)
+        .firstOrNull;
+    final allergyCode = historyStatus?.code ?? '';
+
+    final assessment = assessments.isEmpty ? null : assessments.first;
+    final consciousnessLevel = refService.consciousnessLevelList
+        .where((c) => c.id == assessment?.consciousnessLevelId)
+        .firstOrNull;
+    final staffNames = _resolveStaffNames(
+      refService: refService,
+      staffAssignments: staffAssignments,
+      treatment: treatment,
+    );
+
+    final emtName = staffAssignments
+        .where((assignment) {
+          final role = _findStaffRole(refService, assignment.staffRoleId);
+          return role?.code == 'EMT';
+        })
+        .map((assignment) {
+          final name = assignment.staffName?.trim();
+          if (name != null && name.isNotEmpty) return name;
+          return refService.getMedicalStaffById(assignment.staffId)?.name ?? '';
+        })
+        .firstWhere((name) => name.isNotEmpty, orElse: () => '');
+
+    final totalFee = (fee?.consultFee ?? 0) + (fee?.ambulanceFee ?? 0);
+    final medicalArrivalMinutes = _minutesBetween(
+      incident?.notificationTime,
+      incident?.medicalArrivalTime,
+    );
+    final withinTenMinutes = medicalArrivalMinutes != null &&
+        medicalArrivalMinutes >= 0 &&
+        medicalArrivalMinutes <= 10;
+
+    final transportMethod = treatment?.transportMethod?.trim() ?? '';
+    final treatmentResultName =
+        refService.getTreatmentResultById(treatment?.resultId)?.name ?? '';
+    final healthAssessmentEntries = healthAssessments
+        .take(2)
+        .map(
+          (item) => MedicalServiceHealthAssessmentEntry(
+            name: item.name.trim(),
+            relation: item.relation?.trim() ?? '',
+            temperature: _formatReal(item.temperature),
+          ),
+        )
+        .toList();
+
+    return MedicalServiceApplicationData(
+      isCrew: visitReasonCode == 'crew',
+      isPassenger: visitReasonCode == 'passenger',
+      isStaff: visitReasonCode == 'staff',
+      isOtherVisitReason: visitReasonCode.isNotEmpty &&
+          !['crew', 'passenger', 'staff'].contains(visitReasonCode),
+      otherVisitReason: visitReasonCode.isNotEmpty &&
+              !['crew', 'passenger', 'staff'].contains(visitReasonCode)
+          ? visitReason?.name ?? ''
+          : '',
+      patientName: patient.name?.trim().isNotEmpty == true
+          ? patient.name!.trim()
+          : patient.anonymizationName?.trim() ?? '',
+      birthYear: birthday == null ? '' : birthday.year.toString(),
+      birthMonth: birthday == null ? '' : _twoDigits(birthday.month),
+      birthDay: birthday == null ? '' : _twoDigits(birthday.day),
+      isMale: _mapSexToChinese(sexName) == '男',
+      isFemale: _mapSexToChinese(sexName) == '女',
+      idOrPassportNo: _resolveIdOrPassport(patient),
+      nationality: nationality,
+      airline: airline,
+      flightNo: flight?.flightNumber.trim() ?? '',
+      isArrival: direction == '入境',
+      isTransfer: direction == '過境' || direction == '轉機',
+      isDeparture: direction == '出境',
+      isOtherTravelStatus: direction.isNotEmpty &&
+          !['入境', '過境', '轉機', '出境'].contains(direction),
+      otherTravelStatus: direction.isNotEmpty &&
+              !['入境', '過境', '轉機', '出境'].contains(direction)
+          ? direction
+          : '',
+      dateYear: incidentDate.year.toString(),
+      dateMonth: _twoDigits(incidentDate.month),
+      dateDay: _twoDigits(incidentDate.day),
+      address: patient.address?.trim() ?? '',
+      telephone: patient.telephone?.trim() ?? '',
+      departureIsTpe: _isTpeLocation(departureLocation),
+      departureLocation: _isTpeLocation(departureLocation)
+          ? ''
+          : _locationText(departureLocation),
+      transitIsTpe: _isTpeLocation(transitLocation),
+      transitLocation: _isTpeLocation(transitLocation)
+          ? ''
+          : _locationText(transitLocation),
+      destinationIsTpe: _isTpeLocation(destinationLocation),
+      destinationLocation: _isTpeLocation(destinationLocation)
+          ? ''
+          : _locationText(destinationLocation),
+      beforeLanding: incident?.beforeLanding ?? false,
+      landingTime: _formatTime(incident?.landingTime),
+      notificationTime: _formatTime(incident?.notificationTime),
+      notificationReporter: _joinNonEmpty([
+        reportingUnit?.name ?? '',
+        incident?.notificationPerson?.trim() ?? '',
+      ], ' / '),
+      notificationPhone: incident?.incomingPhone?.trim() ?? '',
+      notificationToOccTime: _formatTime(incident?.notificationToOccTime),
+      occArrived: incident?.occArrived ?? false,
+      occNotArrived: !(incident?.occArrived ?? false),
+      incidentAtT1: _containsAnyText(incidentLocation, ['T1', '第一航廈']),
+      incidentT1Detail: _containsAnyText(incidentLocation, ['T1', '第一航廈'])
+          ? incidentLocation
+          : '',
+      incidentAtT2: _containsAnyText(incidentLocation, ['T2', '第二航廈']),
+      incidentT2Detail: _containsAnyText(incidentLocation, ['T2', '第二航廈'])
+          ? incidentLocation
+          : '',
+      incidentOtherLocation:
+          _containsAnyText(incidentLocation, ['T1', '第一航廈', 'T2', '第二航廈'])
+              ? ''
+              : incidentLocation,
+      medicalArrivalTime: _formatTime(incident?.medicalArrivalTime),
+      arrivedWithin10Minutes: withinTenMinutes,
+      notArrivedWithin10Minutes:
+          medicalArrivalMinutes != null && medicalArrivalMinutes > 10,
+      delayedReason: medicalArrivalMinutes != null && medicalArrivalMinutes > 10
+          ? '${medicalArrivalMinutes}分鐘'
+          : '',
+      examinationTime: _formatTime(
+        incident?.examinationTime ?? treatment?.treatmentTime,
+      ),
+      cdcScreening: row.record.cdcPassed != null ||
+          (row.record.screeningMethod?.trim().isNotEmpty ?? false) ||
+          healthAssessmentEntries.isNotEmpty,
+      assistSampling: row.record.cdcPassed == true ||
+          (row.record.screeningMethod?.trim().isNotEmpty ?? false),
+      throatSampling: _containsAnyText(
+        row.record.screeningMethod,
+        ['喉', '咽', 'throat'],
+      ),
+      bloodSampling: _containsAnyText(
+        row.record.screeningMethod,
+        ['血', 'blood'],
+      ),
+      otherSampling: _containsAnyText(
+        row.record.screeningMethod,
+        ['其他', 'other'],
+      ),
+      otherSamplingDetail: _containsAnyText(
+        row.record.screeningMethod,
+        ['其他', 'other'],
+      )
+          ? row.record.screeningMethod?.trim() ?? ''
+          : '',
+      healthAssessment: healthAssessmentEntries.isNotEmpty,
+      healthAssessments: healthAssessmentEntries,
+      generalClearance: _containsAnyText(transportMethod, ['一般通關']),
+      emergencyClearance: _containsAnyText(transportMethod, ['緊急通關']),
+      emergencyPublicGate: _containsAnyText(transportMethod, ['公務門']),
+      emergencyApron: _containsAnyText(transportMethod, ['機坪']),
+      ambulanceClinic: _containsAnyText(transportMethod, ['醫療中心']) ||
+          ((treatment?.transportRequired ?? false) &&
+              !_containsAnyText(transportMethod, ['民間', '消防'])),
+      ambulanceClinicDetail: '',
+      ambulancePrivate: _containsAnyText(transportMethod, ['民間']),
+      ambulancePrivateDetail: '',
+      ambulanceFireDepartment: _containsAnyText(transportMethod, ['消防']),
+      ambulanceFireDepartmentDetail: '',
+      transferHospital: _resolveTransferHospital(treatment, refService),
+      escortStaff: treatment?.assistStaff?.trim().isNotEmpty == true
+          ? treatment!.assistStaff!.trim()
+          : staffNames.nurse,
+      outreachFee: fee == null || fee.consultFee == 0
+          ? ''
+          : _formatFeeAmount(fee.consultFee),
+      ambulanceFee: fee == null || fee.ambulanceFee == 0
+          ? ''
+          : _formatFeeAmount(fee.ambulanceFee),
+      selfPay: paymentMethodCode == 'self_pay',
+      selfPayAmount: paymentMethodCode == 'self_pay' && totalFee > 0
+          ? _formatFeeAmount(totalFee)
+          : '',
+      unifiedBilling:
+          ['unified_billing', 'hospital_collect'].contains(paymentMethodCode),
+      unifiedBillingAmount:
+          ['unified_billing', 'hospital_collect'].contains(paymentMethodCode) &&
+                  totalFee > 0
+              ? _formatFeeAmount(totalFee)
+              : '',
+      payByCash: paymentMethodCode == 'self_pay' && paymentType.contains('現金'),
+      payInTwd: paymentMethodCode == 'self_pay' &&
+          paymentType.contains('現金') &&
+          (currencyCode.isEmpty || currencyCode == 'TWD'),
+      payInOtherCurrency: paymentMethodCode == 'self_pay' &&
+          paymentType.contains('現金') &&
+          currencyCode.isNotEmpty &&
+          currencyCode != 'TWD',
+      otherCurrency: currencyCode.isNotEmpty && currencyCode != 'TWD'
+          ? currencyCode
+          : '',
+      payByCard:
+          paymentMethodCode == 'self_pay' && paymentType.contains('刷卡'),
+      abnormalCharge:
+          paymentMethodCode == 'abnormal' ||
+          (fee?.abnormalReason?.trim().isNotEmpty ?? false),
+      abnormalReason: fee?.abnormalReason?.trim() ?? '',
+      applicantName: fee?.applicantName?.trim() ?? '',
+      applicantUnit: fee?.applicantUnit?.trim() ?? '',
+      applicantPhone: fee?.applicantPhone?.trim() ?? '',
+      chiefComplaint: chiefComplaint?.chiefComplaintFinal?.trim() ?? '',
+      temperature: _formatReal(assessment?.temperature),
+      pulse: assessment?.pulse?.toString() ?? '',
+      breath: assessment?.breath?.toString() ?? '',
+      bloodPressure: _formatBp(assessment?.systolic, assessment?.diastolic),
+      consciousnessClear: _containsAnyText(
+        consciousnessLevel?.name,
+        ['清', 'clear'],
+      ),
+      consciousnessGcs: (assessment?.gcsE?.trim().isNotEmpty ?? false) ||
+          (assessment?.gcsV?.trim().isNotEmpty ?? false) ||
+          (assessment?.gcsM?.trim().isNotEmpty ?? false),
+      gcsE: assessment?.gcsE?.trim() ?? '',
+      gcsV: assessment?.gcsV?.trim() ?? '',
+      gcsM: assessment?.gcsM?.trim() ?? '',
+      pupilRight: _joinNonEmpty([
+        _formatReal(assessment?.rightPupilSize),
+        await _resolvePupilReactionSymbol(
+          db,
+          assessment?.rightPupilReactionId,
+          assessment?.rightPupilReaction,
+        ),
+      ], '/'),
+      pupilLeft: _joinNonEmpty([
+        _formatReal(assessment?.leftPupilSize),
+        await _resolvePupilReactionSymbol(
+          db,
+          assessment?.leftPupilReactionId,
+          assessment?.leftPupilReaction,
+        ),
+      ], '/'),
+      history: medicalHistory?.pastHistoryDetail?.trim() ?? '',
+      allergyNone: allergyCode == 'none',
+      allergyHas: allergyCode == 'yes',
+      allergyDetail: medicalHistory?.allergyDetail?.trim() ?? '',
+      heent: assessment?.headNeckExam?.trim() ?? '',
+      chest: assessment?.chestExam?.trim() ?? '',
+      abdomen: assessment?.abdomenExam?.trim() ?? '',
+      extremity: assessment?.extremitiesExam?.trim() ?? '',
+      tentativeDiagnosis: await _buildDiagnosisWithIcdNames(db, treatment),
+      signedFourCopy: fee?.userAgreed ?? false,
+      advisedReferral: _containsAnyText(treatmentResultName, ['轉', '醫院']) ||
+          (treatment?.transportRequired ?? false),
+      doctorName: staffNames.doctor,
+      nurseName: staffNames.nurse,
+      emtName: emtName,
+      refusalRelationship: '',
+    );
+  }
 
   String _buildDiagnosis(TreatmentData? treatment) {
     final parts = [
@@ -1858,6 +2189,46 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
   String _formatFeeAmount(double amount) {
     final rounded = amount % 1 == 0;
     return rounded ? amount.toStringAsFixed(0) : amount.toStringAsFixed(2);
+  }
+
+  String _formatReal(double? value) {
+    if (value == null) return '';
+    if (value % 1 == 0) return value.toInt().toString();
+    return value.toStringAsFixed(1);
+  }
+
+  String _joinNonEmpty(Iterable<String?> values, [String separator = ' ']) {
+    return values
+        .map((value) => value?.trim() ?? '')
+        .where((value) => value.isNotEmpty)
+        .join(separator);
+  }
+
+  bool _containsAnyText(String? text, List<String> keywords) {
+    final normalized = text?.trim() ?? '';
+    if (normalized.isEmpty) return false;
+    return keywords.any((keyword) => normalized.contains(keyword));
+  }
+
+  int? _minutesBetween(DateTime? start, DateTime? end) {
+    if (start == null || end == null) return null;
+    return end.difference(start).inMinutes;
+  }
+
+  bool _isTpeLocation(LocationData? location) {
+    if (location == null) return false;
+    final code = location.code.trim().toUpperCase();
+    final name = location.name.trim().toUpperCase();
+    return code == 'TPE' ||
+        code == 'TSA' ||
+        name.contains('TPE') ||
+        name.contains('台灣') ||
+        name.contains('桃園');
+  }
+
+  String _locationText(LocationData? location) {
+    if (location == null) return '';
+    return _joinNonEmpty([location.code, location.name], ' ');
   }
 
   String _formatAge(DateTime? birthday) {
