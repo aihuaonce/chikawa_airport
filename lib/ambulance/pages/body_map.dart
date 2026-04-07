@@ -1,36 +1,51 @@
 import 'dart:convert';
+import 'dart:typed_data';
+import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_painter_v2/flutter_painter.dart';
 import 'package:provider/provider.dart';
 import '../../data/db/database.dart';
 
-class BodyMarker {
-  final String id;
-  double x;
-  double y;
-  String description;
+/// BodyMapProvider - 快取狀態管理
+/// 負責管理人形圖繪圖資料的快取狀態
+class BodyMapProvider extends ChangeNotifier {
+  String? _cachedJson;
+  int? _currentMedicalId;
+  bool _hasUnsavedChanges = false;
 
-  BodyMarker({
-    required this.id,
-    required this.x,
-    required this.y,
-    required this.description,
-  });
+  String? get cachedJson => _cachedJson;
+  bool get hasUnsavedChanges => _hasUnsavedChanges;
 
-  Map<String, dynamic> toJson() => {
-    'id': id,
-    'x': x,
-    'y': y,
-    'description': description,
-  };
+  void setMedicalId(int medicalId) {
+    if (_currentMedicalId != medicalId) {
+      _currentMedicalId = medicalId;
+      _hasUnsavedChanges = false;
+      _cachedJson = null;
+    }
+  }
 
-  factory BodyMarker.fromJson(Map<String, dynamic> json) => BodyMarker(
-    id: json['id'] as String,
-    x: (json['x'] as num).toDouble(),
-    y: (json['y'] as num).toDouble(),
-    description: json['description'] as String,
-  );
+  void updateCache(String? json) {
+    if (_cachedJson != json) {
+      _cachedJson = json;
+      _hasUnsavedChanges = true;
+      notifyListeners();
+    }
+  }
+
+  void markAsSaved() {
+    _hasUnsavedChanges = false;
+  }
+
+  void clear() {
+    _cachedJson = null;
+    _currentMedicalId = null;
+    _hasUnsavedChanges = false;
+    notifyListeners();
+  }
 }
 
+/// AmbulanceBodyMap - 使用 FlutterPainter 重構的人形圖 Widget
 class AmbulanceBodyMap extends StatefulWidget {
   final int medicalId;
 
@@ -47,721 +62,291 @@ class _AmbulanceBodyMapState extends State<AmbulanceBodyMap> {
   static const Color borderColor = Color(0xFFE2E8F0);
   static const Color markerColor = Color(0xFFE53935);
 
-  List<BodyMarker> _markers = [];
+  PainterController? _controller;
   bool _isLoading = true;
-  Size? _canvasSize;
-  BodyMarker? _editingMarker;
-  final TextEditingController _editController = TextEditingController();
+  String? _rawErrorMessage;
+  ui.Image? _backgroundImage;
+  bool _isSaving = false;
+  bool get isLoading => _isLoading;
 
   @override
   void initState() {
     super.initState();
-    _loadData();
+    _initializeAndLoadPainter();
   }
 
-  Future<void> _loadData() async {
-    final db = context.read<AppDatabase>();
-    final jsonStr = await db.ambulanceDao.getBodyMap(widget.medicalId);
+  @override
+  void dispose() {
+    _saveToCache();
+    _controller?.dispose();
+    _backgroundImage?.dispose();
+    super.dispose();
+  }
 
-    if (jsonStr != null && jsonStr.isNotEmpty) {
-      try {
-        final Map<String, dynamic> data = json.decode(jsonStr);
-        final markerList =
-            (data['markers'] as List<dynamic>?)
-                ?.map((e) => BodyMarker.fromJson(e as Map<String, dynamic>))
-                .toList() ??
-            [];
-
-        setState(() {
-          _markers = markerList;
-        });
-      } catch (e) {
-        debugPrint('Error parsing body map JSON: $e');
-      }
+  @override
+  void didUpdateWidget(AmbulanceBodyMap oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.medicalId != widget.medicalId) {
+      _saveToCache();
+      _initializeAndLoadPainter();
     }
-
-    setState(() {
-      _isLoading = false;
-    });
   }
 
-  Future<void> _saveData() async {
-    final db = context.read<AppDatabase>();
-    final Map<String, dynamic> data = {
-      'markers': _markers.map((m) => m.toJson()).toList(),
-    };
-    await db.ambulanceDao.updateBodyMap(widget.medicalId, json.encode(data));
-  }
+  /// 初始化並載入 Painter
+  Future<void> _initializeAndLoadPainter() async {
+    try {
+      // 設定 Provider 的 medicalId
+      final bodyMapProvider = context.read<BodyMapProvider>();
+      bodyMapProvider.setMedicalId(widget.medicalId);
 
-  void _onMarkerTap(BodyMarker marker) {
-    _showMarkerDetailDialog(marker);
-  }
+      final db = context.read<AppDatabase>();
+      final jsonStr = await db.ambulanceDao.getBodyMap(widget.medicalId);
 
-  void _showAddDescriptionDialog(double x, double y) {
-    final controller = TextEditingController();
+      // 更新快取
+      bodyMapProvider.updateCache(jsonStr);
 
-    showDialog(
-      context: context,
-      builder: (dialogContext) => Dialog(
-        insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        child: SizedBox(
-          width: 400,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 20,
-                ),
-                decoration: const BoxDecoration(
-                  border: Border(bottom: BorderSide(color: borderColor)),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: primaryColor.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: const Icon(
-                            Icons.add_location_alt_outlined,
-                            color: primaryColor,
-                            size: 24,
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        const Text(
-                          '新增標記',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: textDark,
-                          ),
-                        ),
-                      ],
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.close),
-                      onPressed: () => Navigator.pop(dialogContext),
-                      color: textMuted,
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Row(
-                      children: [
-                        Icon(Icons.notes, size: 14, color: textMuted),
-                        SizedBox(width: 6),
-                        Text(
-                          '症狀描述',
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF475569),
-                          ),
-                        ),
-                        SizedBox(width: 6),
-                        Text(
-                          'SYMPTOM',
-                          style: TextStyle(fontSize: 11, color: textMuted),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    TextField(
-                      controller: controller,
-                      autofocus: true,
-                      maxLines: 3,
-                      style: const TextStyle(fontSize: 14),
-                      decoration: InputDecoration(
-                        hintText: '輸入症狀描述...',
-                        hintStyle: TextStyle(
-                          color: textMuted.withValues(alpha: 0.4),
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 12,
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: const BorderSide(color: borderColor),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: const BorderSide(color: borderColor),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: const BorderSide(color: primaryColor),
-                        ),
-                        filled: true,
-                        fillColor: Colors.white,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 20,
-                ),
-                decoration: const BoxDecoration(
-                  border: Border(top: BorderSide(color: borderColor)),
-                  color: Color(0xFFF8FAFC),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(dialogContext),
-                      style: TextButton.styleFrom(
-                        foregroundColor: textMuted,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 12,
-                        ),
-                      ),
-                      child: const Text('取消 Cancel'),
-                    ),
-                    const SizedBox(width: 12),
-                    ElevatedButton.icon(
-                      onPressed: () {
-                        final description = controller.text.trim();
-                        final marker = BodyMarker(
-                          id: DateTime.now().millisecondsSinceEpoch.toString(),
-                          x: x,
-                          y: y,
-                          description: description,
-                        );
-                        setState(() {
-                          _markers.add(marker);
-                        });
-                        _saveData();
-                        Navigator.pop(dialogContext);
-                      },
-                      icon: const Icon(Icons.check_circle_outline, size: 18),
-                      label: const Text(
-                        '確認',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: primaryColor,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 24,
-                          vertical: 12,
-                        ),
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+      _backgroundImage = await _loadBodyMapBackground();
+      if (!mounted) return;
+
+      _controller = PainterController(
+        settings: PainterSettings(
+          freeStyle: FreeStyleSettings(
+            color: markerColor,
+            strokeWidth: 2,
           ),
-        ),
-      ),
-    );
-  }
-
-  void _showMarkerDetailDialog(BodyMarker marker) {
-    final editController = TextEditingController(text: marker.description);
-    bool isEditing = false;
-
-    showDialog(
-      context: context,
-      builder: (dialogContext) => StatefulBuilder(
-        builder: (context, setDialogState) => Dialog(
-          insetPadding: const EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 24,
-          ),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          backgroundColor: Colors.white,
-          elevation: 0,
-          child: SizedBox(
-            width: 400,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 20,
-                  ),
-                  decoration: const BoxDecoration(
-                    border: Border(bottom: BorderSide(color: borderColor)),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: markerColor.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: const Icon(
-                              Icons.location_on,
-                              color: markerColor,
-                              size: 24,
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          Text(
-                            isEditing ? '編輯標記' : '標記詳情',
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: textDark,
-                            ),
-                          ),
-                        ],
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.close),
-                        onPressed: () => Navigator.pop(dialogContext),
-                        color: textMuted,
-                      ),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(24),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Row(
-                        children: [
-                          Icon(Icons.notes, size: 14, color: textMuted),
-                          SizedBox(width: 6),
-                          Text(
-                            '症狀描述',
-                            style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF475569),
-                            ),
-                          ),
-                          SizedBox(width: 6),
-                          Text(
-                            'SYMPTOM',
-                            style: TextStyle(fontSize: 11, color: textMuted),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      if (isEditing)
-                        TextField(
-                          controller: editController,
-                          autofocus: true,
-                          maxLines: 3,
-                          style: const TextStyle(fontSize: 14),
-                          decoration: InputDecoration(
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 12,
-                            ),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                              borderSide: const BorderSide(color: borderColor),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                              borderSide: const BorderSide(color: borderColor),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                              borderSide: const BorderSide(color: primaryColor),
-                            ),
-                            filled: true,
-                            fillColor: Colors.white,
-                          ),
-                        )
-                      else
-                        Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFF8FAFC),
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: borderColor),
-                          ),
-                          child: Text(
-                            marker.description.isEmpty
-                                ? '（無描述）'
-                                : marker.description,
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: marker.description.isEmpty
-                                  ? textMuted
-                                  : textDark,
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 20,
-                  ),
-                  decoration: const BoxDecoration(
-                    border: Border(top: BorderSide(color: borderColor)),
-                    color: Color(0xFFF8FAFC),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      if (isEditing) ...[
-                        TextButton(
-                          onPressed: () =>
-                              setDialogState(() => isEditing = false),
-                          style: TextButton.styleFrom(
-                            foregroundColor: textMuted,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 20,
-                              vertical: 12,
-                            ),
-                          ),
-                          child: const Text('取消 Cancel'),
-                        ),
-                        const SizedBox(width: 12),
-                        ElevatedButton.icon(
-                          onPressed: () {
-                            setState(() {
-                              marker.description = editController.text.trim();
-                            });
-                            _saveData();
-                            Navigator.pop(dialogContext);
-                          },
-                          icon: const Icon(
-                            Icons.check_circle_outline,
-                            size: 18,
-                          ),
-                          label: const Text(
-                            '儲存',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: primaryColor,
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 24,
-                              vertical: 12,
-                            ),
-                            elevation: 0,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
-                        ),
-                      ] else ...[
-                        const SizedBox(width: 12),
-                        OutlinedButton.icon(
-                          onPressed: () =>
-                              setDialogState(() => isEditing = true),
-                          icon: const Icon(Icons.edit_outlined, size: 18),
-                          label: const Text(
-                            '編輯',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: primaryColor,
-                            side: const BorderSide(color: primaryColor),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 24,
-                              vertical: 12,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        ElevatedButton.icon(
-                          onPressed: () {
-                            showDialog(
-                              context: dialogContext,
-                              builder: (confirmContext) => Dialog(
-                                insetPadding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 24,
-                                ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                backgroundColor: Colors.white,
-                                elevation: 0,
-                                child: SizedBox(
-                                  width: 300,
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Container(
-                                        padding: const EdgeInsets.all(20),
-                                        child: Column(
-                                          children: [
-                                            Container(
-                                              padding: const EdgeInsets.all(12),
-                                              decoration: BoxDecoration(
-                                                color: Colors.red.withValues(
-                                                  alpha: 0.1,
-                                                ),
-                                                shape: BoxShape.circle,
-                                              ),
-                                              child: const Icon(
-                                                Icons.warning_amber_rounded,
-                                                color: Colors.red,
-                                                size: 32,
-                                              ),
-                                            ),
-                                            const SizedBox(height: 16),
-                                            const Text(
-                                              '刪除確認',
-                                              style: TextStyle(
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.bold,
-                                                color: textDark,
-                                              ),
-                                            ),
-                                            const SizedBox(height: 8),
-                                            const Text(
-                                              '確定要刪除此標記嗎？',
-                                              style: TextStyle(
-                                                fontSize: 14,
-                                                color: textMuted,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      Container(
-                                        padding: const EdgeInsets.all(16),
-                                        decoration: const BoxDecoration(
-                                          border: Border(
-                                            top: BorderSide(color: borderColor),
-                                          ),
-                                        ),
-                                        child: Row(
-                                          children: [
-                                            Expanded(
-                                              child: TextButton(
-                                                onPressed: () => Navigator.pop(
-                                                  confirmContext,
-                                                ),
-                                                child: const Text('取消'),
-                                              ),
-                                            ),
-                                            const SizedBox(width: 12),
-                                            Expanded(
-                                              child: ElevatedButton(
-                                                onPressed: () {
-                                                  Navigator.pop(confirmContext);
-                                                  setState(() {
-                                                    _markers.removeWhere(
-                                                      (m) => m.id == marker.id,
-                                                    );
-                                                  });
-                                                  _saveData();
-                                                  Navigator.pop(dialogContext);
-                                                },
-                                                style: ElevatedButton.styleFrom(
-                                                  backgroundColor: Colors.red,
-                                                  foregroundColor: Colors.white,
-                                                  shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                          8,
-                                                        ),
-                                                  ),
-                                                ),
-                                                child: const Text('刪除'),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            );
-                          },
-                          icon: const Icon(Icons.delete_outline, size: 18),
-                          label: const Text(
-                            '刪除',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.red,
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 24,
-                              vertical: 12,
-                            ),
-                            elevation: 0,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-              ],
+          text: TextSettings(
+            textStyle: TextStyle(
+              color: Colors.black,
+              fontSize: 18,
+              fontWeight: FontWeight.normal,
             ),
           ),
         ),
-      ),
-    );
+      );
+
+      // 設定背景圖片
+      _controller!.background = _backgroundImage!.backgroundDrawable;
+
+      // 載入現有資料
+      if (jsonStr != null && jsonStr.isNotEmpty && jsonStr != 'null' && jsonStr != '[]') {
+        _loadDrawablesFromJson(jsonStr);
+      }
+
+      // 設置監聽
+      _setupControllerListener();
+
+      setState(() => _isLoading = false);
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _rawErrorMessage = e.toString();
+          _isLoading = false;
+        });
+      }
+    }
   }
 
-  void _clearAll() {
-    showDialog(
-      context: context,
-      builder: (dialogContext) => Dialog(
-        insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        child: SizedBox(
-          width: 400,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 20,
-                ),
-                decoration: const BoxDecoration(
-                  border: Border(bottom: BorderSide(color: borderColor)),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: Colors.red.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: const Icon(
-                            Icons.delete_forever,
-                            color: Colors.red,
-                            size: 24,
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        const Text(
-                          '清除確認',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: textDark,
-                          ),
-                        ),
-                      ],
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.close),
-                      onPressed: () => Navigator.pop(dialogContext),
-                      color: textMuted,
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(24),
-                child: Text(
-                  '確定要清除所有標記嗎？',
-                  style: TextStyle(fontSize: 14, color: textMuted),
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 20,
-                ),
-                decoration: const BoxDecoration(
-                  border: Border(top: BorderSide(color: borderColor)),
-                  color: Color(0xFFF8FAFC),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(dialogContext),
-                      style: TextButton.styleFrom(
-                        foregroundColor: textMuted,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 12,
-                        ),
-                      ),
-                      child: const Text('取消 Cancel'),
-                    ),
-                    const SizedBox(width: 12),
-                    ElevatedButton.icon(
-                      onPressed: () {
-                        setState(() {
-                          _markers.clear();
-                        });
-                        _saveData();
-                        Navigator.pop(dialogContext);
-                      },
-                      icon: const Icon(Icons.delete_forever, size: 18),
-                      label: const Text(
-                        '清除全部',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 24,
-                          vertical: 12,
-                        ),
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+  void _setupControllerListener() {
+    _controller?.addListener(() {
+      if (mounted && _controller != null) {
+        _updateBodyMapData();
+      }
+    });
+  }
+
+  void _updateBodyMapData() {
+    try {
+      if (_controller == null || !mounted) return;
+
+      final drawables = _controller!.drawables;
+
+      final drawablesList = drawables
+          .map((d) => _drawableToJson(d))
+          .whereType<Map<String, dynamic>>()
+          .toList();
+
+      final jsonString = drawablesList.isEmpty
+          ? null
+          : jsonEncode(drawablesList);
+
+      // 更新本地快取
+      context.read<BodyMapProvider>().updateCache(jsonString);
+    } catch (e) {
+      debugPrint('更新 BodyMap 資料失敗: $e');
+    }
+  }
+
+  /// 儲存到資料庫
+  Future<void> saveData() async {
+    if (_controller == null || _isSaving) {
+      return;
+    }
+
+    if (!mounted) return;
+
+    _isSaving = true;
+    final bodyMapProvider = context.read<BodyMapProvider>();
+
+    try {
+      final drawables = _controller!.drawables;
+      String? jsonString;
+
+      if (drawables.isNotEmpty) {
+        final drawablesList = drawables
+            .map((d) => _drawableToJson(d))
+            .whereType<Map<String, dynamic>>()
+            .toList();
+        jsonString = jsonEncode(drawablesList);
+      }
+
+      final db = context.read<AppDatabase>();
+      await db.ambulanceDao.updateBodyMap(widget.medicalId, jsonString);
+
+      // 更新 Provider 狀態
+      bodyMapProvider.updateCache(jsonString);
+      bodyMapProvider.markAsSaved();
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('BodyMap 儲存成功'),
+            duration: const Duration(seconds: 1),
           ),
-        ),
-      ),
-    );
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('BodyMap 儲存失敗: $e'),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
+    } finally {
+      _isSaving = false;
+    }
+  }
+
+  /// 儲存到快取（切換頁面時呼叫）
+  void _saveToCache() {
+    if (_controller == null) return;
+
+    try {
+      final drawables = _controller!.drawables;
+      final drawablesList = drawables
+          .map((d) => _drawableToJson(d))
+          .whereType<Map<String, dynamic>>()
+          .toList();
+
+      final jsonString = drawablesList.isEmpty
+          ? null
+          : jsonEncode(drawablesList);
+
+      context.read<BodyMapProvider>().updateCache(jsonString);
+      debugPrint('BodyMap 快取已更新');
+    } catch (e) {
+      debugPrint('更新 BodyMap 快取失敗: $e');
+    }
+  }
+
+  Future<ui.Image> _loadBodyMapBackground() async {
+    const String imagePath = 'assets/images/body_diagram_placeholder.jpg';
+    final ByteData data = await rootBundle.load(imagePath);
+    final Uint8List bytes = data.buffer.asUint8List();
+    final ui.Codec codec = await ui.instantiateImageCodec(bytes);
+    final ui.FrameInfo frameInfo = await codec.getNextFrame();
+    return frameInfo.image;
+  }
+
+  void _loadDrawablesFromJson(String jsonString) {
+    try {
+      final List<dynamic> jsonData = jsonDecode(jsonString);
+      final drawables = <Drawable>[];
+
+      for (var json in jsonData) {
+        try {
+          final d = _drawableFromJson(Map<String, dynamic>.from(json));
+          if (d != null) drawables.add(d);
+        } catch (e) {
+          debugPrint('解析單筆 Drawable 失敗: $e');
+        }
+      }
+
+      if (drawables.isNotEmpty) {
+        _controller!.addDrawables(drawables);
+      }
+    } catch (e) {
+      debugPrint('JSON 解析失敗: $e');
+    }
+  }
+
+  Drawable? _drawableFromJson(Map<String, dynamic> json) {
+    try {
+      final type = json['type'] as String?;
+      if (type == null) return null;
+
+      switch (type) {
+        case 'FreeStyleDrawable':
+          final pointsList = (json['path'] ?? json['points']) as List? ?? [];
+          final points = pointsList.map((point) {
+            final p = point as List;
+            return Offset((p[0] as num).toDouble(), (p[1] as num).toDouble());
+          }).toList();
+          final color = Color(json['color'] as int? ?? markerColor.value);
+          final strokeWidth = (json['strokeWidth'] as num?)?.toDouble() ?? 2.0;
+          return FreeStyleDrawable(
+            path: points,
+            color: color,
+            strokeWidth: strokeWidth,
+          );
+
+        case 'TextDrawable':
+          final text = json['text'] as String? ?? '';
+          final positionList = (json['position'] as List?) ?? [0, 0];
+          final position = Offset(
+            (positionList[0] as num).toDouble(),
+            (positionList[1] as num).toDouble(),
+          );
+          final styleJson = (json['style'] as Map<String, dynamic>?) ?? {};
+          final textStyle = TextStyle(
+            color: Color(styleJson['color'] as int? ?? Colors.black.value),
+            fontSize: (styleJson['fontSize'] as num?)?.toDouble() ?? 18.0,
+            fontWeight: FontWeight.values[styleJson['fontWeightIndex'] as int? ?? FontWeight.normal.index],
+          );
+          return TextDrawable(text: text, position: position, style: textStyle);
+
+        default:
+          return null;
+      }
+    } catch (e) {
+      debugPrint('解析 drawable 失敗: $json , 錯誤: $e');
+      return null;
+    }
+  }
+
+  Map<String, dynamic>? _drawableToJson(Drawable drawable) {
+    if (drawable is FreeStyleDrawable) {
+      return {
+        'type': 'FreeStyleDrawable',
+        'path': drawable.path.map((p) => [p.dx, p.dy]).toList(),
+        'color': drawable.color.value,
+        'strokeWidth': drawable.strokeWidth,
+      };
+    } else if (drawable is TextDrawable) {
+      return {
+        'type': 'TextDrawable',
+        'text': drawable.text,
+        'position': [drawable.position.dx, drawable.position.dy],
+        'style': {
+          'color': drawable.style.color?.value ?? Colors.black.value,
+          'fontSize': drawable.style.fontSize ?? 18.0,
+          'fontWeightIndex': (drawable.style.fontWeight ?? FontWeight.normal).index,
+        },
+      };
+    }
+    return null;
   }
 
   @override
@@ -770,19 +355,52 @@ class _AmbulanceBodyMapState extends State<AmbulanceBodyMap> {
       return const Center(child: CircularProgressIndicator());
     }
 
+    if (_rawErrorMessage != null) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                '載入失敗: $_rawErrorMessage',
+                style: const TextStyle(color: Colors.red),
+              ),
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  _isLoading = true;
+                  _rawErrorMessage = null;
+                });
+                _initializeAndLoadPainter();
+              },
+              child: const Text('重試'),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (_controller == null || _backgroundImage == null) {
+      return const Center(child: Text('初始化失敗'));
+    }
+
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // 側邊工具列
+        _buildVerticalToolbar(),
+        // 主畫面
         Expanded(
           child: Column(
             children: [
-              // Header with count (left) and list (right)
-              _buildMarkerHeader(),
-              const SizedBox(height: 16),
-              _buildBodyCanvas(),
-              const SizedBox(height: 24),
-              _buildClearButton(),
-              const SizedBox(height: 60),
+              // Canvas
+              Expanded(child: _buildBodyCanvas()),
+              const SizedBox(height: 8),
+              // 底部動作按鈕
+              _buildActionButtons(),
             ],
           ),
         ),
@@ -790,182 +408,218 @@ class _AmbulanceBodyMapState extends State<AmbulanceBodyMap> {
     );
   }
 
-  Widget _buildBodyCanvas() {
+  Widget _buildVerticalToolbar() {
     return Container(
+      width: 52,
+      margin: const EdgeInsets.only(right: 8),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: borderColor),
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(12),
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            final canvasWidth = constraints.maxWidth;
-            final canvasHeight = canvasWidth * 1.2;
-            _canvasSize = Size(canvasWidth, canvasHeight);
-
-            return SizedBox(
-              width: canvasWidth,
-              height: canvasHeight,
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  Image.asset(
-                    'assets/images/body_diagram_placeholder.jpg',
-                    fit: BoxFit.contain,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        color: Colors.grey[200],
-                        child: const Center(
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Icons.image_not_supported,
-                                size: 64,
-                                color: Colors.grey,
-                              ),
-                              SizedBox(height: 8),
-                              Text(
-                                '找不到人形圖圖片',
-                                style: TextStyle(color: Colors.grey),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                  ..._buildMarkerWidgets(canvasWidth, canvasHeight),
-                  Positioned.fill(
-                    child: GestureDetector(
-                      behavior: HitTestBehavior.translucent,
-                      onTapUp: (details) => _handleTap(
-                        details.localPosition,
-                        Size(canvasWidth, canvasHeight),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            );
-          },
+        color: Colors.white.withValues(alpha: 0.95),
+        borderRadius: const BorderRadius.only(
+          topRight: Radius.circular(12),
+          bottomRight: Radius.circular(12),
         ),
+        boxShadow: const [
+          BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(2, 2)),
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const SizedBox(height: 8),
+          // 平移/縮放
+          IconButton(
+            icon: Icon(
+              Icons.open_with,
+              color: _controller?.freeStyleMode == FreeStyleMode.none
+                  ? primaryColor
+                  : textMuted,
+              size: 22,
+            ),
+            onPressed: () {
+              setState(() {
+                _controller?.freeStyleMode = FreeStyleMode.none;
+              });
+            },
+            tooltip: '平移/縮放',
+          ),
+          // 自由繪圖
+          IconButton(
+            icon: Icon(
+              Icons.brush,
+              color: _controller?.freeStyleMode == FreeStyleMode.draw
+                  ? primaryColor
+                  : textMuted,
+              size: 22,
+            ),
+            onPressed: () {
+              setState(() {
+                _controller?.freeStyleMode = FreeStyleMode.draw;
+              });
+            },
+            tooltip: '自由繪圖',
+          ),
+          // 新增文字
+          IconButton(
+            icon: const Icon(Icons.text_fields, size: 22),
+            onPressed: () {
+              setState(() {
+                _controller?.freeStyleMode = FreeStyleMode.none;
+              });
+              _controller?.addText();
+            },
+            tooltip: '新增文字',
+          ),
+          const Divider(height: 16, indent: 8, endIndent: 8),
+          // 復原
+          IconButton(
+            icon: Icon(
+              Icons.undo,
+              size: 22,
+              color: _controller?.canUndo == true ? textDark : textMuted.withValues(alpha: 0.3),
+            ),
+            onPressed: _controller?.canUndo == true
+                ? () => _controller?.undo()
+                : null,
+            tooltip: '復原',
+          ),
+          // 重做
+          IconButton(
+            icon: Icon(
+              Icons.redo,
+              size: 22,
+              color: _controller?.canRedo == true ? textDark : textMuted.withValues(alpha: 0.3),
+            ),
+            onPressed: _controller?.canRedo == true
+                ? () => _controller?.redo()
+                : null,
+            tooltip: '重做',
+          ),
+          const Divider(height: 16, indent: 8, endIndent: 8),
+          // 顏色選擇
+          _buildColorPicker(),
+          // 清除
+          IconButton(
+            icon: Icon(Icons.delete_outline, size: 22, color: Colors.red.shade400),
+            onPressed: _showClearConfirmationDialog,
+            tooltip: '清除全部',
+          ),
+          const SizedBox(height: 8),
+        ],
       ),
     );
   }
 
-  Widget _buildMarkerHeader() {
-    final count = _markers.length;
-
-    if (count == 0) {
-      return const SizedBox.shrink();
-    }
-
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: borderColor),
+  Widget _buildColorPicker() {
+    return PopupMenuButton<Color>(
+      icon: Icon(
+        Icons.color_lens,
+        color: _controller?.settings.freeStyle.color ?? markerColor,
+        size: 20,
       ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Left: count
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            decoration: BoxDecoration(
-              color: primaryColor.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  '$count',
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: primaryColor,
-                  ),
+      tooltip: '顏色',
+      onSelected: (color) {
+        setState(() {
+          _controller?.settings = _controller!.settings.copyWith(
+            freeStyle: _controller!.settings.freeStyle.copyWith(color: color),
+          );
+        });
+      },
+      itemBuilder: (context) => [
+        Colors.red,
+        Colors.blue,
+        Colors.green,
+        Colors.black,
+        Colors.orange,
+        Colors.purple,
+      ].map((color) => PopupMenuItem(
+        value: color,
+        child: Container(width: 100, height: 30, color: color),
+      )).toList(),
+    );
+  }
+
+  Widget _buildBodyCanvas() {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final canvasWidth = constraints.maxWidth;
+        final imageWidth = _backgroundImage!.width.toDouble();
+        final imageHeight = _backgroundImage!.height.toDouble();
+        
+        // 計算能完整放入螢幕的最大尺寸（保持比例）
+        final maxFitHeight = constraints.maxHeight;
+        final fitHeight = imageHeight * (canvasWidth / imageWidth);
+        
+        final canvasHeight = fitHeight > maxFitHeight 
+            ? maxFitHeight 
+            : fitHeight;
+
+        return Center(
+          child: SizedBox(
+            width: canvasWidth,
+            height: canvasHeight,
+            child: InteractiveViewer(
+              boundaryMargin: const EdgeInsets.all(20),
+              minScale: 0.5,
+              maxScale: 3.0,
+              panEnabled: _controller?.freeStyleMode == FreeStyleMode.none,
+              scaleEnabled: _controller?.freeStyleMode == FreeStyleMode.none,
+              child: FittedBox(
+                fit: BoxFit.contain,
+                alignment: Alignment.center,
+                child: SizedBox(
+                  width: imageWidth,
+                  height: imageHeight,
+                  child: FlutterPainter(controller: _controller!),
                 ),
-                const SizedBox(width: 4),
-                const Text(
-                  '處',
-                  style: TextStyle(fontSize: 14, color: primaryColor),
-                ),
-              ],
+              ),
             ),
           ),
-          const SizedBox(width: 12),
-          // Right: marker descriptions
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text(
-                  '標記內容',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    color: textDark,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 4,
-                  children: _markers.asMap().entries.map((entry) {
-                    final index = entry.key;
-                    final marker = entry.value;
-                    return Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(
-                          width: 16,
-                          height: 16,
-                          decoration: const BoxDecoration(
-                            color: markerColor,
-                            shape: BoxShape.circle,
-                          ),
-                          child: Center(
-                            child: Text(
-                              '${index + 1}',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 9,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          marker.description.isEmpty
-                              ? '（無描述）'
-                              : marker.description,
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: marker.description.isEmpty
-                                ? textMuted
-                                : textDark,
-                          ),
-                        ),
-                        if (index < _markers.length - 1)
-                          Container(
-                            margin: const EdgeInsets.symmetric(horizontal: 8),
-                            width: 1,
-                            height: 14,
-                            color: borderColor,
-                          ),
-                      ],
-                    );
-                  }).toList(),
-                ),
-              ],
+        );
+      },
+    );
+  }
+
+  Widget _buildActionButtons() {
+    return SizedBox(
+      height: 40,
+      child: Row(
+        children: [
+          // 清除按鈕
+          SizedBox(
+            width: 100,
+            child: OutlinedButton.icon(
+              onPressed: _showClearConfirmationDialog,
+              icon: const Icon(Icons.delete_outline, size: 16),
+              label: const Text('清除', style: TextStyle(fontSize: 13)),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: Colors.red.shade400,
+                side: BorderSide(color: Colors.red.shade200),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+              ),
+            ),
+          ),
+          const Spacer(),
+          // 儲存按鈕
+          SizedBox(
+            width: 100,
+            child: ElevatedButton.icon(
+              onPressed: _isSaving ? null : saveData,
+              icon: _isSaving
+                  ? const SizedBox(
+                      width: 14,
+                      height: 14,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : const Icon(Icons.save, size: 16),
+              label: Text(_isSaving ? '儲存中' : '儲存', style: const TextStyle(fontSize: 13)),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: primaryColor,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+              ),
             ),
           ),
         ],
@@ -973,92 +627,26 @@ class _AmbulanceBodyMapState extends State<AmbulanceBodyMap> {
     );
   }
 
-  List<Widget> _buildMarkerWidgets(double width, double height) {
-    return _markers.asMap().entries.map((entry) {
-      final index = entry.key;
-      final marker = entry.value;
-      return Positioned(
-        left: marker.x * width - 24,
-        top: marker.y * height - 24,
-        child: GestureDetector(
-          onTap: () => _onMarkerTap(marker),
-          onPanUpdate: (details) {
-            final newX = (marker.x * width + details.delta.dx) / width;
-            final newY = (marker.y * height + details.delta.dy) / height;
-
-            if (newX >= 0 && newX <= 1 && newY >= 0 && newY <= 1) {
-              setState(() {
-                marker.x = newX;
-                marker.y = newY;
-              });
-            }
-          },
-          onPanEnd: (details) {
-            _saveData();
-          },
-          child: Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              color: markerColor,
-              shape: BoxShape.circle,
-              border: Border.all(color: Colors.white, width: 3),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.3),
-                  blurRadius: 4,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Center(
-              child: Text(
-                '${index + 1}',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
+  void _showClearConfirmationDialog() {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('清除確認'),
+        content: const Text('確定要清除所有繪圖嗎？此操作無法復原。'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('取消'),
           ),
-        ),
-      );
-    }).toList();
-  }
-
-  void _handleTap(Offset position, Size canvasSize) {
-    final x = position.dx / canvasSize.width;
-    final y = position.dy / canvasSize.height;
-
-    for (final marker in _markers) {
-      final markerX = marker.x;
-      final markerY = marker.y;
-      final distance =
-          ((x - markerX) * (x - markerX) + (y - markerY) * (y - markerY));
-      if (distance < 0.002) {
-        _onMarkerTap(marker);
-        return;
-      }
-    }
-
-    if (x >= 0 && x <= 1 && y >= 0 && y <= 1) {
-      _showAddDescriptionDialog(x, y);
-    }
-  }
-
-  Widget _buildClearButton() {
-    return SizedBox(
-      width: double.infinity,
-      child: OutlinedButton.icon(
-        onPressed: _clearAll,
-        icon: const Icon(Icons.delete_forever, size: 18),
-        label: const Text('清除全部'),
-        style: OutlinedButton.styleFrom(
-          foregroundColor: Colors.red.shade400,
-          side: BorderSide(color: Colors.red.shade200),
-          padding: const EdgeInsets.symmetric(vertical: 14),
-        ),
+          TextButton(
+            onPressed: () {
+              _controller?.clearDrawables();
+              _updateBodyMapData();
+              Navigator.pop(dialogContext);
+            },
+            child: const Text('確認', style: TextStyle(color: Colors.red)),
+          ),
+        ],
       ),
     );
   }

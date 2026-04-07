@@ -77,17 +77,15 @@ class _AmbulancePageState extends State<AmbulancePage> {
 
             // 2. 中間內容區域
             Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 32,
-                ),
-                child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 250),
-                  child: Container(
-                    key: ValueKey(_currentSectionIndex),
-                    child: _getCurrentPage(),
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 250),
+                child: Container(
+                  key: ValueKey(_currentSectionIndex),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 32,
                   ),
+                  child: _getCurrentPage(),
                 ),
               ),
             ),
