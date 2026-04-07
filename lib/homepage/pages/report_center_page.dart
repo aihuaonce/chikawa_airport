@@ -1,4 +1,4 @@
-import 'dart:io';
+﻿import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -21,6 +21,7 @@ import '../reports/emergency_report.dart';
 import '../reports/english_diagnosis_report.dart';
 import '../reports/referral_report.dart';
 import '../reports/telex_report.dart';
+import '../reports/medical_service_application.dart';
 
 class ReportCenterPage extends StatefulWidget {
   const ReportCenterPage({super.key});
@@ -82,6 +83,7 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
       PatientReportType.emergency,
       PatientReportType.ambulance,
       PatientReportType.referral,
+      PatientReportType.medicalServiceApplication,
     ];
   }
 
@@ -177,6 +179,19 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
         );
         return;
       }
+      if (type == PatientReportType.medicalServiceApplication) {
+  final reportData = await _buildMedicalServiceApplicationReportData(
+    db: db,
+    refService: refService,
+    row: row,
+  );
+  final pdfBytes = await buildMedicalServiceApplicationPdf(reportData);
+  await Printing.layoutPdf(
+    name: 'patient_${row.record.medicalId}_${type.code}.pdf',
+    onLayout: (_) async => pdfBytes,
+  );
+  return;
+}
       await Printing.layoutPdf(
         name: 'patient_${row.record.medicalId}_${type.code}.pdf',
         onLayout: (format) async {
@@ -330,6 +345,15 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
       final pdfBytes = await buildTelexPdf(reportData);
       return (fileName, pdfBytes);
     }
+    if (type == PatientReportType.medicalServiceApplication) {
+  final reportData = await _buildMedicalServiceApplicationReportData(
+    db: db,
+    refService: refService,
+    row: row,
+  );
+  final pdfBytes = await buildMedicalServiceApplicationPdf(reportData);
+  return (fileName, pdfBytes);
+}
 
     final patientName = row.patient.name?.trim().isNotEmpty == true
         ? row.patient.name!
@@ -1590,6 +1614,15 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
     );
   }
 
+  Future<MedicalServiceApplicationData> _buildMedicalServiceApplicationReportData({
+  required AppDatabase db,
+  required ReferenceService refService,
+  required MedicalRecordWithPatient row,
+}) async {
+  // 這裡之後要像其他方法一樣，從 db 撈取相關資料並填入物件中
+  return const MedicalServiceApplicationData(); 
+}
+
   String _buildDiagnosis(TreatmentData? treatment) {
     final parts = [
       treatment?.tentative,
@@ -2345,6 +2378,7 @@ enum PatientReportType {
   diagnosisCertificate,
   englishDiagnosisCertificate,
   telex,
+  medicalServiceApplication, 
 }
 
 extension PatientReportTypeLabel on PatientReportType {
@@ -2362,6 +2396,8 @@ extension PatientReportTypeLabel on PatientReportType {
         return '英文診斷書';
       case PatientReportType.telex:
         return '出診診療服務電傳文件';
+        case PatientReportType.medicalServiceApplication:
+        return '緊急醫療救護申請單';
     }
   }
 
@@ -2379,6 +2415,8 @@ extension PatientReportTypeLabel on PatientReportType {
         return 'English Diagnosis Certificate';
       case PatientReportType.telex:
         return 'Telex Document';
+        case PatientReportType.medicalServiceApplication:
+        return 'Medical Service Application';
     }
   }
 
@@ -2396,6 +2434,8 @@ extension PatientReportTypeLabel on PatientReportType {
         return 'diagnosis_en';
       case PatientReportType.telex:
         return 'telex';
+        case PatientReportType.medicalServiceApplication:
+        return 'medical_service_app';
     }
   }
 }
