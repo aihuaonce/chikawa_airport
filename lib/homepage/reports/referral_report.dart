@@ -1561,18 +1561,11 @@ Future<Uint8List> buildReferralReportPdf(ReferralReportData d) async {
                                               mainAxisAlignment:
                                                   pw.MainAxisAlignment.center,
                                               children: [
-                                                pw.Text(
-                                                  '     年',
-                                                  style: ts(sz: 8),
-                                                ),
-                                                pw.Text(
-                                                  '     月',
-                                                  style: ts(sz: 8),
-                                                ),
-                                                pw.Text(
-                                                  '     日',
-                                                  style: ts(sz: 8),
-                                                ),
+                                                pw.Text('年', style: ts(sz: 10)),
+                                                pw.SizedBox(width: 25),
+                                                pw.Text('月', style: ts(sz: 10)),
+                                                pw.SizedBox(width: 25),
+                                                pw.Text('日', style: ts(sz: 10)),
                                               ],
                                             ),
                                           ),
