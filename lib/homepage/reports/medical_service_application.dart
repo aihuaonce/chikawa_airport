@@ -270,8 +270,9 @@ Future<Uint8List> buildMedicalServiceApplicationPdf(MedicalServiceApplicationDat
         pw.Container(
           width: 9,
           height: 9,
-          decoration: pw.BoxDecoration(border: pw.Border.all(width: 0.8)),
-          child: checked ? pw.Center(child: pw.Text('v', style: pw.TextStyle(font: font, fontSize: 8))) : null,
+          decoration: checked
+              ? pw.BoxDecoration(color: PdfColors.black)
+              : pw.BoxDecoration(border: pw.Border.all(width: 0.8)),
         ),
         if (label.isNotEmpty) pw.SizedBox(width: 4),
         if (label.isNotEmpty) pw.Text(label, style: ts(sz: sz)),
@@ -282,19 +283,15 @@ Future<Uint8List> buildMedicalServiceApplicationPdf(MedicalServiceApplicationDat
 
   // 3. 輔助元件：嵌入文字中的短底線
   pw.Widget buildInlineUnderline(double width) {
-    return pw.Container(
-      width: width * PdfPageFormat.mm,
-      margin: const pw.EdgeInsets.symmetric(horizontal: 2),
-      decoration: const pw.BoxDecoration(border: pw.Border(bottom: pw.BorderSide(width: 0.6))),
-      child: pw.SizedBox(height: 1),
-    );
+    // 已移除底線，改為保留寬度空間
+    return pw.SizedBox(width: width * PdfPageFormat.mm);
   }
 
   // 4. 輔助元件：一般填寫底線
   pw.Widget buildUnderline(String text, double width) {
+    // 已移除底線：僅顯示文字或保留空白區塊
     return pw.Container(
       width: width,
-      decoration: const pw.BoxDecoration(border: pw.Border(bottom: pw.BorderSide(width: 0.6))),
       padding: const pw.EdgeInsets.only(bottom: 1),
       child: pw.Text(text, style: ts(), textAlign: pw.TextAlign.center),
     );
@@ -303,12 +300,12 @@ Future<Uint8List> buildMedicalServiceApplicationPdf(MedicalServiceApplicationDat
   // 5. 輔助元件：區塊標題
   pw.Widget buildSectionTitle(String title, String english) {
     return pw.Padding(
-      padding: const pw.EdgeInsets.only(top: 15, bottom: 8),
+      padding: const pw.EdgeInsets.only(top: 8, bottom: 4),
       child: pw.Row(
         children: [
-          pw.Text(title, style: ts(sz: 12, bold: true, color: tealColor)),
+          pw.Text(title, style: ts(sz: 11, bold: true, color: tealColor)),
           pw.SizedBox(width: 5),
-          pw.Text('($english)', style: ts(sz: 10, bold: true, color: tealColor)),
+          pw.Text('($english)', style: ts(sz: 9, bold: true, color: tealColor)),
         ],
       ),
     );
@@ -331,7 +328,7 @@ Future<Uint8List> buildMedicalServiceApplicationPdf(MedicalServiceApplicationDat
                   style: ts(sz: 9, bold: true, color: tealColor)),
               ]),
             ),
-            pw.SizedBox(height: 6),
+            pw.SizedBox(height: 4),
 
             // --- 基本資料 (Personal Data) ---
             buildSectionTitle('基本資料', 'Personal Data'),
