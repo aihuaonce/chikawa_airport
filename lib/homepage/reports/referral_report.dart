@@ -1218,10 +1218,7 @@ Future<Uint8List> buildReferralReportPdf(ReferralReportData d) async {
                                         lineHospital,
                                       ),
                                       pw.SizedBox(width: 8),
-                                      pw.Text(
-                                        '醫院',
-                                        style: ts(sz: 8.5),
-                                      ),
+                                      pw.Text('醫院', style: ts(sz: 8.5)),
                                     ],
                                   ),
                                   pw.Row(
@@ -1236,10 +1233,7 @@ Future<Uint8List> buildReferralReportPdf(ReferralReportData d) async {
                                         lineHospital,
                                       ),
                                       pw.SizedBox(width: 8),
-                                      pw.Text(
-                                        '病房治療中',
-                                        style: ts(sz: 8.5),
-                                      ),
+                                      pw.Text('病房治療中', style: ts(sz: 8.5)),
                                     ],
                                   ),
                                   pw.Row(
@@ -1248,10 +1242,7 @@ Future<Uint8List> buildReferralReportPdf(ReferralReportData d) async {
                                       pw.SizedBox(width: 4),
                                       uvLine(d.recvAdmitWard, lineHospital),
                                       pw.SizedBox(width: 8),
-                                      pw.Text(
-                                        '病房治療中',
-                                        style: ts(sz: 8.5),
-                                      ),
+                                      pw.Text('病房治療中', style: ts(sz: 8.5)),
                                     ],
                                   ),
                                   pw.Row(
@@ -1260,10 +1251,7 @@ Future<Uint8List> buildReferralReportPdf(ReferralReportData d) async {
                                       pw.SizedBox(width: 4),
                                       uvLine(d.recvClinicDept, lineHospital),
                                       pw.SizedBox(width: 8),
-                                      pw.Text(
-                                        '科門診治療中',
-                                        style: ts(sz: 8.5),
-                                      ),
+                                      pw.Text('科門診治療中', style: ts(sz: 8.5)),
                                     ],
                                   ),
                                   pw.Row(
@@ -1311,9 +1299,21 @@ Future<Uint8List> buildReferralReportPdf(ReferralReportData d) async {
                                 children: [
                                   pw.TableRow(
                                     children: [
-                                      cell('1. 主診斷', bold: true, h: hRecvSummary / 3),
-                                      cell('2. 治療藥物或手術名稱', bold: true, h: hRecvSummary / 3),
-                                      cell('3. 輔助診斷之檢查結果', bold: true, h: hRecvSummary / 3),
+                                      cell(
+                                        '1. 主診斷',
+                                        bold: true,
+                                        h: hRecvSummary / 3,
+                                      ),
+                                      cell(
+                                        '2. 治療藥物或手術名稱',
+                                        bold: true,
+                                        h: hRecvSummary / 3,
+                                      ),
+                                      cell(
+                                        '3. 輔助診斷之檢查結果',
+                                        bold: true,
+                                        h: hRecvSummary / 3,
+                                      ),
                                     ],
                                   ),
                                   pw.TableRow(
@@ -1362,48 +1362,140 @@ Future<Uint8List> buildReferralReportPdf(ReferralReportData d) async {
                         ),
                         pw.TableRow(
                           children: [
-                            cell(
-                              '院\n所\n資\n訊',
-                              bold: true,
-                              align: pw.Alignment.center,
-                              h: hRecvInfo,
-                            ),
+                            // 左側標題格：院所名稱 + 診治醫師
                             pw.Container(
                               height: hRecvInfo,
-                              padding: const pw.EdgeInsets.all(3),
+                              decoration: pw.BoxDecoration(
+                                border: pw.Border(
+                                  left: bdr,
+                                  top: bdr,
+                                  bottom: bdr,
+                                ),
+                              ),
                               child: pw.Column(
-                                crossAxisAlignment: pw.CrossAxisAlignment.start,
                                 children: [
-                                  pw.Row(
+                                  pw.Container(
+                                    height: hRecvInfo / 2,
+                                    decoration: pw.BoxDecoration(
+                                      border: pw.Border(
+                                        bottom: bdr,
+                                        right: bdr,
+                                      ),
+                                    ),
+                                    alignment: pw.Alignment.center,
+                                    child: pw.Text(
+                                      '院所\n名稱',
+                                      style: ts(bold: true, sz: 9),
+                                    ),
+                                  ),
+                                  pw.Container(
+                                    height: hRecvInfo / 2,
+                                    decoration: pw.BoxDecoration(
+                                      border: pw.Border(right: bdr),
+                                    ),
+                                    alignment: pw.Alignment.center,
+                                    child: pw.Text(
+                                      '診治\n醫師',
+                                      style: ts(bold: true, sz: 9),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            // 右側內容格：對應兩行
+                            pw.Container(
+                              height: hRecvInfo,
+                              padding: pw.EdgeInsets.zero,
+                              child: pw.Table(
+                                border: innerTbl,
+                                columnWidths: {
+                                  0: flexW(1),
+                                  1: colW(30 * PdfPageFormat.mm),
+                                  2: colW(12 * PdfPageFormat.mm),
+                                  3: colW(12 * PdfPageFormat.mm),
+                                  4: colW(12 * PdfPageFormat.mm),
+                                  5: flexW(1),
+                                },
+                                children: [
+                                  // 第一行：院所名稱內容 + 電話(合併標題+內容) + 兩個空白格
+                                  pw.TableRow(
                                     children: [
-                                      pw.Text('院所名稱：', style: ts(bold: true)),
-                                      uv(d.recvHospName, w: 40),
-                                      pw.SizedBox(width: 6),
-                                      pw.Text('電話或傳真：', style: ts(bold: true)),
-                                      uv(d.recvHospPhone, w: 25),
+                                      pw.Container(
+                                        height: hRecvInfo / 2,
+                                        padding: const pw.EdgeInsets.all(2),
+                                        child: pw.Text(
+                                          d.recvHospName,
+                                          style: ts(sz: 9),
+                                        ),
+                                      ),
+                                      // 電話標題 + 內容合併成一格
+                                      pw.Container(
+                                        height: hRecvInfo / 2,
+                                        padding: const pw.EdgeInsets.all(2),
+                                        child: pw.Column(
+                                          crossAxisAlignment:
+                                              pw.CrossAxisAlignment.start,
+                                          mainAxisAlignment:
+                                              pw.MainAxisAlignment.center,
+                                          children: [
+                                            pw.Text(
+                                              '電話或傳真：',
+                                              style: ts(sz: 8, bold: true),
+                                            ),
+                                            pw.Text(
+                                              d.recvHospPhone,
+                                              style: ts(sz: 8),
+                                            ),
+                                            pw.SizedBox(height: 1),
+                                            pw.Text(
+                                              '電子信箱：',
+                                              style: ts(sz: 8, bold: true),
+                                            ),
+                                            pw.Text(
+                                              d.recvHospEmail,
+                                              style: ts(sz: 8),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      cell('', bold: false, h: hRecvInfo / 2),
+                                      cell('', bold: false, h: hRecvInfo / 2),
+                                      cell('', bold: false, h: hRecvInfo / 2),
+                                      cell('', bold: false, h: hRecvInfo / 2),
                                     ],
                                   ),
-                                  pw.SizedBox(height: 2),
-                                  pw.Text(
-                                    '電子信箱：${d.recvHospEmail}',
-                                    style: ts(),
-                                  ),
-                                  pw.SizedBox(height: 2),
-                                  pw.Row(
+                                  // 第二行：醫師簽章+空白格+科別+空白格+回覆日期+年月日
+                                  pw.TableRow(
                                     children: [
-                                      pw.Text('診治醫師：', style: ts(bold: true)),
-                                      uv(d.recvDoctorName, w: 25),
-                                      pw.SizedBox(width: 4),
-                                      pw.Text('科別：', style: ts(bold: true)),
-                                      uv(d.recvDept, w: 15),
-                                      pw.SizedBox(width: 4),
-                                      pw.Text('回覆日期：', style: ts(bold: true)),
-                                      uv(d.recvReturnYear, w: 10, center: true),
-                                      pw.Text('年', style: ts()),
-                                      uv(d.recvReturnMonth, w: 8, center: true),
-                                      pw.Text('月', style: ts()),
-                                      uv(d.recvReturnDay, w: 8, center: true),
-                                      pw.Text('日', style: ts()),
+                                      cell(
+                                        '醫師\n簽章',
+                                        bold: true,
+                                        sz: 9,
+                                        h: hRecvInfo / 2,
+                                      ),
+                                      cell('', bold: false, h: hRecvInfo / 2),
+                                      cell(
+                                        '科別',
+                                        bold: true,
+                                        sz: 9,
+                                        h: hRecvInfo / 2,
+                                      ),
+                                      cell('', bold: false, h: hRecvInfo / 2),
+                                      cell(
+                                        '回覆\n日期',
+                                        bold: true,
+                                        sz: 9,
+                                        h: hRecvInfo / 2,
+                                      ),
+                                      pw.Container(
+                                        height: hRecvInfo / 2,
+                                        padding: const pw.EdgeInsets.all(2),
+                                        alignment: pw.Alignment.centerLeft,
+                                        child: pw.Text(
+                                          '${d.recvReturnYear} 年${d.recvReturnMonth} 月${d.recvReturnDay} 日',
+                                          style: ts(sz: 8),
+                                        ),
+                                      ),
                                     ],
                                   ),
                                 ],
