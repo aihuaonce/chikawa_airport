@@ -1402,104 +1402,129 @@ Future<Uint8List> buildReferralReportPdf(ReferralReportData d) async {
                                 ],
                               ),
                             ),
-                            // 右側內容格：對應兩行
-                            pw.Container(
-                              height: hRecvInfo,
-                              padding: pw.EdgeInsets.zero,
-                              child: pw.Table(
-                                border: innerTbl,
-                                columnWidths: {
-                                  0: flexW(1),
-                                  1: colW(25 * PdfPageFormat.mm),
-                                  2: colW(12 * PdfPageFormat.mm),
-                                  3: colW(10 * PdfPageFormat.mm),
-                                  4: colW(10 * PdfPageFormat.mm),
-                                  5: colW(10 * PdfPageFormat.mm),
-                                  6: flexW(1),
-                                },
-                                children: [
-                                  // 第一行：院所名稱內容 + 電話(合併標題+內容) + 四個空白格
-                                  pw.TableRow(
+                            // 右側內容格：分兩列，第一列院所名稱+電話，第二列診治醫師+醫師簽章+科別+回覆日期
+                            pw.Column(
+                              children: [
+                                // 第一列：院所名稱 + 電話 + 合併的空白格
+                                pw.Container(
+                                  height: hRecvInfo / 2,
+                                  padding: pw.EdgeInsets.zero,
+                                  child: pw.Table(
+                                    border: innerTbl,
+                                    columnWidths: {
+                                      0: flexW(1),
+                                      1: colW(25 * PdfPageFormat.mm),
+                                      2: colW(45 * PdfPageFormat.mm),
+                                    },
                                     children: [
-                                      pw.Container(
-                                        height: hRecvInfo / 2,
-                                        padding: const pw.EdgeInsets.all(2),
-                                        child: pw.Text(
-                                          d.recvHospName,
-                                          style: ts(sz: 9),
-                                        ),
-                                      ),
-                                      // 電話標題 + 內容合併成一格（無內框線）
-                                      pw.Container(
-                                        height: hRecvInfo / 2,
-                                        padding: const pw.EdgeInsets.all(2),
-                                        child: pw.Column(
-                                          crossAxisAlignment:
-                                              pw.CrossAxisAlignment.start,
-                                          mainAxisAlignment:
-                                              pw.MainAxisAlignment.center,
-                                          children: [
-                                            pw.Text(
-                                              '電話或傳真：',
-                                              style: ts(sz: 8),
+                                      pw.TableRow(
+                                        children: [
+                                          pw.Container(
+                                            height: hRecvInfo / 2,
+                                            padding: const pw.EdgeInsets.all(2),
+                                            child: pw.Text(
+                                              '',
+                                              style: ts(sz: 9),
                                             ),
-                                            pw.SizedBox(height: 1),
-                                            pw.Text(
-                                              '電子信箱：',
-                                              style: ts(sz: 8),
+                                          ),
+                                          // 電話標題 + 內容合併成一格（無內框線）
+                                          pw.Container(
+                                            height: hRecvInfo / 2,
+                                            padding: const pw.EdgeInsets.all(2),
+                                            child: pw.Column(
+                                              crossAxisAlignment:
+                                                  pw.CrossAxisAlignment.start,
+                                              mainAxisAlignment:
+                                                  pw.MainAxisAlignment.center,
+                                              children: [
+                                                pw.Text(
+                                                  '電話或傳真：',
+                                                  style: ts(sz: 8),
+                                                ),
+                                                pw.SizedBox(height: 1),
+                                                pw.Text(
+                                                  '電子信箱：',
+                                                  style: ts(sz: 8),
+                                                ),
+                                              ],
                                             ),
-                                          ],
-                                        ),
-                                      ),
-                                      cell('', bold: false, h: hRecvInfo / 2),
-                                      cell('', bold: false, h: hRecvInfo / 2),
-                                      cell('', bold: false, h: hRecvInfo / 2),
-                                      cell('', bold: false, h: hRecvInfo / 2),
-                                      cell('', bold: false, h: hRecvInfo / 2),
-                                    ],
-                                  ),
-                                  // 第二行：診治醫師+醫師簽章+空白格+科別+空白格+回覆日期+年月日
-                                  pw.TableRow(
-                                    children: [
-                                      cell(
-                                        '診治\n醫師',
-                                        bold: true,
-                                        sz: 9,
-                                        h: hRecvInfo / 2,
-                                      ),
-                                      cell(
-                                        '醫師\n簽章',
-                                        bold: true,
-                                        sz: 9,
-                                        h: hRecvInfo / 2,
-                                      ),
-                                      cell('', bold: false, h: hRecvInfo / 2),
-                                      cell(
-                                        '科別',
-                                        bold: true,
-                                        sz: 9,
-                                        h: hRecvInfo / 2,
-                                      ),
-                                      cell('', bold: false, h: hRecvInfo / 2),
-                                      cell(
-                                        '回覆\n日期',
-                                        bold: true,
-                                        sz: 9,
-                                        h: hRecvInfo / 2,
-                                      ),
-                                      pw.Container(
-                                        height: hRecvInfo / 2,
-                                        padding: const pw.EdgeInsets.all(2),
-                                        alignment: pw.Alignment.centerLeft,
-                                        child: pw.Text(
-                                          '${d.recvReturnYear} 年${d.recvReturnMonth} 月${d.recvReturnDay} 日',
-                                          style: ts(sz: 8),
-                                        ),
+                                          ),
+                                          cell(
+                                            '',
+                                            bold: false,
+                                            h: hRecvInfo / 2,
+                                          ),
+                                        ],
                                       ),
                                     ],
                                   ),
-                                ],
-                              ),
+                                ),
+                                // 第二列：診治醫師+醫師簽章+空白格+科別+空白格+回覆日期+年月日
+                                pw.Container(
+                                  height: hRecvInfo / 2,
+                                  padding: pw.EdgeInsets.zero,
+                                  child: pw.Table(
+                                    border: innerTbl,
+                                    columnWidths: {
+                                      0: colW(12 * PdfPageFormat.mm),
+                                      1: colW(12 * PdfPageFormat.mm),
+                                      2: colW(10 * PdfPageFormat.mm),
+                                      3: colW(10 * PdfPageFormat.mm),
+                                      4: colW(10 * PdfPageFormat.mm),
+                                      5: flexW(1),
+                                    },
+                                    children: [
+                                      pw.TableRow(
+                                        children: [
+                                          cell(
+                                            '診治\n醫師',
+                                            bold: true,
+                                            sz: 9,
+                                            h: hRecvInfo / 2,
+                                          ),
+                                          cell(
+                                            '醫師\n簽章',
+                                            bold: true,
+                                            sz: 9,
+                                            h: hRecvInfo / 2,
+                                          ),
+                                          cell(
+                                            '',
+                                            bold: false,
+                                            h: hRecvInfo / 2,
+                                          ),
+                                          cell(
+                                            '科別',
+                                            bold: true,
+                                            sz: 9,
+                                            h: hRecvInfo / 2,
+                                          ),
+                                          cell(
+                                            '',
+                                            bold: false,
+                                            h: hRecvInfo / 2,
+                                          ),
+                                          cell(
+                                            '回覆\n日期',
+                                            bold: true,
+                                            sz: 9,
+                                            h: hRecvInfo / 2,
+                                          ),
+                                          pw.Container(
+                                            height: hRecvInfo / 2,
+                                            padding: const pw.EdgeInsets.all(2),
+                                            alignment: pw.Alignment.centerLeft,
+                                            child: pw.Text(
+                                              '',
+                                              style: ts(sz: 8),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
