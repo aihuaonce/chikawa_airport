@@ -1405,12 +1405,11 @@ Future<Uint8List> buildReferralReportPdf(ReferralReportData d) async {
                             // 右側內容格：分兩列，第一列院所名稱+電話，第二列診治醫師+醫師簽章+科別+回覆日期
                             pw.Column(
                               children: [
-                                // 第一列：院所名稱 + 電話 + 合併的空白格
+                                // 第一列：院所名稱 + 電話 + 合併的空白格（無框線，用自訂邊框）
                                 pw.Container(
                                   height: hRecvInfo / 2,
                                   padding: pw.EdgeInsets.zero,
                                   child: pw.Table(
-                                    border: innerTbl,
                                     columnWidths: {
                                       0: flexW(1),
                                       1: colW(25 * PdfPageFormat.mm),
@@ -1419,15 +1418,19 @@ Future<Uint8List> buildReferralReportPdf(ReferralReportData d) async {
                                     children: [
                                       pw.TableRow(
                                         children: [
+                                          // 院所名稱格（只有右框線）
                                           pw.Container(
                                             height: hRecvInfo / 2,
+                                            decoration: const pw.BoxDecoration(
+                                              border: pw.Border(right: bdr),
+                                            ),
                                             padding: const pw.EdgeInsets.all(2),
                                             child: pw.Text(
                                               '',
                                               style: ts(sz: 9),
                                             ),
                                           ),
-                                          // 電話標題 + 內容合併成一格（無內框線）
+                                          // 電話或傳真格（無框線）
                                           pw.Container(
                                             height: hRecvInfo / 2,
                                             padding: const pw.EdgeInsets.all(2),
@@ -1449,22 +1452,25 @@ Future<Uint8List> buildReferralReportPdf(ReferralReportData d) async {
                                               ],
                                             ),
                                           ),
-                                          cell(
-                                            '',
-                                            bold: false,
-                                            h: hRecvInfo / 2,
+                                          // 空白格（無框線）
+                                          pw.Container(
+                                            height: hRecvInfo / 2,
+                                            padding: const pw.EdgeInsets.all(2),
+                                            child: pw.Text(
+                                              '',
+                                              style: ts(sz: 9),
+                                            ),
                                           ),
                                         ],
                                       ),
                                     ],
                                   ),
                                 ),
-                                // 第二列：診治醫師+醫師簽章+空白格+科別+空白格+回覆日期+年月日
+                                // 第二列：醫師簽章+空白格+科別+空白格+回覆日期+年月日（共6格）
                                 pw.Container(
                                   height: hRecvInfo / 2,
                                   padding: pw.EdgeInsets.zero,
                                   child: pw.Table(
-                                    border: innerTbl,
                                     columnWidths: {
                                       0: colW(12 * PdfPageFormat.mm),
                                       1: colW(12 * PdfPageFormat.mm),
@@ -1476,12 +1482,6 @@ Future<Uint8List> buildReferralReportPdf(ReferralReportData d) async {
                                     children: [
                                       pw.TableRow(
                                         children: [
-                                          cell(
-                                            '診治\n醫師',
-                                            bold: true,
-                                            sz: 9,
-                                            h: hRecvInfo / 2,
-                                          ),
                                           cell(
                                             '醫師\n簽章',
                                             bold: true,
