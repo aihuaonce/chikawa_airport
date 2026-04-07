@@ -135,6 +135,14 @@ Future<Uint8List> buildReferralReportPdf(ReferralReportData d) async {
     horizontalInside: bdr,
     verticalInside: bdr,
   );
+  const tblNoLeftNoTop = pw.TableBorder(
+    top: pw.BorderSide.none,
+    bottom: bdr,
+    left: pw.BorderSide.none,
+    right: bdr,
+    horizontalInside: bdr,
+    verticalInside: bdr,
+  );
   const innerTbl = pw.TableBorder(horizontalInside: bdr, verticalInside: bdr);
 
   pw.Widget cell(
@@ -351,168 +359,371 @@ Future<Uint8List> buildReferralReportPdf(ReferralReportData d) async {
                 ),
               ),
               pw.Expanded(
-                child: pw.Table(
-                  border: tblNoLeft,
-                  columnWidths: {0: colW(midColW), 1: flexW(1)},
+                child: pw.Column(
                   children: [
-                    pw.TableRow(
+                    pw.Table(
+                      border: tblNoLeft,
+                      columnWidths: {0: colW(midColW), 1: flexW(1)},
                       children: [
-                        cell(
-                          '基\n本\n資\n料',
-                          bold: true,
-                          align: pw.Alignment.center,
-                          h: hBasic,
+                        pw.TableRow(
+                          children: [
+                            cell(
+                              '基\n本\n資\n料',
+                              bold: true,
+                              align: pw.Alignment.center,
+                              h: hBasic,
+                            ),
+                            pw.Container(
+                              height: hBasic,
+                              padding: pw.EdgeInsets.zero,
+                              child: pw.Column(
+                                mainAxisAlignment:
+                                    pw.MainAxisAlignment.spaceBetween,
+                                children: [
+                                  pw.Row(
+                                    children: [
+                                      gridCellTextW(
+                                        '姓名',
+                                        basicNameW,
+                                        bold: true,
+                                        left: true,
+                                        top: true,
+                                        align: pw.Alignment.center,
+                                      ),
+                                      gridCellTextW(
+                                        '性別',
+                                        basicGenderW,
+                                        bold: true,
+                                        top: true,
+                                        align: pw.Alignment.center,
+                                      ),
+                                      gridCellTextW(
+                                        '出生日期',
+                                        basicBirthW,
+                                        bold: true,
+                                        top: true,
+                                        align: pw.Alignment.center,
+                                      ),
+                                      gridCellTextW(
+                                        '身分證字號',
+                                        basicIdW,
+                                        bold: true,
+                                        top: true,
+                                        align: pw.Alignment.center,
+                                      ),
+                                    ],
+                                  ),
+                                  pw.Row(
+                                    children: [
+                                      gridCellTextW(
+                                        d.name,
+                                        basicNameW,
+                                        left: true,
+                                        align: pw.Alignment.center,
+                                      ),
+                                      gridCellWidgetW(
+                                        pw.Row(
+                                          mainAxisAlignment:
+                                              pw.MainAxisAlignment.center,
+                                          children: [
+                                            chk(d.gender == '男', '男'),
+                                            chk(d.gender == '女', '女'),
+                                          ],
+                                        ),
+                                        basicGenderW,
+                                        align: pw.Alignment.center,
+                                      ),
+                                      gridCellWidgetW(
+                                        pw.Row(
+                                          children: [
+                                            pw.Text('西元', style: ts()),
+                                            pw.SizedBox(width: 2),
+                                            uv(
+                                              d.birthYear,
+                                              w: 10,
+                                              center: true,
+                                            ),
+                                            pw.Text('年', style: ts()),
+                                            pw.SizedBox(width: 2),
+                                            uv(
+                                              d.birthMonth,
+                                              w: 8,
+                                              center: true,
+                                            ),
+                                            pw.Text('月', style: ts()),
+                                            pw.SizedBox(width: 2),
+                                            uv(d.birthDay, w: 8, center: true),
+                                            pw.Text('日', style: ts()),
+                                          ],
+                                        ),
+                                        basicBirthW,
+                                        align: pw.Alignment.center,
+                                      ),
+                                      gridCellTextW(
+                                        d.idNo,
+                                        basicIdW,
+                                        align: pw.Alignment.center,
+                                      ),
+                                    ],
+                                  ),
+                                  pw.Row(
+                                    children: [
+                                      gridCellTextW(
+                                        '聯絡人',
+                                        basicNameW,
+                                        bold: true,
+                                        left: true,
+                                        align: pw.Alignment.center,
+                                      ),
+                                      gridCellTextW(
+                                        '聯絡電話',
+                                        basicGenderW,
+                                        bold: true,
+                                        align: pw.Alignment.center,
+                                      ),
+                                      gridCellTextW(
+                                        '聯絡地址',
+                                        basicAddrW,
+                                        bold: true,
+                                        align: pw.Alignment.center,
+                                      ),
+                                    ],
+                                  ),
+                                  pw.Row(
+                                    children: [
+                                      gridCellTextW(
+                                        d.contact,
+                                        basicNameW,
+                                        left: true,
+                                        align: pw.Alignment.center,
+                                      ),
+                                      gridCellTextW(
+                                        d.contactPhone,
+                                        basicGenderW,
+                                        align: pw.Alignment.center,
+                                      ),
+                                      gridCellTextW(
+                                        d.contactAddress,
+                                        basicAddrW,
+                                        align: pw.Alignment.center,
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
-                        pw.Container(
-                          height: hBasic,
-                          padding: pw.EdgeInsets.zero,
-                          child: pw.Column(
-                            mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                            children: [
-                              pw.Row(
-                                children: [
-                                  gridCellTextW(
-                                    '姓名',
-                                    basicNameW,
-                                    bold: true,
-                                    left: true,
-                                    top: true,
-                                    align: pw.Alignment.center,
-                                  ),
-                                  gridCellTextW(
-                                    '性別',
-                                    basicGenderW,
-                                    bold: true,
-                                    top: true,
-                                    align: pw.Alignment.center,
-                                  ),
-                                  gridCellTextW(
-                                    '出生日期',
-                                    basicBirthW,
-                                    bold: true,
-                                    top: true,
-                                    align: pw.Alignment.center,
-                                  ),
-                                  gridCellTextW(
-                                    '身分證字號',
-                                    basicIdW,
-                                    bold: true,
-                                    top: true,
-                                    align: pw.Alignment.center,
-                                  ),
-                                ],
-                              ),
-                              pw.Row(
-                                children: [
-                                  gridCellTextW(d.name, basicNameW, left: true),
-                                  gridCellWidgetW(
-                                    pw.Row(
-                                      mainAxisAlignment:
-                                          pw.MainAxisAlignment.center,
-                                      children: [
-                                        chk(d.gender == '男', '男'),
-                                        chk(d.gender == '女', '女'),
-                                      ],
-                                    ),
-                                    basicGenderW,
-                                    align: pw.Alignment.center,
-                                  ),
-                                  gridCellWidgetW(
-                                    pw.Row(
-                                      children: [
-                                        pw.Text('西元', style: ts()),
-                                        pw.SizedBox(width: 2),
-                                        uv(d.birthYear, w: 10, center: true),
-                                        pw.Text('年', style: ts()),
-                                        pw.SizedBox(width: 2),
-                                        uv(d.birthMonth, w: 8, center: true),
-                                        pw.Text('月', style: ts()),
-                                        pw.SizedBox(width: 2),
-                                        uv(d.birthDay, w: 8, center: true),
-                                        pw.Text('日', style: ts()),
-                                      ],
-                                    ),
-                                    basicBirthW,
-                                  ),
-                                  gridCellTextW(d.idNo, basicIdW),
-                                ],
-                              ),
-                              pw.Row(
-                                children: [
-                                  gridCellTextW(
-                                    '聯絡人',
-                                    basicNameW,
-                                    bold: true,
-                                    left: true,
-                                    align: pw.Alignment.center,
-                                  ),
-                                  gridCellTextW(
-                                    '聯絡電話',
-                                    basicGenderW,
-                                    bold: true,
-                                    align: pw.Alignment.center,
-                                  ),
-                                  gridCellTextW(
-                                    '聯絡地址',
-                                    basicAddrW,
-                                    bold: true,
-                                    align: pw.Alignment.center,
-                                  ),
-                                ],
-                              ),
-                              pw.Row(
-                                children: [
-                                  gridCellTextW(d.contact, basicNameW, left: true),
-                                  gridCellTextW(d.contactPhone, basicGenderW),
-                                  gridCellTextW(d.contactAddress, basicAddrW),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    pw.TableRow(
-                      children: [
-                        cell(
-                          '病\n歷\n摘\n要',
-                          bold: true,
-                          align: pw.Alignment.center,
-                          h: hHistory,
-                        ),
-                        pw.Container(
-                          height: hHistory,
-                          padding: const pw.EdgeInsets.all(4),
-                          child: pw.Column(
-                            crossAxisAlignment: pw.CrossAxisAlignment.start,
-                            children: [
-                              pw.Text('A. 病情摘要（主訴、簡短病史）', style: ts(bold: true)),
-                              pw.SizedBox(height: 2),
-                              pw.Text(d.chiefComplaintHistory, style: ts()),
-                              pw.SizedBox(height: 4),
-                              pw.Row(
+                        pw.TableRow(
+                          children: [
+                            cell(
+                              '病\n歷\n摘\n要',
+                              bold: true,
+                              align: pw.Alignment.center,
+                              h: hHistory + hSummary,
+                            ),
+                            pw.Container(
+                              height: hHistory + hSummary,
+                              padding: pw.EdgeInsets.zero,
+                              child: pw.Column(
                                 children: [
                                   pw.Container(
-                                    width: halfRightWidth,
+                                    height: hHistory,
+                                    padding: const pw.EdgeInsets.all(4),
+                                    child: pw.Row(
+                                      crossAxisAlignment:
+                                          pw.CrossAxisAlignment.stretch,
+                                      children: [
+                                        pw.Expanded(
+                                          child: pw.Column(
+                                            crossAxisAlignment:
+                                                pw.CrossAxisAlignment.start,
+                                            children: [
+                                              pw.Text(
+                                                'A. 病情摘要（主訴、簡短病史）',
+                                                style: ts(bold: true),
+                                              ),
+                                              pw.SizedBox(height: 2),
+                                              pw.Text(
+                                                d.chiefComplaintHistory,
+                                                style: ts(),
+                                              ),
+                                              pw.SizedBox(height: 4),
+                                              pw.Text(
+                                                'B. 診斷 ICD-10-CM/PCS 病名',
+                                                style: ts(bold: true),
+                                              ),
+                                              pw.Text(
+                                                '1.(主診斷) ${d.diagnosisName1}',
+                                                style: ts(),
+                                              ),
+                                              pw.Text(
+                                                '2. ${d.diagnosisName2}',
+                                                style: ts(),
+                                              ),
+                                              pw.Text(
+                                                '3. ${d.diagnosisName3}',
+                                                style: ts(),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        pw.SizedBox(width: 8),
+                                        pw.Expanded(
+                                          child: pw.Column(
+                                            crossAxisAlignment:
+                                                pw.CrossAxisAlignment.start,
+                                            children: [
+                                              pw.Text(
+                                                'D. 藥物過敏史',
+                                                style: ts(bold: true),
+                                              ),
+                                              pw.Row(
+                                                children: [
+                                                  chk(d.allergyNone, '無'),
+                                                  chk(d.allergyHas, '有（請詳述）'),
+                                                  uvLine(
+                                                    d.allergyDetail,
+                                                    lineShort,
+                                                  ),
+                                                ],
+                                              ),
+                                              pw.SizedBox(height: 4),
+                                              pw.Text(
+                                                'E. 醫師交班注意事項',
+                                                style: ts(bold: true),
+                                              ),
+                                              pw.Text(
+                                                d.doctorHandoverNote,
+                                                style: ts(),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  pw.Container(
+                                    height: hSummary,
+                                    padding: const pw.EdgeInsets.all(4),
                                     child: pw.Column(
                                       crossAxisAlignment:
                                           pw.CrossAxisAlignment.start,
                                       children: [
                                         pw.Text(
-                                          'B. 診斷 ICD-10-CM/PCS 病名',
+                                          'C. 檢查及治療摘要',
                                           style: ts(bold: true),
                                         ),
-                                        pw.Text(
-                                          '1.(主診斷) ${d.diagnosisName1}',
-                                          style: ts(),
+                                        pw.Row(
+                                          children: [
+                                            pw.Container(
+                                              width: halfRightWidth,
+                                              child: pw.Column(
+                                                crossAxisAlignment:
+                                                    pw.CrossAxisAlignment.start,
+                                                children: [
+                                                  pw.Text(
+                                                    '1. 最近一次檢查結果',
+                                                    style: ts(),
+                                                  ),
+                                                  pw.Row(
+                                                    children: [
+                                                      pw.Text(
+                                                        '日期：',
+                                                        style: ts(),
+                                                      ),
+                                                      uv(d.lastExamDate, w: 20),
+                                                    ],
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            pw.SizedBox(width: 8),
+                                            pw.Container(
+                                              width: halfRightWidth,
+                                              child: pw.Column(
+                                                crossAxisAlignment:
+                                                    pw.CrossAxisAlignment.start,
+                                                children: [
+                                                  pw.Text(
+                                                    '2. 最近一次用藥或手術名稱',
+                                                    style: ts(),
+                                                  ),
+                                                  pw.Row(
+                                                    children: [
+                                                      pw.Text(
+                                                        '日期：',
+                                                        style: ts(),
+                                                      ),
+                                                      uv(d.lastMedDate, w: 20),
+                                                    ],
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                        pw.Text(
-                                          '2. ${d.diagnosisName2}',
-                                          style: ts(),
+                                        pw.SizedBox(height: 2),
+                                        pw.Row(
+                                          children: [
+                                            pw.Text('報告：', style: ts()),
+                                            uvLine(d.lastExamReport, lineLong),
+                                          ],
                                         ),
-                                        pw.Text(
-                                          '3. ${d.diagnosisName3}',
-                                          style: ts(),
+                                        pw.SizedBox(height: 2),
+                                        pw.Row(
+                                          children: [
+                                            pw.Text('用藥/手術：', style: ts()),
+                                            uvLine(
+                                              d.lastMedOrSurgery,
+                                              lineLong,
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        pw.TableRow(
+                          children: [
+                            cell(
+                              '轉\n診\n目\n的',
+                              bold: true,
+                              align: pw.Alignment.center,
+                              h: hPurpose,
+                            ),
+                            pw.Container(
+                              height: hPurpose,
+                              padding: const pw.EdgeInsets.all(4),
+                              child: pw.Row(
+                                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                                children: [
+                                  pw.Container(
+                                    width: halfRightWidth,
+                                    child: pw.Column(
+                                      mainAxisAlignment:
+                                          pw.MainAxisAlignment.spaceBetween,
+                                      crossAxisAlignment:
+                                          pw.CrossAxisAlignment.start,
+                                      children: [
+                                        pw.Row(
+                                          children: [
+                                            chk(d.purposeEmergency, '1. 急診治療'),
+                                          ],
+                                        ),
+                                        pw.Row(
+                                          children: [
+                                            chk(d.purposeHospital, '2. 住院治療'),
+                                          ],
+                                        ),
+                                        pw.Row(
+                                          children: [
+                                            chk(d.purposeClinic, '3. 門診治療'),
+                                          ],
                                         ),
                                       ],
                                     ),
@@ -521,75 +732,38 @@ Future<Uint8List> buildReferralReportPdf(ReferralReportData d) async {
                                   pw.Container(
                                     width: halfRightWidth,
                                     child: pw.Column(
+                                      mainAxisAlignment:
+                                          pw.MainAxisAlignment.spaceBetween,
                                       crossAxisAlignment:
                                           pw.CrossAxisAlignment.start,
                                       children: [
-                                        pw.Text('D. 藥物過敏史', style: ts(bold: true)),
                                         pw.Row(
                                           children: [
-                                            chk(d.allergyNone, '無'),
-                                            chk(d.allergyHas, '有（請詳述）'),
-                                            uvLine(d.allergyDetail, lineShort),
+                                            chk(
+                                              d.purposeFurtherExam,
+                                              '4. 進一步檢查，檢查項目',
+                                            ),
+                                            uvLine(
+                                              d.furtherExamItems,
+                                              linePurpose,
+                                            ),
                                           ],
                                         ),
-                                        pw.SizedBox(height: 4),
-                                        pw.Text('E. 醫師交班注意事項', style: ts(bold: true)),
-                                        pw.Text(d.doctorHandoverNote, style: ts()),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    pw.TableRow(
-                      children: [
-                        cell(
-                          '診\n治\n摘\n要',
-                          bold: true,
-                          align: pw.Alignment.center,
-                          h: hSummary,
-                        ),
-                        pw.Container(
-                          height: hSummary,
-                          padding: const pw.EdgeInsets.all(4),
-                          child: pw.Column(
-                            crossAxisAlignment: pw.CrossAxisAlignment.start,
-                            children: [
-                              pw.Text('C. 檢查及治療摘要', style: ts(bold: true)),
-                              pw.Row(
-                                children: [
-                                  pw.Container(
-                                    width: halfRightWidth,
-                                    child: pw.Column(
-                                      crossAxisAlignment:
-                                          pw.CrossAxisAlignment.start,
-                                      children: [
-                                        pw.Text('1. 最近一次檢查結果', style: ts()),
                                         pw.Row(
                                           children: [
-                                            pw.Text('日期：', style: ts()),
-                                            uv(d.lastExamDate, w: 20),
+                                            chk(
+                                              d.purposeFollowUp,
+                                              '5. 轉回轉出或適當之院所繼續追蹤',
+                                            ),
                                           ],
                                         ),
-                                      ],
-                                    ),
-                                  ),
-                                  pw.SizedBox(width: 8),
-                                  pw.Container(
-                                    width: halfRightWidth,
-                                    child: pw.Column(
-                                      crossAxisAlignment:
-                                          pw.CrossAxisAlignment.start,
-                                      children: [
-                                        pw.Text('2. 最近一次用藥或手術名稱', style: ts()),
                                         pw.Row(
                                           children: [
-                                            pw.Text('日期：', style: ts()),
-                                            uv(d.lastMedDate, w: 20),
+                                            chk(d.purposeOther, '6. 其他'),
+                                            uvLine(
+                                              d.purposeOtherText,
+                                              linePurpose,
+                                            ),
                                           ],
                                         ),
                                       ],
@@ -597,328 +771,235 @@ Future<Uint8List> buildReferralReportPdf(ReferralReportData d) async {
                                   ),
                                 ],
                               ),
-                              pw.SizedBox(height: 2),
-                              pw.Row(
-                                children: [
-                                  pw.Text('報告：', style: ts()),
-                                  uvLine(d.lastExamReport, lineLong),
-                                ],
-                              ),
-                              pw.SizedBox(height: 2),
-                              pw.Row(
-                                children: [
-                                  pw.Text('用藥/手術：', style: ts()),
-                                  uvLine(d.lastMedOrSurgery, lineLong),
-                                ],
-                              ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
-                    pw.TableRow(
+
+                    pw.Table(
+                      border: tblNoLeftNoTop,
+                      columnWidths: {0: flexW(1)},
                       children: [
-                        cell(
-                          '轉\n診\n目\n的',
-                          bold: true,
-                          align: pw.Alignment.center,
-                          h: hPurpose,
-                        ),
-                        pw.Container(
-                          height: hPurpose,
-                          padding: const pw.EdgeInsets.all(4),
-                          child: pw.Row(
-                            crossAxisAlignment: pw.CrossAxisAlignment.start,
-                            children: [
-                              pw.Container(
-                                width: halfRightWidth,
-                                child: pw.Column(
-                                  mainAxisAlignment:
-                                      pw.MainAxisAlignment.spaceBetween,
-                                  crossAxisAlignment:
-                                      pw.CrossAxisAlignment.start,
-                                  children: [
-                                    pw.Row(
-                                      children: [
-                                        chk(d.purposeEmergency, '1. 急診治療'),
-                                      ],
-                                    ),
-                                    pw.Row(
-                                      children: [
-                                        chk(d.purposeHospital, '2. 住院治療'),
-                                      ],
-                                    ),
-                                    pw.Row(
-                                      children: [
-                                        chk(d.purposeClinic, '3. 門診治療'),
-                                      ],
-                                    ),
-                                  ],
-                                ),
+                        pw.TableRow(
+                          children: [
+                            pw.Container(
+                              height: hConsent,
+                              padding: const pw.EdgeInsets.symmetric(
+                                horizontal: 4,
+                                vertical: 3,
                               ),
-                              pw.SizedBox(width: 8),
-                              pw.Container(
-                                width: halfRightWidth,
-                                child: pw.Column(
-                                  mainAxisAlignment:
-                                      pw.MainAxisAlignment.spaceBetween,
-                                  crossAxisAlignment:
-                                      pw.CrossAxisAlignment.start,
-                                  children: [
-                                    pw.Row(
-                                      children: [
-                                        chk(
-                                          d.purposeFurtherExam,
-                                          '4. 進一步檢查，檢查項目',
-                                        ),
-                                        uvLine(d.furtherExamItems, linePurpose),
-                                      ],
-                                    ),
-                                    pw.Row(
-                                      children: [
-                                        chk(
-                                          d.purposeFollowUp,
-                                          '5. 轉回轉出或適當之院所繼續追蹤',
-                                        ),
-                                      ],
-                                    ),
-                                    pw.Row(
-                                      children: [
-                                        chk(d.purposeOther, '6. 其他'),
-                                        uvLine(d.purposeOtherText, linePurpose),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    pw.TableRow(
-                      children: [
-                        cell('', h: hConsent),
-                        pw.Container(
-                          height: hConsent,
-                          padding: const pw.EdgeInsets.symmetric(
-                            horizontal: 4,
-                            vertical: 3,
-                          ),
-                          child: pw.Column(
-                            crossAxisAlignment: pw.CrossAxisAlignment.start,
-                            children: [
-                              pw.Text(
-                                '經醫師解釋病情及轉診目的後同意轉院。',
-                                style: ts(
-                                  sz: 8,
-                                  bold: true,
-                                  c: const PdfColor.fromInt(0xFFC0392B),
-                                ),
-                              ),
-                              pw.Row(
+                              child: pw.Column(
+                                crossAxisAlignment: pw.CrossAxisAlignment.start,
                                 children: [
                                   pw.Text(
-                                    '同意人簽名：',
+                                    '經醫師解釋病情及轉診目的後同意轉院。',
                                     style: ts(
+                                      sz: 8,
                                       bold: true,
                                       c: const PdfColor.fromInt(0xFFC0392B),
                                     ),
                                   ),
-                                  uv(d.consentSignName, w: 25),
-                                  pw.SizedBox(width: 4),
-                                  pw.Text(
-                                    '與病人關係：',
-                                    style: ts(
-                                      bold: true,
-                                      c: const PdfColor.fromInt(0xFFC0392B),
-                                    ),
-                                  ),
-                                  uv(d.consentRelationship, w: 15),
-                                  pw.SizedBox(width: 4),
-                                  pw.Text(
-                                    '日期：',
-                                    style: ts(
-                                      bold: true,
-                                      c: const PdfColor.fromInt(0xFFC0392B),
-                                    ),
-                                  ),
-                                  uv(d.consentYear, w: 8, center: true),
-                                  pw.Text(
-                                    '年',
-                                    style: ts(
-                                      c: const PdfColor.fromInt(0xFFC0392B),
-                                    ),
-                                  ),
-                                  uv(d.consentMonth, w: 6, center: true),
-                                  pw.Text(
-                                    '月',
-                                    style: ts(
-                                      c: const PdfColor.fromInt(0xFFC0392B),
-                                    ),
-                                  ),
-                                  uv(d.consentDay, w: 6, center: true),
-                                  pw.Text(
-                                    '日',
-                                    style: ts(
-                                      c: const PdfColor.fromInt(0xFFC0392B),
-                                    ),
-                                  ),
-                                  uv(d.consentHour, w: 6, center: true),
-                                  pw.Text(
-                                    '時',
-                                    style: ts(
-                                      c: const PdfColor.fromInt(0xFFC0392B),
-                                    ),
-                                  ),
-                                  uv(d.consentMin, w: 6, center: true),
-                                  pw.Text(
-                                    '分',
-                                    style: ts(
-                                      c: const PdfColor.fromInt(0xFFC0392B),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    pw.TableRow(
-                      children: [
-                        cell(
-                          '診\n治\n醫\n師',
-                          bold: true,
-                          align: pw.Alignment.center,
-                          h: hDoctor,
-                        ),
-                        pw.Container(
-                          height: hDoctor,
-                          padding: pw.EdgeInsets.zero,
-                          child: pw.Column(
-                            mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                            children: [
-                              pw.Row(
-                                children: [
-                                  gridCellTextW(
-                                    '院所住址',
-                                    w10,
-                                    bold: true,
-                                    left: true,
-                                    top: true,
-                                  ),
-                                  gridCellTextW(
-                                    '337桃園市大園區航站南路9號及15號  TEL：03-3983456  FAX：03-3834225',
-                                    mainRightWidth - w10,
-                                    top: true,
-                                  ),
-                                ],
-                              ),
-                              pw.Row(
-                                children: [
-                                  gridCellTextW(
-                                    '診治\n醫師',
-                                    w10,
-                                    bold: true,
-                                    left: true,
-                                    align: pw.Alignment.center,
-                                  ),
-                                  gridCellTextW(
-                                    '姓\n名',
-                                    w10,
-                                    bold: true,
-                                    align: pw.Alignment.center,
-                                  ),
-                                  gridCellTextW(d.doctorName, w14),
-                                  gridCellTextW(
-                                    '科\n別',
-                                    w10,
-                                    bold: true,
-                                    align: pw.Alignment.center,
-                                  ),
-                                  gridCellTextW(d.doctorDept, w10),
-                                  gridCellTextW(
-                                    '聯絡\n電話',
-                                    w12,
-                                    bold: true,
-                                    align: pw.Alignment.center,
-                                  ),
-                                  gridCellTextW(d.doctorPhone, w10),
-                                  gridCellTextW(
-                                    '醫師\n簽章',
-                                    w12,
-                                    bold: true,
-                                    align: pw.Alignment.center,
-                                  ),
-                                  gridCellTextW('', w9),
-                                ],
-                              ),
-                              pw.Row(
-                                children: [
-                                  gridCellTextW(
-                                    '開單\n日期',
-                                    w10,
-                                    bold: true,
-                                    left: true,
-                                    align: pw.Alignment.center,
-                                  ),
-                                  gridCellTextW(
-                                    '西元 ${d.issueDateYear} 年 ${d.issueDateMonth} 月 ${d.issueDateDay} 日\n（90天內有效）',
-                                    w10 + w14 + w10 + w10,
-                                  ),
-                                  gridCellTextW(
-                                    '安排就醫日期',
-                                    w12,
-                                    bold: true,
-                                    align: pw.Alignment.center,
-                                  ),
-                                  gridCellTextW(
-                                    '西元 ${d.appointDateYear} 年 ${d.appointDateMonth} 月 ${d.appointDateDay} 日\n${d.appointDept}科 診${d.appointNo}號',
-                                    w10 + w12 + w9,
-                                  ),
-                                ],
-                              ),
-                              pw.Row(
-                                children: [
-                                  gridCellTextW(
-                                    '建議轉診\n院所科別',
-                                    w10,
-                                    bold: true,
-                                    left: true,
-                                    align: pw.Alignment.center,
-                                  ),
-                                  gridCellTextW(
-                                    '${d.referHospital}  ${d.referDept}科  ${d.referDoctor}醫師',
-                                    w10 + w14 + w10 + w10,
-                                  ),
-                                  gridCellTextW(
-                                    '轉診院所地址\n及專線電話',
-                                    w12,
-                                    bold: true,
-                                    align: pw.Alignment.center,
-                                  ),
-                                  gridCellWidgetW(
-                                    pw.Column(
-                                      crossAxisAlignment:
-                                          pw.CrossAxisAlignment.start,
-                                      children: [
-                                        pw.Text(
-                                          '地址: ${d.referHospAddress}',
-                                          style: ts(),
+                                  pw.Row(
+                                    children: [
+                                      pw.Text(
+                                        '同意人簽名：',
+                                        style: ts(
+                                          bold: true,
+                                          c: const PdfColor.fromInt(0xFFC0392B),
                                         ),
-                                        pw.Text(
-                                          '電話: ${d.referHospPhone}',
-                                          style: ts(),
+                                      ),
+                                      uv(d.consentSignName, w: 25),
+                                      pw.SizedBox(width: 4),
+                                      pw.Text(
+                                        '與病人關係：',
+                                        style: ts(
+                                          bold: true,
+                                          c: const PdfColor.fromInt(0xFFC0392B),
                                         ),
-                                      ],
-                                    ),
-                                    w10 + w12 + w9,
+                                      ),
+                                      uv(d.consentRelationship, w: 15),
+                                      pw.SizedBox(width: 4),
+                                      pw.Text(
+                                        '日期：',
+                                        style: ts(
+                                          bold: true,
+                                          c: const PdfColor.fromInt(0xFFC0392B),
+                                        ),
+                                      ),
+                                      uv(d.consentYear, w: 8, center: true),
+                                      pw.Text(
+                                        '年',
+                                        style: ts(
+                                          c: const PdfColor.fromInt(0xFFC0392B),
+                                        ),
+                                      ),
+                                      uv(d.consentMonth, w: 6, center: true),
+                                      pw.Text(
+                                        '月',
+                                        style: ts(
+                                          c: const PdfColor.fromInt(0xFFC0392B),
+                                        ),
+                                      ),
+                                      uv(d.consentDay, w: 6, center: true),
+                                      pw.Text(
+                                        '日',
+                                        style: ts(
+                                          c: const PdfColor.fromInt(0xFFC0392B),
+                                        ),
+                                      ),
+                                      uv(d.consentHour, w: 6, center: true),
+                                      pw.Text(
+                                        '時',
+                                        style: ts(
+                                          c: const PdfColor.fromInt(0xFFC0392B),
+                                        ),
+                                      ),
+                                      uv(d.consentMin, w: 6, center: true),
+                                      pw.Text(
+                                        '分',
+                                        style: ts(
+                                          c: const PdfColor.fromInt(0xFFC0392B),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ],
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
+                        ),
+                        pw.TableRow(
+                          children: [
+                            pw.Container(
+                              height: hDoctor,
+                              padding: pw.EdgeInsets.zero,
+                              child: pw.Column(
+                                mainAxisAlignment:
+                                    pw.MainAxisAlignment.spaceBetween,
+                                children: [
+                                  pw.Row(
+                                    children: [
+                                      gridCellTextW(
+                                        '院所住址',
+                                        w10,
+                                        bold: true,
+                                        left: true,
+                                        top: true,
+                                      ),
+                                      gridCellTextW(
+                                        '337桃園市大園區航站南路9號及15號  TEL：03-3983456  FAX：03-3834225',
+                                        mainRightWidth - w10,
+                                        top: true,
+                                      ),
+                                    ],
+                                  ),
+                                  pw.Row(
+                                    children: [
+                                      gridCellTextW(
+                                        '診治\n醫師',
+                                        w10,
+                                        bold: true,
+                                        left: true,
+                                        align: pw.Alignment.center,
+                                      ),
+                                      gridCellTextW(
+                                        '姓\n名',
+                                        w10,
+                                        bold: true,
+                                        align: pw.Alignment.center,
+                                      ),
+                                      gridCellTextW(d.doctorName, w14),
+                                      gridCellTextW(
+                                        '科\n別',
+                                        w10,
+                                        bold: true,
+                                        align: pw.Alignment.center,
+                                      ),
+                                      gridCellTextW(d.doctorDept, w10),
+                                      gridCellTextW(
+                                        '聯絡\n電話',
+                                        w12,
+                                        bold: true,
+                                        align: pw.Alignment.center,
+                                      ),
+                                      gridCellTextW(d.doctorPhone, w10),
+                                      gridCellTextW(
+                                        '醫師\n簽章',
+                                        w12,
+                                        bold: true,
+                                        align: pw.Alignment.center,
+                                      ),
+                                      gridCellTextW('', w9),
+                                    ],
+                                  ),
+                                  pw.Row(
+                                    children: [
+                                      gridCellTextW(
+                                        '開單\n日期',
+                                        w10,
+                                        bold: true,
+                                        left: true,
+                                        align: pw.Alignment.center,
+                                      ),
+                                      gridCellTextW(
+                                        '西元 ${d.issueDateYear} 年 ${d.issueDateMonth} 月 ${d.issueDateDay} 日\n（90天內有效）',
+                                        w10 + w14 + w10 + w10,
+                                      ),
+                                      gridCellTextW(
+                                        '安排就醫日期',
+                                        w12,
+                                        bold: true,
+                                        align: pw.Alignment.center,
+                                      ),
+                                      gridCellTextW(
+                                        '西元 ${d.appointDateYear} 年 ${d.appointDateMonth} 月 ${d.appointDateDay} 日\n${d.appointDept}科 診${d.appointNo}號',
+                                        w10 + w12 + w9,
+                                      ),
+                                    ],
+                                  ),
+                                  pw.Row(
+                                    children: [
+                                      gridCellTextW(
+                                        '建議轉診\n院所科別',
+                                        w10,
+                                        bold: true,
+                                        left: true,
+                                        align: pw.Alignment.center,
+                                      ),
+                                      gridCellTextW(
+                                        '${d.referHospital}  ${d.referDept}科  ${d.referDoctor}醫師',
+                                        w10 + w14 + w10 + w10,
+                                      ),
+                                      gridCellTextW(
+                                        '轉診院所地址\n及專線電話',
+                                        w12,
+                                        bold: true,
+                                        align: pw.Alignment.center,
+                                      ),
+                                      gridCellWidgetW(
+                                        pw.Column(
+                                          crossAxisAlignment:
+                                              pw.CrossAxisAlignment.start,
+                                          children: [
+                                            pw.Text(
+                                              '地址: ${d.referHospAddress}',
+                                              style: ts(),
+                                            ),
+                                            pw.Text(
+                                              '電話: ${d.referHospPhone}',
+                                              style: ts(),
+                                            ),
+                                          ],
+                                        ),
+                                        w10 + w12 + w9,
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -951,193 +1032,217 @@ Future<Uint8List> buildReferralReportPdf(ReferralReportData d) async {
                 ),
               ),
               pw.Expanded(
-                child: pw.Table(
-                  border: tblNoLeft,
-                  columnWidths: {0: colW(midColW), 1: flexW(1)},
+                child: pw.Column(
                   children: [
-                    pw.TableRow(
+                    pw.Table(
+                      border: tblNoLeft,
+                      columnWidths: {0: colW(midColW), 1: flexW(1)},
                       children: [
-                        cell(
-                          '處\n理\n情\n形',
-                          bold: true,
-                          align: pw.Alignment.center,
-                          h: hRecvProcess,
-                        ),
-                        pw.Container(
-                          height: hRecvProcess,
-                          padding: const pw.EdgeInsets.all(3),
-                          child: pw.Column(
-                            mainAxisAlignment:
-                                pw.MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: pw.CrossAxisAlignment.start,
-                            children: [
-                              pw.Row(
-                                children: [
-                                  chk(d.recvEmergencyTransfer, '1. 已予急診處置並轉診至'),
-                                  pw.SizedBox(width: 4),
-                                  uvLine(d.recvEmergencyHospital, lineHospital),
-                                  pw.SizedBox(width: 4),
-                                  pw.Text('醫院', style: ts()),
-                                ],
-                              ),
-                              pw.Row(
-                                children: [
-                                  chk(d.recvEmergencyAdmit, '2. 已予急診處置，並住本院'),
-                                  pw.SizedBox(width: 4),
-                                  uvLine(d.recvEmergencyAdmitWard, lineHospital),
-                                  pw.SizedBox(width: 4),
-                                  pw.Text('病房治療中', style: ts()),
-                                ],
-                              ),
-                              pw.Row(
-                                children: [
-                                  chk(d.recvAdmit, '3. 已安排住本院'),
-                                  pw.SizedBox(width: 4),
-                                  uvLine(d.recvAdmitWard, lineHospital),
-                                  pw.SizedBox(width: 4),
-                                  pw.Text('病房治療中', style: ts()),
-                                ],
-                              ),
-                              pw.Row(
-                                children: [
-                                  chk(d.recvClinicArranged, '4. 已安排本院'),
-                                  pw.SizedBox(width: 4),
-                                  uvLine(d.recvClinicDept, lineHospital),
-                                  pw.SizedBox(width: 4),
-                                  pw.Text('科門診治療中', style: ts()),
-                                ],
-                              ),
-                              pw.Row(
+                        pw.TableRow(
+                          children: [
+                            cell(
+                              '處\n理\n情\n形',
+                              bold: true,
+                              align: pw.Alignment.center,
+                              h: hRecvProcess,
+                            ),
+                            pw.Container(
+                              height: hRecvProcess,
+                              padding: const pw.EdgeInsets.all(3),
+                              child: pw.Column(
+                                mainAxisAlignment:
+                                    pw.MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: pw.CrossAxisAlignment.start,
                                 children: [
                                   pw.Row(
                                     children: [
                                       chk(
-                                        d.recvSendBack,
-                                        '5. 已予適當處理並轉回原院所，建議事項如下',
+                                        d.recvEmergencyTransfer,
+                                        '1. 已予急診處置並轉診至',
+                                      ),
+                                      pw.SizedBox(width: 4),
+                                      uvLine(
+                                        d.recvEmergencyHospital,
+                                        lineHospital,
+                                      ),
+                                      pw.SizedBox(width: 4),
+                                      pw.Text('醫院', style: ts()),
+                                    ],
+                                  ),
+                                  pw.Row(
+                                    children: [
+                                      chk(
+                                        d.recvEmergencyAdmit,
+                                        '2. 已予急診處置，並住本院',
+                                      ),
+                                      pw.SizedBox(width: 4),
+                                      uvLine(
+                                        d.recvEmergencyAdmitWard,
+                                        lineHospital,
+                                      ),
+                                      pw.SizedBox(width: 4),
+                                      pw.Text('病房治療中', style: ts()),
+                                    ],
+                                  ),
+                                  pw.Row(
+                                    children: [
+                                      chk(d.recvAdmit, '3. 已安排住本院'),
+                                      pw.SizedBox(width: 4),
+                                      uvLine(d.recvAdmitWard, lineHospital),
+                                      pw.SizedBox(width: 4),
+                                      pw.Text('病房治療中', style: ts()),
+                                    ],
+                                  ),
+                                  pw.Row(
+                                    children: [
+                                      chk(d.recvClinicArranged, '4. 已安排本院'),
+                                      pw.SizedBox(width: 4),
+                                      uvLine(d.recvClinicDept, lineHospital),
+                                      pw.SizedBox(width: 4),
+                                      pw.Text('科門診治療中', style: ts()),
+                                    ],
+                                  ),
+                                  pw.Row(
+                                    children: [
+                                      pw.Row(
+                                        children: [
+                                          chk(
+                                            d.recvSendBack,
+                                            '5. 已予適當處理並轉回原院所，建議事項如下',
+                                          ),
+                                        ],
+                                      ),
+                                      pw.SizedBox(width: 8),
+                                      pw.Row(
+                                        children: [
+                                          chk(d.recvOther, '6. 其他'),
+                                          uvLine(d.recvOtherText, lineOther),
+                                        ],
                                       ),
                                     ],
                                   ),
-                                  pw.SizedBox(width: 8),
-                                  pw.Row(
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        pw.TableRow(
+                          children: [
+                            cell(
+                              '治\n療\n摘\n要',
+                              bold: true,
+                              align: pw.Alignment.center,
+                              h: hRecvSummary,
+                            ),
+                            pw.Container(
+                              height: hRecvSummary,
+                              padding: pw.EdgeInsets.zero,
+                              child: pw.Table(
+                                border: innerTbl,
+                                columnWidths: {
+                                  0: flexW(1.2),
+                                  1: flexW(1.1),
+                                  2: flexW(1.1),
+                                },
+                                children: [
+                                  pw.TableRow(
                                     children: [
-                                      chk(d.recvOther, '6. 其他'),
-                                      uvLine(d.recvOtherText, lineOther),
+                                      cell('1. 主診斷', bold: true),
+                                      cell('2. 治療藥物或手術名稱', bold: true),
+                                      cell('3. 輔助診斷之檢查結果', bold: true),
+                                    ],
+                                  ),
+                                  pw.TableRow(
+                                    children: [
+                                      pw.Container(
+                                        padding: const pw.EdgeInsets.all(3),
+                                        child: pw.Column(
+                                          crossAxisAlignment:
+                                              pw.CrossAxisAlignment.start,
+                                          children: [
+                                            pw.Text(
+                                              'ICD-10-CM/PCS：${d.recvMainDiagICD}',
+                                              style: ts(),
+                                            ),
+                                            pw.SizedBox(height: 2),
+                                            pw.Text(
+                                              '病名：${d.recvMainDiagName}',
+                                              style: ts(),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      pw.Container(
+                                        padding: const pw.EdgeInsets.all(3),
+                                        child: pw.Text(
+                                          d.recvTreatmentMed,
+                                          style: ts(),
+                                        ),
+                                      ),
+                                      pw.Container(
+                                        padding: const pw.EdgeInsets.all(3),
+                                        child: pw.Text(
+                                          d.recvAuxExamResult,
+                                          style: ts(),
+                                        ),
+                                      ),
                                     ],
                                   ),
                                 ],
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                    pw.TableRow(
-                      children: [
-                        cell(
-                          '治\n療\n摘\n要',
-                          bold: true,
-                          align: pw.Alignment.center,
-                          h: hRecvSummary,
-                        ),
-                        pw.Container(
-                          height: hRecvSummary,
-                          padding: pw.EdgeInsets.zero,
-                          child: pw.Table(
-                            border: innerTbl,
-                            columnWidths: {
-                              0: flexW(1.2),
-                              1: flexW(1.1),
-                              2: flexW(1.1),
-                            },
-                            children: [
-                              pw.TableRow(
+                        pw.TableRow(
+                          children: [
+                            cell(
+                              '院\n所\n資\n訊',
+                              bold: true,
+                              align: pw.Alignment.center,
+                              h: hRecvInfo,
+                            ),
+                            pw.Container(
+                              height: hRecvInfo,
+                              padding: const pw.EdgeInsets.all(3),
+                              child: pw.Column(
+                                crossAxisAlignment: pw.CrossAxisAlignment.start,
                                 children: [
-                                  cell('1. 主診斷', bold: true),
-                                  cell('2. 治療藥物或手術名稱', bold: true),
-                                  cell('3. 輔助診斷之檢查結果', bold: true),
-                                ],
-                              ),
-                              pw.TableRow(
-                                children: [
-                                  pw.Container(
-                                    padding: const pw.EdgeInsets.all(3),
-                                    child: pw.Column(
-                                      crossAxisAlignment:
-                                          pw.CrossAxisAlignment.start,
-                                      children: [
-                                        pw.Text(
-                                          'ICD-10-CM/PCS：${d.recvMainDiagICD}',
-                                          style: ts(),
-                                        ),
-                                        pw.SizedBox(height: 2),
-                                        pw.Text(
-                                          '病名：${d.recvMainDiagName}',
-                                          style: ts(),
-                                        ),
-                                      ],
-                                    ),
+                                  pw.Row(
+                                    children: [
+                                      pw.Text('院所名稱：', style: ts(bold: true)),
+                                      uv(d.recvHospName, w: 40),
+                                      pw.SizedBox(width: 6),
+                                      pw.Text('電話或傳真：', style: ts(bold: true)),
+                                      uv(d.recvHospPhone, w: 25),
+                                    ],
                                   ),
-                                  pw.Container(
-                                    padding: const pw.EdgeInsets.all(3),
-                                    child: pw.Text(d.recvTreatmentMed, style: ts()),
+                                  pw.SizedBox(height: 2),
+                                  pw.Text(
+                                    '電子信箱：${d.recvHospEmail}',
+                                    style: ts(),
                                   ),
-                                  pw.Container(
-                                    padding: const pw.EdgeInsets.all(3),
-                                    child:
-                                        pw.Text(d.recvAuxExamResult, style: ts()),
+                                  pw.SizedBox(height: 2),
+                                  pw.Row(
+                                    children: [
+                                      pw.Text('診治醫師：', style: ts(bold: true)),
+                                      uv(d.recvDoctorName, w: 25),
+                                      pw.SizedBox(width: 4),
+                                      pw.Text('科別：', style: ts(bold: true)),
+                                      uv(d.recvDept, w: 15),
+                                      pw.SizedBox(width: 4),
+                                      pw.Text('回覆日期：', style: ts(bold: true)),
+                                      uv(d.recvReturnYear, w: 10, center: true),
+                                      pw.Text('年', style: ts()),
+                                      uv(d.recvReturnMonth, w: 8, center: true),
+                                      pw.Text('月', style: ts()),
+                                      uv(d.recvReturnDay, w: 8, center: true),
+                                      pw.Text('日', style: ts()),
+                                    ],
                                   ),
                                 ],
                               ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    pw.TableRow(
-                      children: [
-                        cell(
-                          '院\n所\n資\n訊',
-                          bold: true,
-                          align: pw.Alignment.center,
-                          h: hRecvInfo,
-                        ),
-                        pw.Container(
-                          height: hRecvInfo,
-                          padding: const pw.EdgeInsets.all(3),
-                          child: pw.Column(
-                            crossAxisAlignment: pw.CrossAxisAlignment.start,
-                            children: [
-                              pw.Row(
-                                children: [
-                                  pw.Text('院所名稱：', style: ts(bold: true)),
-                                  uv(d.recvHospName, w: 40),
-                                  pw.SizedBox(width: 6),
-                                  pw.Text('電話或傳真：', style: ts(bold: true)),
-                                  uv(d.recvHospPhone, w: 25),
-                                ],
-                              ),
-                              pw.SizedBox(height: 2),
-                              pw.Text('電子信箱：${d.recvHospEmail}', style: ts()),
-                              pw.SizedBox(height: 2),
-                              pw.Row(
-                                children: [
-                                  pw.Text('診治醫師：', style: ts(bold: true)),
-                                  uv(d.recvDoctorName, w: 25),
-                                  pw.SizedBox(width: 4),
-                                  pw.Text('科別：', style: ts(bold: true)),
-                                  uv(d.recvDept, w: 15),
-                                  pw.SizedBox(width: 4),
-                                  pw.Text('回覆日期：', style: ts(bold: true)),
-                                  uv(d.recvReturnYear, w: 10, center: true),
-                                  pw.Text('年', style: ts()),
-                                  uv(d.recvReturnMonth, w: 8, center: true),
-                                  pw.Text('月', style: ts()),
-                                  uv(d.recvReturnDay, w: 8, center: true),
-                                  pw.Text('日', style: ts()),
-                                ],
-                              ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
