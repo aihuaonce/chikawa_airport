@@ -47,6 +47,7 @@ class ReferralReportData {
 
   // 知情同意
   String consentSignName = '';
+  Uint8List? consentSignature;
   String consentRelationship = '';
   String consentYear = '';
   String consentMonth = '';
@@ -184,6 +185,27 @@ Future<Uint8List> buildReferralReportPdf(ReferralReportData d) async {
     width: width,
     child: pw.Text(val, style: ts()),
   );
+  pw.Widget signatureValue(
+    Uint8List? data, {
+    double? width,
+    double height = 8,
+  }) {
+    final signatureData = data;
+    final hasData = signatureData != null && signatureData.isNotEmpty;
+    return pw.Container(
+      width: width == null ? null : width * PdfPageFormat.mm,
+      height: height * PdfPageFormat.mm,
+      alignment: pw.Alignment.centerLeft,
+      decoration: const pw.BoxDecoration(border: pw.Border(bottom: bdr)),
+      child: hasData
+          ? pw.Image(
+              pw.MemoryImage(signatureData),
+              fit: pw.BoxFit.contain,
+              alignment: pw.Alignment.centerLeft,
+            )
+          : pw.SizedBox(),
+    );
+  }
 
   pw.Widget gridCellWidgetW(
     pw.Widget child,
@@ -350,6 +372,8 @@ Future<Uint8List> buildReferralReportPdf(ReferralReportData d) async {
                               child: pw.Column(
                                 children: [
                                   pw.Row(
+                                    crossAxisAlignment:
+                                        pw.CrossAxisAlignment.center,
                                     children: [
                                       gridCellTextW(
                                         '姓名',
@@ -794,7 +818,14 @@ Future<Uint8List> buildReferralReportPdf(ReferralReportData d) async {
                                           c: const PdfColor.fromInt(0xFFC0392B),
                                         ),
                                       ),
-                                      uv(d.consentSignName, w: 25),
+                                      pw.SizedBox(width: 2),
+                                      pw.Expanded(
+                                        flex: 5,
+                                        child: signatureValue(
+                                          d.consentSignature,
+                                          height: 5,
+                                        ),
+                                      ),
                                       pw.SizedBox(width: 4),
                                       pw.Text(
                                         '與病人關係：',
@@ -803,7 +834,12 @@ Future<Uint8List> buildReferralReportPdf(ReferralReportData d) async {
                                           c: const PdfColor.fromInt(0xFFC0392B),
                                         ),
                                       ),
-                                      uv(d.consentRelationship, w: 15),
+                                      pw.Expanded(
+                                        child: pw.Text(
+                                          d.consentRelationship,
+                                          style: ts(),
+                                        ),
+                                      ),
                                       pw.SizedBox(width: 4),
                                       pw.Text(
                                         '日期：',

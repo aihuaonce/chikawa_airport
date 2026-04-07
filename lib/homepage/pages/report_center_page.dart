@@ -1498,6 +1498,7 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
       ..purposeOther = purposeCode == 'other'
       ..purposeOtherText = purposeCode == 'other' ? otherPurpose : ''
       ..consentSignName = contactName
+      ..consentSignature = form?.consentSignature
       ..consentRelationship = consentRelationship
       ..consentYear = consentYear
       ..consentMonth = consentMonth
