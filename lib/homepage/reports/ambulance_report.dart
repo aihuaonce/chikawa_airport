@@ -202,6 +202,10 @@ Future<Uint8List> buildAmbulanceReportPdf(
     return value + (' ' * (length - value.length));
   }
 
+  String _formatTimeCell(String hour, String min) {
+    return '${_pad(hour, 2)}時 ${_pad(min, 2)}分';
+  }
+
   final tbFull = pw.TableBorder.all(width: 0.5, color: PdfColors.black);
   final tbFirstRowBorder = pw.TableBorder.all(
     width: 0.5,
@@ -246,6 +250,19 @@ Future<Uint8List> buildAmbulanceReportPdf(
       ),
       bg: bg,
       align: align,
+    );
+  }
+
+  pw.Widget _timeCell(String hour, String min) {
+    return _cell(
+      pw.Padding(
+        padding: const pw.EdgeInsets.symmetric(vertical: 1),
+        child: pw.Row(
+          mainAxisAlignment: pw.MainAxisAlignment.end,
+          children: [pw.Text(_formatTimeCell(hour, min), style: ts9())],
+        ),
+      ),
+      align: pw.Alignment.centerRight,
     );
   }
 
@@ -483,114 +500,12 @@ Future<Uint8List> buildAmbulanceReportPdf(
                             children: [
                               pw.TableRow(
                                 children: [
-                                  _cell(
-                                    pw.Padding(
-                                      padding: const pw.EdgeInsets.symmetric(
-                                        vertical: 0,
-                                      ),
-                                      child: pw.Row(
-                                        mainAxisAlignment:
-                                            pw.MainAxisAlignment.end,
-                                        children: [
-                                          pw.Text(
-                                            '${d.departureHour.isEmpty ? "   " : d.departureHour}${d.departureHour.isNotEmpty ? "時" : ""} ${d.departureMin.isEmpty ? "  " : d.departureMin}${d.departureMin.isNotEmpty ? "分" : ""}',
-                                            style: ts9(),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    align: pw.Alignment.centerRight,
-                                  ),
-                                  _cell(
-                                    pw.Padding(
-                                      padding: const pw.EdgeInsets.symmetric(
-                                        vertical: 0,
-                                      ),
-                                      child: pw.Row(
-                                        mainAxisAlignment:
-                                            pw.MainAxisAlignment.end,
-                                        children: [
-                                          pw.Text(
-                                            '${d.arrivalHour.isEmpty ? "   " : d.arrivalHour}${d.arrivalHour.isNotEmpty ? "時" : ""} ${d.arrivalMin.isEmpty ? "  " : d.arrivalMin}${d.arrivalMin.isNotEmpty ? "分" : ""}',
-                                            style: ts9(),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    align: pw.Alignment.centerRight,
-                                  ),
-                                  _cell(
-                                    pw.Padding(
-                                      padding: const pw.EdgeInsets.symmetric(
-                                        vertical: 0,
-                                      ),
-                                      child: pw.Row(
-                                        mainAxisAlignment:
-                                            pw.MainAxisAlignment.end,
-                                        children: [
-                                          pw.Text(
-                                            '${d.leaveSceneHour.isEmpty ? "   " : d.leaveSceneHour}${d.leaveSceneHour.isNotEmpty ? "時" : ""} ${d.leaveSceneMin.isEmpty ? "  " : d.leaveSceneMin}${d.leaveSceneMin.isNotEmpty ? "分" : ""}',
-                                            style: ts9(),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    align: pw.Alignment.centerRight,
-                                  ),
-                                  _cell(
-                                    pw.Padding(
-                                      padding: const pw.EdgeInsets.symmetric(
-                                        vertical: 0,
-                                      ),
-                                      child: pw.Row(
-                                        mainAxisAlignment:
-                                            pw.MainAxisAlignment.end,
-                                        children: [
-                                          pw.Text(
-                                            '${d.deliveryHour.isEmpty ? "   " : d.deliveryHour}${d.deliveryHour.isNotEmpty ? "時" : ""} ${d.deliveryMin.isEmpty ? "  " : d.deliveryMin}${d.deliveryMin.isNotEmpty ? "分" : ""}',
-                                            style: ts9(),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    align: pw.Alignment.centerRight,
-                                  ),
-                                  _cell(
-                                    pw.Padding(
-                                      padding: const pw.EdgeInsets.symmetric(
-                                        vertical: 0,
-                                      ),
-                                      child: pw.Row(
-                                        mainAxisAlignment:
-                                            pw.MainAxisAlignment.end,
-                                        children: [
-                                          pw.Text(
-                                            '${d.leaveHospHour.isEmpty ? "   " : d.leaveHospHour}${d.leaveHospHour.isNotEmpty ? "時" : ""} ${d.leaveHospMin.isEmpty ? "  " : d.leaveHospMin}${d.leaveHospMin.isNotEmpty ? "分" : ""}',
-                                            style: ts9(),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    align: pw.Alignment.centerRight,
-                                  ),
-                                  _cell(
-                                    pw.Padding(
-                                      padding: const pw.EdgeInsets.symmetric(
-                                        vertical: 0,
-                                      ),
-                                      child: pw.Row(
-                                        mainAxisAlignment:
-                                            pw.MainAxisAlignment.end,
-                                        children: [
-                                          pw.Text(
-                                            '${d.returnBaseHour.isEmpty ? "   " : d.returnBaseHour}${d.returnBaseHour.isNotEmpty ? "時" : ""} ${d.returnBaseMin.isEmpty ? "  " : d.returnBaseMin}${d.returnBaseMin.isNotEmpty ? "分" : ""}',
-                                            style: ts9(),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    align: pw.Alignment.centerRight,
-                                  ),
+                                  _timeCell(d.departureHour, d.departureMin),
+                                  _timeCell(d.arrivalHour, d.arrivalMin),
+                                  _timeCell(d.leaveSceneHour, d.leaveSceneMin),
+                                  _timeCell(d.deliveryHour, d.deliveryMin),
+                                  _timeCell(d.leaveHospHour, d.leaveHospMin),
+                                  _timeCell(d.returnBaseHour, d.returnBaseMin),
                                 ],
                               ),
                             ],

@@ -1,8 +1,12 @@
-﻿import 'dart:io';
+﻿import 'dart:convert';
+import 'dart:io';
 import 'dart:typed_data';
+import 'dart:ui' as ui;
 
 import 'package:chikawa_airport/ambulance/pages/body_map.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_painter_v2/flutter_painter.dart';
 
 import 'package:intl/intl.dart';
 import 'package:path/path.dart' as p;
@@ -122,16 +126,11 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
           row: row,
         );
 
-        // === 正確取得 BodyMap 筆跡（使用 GlobalKey）===
-        Uint8List? bodyMapImage;
-        try {
-          final bodyMapState = AmbulanceBodyMap.globalKey.currentState;
-          if (bodyMapState != null) {
-            bodyMapImage = await bodyMapState.renderToImage();
-          }
-        } catch (e) {
-          debugPrint('取得 BodyMap 筆跡失敗: $e');
-        }
+        // === 從資料庫直接讀取並渲染筆跡（推薦方式）===
+        Uint8List? bodyMapImage = await _renderBodyMapFromDatabase(
+          db,
+          row.record.medicalId,
+        );
 
         final pdfBytes = await buildAmbulanceReportPdf(
           reportData,
@@ -324,16 +323,11 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
         row: row,
       );
 
-      // === 正確取得 BodyMap 筆跡（使用 GlobalKey）===
-      Uint8List? bodyMapImage;
-      try {
-        final bodyMapState = AmbulanceBodyMap.globalKey.currentState;
-        if (bodyMapState != null) {
-          bodyMapImage = await bodyMapState.renderToImage();
-        }
-      } catch (e) {
-        debugPrint('取得 BodyMap 筆跡失敗: $e');
-      }
+      // === 從資料庫直接讀取並渲染筆跡 ===
+      Uint8List? bodyMapImage = await _renderBodyMapFromDatabase(
+        db,
+        row.record.medicalId,
+      );
 
       final pdfBytes = await buildAmbulanceReportPdf(
         reportData,
@@ -2491,6 +2485,129 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
     }
 
     return '';
+  }
+
+  /// 從資料庫讀取 BodyMap 筆跡並渲染成圖片給 PDF 使用
+  /// 從資料庫讀取 BodyMap 筆跡並以原始比例渲染（解決跑版問題）
+  Future<Uint8List?> _renderBodyMapFromDatabase(
+    AppDatabase db,
+    int medicalId,
+  ) async {
+    try {
+      final jsonStr = await db.ambulanceDao.getBodyMap(medicalId);
+
+      if (jsonStr == null ||
+          jsonStr.isEmpty ||
+          jsonStr == 'null' ||
+          jsonStr == '[]') {
+        print('BodyMap 資料庫中沒有筆跡資料');
+        return null;
+      }
+
+      print('從資料庫讀取到 BodyMap 筆跡，長度: ${jsonStr.length} 字元');
+
+      final controller = PainterController(
+        settings: PainterSettings(
+          freeStyle: FreeStyleSettings(
+            color: const Color(0xFFE53935),
+            strokeWidth: 2.5,
+          ),
+        ),
+      );
+
+      // 載入背景圖並取得「真實原始尺寸」
+      final ByteData bgData = await rootBundle.load(
+        'assets/images/body_diagram_placeholder.jpg',
+      );
+      final Uint8List bgBytes = bgData.buffer.asUint8List();
+      final ui.Codec codec = await ui.instantiateImageCodec(bgBytes);
+      final ui.FrameInfo frame = await codec.getNextFrame();
+      final ui.Image backgroundImage = frame.image;
+
+      controller.background = backgroundImage.backgroundDrawable;
+
+      // 載入筆跡
+      final List<dynamic> drawablesJson = jsonDecode(jsonStr);
+      final drawables = <Drawable>[];
+
+      for (var json in drawablesJson) {
+        final d = _drawableFromJson(Map<String, dynamic>.from(json));
+        if (d != null) drawables.add(d);
+      }
+
+      if (drawables.isNotEmpty) {
+        controller.addDrawables(drawables);
+        print('成功載入 ${drawables.length} 筆筆跡');
+      }
+
+      // === 關鍵修正：使用背景圖片的「真實原始尺寸」來渲染 ===
+      final double realWidth = backgroundImage.width.toDouble();
+      final double realHeight = backgroundImage.height.toDouble();
+
+      print('使用真實背景尺寸渲染: ${realWidth.toInt()} x ${realHeight.toInt()}');
+
+      final ui.Image renderedImage = await controller.renderImage(
+        Size(realWidth, realHeight),
+      );
+
+      final ByteData? byteData = await renderedImage.toByteData(
+        format: ui.ImageByteFormat.png,
+      );
+
+      controller.dispose();
+
+      return byteData?.buffer.asUint8List();
+    } catch (e) {
+      print('從資料庫渲染 BodyMap 失敗: $e');
+      return null;
+    }
+  }
+
+  /// 解析 Drawable JSON（從 body_map.dart 複製過來的）
+  Drawable? _drawableFromJson(Map<String, dynamic> json) {
+    try {
+      final type = json['type'] as String?;
+      if (type == null) return null;
+
+      switch (type) {
+        case 'FreeStyleDrawable':
+          final pointsList = (json['path'] ?? json['points']) as List? ?? [];
+          final points = pointsList.map((point) {
+            final p = point as List;
+            return Offset((p[0] as num).toDouble(), (p[1] as num).toDouble());
+          }).toList();
+          final color = Color(json['color'] as int? ?? 0xFFE53935);
+          final strokeWidth = (json['strokeWidth'] as num?)?.toDouble() ?? 2.0;
+          return FreeStyleDrawable(
+            path: points,
+            color: color,
+            strokeWidth: strokeWidth,
+          );
+
+        case 'TextDrawable':
+          final text = json['text'] as String? ?? '';
+          final positionList = (json['position'] as List?) ?? [0, 0];
+          final position = Offset(
+            (positionList[0] as num).toDouble(),
+            (positionList[1] as num).toDouble(),
+          );
+          final styleJson = (json['style'] as Map<String, dynamic>?) ?? {};
+          final textStyle = TextStyle(
+            color: Color(styleJson['color'] as int? ?? Colors.black.value),
+            fontSize: (styleJson['fontSize'] as num?)?.toDouble() ?? 18.0,
+            fontWeight:
+                FontWeight.values[styleJson['fontWeightIndex'] as int? ??
+                    FontWeight.normal.index],
+          );
+          return TextDrawable(text: text, position: position, style: textStyle);
+
+        default:
+          return null;
+      }
+    } catch (e) {
+      print('解析 drawable 失敗: $e');
+      return null;
+    }
   }
 
   _EmergencyStaffNames _resolveEmergencyStaffNames({
