@@ -69,6 +69,14 @@ class _AmbulanceBodyMapState extends State<AmbulanceBodyMap> {
   bool _isSaving = false;
   bool get isLoading => _isLoading;
 
+  BodyMapProvider? _bodyMapProvider;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _bodyMapProvider = context.read<BodyMapProvider>();
+  }
+
   @override
   void initState() {
     super.initState();
@@ -96,14 +104,13 @@ class _AmbulanceBodyMapState extends State<AmbulanceBodyMap> {
   Future<void> _initializeAndLoadPainter() async {
     try {
       // 設定 Provider 的 medicalId
-      final bodyMapProvider = context.read<BodyMapProvider>();
-      bodyMapProvider.setMedicalId(widget.medicalId);
+      _bodyMapProvider?.setMedicalId(widget.medicalId);
 
       final db = context.read<AppDatabase>();
       final jsonStr = await db.ambulanceDao.getBodyMap(widget.medicalId);
 
       // 更新快取
-      bodyMapProvider.updateCache(jsonStr);
+      _bodyMapProvider?.updateCache(jsonStr);
 
       _backgroundImage = await _loadBodyMapBackground();
       if (!mounted) return;
@@ -134,6 +141,8 @@ class _AmbulanceBodyMapState extends State<AmbulanceBodyMap> {
 
       // 設置監聽
       _setupControllerListener();
+
+      setState(() {});
 
       setState(() => _isLoading = false);
     } catch (e) {
@@ -170,7 +179,9 @@ class _AmbulanceBodyMapState extends State<AmbulanceBodyMap> {
           : jsonEncode(drawablesList);
 
       // 更新本地快取
-      context.read<BodyMapProvider>().updateCache(jsonString);
+      if (mounted) {
+        _bodyMapProvider?.updateCache(jsonString);
+      }
     } catch (e) {
       debugPrint('更新 BodyMap 資料失敗: $e');
     }
@@ -185,7 +196,7 @@ class _AmbulanceBodyMapState extends State<AmbulanceBodyMap> {
     if (!mounted) return;
 
     _isSaving = true;
-    final bodyMapProvider = context.read<BodyMapProvider>();
+    if (!mounted) return;
 
     try {
       final drawables = _controller!.drawables;
@@ -203,8 +214,8 @@ class _AmbulanceBodyMapState extends State<AmbulanceBodyMap> {
       await db.ambulanceDao.updateBodyMap(widget.medicalId, jsonString);
 
       // 更新 Provider 狀態
-      bodyMapProvider.updateCache(jsonString);
-      bodyMapProvider.markAsSaved();
+      _bodyMapProvider?.updateCache(jsonString);
+      _bodyMapProvider?.markAsSaved();
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -244,7 +255,7 @@ class _AmbulanceBodyMapState extends State<AmbulanceBodyMap> {
           ? null
           : jsonEncode(drawablesList);
 
-      context.read<BodyMapProvider>().updateCache(jsonString);
+      _bodyMapProvider?.updateCache(jsonString);
       debugPrint('BodyMap 快取已更新');
     } catch (e) {
       debugPrint('更新 BodyMap 快取失敗: $e');
@@ -391,14 +402,16 @@ class _AmbulanceBodyMapState extends State<AmbulanceBodyMap> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // 側邊工具列
-        _buildVerticalToolbar(),
+        Padding(
+          padding: const EdgeInsets.only(left: 8),
+          child: _buildVerticalToolbar(),
+        ),
         // 主畫面
         Expanded(
           child: Column(
             children: [
               // Canvas
               Expanded(child: _buildBodyCanvas()),
-              const SizedBox(height: 8),
               // 底部動作按鈕
               _buildActionButtons(),
             ],
@@ -410,8 +423,7 @@ class _AmbulanceBodyMapState extends State<AmbulanceBodyMap> {
 
   Widget _buildVerticalToolbar() {
     return Container(
-      width: 52,
-      margin: const EdgeInsets.only(right: 8),
+      width: 48,
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.95),
         borderRadius: const BorderRadius.only(
@@ -544,23 +556,15 @@ class _AmbulanceBodyMapState extends State<AmbulanceBodyMap> {
         final canvasWidth = constraints.maxWidth;
         final imageWidth = _backgroundImage!.width.toDouble();
         final imageHeight = _backgroundImage!.height.toDouble();
-        
-        // 計算能完整放入螢幕的最大尺寸（保持比例）
-        final maxFitHeight = constraints.maxHeight;
-        final fitHeight = imageHeight * (canvasWidth / imageWidth);
-        
-        final canvasHeight = fitHeight > maxFitHeight 
-            ? maxFitHeight 
-            : fitHeight;
 
         return Center(
           child: SizedBox(
             width: canvasWidth,
-            height: canvasHeight,
+            height: constraints.maxHeight,
             child: InteractiveViewer(
-              boundaryMargin: const EdgeInsets.all(20),
+              boundaryMargin: const EdgeInsets.all(50),
               minScale: 0.5,
-              maxScale: 3.0,
+              maxScale: 4.0,
               panEnabled: _controller?.freeStyleMode == FreeStyleMode.none,
               scaleEnabled: _controller?.freeStyleMode == FreeStyleMode.none,
               child: FittedBox(
@@ -581,24 +585,10 @@ class _AmbulanceBodyMapState extends State<AmbulanceBodyMap> {
 
   Widget _buildActionButtons() {
     return SizedBox(
-      height: 40,
+      height: 36,
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          // 清除按鈕
-          SizedBox(
-            width: 100,
-            child: OutlinedButton.icon(
-              onPressed: _showClearConfirmationDialog,
-              icon: const Icon(Icons.delete_outline, size: 16),
-              label: const Text('清除', style: TextStyle(fontSize: 13)),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: Colors.red.shade400,
-                side: BorderSide(color: Colors.red.shade200),
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
-              ),
-            ),
-          ),
-          const Spacer(),
           // 儲存按鈕
           SizedBox(
             width: 100,

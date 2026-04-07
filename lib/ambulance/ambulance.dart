@@ -79,14 +79,18 @@ class _AmbulancePageState extends State<AmbulancePage> {
             Expanded(
               child: AnimatedSwitcher(
                 duration: const Duration(milliseconds: 250),
-                child: Container(
-                  key: ValueKey(_currentSectionIndex),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 32,
-                  ),
-                  child: _getCurrentPage(),
-                ),
+                child: _currentSectionIndex == 5
+                    ? _getCurrentPage() // BodyMap 不需要 ScrollView
+                    : SingleChildScrollView(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 32,
+                        ),
+                        child: Container(
+                          key: ValueKey(_currentSectionIndex),
+                          child: _getCurrentPage(),
+                        ),
+                      ),
               ),
             ),
           ],
