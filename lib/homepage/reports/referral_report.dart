@@ -184,10 +184,12 @@ Future<Uint8List> buildReferralReportPdf(ReferralReportData d) async {
     alignment: center ? pw.Alignment.center : pw.Alignment.centerLeft,
     child: pw.Text(val, style: ts(sz: sz)),
   );
-  pw.Widget uvLine(String val, double width) => pw.Container(
-    width: width,
-    child: pw.Text(val, style: ts()),
-  );
+  pw.Widget uvLine(String val, double width, {bool center = false}) =>
+      pw.Container(
+        width: width,
+        alignment: center ? pw.Alignment.center : pw.Alignment.centerLeft,
+        child: pw.Text(val, style: ts()),
+      );
   pw.Widget signatureValue(
     Uint8List? data, {
     double? width,
@@ -313,7 +315,7 @@ Future<Uint8List> buildReferralReportPdf(ReferralReportData d) async {
   final lineShort = halfRightWidth * 0.5;
   final lineLong = mainRightWidth * 0.6;
   final linePurpose = halfRightWidth * 0.55;
-  final lineHospital = mainRightWidth * 0.55;
+  final lineHospital = mainRightWidth * 0.30;
   final lineOther = mainRightWidth * 0.35;
 
   final basicUnit = mainRightWidth / 72;
@@ -341,8 +343,8 @@ Future<Uint8List> buildReferralReportPdf(ReferralReportData d) async {
   final hPurpose = 22 * PdfPageFormat.mm;
   final hConsent = 12 * PdfPageFormat.mm;
   final hDoctor = 34 * PdfPageFormat.mm;
-  final hRecvProcess = 36 * PdfPageFormat.mm;
-  final hRecvSummary = 25 * PdfPageFormat.mm;
+  final hRecvProcess = 32 * PdfPageFormat.mm;
+  final hRecvSummary = 22 * PdfPageFormat.mm;
   final hRecvInfo = 22 * PdfPageFormat.mm;
   final topSectionH =
       hBasic + hHistory + hSummary + hPurpose + hConsent + hDoctor;
@@ -1215,8 +1217,11 @@ Future<Uint8List> buildReferralReportPdf(ReferralReportData d) async {
                                         d.recvEmergencyHospital,
                                         lineHospital,
                                       ),
-                                      pw.SizedBox(width: 4),
-                                      pw.Text('醫院', style: ts()),
+                                      pw.SizedBox(width: 8),
+                                      pw.Text(
+                                        '醫院',
+                                        style: ts(sz: 8.5),
+                                      ),
                                     ],
                                   ),
                                   pw.Row(
@@ -1230,8 +1235,11 @@ Future<Uint8List> buildReferralReportPdf(ReferralReportData d) async {
                                         d.recvEmergencyAdmitWard,
                                         lineHospital,
                                       ),
-                                      pw.SizedBox(width: 4),
-                                      pw.Text('病房治療中', style: ts()),
+                                      pw.SizedBox(width: 8),
+                                      pw.Text(
+                                        '病房治療中',
+                                        style: ts(sz: 8.5),
+                                      ),
                                     ],
                                   ),
                                   pw.Row(
@@ -1239,8 +1247,11 @@ Future<Uint8List> buildReferralReportPdf(ReferralReportData d) async {
                                       chk(d.recvAdmit, '3. 已安排住本院'),
                                       pw.SizedBox(width: 4),
                                       uvLine(d.recvAdmitWard, lineHospital),
-                                      pw.SizedBox(width: 4),
-                                      pw.Text('病房治療中', style: ts()),
+                                      pw.SizedBox(width: 8),
+                                      pw.Text(
+                                        '病房治療中',
+                                        style: ts(sz: 8.5),
+                                      ),
                                     ],
                                   ),
                                   pw.Row(
@@ -1248,8 +1259,11 @@ Future<Uint8List> buildReferralReportPdf(ReferralReportData d) async {
                                       chk(d.recvClinicArranged, '4. 已安排本院'),
                                       pw.SizedBox(width: 4),
                                       uvLine(d.recvClinicDept, lineHospital),
-                                      pw.SizedBox(width: 4),
-                                      pw.Text('科門診治療中', style: ts()),
+                                      pw.SizedBox(width: 8),
+                                      pw.Text(
+                                        '科門診治療中',
+                                        style: ts(sz: 8.5),
+                                      ),
                                     ],
                                   ),
                                   pw.Row(
