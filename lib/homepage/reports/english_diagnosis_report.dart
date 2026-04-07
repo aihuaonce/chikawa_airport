@@ -2,6 +2,7 @@ import 'dart:typed_data';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
+import 'package:flutter/services.dart' show rootBundle;
 
 class EnglishDiagnosisReportData {
   final String name;
@@ -39,6 +40,11 @@ Future<Uint8List> buildEnglishDiagnosisPdf(EnglishDiagnosisReportData d) async {
 
   const borderSide = pw.BorderSide(width: 0.8, color: PdfColors.black);
 
+  // 載入標題中要顯示的簽章圖片（放在 assets/images/sign02.png）
+  final signImage = pw.MemoryImage(
+    (await rootBundle.load('assets/images/sign02.png')).buffer.asUint8List(),
+  );
+
   // 輔助方法：儲存格容器
   pw.Widget _cell(
     pw.Widget child, {
@@ -71,7 +77,8 @@ Future<Uint8List> buildEnglishDiagnosisPdf(EnglishDiagnosisReportData d) async {
       ),
       height: height,
       align: align ?? (isLabel ? pw.Alignment.center : pw.Alignment.centerLeft),
-      padding: padding ??
+      padding:
+          padding ??
           (isLabel
               ? const pw.EdgeInsets.symmetric(horizontal: 4, vertical: 2)
               : null),
@@ -110,26 +117,40 @@ Future<Uint8List> buildEnglishDiagnosisPdf(EnglishDiagnosisReportData d) async {
       pageFormat: PdfPageFormat.a4,
       margin: const pw.EdgeInsets.all(16 * PdfPageFormat.mm),
       build: (ctx) {
-        const titleBlockHeight = 22 * PdfPageFormat.mm;
+        const titleBlockHeight = 30 * PdfPageFormat.mm;
         final mainContent = pw.Column(
           crossAxisAlignment: pw.CrossAxisAlignment.start,
           children: [
-            // 標題
+            // 標題（使用 Stack 將簽章疊圖蓋在文字上）
             pw.SizedBox(
               height: titleBlockHeight,
-              child: pw.Center(
-                child: pw.Column(
-                  children: [
-                    pw.Text(
-                      'Landseed Medical Clinic at Taiwan Taoyuan Int\'l Airport',
-                      style: ts(bold: true, size: 13),
+              child: pw.Stack(
+                alignment: pw.Alignment.center,
+                children: [
+                  pw.Center(
+                    child: pw.Column(
+                      children: [
+                        pw.Text(
+                          'Landseed Medical Clinic at Taiwan Taoyuan Int\'l Airport',
+                          style: ts(bold: true, size: 13),
+                        ),
+                        pw.SizedBox(height: 12),
+                        pw.Text(
+                          'Medical Certificate',
+                          style: ts(bold: true, size: 12),
+                        ),
+                      ],
                     ),
-                    pw.SizedBox(height: 4),
-                    pw.Text('Medical Certificate',
-                        style: ts(bold: true, size: 12)),
-                    pw.SizedBox(height: 15),
-                  ],
-                ),
+                  ),
+                  pw.Positioned(
+                    top: 8 * PdfPageFormat.mm,
+                    child: pw.Image(
+                      signImage,
+                      height: 14 * PdfPageFormat.mm,
+                      fit: pw.BoxFit.contain,
+                    ),
+                  ),
+                ],
               ),
             ),
 
@@ -142,8 +163,7 @@ Future<Uint8List> buildEnglishDiagnosisPdf(EnglishDiagnosisReportData d) async {
                 bottom: borderSide,
                 verticalInside: borderSide,
               ),
-              defaultVerticalAlignment:
-                  pw.TableCellVerticalAlignment.middle,
+              defaultVerticalAlignment: pw.TableCellVerticalAlignment.middle,
               columnWidths: {
                 0: const pw.FixedColumnWidth(24 * PdfPageFormat.mm),
                 1: const pw.FlexColumnWidth(),
@@ -173,8 +193,7 @@ Future<Uint8List> buildEnglishDiagnosisPdf(EnglishDiagnosisReportData d) async {
                 bottom: borderSide,
                 verticalInside: borderSide,
               ),
-              defaultVerticalAlignment:
-                  pw.TableCellVerticalAlignment.middle,
+              defaultVerticalAlignment: pw.TableCellVerticalAlignment.middle,
               columnWidths: {
                 0: const pw.FixedColumnWidth(24 * PdfPageFormat.mm),
                 1: const pw.FlexColumnWidth(1.3),
@@ -206,19 +225,14 @@ Future<Uint8List> buildEnglishDiagnosisPdf(EnglishDiagnosisReportData d) async {
                     ),
                     _cell(
                       pw.Row(
-                        mainAxisAlignment:
-                            pw.MainAxisAlignment.spaceAround,
+                        mainAxisAlignment: pw.MainAxisAlignment.spaceAround,
                         children: [
                           _pdfCheckBox('Male', _isMale(d.sex)),
                           _pdfCheckBox('Female', _isFemale(d.sex)),
                         ],
                       ),
                     ),
-                    _textCell(
-                      'ID/Passport\nNo',
-                      isLabel: true,
-                      size: 8,
-                    ),
+                    _textCell('ID/Passport\nNo', isLabel: true, size: 8),
                     _textCell(d.idOrPassportNo, size: 9),
                   ],
                 ),
@@ -233,8 +247,7 @@ Future<Uint8List> buildEnglishDiagnosisPdf(EnglishDiagnosisReportData d) async {
                 bottom: borderSide,
                 verticalInside: borderSide,
               ),
-              defaultVerticalAlignment:
-                  pw.TableCellVerticalAlignment.middle,
+              defaultVerticalAlignment: pw.TableCellVerticalAlignment.middle,
               columnWidths: {
                 0: const pw.FixedColumnWidth(24 * PdfPageFormat.mm),
                 1: const pw.FlexColumnWidth(),
@@ -349,20 +362,20 @@ Future<Uint8List> buildEnglishDiagnosisPdf(EnglishDiagnosisReportData d) async {
                           pw.SizedBox(height: 12),
                           pw.Row(
                             children: [
-                              pw.Text('President: ',
-                                  style: ts(bold: true, size: 9)),
+                              pw.Text(
+                                'President: ',
+                                style: ts(bold: true, size: 9),
+                              ),
                               pw.Container(
                                 width: 40 * PdfPageFormat.mm,
-                                child: pw.Text(
-                                  d.director,
-                                  style: ts(size: 9),
-                                ),
+                                child: pw.Text(d.director, style: ts(size: 9)),
                               ),
                               pw.SizedBox(width: 10),
-                              pw.Text('Attending Physician: ',
-                                  style: ts(bold: true, size: 9)),
-                              pw.Text(d.attendingPhysician,
-                                  style: ts(size: 9)),
+                              pw.Text(
+                                'Attending Physician: ',
+                                style: ts(bold: true, size: 9),
+                              ),
+                              pw.Text(d.attendingPhysician, style: ts(size: 9)),
                             ],
                           ),
                           pw.SizedBox(height: 8),
@@ -375,8 +388,10 @@ Future<Uint8List> buildEnglishDiagnosisPdf(EnglishDiagnosisReportData d) async {
                           pw.Row(
                             mainAxisAlignment: pw.MainAxisAlignment.center,
                             children: [
-                              pw.Text('Issue Date: ',
-                                  style: ts(bold: true, size: 9)),
+                              pw.Text(
+                                'Issue Date: ',
+                                style: ts(bold: true, size: 9),
+                              ),
                               pw.Text(d.issuedDate, style: ts(size: 9)),
                             ],
                           ),
