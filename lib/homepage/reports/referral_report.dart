@@ -1410,14 +1410,15 @@ Future<Uint8List> buildReferralReportPdf(ReferralReportData d) async {
                                 border: innerTbl,
                                 columnWidths: {
                                   0: flexW(1),
-                                  1: colW(30 * PdfPageFormat.mm),
+                                  1: colW(25 * PdfPageFormat.mm),
                                   2: colW(12 * PdfPageFormat.mm),
-                                  3: colW(12 * PdfPageFormat.mm),
-                                  4: colW(12 * PdfPageFormat.mm),
-                                  5: flexW(1),
+                                  3: colW(10 * PdfPageFormat.mm),
+                                  4: colW(10 * PdfPageFormat.mm),
+                                  5: colW(10 * PdfPageFormat.mm),
+                                  6: flexW(1),
                                 },
                                 children: [
-                                  // 第一行：院所名稱內容 + 電話(合併標題+內容) + 兩個空白格
+                                  // 第一行：院所名稱內容 + 電話(合併標題+內容) + 四個空白格
                                   pw.TableRow(
                                     children: [
                                       pw.Container(
@@ -1428,7 +1429,7 @@ Future<Uint8List> buildReferralReportPdf(ReferralReportData d) async {
                                           style: ts(sz: 9),
                                         ),
                                       ),
-                                      // 電話標題 + 內容合併成一格
+                                      // 電話標題 + 內容合併成一格（無內框線）
                                       pw.Container(
                                         height: hRecvInfo / 2,
                                         padding: const pw.EdgeInsets.all(2),
@@ -1440,19 +1441,11 @@ Future<Uint8List> buildReferralReportPdf(ReferralReportData d) async {
                                           children: [
                                             pw.Text(
                                               '電話或傳真：',
-                                              style: ts(sz: 8, bold: true),
-                                            ),
-                                            pw.Text(
-                                              d.recvHospPhone,
                                               style: ts(sz: 8),
                                             ),
                                             pw.SizedBox(height: 1),
                                             pw.Text(
                                               '電子信箱：',
-                                              style: ts(sz: 8, bold: true),
-                                            ),
-                                            pw.Text(
-                                              d.recvHospEmail,
                                               style: ts(sz: 8),
                                             ),
                                           ],
@@ -1462,11 +1455,18 @@ Future<Uint8List> buildReferralReportPdf(ReferralReportData d) async {
                                       cell('', bold: false, h: hRecvInfo / 2),
                                       cell('', bold: false, h: hRecvInfo / 2),
                                       cell('', bold: false, h: hRecvInfo / 2),
+                                      cell('', bold: false, h: hRecvInfo / 2),
                                     ],
                                   ),
-                                  // 第二行：醫師簽章+空白格+科別+空白格+回覆日期+年月日
+                                  // 第二行：診治醫師+醫師簽章+空白格+科別+空白格+回覆日期+年月日
                                   pw.TableRow(
                                     children: [
+                                      cell(
+                                        '診治\n醫師',
+                                        bold: true,
+                                        sz: 9,
+                                        h: hRecvInfo / 2,
+                                      ),
                                       cell(
                                         '醫師\n簽章',
                                         bold: true,
