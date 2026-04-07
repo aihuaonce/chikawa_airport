@@ -2,6 +2,7 @@ import 'dart:typed_data';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
+import 'package:flutter/services.dart' show rootBundle;
 import 'dart:math' as math;
 
 class ChineseDiagnosisReportData {
@@ -47,6 +48,11 @@ Future<Uint8List> buildChineseDiagnosisPdf(ChineseDiagnosisReportData d) async {
 
   pw.TextStyle ts({double size = 10, bool bold = false}) =>
       pw.TextStyle(font: bold ? fontB : font, fontSize: size);
+
+  // 載入標題簽章圖片
+  final signImage = pw.MemoryImage(
+    (await rootBundle.load('assets/images/sign02.png')).buffer.asUint8List(),
+  );
 
   // 輔助方法：儲存格容器
   pw.Widget _cell(
@@ -94,27 +100,39 @@ Future<Uint8List> buildChineseDiagnosisPdf(ChineseDiagnosisReportData d) async {
       margin: const pw.EdgeInsets.all(16 * PdfPageFormat.mm),
       build: (ctx) {
         // 先忽略右側警語區，將主表格與標題置中
-        const titleBlockHeight = 22 * PdfPageFormat.mm;
+        const titleBlockHeight = 30 * PdfPageFormat.mm;
         const warningTopOffset = titleBlockHeight + 8 * PdfPageFormat.mm;
 
         final mainContent = pw.Column(
           crossAxisAlignment: pw.CrossAxisAlignment.start,
           children: [
-            // 標題
+            // 標題（使用 Stack 將簽章疊圖蓋在文字上）
             pw.SizedBox(
               height: titleBlockHeight,
-              child: pw.Center(
-                child: pw.Column(
-                  children: [
-                    pw.Text(
-                      '聯新國際醫院桃園國際機場醫療中心',
-                      style: ts(bold: true, size: 16),
+              child: pw.Stack(
+                alignment: pw.Alignment.center,
+                children: [
+                  pw.Center(
+                    child: pw.Column(
+                      children: [
+                        pw.Text(
+                          '聯新國際醫院桃園國際機場醫療中心',
+                          style: ts(bold: true, size: 16),
+                        ),
+                        pw.SizedBox(height: 12),
+                        pw.Text('診 斷 證 明 書', style: ts(bold: true, size: 15)),
+                      ],
                     ),
-                    pw.SizedBox(height: 4),
-                    pw.Text('診 斷 證 明 書', style: ts(bold: true, size: 15)),
-                    pw.SizedBox(height: 15),
-                  ],
-                ),
+                  ),
+                  pw.Positioned(
+                    top: 8 * PdfPageFormat.mm,
+                    child: pw.Image(
+                      signImage,
+                      height: 14 * PdfPageFormat.mm,
+                      fit: pw.BoxFit.contain,
+                    ),
+                  ),
+                ],
               ),
             ),
 
@@ -263,15 +281,15 @@ Future<Uint8List> buildChineseDiagnosisPdf(ChineseDiagnosisReportData d) async {
                       isLabel: true,
                       height: 50 * PdfPageFormat.mm,
                     ),
-                          _cell(
-                            pw.Text(
-                              d.doctorNotes,
-                              style: ts(),
-                              textAlign: pw.TextAlign.left,
-                            ),
-                            height: 50 * PdfPageFormat.mm,
-                            align: pw.Alignment.topLeft,
-                          ),
+                    _cell(
+                      pw.Text(
+                        d.doctorNotes,
+                        style: ts(),
+                        textAlign: pw.TextAlign.left,
+                      ),
+                      height: 50 * PdfPageFormat.mm,
+                      align: pw.Alignment.topLeft,
+                    ),
                   ],
                 ),
               ],
