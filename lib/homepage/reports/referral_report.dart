@@ -188,19 +188,22 @@ Future<Uint8List> buildReferralReportPdf(ReferralReportData d) async {
   pw.Widget signatureValue(
     Uint8List? data, {
     double? width,
-    double height = 8,
+    double height = 10,
   }) {
     final signatureData = data;
     final hasData = signatureData != null && signatureData.isNotEmpty;
     return pw.Container(
       width: width == null ? null : width * PdfPageFormat.mm,
       height: height * PdfPageFormat.mm,
+      padding: const pw.EdgeInsets.symmetric(horizontal: 2, vertical: 1),
       alignment: pw.Alignment.centerLeft,
-      decoration: const pw.BoxDecoration(border: pw.Border(bottom: bdr)),
+      decoration: const pw.BoxDecoration(
+        border: pw.Border(left: bdr, right: bdr, bottom: bdr),
+      ),
       child: hasData
           ? pw.Image(
               pw.MemoryImage(signatureData),
-              fit: pw.BoxFit.contain,
+              fit: pw.BoxFit.fitHeight,
               alignment: pw.Alignment.centerLeft,
             )
           : pw.SizedBox(),
@@ -289,7 +292,7 @@ Future<Uint8List> buildReferralReportPdf(ReferralReportData d) async {
   final hHistory = 35 * PdfPageFormat.mm;
   final hSummary = 28 * PdfPageFormat.mm;
   final hPurpose = 22 * PdfPageFormat.mm;
-  final hConsent = 12 * PdfPageFormat.mm;
+  final hConsent = 16 * PdfPageFormat.mm;
   final hDoctor = 34 * PdfPageFormat.mm;
   final hRecvProcess = 36 * PdfPageFormat.mm;
   final hRecvSummary = 25 * PdfPageFormat.mm;
@@ -809,24 +812,11 @@ Future<Uint8List> buildReferralReportPdf(ReferralReportData d) async {
                                       c: const PdfColor.fromInt(0xFFC0392B),
                                     ),
                                   ),
+                                  pw.SizedBox(height: 2),
+                                  signatureValue(d.consentSignature, height: 7),
+                                  pw.SizedBox(height: 2),
                                   pw.Row(
                                     children: [
-                                      pw.Text(
-                                        '同意人簽名：',
-                                        style: ts(
-                                          bold: true,
-                                          c: const PdfColor.fromInt(0xFFC0392B),
-                                        ),
-                                      ),
-                                      pw.SizedBox(width: 2),
-                                      pw.Expanded(
-                                        flex: 5,
-                                        child: signatureValue(
-                                          d.consentSignature,
-                                          height: 5,
-                                        ),
-                                      ),
-                                      pw.SizedBox(width: 4),
                                       pw.Text(
                                         '與病人關係：',
                                         style: ts(
