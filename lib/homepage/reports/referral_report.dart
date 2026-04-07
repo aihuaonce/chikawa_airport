@@ -49,6 +49,9 @@ class ReferralReportData {
   String consentSignName = '';
   Uint8List? consentSignature;
   String consentRelationship = '';
+
+  // 醫師簽章
+  Uint8List? doctorSignature;
   String consentYear = '';
   String consentMonth = '';
   String consentDay = '';
@@ -210,6 +213,45 @@ Future<Uint8List> buildReferralReportPdf(ReferralReportData d) async {
     );
   }
 
+  // 底線式簽名框（參考 telex_report）
+  pw.Widget signatureUnderline(
+    Uint8List? data, {
+    double width = 50,
+    double height = 12,
+  }) {
+    final hasData = data != null && data.isNotEmpty;
+    return pw.Container(
+      width: width,
+      height: height,
+      decoration: pw.BoxDecoration(
+        border: pw.Border(
+          bottom: pw.BorderSide(color: PdfColors.black, width: 0.8),
+        ),
+      ),
+      alignment: pw.Alignment.centerLeft,
+      child: hasData
+          ? pw.Image(pw.MemoryImage(data!), fit: pw.BoxFit.contain)
+          : pw.SizedBox(),
+    );
+  }
+
+  // 無底線簽名框
+  pw.Widget signatureBox(
+    Uint8List? data, {
+    double width = 50,
+    double height = 12,
+  }) {
+    final hasData = data != null && data.isNotEmpty;
+    return pw.Container(
+      width: width,
+      height: height,
+      alignment: pw.Alignment.centerLeft,
+      child: hasData
+          ? pw.Image(pw.MemoryImage(data!), fit: pw.BoxFit.contain)
+          : pw.SizedBox(),
+    );
+  }
+
   pw.Widget gridCellWidgetW(
     pw.Widget child,
     double width, {
@@ -264,7 +306,7 @@ Future<Uint8List> buildReferralReportPdf(ReferralReportData d) async {
   final contentWidth =
       PdfPageFormat.a4.width - 20 * PdfPageFormat.mm; // page minus margins
   final leftColW = 8 * PdfPageFormat.mm;
-  final midColW = 8 * PdfPageFormat.mm;
+  final midColW = 12 * PdfPageFormat.mm;
   final rightColW = contentWidth - leftColW - midColW;
   final mainRightWidth = rightColW;
   final halfRightWidth = (mainRightWidth - 8) / 2;
@@ -282,17 +324,22 @@ Future<Uint8List> buildReferralReportPdf(ReferralReportData d) async {
   final basicAddrW = basicBirthW + basicIdW;
 
   final docUnit = mainRightWidth / 97;
+  final w7 = docUnit * 7;
+  final w8 = docUnit * 8;
+  final w9 = docUnit * 9;
   final w10 = docUnit * 10;
   final w12 = docUnit * 12;
+  final w13 = docUnit * 13;
   final w14 = docUnit * 14;
-  final w9 = docUnit * 9;
+  final w16 = docUnit * 16;
+  final w18 = docUnit * 18;
 
   final hBasic = 24 * PdfPageFormat.mm;
   final basicRowH = hBasic / 4;
   final hHistory = 35 * PdfPageFormat.mm;
   final hSummary = 28 * PdfPageFormat.mm;
   final hPurpose = 22 * PdfPageFormat.mm;
-  final hConsent = 16 * PdfPageFormat.mm;
+  final hConsent = 12 * PdfPageFormat.mm;
   final hDoctor = 34 * PdfPageFormat.mm;
   final hRecvProcess = 36 * PdfPageFormat.mm;
   final hRecvSummary = 25 * PdfPageFormat.mm;
@@ -813,28 +860,48 @@ Future<Uint8List> buildReferralReportPdf(ReferralReportData d) async {
                                     ),
                                   ),
                                   pw.SizedBox(height: 2),
-                                  signatureValue(d.consentSignature, height: 7),
-                                  pw.SizedBox(height: 2),
+                                  // 同意人簽名、與病人關係、日期 同一行，日期靠右
                                   pw.Row(
+                                    crossAxisAlignment:
+                                        pw.CrossAxisAlignment.center,
                                     children: [
+                                      pw.Text(
+                                        '同意人簽名：',
+                                        style: ts(
+                                          bold: true,
+                                          sz: 7,
+                                          c: const PdfColor.fromInt(0xFFC0392B),
+                                        ),
+                                      ),
+                                      signatureBox(
+                                        d.consentSignature,
+                                        width: 40,
+                                        height: 12,
+                                      ),
+                                      pw.SizedBox(width: 16),
                                       pw.Text(
                                         '與病人關係：',
                                         style: ts(
                                           bold: true,
+                                          sz: 7,
                                           c: const PdfColor.fromInt(0xFFC0392B),
                                         ),
                                       ),
-                                      pw.Expanded(
+                                      pw.Container(
+                                        constraints: pw.BoxConstraints(
+                                          minWidth: 25,
+                                        ),
                                         child: pw.Text(
                                           d.consentRelationship,
-                                          style: ts(),
+                                          style: ts(sz: 7),
                                         ),
                                       ),
-                                      pw.SizedBox(width: 4),
+                                      pw.Spacer(),
                                       pw.Text(
                                         '日期：',
                                         style: ts(
                                           bold: true,
+                                          sz: 7,
                                           c: const PdfColor.fromInt(0xFFC0392B),
                                         ),
                                       ),
@@ -842,34 +909,39 @@ Future<Uint8List> buildReferralReportPdf(ReferralReportData d) async {
                                       pw.Text(
                                         '年',
                                         style: ts(
+                                          sz: 7,
                                           c: const PdfColor.fromInt(0xFFC0392B),
                                         ),
                                       ),
-                                      uv(d.consentMonth, w: 6, center: true),
+                                      uv(d.consentMonth, w: 5, center: true),
                                       pw.Text(
                                         '月',
                                         style: ts(
+                                          sz: 7,
                                           c: const PdfColor.fromInt(0xFFC0392B),
                                         ),
                                       ),
-                                      uv(d.consentDay, w: 6, center: true),
+                                      uv(d.consentDay, w: 5, center: true),
                                       pw.Text(
                                         '日',
                                         style: ts(
+                                          sz: 7,
                                           c: const PdfColor.fromInt(0xFFC0392B),
                                         ),
                                       ),
-                                      uv(d.consentHour, w: 6, center: true),
+                                      uv(d.consentHour, w: 5, center: true),
                                       pw.Text(
                                         '時',
                                         style: ts(
+                                          sz: 7,
                                           c: const PdfColor.fromInt(0xFFC0392B),
                                         ),
                                       ),
-                                      uv(d.consentMin, w: 6, center: true),
+                                      uv(d.consentMin, w: 5, center: true),
                                       pw.Text(
                                         '分',
                                         style: ts(
+                                          sz: 7,
                                           c: const PdfColor.fromInt(0xFFC0392B),
                                         ),
                                       ),
@@ -885,125 +957,192 @@ Future<Uint8List> buildReferralReportPdf(ReferralReportData d) async {
                             pw.Container(
                               height: hDoctor,
                               padding: pw.EdgeInsets.zero,
-                              child: pw.Column(
-                                mainAxisAlignment:
-                                    pw.MainAxisAlignment.spaceBetween,
+                              child: pw.Table(
+                                border: tblNoLeft,
+                                columnWidths: {0: colW(midColW), 1: flexW(1)},
                                 children: [
-                                  pw.Row(
+                                  // 院所住址列
+                                  pw.TableRow(
                                     children: [
-                                      gridCellTextW(
-                                        '院所住址',
-                                        w10,
+                                      cell(
+                                        '院所\n住址',
                                         bold: true,
-                                        left: true,
-                                        top: true,
+                                        align: pw.Alignment.center,
+                                        h: hDoctor / 4,
                                       ),
-                                      gridCellTextW(
-                                        '337桃園市大園區航站南路9號及15號  TEL：03-3983456  FAX：03-3834225',
-                                        mainRightWidth - w10,
-                                        top: true,
+                                      pw.Container(
+                                        height: hDoctor / 4,
+                                        padding: const pw.EdgeInsets.symmetric(
+                                          horizontal: 2,
+                                          vertical: 1,
+                                        ),
+                                        alignment: pw.Alignment.center,
+                                        decoration: const pw.BoxDecoration(
+                                          border: pw.Border(
+                                            top: bdr,
+                                            right: bdr,
+                                            bottom: bdr,
+                                          ),
+                                        ),
+                                        child: pw.Text(
+                                          '337桃園市大園區航站南路9號及15號    TEL：03-3983456    FAX：03-3834225',
+                                          style: ts(sz: 8),
+                                        ),
                                       ),
                                     ],
                                   ),
-                                  pw.Row(
+                                  // 診治醫師列
+                                  pw.TableRow(
                                     children: [
-                                      gridCellTextW(
+                                      cell(
                                         '診治\n醫師',
-                                        w10,
-                                        bold: true,
-                                        left: true,
-                                        align: pw.Alignment.center,
-                                      ),
-                                      gridCellTextW(
-                                        '姓\n名',
-                                        w10,
                                         bold: true,
                                         align: pw.Alignment.center,
+                                        h: hDoctor / 4,
                                       ),
-                                      gridCellTextW(d.doctorName, w14),
-                                      gridCellTextW(
-                                        '科\n別',
-                                        w10,
-                                        bold: true,
-                                        align: pw.Alignment.center,
-                                      ),
-                                      gridCellTextW(d.doctorDept, w10),
-                                      gridCellTextW(
-                                        '聯絡\n電話',
-                                        w12,
-                                        bold: true,
-                                        align: pw.Alignment.center,
-                                      ),
-                                      gridCellTextW(d.doctorPhone, w10),
-                                      gridCellTextW(
-                                        '醫師\n簽章',
-                                        w12,
-                                        bold: true,
-                                        align: pw.Alignment.center,
-                                      ),
-                                      gridCellTextW('', w9),
-                                    ],
-                                  ),
-                                  pw.Row(
-                                    children: [
-                                      gridCellTextW(
-                                        '開單\n日期',
-                                        w10,
-                                        bold: true,
-                                        left: true,
-                                        align: pw.Alignment.center,
-                                      ),
-                                      gridCellTextW(
-                                        '西元 ${d.issueDateYear} 年 ${d.issueDateMonth} 月 ${d.issueDateDay} 日\n（90天內有效）',
-                                        w10 + w14 + w10 + w10,
-                                      ),
-                                      gridCellTextW(
-                                        '安排就醫日期',
-                                        w12,
-                                        bold: true,
-                                        align: pw.Alignment.center,
-                                      ),
-                                      gridCellTextW(
-                                        '西元 ${d.appointDateYear} 年 ${d.appointDateMonth} 月 ${d.appointDateDay} 日\n${d.appointDept}科 診${d.appointNo}號',
-                                        w10 + w12 + w9,
-                                      ),
-                                    ],
-                                  ),
-                                  pw.Row(
-                                    children: [
-                                      gridCellTextW(
-                                        '建議轉診\n院所科別',
-                                        w10,
-                                        bold: true,
-                                        left: true,
-                                        align: pw.Alignment.center,
-                                      ),
-                                      gridCellTextW(
-                                        '${d.referHospital}  ${d.referDept}科  ${d.referDoctor}醫師',
-                                        w10 + w14 + w10 + w10,
-                                      ),
-                                      gridCellTextW(
-                                        '轉診院所地址\n及專線電話',
-                                        w12,
-                                        bold: true,
-                                        align: pw.Alignment.center,
-                                      ),
-                                      gridCellWidgetW(
-                                        pw.Column(
-                                          crossAxisAlignment:
-                                              pw.CrossAxisAlignment.start,
+                                      pw.Container(
+                                        height: hDoctor / 4,
+                                        padding: pw.EdgeInsets.zero,
+                                        child: pw.Row(
                                           children: [
-                                            pw.Text(
-                                              '地址: ${d.referHospAddress}',
-                                              style: ts(),
+                                            gridCellTextW(
+                                              '姓\n名',
+                                              w10,
+                                              bold: true,
+                                              align: pw.Alignment.center,
+                                              height: hDoctor / 4,
                                             ),
-                                            pw.Text(
-                                              '電話: ${d.referHospPhone}',
-                                              style: ts(),
+                                            gridCellTextW(
+                                              d.doctorName,
+                                              w18,
+                                              align: pw.Alignment.center,
+                                              height: hDoctor / 4,
+                                            ),
+                                            gridCellTextW(
+                                              '科\n別',
+                                              w10,
+                                              bold: true,
+                                              align: pw.Alignment.center,
+                                              height: hDoctor / 4,
+                                            ),
+                                            gridCellTextW(
+                                              d.doctorDept,
+                                              w12,
+                                              align: pw.Alignment.center,
+                                              height: hDoctor / 4,
+                                            ),
+                                            gridCellTextW(
+                                              '聯絡\n電話',
+                                              w12,
+                                              bold: true,
+                                              align: pw.Alignment.center,
+                                              height: hDoctor / 4,
+                                            ),
+                                            gridCellTextW(
+                                              d.doctorPhone,
+                                              w10,
+                                              align: pw.Alignment.center,
+                                              height: hDoctor / 4,
+                                            ),
+                                            gridCellTextW(
+                                              '醫師\n簽章',
+                                              w12,
+                                              bold: true,
+                                              align: pw.Alignment.center,
+                                              height: hDoctor / 4,
+                                            ),
+                                            gridCellWidgetW(
+                                              signatureBox(
+                                                d.doctorSignature,
+                                                width: w13,
+                                                height: hDoctor / 4 - 8,
+                                              ),
+                                              w13,
+                                              height: hDoctor / 4,
                                             ),
                                           ],
                                         ),
-                                        w10 + w12 + w9,
+                                      ),
+                                    ],
+                                  ),
+                                  // 開單日期列
+                                  pw.TableRow(
+                                    children: [
+                                      cell(
+                                        '開單\n日期',
+                                        bold: true,
+                                        align: pw.Alignment.center,
+                                        h: hDoctor / 4,
+                                      ),
+                                      pw.Container(
+                                        height: hDoctor / 4,
+                                        padding: pw.EdgeInsets.zero,
+                                        child: pw.Row(
+                                          children: [
+                                            // 開單日期內容 - 與姓名+醫師名稱+科別+部門 同寬度
+                                            gridCellTextW(
+                                              '西元 ${d.issueDateYear} 年 ${d.issueDateMonth} 月 ${d.issueDateDay} 日（90天內有效）',
+                                              w10 + w18 + w10 + w12,
+                                              align: pw.Alignment.center,
+                                              height: hDoctor / 4,
+                                            ),
+                                            // 安排就醫日期+內容格 - 與聯絡電話+電話+醫師簽章+簽名 同寬度
+                                            gridCellTextW(
+                                              '安排就醫日期',
+                                              (w10 + w18 + w10 + w12) / 3,
+                                              bold: true,
+                                              align: pw.Alignment.center,
+                                              height: hDoctor / 4,
+                                              right: true,
+                                            ),
+                                            // 就醫日期內容
+                                            gridCellTextW(
+                                              '西元 ${d.appointDateYear} 年 ${d.appointDateMonth} 月 ${d.appointDateDay} 日\n${d.appointDept}科 診${d.appointNo}號',
+                                              (w10 + w18 + w10 + w12) / 3 * 2,
+                                              align: pw.Alignment.center,
+                                              height: hDoctor / 4,
+                                              right: true,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  // 建議轉診院所列
+                                  pw.TableRow(
+                                    children: [
+                                      cell(
+                                        '建議轉\n診院所',
+                                        bold: true,
+                                        align: pw.Alignment.center,
+                                        h: hDoctor / 4,
+                                      ),
+                                      pw.Container(
+                                        height: hDoctor / 4,
+                                        padding: pw.EdgeInsets.zero,
+                                        child: pw.Row(
+                                          children: [
+                                            gridCellTextW(
+                                              '${d.referHospital}  ${d.referDept}科  ${d.referDoctor}醫師',
+                                              w18 + w18,
+                                              align: pw.Alignment.center,
+                                              height: hDoctor / 4,
+                                            ),
+                                            gridCellTextW(
+                                              '轉診院所地址及專線電話',
+                                              w18 + w14,
+                                              bold: true,
+                                              align: pw.Alignment.center,
+                                              height: hDoctor / 4,
+                                            ),
+                                            gridCellTextW(
+                                              '地址: ${d.referHospAddress}\n電話: ${d.referHospPhone}',
+                                              w16 + w13,
+                                              align: pw.Alignment.center,
+                                              height: hDoctor / 4,
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ],
                                   ),
