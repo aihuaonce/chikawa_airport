@@ -243,7 +243,7 @@ Future<Uint8List> buildAmbulanceReportPdf(AmbulanceReportData d) async {
     double sz = 5.5,
     bool bold = false,
     double indent = 0,
-    bool fillBlack = false,
+    bool fillBlack = true,
   }) {
     return pw.Padding(
       padding: pw.EdgeInsets.only(left: indent, right: 2, bottom: 1, top: 0.5),
@@ -257,14 +257,6 @@ Future<Uint8List> buildAmbulanceReportPdf(AmbulanceReportData d) async {
               border: pw.Border.all(width: 0.5),
               color: fillBlack && checked ? PdfColors.black : null,
             ),
-            child: !fillBlack && checked
-                ? pw.Center(
-                    child: pw.Text(
-                      'v',
-                      style: pw.TextStyle(font: font, fontSize: 4),
-                    ),
-                  )
-                : null,
           ),
           pw.SizedBox(width: 1),
           pw.Text(
@@ -921,7 +913,7 @@ Future<Uint8List> buildAmbulanceReportPdf(AmbulanceReportData d) async {
                                 children: [
                                   _lbl(
                                     '現場狀況 (此欄可複選)',
-                                    align: pw.Alignment.centerLeft,
+                                    align: pw.Alignment.center,
                                   ),
                                 ],
                               ),
@@ -938,155 +930,319 @@ Future<Uint8List> buildAmbulanceReportPdf(AmbulanceReportData d) async {
                             children: [
                               pw.TableRow(
                                 children: [
-                                  _lbl('□ 非創傷', align: pw.Alignment.centerLeft),
-                                  _lbl('□ 創傷', align: pw.Alignment.centerLeft),
+                                  _lbl('□ 非創傷', align: pw.Alignment.center),
+                                  _lbl('□ 創傷', align: pw.Alignment.center),
                                 ],
                               ),
                               pw.TableRow(
                                 children: [
                                   _cell(
-                                    pw.Column(
-                                      crossAxisAlignment:
-                                          pw.CrossAxisAlignment.start,
-                                      children: [
-                                        _chk('急症', d.ntiEmergency, bold: true),
-                                        _chk(
-                                          '呼吸問題(喘)',
-                                          d.ntiBreathIssue,
-                                          indent: 3,
-                                        ),
-                                        _chk(
-                                          '呼吸道問題(異物)',
-                                          d.ntiAirwayIssue,
-                                          indent: 3,
-                                        ),
-                                        _chk('昏迷(意識不清)', d.ntiFaint, indent: 3),
-                                        _chk(
-                                          '胸痛/胸悶',
-                                          d.ntiChestPain,
-                                          indent: 3,
-                                        ),
-                                        _chk('腹痛', d.ntiAbdomen, indent: 3),
-                                        pw.SizedBox(height: 2),
-                                        _chk('一般疾病', d.ntiGeneral, bold: true),
-                                        _chk('頭痛/頭暈', d.ntiHeadache, indent: 3),
-                                        _chk('昏倒/昏厥', d.ntiFaint, indent: 3),
-                                        _chk('發燒', d.ntiFever, indent: 3),
-                                        _chk(
-                                          '噁心/嘔吐/腹瀉',
-                                          d.ntiNausea,
-                                          indent: 3,
-                                        ),
-                                        _chk('肢體無力', d.ntiWeakness, indent: 3),
-                                        pw.SizedBox(height: 2),
-                                        _chk('疑似毒藥物中毒', d.ntiDrug),
-                                        _chk('疑似一氧化碳中毒', d.ntiCO),
-                                        _chk('癲癇/抽搐', d.ntiSeizure),
-                                        _chk('路倒', d.ntiFall),
-                                        _chk('精神異常', d.ntiMental),
-                                        _chk('孕婦急產', d.ntiPregnancy),
-                                        _chk('到院前心肺功能停止', d.ntiCardiacArrest),
-                                        _chk('其他', d.ntiOtherNT),
-                                        if (d.ntiOtherNTText.isNotEmpty)
-                                          pw.Padding(
-                                            padding: const pw.EdgeInsets.only(
-                                              left: 6,
-                                            ),
-                                            child: pw.Text(
-                                              d.ntiOtherNTText,
-                                              style: ts(),
+                                    pw.Padding(
+                                      padding: const pw.EdgeInsets.all(3),
+                                      child: pw.Row(
+                                        crossAxisAlignment:
+                                            pw.CrossAxisAlignment.start,
+                                        children: [
+                                          pw.Container(
+                                            width: 35 * PdfPageFormat.mm,
+                                            child: pw.Column(
+                                              crossAxisAlignment:
+                                                  pw.CrossAxisAlignment.start,
+                                              children: [
+                                                _chk(
+                                                  '急症',
+                                                  d.ntiEmergency,
+                                                  bold: true,
+                                                ),
+                                                _chk(
+                                                  '呼吸問題\n(喘/呼吸急促)',
+                                                  d.ntiBreathIssue,
+                                                  indent: 3,
+                                                ),
+                                                _chk(
+                                                  '呼吸道問題\n(異物哽塞)',
+                                                  d.ntiAirwayIssue,
+                                                  indent: 3,
+                                                ),
+                                                _chk(
+                                                  '昏迷(意識不清)',
+                                                  d.ntiFaint,
+                                                  indent: 3,
+                                                ),
+                                                _chk(
+                                                  '胸痛/胸悶',
+                                                  d.ntiChestPain,
+                                                  indent: 3,
+                                                ),
+                                                _chk(
+                                                  '腹痛',
+                                                  d.ntiAbdomen,
+                                                  indent: 3,
+                                                ),
+                                                pw.SizedBox(height: 2),
+                                                _chk(
+                                                  '一般疾病',
+                                                  d.ntiGeneral,
+                                                  bold: true,
+                                                ),
+                                                _chk(
+                                                  '頭痛/頭暈',
+                                                  d.ntiHeadache,
+                                                  indent: 3,
+                                                ),
+                                                _chk(
+                                                  '昏倒/昏厥',
+                                                  d.ntiFaint,
+                                                  indent: 3,
+                                                ),
+                                                _chk(
+                                                  '發燒',
+                                                  d.ntiFever,
+                                                  indent: 3,
+                                                ),
+                                                _chk(
+                                                  '噁心/嘔吐/腹瀉',
+                                                  d.ntiNausea,
+                                                  indent: 3,
+                                                ),
+                                                _chk(
+                                                  '肢體無力',
+                                                  d.ntiWeakness,
+                                                  indent: 3,
+                                                ),
+                                              ],
                                             ),
                                           ),
-                                      ],
+                                          pw.SizedBox(width: 4),
+                                          pw.Container(
+                                            width: 24 * PdfPageFormat.mm,
+                                            child: pw.Column(
+                                              crossAxisAlignment:
+                                                  pw.CrossAxisAlignment.start,
+                                              children: [
+                                                _chk('疑似毒藥物中毒', d.ntiDrug),
+                                                _chk('疑似一氧化碳中毒', d.ntiCO),
+                                                _chk('癲癇/抽搐', d.ntiSeizure),
+                                                _chk('路倒', d.ntiFall),
+                                                _chk('精神異常', d.ntiMental),
+                                                _chk('孕婦急產', d.ntiPregnancy),
+                                                _chk(
+                                                  '到院前心肺功能停止',
+                                                  d.ntiCardiacArrest,
+                                                ),
+                                                _chk('其他', d.ntiOtherNT),
+                                                if (d.ntiOtherNTText.isNotEmpty)
+                                                  pw.Padding(
+                                                    padding:
+                                                        const pw.EdgeInsets.only(
+                                                          left: 6,
+                                                        ),
+                                                    child: pw.Text(
+                                                      d.ntiOtherNTText,
+                                                      style: ts(),
+                                                    ),
+                                                  ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
                                   _cell(
-                                    pw.Column(
-                                      crossAxisAlignment:
-                                          pw.CrossAxisAlignment.start,
-                                      children: [
-                                        _chk('一般外傷', d.trGeneral, bold: true),
-                                        _chk('頭部外傷', d.trHead, indent: 3),
-                                        _chk('胸部外傷', d.trChest, indent: 3),
-                                        _chk('腹部外傷', d.trAbdomen, indent: 3),
-                                        _chk('背部外傷', d.trBack, indent: 3),
-                                        _chk('肢體外傷', d.trLimb, indent: 3),
-                                        _chk('其他', d.trOtherT, indent: 3),
-                                        pw.SizedBox(height: 2),
-                                        _chk('溺水', d.trDrown),
-                                        _chk('摔跌傷', d.trFall),
-                                        _chk(
-                                          '墜落傷(約${d.trFallHeight.isNotEmpty ? d.trFallHeight : '__'}公尺)',
-                                          d.trCrush,
-                                        ),
-                                        _chk('穿刺傷', d.trPenetrate),
-                                        _chk(
-                                          "燒燙傷${d.trBurnDegree.isNotEmpty ? ' ${d.trBurnDegree}' : ''}",
-                                          d.trBurn,
-                                        ),
-                                        _chk('電擊傷', d.trElectric),
-                                        _chk('生物螫咬', d.trBioStrike),
-                                        _chk('到院前心肺功能停止', d.trCardiacArrest),
-                                        _chk('其他', d.trOtherT2),
-                                        if (d.trOtherT2Text.isNotEmpty)
-                                          pw.Padding(
-                                            padding: const pw.EdgeInsets.only(
-                                              left: 6,
-                                            ),
-                                            child: pw.Text(
-                                              d.trOtherT2Text,
-                                              style: ts(),
-                                            ),
+                                    pw.Padding(
+                                      padding: const pw.EdgeInsets.all(3),
+                                      child: pw.Column(
+                                        children: [
+                                          pw.Row(
+                                            crossAxisAlignment:
+                                                pw.CrossAxisAlignment.start,
+                                            children: [
+                                              pw.Container(
+                                                width: 30 * PdfPageFormat.mm,
+                                                child: pw.Column(
+                                                  crossAxisAlignment: pw
+                                                      .CrossAxisAlignment
+                                                      .start,
+                                                  children: [
+                                                    _chk(
+                                                      '一般外傷',
+                                                      d.trGeneral,
+                                                      bold: true,
+                                                    ),
+                                                    _chk(
+                                                      '頭部外傷',
+                                                      d.trHead,
+                                                      indent: 3,
+                                                    ),
+                                                    _chk(
+                                                      '胸部外傷',
+                                                      d.trChest,
+                                                      indent: 3,
+                                                    ),
+                                                    _chk(
+                                                      '腹部外傷',
+                                                      d.trAbdomen,
+                                                      indent: 3,
+                                                    ),
+                                                    _chk(
+                                                      '背部外傷',
+                                                      d.trBack,
+                                                      indent: 3,
+                                                    ),
+                                                    _chk(
+                                                      '肢體外傷',
+                                                      d.trLimb,
+                                                      indent: 3,
+                                                    ),
+                                                    _chk(
+                                                      '其他',
+                                                      d.trOtherT,
+                                                      indent: 3,
+                                                    ),
+                                                    pw.SizedBox(height: 2),
+                                                    _chk(
+                                                      '受傷機轉',
+                                                      false,
+                                                      bold: true,
+                                                    ),
+                                                    _chk(
+                                                      '因交通事故',
+                                                      d.trTrafficAcc,
+                                                      indent: 3,
+                                                    ),
+                                                    _chk(
+                                                      '非交通事故',
+                                                      d.trNonTrafficAcc,
+                                                      indent: 3,
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              pw.SizedBox(width: 4),
+                                              pw.Container(
+                                                width: 30 * PdfPageFormat.mm,
+                                                child: pw.Column(
+                                                  crossAxisAlignment: pw
+                                                      .CrossAxisAlignment
+                                                      .start,
+                                                  children: [
+                                                    _chk('溺水', d.trDrown),
+                                                    _chk('摔跌傷', d.trFall),
+                                                    _chk(
+                                                      '墜落傷(約${d.trFallHeight.isNotEmpty ? d.trFallHeight : '__'}公尺)',
+                                                      d.trCrush,
+                                                    ),
+                                                    _chk('穿刺傷', d.trPenetrate),
+                                                    _chk(
+                                                      "燒燙傷 度: ${d.trBurnDegree.isNotEmpty ? d.trBurnDegree : '___'} %: ___",
+                                                      d.trBurn,
+                                                    ),
+                                                    _chk('電擊傷', d.trElectric),
+                                                    _chk('生物螫咬', d.trBioStrike),
+                                                    _chk(
+                                                      '到院前心肺功能停止',
+                                                      d.trCardiacArrest,
+                                                    ),
+                                                    _chk('其他', d.trOtherT2),
+                                                    if (d
+                                                        .trOtherT2Text
+                                                        .isNotEmpty)
+                                                      pw.Padding(
+                                                        padding:
+                                                            const pw.EdgeInsets.only(
+                                                              left: 3,
+                                                            ),
+                                                        child: pw.Text(
+                                                          d.trOtherT2Text,
+                                                          style: ts(),
+                                                        ),
+                                                      ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
                                           ),
-                                        pw.SizedBox(height: 2),
-                                        _chk('受傷機轉', false, bold: true),
-                                        _chk(
-                                          '因交通事故',
-                                          d.trTrafficAcc,
-                                          indent: 3,
-                                        ),
-                                        _chk(
-                                          '非交通事故',
-                                          d.trNonTrafficAcc,
-                                          indent: 3,
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-
-                          // ── 過敏史 (修正：獨立區塊，12+131=143) ──
-                          pw.Table(
-                            border: tbInner,
-                            columnWidths: {
-                              0: pw.FixedColumnWidth(12 * PdfPageFormat.mm),
-                              1: pw.FixedColumnWidth(131 * PdfPageFormat.mm),
-                            },
-                            children: [
-                              pw.TableRow(
-                                children: [
-                                  _lbl('過敏\n史'),
-                                  _cell(
-                                    pw.Wrap(
-                                      spacing: 2,
-                                      children: [
-                                        _chk('無', d.allergyNone),
-                                        _chk('不詳', d.allergyUnknown),
-                                        // 修正：顯示過敏實際內容
-                                        _chk(
-                                          '食物: ${d.allergyFood.isNotEmpty ? d.allergyFood : "______"}',
-                                          false,
-                                        ),
-                                        _chk(
-                                          '藥物: ${d.allergyMeds.isNotEmpty ? d.allergyMeds : "______"}',
-                                          false,
-                                        ),
-                                        if (d.allergyOther.isNotEmpty)
-                                          _chk('其他: ${d.allergyOther}', false),
-                                      ],
+                                          pw.Table(
+                                            border: pw.TableBorder(
+                                              top: bSide,
+                                              bottom: bSide,
+                                            ),
+                                            columnWidths: {
+                                              0: pw.FixedColumnWidth(
+                                                65 * PdfPageFormat.mm,
+                                              ),
+                                            },
+                                            children: [
+                                              pw.TableRow(
+                                                children: [
+                                                  _lbl(
+                                                    '過敏史',
+                                                    align: pw.Alignment.center,
+                                                  ),
+                                                ],
+                                              ),
+                                              pw.TableRow(
+                                                children: [
+                                                  _cell(
+                                                    pw.Column(
+                                                      crossAxisAlignment: pw
+                                                          .CrossAxisAlignment
+                                                          .start,
+                                                      children: [
+                                                        pw.Row(
+                                                          children: [
+                                                            _chk(
+                                                              '無',
+                                                              d.allergyNone,
+                                                            ),
+                                                            pw.SizedBox(
+                                                              width: 4,
+                                                            ),
+                                                            _chk(
+                                                              '不詳',
+                                                              d.allergyUnknown,
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        pw.Row(
+                                                          children: [
+                                                            _chk(
+                                                              '食物: ${d.allergyFood}',
+                                                              false,
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        pw.Row(
+                                                          children: [
+                                                            _chk(
+                                                              '藥物: ${d.allergyMeds}',
+                                                              false,
+                                                            ),
+                                                            if (d
+                                                                .allergyOther
+                                                                .isNotEmpty)
+                                                              pw.SizedBox(
+                                                                width: 4,
+                                                              ),
+                                                            if (d
+                                                                .allergyOther
+                                                                .isNotEmpty)
+                                                              _chk(
+                                                                '其他: ${d.allergyOther}',
+                                                                false,
+                                                              ),
+                                                          ],
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -1106,14 +1262,14 @@ Future<Uint8List> buildAmbulanceReportPdf(AmbulanceReportData d) async {
                             children: [
                               pw.TableRow(
                                 children: [
-                                  _lbl('病患\n主訴'),
+                                  _lbl('病\n患\n主\n訴'),
                                   _cell(
                                     pw.Column(
                                       crossAxisAlignment:
                                           pw.CrossAxisAlignment.start,
                                       children: [
                                         // 修正：顯示家屬代述
-                                        _chk('家屬代述', d.chiefByFamily),
+                                        _chk('家屬或同事、有人代述', d.chiefByFamily),
                                         pw.Text(
                                           d.chiefComplaint,
                                           style: ts(sz: 6),
@@ -1121,7 +1277,7 @@ Future<Uint8List> buildAmbulanceReportPdf(AmbulanceReportData d) async {
                                       ],
                                     ),
                                   ),
-                                  _lbl('過去\n病史'),
+                                  _lbl('過去病史'),
                                   _cell(
                                     pw.Wrap(
                                       children: [
