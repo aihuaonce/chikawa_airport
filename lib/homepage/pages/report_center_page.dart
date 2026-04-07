@@ -1524,6 +1524,7 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
       ..consentSignName = contactName
       ..consentSignature = form?.consentSignature
       ..consentRelationship = consentRelationship
+      ..doctorSignature = form?.doctorSignature
       ..consentYear = consentYear
       ..consentMonth = consentMonth
       ..consentDay = consentDay

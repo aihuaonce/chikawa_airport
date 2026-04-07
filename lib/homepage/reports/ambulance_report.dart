@@ -1759,16 +1759,136 @@ Future<Uint8List> buildAmbulanceReportPdf(AmbulanceReportData d) async {
                   ],
                 ),
 
+                pw.SizedBox(height: 6), // 與上方區塊保留一點間距
+                // ================== Block 6：底部橫向簽名欄 (總寬 284mm) ==================
+                pw.Row(
+                  crossAxisAlignment: pw.CrossAxisAlignment.stretch,
+                  children: [
+                    // 1. 垂直標題：簽名欄
+                    buildCell(
+                      pw.Center(
+                        child: pw.Text(
+                          '簽\n名\n欄',
+                          style: ts(bold: true, sz: 8),
+                          textAlign: pw.TextAlign.center,
+                        ),
+                      ),
+                      width: 8,
+                      minHeight: 20,
+                      isFirstRow: true,
+                      isFirstColumn: true,
+                      bg: PdfColors.grey200,
+                    ),
+
+                    // 2. 救護車救護人員簽名
+                    buildCell(
+                      pw.Column(
+                        crossAxisAlignment: pw.CrossAxisAlignment.start,
+                        children: [
+                          pw.Text('救護車救護人員簽名', style: ts(bold: true)),
+                          pw.Spacer(),
+                          pw.Row(
+                            mainAxisAlignment: pw.MainAxisAlignment.spaceAround,
+                            children: [
+                              pw.Text('一、 ${d.emt1}', style: ts(sz: 8)),
+                              pw.Text('二、 ${d.emt2}', style: ts(sz: 8)),
+                              pw.Text('三、 ${d.emt3}', style: ts(sz: 8)),
+                            ],
+                          ),
+                          pw.SizedBox(height: 4),
+                        ],
+                      ),
+                      width: 66,
+                      minHeight: 20,
+                      isFirstRow: true,
+                    ),
+
+                    // 3. 接收單位簽名
+                    buildCell(
+                      pw.Column(
+                        crossAxisAlignment: pw.CrossAxisAlignment.center,
+                        children: [
+                          pw.Text('接收單位簽名', style: ts(bold: true)),
+                          pw.Spacer(),
+                          pw.Text(d.receiveUnit, style: ts(sz: 8)),
+                          pw.Spacer(),
+                          pw.Text(
+                            '時間： ${d.signTimeHour} 時 ${d.signTimeMin} 分',
+                            style: ts(sz: 6),
+                          ),
+                        ],
+                      ),
+                      width: 50,
+                      minHeight: 20,
+                      isFirstRow: true,
+                    ),
+
+                    // 4. 拒絕送醫聲明
+                    buildCell(
+                      pw.Column(
+                        crossAxisAlignment: pw.CrossAxisAlignment.center,
+                        children: [
+                          pw.Text('拒絕送醫聲明', style: ts(bold: true)),
+                          pw.Expanded(
+                            child: pw.Row(
+                              crossAxisAlignment: pw.CrossAxisAlignment.center,
+                              children: [
+                                buildCheckBox('', false, sz: 6),
+                                pw.Expanded(
+                                  child: pw.Text(
+                                    '拒絕送醫聲明：本人(或關係人)聲明，救護人員已將病情與拒絕送醫之可能危險告知，但我仍拒絕接受處置及送醫。',
+                                    style: ts(sz: 5.5),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      width: 90,
+                      minHeight: 20,
+                      isFirstRow: true,
+                    ),
+
+                    // 5. 病患/家屬/關係人簽名
+                    buildCell(
+                      pw.Column(
+                        crossAxisAlignment: pw.CrossAxisAlignment.start,
+                        children: [
+                          pw.Text('病患/家屬/關係人簽名', style: ts(bold: true)),
+                          pw.Spacer(),
+                          pw.Text(
+                            '簽名： ${d.patientFamilySign}',
+                            style: ts(sz: 8),
+                          ),
+                          pw.Spacer(),
+                          pw.Text(
+                            '連絡電話： ${d.refuseContactPhone}',
+                            style: ts(sz: 6),
+                          ),
+                        ],
+                      ),
+                      width: 70,
+                      minHeight: 20,
+                      isFirstRow: true,
+                    ),
+                  ],
+                ),
+
                 pw.Spacer(),
 
-                // 底部說明
+                // 底部邊界說明文字
                 pw.Container(
-                  width: 280 * PdfPageFormat.mm,
+                  width: 284 * PdfPageFormat.mm,
                   child: pw.Row(
                     mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                     children: [
+                      pw.Text('聯新(A432)2022/06x500張', style: ts(sz: 5)),
+                      pw.Text(
+                        '第一聯：救護車單位自存(白色)　第二聯：交診察醫院(藍色)',
+                        style: ts(sz: 5),
+                      ),
                       pw.Text('51-S-000-001', style: ts(sz: 5)),
-                      pw.Text('聯新國際醫院救護紀錄表', style: ts(sz: 5)),
                     ],
                   ),
                 ),

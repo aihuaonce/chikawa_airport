@@ -1,5 +1,6 @@
 import 'package:chikawa_airport/data/models/reference_service.dart';
 import 'package:chikawa_airport/data/models/sync_service_provider.dart';
+import 'package:chikawa_airport/ambulance/pages/body_map.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -26,6 +27,7 @@ void main() async {
         Provider<AppDatabase>.value(value: database),
         ChangeNotifierProvider<ReferenceService>.value(value: refService),
         ChangeNotifierProvider<SyncServiceProvider>.value(value: syncServiceProvider),
+        ChangeNotifierProvider<BodyMapProvider>(create: (_) => BodyMapProvider()),
       ],
       child: const MyApp(),
     ),
