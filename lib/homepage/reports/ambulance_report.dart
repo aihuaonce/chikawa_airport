@@ -1,9 +1,11 @@
 import 'dart:convert';
 import 'dart:typed_data';
 import 'dart:math' as math;
+import 'package:flutter/material.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
+import 'package:flutter/services.dart' show rootBundle;
 
 class AmbulanceReportData {
   String licensePlate = '';
@@ -168,10 +170,20 @@ class AmbulanceReportData {
   String ambulanceFee = '', o2Fee = '', totalFee = '';
   bool paidCash = false, paidCard = false, paidHospital = false, unpaid = false;
   String unpaidNote = '', notes = '';
+  Uint8List? bodyMapWithDrawing;
 }
 
-Future<Uint8List> buildAmbulanceReportPdf(AmbulanceReportData d) async {
+Future<Uint8List> buildAmbulanceReportPdf(
+  AmbulanceReportData d, {
+  Uint8List? bodyMapWithDrawing, // ← 新增參數
+}) async {
   final pdf = pw.Document();
+  // 載入人體圖（前/後）
+  final ByteData bodyData = await rootBundle.load(
+    'assets/images/body_diagram_placeholder.jpg',
+  );
+  final Uint8List bodyBytes = bodyData.buffer.asUint8List();
+  final pw.MemoryImage bodyImage = pw.MemoryImage(bodyBytes);
   final font = await PdfGoogleFonts.notoSansTCRegular();
   final fontB = await PdfGoogleFonts.notoSansTCBold();
 
@@ -291,29 +303,27 @@ Future<Uint8List> buildAmbulanceReportPdf(AmbulanceReportData d) async {
                 // ══════════════════════════════════════════════════
                 pw.Row(
                   children: [
-                    // 左半部：標題置中
+                    // 左半部：標題靠右
                     pw.Container(
                       width: leftW * PdfPageFormat.mm,
-                      alignment: pw.Alignment.center,
+                      alignment: pw.Alignment.centerRight,
                       padding: const pw.EdgeInsets.symmetric(vertical: 2),
                       child: pw.Text(
                         '聯  新  國  際  醫  院 桃  園  國  際',
                         style: ts(sz: 12, bold: true),
                       ),
                     ),
+                    // 右半部：標題靠左 + 車號
                     pw.Container(
                       width: rightW * PdfPageFormat.mm,
-                      alignment: pw.Alignment.center,
                       padding: const pw.EdgeInsets.symmetric(vertical: 2),
-                      child: pw.Column(
-                        mainAxisSize: pw.MainAxisSize.min,
-                        crossAxisAlignment: pw.CrossAxisAlignment.center,
+                      child: pw.Row(
+                        mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                         children: [
                           pw.Text(
                             ' 機  場  醫  療  中  心  救  護  紀  錄  表',
                             style: ts(sz: 12, bold: true),
                           ),
-                          pw.SizedBox(height: 4),
                           pw.Text('車號：${d.licensePlate}', style: ts(sz: 10)),
                         ],
                       ),
@@ -1164,10 +1174,6 @@ Future<Uint8List> buildAmbulanceReportPdf(AmbulanceReportData d) async {
                                             ],
                                           ),
                                           pw.Table(
-                                            border: pw.TableBorder(
-                                              top: bSide,
-                                              bottom: bSide,
-                                            ),
                                             columnWidths: {
                                               0: pw.FixedColumnWidth(
                                                 65 * PdfPageFormat.mm,
@@ -1250,7 +1256,7 @@ Future<Uint8List> buildAmbulanceReportPdf(AmbulanceReportData d) async {
                             ],
                           ),
 
-                          // ── 主訴 / 過去病史 (12+59.5+12+59.5=143) ──
+                          // ── 病患主訴 / 過去病史（穩定短版 + 標題水平垂直置中 + 上面留白減少） ─────
                           pw.Table(
                             border: tbInner,
                             columnWidths: {
@@ -1262,41 +1268,99 @@ Future<Uint8List> buildAmbulanceReportPdf(AmbulanceReportData d) async {
                             children: [
                               pw.TableRow(
                                 children: [
-                                  _lbl('病\n患\n主\n訴'),
+                                  // 病患主訴標題 - 水平垂直置中
                                   _cell(
-                                    pw.Column(
-                                      crossAxisAlignment:
-                                          pw.CrossAxisAlignment.start,
-                                      children: [
-                                        // 修正：顯示家屬代述
-                                        _chk('家屬或同事、有人代述', d.chiefByFamily),
-                                        pw.Text(
-                                          d.chiefComplaint,
-                                          style: ts(sz: 6),
-                                        ),
-                                      ],
+                                    pw.Container(
+                                      height: 48, // 控制高度，建議不要超過50
+                                      alignment: pw.Alignment.center,
+                                      child: pw.Text(
+                                        '病\n患\n主\n訴',
+                                        style: ts(bold: true),
+                                        textAlign: pw.TextAlign.center,
+                                      ),
                                     ),
                                   ),
-                                  _lbl('過去病史'),
                                   _cell(
-                                    pw.Wrap(
-                                      children: [
-                                        _chk('無', d.histNone),
-                                        _chk('不詳', d.histUnknown),
-                                        _chk('高血壓', d.histHypertension),
-                                        _chk('糖尿病', d.histDiabetes),
-                                        _chk('心臟病', d.histHeart),
-                                        _chk('腦中風', d.histStroke),
-                                        // 修正：加入腎臟病/肺臟病
-                                        _chk('腎臟病', d.histKidney),
-                                        _chk('肺臟病', d.histLung),
-                                        _chk('氣喘', d.histAsthma),
-                                        if (d.histOther.isNotEmpty)
+                                    pw.Padding(
+                                      padding: const pw.EdgeInsets.fromLTRB(
+                                        5,
+                                        4,
+                                        5,
+                                        6,
+                                      ), // 上方留白少一點
+                                      child: pw.Column(
+                                        crossAxisAlignment:
+                                            pw.CrossAxisAlignment.start,
+                                        children: [
+                                          _chk('家屬或同事、有人代述', d.chiefByFamily),
+                                          pw.SizedBox(height: 4),
                                           pw.Text(
-                                            '其他: ${d.histOther}',
-                                            style: ts(),
+                                            d.chiefComplaint.isNotEmpty
+                                                ? d.chiefComplaint
+                                                : ' ',
+                                            style: ts(sz: 6),
                                           ),
-                                      ],
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+
+                                  // 過去病史標題 - 水平垂直置中
+                                  _cell(
+                                    pw.Container(
+                                      height: 48,
+                                      alignment: pw.Alignment.center,
+                                      child: pw.Text(
+                                        '過\n去\n病\n史',
+                                        style: ts(bold: true),
+                                        textAlign: pw.TextAlign.center,
+                                      ),
+                                    ),
+                                  ),
+                                  _cell(
+                                    pw.Padding(
+                                      padding: const pw.EdgeInsets.fromLTRB(
+                                        5,
+                                        4,
+                                        5,
+                                        6,
+                                      ),
+                                      child: pw.Column(
+                                        crossAxisAlignment:
+                                            pw.CrossAxisAlignment.start,
+                                        children: [
+                                          pw.Wrap(
+                                            spacing: 6,
+                                            runSpacing: 3,
+                                            children: [
+                                              _chk('無', d.histNone),
+                                              _chk('不詳', d.histUnknown),
+                                              _chk('高血壓', d.histHypertension),
+                                              _chk('糖尿病', d.histDiabetes),
+                                              _chk('心臟病', d.histHeart),
+                                              _chk('腦中風', d.histStroke),
+                                              _chk('腎臟病', d.histKidney),
+                                              _chk('肺臟病', d.histLung),
+                                              _chk('氣喘', d.histAsthma),
+                                              _chk(
+                                                '其他',
+                                                d.histOther.isNotEmpty,
+                                              ),
+                                            ],
+                                          ),
+                                          if (d.histOther.isNotEmpty)
+                                            pw.Padding(
+                                              padding: const pw.EdgeInsets.only(
+                                                left: 6,
+                                                top: 4,
+                                              ),
+                                              child: pw.Text(
+                                                d.histOther,
+                                                style: ts(sz: 6),
+                                              ),
+                                            ),
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -1304,7 +1368,7 @@ Future<Uint8List> buildAmbulanceReportPdf(AmbulanceReportData d) async {
                             ],
                           ),
 
-                          // ── 費用 ──────────────────────────────
+                          // 費用
                           pw.Table(
                             border: tbInner,
                             columnWidths: {
@@ -1314,47 +1378,94 @@ Future<Uint8List> buildAmbulanceReportPdf(AmbulanceReportData d) async {
                               pw.TableRow(
                                 children: [
                                   _cell(
-                                    pw.Column(
-                                      crossAxisAlignment:
-                                          pw.CrossAxisAlignment.start,
-                                      children: [
-                                        pw.Row(
-                                          mainAxisAlignment:
-                                              pw.MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            // 修正：顯示氧氣費用
-                                            pw.Text(
-                                              '費用：救護車 ${d.ambulanceFee}　氧氣 ${d.o2Fee}',
-                                              style: ts(bold: true),
-                                            ),
-                                            pw.Text(
-                                              '總計: ${d.totalFee}',
-                                              style: ts(bold: true),
-                                            ),
-                                          ],
-                                        ),
-                                        pw.SizedBox(height: 2),
-                                        pw.Row(
-                                          children: [
-                                            pw.Text(
-                                              '付款: ',
-                                              style: ts(bold: true),
-                                            ),
-                                            _chk('已收(現金)', d.paidCash),
-                                            // 修正：顯示刷卡
-                                            _chk('刷卡', d.paidCard),
-                                            _chk('代收', d.paidHospital),
-                                            _chk('未收', d.unpaid),
-                                            // 修正：顯示未收備註
-                                            if (d.unpaid &&
-                                                d.unpaidNote.isNotEmpty)
+                                    pw.Padding(
+                                      padding: const pw.EdgeInsets.all(
+                                        6,
+                                      ), // 整體加上 padding
+                                      child: pw.Column(
+                                        crossAxisAlignment:
+                                            pw.CrossAxisAlignment.start,
+                                        children: [
+                                          // 第1行：費用金額（字放大 + 預留長空位）
+                                          pw.Row(
+                                            children: [
                                               pw.Text(
-                                                '(${d.unpaidNote})',
-                                                style: ts(),
+                                                '救護車費用(含醫護人員): ',
+                                                style: ts(sz: 7.5, bold: true),
                                               ),
-                                          ],
-                                        ),
-                                      ],
+                                              pw.Text(
+                                                d.ambulanceFee.isNotEmpty
+                                                    ? d.ambulanceFee
+                                                    : '__________________',
+                                                style: ts(sz: 7.5, bold: true),
+                                              ),
+                                              pw.SizedBox(width: 10),
+                                              pw.Text(
+                                                '氧氣使用費: ',
+                                                style: ts(sz: 7.5, bold: true),
+                                              ),
+                                              pw.Text(
+                                                d.o2Fee.isNotEmpty
+                                                    ? d.o2Fee
+                                                    : '__________________',
+                                                style: ts(sz: 7.5, bold: true),
+                                              ),
+                                              pw.SizedBox(width: 10),
+                                              pw.Text(
+                                                '總計: ',
+                                                style: ts(sz: 7.5, bold: true),
+                                              ),
+                                              pw.Text(
+                                                d.totalFee.isNotEmpty
+                                                    ? d.totalFee
+                                                    : '__________________',
+                                                style: ts(sz: 7.5, bold: true),
+                                              ),
+                                            ],
+                                          ),
+
+                                          pw.SizedBox(height: 10), // 間距拉開
+                                          // 第2行：已收費 + 代收
+                                          pw.Row(
+                                            children: [
+                                              _chk(
+                                                '已收費 (現金 / 刷卡)',
+                                                d.paidCash || d.paidCard,
+                                                sz: 6.5, // 勾選框文字也稍微放大
+                                              ),
+                                              pw.SizedBox(width: 40), // 間距拉開
+                                              _chk(
+                                                '聯新國際醫院代收',
+                                                d.paidHospital,
+                                                sz: 6.5,
+                                              ),
+                                            ],
+                                          ),
+
+                                          pw.SizedBox(height: 8), // 間距拉開
+                                          // 第3行：未收費（永遠預留空位）
+                                          pw.Row(
+                                            children: [
+                                              _chk(
+                                                '未收費 (欠款 / 匯款 / 統一請款: ',
+                                                d.unpaid,
+                                                sz: 6.5,
+                                              ),
+                                              pw.Text(
+                                                d.unpaid &&
+                                                        d.unpaidNote.isNotEmpty
+                                                    ? '${d.unpaidNote}'
+                                                    : '__________________',
+                                                style: ts(sz: 7, bold: true),
+                                              ),
+                                              pw.Text(
+                                                d.unpaid ? ')' : ' )',
+                                                style: ts(sz: 7, bold: true),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -1364,9 +1475,6 @@ Future<Uint8List> buildAmbulanceReportPdf(AmbulanceReportData d) async {
                         ],
                       ),
                     ),
-
-                    pw.SizedBox(width: 1 * PdfPageFormat.mm),
-
                     // ────────────────────────────────────────────
                     // 右半部 143 mm
                     // ────────────────────────────────────────────
@@ -1374,224 +1482,341 @@ Future<Uint8List> buildAmbulanceReportPdf(AmbulanceReportData d) async {
                       width: rightW * PdfPageFormat.mm,
                       child: pw.Column(
                         children: [
-                          // ── 處置項目 ──────────────────────────
-                          pw.Table(
-                            border: tbFull,
-                            columnWidths: {
-                              0: pw.FixedColumnWidth(rightW * PdfPageFormat.mm),
-                            },
+                          // ── 處置項目（標題獨立一整欄 + 急救處置垂直置中加強版） ─────────────────────
+                          pw.Column(
                             children: [
-                              pw.TableRow(children: [_lbl('處置項目（此欄可複選）')]),
-                            ],
-                          ),
-
-                          // 急救處置 (6+45+46+46=143)
-                          pw.Table(
-                            border: tbInner,
-                            columnWidths: {
-                              0: pw.FixedColumnWidth(6 * PdfPageFormat.mm),
-                              1: pw.FixedColumnWidth(45 * PdfPageFormat.mm),
-                              2: pw.FixedColumnWidth(46 * PdfPageFormat.mm),
-                              3: pw.FixedColumnWidth(46 * PdfPageFormat.mm),
-                            },
-                            children: [
-                              pw.TableRow(
+                              // 1. 標題獨立一整欄
+                              pw.Table(
+                                border: tbInner,
+                                columnWidths: {
+                                  0: pw.FixedColumnWidth(
+                                    rightW * PdfPageFormat.mm,
+                                  ),
+                                },
                                 children: [
-                                  _cell(
-                                    pw.Center(
-                                      child: pw.Transform.rotateBox(
-                                        angle: -math.pi / 2,
-                                        child: pw.Text(
-                                          '急救處置',
-                                          style: ts(bold: true),
+                                  pw.TableRow(children: [_lbl('處置項目（此欄可複選）')]),
+                                ],
+                              ),
+
+                              pw.SizedBox(height: 3),
+
+                              // 2. 內容表格
+                              pw.Table(
+                                border: tbFull,
+                                columnWidths: {
+                                  0: pw.FixedColumnWidth(
+                                    9 * PdfPageFormat.mm,
+                                  ), // 垂直標籤欄位稍加寬
+                                  1: pw.FixedColumnWidth(39 * PdfPageFormat.mm),
+                                  2: pw.FixedColumnWidth(39 * PdfPageFormat.mm),
+                                  3: pw.FixedColumnWidth(
+                                    56 * PdfPageFormat.mm,
+                                  ), // 人體圖欄位加大
+                                },
+                                children: [
+                                  pw.TableRow(
+                                    children: [
+                                      // 垂直「急救處置」標籤 - 加強垂直置中
+                                      _cell(
+                                        pw.Container(
+                                          height: 192, // 關鍵調整：加大高度讓文字真正置中
+                                          alignment: pw.Alignment.center,
+                                          child: pw.Text(
+                                            '急\n救\n處\n置',
+                                            style: ts(
+                                              sz: 8,
+                                              bold: true,
+                                            ), // 字稍微放大一點
+                                            textAlign: pw.TextAlign.center,
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                  ),
 
-                                  // 呼吸道 + 創傷處置 + 搬運
-                                  _cell(
-                                    pw.Column(
-                                      crossAxisAlignment:
-                                          pw.CrossAxisAlignment.start,
-                                      children: [
-                                        _chk('【呼吸道】', false, bold: true),
-                                        _chk(
-                                          '口咽呼吸道',
-                                          d.airOralAirway,
-                                          indent: 2,
-                                        ),
-                                        _chk(
-                                          '鼻咽呼吸道',
-                                          d.airNasalAirway,
-                                          indent: 2,
-                                        ),
-                                        _chk('抽吸', d.airSuction, indent: 2),
-                                        _chk('哈姆立克法', d.airHeimlick, indent: 2),
-                                        // 修正：顯示流量
-                                        _chk(
-                                          '鼻管O2${d.airNasalLMin.isNotEmpty ? " ${d.airNasalLMin}L/MIN" : ""}',
-                                          d.airNasalO2,
-                                          indent: 2,
-                                        ),
-                                        _chk(
-                                          '面罩O2${d.airMaskLMin.isNotEmpty ? " ${d.airMaskLMin}L/MIN" : ""}',
-                                          d.airMaskO2,
-                                          indent: 2,
-                                        ),
-                                        _chk(
-                                          '非再吸入面罩',
-                                          d.airNonRebreather,
-                                          indent: 2,
-                                        ),
-                                        _chk('BVM(正壓)', d.airBVM, indent: 2),
-                                        // 修正：顯示 LMA/i-gel 號碼
-                                        _chk(
-                                          'LMA No.${d.airLMANo.isNotEmpty ? d.airLMANo : "_"}',
-                                          d.airLMA,
-                                          indent: 2,
-                                        ),
-                                        _chk(
-                                          'i-gel No.${d.airIgelNo.isNotEmpty ? d.airIgelNo : "_"}',
-                                          d.airIgel,
-                                          indent: 2,
-                                        ),
-                                        _chk(
-                                          '氣管內管',
-                                          d.airEndotracheal,
-                                          indent: 2,
-                                        ),
-                                        if (d.airOtherText.isNotEmpty)
-                                          _chk(
-                                            '其他: ${d.airOtherText}',
-                                            d.airOther,
-                                            indent: 2,
+                                      // 左欄：呼吸道 + 創傷 + 搬運
+                                      _cell(
+                                        pw.Padding(
+                                          padding: const pw.EdgeInsets.all(5),
+                                          child: pw.Column(
+                                            crossAxisAlignment:
+                                                pw.CrossAxisAlignment.start,
+                                            children: [
+                                              _chk('呼吸道處置', false, bold: true),
+                                              _chk(
+                                                '口咽呼吸道',
+                                                d.airOralAirway,
+                                                indent: 2,
+                                              ),
+                                              _chk(
+                                                '鼻咽呼吸道',
+                                                d.airNasalAirway,
+                                                indent: 2,
+                                              ),
+                                              _chk(
+                                                '抽吸',
+                                                d.airSuction,
+                                                indent: 2,
+                                              ),
+                                              _chk(
+                                                '哈姆立克法',
+                                                d.airHeimlick,
+                                                indent: 2,
+                                              ),
+                                              _chk(
+                                                '鼻管${d.airNasalLMin.isNotEmpty ? " ${d.airNasalLMin}L/MIN" : ""}',
+                                                d.airNasalO2,
+                                                indent: 2,
+                                              ),
+                                              _chk(
+                                                '面罩${d.airMaskLMin.isNotEmpty ? " ${d.airMaskLMin}L/MIN" : ""}',
+                                                d.airMaskO2,
+                                                indent: 2,
+                                              ),
+                                              _chk(
+                                                '非再吸入型面罩',
+                                                d.airNonRebreather,
+                                                indent: 2,
+                                              ),
+                                              _chk(
+                                                'BVM(正壓輔助呼吸)',
+                                                d.airBVM,
+                                                indent: 2,
+                                              ),
+                                              _chk(
+                                                'LMA ${d.airLMANo.isNotEmpty ? d.airLMANo : "__"}號',
+                                                d.airLMA,
+                                                indent: 2,
+                                              ),
+                                              _chk(
+                                                'Igel ${d.airIgelNo.isNotEmpty ? d.airIgelNo : "__"}號',
+                                                d.airIgel,
+                                                indent: 2,
+                                              ),
+                                              _chk(
+                                                '氣管內管 ${d.airETNo.isNotEmpty ? d.airETNo : "__"}號',
+                                                d.airEndotracheal,
+                                                indent: 2,
+                                              ),
+                                              if (d.airOtherText.isNotEmpty)
+                                                _chk(
+                                                  '其他: ${d.airOtherText}',
+                                                  d.airOther,
+                                                  indent: 2,
+                                                ),
+
+                                              pw.SizedBox(height: 8),
+                                              _chk('創傷處置', false, bold: true),
+                                              _chk('頸圈', d.trCollar, indent: 2),
+                                              _chk(
+                                                '清洗傷口',
+                                                d.trCleanWound,
+                                                indent: 2,
+                                              ),
+                                              _chk(
+                                                '止血、包紮',
+                                                d.trHemostasis,
+                                                indent: 2,
+                                              ),
+                                              _chk(
+                                                '骨折固定',
+                                                d.trImmobilize,
+                                                indent: 2,
+                                              ),
+                                              _chk(
+                                                '長背板固定',
+                                                d.trBackboard,
+                                                indent: 2,
+                                              ),
+                                              _chk(
+                                                '鏟式擔架固定',
+                                                d.trSplint,
+                                                indent: 2,
+                                              ),
+                                              if (d.trOtherTText.isNotEmpty)
+                                                _chk(
+                                                  '其他: ${d.trOtherTText}',
+                                                  d.trOtherT,
+                                                  indent: 2,
+                                                ),
+
+                                              pw.SizedBox(height: 8),
+                                              _chk('搬運', false, bold: true),
+                                              _chk('自行上車', false, indent: 2),
+                                              _chk('以適當方式搬運', true, indent: 2),
+                                            ],
                                           ),
-                                        pw.SizedBox(height: 3),
-                                        _chk('【創傷處置】', false, bold: true),
-                                        _chk('頸圈', d.trCollar, indent: 2),
-                                        _chk('清洗傷口', d.trCleanWound, indent: 2),
-                                        _chk('止血包紮', d.trHemostasis, indent: 2),
-                                        _chk('骨折固定', d.trImmobilize, indent: 2),
-                                        // 修正：加入夾板
-                                        _chk('夾板', d.trSplint, indent: 2),
-                                        _chk('長背板', d.trBackboard, indent: 2),
-                                        pw.SizedBox(height: 3),
-                                        _chk('【搬運】', false, bold: true),
-                                        _chk('擔架搬運', true, indent: 2),
-                                      ],
-                                    ),
-                                  ),
+                                        ),
+                                      ),
 
-                                  // 心肺復甦 + 藥物處置 + 其他
-                                  _cell(
-                                    pw.Column(
-                                      crossAxisAlignment:
-                                          pw.CrossAxisAlignment.start,
-                                      children: [
-                                        _chk('【心肺復甦】', false, bold: true),
-                                        _chk('自動CPR機', d.cprAuto, indent: 2),
-                                        // 修正：顯示 AED 分鐘
-                                        _chk(
-                                          'AED${d.cprAEDMin.isNotEmpty ? " ${d.cprAEDMin}分" : ""}',
-                                          d.cprAED,
-                                          indent: 2,
-                                        ),
-                                        // 修正：顯示電擊次數
-                                        _chk(
-                                          '電擊去顫${d.cprShockTimes.isNotEmpty ? " ${d.cprShockTimes}次" : ""}',
-                                          d.cprElectricShock,
-                                          indent: 2,
-                                        ),
-                                        pw.SizedBox(height: 3),
-                                        _chk('【藥物處置】', false, bold: true),
-                                        _chk('靜脈輸液', d.medIV, indent: 2),
-                                        // 修正：顯示劑量
-                                        _chk(
-                                          '0.9% N/S${d.medNSml.isNotEmpty ? " ${d.medNSml}ml" : ""}',
-                                          d.medNS,
-                                          indent: 2,
-                                        ),
-                                        _chk(
-                                          'L/R${d.medLRml.isNotEmpty ? " ${d.medLRml}ml" : ""}',
-                                          d.medLR,
-                                          indent: 2,
-                                        ),
-                                        _chk(
-                                          '葡萄糖液${d.medGlucoseType.isNotEmpty ? " ${d.medGlucoseType}" : ""}',
-                                          d.medGlucose,
-                                          indent: 2,
-                                        ),
-                                        _chk(
-                                          'Aspirin',
-                                          d.medAspirin,
-                                          indent: 2,
-                                        ),
-                                        _chk(
-                                          'NTG${d.medNTGCount.isNotEmpty ? " ${d.medNTGCount}顆" : ""}',
-                                          d.medNTG,
-                                          indent: 2,
-                                        ),
-                                        _chk(
-                                          '支氣管擴張劑${d.medBronchoTimes.isNotEmpty ? " ${d.medBronchoTimes}次" : ""}',
-                                          d.medBroncho,
-                                          indent: 2,
-                                        ),
-                                        pw.SizedBox(height: 3),
-                                        _chk('【其他】', false, bold: true),
-                                        _chk('保暖', d.otherKeepWarm, indent: 2),
-                                        _chk('心理支持', d.otherPsych, indent: 2),
-                                        _chk(
-                                          '生命徵象監測',
-                                          d.otherVitalMonitor,
-                                          indent: 2,
-                                        ),
-                                        // 修正：加入包紮/拒絕給氧
-                                        _chk('包紮', d.otherBandage, indent: 2),
-                                        _chk(
-                                          '拒絕給氧',
-                                          d.otherO2Refuse,
-                                          indent: 2,
-                                        ),
-                                        if (d.otherOtherText.isNotEmpty)
-                                          _chk(
-                                            '其他: ${d.otherOtherText}',
-                                            d.otherOther,
-                                            indent: 2,
+                                      // 中欄：心肺復甦術 + 藥物處置 + 其他處置
+                                      _cell(
+                                        pw.Padding(
+                                          padding: const pw.EdgeInsets.all(5),
+                                          child: pw.Column(
+                                            crossAxisAlignment:
+                                                pw.CrossAxisAlignment.start,
+                                            children: [
+                                              _chk('心肺復甦術', false, bold: true),
+                                              _chk(
+                                                '自動心肺復甦機',
+                                                d.cprAuto,
+                                                indent: 2,
+                                              ),
+                                              _chk(
+                                                'CPR: ${d.cprAEDMin.isNotEmpty ? d.cprAEDMin : "______"} 分鐘',
+                                                d.cprCPR,
+                                                indent: 2,
+                                              ),
+                                              _chk(
+                                                '使用 AED',
+                                                d.cprAED,
+                                                indent: 2,
+                                              ),
+                                              _chk(
+                                                '電擊去顫${d.cprShockTimes.isNotEmpty ? " ${d.cprShockTimes}次" : ""}',
+                                                d.cprElectricShock,
+                                                indent: 2,
+                                              ),
+                                              _chk(
+                                                '不建議電擊',
+                                                d.cprNoElectric,
+                                                indent: 2,
+                                              ),
+                                              _chk(
+                                                '手動電擊器',
+                                                d.cprHandShock,
+                                                indent: 2,
+                                              ),
+
+                                              pw.SizedBox(height: 8),
+                                              _chk('藥物處置', false, bold: true),
+                                              _chk(
+                                                '靜脈輸液，部位${d.medIVPart.isNotEmpty ? " ${d.medIVPart}" : "______"}',
+                                                d.medIV,
+                                                indent: 2,
+                                              ),
+                                              _chk(
+                                                '0.9%N/S${d.medNSml.isNotEmpty ? " ${d.medNSml}ml" : ""}',
+                                                d.medNS,
+                                                indent: 2,
+                                              ),
+                                              _chk(
+                                                'L/R${d.medLRml.isNotEmpty ? " ${d.medLRml}ml" : ""}',
+                                                d.medLR,
+                                                indent: 2,
+                                              ),
+                                              _chk(
+                                                '葡萄糖液${d.medGlucoseType.isNotEmpty ? " ${d.medGlucoseType}" : ""}ml',
+                                                d.medGlucose,
+                                                indent: 2,
+                                              ),
+                                              _chk(
+                                                '口服葡萄糖液/粉',
+                                                false,
+                                                indent: 2,
+                                              ),
+                                              _chk(
+                                                '協助使用 Aspirin',
+                                                d.medAspirin,
+                                                indent: 2,
+                                              ),
+                                              _chk(
+                                                '協助使用 NTG${d.medNTGCount.isNotEmpty ? " ${d.medNTGCount}片" : ""}',
+                                                d.medNTG,
+                                                indent: 2,
+                                              ),
+                                              _chk(
+                                                '協助使用支氣管擴張劑${d.medBronchoTimes.isNotEmpty ? " ${d.medBronchoTimes}次" : ""}',
+                                                d.medBroncho,
+                                                indent: 2,
+                                              ),
+
+                                              pw.SizedBox(height: 8),
+                                              _chk('其他處置', false, bold: true),
+                                              _chk(
+                                                '保暖',
+                                                d.otherKeepWarm,
+                                                indent: 2,
+                                              ),
+                                              _chk(
+                                                '心理支持',
+                                                d.otherPsych,
+                                                indent: 2,
+                                              ),
+                                              _chk(
+                                                '約束帶',
+                                                d.otherBandage,
+                                                indent: 2,
+                                              ),
+                                              _chk(
+                                                '拒絕使用氧氣',
+                                                d.otherO2Refuse,
+                                                indent: 2,
+                                              ),
+                                              _chk(
+                                                '生命徵象監測',
+                                                d.otherVitalMonitor,
+                                                indent: 2,
+                                              ),
+                                              if (d.otherOtherText.isNotEmpty)
+                                                _chk(
+                                                  '其他: ${d.otherOtherText}',
+                                                  d.otherOther,
+                                                  indent: 2,
+                                                ),
+                                            ],
                                           ),
-                                      ],
-                                    ),
-                                  ),
+                                        ),
+                                      ),
 
-                                  // 人體圖 + 備註
-                                  _cell(
-                                    pw.Column(
-                                      children: [
-                                        pw.Container(
-                                          height: 46 * PdfPageFormat.mm,
-                                          child: pw.Center(
-                                            child: pw.Text(
-                                              '人體圖\n(前/後)',
-                                              style: ts(sz: 8),
+                                      // 右欄：人體圖 + 備註（顯示背景 + 所有筆跡）
+                                      _cell(
+                                        pw.Column(
+                                          children: [
+                                            pw.Text(
+                                              '請在圖上標示說明受傷部位及其尺寸：',
+                                              style: ts(bold: true, sz: 7),
+                                              textAlign: pw.TextAlign.center,
                                             ),
-                                          ),
+                                            pw.SizedBox(height: 6),
+
+                                            // 優先使用有筆跡的圖片，否則用原始背景
+                                            if (bodyMapWithDrawing != null &&
+                                                bodyMapWithDrawing.isNotEmpty)
+                                              pw.Image(
+                                                pw.MemoryImage(
+                                                  bodyMapWithDrawing,
+                                                ),
+                                                height: 120, // 可調整大小
+                                                fit: pw.BoxFit.contain,
+                                              )
+                                            else
+                                              pw.Image(
+                                                bodyImage,
+                                                height: 120,
+                                                fit: pw.BoxFit.contain,
+                                              ),
+
+                                            pw.Divider(
+                                              height: 0.5,
+                                              thickness: 0.5,
+                                              color: PdfColors.black,
+                                            ),
+
+                                            pw.Container(
+                                              height: 24 * PdfPageFormat.mm,
+                                              alignment: pw.Alignment.topLeft,
+                                              padding: const pw.EdgeInsets.all(
+                                                5,
+                                              ),
+                                              child: pw.Text(
+                                                '備註：${d.notes}',
+                                                style: ts(sz: 6.5),
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                        pw.Divider(
-                                          height: 0.5,
-                                          thickness: 0.5,
-                                          color: PdfColors.black,
-                                        ),
-                                        pw.Container(
-                                          height: 20 * PdfPageFormat.mm,
-                                          alignment: pw.Alignment.topLeft,
-                                          child: pw.Text(
-                                            '備註：${d.notes}',
-                                            style: ts(),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    align: pw.Alignment.topCenter,
+                                      ),
+                                    ],
                                   ),
                                 ],
                               ),
@@ -1793,7 +2018,6 @@ Future<Uint8List> buildAmbulanceReportPdf(AmbulanceReportData d) async {
                 // ══════════════════════════════════════════════════
                 // 3. 底部簽名 (287 mm 全寬)
                 // ══════════════════════════════════════════════════
-                pw.SizedBox(height: 2),
                 pw.Table(
                   border: tbFull,
                   columnWidths: {

@@ -1,6 +1,7 @@
 ﻿import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:chikawa_airport/ambulance/pages/body_map.dart';
 import 'package:flutter/material.dart';
 
 import 'package:intl/intl.dart';
@@ -120,7 +121,23 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
           refService: refService,
           row: row,
         );
-        final pdfBytes = await buildAmbulanceReportPdf(reportData);
+
+        // === 正確取得 BodyMap 筆跡（使用 GlobalKey）===
+        Uint8List? bodyMapImage;
+        try {
+          final bodyMapState = AmbulanceBodyMap.globalKey.currentState;
+          if (bodyMapState != null) {
+            bodyMapImage = await bodyMapState.renderToImage();
+          }
+        } catch (e) {
+          debugPrint('取得 BodyMap 筆跡失敗: $e');
+        }
+
+        final pdfBytes = await buildAmbulanceReportPdf(
+          reportData,
+          bodyMapWithDrawing: bodyMapImage,
+        );
+
         await Printing.layoutPdf(
           name: 'patient_${row.record.medicalId}_${type.code}.pdf',
           onLayout: (_) async => pdfBytes,
@@ -180,18 +197,18 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
         return;
       }
       if (type == PatientReportType.medicalServiceApplication) {
-  final reportData = await _buildMedicalServiceApplicationReportData(
-    db: db,
-    refService: refService,
-    row: row,
-  );
-  final pdfBytes = await buildMedicalServiceApplicationPdf(reportData);
-  await Printing.layoutPdf(
-    name: 'patient_${row.record.medicalId}_${type.code}.pdf',
-    onLayout: (_) async => pdfBytes,
-  );
-  return;
-}
+        final reportData = await _buildMedicalServiceApplicationReportData(
+          db: db,
+          refService: refService,
+          row: row,
+        );
+        final pdfBytes = await buildMedicalServiceApplicationPdf(reportData);
+        await Printing.layoutPdf(
+          name: 'patient_${row.record.medicalId}_${type.code}.pdf',
+          onLayout: (_) async => pdfBytes,
+        );
+        return;
+      }
       await Printing.layoutPdf(
         name: 'patient_${row.record.medicalId}_${type.code}.pdf',
         onLayout: (format) async {
@@ -306,7 +323,22 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
         refService: refService,
         row: row,
       );
-      final pdfBytes = await buildAmbulanceReportPdf(reportData);
+
+      // === 正確取得 BodyMap 筆跡（使用 GlobalKey）===
+      Uint8List? bodyMapImage;
+      try {
+        final bodyMapState = AmbulanceBodyMap.globalKey.currentState;
+        if (bodyMapState != null) {
+          bodyMapImage = await bodyMapState.renderToImage();
+        }
+      } catch (e) {
+        debugPrint('取得 BodyMap 筆跡失敗: $e');
+      }
+
+      final pdfBytes = await buildAmbulanceReportPdf(
+        reportData,
+        bodyMapWithDrawing: bodyMapImage,
+      );
       return (fileName, pdfBytes);
     }
     if (type == PatientReportType.referral) {
@@ -346,14 +378,14 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
       return (fileName, pdfBytes);
     }
     if (type == PatientReportType.medicalServiceApplication) {
-  final reportData = await _buildMedicalServiceApplicationReportData(
-    db: db,
-    refService: refService,
-    row: row,
-  );
-  final pdfBytes = await buildMedicalServiceApplicationPdf(reportData);
-  return (fileName, pdfBytes);
-}
+      final reportData = await _buildMedicalServiceApplicationReportData(
+        db: db,
+        refService: refService,
+        row: row,
+      );
+      final pdfBytes = await buildMedicalServiceApplicationPdf(reportData);
+      return (fileName, pdfBytes);
+    }
 
     final patientName = row.patient.name?.trim().isNotEmpty == true
         ? row.patient.name!
@@ -1615,7 +1647,8 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
     );
   }
 
-  Future<MedicalServiceApplicationData> _buildMedicalServiceApplicationReportData({
+  Future<MedicalServiceApplicationData>
+  _buildMedicalServiceApplicationReportData({
     required AppDatabase db,
     required ReferenceService refService,
     required MedicalRecordWithPatient row,
@@ -1684,7 +1717,9 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
       refService: refService,
       incident: incident,
     );
-    final reportingUnit = refService.getReportingUnitById(incident?.reportingUnitId);
+    final reportingUnit = refService.getReportingUnitById(
+      incident?.reportingUnitId,
+    );
 
     final paymentMethod = refService.paymentMethodList
         .where((m) => m.id == fee?.paymentMethodId)
@@ -1728,7 +1763,8 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
       incident?.notificationTime,
       incident?.medicalArrivalTime,
     );
-    final withinTenMinutes = medicalArrivalMinutes != null &&
+    final withinTenMinutes =
+        medicalArrivalMinutes != null &&
         medicalArrivalMinutes >= 0 &&
         medicalArrivalMinutes <= 10;
 
@@ -1750,9 +1786,11 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
       isCrew: visitReasonCode == 'crew',
       isPassenger: visitReasonCode == 'passenger',
       isStaff: visitReasonCode == 'staff',
-      isOtherVisitReason: visitReasonCode.isNotEmpty &&
+      isOtherVisitReason:
+          visitReasonCode.isNotEmpty &&
           !['crew', 'passenger', 'staff'].contains(visitReasonCode),
-      otherVisitReason: visitReasonCode.isNotEmpty &&
+      otherVisitReason:
+          visitReasonCode.isNotEmpty &&
               !['crew', 'passenger', 'staff'].contains(visitReasonCode)
           ? visitReason?.name ?? ''
           : '',
@@ -1771,10 +1809,10 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
       isArrival: direction == '入境',
       isTransfer: direction == '過境' || direction == '轉機',
       isDeparture: direction == '出境',
-      isOtherTravelStatus: direction.isNotEmpty &&
-          !['入境', '過境', '轉機', '出境'].contains(direction),
-      otherTravelStatus: direction.isNotEmpty &&
-              !['入境', '過境', '轉機', '出境'].contains(direction)
+      isOtherTravelStatus:
+          direction.isNotEmpty && !['入境', '過境', '轉機', '出境'].contains(direction),
+      otherTravelStatus:
+          direction.isNotEmpty && !['入境', '過境', '轉機', '出境'].contains(direction)
           ? direction
           : '',
       dateYear: incidentDate.year.toString(),
@@ -1815,8 +1853,8 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
           : '',
       incidentOtherLocation:
           _containsAnyText(incidentLocation, ['T1', '第一航廈', 'T2', '第二航廈'])
-              ? ''
-              : incidentLocation,
+          ? ''
+          : incidentLocation,
       medicalArrivalTime: _formatTime(incident?.medicalArrivalTime),
       arrivedWithin10Minutes: withinTenMinutes,
       notArrivedWithin10Minutes:
@@ -1827,27 +1865,28 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
       examinationTime: _formatTime(
         incident?.examinationTime ?? treatment?.treatmentTime,
       ),
-      cdcScreening: row.record.cdcPassed != null ||
+      cdcScreening:
+          row.record.cdcPassed != null ||
           (row.record.screeningMethod?.trim().isNotEmpty ?? false) ||
           healthAssessmentEntries.isNotEmpty,
-      assistSampling: row.record.cdcPassed == true ||
+      assistSampling:
+          row.record.cdcPassed == true ||
           (row.record.screeningMethod?.trim().isNotEmpty ?? false),
-      throatSampling: _containsAnyText(
-        row.record.screeningMethod,
-        ['喉', '咽', 'throat'],
-      ),
-      bloodSampling: _containsAnyText(
-        row.record.screeningMethod,
-        ['血', 'blood'],
-      ),
-      otherSampling: _containsAnyText(
-        row.record.screeningMethod,
-        ['其他', 'other'],
-      ),
-      otherSamplingDetail: _containsAnyText(
-        row.record.screeningMethod,
-        ['其他', 'other'],
-      )
+      throatSampling: _containsAnyText(row.record.screeningMethod, [
+        '喉',
+        '咽',
+        'throat',
+      ]),
+      bloodSampling: _containsAnyText(row.record.screeningMethod, [
+        '血',
+        'blood',
+      ]),
+      otherSampling: _containsAnyText(row.record.screeningMethod, [
+        '其他',
+        'other',
+      ]),
+      otherSamplingDetail:
+          _containsAnyText(row.record.screeningMethod, ['其他', 'other'])
           ? row.record.screeningMethod?.trim() ?? ''
           : '',
       healthAssessment: healthAssessmentEntries.isNotEmpty,
@@ -1856,7 +1895,8 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
       emergencyClearance: _containsAnyText(transportMethod, ['緊急通關']),
       emergencyPublicGate: _containsAnyText(transportMethod, ['公務門']),
       emergencyApron: _containsAnyText(transportMethod, ['機坪']),
-      ambulanceClinic: _containsAnyText(transportMethod, ['醫療中心']) ||
+      ambulanceClinic:
+          _containsAnyText(transportMethod, ['醫療中心']) ||
           ((treatment?.transportRequired ?? false) &&
               !_containsAnyText(transportMethod, ['民間', '消防'])),
       ambulanceClinicDetail: '',
@@ -1878,26 +1918,29 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
       selfPayAmount: paymentMethodCode == 'self_pay' && totalFee > 0
           ? _formatFeeAmount(totalFee)
           : '',
-      unifiedBilling:
-          ['unified_billing', 'hospital_collect'].contains(paymentMethodCode),
+      unifiedBilling: [
+        'unified_billing',
+        'hospital_collect',
+      ].contains(paymentMethodCode),
       unifiedBillingAmount:
           ['unified_billing', 'hospital_collect'].contains(paymentMethodCode) &&
-                  totalFee > 0
-              ? _formatFeeAmount(totalFee)
-              : '',
+              totalFee > 0
+          ? _formatFeeAmount(totalFee)
+          : '',
       payByCash: paymentMethodCode == 'self_pay' && paymentType.contains('現金'),
-      payInTwd: paymentMethodCode == 'self_pay' &&
+      payInTwd:
+          paymentMethodCode == 'self_pay' &&
           paymentType.contains('現金') &&
           (currencyCode.isEmpty || currencyCode == 'TWD'),
-      payInOtherCurrency: paymentMethodCode == 'self_pay' &&
+      payInOtherCurrency:
+          paymentMethodCode == 'self_pay' &&
           paymentType.contains('現金') &&
           currencyCode.isNotEmpty &&
           currencyCode != 'TWD',
       otherCurrency: currencyCode.isNotEmpty && currencyCode != 'TWD'
           ? currencyCode
           : '',
-      payByCard:
-          paymentMethodCode == 'self_pay' && paymentType.contains('刷卡'),
+      payByCard: paymentMethodCode == 'self_pay' && paymentType.contains('刷卡'),
       abnormalCharge:
           paymentMethodCode == 'abnormal' ||
           (fee?.abnormalReason?.trim().isNotEmpty ?? false),
@@ -1910,11 +1953,12 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
       pulse: assessment?.pulse?.toString() ?? '',
       breath: assessment?.breath?.toString() ?? '',
       bloodPressure: _formatBp(assessment?.systolic, assessment?.diastolic),
-      consciousnessClear: _containsAnyText(
-        consciousnessLevel?.name,
-        ['清', 'clear'],
-      ),
-      consciousnessGcs: (assessment?.gcsE?.trim().isNotEmpty ?? false) ||
+      consciousnessClear: _containsAnyText(consciousnessLevel?.name, [
+        '清',
+        'clear',
+      ]),
+      consciousnessGcs:
+          (assessment?.gcsE?.trim().isNotEmpty ?? false) ||
           (assessment?.gcsV?.trim().isNotEmpty ?? false) ||
           (assessment?.gcsM?.trim().isNotEmpty ?? false),
       gcsE: assessment?.gcsE?.trim() ?? '',
@@ -1946,7 +1990,8 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
       extremity: assessment?.extremitiesExam?.trim() ?? '',
       tentativeDiagnosis: await _buildDiagnosisWithIcdNames(db, treatment),
       signedFourCopy: fee?.userAgreed ?? false,
-      advisedReferral: _containsAnyText(treatmentResultName, ['轉', '醫院']) ||
+      advisedReferral:
+          _containsAnyText(treatmentResultName, ['轉', '醫院']) ||
           (treatment?.transportRequired ?? false),
       doctorName: staffNames.doctor,
       nurseName: staffNames.nurse,
@@ -2750,7 +2795,7 @@ enum PatientReportType {
   diagnosisCertificate,
   englishDiagnosisCertificate,
   telex,
-  medicalServiceApplication, 
+  medicalServiceApplication,
 }
 
 extension PatientReportTypeLabel on PatientReportType {
@@ -2768,7 +2813,7 @@ extension PatientReportTypeLabel on PatientReportType {
         return '英文診斷書';
       case PatientReportType.telex:
         return '出診診療服務電傳文件';
-        case PatientReportType.medicalServiceApplication:
+      case PatientReportType.medicalServiceApplication:
         return '緊急醫療救護申請單';
     }
   }
@@ -2787,7 +2832,7 @@ extension PatientReportTypeLabel on PatientReportType {
         return 'English Diagnosis Certificate';
       case PatientReportType.telex:
         return 'Telex Document';
-        case PatientReportType.medicalServiceApplication:
+      case PatientReportType.medicalServiceApplication:
         return 'Medical Service Application';
     }
   }
@@ -2806,7 +2851,7 @@ extension PatientReportTypeLabel on PatientReportType {
         return 'diagnosis_en';
       case PatientReportType.telex:
         return 'telex';
-        case PatientReportType.medicalServiceApplication:
+      case PatientReportType.medicalServiceApplication:
         return 'medical_service_app';
     }
   }

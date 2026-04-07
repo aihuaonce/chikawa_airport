@@ -49,6 +49,10 @@ class BodyMapProvider extends ChangeNotifier {
 class AmbulanceBodyMap extends StatefulWidget {
   final int medicalId;
 
+  // === 新增：公開的 GlobalKey ===
+  static final GlobalKey<_AmbulanceBodyMapState> globalKey =
+      GlobalKey<_AmbulanceBodyMapState>();
+
   const AmbulanceBodyMap({super.key, required this.medicalId});
 
   @override
@@ -147,10 +151,7 @@ class _AmbulanceBodyMapState extends State<AmbulanceBodyMap> {
 
       _controller = PainterController(
         settings: PainterSettings(
-          freeStyle: FreeStyleSettings(
-            color: markerColor,
-            strokeWidth: 2,
-          ),
+          freeStyle: FreeStyleSettings(color: markerColor, strokeWidth: 2),
           text: TextSettings(
             textStyle: TextStyle(
               color: Colors.black,
@@ -165,7 +166,10 @@ class _AmbulanceBodyMapState extends State<AmbulanceBodyMap> {
       _controller!.background = _backgroundImage!.backgroundDrawable;
 
       // 載入現有資料
-      if (jsonStr != null && jsonStr.isNotEmpty && jsonStr != 'null' && jsonStr != '[]') {
+      if (jsonStr != null &&
+          jsonStr.isNotEmpty &&
+          jsonStr != 'null' &&
+          jsonStr != '[]') {
         _loadDrawablesFromJson(jsonStr);
       }
 
@@ -187,6 +191,27 @@ class _AmbulanceBodyMapState extends State<AmbulanceBodyMap> {
           _isLoading = false;
         });
       }
+    }
+  }
+
+  /// 公開給報表頁面使用：把目前畫好的內容（背景 + 所有筆跡）渲染成圖片
+  Future<Uint8List?> renderToImage() async {
+    if (_controller == null) return null;
+
+    try {
+      // 使用較高解析度，讓筆跡更清楚
+      final ui.Image renderedImage = await _controller!.renderImage(
+        const Size(1000, 1400),
+      );
+
+      final ByteData? byteData = await renderedImage.toByteData(
+        format: ui.ImageByteFormat.png,
+      );
+
+      return byteData?.buffer.asUint8List();
+    } catch (e) {
+      debugPrint('BodyMap 渲染失敗: $e');
+      return null;
     }
   }
 
@@ -288,7 +313,6 @@ class _AmbulanceBodyMapState extends State<AmbulanceBodyMap> {
       final jsonString = drawablesList.isEmpty
           ? null
           : jsonEncode(drawablesList);
-
     } catch (e) {
       // Silent fail for cache updates
     }
@@ -356,7 +380,9 @@ class _AmbulanceBodyMapState extends State<AmbulanceBodyMap> {
           final textStyle = TextStyle(
             color: Color(styleJson['color'] as int? ?? Colors.black.value),
             fontSize: (styleJson['fontSize'] as num?)?.toDouble() ?? 18.0,
-            fontWeight: FontWeight.values[styleJson['fontWeightIndex'] as int? ?? FontWeight.normal.index],
+            fontWeight:
+                FontWeight.values[styleJson['fontWeightIndex'] as int? ??
+                    FontWeight.normal.index],
           );
           return TextDrawable(text: text, position: position, style: textStyle);
 
@@ -385,7 +411,8 @@ class _AmbulanceBodyMapState extends State<AmbulanceBodyMap> {
         'style': {
           'color': drawable.style.color?.value ?? Colors.black.value,
           'fontSize': drawable.style.fontSize ?? 18.0,
-          'fontWeightIndex': (drawable.style.fontWeight ?? FontWeight.normal).index,
+          'fontWeightIndex':
+              (drawable.style.fontWeight ?? FontWeight.normal).index,
         },
       };
     }
@@ -519,7 +546,9 @@ class _AmbulanceBodyMapState extends State<AmbulanceBodyMap> {
             icon: Icon(
               Icons.undo,
               size: 22,
-              color: _controller?.canUndo == true ? textDark : textMuted.withValues(alpha: 0.3),
+              color: _controller?.canUndo == true
+                  ? textDark
+                  : textMuted.withValues(alpha: 0.3),
             ),
             onPressed: _controller?.canUndo == true
                 ? () => _controller?.undo()
@@ -531,7 +560,9 @@ class _AmbulanceBodyMapState extends State<AmbulanceBodyMap> {
             icon: Icon(
               Icons.redo,
               size: 22,
-              color: _controller?.canRedo == true ? textDark : textMuted.withValues(alpha: 0.3),
+              color: _controller?.canRedo == true
+                  ? textDark
+                  : textMuted.withValues(alpha: 0.3),
             ),
             onPressed: _controller?.canRedo == true
                 ? () => _controller?.redo()
@@ -543,7 +574,11 @@ class _AmbulanceBodyMapState extends State<AmbulanceBodyMap> {
           _buildColorPicker(),
           // 清除
           IconButton(
-            icon: Icon(Icons.delete_outline, size: 22, color: Colors.red.shade400),
+            icon: Icon(
+              Icons.delete_outline,
+              size: 22,
+              color: Colors.red.shade400,
+            ),
             onPressed: _showClearConfirmationDialog,
             tooltip: '清除全部',
           ),
@@ -568,17 +603,22 @@ class _AmbulanceBodyMapState extends State<AmbulanceBodyMap> {
           );
         });
       },
-      itemBuilder: (context) => [
-        Colors.red,
-        Colors.blue,
-        Colors.green,
-        Colors.black,
-        Colors.orange,
-        Colors.purple,
-      ].map((color) => PopupMenuItem(
-        value: color,
-        child: Container(width: 100, height: 30, color: color),
-      )).toList(),
+      itemBuilder: (context) =>
+          [
+                Colors.red,
+                Colors.blue,
+                Colors.green,
+                Colors.black,
+                Colors.orange,
+                Colors.purple,
+              ]
+              .map(
+                (color) => PopupMenuItem(
+                  value: color,
+                  child: Container(width: 100, height: 30, color: color),
+                ),
+              )
+              .toList(),
     );
   }
 
@@ -636,7 +676,10 @@ class _AmbulanceBodyMapState extends State<AmbulanceBodyMap> {
                       ),
                     )
                   : const Icon(Icons.save, size: 16),
-              label: Text(_isSaving ? '儲存中' : '儲存', style: const TextStyle(fontSize: 13)),
+              label: Text(
+                _isSaving ? '儲存中' : '儲存',
+                style: const TextStyle(fontSize: 13),
+              ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: primaryColor,
                 foregroundColor: Colors.white,
