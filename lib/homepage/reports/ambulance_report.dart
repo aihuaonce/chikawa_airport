@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:typed_data';
 import 'dart:math' as math;
 import 'package:pdf/pdf.dart';
@@ -22,6 +23,7 @@ class AmbulanceReportData {
       guardian = '',
       address = '',
       propertyNote = '';
+  Uint8List? guardianSign;
   bool propertyNone = false, propertyHas = false;
   bool ntiEmergency = false,
       ntiBreathIssue = false,
@@ -176,8 +178,24 @@ Future<Uint8List> buildAmbulanceReportPdf(AmbulanceReportData d) async {
   // ── 字體與邊框設定 ──────────────────────────────────────────────
   pw.TextStyle ts({double sz = 6.0, bool bold = false}) =>
       pw.TextStyle(font: bold ? fontB : font, fontSize: sz);
+  pw.TextStyle ts8({double sz = 6.0, bool bold = false}) =>
+      pw.TextStyle(font: bold ? fontB : font, fontSize: sz);
+  pw.TextStyle ts9({double sz = 6.0, bool bold = false}) =>
+      pw.TextStyle(font: bold ? fontB : font, fontSize: sz);
+
+  // 固定寬度填充函數
+  String _pad(String value, int length) {
+    if (value.isEmpty) return ' ' * length;
+    if (value.length >= length) return value.substring(0, length);
+    return value + (' ' * (length - value.length));
+  }
 
   final tbFull = pw.TableBorder.all(width: 0.5, color: PdfColors.black);
+  final tbFirstRowBorder = pw.TableBorder.all(width: 0.5, color: PdfColors.black);
+  // 第二三四列外框細線，內部細線
+  final tbTimeBorder = pw.TableBorder.all(width: 0.5, color: PdfColors.black);
+  // 第三列外框細線
+  final tbRow3Border = pw.TableBorder.all(width: 0.5, color: PdfColors.black);
   final bSide = pw.BorderSide(width: 0.5, color: PdfColors.black);
 
   // 修正：加入 top 與 horizontalInside，讓各列都有完整邊框
@@ -198,7 +216,6 @@ Future<Uint8List> buildAmbulanceReportPdf(AmbulanceReportData d) async {
   }) {
     return pw.Container(
       color: bg,
-      padding: const pw.EdgeInsets.all(1.5),
       alignment: align,
       child: child,
     );
@@ -227,6 +244,7 @@ Future<Uint8List> buildAmbulanceReportPdf(AmbulanceReportData d) async {
     double sz = 5.5,
     bool bold = false,
     double indent = 0,
+    bool fillBlack = false,
   }) {
     return pw.Padding(
       padding: pw.EdgeInsets.only(left: indent, right: 2, bottom: 1, top: 0.5),
@@ -236,8 +254,11 @@ Future<Uint8List> buildAmbulanceReportPdf(AmbulanceReportData d) async {
           pw.Container(
             width: 4.5,
             height: 4.5,
-            decoration: pw.BoxDecoration(border: pw.Border.all(width: 0.5)),
-            child: checked
+            decoration: pw.BoxDecoration(
+              border: pw.Border.all(width: 0.5),
+              color: fillBlack && checked ? PdfColors.black : null,
+            ),
+            child: !fillBlack && checked
                 ? pw.Center(
                     child: pw.Text(
                       'v',
@@ -257,9 +278,9 @@ Future<Uint8List> buildAmbulanceReportPdf(AmbulanceReportData d) async {
   }
 
   // ── 尺寸定義 (mm) ────────────────────────────────────────────────
-  const double leftW = 135;
-  const double rightW = 135;
-  const double totalW = 272; // 135 + 2(間隙) + 135
+  const double leftW = 130;
+  const double rightW = 130;
+  const double totalW = 260; // 130 + 0(間隙) + 130
 
   pdf.addPage(
     pw.Page(
@@ -324,11 +345,11 @@ Future<Uint8List> buildAmbulanceReportPdf(AmbulanceReportData d) async {
                           // ── 派遣資料 ──────────────────────────
                           // 列1：派遣資料 | 出勤日期 | 西元年月日 (50% + 20% + 30%)
                           pw.Table(
-                            border: tbFull,
+                            border: tbFirstRowBorder,
                             columnWidths: {
-                              0: pw.FixedColumnWidth(67.5 * PdfPageFormat.mm),
-                              1: pw.FixedColumnWidth(27 * PdfPageFormat.mm),
-                              2: pw.FixedColumnWidth(40.5 * PdfPageFormat.mm),
+                              0: pw.FixedColumnWidth(65 * PdfPageFormat.mm),
+                              1: pw.FixedColumnWidth(26 * PdfPageFormat.mm),
+                              2: pw.FixedColumnWidth(39 * PdfPageFormat.mm),
                             },
                             children: [
                               pw.TableRow(
@@ -340,7 +361,272 @@ Future<Uint8List> buildAmbulanceReportPdf(AmbulanceReportData d) async {
                                       ),
                                       child: pw.Text(
                                         '派 遣 資 料',
-                                        style: ts(sz: 9),
+                                        style: ts9(),
+                                      ),
+                                    ),
+                                    align: pw.Alignment.center,
+                                  ),
+                                  _cell(
+                                    pw.Padding(
+                                      padding: const pw.EdgeInsets.symmetric(
+                                        vertical: 0,
+                                      ),
+                                      child: pw.Text('出勤日期', style: ts9()),
+                                    ),
+                                    align: pw.Alignment.center,
+                                  ),
+                                  _cell(
+                                    pw.Padding(
+                                      padding: const pw.EdgeInsets.symmetric(
+                                        vertical: 0,
+                                      ),
+                                      child: pw.Text(
+                                        d.dispatchDateYear.isEmpty &&
+                                                d.dispatchDateMonth.isEmpty &&
+                                                d.dispatchDateDay.isEmpty
+                                          ? '西元             年             月             日'
+                                          : '西元${_pad(d.dispatchDateYear, 4)}年${_pad(d.dispatchDateMonth, 2)}月${_pad(d.dispatchDateDay, 2)}日',
+                                        style: ts9(),
+                                      ),
+                                    ),
+                                    align: pw.Alignment.center,
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+
+                          // 列2：時間標題 - 六等分 (每個 21.67mm)
+                          pw.Table(
+                            border: tbTimeBorder,
+                            columnWidths: {
+                              0: pw.FixedColumnWidth(21.67 * PdfPageFormat.mm),
+                              1: pw.FixedColumnWidth(21.67 * PdfPageFormat.mm),
+                              2: pw.FixedColumnWidth(21.67 * PdfPageFormat.mm),
+                              3: pw.FixedColumnWidth(21.67 * PdfPageFormat.mm),
+                              4: pw.FixedColumnWidth(21.67 * PdfPageFormat.mm),
+                              5: pw.FixedColumnWidth(21.67 * PdfPageFormat.mm),
+                            },
+                            children: [
+                              pw.TableRow(
+                                children: [
+                                  _cell(
+                                    pw.Padding(
+                                      padding: const pw.EdgeInsets.symmetric(
+                                        vertical: 0,
+                                      ),
+                                      child: pw.Text('出勤時間', style: ts9()),
+                                    ),
+                                    align: pw.Alignment.center,
+                                  ),
+                                  _cell(
+                                    pw.Padding(
+                                      padding: const pw.EdgeInsets.symmetric(
+                                        vertical: 0,
+                                      ),
+                                      child: pw.Text('到達現場', style: ts9()),
+                                    ),
+                                    align: pw.Alignment.center,
+                                  ),
+                                  _cell(
+                                    pw.Padding(
+                                      padding: const pw.EdgeInsets.symmetric(
+                                        vertical: 0,
+                                      ),
+                                      child: pw.Text('離開現場', style: ts9()),
+                                    ),
+                                    align: pw.Alignment.center,
+                                  ),
+                                  _cell(
+                                    pw.Padding(
+                                      padding: const pw.EdgeInsets.symmetric(
+                                        vertical: 0,
+                                      ),
+                                      child: pw.Text('送達時間', style: ts9()),
+                                    ),
+                                    align: pw.Alignment.center,
+                                  ),
+                                  _cell(
+                                    pw.Padding(
+                                      padding: const pw.EdgeInsets.symmetric(
+                                        vertical: 0,
+                                      ),
+                                      child: pw.Text('離開時間', style: ts9()),
+                                    ),
+                                    align: pw.Alignment.center,
+                                  ),
+                                  _cell(
+                                    pw.Padding(
+                                      padding: const pw.EdgeInsets.symmetric(
+                                        vertical: 0,
+                                      ),
+                                      child: pw.Text('返回待命', style: ts9()),
+                                    ),
+                                    align: pw.Alignment.center,
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+
+                          // 列3：時間資料 - 六等分
+                          pw.Table(
+                            border: tbRow3Border,
+                            columnWidths: {
+                              0: pw.FixedColumnWidth(21.67 * PdfPageFormat.mm),
+                              1: pw.FixedColumnWidth(21.67 * PdfPageFormat.mm),
+                              2: pw.FixedColumnWidth(21.67 * PdfPageFormat.mm),
+                              3: pw.FixedColumnWidth(21.67 * PdfPageFormat.mm),
+                              4: pw.FixedColumnWidth(21.67 * PdfPageFormat.mm),
+                              5: pw.FixedColumnWidth(21.67 * PdfPageFormat.mm),
+                            },
+                            children: [
+                              pw.TableRow(
+                                children: [
+                                  _cell(
+                                    pw.Padding(
+                                      padding: const pw.EdgeInsets.symmetric(
+                                        vertical: 0,
+                                      ),
+                                      child: pw.Row(
+                                        mainAxisAlignment:
+                                            pw.MainAxisAlignment.end,
+                                        children: [
+                                          pw.Text(
+                                            '${d.departureHour.isEmpty ? "   " : d.departureHour}${d.departureHour.isNotEmpty ? "時" : ""} ${d.departureMin.isEmpty ? "  " : d.departureMin}${d.departureMin.isNotEmpty ? "分" : ""}',
+                                            style: ts9(),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    align: pw.Alignment.centerRight,
+                                  ),
+                                  _cell(
+                                    pw.Padding(
+                                      padding: const pw.EdgeInsets.symmetric(
+                                        vertical: 0,
+                                      ),
+                                      child: pw.Row(
+                                        mainAxisAlignment:
+                                            pw.MainAxisAlignment.end,
+                                        children: [
+                                          pw.Text(
+                                            '${d.arrivalHour.isEmpty ? "   " : d.arrivalHour}${d.arrivalHour.isNotEmpty ? "時" : ""} ${d.arrivalMin.isEmpty ? "  " : d.arrivalMin}${d.arrivalMin.isNotEmpty ? "分" : ""}',
+                                            style: ts9(),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    align: pw.Alignment.centerRight,
+                                  ),
+                                  _cell(
+                                    pw.Padding(
+                                      padding: const pw.EdgeInsets.symmetric(
+                                        vertical: 0,
+                                      ),
+                                      child: pw.Row(
+                                        mainAxisAlignment:
+                                            pw.MainAxisAlignment.end,
+                                        children: [
+                                          pw.Text(
+                                            '${d.leaveSceneHour.isEmpty ? "   " : d.leaveSceneHour}${d.leaveSceneHour.isNotEmpty ? "時" : ""} ${d.leaveSceneMin.isEmpty ? "  " : d.leaveSceneMin}${d.leaveSceneMin.isNotEmpty ? "分" : ""}',
+                                            style: ts9(),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    align: pw.Alignment.centerRight,
+                                  ),
+                                  _cell(
+                                    pw.Padding(
+                                      padding: const pw.EdgeInsets.symmetric(
+                                        vertical: 0,
+                                      ),
+                                      child: pw.Row(
+                                        mainAxisAlignment:
+                                            pw.MainAxisAlignment.end,
+                                        children: [
+                                          pw.Text(
+                                            '${d.deliveryHour.isEmpty ? "   " : d.deliveryHour}${d.deliveryHour.isNotEmpty ? "時" : ""} ${d.deliveryMin.isEmpty ? "  " : d.deliveryMin}${d.deliveryMin.isNotEmpty ? "分" : ""}',
+                                            style: ts9(),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    align: pw.Alignment.centerRight,
+                                  ),
+                                  _cell(
+                                    pw.Padding(
+                                      padding: const pw.EdgeInsets.symmetric(
+                                        vertical: 0,
+                                      ),
+                                      child: pw.Row(
+                                        mainAxisAlignment:
+                                            pw.MainAxisAlignment.end,
+                                        children: [
+                                          pw.Text(
+                                            '${d.leaveHospHour.isEmpty ? "   " : d.leaveHospHour}${d.leaveHospHour.isNotEmpty ? "時" : ""} ${d.leaveHospMin.isEmpty ? "  " : d.leaveHospMin}${d.leaveHospMin.isNotEmpty ? "分" : ""}',
+                                            style: ts9(),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    align: pw.Alignment.centerRight,
+                                  ),
+                                  _cell(
+                                    pw.Padding(
+                                      padding: const pw.EdgeInsets.symmetric(
+                                        vertical: 0,
+                                      ),
+                                      child: pw.Row(
+                                        mainAxisAlignment:
+                                            pw.MainAxisAlignment.end,
+                                        children: [
+                                          pw.Text(
+                                            '${d.returnBaseHour.isEmpty ? "   " : d.returnBaseHour}${d.returnBaseHour.isNotEmpty ? "時" : ""} ${d.returnBaseMin.isEmpty ? "  " : d.returnBaseMin}${d.returnBaseMin.isNotEmpty ? "分" : ""}',
+                                            style: ts9(),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    align: pw.Alignment.centerRight,
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+
+                          // 列4：發生地點 / 送往 (20% + 30% + 20% + 30%)
+                          pw.Table(
+                            border: tbTimeBorder,
+                            columnWidths: {
+                              0: pw.FixedColumnWidth(26 * PdfPageFormat.mm),
+                              1: pw.FixedColumnWidth(39 * PdfPageFormat.mm),
+                              2: pw.FixedColumnWidth(26 * PdfPageFormat.mm),
+                              3: pw.FixedColumnWidth(39 * PdfPageFormat.mm),
+                            },
+                            children: [
+                              pw.TableRow(
+                                children: [
+                                  _cell(
+                                    pw.Padding(
+                                      padding: const pw.EdgeInsets.symmetric(
+                                        vertical: 0,
+                                      ),
+                                      child: pw.Text('發生地點', style: ts9()),
+                                    ),
+                                    align: pw.Alignment.center,
+                                  ),
+                                  _cell(
+                                    pw.Padding(
+                                      padding: const pw.EdgeInsets.symmetric(
+                                        vertical: 0,
+                                      ),
+                                      child: pw.Text(
+                                        d.incidentLocation.isEmpty
+                                            ? _pad('', 20)
+                                            : d.incidentLocation,
+                                        style: ts9(),
                                       ),
                                     ),
                                     align: pw.Alignment.center,
@@ -351,8 +637,8 @@ Future<Uint8List> buildAmbulanceReportPdf(AmbulanceReportData d) async {
                                         vertical: 0,
                                       ),
                                       child: pw.Text(
-                                        '出 勤 日 期',
-                                        style: ts(sz: 9),
+                                        '送往醫院或地點',
+                                        style: ts9(),
                                       ),
                                     ),
                                     align: pw.Alignment.center,
@@ -362,96 +648,35 @@ Future<Uint8List> buildAmbulanceReportPdf(AmbulanceReportData d) async {
                                       padding: const pw.EdgeInsets.symmetric(
                                         vertical: 0,
                                       ),
-                                      child: pw.Text(
-                                        '西元    ${d.dispatchDateYear}    年    ${d.dispatchDateMonth}    月    ${d.dispatchDateDay}    日',
-                                        style: ts(sz: 9),
+                                      child: pw.Row(
+                                        crossAxisAlignment:
+                                            pw.CrossAxisAlignment.center,
+                                        children: [
+                                          pw.Text(
+                                            d.sendToHospital.isEmpty
+                                                ? _pad('', 20)
+                                                : d.sendToHospital,
+                                            style: ts9(),
+                                          ),
+                                          pw.SizedBox(width: 4),
+                                          pw.Column(
+                                            crossAxisAlignment:
+                                                pw.CrossAxisAlignment.start,
+                                            children: [
+                                              _chk(
+                                                '病情需要',
+                                                d.sendReasonCondition,
+                                                fillBlack: true,
+                                              ),
+                                              _chk(
+                                                '病患要求',
+                                                d.sendReasonPatientRequest,
+                                                fillBlack: true,
+                                              ),
+                                            ],
+                                          ),
+                                        ],
                                       ),
-                                    ),
-                                    align: pw.Alignment.center,
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-
-                          // 列2：時間 (22.1 + 20.15×6 = 143)
-                          pw.Table(
-                            border: tbInner,
-                            columnWidths: {
-                              0: pw.FixedColumnWidth(22.1 * PdfPageFormat.mm),
-                              1: pw.FixedColumnWidth(20.15 * PdfPageFormat.mm),
-                              2: pw.FixedColumnWidth(20.15 * PdfPageFormat.mm),
-                              3: pw.FixedColumnWidth(20.15 * PdfPageFormat.mm),
-                              4: pw.FixedColumnWidth(20.15 * PdfPageFormat.mm),
-                              5: pw.FixedColumnWidth(20.15 * PdfPageFormat.mm),
-                              6: pw.FixedColumnWidth(20.15 * PdfPageFormat.mm),
-                            },
-                            children: [
-                              pw.TableRow(
-                                children: [
-                                  _lbl('時間'),
-                                  _lbl(
-                                    '出勤\n${d.departureHour}:${d.departureMin}',
-                                    bold: false,
-                                  ),
-                                  _lbl(
-                                    '到達現場\n${d.arrivalHour}:${d.arrivalMin}',
-                                    bold: false,
-                                  ),
-                                  _lbl(
-                                    '離開現場\n${d.leaveSceneHour}:${d.leaveSceneMin}',
-                                    bold: false,
-                                  ),
-                                  _lbl(
-                                    '送達醫院\n${d.deliveryHour}:${d.deliveryMin}',
-                                    bold: false,
-                                  ),
-                                  _lbl(
-                                    '離開醫院\n${d.leaveHospHour}:${d.leaveHospMin}',
-                                    bold: false,
-                                  ),
-                                  _lbl(
-                                    '返回待命\n${d.returnBaseHour}:${d.returnBaseMin}',
-                                    bold: false,
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-
-                          // 列3：發生地點 / 送往 (22.1+46.4+15+59.5=143)
-                          pw.Table(
-                            border: tbInner,
-                            columnWidths: {
-                              0: pw.FixedColumnWidth(22.1 * PdfPageFormat.mm),
-                              1: pw.FixedColumnWidth(46.4 * PdfPageFormat.mm),
-                              2: pw.FixedColumnWidth(15 * PdfPageFormat.mm),
-                              3: pw.FixedColumnWidth(59.5 * PdfPageFormat.mm),
-                            },
-                            children: [
-                              pw.TableRow(
-                                children: [
-                                  _lbl('發生地點'),
-                                  _cell(
-                                    pw.Text(d.incidentLocation, style: ts()),
-                                  ),
-                                  _lbl('送往'),
-                                  _cell(
-                                    pw.Column(
-                                      crossAxisAlignment:
-                                          pw.CrossAxisAlignment.start,
-                                      children: [
-                                        pw.Text(d.sendToHospital, style: ts()),
-                                        pw.Row(
-                                          children: [
-                                            _chk('病情需要', d.sendReasonCondition),
-                                            _chk(
-                                              '病患要求',
-                                              d.sendReasonPatientRequest,
-                                            ),
-                                          ],
-                                        ),
-                                      ],
                                     ),
                                   ),
                                 ],
@@ -461,79 +686,173 @@ Future<Uint8List> buildAmbulanceReportPdf(AmbulanceReportData d) async {
 
                           // ── 病患資料 ──────────────────────────
                           pw.Table(
-                            border: tbInner,
+                            border: tbTimeBorder,
                             columnWidths: {
-                              0: pw.FixedColumnWidth(leftW * PdfPageFormat.mm),
+                              0: pw.FixedColumnWidth(130 * PdfPageFormat.mm),
                             },
                             children: [
                               pw.TableRow(
                                 children: [
-                                  _lbl(
-                                    '病患資料',
-                                    bg: PdfColors.grey200,
-                                    align: pw.Alignment.centerLeft,
+                                  _cell(
+                                    pw.Text('病患資料', style: ts9()),
+                                    align: pw.Alignment.center,
                                   ),
                                 ],
                               ),
                             ],
                           ),
 
-                          // 姓名/性別/財物 (12+35+10+25+12+49=143)
+                          // 姓名/性別/病患財物明細 (15+33+13+22+30+30=143)
                           pw.Table(
                             border: tbInner,
                             columnWidths: {
-                              0: pw.FixedColumnWidth(12 * PdfPageFormat.mm),
-                              1: pw.FixedColumnWidth(35 * PdfPageFormat.mm),
-                              2: pw.FixedColumnWidth(10 * PdfPageFormat.mm),
-                              3: pw.FixedColumnWidth(25 * PdfPageFormat.mm),
-                              4: pw.FixedColumnWidth(12 * PdfPageFormat.mm),
-                              5: pw.FixedColumnWidth(49 * PdfPageFormat.mm),
+                              0: pw.FixedColumnWidth(15 * PdfPageFormat.mm),
+                              1: pw.FixedColumnWidth(33 * PdfPageFormat.mm),
+                              2: pw.FixedColumnWidth(13 * PdfPageFormat.mm),
+                              3: pw.FixedColumnWidth(22 * PdfPageFormat.mm),
+                              4: pw.FixedColumnWidth(30 * PdfPageFormat.mm),
+                              5: pw.FixedColumnWidth(30 * PdfPageFormat.mm),
                             },
                             children: [
                               pw.TableRow(
                                 children: [
-                                  _lbl('姓名'),
-                                  _cell(pw.Text(d.patientName, style: ts())),
-                                  _lbl('性別'),
                                   _cell(
-                                    pw.Row(
-                                      children: [
-                                        _chk('男', d.gender == '男'),
-                                        _chk('女', d.gender == '女'),
-                                      ],
+                                    pw.Padding(
+                                      padding: const pw.EdgeInsets.symmetric(
+                                        vertical: 0,
+                                      ),
+                                      child: pw.Text('姓名', style: ts9()),
                                     ),
+                                    align: pw.Alignment.center,
                                   ),
-                                  _lbl('財物'),
                                   _cell(
-                                    pw.Column(
-                                      crossAxisAlignment:
-                                          pw.CrossAxisAlignment.start,
-                                      children: [
-                                        pw.Row(
-                                          children: [
-                                            _chk('無', d.propertyNone),
-                                            _chk('有', d.propertyHas),
-                                          ],
-                                        ),
-                                        // 修正：顯示財物備註
-                                        if (d.propertyNote.isNotEmpty)
-                                          pw.Text(
-                                            '備註: ${d.propertyNote}',
-                                            style: ts(),
-                                          ),
-                                      ],
+                                    pw.Padding(
+                                      padding: const pw.EdgeInsets.symmetric(
+                                        vertical: 0,
+                                      ),
+                                      child: pw.Text(d.patientName, style: ts9()),
                                     ),
+                                    align: pw.Alignment.center,
+                                  ),
+                                  _cell(
+                                    pw.Padding(
+                                      padding: const pw.EdgeInsets.symmetric(
+                                        vertical: 0,
+                                      ),
+                                      child: pw.Text('性別', style: ts9()),
+                                    ),
+                                    align: pw.Alignment.center,
+                                  ),
+                                  _cell(
+                                    pw.Padding(
+                                      padding: const pw.EdgeInsets.symmetric(
+                                        vertical: 0,
+                                      ),
+                                      child: pw.Row(
+                                        mainAxisAlignment:
+                                            pw.MainAxisAlignment.center,
+                                        children: [
+                                          _chk('男', d.gender == '男', fillBlack: true),
+                                          _chk('女', d.gender == '女', fillBlack: true),
+                                        ],
+                                      ),
+                                    ),
+                                    align: pw.Alignment.center,
+                                  ),
+                                  _cell(
+                                    pw.Padding(
+                                      padding: const pw.EdgeInsets.symmetric(
+                                        vertical: 0,
+                                      ),
+                                      child: pw.Text('病患財物明細：', style: ts9()),
+                                    ),
+                                    align: pw.Alignment.center,
+                                  ),
+                                  _cell(
+                                    pw.Padding(
+                                      padding: const pw.EdgeInsets.symmetric(
+                                        vertical: 0,
+                                      ),
+                                      child: pw.Row(
+                                        mainAxisAlignment: pw.MainAxisAlignment.center,
+                                        children: [
+                                          _chk('未經手', d.propertyNone, fillBlack: true),
+                                          pw.SizedBox(width: 3),
+                                          _chk('有', d.propertyHas, fillBlack: true),
+                                        ],
+                                      ),
+                                    ),
+                                    align: pw.Alignment.center,
                                   ),
                                 ],
                               ),
+                              // 第二行：身分證、年齡、保管人簽章 (6格)
                               pw.TableRow(
                                 children: [
-                                  _lbl('身分證'),
-                                  _cell(pw.Text(d.idOrPassport, style: ts())),
-                                  _lbl('年齡'),
-                                  _cell(pw.Text(d.age, style: ts())),
-                                  _lbl('保管人'),
-                                  _cell(pw.Text(d.guardian, style: ts())),
+                                  _cell(
+                                    pw.Padding(
+                                      padding: const pw.EdgeInsets.symmetric(
+                                        vertical: 0,
+                                      ),
+                                      child: pw.Text(
+                                        '身分證字號/\n護照號碼',
+                                        style: ts9(),
+                                        textAlign: pw.TextAlign.center,
+                                      ),
+                                    ),
+                                    align: pw.Alignment.center,
+                                  ),
+                                  _cell(
+                                    pw.Padding(
+                                      padding: const pw.EdgeInsets.symmetric(
+                                        vertical: 0,
+                                      ),
+                                      child: pw.Text(d.idOrPassport, style: ts9()),
+                                    ),
+                                    align: pw.Alignment.center,
+                                  ),
+                                  _cell(
+                                    pw.Padding(
+                                      padding: const pw.EdgeInsets.symmetric(
+                                        vertical: 0,
+                                      ),
+                                      child: pw.Text('年齡(歲)', style: ts9()),
+                                    ),
+                                    align: pw.Alignment.center,
+                                  ),
+                                  _cell(
+                                    pw.Padding(
+                                      padding: const pw.EdgeInsets.symmetric(
+                                        vertical: 0,
+                                      ),
+                                      child: pw.Text('${d.age}歲', style: ts9()),
+                                    ),
+                                    align: pw.Alignment.center,
+                                  ),
+                                  _cell(
+                                    pw.Padding(
+                                      padding: const pw.EdgeInsets.symmetric(
+                                        vertical: 0,
+                                      ),
+                                      child: pw.Text('保管人(簽章)', style: ts9()),
+                                    ),
+                                    align: pw.Alignment.center,
+                                  ),
+                                  _cell(
+                                    pw.Padding(
+                                      padding: const pw.EdgeInsets.symmetric(
+                                        vertical: 0,
+                                      ),
+                                      child: d.guardianSign != null &&
+                                              d.guardianSign!.isNotEmpty
+                                          ? pw.Image(
+                                              pw.MemoryImage(d.guardianSign!),
+                                              height: 20,
+                                            )
+                                          : pw.Text('', style: ts9()),
+                                    ),
+                                    align: pw.Alignment.center,
+                                  ),
                                 ],
                               ),
                             ],
@@ -1353,7 +1672,7 @@ Future<Uint8List> buildAmbulanceReportPdf(AmbulanceReportData d) async {
                           pw.Table(
                             border: tbInner,
                             columnWidths: {
-                              0: pw.FixedColumnWidth(rightW * PdfPageFormat.mm),
+                              0: pw.FixedColumnWidth(130 * PdfPageFormat.mm),
                             },
                             children: [
                               pw.TableRow(
