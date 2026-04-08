@@ -819,7 +819,14 @@ Future<Uint8List> buildAmbulanceReportPdf(
                               pw.TableRow(
                                 children: [
                                   _cell(
-                                    pw.Text('住址', style: ts9(bold: false)),
+                                    pw.Container(
+                                      height: 16,
+                                      alignment: pw.Alignment.center,
+                                      child: pw.Text(
+                                        '住址',
+                                        style: ts9(bold: false),
+                                      ),
+                                    ),
                                     align: pw.Alignment.center,
                                   ),
                                   _cell(
@@ -828,7 +835,8 @@ Future<Uint8List> buildAmbulanceReportPdf(
                                         horizontal: 4,
                                         vertical: 2,
                                       ),
-                                      child: pw.Align(
+                                      child: pw.Container(
+                                        height: 16,
                                         alignment: pw.Alignment.centerLeft,
                                         child: pw.Text(
                                           d.address,
@@ -1319,7 +1327,7 @@ Future<Uint8List> buildAmbulanceReportPdf(
                                       padding: const pw.EdgeInsets.all(
                                         6,
                                       ), // ← 新增整體 padding
-                                      height: 32 * PdfPageFormat.mm, // 適度增加高度
+                                      height: 26 * PdfPageFormat.mm, // 適度增加高度
                                       child: pw.Column(
                                         crossAxisAlignment:
                                             pw.CrossAxisAlignment.start,
@@ -1335,7 +1343,7 @@ Future<Uint8List> buildAmbulanceReportPdf(
                                                 child: pw.Text(
                                                   d.ambulanceFee.isNotEmpty
                                                       ? d.ambulanceFee
-                                                      : '________________________',
+                                                      : '                              ',
                                                   style: ts(
                                                     sz: 7.5,
                                                     bold: true,
@@ -1351,7 +1359,7 @@ Future<Uint8List> buildAmbulanceReportPdf(
                                                 child: pw.Text(
                                                   d.o2Fee.isNotEmpty
                                                       ? d.o2Fee
-                                                      : '________________',
+                                                      : '                    ',
                                                   style: ts(
                                                     sz: 7.5,
                                                     bold: true,
@@ -1366,7 +1374,7 @@ Future<Uint8List> buildAmbulanceReportPdf(
                                               pw.Text(
                                                 d.totalFee.isNotEmpty
                                                     ? d.totalFee
-                                                    : '________________',
+                                                    : '                    ',
                                                 style: ts(sz: 7.5, bold: true),
                                               ),
                                             ],
@@ -1407,7 +1415,7 @@ Future<Uint8List> buildAmbulanceReportPdf(
                                                               .unpaidNote
                                                               .isNotEmpty
                                                       ? d.unpaidNote
-                                                      : '________________________',
+                                                      : '                              ',
                                                   style: ts(sz: 7, bold: true),
                                                 ),
                                               ),
@@ -1447,7 +1455,21 @@ Future<Uint8List> buildAmbulanceReportPdf(
                                   ),
                                 },
                                 children: [
-                                  pw.TableRow(children: [_lbl('處置項目（此欄可複選）')]),
+                                  pw.TableRow(
+                                    children: [
+                                      _cell(
+                                        pw.Container(
+                                          height: 21,
+                                          alignment: pw.Alignment.center,
+                                          child: pw.Text(
+                                            '處置項目（此欄可複選）',
+                                            style: ts(bold: true),
+                                            textAlign: pw.TextAlign.center,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ],
                               ),
                               // 2. 內容表格
@@ -1469,7 +1491,7 @@ Future<Uint8List> buildAmbulanceReportPdf(
                                       // 垂直「急救處置」標籤 - 加強垂直置中
                                       _cell(
                                         pw.Container(
-                                          height: 192, // 關鍵調整：加大高度讓文字真正置中
+                                          height: 192, // 加大高度
                                           alignment: pw.Alignment.center,
                                           child: pw.Text(
                                             '急\n救\n處\n置',
