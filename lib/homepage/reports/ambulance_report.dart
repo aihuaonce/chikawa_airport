@@ -1735,9 +1735,9 @@ Future<Uint8List> buildAmbulanceReportPdf(
                             ],
                           ),
 
-                          // ── 給藥紀錄（修正旁邊空白過大問題 + 標題列從第二行開始） ─────────────────
+                          // ── 給藥紀錄（跟急救處置一樣靠左，佔滿整個右半部） ─────────────────
                           pw.Container(
-                            width: 105 * PdfPageFormat.mm, // ← 整體寬度再縮小，讓它更靠左
+                            width: rightW * PdfPageFormat.mm, // ← 跟急救處置一樣寬度
                             height: 72,
                             decoration: pw.BoxDecoration(
                               border: pw.Border.all(
@@ -1749,7 +1749,7 @@ Future<Uint8List> buildAmbulanceReportPdf(
                               children: [
                                 // 1. 第一直行：給藥紀錄 垂直標題
                                 pw.Container(
-                                  width: 9 * PdfPageFormat.mm,
+                                  width: 8 * PdfPageFormat.mm, // ← 標題欄加長
                                   height: 72,
                                   alignment: pw.Alignment.center,
                                   decoration: pw.BoxDecoration(
@@ -1770,7 +1770,7 @@ Future<Uint8List> buildAmbulanceReportPdf(
                                     children: [
                                       // 標題列（從第二行開始）
                                       pw.Container(
-                                        height: 18,
+                                        height: 16, // ← 高度縮短
                                         decoration: pw.BoxDecoration(
                                           border: pw.Border(
                                             bottom: pw.BorderSide(width: 0.5),
@@ -1779,7 +1779,14 @@ Future<Uint8List> buildAmbulanceReportPdf(
                                         child: pw.Row(
                                           children: [
                                             pw.Container(
-                                              width: 17 * PdfPageFormat.mm,
+                                              width: 20 * PdfPageFormat.mm,
+                                              decoration: pw.BoxDecoration(
+                                                border: pw.Border(
+                                                  right: pw.BorderSide(
+                                                    width: 0.5,
+                                                  ),
+                                                ),
+                                              ),
                                               alignment: pw.Alignment.center,
                                               child: pw.Text(
                                                 '時間',
@@ -1788,6 +1795,13 @@ Future<Uint8List> buildAmbulanceReportPdf(
                                             ),
                                             pw.Container(
                                               width: 23 * PdfPageFormat.mm,
+                                              decoration: pw.BoxDecoration(
+                                                border: pw.Border(
+                                                  right: pw.BorderSide(
+                                                    width: 0.5,
+                                                  ),
+                                                ),
+                                              ),
                                               alignment: pw.Alignment.center,
                                               child: pw.Text(
                                                 '藥名',
@@ -1796,6 +1810,13 @@ Future<Uint8List> buildAmbulanceReportPdf(
                                             ),
                                             pw.Container(
                                               width: 23 * PdfPageFormat.mm,
+                                              decoration: pw.BoxDecoration(
+                                                border: pw.Border(
+                                                  right: pw.BorderSide(
+                                                    width: 0.5,
+                                                  ),
+                                                ),
+                                              ),
                                               alignment: pw.Alignment.center,
                                               child: pw.Text(
                                                 '途徑/劑量',
@@ -1804,6 +1825,13 @@ Future<Uint8List> buildAmbulanceReportPdf(
                                             ),
                                             pw.Container(
                                               width: 15 * PdfPageFormat.mm,
+                                              decoration: pw.BoxDecoration(
+                                                border: pw.Border(
+                                                  right: pw.BorderSide(
+                                                    width: 0.5,
+                                                  ),
+                                                ),
+                                              ),
                                               alignment: pw.Alignment.center,
                                               child: pw.Text(
                                                 '執行者',
@@ -1812,6 +1840,13 @@ Future<Uint8List> buildAmbulanceReportPdf(
                                             ),
                                             pw.Container(
                                               width: 23 * PdfPageFormat.mm,
+                                              decoration: pw.BoxDecoration(
+                                                border: pw.Border(
+                                                  right: pw.BorderSide(
+                                                    width: 0.5,
+                                                  ),
+                                                ),
+                                              ),
                                               alignment: pw.Alignment.center,
                                               child: pw.Text(
                                                 'ASL處置',
@@ -1837,7 +1872,8 @@ Future<Uint8List> buildAmbulanceReportPdf(
                                           children: [
                                             // 時間
                                             pw.Container(
-                                              width: 17 * PdfPageFormat.mm,
+                                              width:
+                                                  20 * PdfPageFormat.mm, // ← +3
                                               child: pw.Column(
                                                 children: List.generate(
                                                   4,
@@ -1869,7 +1905,9 @@ Future<Uint8List> buildAmbulanceReportPdf(
                                             ),
                                             // 藥名
                                             pw.Container(
-                                              width: 23 * PdfPageFormat.mm,
+                                              width:
+                                                  23 *
+                                                  PdfPageFormat.mm, // ← 對齊標題列
                                               child: pw.Column(
                                                 children: List.generate(
                                                   4,
@@ -1979,6 +2017,15 @@ Future<Uint8List> buildAmbulanceReportPdf(
                                                             alignment: pw
                                                                 .Alignment
                                                                 .topLeft,
+                                                            decoration: pw.BoxDecoration(
+                                                              border: pw.Border(
+                                                                right:
+                                                                    pw.BorderSide(
+                                                                      width:
+                                                                          0.5,
+                                                                    ),
+                                                              ),
+                                                            ),
                                                             child: pw.Column(
                                                               crossAxisAlignment: pw
                                                                   .CrossAxisAlignment
