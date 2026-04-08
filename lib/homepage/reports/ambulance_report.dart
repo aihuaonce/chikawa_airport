@@ -1316,36 +1316,49 @@ Future<Uint8List> buildAmbulanceReportPdf(
                                 children: [
                                   _cell(
                                     pw.Container(
-                                      height: 24 * PdfPageFormat.mm,
+                                      padding: const pw.EdgeInsets.all(
+                                        6,
+                                      ), // ← 新增整體 padding
+                                      height: 32 * PdfPageFormat.mm, // 適度增加高度
                                       child: pw.Column(
                                         crossAxisAlignment:
                                             pw.CrossAxisAlignment.start,
                                         children: [
-                                          // 第1行：費用金額（字放大 + 預留長空位）
+                                          // 第1行：費用金額
                                           pw.Row(
                                             children: [
                                               pw.Text(
                                                 '救護車費用(含醫護人員): ',
                                                 style: ts(sz: 7.5, bold: true),
                                               ),
-                                              pw.Text(
-                                                d.ambulanceFee.isNotEmpty
-                                                    ? d.ambulanceFee
-                                                    : '__________________',
-                                                style: ts(sz: 7.5, bold: true),
+                                              pw.Expanded(
+                                                child: pw.Text(
+                                                  d.ambulanceFee.isNotEmpty
+                                                      ? d.ambulanceFee
+                                                      : '________________________',
+                                                  style: ts(
+                                                    sz: 7.5,
+                                                    bold: true,
+                                                  ),
+                                                ),
                                               ),
-                                              pw.SizedBox(width: 10),
+                                              pw.SizedBox(width: 12),
                                               pw.Text(
                                                 '氧氣使用費: ',
                                                 style: ts(sz: 7.5, bold: true),
                                               ),
-                                              pw.Text(
-                                                d.o2Fee.isNotEmpty
-                                                    ? d.o2Fee
-                                                    : '__________________',
-                                                style: ts(sz: 7.5, bold: true),
+                                              pw.Expanded(
+                                                child: pw.Text(
+                                                  d.o2Fee.isNotEmpty
+                                                      ? d.o2Fee
+                                                      : '________________',
+                                                  style: ts(
+                                                    sz: 7.5,
+                                                    bold: true,
+                                                  ),
+                                                ),
                                               ),
-                                              pw.SizedBox(width: 10),
+                                              pw.SizedBox(width: 12),
                                               pw.Text(
                                                 '總計: ',
                                                 style: ts(sz: 7.5, bold: true),
@@ -1353,22 +1366,22 @@ Future<Uint8List> buildAmbulanceReportPdf(
                                               pw.Text(
                                                 d.totalFee.isNotEmpty
                                                     ? d.totalFee
-                                                    : '__________________',
+                                                    : '________________',
                                                 style: ts(sz: 7.5, bold: true),
                                               ),
                                             ],
                                           ),
 
-                                          pw.SizedBox(height: 10), // 間距拉開
+                                          pw.SizedBox(height: 8), // 上下間距
                                           // 第2行：已收費 + 代收
                                           pw.Row(
                                             children: [
                                               _chk(
                                                 '已收費 (現金 / 刷卡)',
                                                 d.paidCash || d.paidCard,
-                                                sz: 6.5, // 勾選框文字也稍微放大
+                                                sz: 6.5,
                                               ),
-                                              pw.SizedBox(width: 40), // 間距拉開
+                                              pw.SizedBox(width: 30),
                                               _chk(
                                                 '聯新國際醫院代收',
                                                 d.paidHospital,
@@ -1377,8 +1390,9 @@ Future<Uint8List> buildAmbulanceReportPdf(
                                             ],
                                           ),
 
-                                          pw.SizedBox(height: 8), // 間距拉開
-                                          // 第3行：未收費（永遠預留空位）
+                                          pw.SizedBox(height: 6),
+
+                                          // 第3行：未收費
                                           pw.Row(
                                             children: [
                                               _chk(
@@ -1386,15 +1400,19 @@ Future<Uint8List> buildAmbulanceReportPdf(
                                                 d.unpaid,
                                                 sz: 6.5,
                                               ),
-                                              pw.Text(
-                                                d.unpaid &&
-                                                        d.unpaidNote.isNotEmpty
-                                                    ? '${d.unpaidNote}'
-                                                    : '__________________',
-                                                style: ts(sz: 7, bold: true),
+                                              pw.Expanded(
+                                                child: pw.Text(
+                                                  d.unpaid &&
+                                                          d
+                                                              .unpaidNote
+                                                              .isNotEmpty
+                                                      ? d.unpaidNote
+                                                      : '________________________',
+                                                  style: ts(sz: 7, bold: true),
+                                                ),
                                               ),
                                               pw.Text(
-                                                d.unpaid ? ')' : ' )',
+                                                d.unpaid ? ' )' : ' )',
                                                 style: ts(sz: 7, bold: true),
                                               ),
                                             ],
