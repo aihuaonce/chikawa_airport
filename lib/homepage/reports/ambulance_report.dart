@@ -1749,7 +1749,7 @@ Future<Uint8List> buildAmbulanceReportPdf(
                               children: [
                                 // 1. 第一直行：給藥紀錄 垂直標題
                                 pw.Container(
-                                  width: 8 * PdfPageFormat.mm, // ← 標題欄加長
+                                  width: 8.5 * PdfPageFormat.mm, // ← 標題欄加長
                                   height: 72,
                                   alignment: pw.Alignment.center,
                                   decoration: pw.BoxDecoration(
@@ -1770,12 +1770,7 @@ Future<Uint8List> buildAmbulanceReportPdf(
                                     children: [
                                       // 標題列（從第二行開始）
                                       pw.Container(
-                                        height: 16, // ← 高度縮短
-                                        decoration: pw.BoxDecoration(
-                                          border: pw.Border(
-                                            bottom: pw.BorderSide(width: 0.5),
-                                          ),
-                                        ),
+                                        height: 16,
                                         child: pw.Row(
                                           children: [
                                             pw.Container(
@@ -1783,6 +1778,9 @@ Future<Uint8List> buildAmbulanceReportPdf(
                                               decoration: pw.BoxDecoration(
                                                 border: pw.Border(
                                                   right: pw.BorderSide(
+                                                    width: 0.5,
+                                                  ),
+                                                  bottom: pw.BorderSide(
                                                     width: 0.5,
                                                   ),
                                                 ),
@@ -1800,6 +1798,9 @@ Future<Uint8List> buildAmbulanceReportPdf(
                                                   right: pw.BorderSide(
                                                     width: 0.5,
                                                   ),
+                                                  bottom: pw.BorderSide(
+                                                    width: 0.5,
+                                                  ),
                                                 ),
                                               ),
                                               alignment: pw.Alignment.center,
@@ -1813,6 +1814,9 @@ Future<Uint8List> buildAmbulanceReportPdf(
                                               decoration: pw.BoxDecoration(
                                                 border: pw.Border(
                                                   right: pw.BorderSide(
+                                                    width: 0.5,
+                                                  ),
+                                                  bottom: pw.BorderSide(
                                                     width: 0.5,
                                                   ),
                                                 ),
@@ -1830,6 +1834,9 @@ Future<Uint8List> buildAmbulanceReportPdf(
                                                   right: pw.BorderSide(
                                                     width: 0.5,
                                                   ),
+                                                  bottom: pw.BorderSide(
+                                                    width: 0.5,
+                                                  ),
                                                 ),
                                               ),
                                               alignment: pw.Alignment.center,
@@ -1845,6 +1852,9 @@ Future<Uint8List> buildAmbulanceReportPdf(
                                                   right: pw.BorderSide(
                                                     width: 0.5,
                                                   ),
+                                                  bottom: pw.BorderSide(
+                                                    width: 0.5,
+                                                  ),
                                                 ),
                                               ),
                                               alignment: pw.Alignment.center,
@@ -1855,6 +1865,13 @@ Future<Uint8List> buildAmbulanceReportPdf(
                                             ),
                                             pw.Expanded(
                                               child: pw.Container(
+                                                decoration: pw.BoxDecoration(
+                                                  border: pw.Border(
+                                                    bottom: pw.BorderSide(
+                                                      width: 0.5,
+                                                    ),
+                                                  ),
+                                                ),
                                                 alignment: pw.Alignment.center,
                                                 child: pw.Text(
                                                   '線上指導醫師',
