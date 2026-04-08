@@ -2092,98 +2092,539 @@ Future<Uint8List> buildAmbulanceReportPdf(
                             ),
                           ),
 
-                          // ── 生命徵象 (修正：4 列) ─────────────
-                          // 6+14+14+12+12+12+22+15+36=143
-                          pw.Table(
-                            border: tbInner,
-                            columnWidths: {
-                              0: pw.FixedColumnWidth(6 * PdfPageFormat.mm),
-                              1: pw.FixedColumnWidth(14 * PdfPageFormat.mm),
-                              2: pw.FixedColumnWidth(14 * PdfPageFormat.mm),
-                              3: pw.FixedColumnWidth(12 * PdfPageFormat.mm),
-                              4: pw.FixedColumnWidth(12 * PdfPageFormat.mm),
-                              5: pw.FixedColumnWidth(12 * PdfPageFormat.mm),
-                              6: pw.FixedColumnWidth(22 * PdfPageFormat.mm),
-                              7: pw.FixedColumnWidth(15 * PdfPageFormat.mm),
-                              8: pw.FixedColumnWidth(36 * PdfPageFormat.mm),
-                            },
-                            children: [
-                              pw.TableRow(
-                                children: [
-                                  _lbl('生命\n徵象'),
-                                  _lbl('時間'),
-                                  _lbl('意識'),
-                                  _lbl('體溫'),
-                                  _lbl('脈搏'),
-                                  _lbl('呼吸'),
-                                  _lbl('血壓'),
-                                  _lbl('SpO2'),
-                                  _lbl('GCS'),
-                                ],
+                          // ── 生命徵象 (跟給藥紀錄一樣的格式) ─────────────
+                          pw.Container(
+                            width: rightW * PdfPageFormat.mm,
+                            height: 72,
+                            decoration: pw.BoxDecoration(
+                              border: pw.Border.all(
+                                width: 0.5,
+                                color: PdfColors.black,
                               ),
-                              // 修正：3 → 4 列
-                              ...List.generate(4, (i) {
-                                return pw.TableRow(
-                                  children: [
-                                    if (i == 0)
-                                      _cell(
-                                        pw.Center(
-                                          child: pw.Transform.rotateBox(
-                                            angle: -math.pi / 2,
-                                            child: pw.Text(
-                                              '生命徵象',
-                                              style: ts(bold: true),
-                                            ),
-                                          ),
-                                        ),
-                                      )
-                                    else
-                                      pw.SizedBox(),
-                                    _lbl(d.vsTime[i], bold: false),
-                                    _lbl(d.vsConsciousness[i], bold: false),
-                                    _lbl(d.vsTemp[i], bold: false),
-                                    _lbl(d.vsPulse[i], bold: false),
-                                    _lbl(d.vsBreathing[i], bold: false),
-                                    _lbl(
-                                      '${d.vsBPSys[i]} / ${d.vsBPDia[i]}',
-                                      bold: false,
-                                    ),
-                                    _lbl(d.vsSpO2[i], bold: false),
-                                    _lbl(
-                                      'E${d.vsGcsE[i]} V${d.vsGcsV[i]} M${d.vsGcsM[i]}',
-                                      bold: false,
-                                    ),
-                                  ],
-                                );
-                              }),
-                            ],
-                          ),
-
-                          // ── 到院後狀況 (修正：新增區塊) ─────────
-                          pw.Table(
-                            border: tbInner,
-                            columnWidths: {
-                              0: pw.FixedColumnWidth(130 * PdfPageFormat.mm),
-                            },
-                            children: [
-                              pw.TableRow(
-                                children: [
-                                  _cell(
-                                    pw.Row(
-                                      children: [
-                                        pw.Text(
-                                          '到院後狀況：',
-                                          style: ts(bold: true),
-                                        ),
-                                        _chk('清醒', d.postAlert),
-                                        _chk('疼痛', d.postPain),
-                                        _chk('心停', d.postArrested),
-                                      ],
+                            ),
+                            child: pw.Row(
+                              children: [
+                                // 1. 第一直行：生命徵象 垂直標題
+                                pw.Container(
+                                  width: 8.5 * PdfPageFormat.mm,
+                                  height: 72,
+                                  alignment: pw.Alignment.center,
+                                  decoration: pw.BoxDecoration(
+                                    border: pw.Border(
+                                      right: pw.BorderSide(width: 0.5),
                                     ),
                                   ),
-                                ],
-                              ),
-                            ],
+                                  child: pw.Text(
+                                    '生\n命\n徵\n象',
+                                    style: ts(sz: 7.5, bold: true),
+                                    textAlign: pw.TextAlign.center,
+                                  ),
+                                ),
+
+                                // 右側內容
+                                pw.Expanded(
+                                  child: pw.Column(
+                                    children: [
+                                      // 標題列
+                                      pw.Container(
+                                        height: 16,
+                                        child: pw.Row(
+                                          children: [
+                                            pw.Container(
+                                              width: 20 * PdfPageFormat.mm,
+                                              decoration: pw.BoxDecoration(
+                                                border: pw.Border(
+                                                  right: pw.BorderSide(
+                                                    width: 0.5,
+                                                  ),
+                                                  bottom: pw.BorderSide(
+                                                    width: 0.5,
+                                                  ),
+                                                ),
+                                              ),
+                                              alignment: pw.Alignment.center,
+                                              child: pw.Text(
+                                                '時間',
+                                                style: ts(sz: 6, bold: true),
+                                              ),
+                                            ),
+                                            pw.Container(
+                                              width: 14 * PdfPageFormat.mm,
+                                              decoration: pw.BoxDecoration(
+                                                border: pw.Border(
+                                                  right: pw.BorderSide(
+                                                    width: 0.5,
+                                                  ),
+                                                  bottom: pw.BorderSide(
+                                                    width: 0.5,
+                                                  ),
+                                                ),
+                                              ),
+                                              alignment: pw.Alignment.center,
+                                              child: pw.Text(
+                                                '意識',
+                                                style: ts(sz: 6, bold: true),
+                                              ),
+                                            ),
+                                            pw.Container(
+                                              width: 12 * PdfPageFormat.mm,
+                                              decoration: pw.BoxDecoration(
+                                                border: pw.Border(
+                                                  right: pw.BorderSide(
+                                                    width: 0.5,
+                                                  ),
+                                                  bottom: pw.BorderSide(
+                                                    width: 0.5,
+                                                  ),
+                                                ),
+                                              ),
+                                              alignment: pw.Alignment.center,
+                                              child: pw.Text(
+                                                '體溫',
+                                                style: ts(sz: 6, bold: true),
+                                              ),
+                                            ),
+                                            pw.Container(
+                                              width: 12 * PdfPageFormat.mm,
+                                              decoration: pw.BoxDecoration(
+                                                border: pw.Border(
+                                                  right: pw.BorderSide(
+                                                    width: 0.5,
+                                                  ),
+                                                  bottom: pw.BorderSide(
+                                                    width: 0.5,
+                                                  ),
+                                                ),
+                                              ),
+                                              alignment: pw.Alignment.center,
+                                              child: pw.Text(
+                                                '脈搏',
+                                                style: ts(sz: 6, bold: true),
+                                              ),
+                                            ),
+                                            pw.Container(
+                                              width: 12 * PdfPageFormat.mm,
+                                              decoration: pw.BoxDecoration(
+                                                border: pw.Border(
+                                                  right: pw.BorderSide(
+                                                    width: 0.5,
+                                                  ),
+                                                  bottom: pw.BorderSide(
+                                                    width: 0.5,
+                                                  ),
+                                                ),
+                                              ),
+                                              alignment: pw.Alignment.center,
+                                              child: pw.Text(
+                                                '呼吸',
+                                                style: ts(sz: 6, bold: true),
+                                              ),
+                                            ),
+                                            pw.Container(
+                                              width: 18 * PdfPageFormat.mm,
+                                              decoration: pw.BoxDecoration(
+                                                border: pw.Border(
+                                                  right: pw.BorderSide(
+                                                    width: 0.5,
+                                                  ),
+                                                  bottom: pw.BorderSide(
+                                                    width: 0.5,
+                                                  ),
+                                                ),
+                                              ),
+                                              alignment: pw.Alignment.center,
+                                              child: pw.Text(
+                                                '血壓',
+                                                style: ts(sz: 6, bold: true),
+                                              ),
+                                            ),
+                                            pw.Container(
+                                              width: 12 * PdfPageFormat.mm,
+                                              decoration: pw.BoxDecoration(
+                                                border: pw.Border(
+                                                  right: pw.BorderSide(
+                                                    width: 0.5,
+                                                  ),
+                                                  bottom: pw.BorderSide(
+                                                    width: 0.5,
+                                                  ),
+                                                ),
+                                              ),
+                                              alignment: pw.Alignment.center,
+                                              child: pw.Text(
+                                                'SpO2',
+                                                style: ts(sz: 6, bold: true),
+                                              ),
+                                            ),
+                                            pw.Expanded(
+                                              child: pw.Container(
+                                                decoration: pw.BoxDecoration(
+                                                  border: pw.Border(
+                                                    bottom: pw.BorderSide(
+                                                      width: 0.5,
+                                                    ),
+                                                  ),
+                                                ),
+                                                alignment: pw.Alignment.center,
+                                                child: pw.Text(
+                                                  'E V M',
+                                                  style: ts(sz: 6, bold: true),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+
+                                      // 資料內容區（3行）
+                                      pw.Expanded(
+                                        child: pw.Row(
+                                          children: [
+                                            // 時間
+                                            pw.Container(
+                                              width: 20 * PdfPageFormat.mm,
+                                              child: pw.Column(
+                                                children: List.generate(
+                                                  3,
+                                                  (i) => pw.Expanded(
+                                                    child: pw.Container(
+                                                      alignment:
+                                                          pw.Alignment.center,
+                                                      decoration:
+                                                          pw.BoxDecoration(
+                                                            border: pw.Border(
+                                                              right:
+                                                                  pw.BorderSide(
+                                                                    width: 0.5,
+                                                                  ),
+                                                              bottom:
+                                                                  pw.BorderSide(
+                                                                    width: 0.5,
+                                                                  ),
+                                                            ),
+                                                          ),
+                                                      child: i == 2
+                                                          ? pw.Text(
+                                                              '到院後\n檢傷站',
+                                                              style: ts(
+                                                                sz: 5,
+                                                                bold: true,
+                                                              ),
+                                                              textAlign: pw
+                                                                  .TextAlign
+                                                                  .center,
+                                                            )
+                                                          : pw.Text(
+                                                              d.vsTime[i],
+                                                              style: ts(sz: 6),
+                                                            ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            // 意識
+                                            pw.Container(
+                                              width: 14 * PdfPageFormat.mm,
+                                              child: pw.Column(
+                                                children: List.generate(
+                                                  3,
+                                                  (i) => pw.Expanded(
+                                                    child: pw.Container(
+                                                      alignment:
+                                                          pw.Alignment.center,
+                                                      decoration:
+                                                          pw.BoxDecoration(
+                                                            border: pw.Border(
+                                                              right:
+                                                                  pw.BorderSide(
+                                                                    width: 0.5,
+                                                                  ),
+                                                              bottom:
+                                                                  pw.BorderSide(
+                                                                    width: 0.5,
+                                                                  ),
+                                                            ),
+                                                          ),
+                                                      child: i == 0
+                                                          ? pw.Text(
+                                                              '',
+                                                              style: ts(sz: 6),
+                                                            )
+                                                          : pw.Text(
+                                                              d.vsConsciousness[i],
+                                                              style: ts(sz: 6),
+                                                            ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            // 體溫
+                                            pw.Container(
+                                              width: 12 * PdfPageFormat.mm,
+                                              child: pw.Column(
+                                                children: List.generate(
+                                                  3,
+                                                  (i) => pw.Expanded(
+                                                    child: pw.Container(
+                                                      alignment:
+                                                          pw.Alignment.center,
+                                                      decoration:
+                                                          pw.BoxDecoration(
+                                                            border: pw.Border(
+                                                              right:
+                                                                  pw.BorderSide(
+                                                                    width: 0.5,
+                                                                  ),
+                                                              bottom:
+                                                                  pw.BorderSide(
+                                                                    width: 0.5,
+                                                                  ),
+                                                            ),
+                                                          ),
+                                                      child: i == 0
+                                                          ? pw.Text(
+                                                              '',
+                                                              style: ts(sz: 6),
+                                                            )
+                                                          : pw.Text(
+                                                              d.vsTemp[i],
+                                                              style: ts(sz: 6),
+                                                            ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            // 脈搏
+                                            pw.Container(
+                                              width: 12 * PdfPageFormat.mm,
+                                              child: pw.Column(
+                                                children: List.generate(
+                                                  3,
+                                                  (i) => pw.Expanded(
+                                                    child: pw.Container(
+                                                      alignment:
+                                                          pw.Alignment.center,
+                                                      decoration:
+                                                          pw.BoxDecoration(
+                                                            border: pw.Border(
+                                                              right:
+                                                                  pw.BorderSide(
+                                                                    width: 0.5,
+                                                                  ),
+                                                              bottom:
+                                                                  pw.BorderSide(
+                                                                    width: 0.5,
+                                                                  ),
+                                                            ),
+                                                          ),
+                                                      child: i == 0
+                                                          ? pw.Text(
+                                                              '',
+                                                              style: ts(sz: 6),
+                                                            )
+                                                          : pw.Text(
+                                                              d.vsPulse[i],
+                                                              style: ts(sz: 6),
+                                                            ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            // 呼吸
+                                            pw.Container(
+                                              width: 12 * PdfPageFormat.mm,
+                                              child: pw.Column(
+                                                children: List.generate(
+                                                  3,
+                                                  (i) => pw.Expanded(
+                                                    child: pw.Container(
+                                                      alignment:
+                                                          pw.Alignment.center,
+                                                      decoration:
+                                                          pw.BoxDecoration(
+                                                            border: pw.Border(
+                                                              right:
+                                                                  pw.BorderSide(
+                                                                    width: 0.5,
+                                                                  ),
+                                                              bottom:
+                                                                  pw.BorderSide(
+                                                                    width: 0.5,
+                                                                  ),
+                                                            ),
+                                                          ),
+                                                      child: i == 0
+                                                          ? pw.Text(
+                                                              '',
+                                                              style: ts(sz: 6),
+                                                            )
+                                                          : pw.Text(
+                                                              d.vsBreathing[i],
+                                                              style: ts(sz: 6),
+                                                            ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            // 血壓
+                                            pw.Container(
+                                              width: 18 * PdfPageFormat.mm,
+                                              child: pw.Column(
+                                                children: List.generate(
+                                                  3,
+                                                  (i) => pw.Expanded(
+                                                    child: pw.Container(
+                                                      alignment:
+                                                          pw.Alignment.center,
+                                                      decoration:
+                                                          pw.BoxDecoration(
+                                                            border: pw.Border(
+                                                              right:
+                                                                  pw.BorderSide(
+                                                                    width: 0.5,
+                                                                  ),
+                                                              bottom:
+                                                                  pw.BorderSide(
+                                                                    width: 0.5,
+                                                                  ),
+                                                            ),
+                                                          ),
+                                                      child: i == 0
+                                                          ? pw.Text(
+                                                              '',
+                                                              style: ts(sz: 6),
+                                                            )
+                                                          : pw.Text(
+                                                              '${d.vsBPSys[i]} / ${d.vsBPDia[i]}',
+                                                              style: ts(sz: 6),
+                                                            ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            // SpO2
+                                            pw.Container(
+                                              width: 12 * PdfPageFormat.mm,
+                                              child: pw.Column(
+                                                children: List.generate(
+                                                  3,
+                                                  (i) => pw.Expanded(
+                                                    child: pw.Container(
+                                                      alignment:
+                                                          pw.Alignment.center,
+                                                      decoration:
+                                                          pw.BoxDecoration(
+                                                            border: pw.Border(
+                                                              right:
+                                                                  pw.BorderSide(
+                                                                    width: 0.5,
+                                                                  ),
+                                                              bottom:
+                                                                  pw.BorderSide(
+                                                                    width: 0.5,
+                                                                  ),
+                                                            ),
+                                                          ),
+                                                      child: pw.Text(
+                                                        '${d.vsSpO2[i]}%',
+                                                        style: ts(sz: 6),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            // E V M (GCS)
+                                            pw.Expanded(
+                                              child: pw.Column(
+                                                children: List.generate(
+                                                  3,
+                                                  (i) => pw.Expanded(
+                                                    child: pw.Container(
+                                                      alignment:
+                                                          pw.Alignment.center,
+                                                      decoration:
+                                                          pw.BoxDecoration(
+                                                            border: pw.Border(
+                                                              bottom:
+                                                                  pw.BorderSide(
+                                                                    width: 0.5,
+                                                                  ),
+                                                            ),
+                                                          ),
+                                                      child: i == 0
+                                                          ? pw.Text(
+                                                              '',
+                                                              style: ts(sz: 6),
+                                                            )
+                                                          : pw.RichText(
+                                                              text: pw.TextSpan(
+                                                                children: [
+                                                                  pw.TextSpan(
+                                                                    text:
+                                                                        'E${d.vsGcsE[i]}',
+                                                                    style: ts(
+                                                                      sz: 6,
+                                                                      bold:
+                                                                          true,
+                                                                    ),
+                                                                  ),
+                                                                  pw.TextSpan(
+                                                                    text: ' V',
+                                                                    style: ts(
+                                                                      sz: 6,
+                                                                      bold:
+                                                                          true,
+                                                                    ),
+                                                                  ),
+                                                                  pw.TextSpan(
+                                                                    text:
+                                                                        '${d.vsGcsV[i]}',
+                                                                    style: ts(
+                                                                      sz: 6,
+                                                                      bold:
+                                                                          true,
+                                                                    ),
+                                                                  ),
+                                                                  pw.TextSpan(
+                                                                    text: ' M',
+                                                                    style: ts(
+                                                                      sz: 6,
+                                                                      bold:
+                                                                          true,
+                                                                    ),
+                                                                  ),
+                                                                  pw.TextSpan(
+                                                                    text: d
+                                                                        .vsGcsM[i],
+                                                                    style: ts(
+                                                                      sz: 6,
+                                                                      bold:
+                                                                          true,
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ],
                       ),
