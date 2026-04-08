@@ -2741,10 +2741,9 @@ Future<Uint8List> buildAmbulanceReportPdf(
                                 height: 70,
                                 padding: const pw.EdgeInsets.all(8),
                                 child: pw.Column(
-                                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment: pw.MainAxisAlignment.center,
                                   children: [
                                     pw.Text('簽\n名\n欄', style: ts(bold: true)),
-                                    pw.SizedBox(),
                                   ],
                                 ),
                               ),
@@ -2755,21 +2754,20 @@ Future<Uint8List> buildAmbulanceReportPdf(
                                 padding: const pw.EdgeInsets.all(8),
                                 child: pw.Column(
                                   mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                                  crossAxisAlignment: pw.CrossAxisAlignment.start,
                                   children: [
                                     pw.Text('救護車救護人員簽名', style: ts(bold: true)),
-                                    pw.Row(
-                                      mainAxisAlignment: pw.MainAxisAlignment.start,
+                                    pw.Column(
+                                      crossAxisAlignment: pw.CrossAxisAlignment.start,
                                       children: [
                                         pw.Text(
                                           '一、 ${d.emt1.isNotEmpty ? d.emt1 : "        "}',
                                           style: ts(sz: 8),
                                         ),
-                                        pw.SizedBox(width: 20),
                                         pw.Text(
                                           '二、 ${d.emt2.isNotEmpty ? d.emt2 : "        "}',
                                           style: ts(sz: 8),
                                         ),
-                                        pw.SizedBox(width: 20),
                                         pw.Text(
                                           '三、 ${d.emt3.isNotEmpty ? d.emt3 : "        "}',
                                           style: ts(sz: 8),
@@ -2786,11 +2784,10 @@ Future<Uint8List> buildAmbulanceReportPdf(
                                 padding: const pw.EdgeInsets.all(8),
                                 child: pw.Column(
                                   mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                                  crossAxisAlignment: pw.CrossAxisAlignment.start,
                                   children: [
                                     pw.Text('接收單位簽名', style: ts(bold: true)),
-                                    pw.Center(
-                                      child: pw.Text(d.receiveUnit, style: ts(sz: 8)),
-                                    ),
+                                    pw.Text(d.receiveUnit, style: ts(sz: 8)),
                                     pw.SizedBox(),
                                   ],
                                 ),
@@ -2817,13 +2814,13 @@ Future<Uint8List> buildAmbulanceReportPdf(
                                 height: 70,
                                 padding: const pw.EdgeInsets.all(8),
                                 child: pw.Column(
-                                  mainAxisAlignment: pw.MainAxisAlignment.end,
+                                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                                  crossAxisAlignment: pw.CrossAxisAlignment.start,
                                   children: [
                                     pw.Text(
                                       '□ 拒絕送醫聲明：\n本人(或關係人)聲明，救護人員已將病情與拒絕送醫之可能危險告知，但我仍拒絕接受處置及送醫。',
                                       style: ts(),
                                     ),
-                                    pw.SizedBox(height: 4),
                                     pw.Text(
                                       '簽名：${d.refuseTransferSign}',
                                       style: ts(),
@@ -2837,18 +2834,17 @@ Future<Uint8List> buildAmbulanceReportPdf(
                                 height: 70,
                                 padding: const pw.EdgeInsets.all(8),
                                 child: pw.Column(
-                                  mainAxisAlignment: pw.MainAxisAlignment.end,
+                                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                                  crossAxisAlignment: pw.CrossAxisAlignment.start,
                                   children: [
                                     pw.Text(
                                       '病患/家屬/關係人簽名',
                                       style: ts(bold: true),
                                     ),
-                                    pw.SizedBox(height: 4),
                                     pw.Text(
                                       '簽名：                                    ',
                                       style: ts(sz: 7),
                                     ),
-                                    pw.SizedBox(height: 4),
                                     pw.Text(
                                       '連絡電話：${d.refuseContactPhone}',
                                       style: ts(sz: 7),
