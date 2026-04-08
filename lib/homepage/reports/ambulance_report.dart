@@ -2721,168 +2721,145 @@ Future<Uint8List> buildAmbulanceReportPdf(
                 // 3. 底部簽名
                 // ══════════════════════════════════════════════════
                 pw.Row(
-                  crossAxisAlignment: pw.CrossAxisAlignment.start,
+                  crossAxisAlignment: pw.CrossAxisAlignment.stretch,
                   children: [
                     // ────────────────────────────────────────────
                     // 左半邊：簽名欄 + 救護車救護人員 + 接收單位
                     // ────────────────────────────────────────────
-                    pw.Container(
-                      width: leftW * PdfPageFormat.mm,
-                      height: 80 * PdfPageFormat.mm,
-                      child: pw.Table(
-                        border: tbFull,
-                        columnWidths: {
-                          0: pw.FixedColumnWidth(13 * PdfPageFormat.mm), // 10%
-                          1: pw.FixedColumnWidth(65 * PdfPageFormat.mm), // 50%
-                          2: pw.FixedColumnWidth(52 * PdfPageFormat.mm), // 40%
-                        },
-                        children: [
-                          pw.TableRow(
-                            children: [
-                              _cell(
-                                pw.Padding(
-                                  padding: const pw.EdgeInsets.all(8),
-                                  child: pw.Column(
-                                    mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      pw.Center(
-                                        child: pw.Text(
-                                          '簽\n名\n欄',
-                                          style: ts(bold: true),
-                                        ),
-                                      ),
-                                      pw.SizedBox(),
-                                    ],
-                                  ),
+                    pw.Table(
+                      border: tbFull,
+                      columnWidths: {
+                        0: pw.FixedColumnWidth(26 * PdfPageFormat.mm), // 10%
+                        1: pw.FixedColumnWidth(65 * PdfPageFormat.mm), // 50%
+                        2: pw.FixedColumnWidth(39 * PdfPageFormat.mm), // 40%
+                      },
+                      children: [
+                        pw.TableRow(
+                          children: [
+                            _cell(
+                              pw.Container(
+                                height: 70,
+                                padding: const pw.EdgeInsets.all(8),
+                                child: pw.Column(
+                                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    pw.Text('簽\n名\n欄', style: ts(bold: true)),
+                                    pw.SizedBox(),
+                                  ],
                                 ),
                               ),
-                              _cell(
-                                pw.Padding(
-                                  padding: const pw.EdgeInsets.all(8),
-                                  child: pw.Column(
-                                    crossAxisAlignment:
-                                        pw.CrossAxisAlignment.start,
-                                    mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      pw.Text(
-                                        '救護車救護人員簽名',
-                                        style: ts(bold: true),
-                                      ),
-                                      pw.Row(
-                                        mainAxisAlignment:
-                                            pw.MainAxisAlignment.start,
-                                        children: [
-                                          pw.Text(
-                                            '一、 ${d.emt1.isNotEmpty ? d.emt1 : "        "}',
-                                            style: ts(sz: 8),
-                                          ),
-                                          pw.SizedBox(width: 20),
-                                          pw.Text(
-                                            '二、 ${d.emt2.isNotEmpty ? d.emt2 : "        "}',
-                                            style: ts(sz: 8),
-                                          ),
-                                          pw.SizedBox(width: 20),
-                                          pw.Text(
-                                            '三、 ${d.emt3.isNotEmpty ? d.emt3 : "        "}',
-                                            style: ts(sz: 8),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              _cell(
-                                pw.Padding(
-                                  padding: const pw.EdgeInsets.all(8),
-                                  child: pw.Column(
-                                    crossAxisAlignment:
-                                        pw.CrossAxisAlignment.start,
-                                    mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                                        children: [
-                                      pw.Text('接收單位簽名', style: ts(bold: true)),
-                                      pw.Center(
-                                        child: pw.Text(
-                                          d.receiveUnit,
+                            ),
+                            _cell(
+                              pw.Container(
+                                height: 70,
+                                padding: const pw.EdgeInsets.all(8),
+                                child: pw.Column(
+                                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    pw.Text('救護車救護人員簽名', style: ts(bold: true)),
+                                    pw.Row(
+                                      mainAxisAlignment: pw.MainAxisAlignment.start,
+                                      children: [
+                                        pw.Text(
+                                          '一、 ${d.emt1.isNotEmpty ? d.emt1 : "        "}',
                                           style: ts(sz: 8),
                                         ),
-                                      ),
-                                      pw.SizedBox(),
-                                    ],
-                                  ),
+                                        pw.SizedBox(width: 20),
+                                        pw.Text(
+                                          '二、 ${d.emt2.isNotEmpty ? d.emt2 : "        "}',
+                                          style: ts(sz: 8),
+                                        ),
+                                        pw.SizedBox(width: 20),
+                                        pw.Text(
+                                          '三、 ${d.emt3.isNotEmpty ? d.emt3 : "        "}',
+                                          style: ts(sz: 8),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
                                 ),
                               ),
-                            ],
-                          ),
-                        ],
-                      ),
+                            ),
+                            _cell(
+                              pw.Container(
+                                height: 70,
+                                padding: const pw.EdgeInsets.all(8),
+                                child: pw.Column(
+                                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    pw.Text('接收單位簽名', style: ts(bold: true)),
+                                    pw.Center(
+                                      child: pw.Text(d.receiveUnit, style: ts(sz: 8)),
+                                    ),
+                                    pw.SizedBox(),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                     // ────────────────────────────────────────────
                     // 右半邊：拒絕送醫 + 病患/家屬
                     // ────────────────────────────────────────────
-                    pw.Container(
-                      width: rightW * PdfPageFormat.mm,
-                      height: 80 * PdfPageFormat.mm,
-                      child: pw.Table(
-                        border: tbFull,
-                        columnWidths: {
-                          0: pw.FixedColumnWidth(65 * PdfPageFormat.mm), // 50%
-                          1: pw.FixedColumnWidth(65 * PdfPageFormat.mm), // 50%
-                        },
-                        children: [
-                          pw.TableRow(
-                            children: [
-                              _cell(
-                                pw.Padding(
-                                  padding: const pw.EdgeInsets.all(8),
-                                  child: pw.Column(
-                                    crossAxisAlignment:
-                                        pw.CrossAxisAlignment.start,
-                                    mainAxisAlignment: pw.MainAxisAlignment.end,
-                                    children: [
-                                      pw.Text(
-                                        '□ 拒絕送醫聲明：\n本人(或關係人)聲明，救護人員已將病情與拒絕送醫之可能危險告知，但我仍拒絕接受處置及送醫。',
-                                        style: ts(),
-                                      ),
-                                      pw.SizedBox(height: 4),
-                                      pw.Text(
-                                        '簽名：${d.refuseTransferSign}',
-                                        style: ts(),
-                                      ),
-                                    ],
-                                  ),
+                    pw.Table(
+                      border: tbFull,
+                      columnWidths: {
+                        0: pw.FixedColumnWidth(65 * PdfPageFormat.mm), // 50%
+                        1: pw.FixedColumnWidth(65 * PdfPageFormat.mm), // 50%
+                      },
+                      children: [
+                        pw.TableRow(
+                          children: [
+                            _cell(
+                              pw.Container(
+                                height: 70,
+                                padding: const pw.EdgeInsets.all(8),
+                                child: pw.Column(
+                                  mainAxisAlignment: pw.MainAxisAlignment.end,
+                                  children: [
+                                    pw.Text(
+                                      '□ 拒絕送醫聲明：\n本人(或關係人)聲明，救護人員已將病情與拒絕送醫之可能危險告知，但我仍拒絕接受處置及送醫。',
+                                      style: ts(),
+                                    ),
+                                    pw.SizedBox(height: 4),
+                                    pw.Text(
+                                      '簽名：${d.refuseTransferSign}',
+                                      style: ts(),
+                                    ),
+                                  ],
                                 ),
                               ),
-                              _cell(
-                                pw.Padding(
-                                  padding: const pw.EdgeInsets.all(8),
-                                  child: pw.Column(
-                                    crossAxisAlignment:
-                                        pw.CrossAxisAlignment.start,
-                                    mainAxisAlignment: pw.MainAxisAlignment.end,
-                                    children: [
-                                      pw.Text(
-                                        '病患/家屬/關係人簽名',
-                                        style: ts(bold: true),
-                                      ),
-                                      pw.SizedBox(height: 4),
-                                      pw.Text(
-                                        '簽名：${d.patientFamilySign}',
-                                        style: ts(sz: 7),
-                                      ),
-                                      pw.SizedBox(height: 4),
-                                      pw.Text(
-                                        '連絡電話：${d.refuseContactPhone}',
-                                        style: ts(sz: 7),
-                                      ),
-                                    ],
-                                  ),
+                            ),
+                            _cell(
+                              pw.Container(
+                                height: 70,
+                                padding: const pw.EdgeInsets.all(8),
+                                child: pw.Column(
+                                  mainAxisAlignment: pw.MainAxisAlignment.end,
+                                  children: [
+                                    pw.Text(
+                                      '病患/家屬/關係人簽名',
+                                      style: ts(bold: true),
+                                    ),
+                                    pw.SizedBox(height: 4),
+                                    pw.Text(
+                                      '簽名：                                    ',
+                                      style: ts(sz: 7),
+                                    ),
+                                    pw.SizedBox(height: 4),
+                                    pw.Text(
+                                      '連絡電話：${d.refuseContactPhone}',
+                                      style: ts(sz: 7),
+                                    ),
+                                  ],
                                 ),
                               ),
-                            ],
-                          ),
-                        ],
-                      ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                   ],
                 ),
