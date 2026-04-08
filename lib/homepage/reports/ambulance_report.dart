@@ -341,7 +341,7 @@ Future<Uint8List> buildAmbulanceReportPdf(
                             ' 機  場  醫  療  中  心  救  護  紀  錄  表',
                             style: ts(sz: 12, bold: true),
                           ),
-                          pw.Text('車號：${d.licensePlate}', style: ts(sz: 10)),
+                          pw.Text('車牌號碼：${d.licensePlate}', style: ts(sz: 10)),
                         ],
                       ),
                     ),
@@ -1412,9 +1412,6 @@ Future<Uint8List> buildAmbulanceReportPdf(
                                   pw.TableRow(children: [_lbl('處置項目（此欄可複選）')]),
                                 ],
                               ),
-
-                              pw.SizedBox(height: 3),
-
                               // 2. 內容表格
                               pw.Table(
                                 border: tbFull,
@@ -1738,97 +1735,350 @@ Future<Uint8List> buildAmbulanceReportPdf(
                             ],
                           ),
 
-                          // ── 給藥紀錄 (修正：4 個獨立 TableRow) ──
-                          // 6+12+20+25+15+35+30=143
-                          pw.Table(
-                            border: tbInner,
-                            columnWidths: {
-                              0: pw.FixedColumnWidth(6 * PdfPageFormat.mm),
-                              1: pw.FixedColumnWidth(12 * PdfPageFormat.mm),
-                              2: pw.FixedColumnWidth(20 * PdfPageFormat.mm),
-                              3: pw.FixedColumnWidth(25 * PdfPageFormat.mm),
-                              4: pw.FixedColumnWidth(15 * PdfPageFormat.mm),
-                              5: pw.FixedColumnWidth(35 * PdfPageFormat.mm),
-                              6: pw.FixedColumnWidth(30 * PdfPageFormat.mm),
-                            },
-                            children: [
-                              // 標頭列
-                              pw.TableRow(
-                                children: [
-                                  _lbl('給藥\n紀錄'),
-                                  _lbl('時間'),
-                                  _lbl('藥名'),
-                                  _lbl('途徑/劑量'),
-                                  _lbl('執行者'),
-                                  _lbl('ALS處置'),
-                                  _lbl('線上指導醫師'),
-                                ],
+                          // ── 給藥紀錄（修正旁邊空白過大問題 + 標題列從第二行開始） ─────────────────
+                          pw.Container(
+                            width: 105 * PdfPageFormat.mm, // ← 整體寬度再縮小，讓它更靠左
+                            height: 72,
+                            decoration: pw.BoxDecoration(
+                              border: pw.Border.all(
+                                width: 0.5,
+                                color: PdfColors.black,
                               ),
-                              // 修正：4 筆獨立 TableRow（有行間分隔線）
-                              ...List.generate(4, (i) {
-                                return pw.TableRow(
-                                  children: [
-                                    // 第一列顯示旋轉標籤，其餘空白
-                                    if (i == 0)
-                                      _cell(
-                                        pw.Center(
-                                          child: pw.Transform.rotateBox(
-                                            angle: -math.pi / 2,
-                                            child: pw.Text(
-                                              '給藥紀錄',
-                                              style: ts(bold: true),
-                                            ),
+                            ),
+                            child: pw.Row(
+                              children: [
+                                // 1. 第一直行：給藥紀錄 垂直標題
+                                pw.Container(
+                                  width: 9 * PdfPageFormat.mm,
+                                  height: 72,
+                                  alignment: pw.Alignment.center,
+                                  decoration: pw.BoxDecoration(
+                                    border: pw.Border(
+                                      right: pw.BorderSide(width: 0.5),
+                                    ),
+                                  ),
+                                  child: pw.Text(
+                                    '給\n藥\n紀\n錄',
+                                    style: ts(sz: 7.5, bold: true),
+                                    textAlign: pw.TextAlign.center,
+                                  ),
+                                ),
+
+                                // 右側內容
+                                pw.Expanded(
+                                  child: pw.Column(
+                                    children: [
+                                      // 標題列（從第二行開始）
+                                      pw.Container(
+                                        height: 18,
+                                        decoration: pw.BoxDecoration(
+                                          border: pw.Border(
+                                            bottom: pw.BorderSide(width: 0.5),
                                           ),
                                         ),
-                                      )
-                                    else
-                                      pw.SizedBox(),
-                                    _cell(pw.Text(d.medTime[i], style: ts())),
-                                    _cell(pw.Text(d.medName[i], style: ts())),
-                                    _cell(pw.Text(d.medRoute[i], style: ts())),
-                                    _cell(
-                                      pw.Text(d.medExecutor[i], style: ts()),
-                                    ),
-                                    // ALS 欄：第一列顯示內容
-                                    if (i == 0)
-                                      _cell(
-                                        pw.Column(
-                                          crossAxisAlignment:
-                                              pw.CrossAxisAlignment.start,
+                                        child: pw.Row(
                                           children: [
-                                            // 修正：顯示 aslInfo
-                                            if (d.aslInfo.isNotEmpty)
-                                              pw.Text(d.aslInfo, style: ts()),
-                                            pw.SizedBox(height: 3),
-                                            // 修正：顯示固定位置與焦耳
-                                            _chk(
-                                              '氣管內管: ${d.etTube}cm 固定於 ${d.etTubeFixed}cm',
-                                              false,
+                                            pw.Container(
+                                              width: 17 * PdfPageFormat.mm,
+                                              alignment: pw.Alignment.center,
+                                              child: pw.Text(
+                                                '時間',
+                                                style: ts(sz: 6, bold: true),
+                                              ),
                                             ),
-                                            pw.SizedBox(height: 3),
-                                            _chk(
-                                              '手動電擊: ${d.manualShockTimes}次 ${d.manualShockJoule}Joule',
-                                              false,
+                                            pw.Container(
+                                              width: 23 * PdfPageFormat.mm,
+                                              alignment: pw.Alignment.center,
+                                              child: pw.Text(
+                                                '藥名',
+                                                style: ts(sz: 6, bold: true),
+                                              ),
+                                            ),
+                                            pw.Container(
+                                              width: 23 * PdfPageFormat.mm,
+                                              alignment: pw.Alignment.center,
+                                              child: pw.Text(
+                                                '途徑/劑量',
+                                                style: ts(sz: 6, bold: true),
+                                              ),
+                                            ),
+                                            pw.Container(
+                                              width: 15 * PdfPageFormat.mm,
+                                              alignment: pw.Alignment.center,
+                                              child: pw.Text(
+                                                '執行者',
+                                                style: ts(sz: 6, bold: true),
+                                              ),
+                                            ),
+                                            pw.Container(
+                                              width: 23 * PdfPageFormat.mm,
+                                              alignment: pw.Alignment.center,
+                                              child: pw.Text(
+                                                'ASL處置',
+                                                style: ts(sz: 6, bold: true),
+                                              ),
+                                            ),
+                                            pw.Expanded(
+                                              child: pw.Container(
+                                                alignment: pw.Alignment.center,
+                                                child: pw.Text(
+                                                  '線上指導醫師',
+                                                  style: ts(sz: 6, bold: true),
+                                                ),
+                                              ),
                                             ),
                                           ],
                                         ),
-                                      )
-                                    else
-                                      pw.SizedBox(),
-                                    // 線上指導醫師欄：第一列顯示內容
-                                    if (i == 0)
-                                      _cell(
-                                        pw.Text(
-                                          d.onlinePhysicianNote,
-                                          style: ts(),
+                                      ),
+
+                                      // 資料內容區（4行）
+                                      pw.Expanded(
+                                        child: pw.Row(
+                                          children: [
+                                            // 時間
+                                            pw.Container(
+                                              width: 17 * PdfPageFormat.mm,
+                                              child: pw.Column(
+                                                children: List.generate(
+                                                  4,
+                                                  (i) => pw.Expanded(
+                                                    child: pw.Container(
+                                                      alignment:
+                                                          pw.Alignment.center,
+                                                      decoration:
+                                                          pw.BoxDecoration(
+                                                            border: pw.Border(
+                                                              right:
+                                                                  pw.BorderSide(
+                                                                    width: 0.5,
+                                                                  ),
+                                                              bottom:
+                                                                  pw.BorderSide(
+                                                                    width: 0.5,
+                                                                  ),
+                                                            ),
+                                                          ),
+                                                      child: pw.Text(
+                                                        d.medTime[i],
+                                                        style: ts(sz: 6),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            // 藥名
+                                            pw.Container(
+                                              width: 23 * PdfPageFormat.mm,
+                                              child: pw.Column(
+                                                children: List.generate(
+                                                  4,
+                                                  (i) => pw.Expanded(
+                                                    child: pw.Container(
+                                                      alignment:
+                                                          pw.Alignment.center,
+                                                      decoration:
+                                                          pw.BoxDecoration(
+                                                            border: pw.Border(
+                                                              right:
+                                                                  pw.BorderSide(
+                                                                    width: 0.5,
+                                                                  ),
+                                                              bottom:
+                                                                  pw.BorderSide(
+                                                                    width: 0.5,
+                                                                  ),
+                                                            ),
+                                                          ),
+                                                      child: pw.Text(
+                                                        d.medName[i],
+                                                        style: ts(sz: 6),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            // 途徑/劑量
+                                            pw.Container(
+                                              width: 23 * PdfPageFormat.mm,
+                                              child: pw.Column(
+                                                children: List.generate(
+                                                  4,
+                                                  (i) => pw.Expanded(
+                                                    child: pw.Container(
+                                                      alignment:
+                                                          pw.Alignment.center,
+                                                      decoration:
+                                                          pw.BoxDecoration(
+                                                            border: pw.Border(
+                                                              right:
+                                                                  pw.BorderSide(
+                                                                    width: 0.5,
+                                                                  ),
+                                                              bottom:
+                                                                  pw.BorderSide(
+                                                                    width: 0.5,
+                                                                  ),
+                                                            ),
+                                                          ),
+                                                      child: pw.Text(
+                                                        d.medRoute[i],
+                                                        style: ts(sz: 6),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            // 執行者
+                                            pw.Container(
+                                              width: 15 * PdfPageFormat.mm,
+                                              child: pw.Column(
+                                                children: List.generate(
+                                                  4,
+                                                  (i) => pw.Expanded(
+                                                    child: pw.Container(
+                                                      alignment:
+                                                          pw.Alignment.center,
+                                                      decoration:
+                                                          pw.BoxDecoration(
+                                                            border: pw.Border(
+                                                              right:
+                                                                  pw.BorderSide(
+                                                                    width: 0.5,
+                                                                  ),
+                                                              bottom:
+                                                                  pw.BorderSide(
+                                                                    width: 0.5,
+                                                                  ),
+                                                            ),
+                                                          ),
+                                                      child: pw.Text(
+                                                        d.medExecutor[i],
+                                                        style: ts(sz: 6),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            // ASL處置
+                                            pw.Container(
+                                              width: 23 * PdfPageFormat.mm,
+                                              child: pw.Column(
+                                                children: List.generate(
+                                                  4,
+                                                  (i) => pw.Expanded(
+                                                    child: i == 0
+                                                        ? pw.Container(
+                                                            padding:
+                                                                const pw.EdgeInsets.all(
+                                                                  3,
+                                                                ),
+                                                            alignment: pw
+                                                                .Alignment
+                                                                .topLeft,
+                                                            child: pw.Column(
+                                                              crossAxisAlignment: pw
+                                                                  .CrossAxisAlignment
+                                                                  .start,
+                                                              children: [
+                                                                _chk(
+                                                                  '氣管內管 ${d.etTube.isNotEmpty ? d.etTube : "__"}號 固定 ${d.etTubeFixed.isNotEmpty ? d.etTubeFixed : "__"}cm',
+                                                                  false,
+                                                                  sz: 5,
+                                                                ),
+                                                                pw.SizedBox(
+                                                                  height: 4,
+                                                                ),
+                                                                _chk(
+                                                                  '手動電擊 ${d.manualShockTimes.isNotEmpty ? d.manualShockTimes : "__"}次',
+                                                                  false,
+                                                                  sz: 5,
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          )
+                                                        : pw.SizedBox(),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            // 線上指導醫師（有框線 + 置中）
+                                            pw.Expanded(
+                                              child: pw.Column(
+                                                children: List.generate(
+                                                  4,
+                                                  (i) => pw.Expanded(
+                                                    child: i == 0
+                                                        ? pw.Container(
+                                                            alignment: pw
+                                                                .Alignment
+                                                                .center,
+                                                            decoration: pw.BoxDecoration(
+                                                              border: pw.Border(
+                                                                left:
+                                                                    pw.BorderSide(
+                                                                      width:
+                                                                          0.5,
+                                                                    ),
+                                                              ),
+                                                            ),
+                                                            padding:
+                                                                const pw.EdgeInsets.all(
+                                                                  4,
+                                                                ),
+                                                            child: pw.Column(
+                                                              mainAxisAlignment: pw
+                                                                  .MainAxisAlignment
+                                                                  .center,
+                                                              children: [
+                                                                pw.Text(
+                                                                  '指導說明：',
+                                                                  style: ts(
+                                                                    sz: 5,
+                                                                    bold: true,
+                                                                  ),
+                                                                ),
+                                                                pw.SizedBox(
+                                                                  height: 2,
+                                                                ),
+                                                                pw.Text(
+                                                                  d.onlinePhysicianNote,
+                                                                  style: ts(
+                                                                    sz: 5,
+                                                                  ),
+                                                                  textAlign: pw
+                                                                      .TextAlign
+                                                                      .center,
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          )
+                                                        : pw.Container(
+                                                            decoration: pw.BoxDecoration(
+                                                              border: pw.Border(
+                                                                left:
+                                                                    pw.BorderSide(
+                                                                      width:
+                                                                          0.5,
+                                                                    ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                      )
-                                    else
-                                      pw.SizedBox(),
-                                  ],
-                                );
-                              }),
-                            ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
 
                           // ── 生命徵象 (修正：4 列) ─────────────
