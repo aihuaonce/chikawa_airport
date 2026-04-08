@@ -2742,11 +2742,17 @@ Future<Uint8List> buildAmbulanceReportPdf(
                               _cell(
                                 pw.Padding(
                                   padding: const pw.EdgeInsets.all(8),
-                                  child: pw.Center(
-                                    child: pw.Text(
-                                      '簽\n名\n欄',
-                                      style: ts(bold: true),
-                                    ),
+                                  child: pw.Column(
+                                    mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      pw.Center(
+                                        child: pw.Text(
+                                          '簽\n名\n欄',
+                                          style: ts(bold: true),
+                                        ),
+                                      ),
+                                      pw.SizedBox(),
+                                    ],
                                   ),
                                 ),
                               ),
@@ -2756,12 +2762,12 @@ Future<Uint8List> buildAmbulanceReportPdf(
                                   child: pw.Column(
                                     crossAxisAlignment:
                                         pw.CrossAxisAlignment.start,
+                                    mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                                     children: [
                                       pw.Text(
                                         '救護車救護人員簽名',
                                         style: ts(bold: true),
                                       ),
-                                      pw.SizedBox(height: 10),
                                       pw.Row(
                                         mainAxisAlignment:
                                             pw.MainAxisAlignment.start,
@@ -2792,15 +2798,16 @@ Future<Uint8List> buildAmbulanceReportPdf(
                                   child: pw.Column(
                                     crossAxisAlignment:
                                         pw.CrossAxisAlignment.start,
-                                    children: [
+                                    mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                                        children: [
                                       pw.Text('接收單位簽名', style: ts(bold: true)),
-                                      pw.SizedBox(height: 10),
                                       pw.Center(
                                         child: pw.Text(
                                           d.receiveUnit,
                                           style: ts(sz: 8),
                                         ),
                                       ),
+                                      pw.SizedBox(),
                                     ],
                                   ),
                                 ),
