@@ -2018,54 +2018,40 @@ Future<Uint8List> buildAmbulanceReportPdf(
                                                 ),
                                               ),
                                             ),
-                                            // ASL處置
+                                            // ASL處置（獨立大欄位，不分割）
                                             pw.Container(
                                               width: 23 * PdfPageFormat.mm,
-                                              child: pw.Column(
-                                                children: List.generate(
-                                                  4,
-                                                  (i) => pw.Expanded(
-                                                    child: i == 0
-                                                        ? pw.Container(
-                                                            padding:
-                                                                const pw.EdgeInsets.all(
-                                                                  3,
-                                                                ),
-                                                            alignment: pw
-                                                                .Alignment
-                                                                .topLeft,
-                                                            decoration: pw.BoxDecoration(
-                                                              border: pw.Border(
-                                                                right:
-                                                                    pw.BorderSide(
-                                                                      width:
-                                                                          0.5,
-                                                                    ),
-                                                              ),
-                                                            ),
-                                                            child: pw.Column(
-                                                              crossAxisAlignment: pw
-                                                                  .CrossAxisAlignment
-                                                                  .start,
-                                                              children: [
-                                                                _chk(
-                                                                  '氣管內管 ${d.etTube.isNotEmpty ? d.etTube : "__"}號 固定 ${d.etTubeFixed.isNotEmpty ? d.etTubeFixed : "__"}cm',
-                                                                  false,
-                                                                  sz: 5,
-                                                                ),
-                                                                pw.SizedBox(
-                                                                  height: 4,
-                                                                ),
-                                                                _chk(
-                                                                  '手動電擊 ${d.manualShockTimes.isNotEmpty ? d.manualShockTimes : "__"}次',
-                                                                  false,
-                                                                  sz: 5,
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          )
-                                                        : pw.SizedBox(),
+                                              child: pw.Container(
+                                                decoration: pw.BoxDecoration(
+                                                  border: pw.Border(
+                                                    right: pw.BorderSide(
+                                                      width: 0.5,
+                                                    ),
+                                                    bottom: pw.BorderSide(
+                                                      width: 0.5,
+                                                    ),
                                                   ),
+                                                ),
+                                                padding:
+                                                    const pw.EdgeInsets.all(3),
+                                                alignment: pw.Alignment.topLeft,
+                                                child: pw.Column(
+                                                  crossAxisAlignment: pw
+                                                      .CrossAxisAlignment
+                                                      .start,
+                                                  children: [
+                                                    _chk(
+                                                      '氣管內管 ${d.etTube.isNotEmpty ? d.etTube : "_____"}號\n       固定 ${d.etTubeFixed.isNotEmpty ? d.etTubeFixed : "_____"}cm',
+                                                      false,
+                                                      sz: 5,
+                                                    ),
+                                                    pw.SizedBox(height: 5),
+                                                    _chk(
+                                                      '手動電擊 ${d.manualShockTimes.isNotEmpty ? d.manualShockTimes : "_____"}次\n     ${d.manualShockJoule.isNotEmpty ? d.manualShockJoule : "_____"}Joule',
+                                                      false,
+                                                      sz: 5,
+                                                    ),
+                                                  ],
                                                 ),
                                               ),
                                             ),
