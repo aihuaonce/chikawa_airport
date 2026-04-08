@@ -1315,10 +1315,8 @@ Future<Uint8List> buildAmbulanceReportPdf(
                               pw.TableRow(
                                 children: [
                                   _cell(
-                                    pw.Padding(
-                                      padding: const pw.EdgeInsets.all(
-                                        6,
-                                      ), // 整體加上 padding
+                                    pw.Container(
+                                      height: 24 * PdfPageFormat.mm,
                                       child: pw.Column(
                                         crossAxisAlignment:
                                             pw.CrossAxisAlignment.start,
@@ -2680,7 +2678,7 @@ Future<Uint8List> buildAmbulanceReportPdf(
                 ),
 
                 // ══════════════════════════════════════════════════
-                // 3. 底部簽名 (260 mm = 左半邊 + 右半邊)
+                // 3. 底部簽名
                 // ══════════════════════════════════════════════════
                 pw.Table(
                   border: tbFull,
@@ -2689,7 +2687,9 @@ Future<Uint8List> buildAmbulanceReportPdf(
                     1: pw.FixedColumnWidth(65 * PdfPageFormat.mm),
                     2: pw.FixedColumnWidth(40 * PdfPageFormat.mm),
                     3: pw.FixedColumnWidth(65 * PdfPageFormat.mm),
-                    4: pw.FixedColumnWidth((totalW - 6 - 65 - 40 - 65) * PdfPageFormat.mm),
+                    4: pw.FixedColumnWidth(
+                      (totalW - 6 - 65 - 40 - 65) * PdfPageFormat.mm,
+                    ),
                   },
                   children: [
                     pw.TableRow(
