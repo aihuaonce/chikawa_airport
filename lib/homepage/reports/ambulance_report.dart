@@ -377,18 +377,24 @@ Future<Uint8List> buildAmbulanceReportPdf(
                                   _cell(
                                     pw.Padding(
                                       padding: const pw.EdgeInsets.symmetric(
-                                        vertical: 0,
+                                        vertical: 3,
                                       ),
-                                      child: pw.Text('派 遣 資 料', style: ts9()),
+                                      child: pw.Text(
+                                        '派遣資料',
+                                        style: ts9(bold: true),
+                                      ),
                                     ),
                                     align: pw.Alignment.center,
                                   ),
                                   _cell(
                                     pw.Padding(
                                       padding: const pw.EdgeInsets.symmetric(
-                                        vertical: 0,
+                                        vertical: 3,
                                       ),
-                                      child: pw.Text('出勤日期', style: ts9()),
+                                      child: pw.Text(
+                                        '出勤日期',
+                                        style: ts9(bold: true),
+                                      ),
                                     ),
                                     align: pw.Alignment.center,
                                   ),
@@ -606,7 +612,15 @@ Future<Uint8List> buildAmbulanceReportPdf(
                               pw.TableRow(
                                 children: [
                                   _cell(
-                                    pw.Text('病患資料', style: ts9()),
+                                    pw.Padding(
+                                      padding: const pw.EdgeInsets.symmetric(
+                                        vertical: 3,
+                                      ),
+                                      child: pw.Text(
+                                        '病患資料',
+                                        style: ts9(bold: true),
+                                      ),
+                                    ),
                                     align: pw.Alignment.center,
                                   ),
                                 ],
@@ -836,8 +850,16 @@ Future<Uint8List> buildAmbulanceReportPdf(
                             children: [
                               pw.TableRow(
                                 children: [
-                                  _lbl(
-                                    '現場狀況 (此欄可複選)',
+                                  _cell(
+                                    pw.Padding(
+                                      padding: const pw.EdgeInsets.symmetric(
+                                        vertical: 3,
+                                      ),
+                                      child: pw.Text(
+                                        '現場狀況 (此欄可複選)',
+                                        style: ts9(bold: true),
+                                      ),
+                                    ),
                                     align: pw.Alignment.center,
                                   ),
                                 ],
@@ -2560,23 +2582,22 @@ Future<Uint8List> buildAmbulanceReportPdf(
                                                           ),
                                                       child: i == 0
                                                           ? pw.Text(
-                                                              '',
-                                                              style: ts(sz: 6),
+                                                              'E   V   M',
+                                                              style: ts(
+                                                                sz: 6,
+                                                                bold: true,
+                                                              ),
                                                             )
                                                           : pw.RichText(
                                                               text: pw.TextSpan(
                                                                 children: [
                                                                   pw.TextSpan(
                                                                     text:
-                                                                        'E${d.vsGcsE[i]}',
-                                                                    style: ts(
-                                                                      sz: 6,
-                                                                      bold:
-                                                                          true,
-                                                                    ),
-                                                                  ),
-                                                                  pw.TextSpan(
-                                                                    text: ' V',
+                                                                        d
+                                                                            .vsGcsE[i]
+                                                                            .isEmpty
+                                                                        ? ''
+                                                                        : 'E${d.vsGcsE[i]}',
                                                                     style: ts(
                                                                       sz: 6,
                                                                       bold:
@@ -2585,7 +2606,11 @@ Future<Uint8List> buildAmbulanceReportPdf(
                                                                   ),
                                                                   pw.TextSpan(
                                                                     text:
-                                                                        '${d.vsGcsV[i]}',
+                                                                        d
+                                                                            .vsGcsE[i]
+                                                                            .isEmpty
+                                                                        ? ''
+                                                                        : '   V   ',
                                                                     style: ts(
                                                                       sz: 6,
                                                                       bold:
@@ -2593,7 +2618,12 @@ Future<Uint8List> buildAmbulanceReportPdf(
                                                                     ),
                                                                   ),
                                                                   pw.TextSpan(
-                                                                    text: ' M',
+                                                                    text:
+                                                                        d
+                                                                            .vsGcsV[i]
+                                                                            .isEmpty
+                                                                        ? ''
+                                                                        : '${d.vsGcsV[i]}',
                                                                     style: ts(
                                                                       sz: 6,
                                                                       bold:
@@ -2601,8 +2631,25 @@ Future<Uint8List> buildAmbulanceReportPdf(
                                                                     ),
                                                                   ),
                                                                   pw.TextSpan(
-                                                                    text: d
-                                                                        .vsGcsM[i],
+                                                                    text:
+                                                                        d
+                                                                            .vsGcsV[i]
+                                                                            .isEmpty
+                                                                        ? ''
+                                                                        : '   M   ',
+                                                                    style: ts(
+                                                                      sz: 6,
+                                                                      bold:
+                                                                          true,
+                                                                    ),
+                                                                  ),
+                                                                  pw.TextSpan(
+                                                                    text:
+                                                                        d
+                                                                            .vsGcsM[i]
+                                                                            .isEmpty
+                                                                        ? ''
+                                                                        : d.vsGcsM[i],
                                                                     style: ts(
                                                                       sz: 6,
                                                                       bold:
@@ -2633,16 +2680,16 @@ Future<Uint8List> buildAmbulanceReportPdf(
                 ),
 
                 // ══════════════════════════════════════════════════
-                // 3. 底部簽名 (287 mm 全寬)
+                // 3. 底部簽名 (260 mm = 左半邊 + 右半邊)
                 // ══════════════════════════════════════════════════
                 pw.Table(
                   border: tbFull,
                   columnWidths: {
                     0: pw.FixedColumnWidth(6 * PdfPageFormat.mm),
-                    1: pw.FixedColumnWidth(79 * PdfPageFormat.mm),
-                    2: pw.FixedColumnWidth(50 * PdfPageFormat.mm),
-                    3: pw.FixedColumnWidth(80 * PdfPageFormat.mm),
-                    4: pw.FixedColumnWidth(70 * PdfPageFormat.mm),
+                    1: pw.FixedColumnWidth(65 * PdfPageFormat.mm),
+                    2: pw.FixedColumnWidth(40 * PdfPageFormat.mm),
+                    3: pw.FixedColumnWidth(65 * PdfPageFormat.mm),
+                    4: pw.FixedColumnWidth((totalW - 6 - 65 - 40 - 65) * PdfPageFormat.mm),
                   },
                   children: [
                     pw.TableRow(
