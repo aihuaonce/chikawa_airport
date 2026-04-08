@@ -2055,69 +2055,33 @@ Future<Uint8List> buildAmbulanceReportPdf(
                                                 ),
                                               ),
                                             ),
-                                            // 線上指導醫師（有框線 + 置中）
+                                            // 線上指導醫師（獨立大欄位）
                                             pw.Expanded(
-                                              child: pw.Column(
-                                                children: List.generate(
-                                                  4,
-                                                  (i) => pw.Expanded(
-                                                    child: i == 0
-                                                        ? pw.Container(
-                                                            alignment: pw
-                                                                .Alignment
-                                                                .center,
-                                                            decoration: pw.BoxDecoration(
-                                                              border: pw.Border(
-                                                                left:
-                                                                    pw.BorderSide(
-                                                                      width:
-                                                                          0.5,
-                                                                    ),
-                                                              ),
-                                                            ),
-                                                            padding:
-                                                                const pw.EdgeInsets.all(
-                                                                  4,
-                                                                ),
-                                                            child: pw.Column(
-                                                              mainAxisAlignment: pw
-                                                                  .MainAxisAlignment
-                                                                  .center,
-                                                              children: [
-                                                                pw.Text(
-                                                                  '指導說明：',
-                                                                  style: ts(
-                                                                    sz: 5,
-                                                                    bold: true,
-                                                                  ),
-                                                                ),
-                                                                pw.SizedBox(
-                                                                  height: 2,
-                                                                ),
-                                                                pw.Text(
-                                                                  d.onlinePhysicianNote,
-                                                                  style: ts(
-                                                                    sz: 5,
-                                                                  ),
-                                                                  textAlign: pw
-                                                                      .TextAlign
-                                                                      .center,
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          )
-                                                        : pw.Container(
-                                                            decoration: pw.BoxDecoration(
-                                                              border: pw.Border(
-                                                                left:
-                                                                    pw.BorderSide(
-                                                                      width:
-                                                                          0.5,
-                                                                    ),
-                                                              ),
-                                                            ),
-                                                          ),
+                                              child: pw.Container(
+                                                decoration: pw.BoxDecoration(
+                                                  border: pw.Border(
+                                                    left: pw.BorderSide(
+                                                      width: 0.5,
+                                                    ),
                                                   ),
+                                                ),
+                                                padding:
+                                                    const pw.EdgeInsets.all(4),
+                                                alignment: pw.Alignment.topLeft,
+                                                child: pw.Column(
+                                                  crossAxisAlignment: pw
+                                                      .CrossAxisAlignment
+                                                      .start,
+                                                  children: [
+                                                    _chk(
+                                                      '指導說明：${d.onlinePhysicianNote}',
+                                                      false,
+                                                      sz: 5,
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
                                                 ),
                                               ),
                                             ),
