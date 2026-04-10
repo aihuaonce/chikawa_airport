@@ -281,18 +281,22 @@ Future<Uint8List> buildMedicalServiceApplicationPdf(
     );
   }
 
-  pw.Widget buildUnderline(String text, double width) {
+  pw.Widget buildUnderline(String text, double width, {double sz = 7.5}) {
     return pw.Container(
       width: width,
-      height: 12,
+      height: sz + 4,
       decoration: const pw.BoxDecoration(
         border: pw.Border(
           bottom: pw.BorderSide(width: 0.5, color: PdfColors.black),
         ),
       ),
-      padding: const pw.EdgeInsets.only(left: 2, bottom: 1),
+      padding: const pw.EdgeInsets.only(left: 2, bottom: 0.5),
       alignment: pw.Alignment.bottomLeft,
-      child: pw.Text(text, style: ts(sz: 8), textAlign: pw.TextAlign.left),
+      child: pw.Text(
+        text,
+        style: ts(sz: sz),
+        textAlign: pw.TextAlign.left,
+      ),
     );
   }
 
@@ -840,22 +844,26 @@ Future<Uint8List> buildMedicalServiceApplicationPdf(
 
             pw.Text('■ 病情摘要(Summary)：', style: ts(bold: true, sz: 11)),
             pw.SizedBox(height: 10),
-            pw.Row(
+            pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
               children: [
-                pw.SizedBox(
-                  width: 45 * PdfPageFormat.mm,
-                  child: pw.Text('  1. 主訴(Chief Complaints)：', style: ts()),
+                pw.Text('  1. 主訴(Chief Complaints)：', style: ts(bold: true)),
+
+                pw.Container(
+                  width: double.infinity,
+                  padding: const pw.EdgeInsets.only(left: 15, top: 5),
+                  constraints: const pw.BoxConstraints(minHeight: 30),
+                  child: pw.Text(d.chiefComplaint, style: ts()),
                 ),
-                buildUnderline(d.chiefComplaint, 120 * PdfPageFormat.mm),
               ],
             ),
-            pw.SizedBox(height: 15),
+            pw.SizedBox(height: 10),
 
             pw.Text('  2. 生命徵象(Vital Signs)：', style: ts(bold: true)),
             pw.Padding(
               padding: const pw.EdgeInsets.only(
                 left: 10 * PdfPageFormat.mm,
-                top: 10,
+                top: 6,
               ),
               child: pw.Column(
                 crossAxisAlignment: pw.CrossAxisAlignment.start,
@@ -863,69 +871,98 @@ Future<Uint8List> buildMedicalServiceApplicationPdf(
                   pw.Row(
                     children: [
                       pw.SizedBox(
-                        width: 35 * PdfPageFormat.mm,
-                        child: pw.Text('體溫(Temp)：', style: ts()),
+                        width: 75 * PdfPageFormat.mm,
+                        child: pw.Row(
+                          children: [
+                            pw.SizedBox(
+                              width: 36 * PdfPageFormat.mm,
+                              child: pw.Text('體溫(Temperature)：', style: ts()),
+                            ),
+                            buildUnderline(
+                              d.temperature,
+                              20 * PdfPageFormat.mm,
+                            ),
+                            pw.Text(' ℃', style: ts()),
+                          ],
+                        ),
                       ),
-                      buildUnderline(d.temperature, 30 * PdfPageFormat.mm),
-                      pw.Text(' ℃', style: ts()),
-                      pw.SizedBox(width: 20 * PdfPageFormat.mm),
                       pw.SizedBox(
-                        width: 25 * PdfPageFormat.mm,
+                        width: 45 * PdfPageFormat.mm,
                         child: pw.Text('脈搏(Pulse)：', style: ts()),
                       ),
-                      buildUnderline(d.pulse, 30 * PdfPageFormat.mm),
+                      buildUnderline(d.pulse, 25 * PdfPageFormat.mm),
                       pw.Text(' 次/min', style: ts()),
                     ],
                   ),
-                  pw.SizedBox(height: 12),
+                  pw.SizedBox(height: 8),
+
                   pw.Row(
                     children: [
                       pw.SizedBox(
-                        width: 35 * PdfPageFormat.mm,
-                        child: pw.Text('呼吸(Breath)：', style: ts()),
+                        width: 75 * PdfPageFormat.mm,
+                        child: pw.Row(
+                          children: [
+                            pw.SizedBox(
+                              width: 36 * PdfPageFormat.mm,
+                              child: pw.Text('呼吸(Breath)：', style: ts()),
+                            ),
+                            buildUnderline(d.breath, 20 * PdfPageFormat.mm),
+                            pw.Text(' 次/min', style: ts()),
+                          ],
+                        ),
                       ),
-                      buildUnderline(d.breath, 30 * PdfPageFormat.mm),
-                      pw.Text(' 次/min', style: ts()),
-                      pw.SizedBox(width: 20 * PdfPageFormat.mm),
                       pw.SizedBox(
-                        width: 25 * PdfPageFormat.mm,
-                        child: pw.Text('血壓(BP)：', style: ts()),
+                        width: 45 * PdfPageFormat.mm,
+                        child: pw.Text('血壓(Blood Pressure)：', style: ts()),
                       ),
-                      buildUnderline(d.bloodPressure, 45 * PdfPageFormat.mm),
+                      buildUnderline(d.bloodPressure, 25 * PdfPageFormat.mm),
                       pw.Text(' mmHg', style: ts()),
                     ],
                   ),
-                  pw.SizedBox(height: 12),
+                  pw.SizedBox(height: 8),
+
                   pw.Row(
                     children: [
                       pw.SizedBox(
-                        width: 35 * PdfPageFormat.mm,
-                        child: pw.Text('意識(Cons)：', style: ts()),
+                        width: 75 * PdfPageFormat.mm,
+                        child: pw.Row(
+                          children: [
+                            pw.SizedBox(
+                              width: 36 * PdfPageFormat.mm,
+                              child: pw.Text('血氧(SpO2)：', style: ts()),
+                            ),
+                            buildUnderline('', 20 * PdfPageFormat.mm),
+                            pw.Text(' %', style: ts()),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  pw.SizedBox(height: 8),
+
+                  pw.Row(
+                    children: [
+                      pw.SizedBox(
+                        width: 42 * PdfPageFormat.mm,
+                        child: pw.Text('意識(Consciousness)：', style: ts()),
                       ),
                       buildCheckBox('Clear', d.consciousnessClear),
                       buildCheckBox('GCS：', d.consciousnessGcs),
                       pw.Text('(E：', style: ts()),
-                      buildUnderline(d.gcsE, 12 * PdfPageFormat.mm),
+                      buildUnderline(d.gcsE, 8 * PdfPageFormat.mm),
                       pw.Text('V：', style: ts()),
-                      buildUnderline(d.gcsV, 12 * PdfPageFormat.mm),
+                      buildUnderline(d.gcsV, 8 * PdfPageFormat.mm),
                       pw.Text('M：', style: ts()),
-                      buildUnderline(d.gcsM, 12 * PdfPageFormat.mm),
+                      buildUnderline(d.gcsM, 8 * PdfPageFormat.mm),
+                      pw.Text(') ', style: ts()),
+
+                      pw.SizedBox(width: 5 * PdfPageFormat.mm),
+
+                      pw.Text('Pupil Reaction (R：', style: ts()),
+                      buildUnderline(d.pupilRight, 10 * PdfPageFormat.mm),
+                      pw.Text(' L：', style: ts()),
+                      buildUnderline(d.pupilLeft, 10 * PdfPageFormat.mm),
                       pw.Text(')', style: ts()),
-                    ],
-                  ),
-                  pw.SizedBox(height: 12),
-                  pw.Row(
-                    children: [
-                      pw.SizedBox(
-                        width: 35 * PdfPageFormat.mm,
-                        child: pw.Text('瞳孔(Pupil)：', style: ts()),
-                      ),
-                      pw.Text('R：', style: ts()),
-                      buildUnderline(d.pupilRight, 25 * PdfPageFormat.mm),
-                      pw.SizedBox(width: 15),
-                      pw.Text('L：', style: ts()),
-                      buildUnderline(d.pupilLeft, 25 * PdfPageFormat.mm),
-                      pw.Text(' )', style: ts()),
                     ],
                   ),
                 ],
@@ -937,22 +974,25 @@ Future<Uint8List> buildMedicalServiceApplicationPdf(
               children: [
                 pw.SizedBox(
                   width: 45 * PdfPageFormat.mm,
-                  child: pw.Text('  3. 過去病史(History)：', style: ts()),
+                  child: pw.Text('  3. 過去病史(History)：', style: ts(bold: true)),
                 ),
                 buildUnderline(d.history, 120 * PdfPageFormat.mm),
               ],
             ),
             pw.SizedBox(height: 10),
-            pw.Row(
-              children: [
-                pw.SizedBox(
-                  width: 45 * PdfPageFormat.mm,
-                  child: pw.Text('  藥物過敏(Allergy)：', style: ts()),
-                ),
-                buildCheckBox('無', d.allergyNone),
-                buildCheckBox('有：', d.allergyHas),
-                buildUnderline(d.allergyDetail, 80 * PdfPageFormat.mm),
-              ],
+            pw.Padding(
+              padding: const pw.EdgeInsets.only(left: 10 * PdfPageFormat.mm),
+              child: pw.Row(
+                children: [
+                  pw.SizedBox(
+                    width: 35 * PdfPageFormat.mm,
+                    child: pw.Text('藥物過敏(Allergy)：', style: ts()),
+                  ),
+                  buildCheckBox('無', d.allergyNone),
+                  buildCheckBox('有：', d.allergyHas),
+                  buildUnderline(d.allergyDetail, 80 * PdfPageFormat.mm),
+                ],
+              ),
             ),
 
             pw.SizedBox(height: 20),
@@ -1013,41 +1053,48 @@ Future<Uint8List> buildMedicalServiceApplicationPdf(
             pw.Row(
               children: [
                 pw.Text('■ 初步診斷(Tentative)：', style: ts(bold: true, sz: 11)),
-                buildUnderline(d.tentativeDiagnosis, 130 * PdfPageFormat.mm),
+                buildUnderline(
+                  d.tentativeDiagnosis,
+                  120 * PdfPageFormat.mm,
+                  sz: 11,
+                ),
               ],
             ),
             pw.SizedBox(height: 20),
+
             pw.Row(
               children: [
                 pw.Text('■ 處理摘要(Summary)：', style: ts(bold: true, sz: 11)),
-                buildCheckBox('簽四聯單', d.signedFourCopy),
-                buildCheckBox('建議轉診', d.advisedReferral),
+                buildCheckBox('簽四聯單', d.signedFourCopy, sz: 11),
+                buildCheckBox('建議轉診', d.advisedReferral, sz: 11),
               ],
             ),
 
             pw.SizedBox(height: 20),
+
             pw.Align(
               alignment: pw.Alignment.centerRight,
               child: pw.Row(
                 mainAxisAlignment: pw.MainAxisAlignment.end,
                 children: [
                   pw.Text('醫師：', style: ts(bold: true, sz: 11)),
-                  buildUnderline(d.doctorName, 50 * PdfPageFormat.mm),
+                  buildUnderline(d.doctorName, 50 * PdfPageFormat.mm, sz: 11),
                 ],
               ),
             ),
-
             pw.SizedBox(height: 15),
 
+            // --- 底部切結書區塊 ---
             pw.Table(
               border: pw.TableBorder.all(color: tealColor, width: 0.8),
               columnWidths: {
-                0: const pw.FlexColumnWidth(1.8),
-                1: const pw.FlexColumnWidth(1.2),
+                0: const pw.FlexColumnWidth(1.1),
+                1: const pw.FlexColumnWidth(0.9),
               },
               children: [
                 pw.TableRow(
                   children: [
+                    // ================= 左半部：英文  =================
                     pw.Container(
                       padding: const pw.EdgeInsets.all(5),
                       child: pw.Column(
@@ -1055,18 +1102,20 @@ Future<Uint8List> buildMedicalServiceApplicationPdf(
                         children: [
                           pw.Text(
                             'Statement/Consent of Test/Treatment/Hospital Referral Refusal',
-                            style: ts(bold: true, sz: 7),
+                            style: ts(bold: true, sz: 8),
                           ),
-                          pw.SizedBox(height: 4),
+                          pw.SizedBox(height: 5),
                           pw.RichText(
+                            textAlign: pw.TextAlign.justify,
                             text: pw.TextSpan(
-                              style: ts(sz: 6),
+                              style: ts(sz: 7.5),
                               children: [
-                                const pw.TextSpan(text: 'I (Name:'),
+                                const pw.TextSpan(text: 'I (Name: '),
                                 pw.WidgetSpan(
                                   child: buildUnderline(
                                     d.patientName,
-                                    35 * PdfPageFormat.mm,
+                                    30 * PdfPageFormat.mm,
+                                    sz: 7.5,
                                   ),
                                 ),
                                 const pw.TextSpan(text: ', Date of Birth: '),
@@ -1074,20 +1123,23 @@ Future<Uint8List> buildMedicalServiceApplicationPdf(
                                   child: buildUnderline(
                                     d.birthYear,
                                     8 * PdfPageFormat.mm,
+                                    sz: 7.5,
                                   ),
                                 ),
                                 const pw.TextSpan(text: '/'),
                                 pw.WidgetSpan(
                                   child: buildUnderline(
                                     d.birthMonth,
-                                    8 * PdfPageFormat.mm,
+                                    6 * PdfPageFormat.mm,
+                                    sz: 7.5,
                                   ),
                                 ),
                                 const pw.TextSpan(text: '/'),
                                 pw.WidgetSpan(
                                   child: buildUnderline(
                                     d.birthDay,
-                                    8 * PdfPageFormat.mm,
+                                    6 * PdfPageFormat.mm,
+                                    sz: 7.5,
                                   ),
                                 ),
                                 const pw.TextSpan(
@@ -1096,17 +1148,19 @@ Future<Uint8List> buildMedicalServiceApplicationPdf(
                                 pw.WidgetSpan(
                                   child: buildUnderline(
                                     d.idOrPassportNo,
-                                    40 * PdfPageFormat.mm,
+                                    30 * PdfPageFormat.mm,
+                                    sz: 7.5,
                                   ),
                                 ),
                                 const pw.TextSpan(
                                   text:
-                                      ') here by clarified that I / my family patient had been notified by Dr. ',
+                                      ') here by clarified that I/my family patient had been notified by Dr. ',
                                 ),
                                 pw.WidgetSpan(
                                   child: buildUnderline(
                                     d.doctorName,
-                                    30 * PdfPageFormat.mm,
+                                    25 * PdfPageFormat.mm,
+                                    sz: 7.5,
                                   ),
                                 ),
                                 const pw.TextSpan(
@@ -1118,62 +1172,129 @@ Future<Uint8List> buildMedicalServiceApplicationPdf(
                           ),
                           pw.SizedBox(height: 10),
                           pw.Text(
-                            'Signature：${d.patientName.isEmpty ? "____________________" : d.patientName}',
-                            style: ts(sz: 7),
+                            'Signature：____________________',
+                            style: ts(sz: 8),
                           ),
                           pw.Text(
-                            'Date：${d.dateYear.isEmpty ? "____________________" : "${d.dateYear}/${d.dateMonth}/${d.dateDay}"}',
-                            style: ts(sz: 7),
+                            'Date：${d.dateYear}/${d.dateMonth}/${d.dateDay}',
+                            style: ts(sz: 8),
                           ),
                         ],
                       ),
                     ),
-                    pw.Column(
-                      crossAxisAlignment: pw.CrossAxisAlignment.start,
-                      children: [
-                        pw.Center(
-                          child: pw.Text(
-                            '拒絕轉診治療切結書',
-                            style: ts(bold: true, sz: 10),
+
+                    // ================= 右半部：中文  =================
+                    pw.Container(
+                      padding: const pw.EdgeInsets.all(5),
+                      child: pw.Column(
+                        crossAxisAlignment: pw.CrossAxisAlignment.start,
+                        children: [
+                          pw.Center(
+                            child: pw.Text(
+                              '拒絕轉診治療切結書',
+                              style: ts(bold: true, sz: 10),
+                            ),
                           ),
-                        ),
-                        pw.SizedBox(height: 8),
-                        pw.Row(
-                          children: [
-                            pw.Text('本人：', style: ts(sz: 9)),
-                            buildUnderline(
-                              d.patientName,
-                              25 * PdfPageFormat.mm,
+                          pw.SizedBox(height: 8),
+
+                          pw.Row(
+                            children: [
+                              pw.Text('本人 ', style: ts(sz: 8)),
+                              buildUnderline(
+                                d.patientName,
+                                25 * PdfPageFormat.mm,
+                                sz: 8,
+                              ),
+                              pw.Text(' 身分證字號 ', style: ts(sz: 8)),
+                              buildUnderline(
+                                d.idOrPassportNo,
+                                30 * PdfPageFormat.mm,
+                                sz: 8,
+                              ),
+                              pw.Text('，', style: ts(sz: 8)),
+                            ],
+                          ),
+
+                          pw.SizedBox(height: 4),
+                          pw.RichText(
+                            text: pw.TextSpan(
+                              style: ts(sz: 8),
+                              children: [
+                                pw.WidgetSpan(
+                                  child: buildUnderline(
+                                    d.dateYear,
+                                    10 * PdfPageFormat.mm,
+                                    sz: 8,
+                                  ),
+                                ),
+                                const pw.TextSpan(text: ' 年 '),
+                                pw.WidgetSpan(
+                                  child: buildUnderline(
+                                    d.dateMonth,
+                                    7 * PdfPageFormat.mm,
+                                    sz: 8,
+                                  ),
+                                ),
+                                const pw.TextSpan(text: ' 月 '),
+                                pw.WidgetSpan(
+                                  child: buildUnderline(
+                                    d.dateDay,
+                                    7 * PdfPageFormat.mm,
+                                    sz: 8,
+                                  ),
+                                ),
+                                const pw.TextSpan(
+                                  text: ' 日於桃園國際機場接受聯新國際醫院桃園國際機場醫療中心 ',
+                                ),
+                                pw.WidgetSpan(
+                                  child: buildUnderline(
+                                    d.doctorName,
+                                    20 * PdfPageFormat.mm,
+                                    sz: 8,
+                                  ),
+                                ),
+                                const pw.TextSpan(
+                                  text:
+                                      ' 醫師 診視，醫師建議轉診至醫院繼續治療，但本人因個人因素拒絕醫師「繼續治療」之建議，致生一切後果願自行負責，與聯新國際醫院桃園國際機場醫療中心無涉。',
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
-                        pw.Row(
-                          children: [
-                            pw.Text('身分證字號：', style: ts(sz: 9)),
-                            buildUnderline(
-                              d.idOrPassportNo,
-                              35 * PdfPageFormat.mm,
-                            ),
-                            pw.Text('，', style: ts(sz: 9)),
-                          ],
-                        ),
-                        pw.SizedBox(height: 6),
-                        pw.Row(
-                          children: [
-                            buildUnderline(d.dateYear, 12 * PdfPageFormat.mm),
-                            pw.Text('年', style: ts(sz: 9)),
-                            buildUnderline(d.dateMonth, 10 * PdfPageFormat.mm),
-                            pw.Text('月', style: ts(sz: 9)),
-                            buildUnderline(d.dateDay, 10 * PdfPageFormat.mm),
-                            pw.Text('日於桃園機場接受醫師：', style: ts(sz: 9)),
-                          ],
-                        ),
-                        pw.SizedBox(height: 4),
-                        pw.Text(
-                          '${d.doctorName.isEmpty ? "________" : d.doctorName} 診視，醫師建議轉診至醫院繼續治療，但本人因個人因素拒絕醫師「繼續治療」之建議，致生一切後果願自行負責。',
-                          style: ts(sz: 9),
-                        ),
-                      ],
+                          ),
+
+                          pw.SizedBox(height: 12),
+
+                          pw.Row(
+                            children: [
+                              pw.Text('立切結書人：', style: ts(sz: 7.5)),
+                              buildUnderline('', 35 * PdfPageFormat.mm),
+                            ],
+                          ),
+                          pw.Row(
+                            children: [
+                              pw.Text('身分證字號：', style: ts(sz: 7.5)),
+                              buildUnderline('', 35 * PdfPageFormat.mm),
+                            ],
+                          ),
+                          pw.Row(
+                            children: [
+                              pw.Text('與病患關係：', style: ts(sz: 7.5)),
+                              buildUnderline('', 35 * PdfPageFormat.mm),
+                            ],
+                          ),
+                          pw.Row(
+                            children: [
+                              pw.Text('住址：', style: ts(sz: 7.5)),
+                              buildUnderline('', 55 * PdfPageFormat.mm),
+                            ],
+                          ),
+                          pw.Row(
+                            children: [
+                              pw.Text('電話：', style: ts(sz: 7.5)),
+                              buildUnderline('', 35 * PdfPageFormat.mm),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
