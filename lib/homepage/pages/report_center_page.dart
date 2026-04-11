@@ -1701,9 +1701,14 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
     final destinationLocation = refService.getLocationById(
       flight?.arrivalLocationId,
     );
-    final transitLocation = transitLocations.isEmpty
-        ? null
-        : transitLocations.first.location;
+    final transitLocationList = transitLocations
+        .map((t) => t.location)
+        .where((loc) => loc != null && loc!.name.trim().isNotEmpty)
+        .toList();
+    final transitLocation = transitLocationList.isEmpty
+        ? ''
+        : transitLocationList.map((l) => l!.name.trim()).join(', ');
+    final transitIsTpe = transitLocationList.any((l) => l?.code == 'TPE');
 
     final incidentDate = incident?.incidentDate ?? row.record.createdAt;
     final incidentLocation = await _resolveIncidentLocation(
@@ -1801,14 +1806,14 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
       airline: airline,
       flightNo: flight?.flightNumber.trim() ?? '',
       isArrival: direction == '入境',
-      isTransfer: direction == '過境' || direction == '轉機',
+      isTransfer: direction == '過境',
       isDeparture: direction == '出境',
       isOtherTravelStatus:
-          direction.isNotEmpty && !['入境', '過境', '轉機', '出境'].contains(direction),
+          direction.isNotEmpty && !['入境', '過境', '出境'].contains(direction),
       otherTravelStatus:
-          direction.isNotEmpty && !['入境', '過境', '轉機', '出境'].contains(direction)
-          ? direction
-          : '',
+          direction.isNotEmpty && !['入境', '過境', '出境'].contains(direction)
+              ? direction
+              : '',
       dateYear: incidentDate.year.toString(),
       dateMonth: _twoDigits(incidentDate.month),
       dateDay: _twoDigits(incidentDate.day),
@@ -1818,10 +1823,8 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
       departureLocation: _isTpeLocation(departureLocation)
           ? ''
           : _locationText(departureLocation),
-      transitIsTpe: _isTpeLocation(transitLocation),
-      transitLocation: _isTpeLocation(transitLocation)
-          ? ''
-          : _locationText(transitLocation),
+      transitIsTpe: transitIsTpe,
+      transitLocation: transitLocation,
       destinationIsTpe: _isTpeLocation(destinationLocation),
       destinationLocation: _isTpeLocation(destinationLocation)
           ? ''
@@ -1991,6 +1994,9 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
       nurseName: staffNames.nurse,
       emtName: emtName,
       refusalRelationship: '',
+      consentSignature: fee?.consenterSignature,
+      witnessSignature: fee?.witnessSignature,
+      hasRefusal: _containsAnyText(treatmentResultName, ['拒絕']),
     );
   }
 

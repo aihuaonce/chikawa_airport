@@ -128,6 +128,9 @@ class MedicalServiceApplicationData {
   final String nurseName;
   final String emtName;
   final String refusalRelationship;
+  final Uint8List? consentSignature;
+  final Uint8List? witnessSignature;
+  final bool hasRefusal; // 是否有拒絕轉診
 
   const MedicalServiceApplicationData({
     this.isCrew = false,
@@ -242,6 +245,9 @@ class MedicalServiceApplicationData {
     this.nurseName = '',
     this.emtName = '',
     this.refusalRelationship = '',
+    this.consentSignature,
+    this.witnessSignature,
+    this.hasRefusal = false,
   });
 }
 
@@ -313,6 +319,24 @@ Future<Uint8List> buildMedicalServiceApplicationPdf(
           ),
         ],
       ),
+    );
+  }
+
+  // 簽名框 helper
+  pw.Widget buildSignatureBox(Uint8List? data, {double height = 35}) {
+    return pw.Container(
+      height: height,
+      alignment: pw.Alignment.centerLeft,
+      decoration: const pw.BoxDecoration(
+        border: pw.Border(
+          left: pw.BorderSide(width: 0.5, color: PdfColors.black),
+          right: pw.BorderSide(width: 0.5, color: PdfColors.black),
+          bottom: pw.BorderSide(width: 0.5, color: PdfColors.black),
+        ),
+      ),
+      child: data != null && data.isNotEmpty
+          ? pw.Image(pw.MemoryImage(data), fit: pw.BoxFit.contain)
+          : pw.SizedBox(),
     );
   }
 
@@ -515,16 +539,29 @@ Future<Uint8List> buildMedicalServiceApplicationPdf(
               ],
             ),
             pw.Row(
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
               children: [
                 pw.Text('通報事故地點：', style: ts()),
-                buildCheckBox('T1：', d.incidentAtT1),
-                buildUnderline(d.incidentT1Detail, 100),
-                buildCheckBox('T2：', d.incidentAtT2),
-                buildUnderline(d.incidentT2Detail, 100),
+                pw.SizedBox(width: 4),
+                buildCheckBox('T1', d.incidentAtT1),
+                pw.SizedBox(width: 2),
+                buildUnderline(d.incidentT1Detail, 70),
+                pw.SizedBox(width: 8),
+                buildCheckBox('T2', d.incidentAtT2),
+                pw.SizedBox(width: 2),
+                buildUnderline(d.incidentT2Detail, 70),
+              ],
+            ),
+            pw.Row(
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: [
+                pw.SizedBox(width: 72),
                 pw.Text('其他：', style: ts()),
+                pw.SizedBox(width: 2),
                 buildUnderline(d.incidentOtherLocation, 100),
               ],
             ),
+            pw.SizedBox(height: 4),
             pw.Row(
               children: [
                 pw.Text('醫護抵達時間：', style: ts()),
@@ -816,8 +853,8 @@ Future<Uint8List> buildMedicalServiceApplicationPdf(
                         style: ts(),
                       ),
                     ),
-                    pw.SizedBox(height: 35),
-                    pw.SizedBox(height: 35),
+                    buildSignatureBox(d.consentSignature),
+                    buildSignatureBox(d.witnessSignature),
                   ],
                 ),
                 pw.TableRow(
@@ -829,8 +866,8 @@ Future<Uint8List> buildMedicalServiceApplicationPdf(
                         style: ts(),
                       ),
                     ),
-                    pw.SizedBox(height: 45),
-                    pw.SizedBox(height: 45),
+                    buildSignatureBox(d.consentSignature, height: 45),
+                    buildSignatureBox(d.witnessSignature, height: 45),
                   ],
                 ),
               ],
@@ -1126,232 +1163,234 @@ Future<Uint8List> buildMedicalServiceApplicationPdf(
             ),
             pw.SizedBox(height: 15),
 
-            // --- 底部切結書區塊 ---
-            pw.Table(
-              border: pw.TableBorder.all(color: tealColor, width: 0.8),
-              columnWidths: {
-                0: const pw.FlexColumnWidth(1.1),
-                1: const pw.FlexColumnWidth(0.9),
-              },
-              children: [
-                pw.TableRow(
-                  children: [
-                    // ================= 左半部：英文  =================
-                    pw.Container(
-                      padding: const pw.EdgeInsets.all(5),
-                      child: pw.Column(
-                        crossAxisAlignment: pw.CrossAxisAlignment.start,
-                        children: [
-                          pw.Text(
-                            'Statement/Consent of Test/Treatment/Hospital Referral Refusal',
-                            style: ts(bold: true, sz: 8),
-                          ),
-                          pw.SizedBox(height: 5),
-                          pw.RichText(
-                            textAlign: pw.TextAlign.justify,
-                            text: pw.TextSpan(
-                              style: ts(sz: 7.5),
-                              children: [
-                                const pw.TextSpan(text: 'I (Name: '),
-                                pw.WidgetSpan(
-                                  child: buildUnderline(
-                                    d.patientName,
-                                    30 * PdfPageFormat.mm,
-                                    sz: 7.5,
-                                  ),
-                                ),
-                                const pw.TextSpan(text: ', Date of Birth: '),
-                                pw.WidgetSpan(
-                                  child: buildUnderline(
-                                    d.birthYear,
-                                    8 * PdfPageFormat.mm,
-                                    sz: 7.5,
-                                  ),
-                                ),
-                                const pw.TextSpan(text: '/'),
-                                pw.WidgetSpan(
-                                  child: buildUnderline(
-                                    d.birthMonth,
-                                    6 * PdfPageFormat.mm,
-                                    sz: 7.5,
-                                  ),
-                                ),
-                                const pw.TextSpan(text: '/'),
-                                pw.WidgetSpan(
-                                  child: buildUnderline(
-                                    d.birthDay,
-                                    6 * PdfPageFormat.mm,
-                                    sz: 7.5,
-                                  ),
-                                ),
-                                const pw.TextSpan(
-                                  text: ', Passport /I.D. No: ',
-                                ),
-                                pw.WidgetSpan(
-                                  child: buildUnderline(
-                                    d.idOrPassportNo,
-                                    30 * PdfPageFormat.mm,
-                                    sz: 7.5,
-                                  ),
-                                ),
-                                const pw.TextSpan(
-                                  text:
-                                      ') here by clarified that I/my family patient had been notified by Dr. ',
-                                ),
-                                pw.WidgetSpan(
-                                  child: buildUnderline(
-                                    d.doctorName,
-                                    25 * PdfPageFormat.mm,
-                                    sz: 7.5,
-                                  ),
-                                ),
-                                const pw.TextSpan(
-                                  text:
-                                      ' of Landseed Medical Clinic at Taiwan Taoyuan Int\'l Airport, I am/my family patient is now in illness/necessary condition which needed to be transported to an advanced hospital facilities for further test & treatment. But under my/our personal status/consideration. I/we decided to handle this situation by myself/ourselves against any further medical advice I hereby signing this consent clarified that I am /& my family are willing to take all the risks &hold all the responsibilities of any consequences, even hazardous to my/my family member\'s health or life integrity unexpectedly.',
-                                ),
-                              ],
+            // --- 底部切結書區塊 (僅在拒絕轉診時顯示) ---
+            if (d.hasRefusal) ...[
+              pw.Table(
+                border: pw.TableBorder.all(color: tealColor, width: 0.8),
+                columnWidths: {
+                  0: const pw.FlexColumnWidth(1.1),
+                  1: const pw.FlexColumnWidth(0.9),
+                },
+                children: [
+                  pw.TableRow(
+                    children: [
+                      // ================= 左半部：英文  =================
+                      pw.Container(
+                        padding: const pw.EdgeInsets.all(5),
+                        child: pw.Column(
+                          crossAxisAlignment: pw.CrossAxisAlignment.start,
+                          children: [
+                            pw.Text(
+                              'Statement/Consent of Test/Treatment/Hospital Referral Refusal',
+                              style: ts(bold: true, sz: 8),
                             ),
-                          ),
-                          pw.SizedBox(height: 10),
-                          pw.Text(
-                            'Signature：____________________',
-                            style: ts(sz: 8),
-                          ),
-                          pw.Text(
-                            'Date：${d.dateYear}/${d.dateMonth}/${d.dateDay}',
-                            style: ts(sz: 8),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    // ================= 右半部：中文  =================
-                    pw.Container(
-                      padding: const pw.EdgeInsets.all(5),
-                      child: pw.Column(
-                        crossAxisAlignment: pw.CrossAxisAlignment.start,
-                        children: [
-                          pw.Center(
-                            child: pw.Text(
-                              '拒絕轉診治療切結書',
-                              style: ts(bold: true, sz: 10),
+                            pw.SizedBox(height: 5),
+                            pw.RichText(
+                              textAlign: pw.TextAlign.justify,
+                              text: pw.TextSpan(
+                                style: ts(sz: 7.5),
+                                children: [
+                                  const pw.TextSpan(text: 'I (Name: '),
+                                  pw.WidgetSpan(
+                                    child: buildUnderline(
+                                      d.patientName,
+                                      30 * PdfPageFormat.mm,
+                                      sz: 7.5,
+                                    ),
+                                  ),
+                                  const pw.TextSpan(text: ', Date of Birth: '),
+                                  pw.WidgetSpan(
+                                    child: buildUnderline(
+                                      d.birthYear,
+                                      8 * PdfPageFormat.mm,
+                                      sz: 7.5,
+                                    ),
+                                  ),
+                                  const pw.TextSpan(text: '/'),
+                                  pw.WidgetSpan(
+                                    child: buildUnderline(
+                                      d.birthMonth,
+                                      6 * PdfPageFormat.mm,
+                                      sz: 7.5,
+                                    ),
+                                  ),
+                                  const pw.TextSpan(text: '/'),
+                                  pw.WidgetSpan(
+                                    child: buildUnderline(
+                                      d.birthDay,
+                                      6 * PdfPageFormat.mm,
+                                      sz: 7.5,
+                                    ),
+                                  ),
+                                  const pw.TextSpan(
+                                    text: ', Passport /I.D. No: ',
+                                  ),
+                                  pw.WidgetSpan(
+                                    child: buildUnderline(
+                                      d.idOrPassportNo,
+                                      30 * PdfPageFormat.mm,
+                                      sz: 7.5,
+                                    ),
+                                  ),
+                                  const pw.TextSpan(
+                                    text:
+                                        ') here by clarified that I/my family patient had been notified by Dr. ',
+                                  ),
+                                  pw.WidgetSpan(
+                                    child: buildUnderline(
+                                      d.doctorName,
+                                      25 * PdfPageFormat.mm,
+                                      sz: 7.5,
+                                    ),
+                                  ),
+                                  const pw.TextSpan(
+                                    text:
+                                        ' of Landseed Medical Clinic at Taiwan Taoyuan Int\'l Airport, I am/my family patient is now in illness/necessary condition which needed to be transported to an advanced hospital facilities for further test & treatment. But under my/our personal status/consideration. I/we decided to handle this situation by myself/ourselves against any further medical advice I hereby signing this consent clarified that I am /& my family are willing to take all the risks &hold all the responsibilities of any consequences, even hazardous to my/my family member\'s health or life integrity unexpectedly.',
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                          pw.SizedBox(height: 8),
-
-                          pw.Row(
-                            children: [
-                              pw.Text('本人 ', style: ts(sz: 8)),
-                              buildUnderline(
-                                d.patientName,
-                                25 * PdfPageFormat.mm,
-                                sz: 8,
-                              ),
-                              pw.Text(' 身分證字號 ', style: ts(sz: 8)),
-                              buildUnderline(
-                                d.idOrPassportNo,
-                                30 * PdfPageFormat.mm,
-                                sz: 8,
-                              ),
-                              pw.Text('，', style: ts(sz: 8)),
-                            ],
-                          ),
-
-                          pw.SizedBox(height: 4),
-                          pw.RichText(
-                            text: pw.TextSpan(
+                            pw.SizedBox(height: 10),
+                            pw.Text(
+                              'Signature：____________________',
                               style: ts(sz: 8),
+                            ),
+                            pw.Text(
+                              'Date：${d.dateYear}/${d.dateMonth}/${d.dateDay}',
+                              style: ts(sz: 8),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      // ================= 右半部：中文  =================
+                      pw.Container(
+                        padding: const pw.EdgeInsets.all(5),
+                        child: pw.Column(
+                          crossAxisAlignment: pw.CrossAxisAlignment.start,
+                          children: [
+                            pw.Center(
+                              child: pw.Text(
+                                '拒絕轉診治療切結書',
+                                style: ts(bold: true, sz: 10),
+                              ),
+                            ),
+                            pw.SizedBox(height: 8),
+
+                            pw.Row(
                               children: [
-                                pw.WidgetSpan(
-                                  child: buildUnderline(
-                                    d.dateYear,
-                                    10 * PdfPageFormat.mm,
-                                    sz: 8,
-                                  ),
+                                pw.Text('本人 ', style: ts(sz: 8)),
+                                buildUnderline(
+                                  d.patientName,
+                                  25 * PdfPageFormat.mm,
+                                  sz: 8,
                                 ),
-                                const pw.TextSpan(text: ' 年 '),
-                                pw.WidgetSpan(
-                                  child: buildUnderline(
-                                    d.dateMonth,
-                                    7 * PdfPageFormat.mm,
-                                    sz: 8,
-                                  ),
+                                pw.Text(' 身分證字號 ', style: ts(sz: 8)),
+                                buildUnderline(
+                                  d.idOrPassportNo,
+                                  30 * PdfPageFormat.mm,
+                                  sz: 8,
                                 ),
-                                const pw.TextSpan(text: ' 月 '),
-                                pw.WidgetSpan(
-                                  child: buildUnderline(
-                                    d.dateDay,
-                                    7 * PdfPageFormat.mm,
-                                    sz: 8,
-                                  ),
-                                ),
-                                const pw.TextSpan(
-                                  text: ' 日於桃園國際機場接受聯新國際醫院桃園國際機場醫療中心 ',
-                                ),
-                                pw.WidgetSpan(
-                                  child: buildUnderline(
-                                    d.doctorName,
-                                    20 * PdfPageFormat.mm,
-                                    sz: 8,
-                                  ),
-                                ),
-                                const pw.TextSpan(
-                                  text:
-                                      ' 醫師 診視，醫師建議轉診至醫院繼續治療，但本人因個人因素拒絕醫師「繼續治療」之建議，致生一切後果願自行負責，與聯新國際醫院桃園國際機場醫療中心無涉。',
-                                ),
+                                pw.Text('，', style: ts(sz: 8)),
                               ],
                             ),
-                          ),
 
-                          pw.SizedBox(height: 12),
+                            pw.SizedBox(height: 4),
+                            pw.RichText(
+                              text: pw.TextSpan(
+                                style: ts(sz: 8),
+                                children: [
+                                  pw.WidgetSpan(
+                                    child: buildUnderline(
+                                      d.dateYear,
+                                      10 * PdfPageFormat.mm,
+                                      sz: 8,
+                                    ),
+                                  ),
+                                  const pw.TextSpan(text: ' 年 '),
+                                  pw.WidgetSpan(
+                                    child: buildUnderline(
+                                      d.dateMonth,
+                                      7 * PdfPageFormat.mm,
+                                      sz: 8,
+                                    ),
+                                  ),
+                                  const pw.TextSpan(text: ' 月 '),
+                                  pw.WidgetSpan(
+                                    child: buildUnderline(
+                                      d.dateDay,
+                                      7 * PdfPageFormat.mm,
+                                      sz: 8,
+                                    ),
+                                  ),
+                                  const pw.TextSpan(
+                                    text: ' 日於桃園國際機場接受聯新國際醫院桃園國際機場醫療中心 ',
+                                  ),
+                                  pw.WidgetSpan(
+                                    child: buildUnderline(
+                                      d.doctorName,
+                                      20 * PdfPageFormat.mm,
+                                      sz: 8,
+                                    ),
+                                  ),
+                                  const pw.TextSpan(
+                                    text:
+                                        ' 醫師 診視，醫師建議轉診至醫院繼續治療，但本人因個人因素拒絕醫師「繼續治療」之建議，致生一切後果願自行負責，與聯新國際醫院桃園國際機場醫療中心無涉。',
+                                  ),
+                                ],
+                              ),
+                            ),
 
-                          pw.Row(
-                            children: [
-                              pw.Text('立切結書人：', style: ts(sz: 7.5)),
-                              buildUnderline('', 35 * PdfPageFormat.mm),
-                            ],
-                          ),
-                          pw.Row(
-                            children: [
-                              pw.Text('身分證字號：', style: ts(sz: 7.5)),
-                              buildUnderline('', 35 * PdfPageFormat.mm),
-                            ],
-                          ),
-                          pw.Row(
-                            children: [
-                              pw.Text('與病患關係：', style: ts(sz: 7.5)),
-                              buildUnderline('', 35 * PdfPageFormat.mm),
-                            ],
-                          ),
-                          pw.Row(
-                            children: [
-                              pw.Text('住址：', style: ts(sz: 7.5)),
-                              buildUnderline('', 55 * PdfPageFormat.mm),
-                            ],
-                          ),
-                          pw.Row(
-                            children: [
-                              pw.Text('電話：', style: ts(sz: 7.5)),
-                              buildUnderline('', 35 * PdfPageFormat.mm),
-                            ],
-                          ),
-                        ],
+                            pw.SizedBox(height: 12),
+
+                            pw.Row(
+                              children: [
+                                pw.Text('立切結書人：', style: ts(sz: 7.5)),
+                                buildUnderline('', 35 * PdfPageFormat.mm),
+                              ],
+                            ),
+                            pw.Row(
+                              children: [
+                                pw.Text('身分證字號：', style: ts(sz: 7.5)),
+                                buildUnderline('', 35 * PdfPageFormat.mm),
+                              ],
+                            ),
+                            pw.Row(
+                              children: [
+                                pw.Text('與病患關係：', style: ts(sz: 7.5)),
+                                buildUnderline('', 35 * PdfPageFormat.mm),
+                              ],
+                            ),
+                            pw.Row(
+                              children: [
+                                pw.Text('住址：', style: ts(sz: 7.5)),
+                                buildUnderline('', 55 * PdfPageFormat.mm),
+                              ],
+                            ),
+                            pw.Row(
+                              children: [
+                                pw.Text('電話：', style: ts(sz: 7.5)),
+                                buildUnderline('', 35 * PdfPageFormat.mm),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
+                    ],
+                  ),
+                ],
+              ),
 
-            pw.Spacer(),
-            pw.Center(child: pw.Text('第 2 頁', style: ts(sz: 8))),
-            pw.Row(
-              mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-              children: [
-                pw.Text('51-P-002-001', style: ts(sz: 7)),
-                pw.Text('聯新[A431]2021/11x500 張', style: ts(sz: 7)),
-              ],
-            ),
+              pw.Spacer(),
+              pw.Center(child: pw.Text('第 2 頁', style: ts(sz: 8))),
+              pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                children: [
+                  pw.Text('51-P-002-001', style: ts(sz: 7)),
+                  pw.Text('聯新[A431]2021/11x500 張', style: ts(sz: 7)),
+                ],
+              ),
+            ],
           ],
         );
       },
