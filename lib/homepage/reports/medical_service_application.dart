@@ -655,33 +655,48 @@ Future<Uint8List> buildMedicalServiceApplicationPdf(
             pw.Row(
               crossAxisAlignment: pw.CrossAxisAlignment.start,
               children: [
+                // --- 左側：自付 ---
                 pw.Expanded(
+                  flex: 52,
                   child: pw.Column(
                     crossAxisAlignment: pw.CrossAxisAlignment.start,
                     children: [
                       pw.Text('■ 自付', style: ts(sz: 9.5, bold: true)),
                       pw.Padding(
-                        padding: const pw.EdgeInsets.only(left: 15),
+                        padding: const pw.EdgeInsets.only(left: 12),
                         child: pw.Column(
                           crossAxisAlignment: pw.CrossAxisAlignment.start,
                           children: [
+                            buildCheckBox('現金', d.payByCash),
+                            pw.Padding(
+                              padding: const pw.EdgeInsets.only(left: 12),
+                              child: pw.Row(
+                                children: [
+                                  buildCheckBox('台幣', d.payInTwd, sz: 7.5),
+                                  buildCheckBox(
+                                    '其他：',
+                                    d.payInOtherCurrency,
+                                    sz: 7.5,
+                                  ),
+                                  buildUnderline(d.otherCurrency, 22),
+                                  pw.SizedBox(width: 4),
+                                  pw.Text(
+                                    '(兌換後=台幣：__________)',
+                                    style: ts(sz: 6),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            pw.SizedBox(height: 2),
                             pw.Row(
                               children: [
-                                buildCheckBox('現金', d.payByCash),
-                                buildCheckBox('台幣', d.payInTwd),
-                                buildCheckBox('其他幣別：', d.payInOtherCurrency),
-                                buildUnderline(d.otherCurrency, 40),
-                              ],
-                            ),
-                            pw.Text(
-                              '   ( 兌換後=台幣：___________ )',
-                              style: ts(sz: 6.5),
-                            ),
-                            pw.Row(
-                              children: [
-                                buildCheckBox('刷卡', d.payByCard),
-                                buildCheckBox('收費異常，原因：', d.abnormalCharge),
-                                buildUnderline(d.abnormalReason, 65),
+                                buildCheckBox('刷卡', d.payByCard, sz: 7.5),
+                                buildCheckBox(
+                                  '收費異常，原因：',
+                                  d.abnormalCharge,
+                                  sz: 7.5,
+                                ),
+                                buildUnderline(d.abnormalReason, 50),
                               ],
                             ),
                           ],
@@ -691,32 +706,59 @@ Future<Uint8List> buildMedicalServiceApplicationPdf(
                   ),
                 ),
 
+                pw.SizedBox(width: 10),
+                // --- 右側：統一請款 ---
                 pw.Expanded(
+                  flex: 48,
                   child: pw.Column(
                     crossAxisAlignment: pw.CrossAxisAlignment.start,
                     children: [
                       pw.Text('■ 統一請款', style: ts(sz: 9.5, bold: true)),
                       pw.Padding(
-                        padding: const pw.EdgeInsets.only(left: 15),
+                        padding: const pw.EdgeInsets.only(left: 10, top: 2),
                         child: pw.Column(
                           crossAxisAlignment: pw.CrossAxisAlignment.start,
                           children: [
+                            // 第一列
                             pw.Row(
+                              crossAxisAlignment: pw.CrossAxisAlignment.end,
                               children: [
-                                pw.Text('申請人(Applicant)：', style: ts()),
-                                buildUnderline(d.applicantName, 80),
+                                pw.SizedBox(
+                                  width: 32 * PdfPageFormat.mm,
+                                  child: pw.Text(
+                                    '申請人(Applicant)：',
+                                    style: ts(sz: 7.5),
+                                  ),
+                                ),
+                                buildUnderline(d.applicantName, 45),
                               ],
                             ),
+                            pw.SizedBox(height: 1),
                             pw.Row(
+                              crossAxisAlignment: pw.CrossAxisAlignment.end,
                               children: [
-                                pw.Text('申請單位(Department)：', style: ts()),
-                                buildUnderline(d.applicantUnit, 80),
+                                pw.SizedBox(
+                                  width: 32 * PdfPageFormat.mm,
+                                  child: pw.Text(
+                                    '申請單位(Department)：',
+                                    style: ts(sz: 7.5),
+                                  ),
+                                ),
+                                buildUnderline(d.applicantUnit, 45),
                               ],
                             ),
+                            pw.SizedBox(height: 1),
                             pw.Row(
+                              crossAxisAlignment: pw.CrossAxisAlignment.end,
                               children: [
-                                pw.Text('聯絡電話(Telephone)：', style: ts()),
-                                buildUnderline(d.applicantPhone, 80),
+                                pw.SizedBox(
+                                  width: 32 * PdfPageFormat.mm,
+                                  child: pw.Text(
+                                    '聯絡電話(Telephone)：',
+                                    style: ts(sz: 7.5),
+                                  ),
+                                ),
+                                buildUnderline(d.applicantPhone, 45),
                               ],
                             ),
                           ],
