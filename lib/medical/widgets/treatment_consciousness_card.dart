@@ -19,7 +19,6 @@ class _TreatmentConsciousnessCardState
   static const Color borderColor = Color(0xFFE2E8F0);
 
   // --- 狀態變數 ---
-  bool _isInitialized = false;
   bool _isAlert = true;
   int? _leftPupilReactionId = 1;
   int? _rightPupilReactionId = 1;
@@ -68,7 +67,8 @@ class _TreatmentConsciousnessCardState
   }
 
   void _updateControllers(TreatmentViewModel viewModel) {
-    if (_isInitialized) return;
+    // 每次 build 都同步 Controller，確保最新資料能顯示在 UI 上
+    // 不再使用 _isInitialized 來阻止更新
 
     final latestConsciousnessExam = viewModel.latestConsciousnessExam;
     if (latestConsciousnessExam != null) {
@@ -93,8 +93,6 @@ class _TreatmentConsciousnessCardState
       // 計算 GCS Total
       _updateGCSTotalAndValidate(viewModel, save: false);
     }
-
-    _isInitialized = true;
   }
 
   // GCS 驗證：檢查數值是否在有效範圍內
@@ -162,8 +160,8 @@ class _TreatmentConsciousnessCardState
   Widget build(BuildContext context) {
     final viewModel = context.watch<TreatmentViewModel>();
     
-    // 初始化控制器
-    if (!_isInitialized && viewModel.treatment != null) {
+    // 每次 build 都同步控制器，確保最新資料能顯示在 UI 上
+    if (viewModel.treatment != null) {
       _updateControllers(viewModel);
     }
 

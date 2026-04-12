@@ -142,7 +142,8 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
 
   // --- 核心邏輯：ViewModel 同步 ---
   void _updateControllers(TreatmentViewModel viewModel) {
-    if (_isInitialized) return;
+    // 每次 build 都同步 Controller，確保最新資料能顯示在 UI 上
+    // 不再使用 _isInitialized 來阻止更新
 
     final medicalRecord = viewModel.medicalRecord;
     if (medicalRecord != null) {
@@ -161,7 +162,7 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
       _actionSummaryOtherController.text = treatment.actionSummaryOther ?? '';
       _tentativeController.text = treatment.tentative ?? '';
       _secondaryDiagnosis1Controller.text = treatment.secondaryDiagnosis1 ?? '';
-      _secondaryDiagnosis2Controller.text = treatment.secondaryDiagnosis2 ?? '';
+      _secondaryDiagnosis2Controller.text = treatment.secondaryDiagnosis1 ?? '';
       _directorNameController.text = treatment.directorName ?? '';
       _referralHospitalFinalController.text =
           treatment.referralHospitalFinal ?? '';
@@ -195,8 +196,6 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
       _diastolicController.text = latestAssessment.diastolic?.toString() ?? '';
       _spo2Controller.text = latestAssessment.spo2?.toString() ?? '';
     }
-
-    _isInitialized = true;
   }
 
   // 同步健康評估表編輯的值到資料庫

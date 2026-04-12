@@ -1649,6 +1649,9 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
   }) async {
     final medicalId = row.record.medicalId;
 
+    // 先取得 chiefComplaint 來獲取 ID
+    final chiefComplaintTmp = await db.treatmentDao.getChiefComplaint(medicalId);
+    
     final results = await Future.wait([
       db.flightDao.getFlightByMedicalId(medicalId),
       db.incidentDao.getByMedicalId(medicalId),
@@ -1659,6 +1662,9 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
       db.treatmentDao.getMedicalAssessments(medicalId),
       db.treatmentDao.getMedicalHistory(medicalId),
       db.treatmentDao.getHealthAssessments(medicalId),
+      chiefComplaintTmp != null
+          ? db.treatmentDao.getChiefComplaintSymptomIds(chiefComplaintTmp.complaintId)
+          : Future.value(<int>[]),
     ]);
 
     final flight = results[0] as FlightRecordData?;
@@ -1670,6 +1676,7 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
     final assessments = results[6] as List<MedicalAssessmentData>;
     final medicalHistory = results[7] as MedicalHistoryData?;
     final healthAssessments = results[8] as List<HealthAssessmentFormData>;
+    final selectedSymptomIds = results[9] as List<int>;
 
     final transitLocations = flight == null
         ? []
@@ -1709,6 +1716,10 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
         ? ''
         : transitLocationList.map((l) => l!.name.trim()).join(', ');
     final transitIsTpe = transitLocationList.any((l) => l?.code == 'TPE');
+    
+    // DEBUG: 經過地
+    print('transitLocations count: ${transitLocations.length}');
+    print('transitLocation: $transitLocation');
 
     final incidentDate = incident?.incidentDate ?? row.record.createdAt;
     final incidentLocation = await _resolveIncidentLocation(
@@ -1735,9 +1746,63 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
         .firstOrNull;
     final allergyCode = historyStatus?.code ?? '';
 
-    final assessment = assessments.isEmpty ? null : assessments.first;
+    // DEBUG: 打印讀取的資料
+    print('=== DEBUG: 緊急醫療救護申請單資料 ===');
+    print('treatment: ${treatment != null ? "exists" : "null"}');
+    if (treatment != null) {
+      print('  - tentative: ${treatment!.tentative}');
+      print('  - secondaryDiagnosis1: ${treatment!.secondaryDiagnosis1}');
+      print('  - referralHospitalFinal: ${treatment!.referralHospitalFinal}');
+      print('  - transportMethod: ${treatment!.transportMethod}');
+      print('  - clearanceId: ${treatment!.clearanceId}');
+      print('  - expeditedClearanceId: ${treatment!.expeditedClearanceId}');
+    }
+    print('chiefComplaint: ${chiefComplaint != null ? "exists" : "null"}');
+    if (chiefComplaint != null) {
+      print('  - chiefComplaintFinal: ${chiefComplaint!.chiefComplaintFinal}');
+    }
+    print('assessments count: ${assessments.length}');
+    if (assessments.isNotEmpty) {
+      final firstAssessment = assessments.first;
+      print('  - first assessment: temperature=${firstAssessment.temperature}, pulse=${firstAssessment.pulse}, breath=${firstAssessment.breath}');
+    }
+    print('=== END DEBUG ===');
+
+    // 找出有生命徵象資料的評估記錄
+    MedicalAssessmentData? vitalSignsAssessment;
+    MedicalAssessmentData? consciousnessAssessment;
+    
+    for (final assessment in assessments) {
+      if (assessment.temperature != null ||
+          assessment.pulse != null ||
+          assessment.breath != null ||
+          assessment.systolic != null ||
+          assessment.diastolic != null ||
+          assessment.spo2 != null) {
+        vitalSignsAssessment = assessment;
+        break;
+      }
+    }
+    
+    // 找出有意識/理學檢查資料的評估記錄
+    for (final assessment in assessments) {
+      if (assessment.consciousnessLevelId != null ||
+          assessment.gcsE != null ||
+          assessment.gcsV != null ||
+          assessment.gcsM != null ||
+          assessment.headNeckExam != null ||
+          assessment.chestExam != null ||
+          assessment.abdomenExam != null ||
+          assessment.extremitiesExam != null) {
+        consciousnessAssessment = assessment;
+        break;
+      }
+    }
+
+    // 使用有資料的評估記錄
+    final assessment = vitalSignsAssessment;
     final consciousnessLevel = refService.consciousnessLevelList
-        .where((c) => c.id == assessment?.consciousnessLevelId)
+        .where((c) => c.id == consciousnessAssessment?.consciousnessLevelId)
         .firstOrNull;
     final staffNames = _resolveStaffNames(
       refService: refService,
@@ -1767,7 +1832,10 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
         medicalArrivalMinutes >= 0 &&
         medicalArrivalMinutes <= 10;
 
+    // 讀取通關方式 - 優先從 transportMethod， fallback 到 clearanceId/expeditedClearanceId
     final transportMethod = treatment?.transportMethod?.trim() ?? '';
+    final hasClearanceId = treatment?.clearanceId != null;
+    final hasExpeditedClearanceId = treatment?.expeditedClearanceId != null;
     final treatmentResultName =
         refService.getTreatmentResultById(treatment?.resultId)?.name ?? '';
     final healthAssessmentEntries = healthAssessments
@@ -1888,8 +1956,8 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
           : '',
       healthAssessment: healthAssessmentEntries.isNotEmpty,
       healthAssessments: healthAssessmentEntries,
-      generalClearance: _containsAnyText(transportMethod, ['一般通關']),
-      emergencyClearance: _containsAnyText(transportMethod, ['緊急通關']),
+      generalClearance: hasClearanceId || _containsAnyText(transportMethod, ['一般通關']),
+      emergencyClearance: hasExpeditedClearanceId || _containsAnyText(transportMethod, ['緊急通關']),
       emergencyPublicGate: _containsAnyText(transportMethod, ['公務門']),
       emergencyApron: _containsAnyText(transportMethod, ['機坪']),
       ambulanceClinic:
@@ -1945,46 +2013,54 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
       applicantName: fee?.applicantName?.trim() ?? '',
       applicantUnit: fee?.applicantUnit?.trim() ?? '',
       applicantPhone: fee?.applicantPhone?.trim() ?? '',
-      chiefComplaint: chiefComplaint?.chiefComplaintFinal?.trim() ?? '',
-      temperature: _formatReal(assessment?.temperature),
-      pulse: assessment?.pulse?.toString() ?? '',
-      breath: assessment?.breath?.toString() ?? '',
-      bloodPressure: _formatBp(assessment?.systolic, assessment?.diastolic),
+      // 主訴：主訴類別 + 症狀/傷病 + 補充說明
+      chiefComplaint: _buildChiefComplaintText(
+        refService: refService,
+        chiefComplaint: chiefComplaint,
+        selectedSymptomIds: selectedSymptomIds,
+      ),
+      // 生命徵象使用 vitalSignsAssessment
+      temperature: _formatReal(vitalSignsAssessment?.temperature),
+      pulse: vitalSignsAssessment?.pulse?.toString() ?? '',
+      breath: vitalSignsAssessment?.breath?.toString() ?? '',
+      bloodPressure: _formatBp(vitalSignsAssessment?.systolic, vitalSignsAssessment?.diastolic),
+      spo2: vitalSignsAssessment?.spo2?.toString() ?? '',
+      // 意識與理學檢查使用 consciousnessAssessment
       consciousnessClear: _containsAnyText(consciousnessLevel?.name, [
         '清',
         'clear',
       ]),
       consciousnessGcs:
-          (assessment?.gcsE?.trim().isNotEmpty ?? false) ||
-          (assessment?.gcsV?.trim().isNotEmpty ?? false) ||
-          (assessment?.gcsM?.trim().isNotEmpty ?? false),
-      gcsE: assessment?.gcsE?.trim() ?? '',
-      gcsV: assessment?.gcsV?.trim() ?? '',
-      gcsM: assessment?.gcsM?.trim() ?? '',
+          (consciousnessAssessment?.gcsE?.trim().isNotEmpty ?? false) ||
+          (consciousnessAssessment?.gcsV?.trim().isNotEmpty ?? false) ||
+          (consciousnessAssessment?.gcsM?.trim().isNotEmpty ?? false),
+      gcsE: consciousnessAssessment?.gcsE?.trim() ?? '',
+      gcsV: consciousnessAssessment?.gcsV?.trim() ?? '',
+      gcsM: consciousnessAssessment?.gcsM?.trim() ?? '',
       pupilRight: _joinNonEmpty([
-        _formatReal(assessment?.rightPupilSize),
+        _formatReal(consciousnessAssessment?.rightPupilSize),
         await _resolvePupilReactionSymbol(
           db,
-          assessment?.rightPupilReactionId,
-          assessment?.rightPupilReaction,
+          consciousnessAssessment?.rightPupilReactionId,
+          consciousnessAssessment?.rightPupilReaction,
         ),
       ], '/'),
       pupilLeft: _joinNonEmpty([
-        _formatReal(assessment?.leftPupilSize),
+        _formatReal(consciousnessAssessment?.leftPupilSize),
         await _resolvePupilReactionSymbol(
           db,
-          assessment?.leftPupilReactionId,
-          assessment?.leftPupilReaction,
+          consciousnessAssessment?.leftPupilReactionId,
+          consciousnessAssessment?.leftPupilReaction,
         ),
       ], '/'),
       history: medicalHistory?.pastHistoryDetail?.trim() ?? '',
       allergyNone: allergyCode == 'none',
       allergyHas: allergyCode == 'yes',
       allergyDetail: medicalHistory?.allergyDetail?.trim() ?? '',
-      heent: assessment?.headNeckExam?.trim() ?? '',
-      chest: assessment?.chestExam?.trim() ?? '',
-      abdomen: assessment?.abdomenExam?.trim() ?? '',
-      extremity: assessment?.extremitiesExam?.trim() ?? '',
+      heent: consciousnessAssessment?.headNeckExam?.trim() ?? '',
+      chest: consciousnessAssessment?.chestExam?.trim() ?? '',
+      abdomen: consciousnessAssessment?.abdomenExam?.trim() ?? '',
+      extremity: consciousnessAssessment?.extremitiesExam?.trim() ?? '',
       tentativeDiagnosis: await _buildDiagnosisWithIcdNames(db, treatment),
       signedFourCopy: fee?.userAgreed ?? false,
       advisedReferral:
@@ -2342,6 +2418,49 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
       return '$systolic/$diastolic';
     }
     return systolic?.toString() ?? '';
+  }
+
+  // 建構主訴文字：主訴類別 + 症狀/傷病 + 補充說明
+  String _buildChiefComplaintText({
+    required ReferenceService refService,
+    required ChiefComplaintData? chiefComplaint,
+    required List<int> selectedSymptomIds,
+  }) {
+    if (chiefComplaint == null) return '';
+
+    final parts = <String>[];
+
+    // 1. 主訴類別
+    final typeName = refService.getChiefComplaintTypeById(chiefComplaint.chiefComplaintTypeId)?.name ?? '';
+    if (typeName.isNotEmpty) {
+      parts.add(typeName);
+    }
+
+    // 2. 症狀/傷病（從 selectedSymptomIds 取得症狀名稱）
+    if (selectedSymptomIds.isNotEmpty) {
+      final symptomNames = <String>[];
+      final typeId = chiefComplaint.chiefComplaintTypeId;
+      if (typeId != null) {
+        final details = refService.getChiefComplaintDetailsByType(typeId);
+        for (final id in selectedSymptomIds) {
+          final detail = details.where((d) => d.id == id).firstOrNull;
+          if (detail != null && detail.name.isNotEmpty) {
+            symptomNames.add(detail.name);
+          }
+        }
+      }
+      if (symptomNames.isNotEmpty) {
+        parts.add(symptomNames.join('、'));
+      }
+    }
+
+    // 3. 補充說明
+    final supplementary = chiefComplaint.otherSymptomDetail?.trim() ?? '';
+    if (supplementary.isNotEmpty) {
+      parts.add(supplementary);
+    }
+
+    return parts.join('\n');
   }
 
   (String, String) _splitBp(String bp) {

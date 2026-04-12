@@ -106,6 +106,7 @@ class MedicalServiceApplicationData {
   final String pulse;
   final String breath;
   final String bloodPressure;
+  final String spo2;
   final bool consciousnessClear;
   final bool consciousnessGcs;
   final String gcsE;
@@ -223,6 +224,7 @@ class MedicalServiceApplicationData {
     this.pulse = '',
     this.breath = '',
     this.bloodPressure = '',
+    this.spo2 = '',
     this.consciousnessClear = false,
     this.consciousnessGcs = false,
     this.gcsE = '',
@@ -636,6 +638,7 @@ Future<Uint8List> buildMedicalServiceApplicationPdf(
                       buildCheckBox('公務門', d.emergencyPublicGate),
                       buildCheckBox('機坪)', d.emergencyApron),
                     ],
+                    
                   ),
                   pw.Row(
                     children: [
@@ -1010,7 +1013,7 @@ Future<Uint8List> buildMedicalServiceApplicationPdf(
                               width: 36 * PdfPageFormat.mm,
                               child: pw.Text('血氧(SpO2)：', style: ts()),
                             ),
-                            buildUnderline('', 20 * PdfPageFormat.mm),
+                            buildUnderline(d.spo2, 20 * PdfPageFormat.mm),
                             pw.Text(' %', style: ts()),
                           ],
                         ),
