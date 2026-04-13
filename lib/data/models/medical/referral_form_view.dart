@@ -61,7 +61,7 @@ class ReferralFormViewModel extends ChangeNotifier {
 
     // 自動從資料庫帶入缺少的資料
     await populateMissingData();
-    
+
     // 載入病患 ID
     await _loadPatientId();
 
@@ -88,7 +88,7 @@ class ReferralFormViewModel extends ChangeNotifier {
     bool needsUpdate = false;
 
     // 1. 聯絡人資料 (不自動帶入，由使用者自行填寫)
-    
+
     // 2. 診斷與醫院資料 (從 Treatment 表)
     // 3. 醫師資料 (從 StaffAssignment 表)
     // 4. 關係 (從 HealthAssessment 表)
@@ -100,19 +100,23 @@ class ReferralFormViewModel extends ChangeNotifier {
       // 診斷 (Tentative -> Primary Diagnosis)
       if ((_formCache!.primaryDiagnosis ?? '').isEmpty &&
           (treatment.tentative ?? '').isNotEmpty) {
-        companion = companion.copyWith(primaryDiagnosis: Value(treatment.tentative));
+        companion = companion.copyWith(
+          primaryDiagnosis: Value(treatment.tentative),
+        );
         needsUpdate = true;
       }
       if ((_formCache!.secondaryDiagnosis1 ?? '').isEmpty &&
           (treatment.secondaryDiagnosis1 ?? '').isNotEmpty) {
         companion = companion.copyWith(
-            secondaryDiagnosis1: Value(treatment.secondaryDiagnosis1));
+          secondaryDiagnosis1: Value(treatment.secondaryDiagnosis1),
+        );
         needsUpdate = true;
       }
       if ((_formCache!.secondaryDiagnosis2 ?? '').isEmpty &&
           (treatment.secondaryDiagnosis2 ?? '').isNotEmpty) {
         companion = companion.copyWith(
-            secondaryDiagnosis2: Value(treatment.secondaryDiagnosis2));
+          secondaryDiagnosis2: Value(treatment.secondaryDiagnosis2),
+        );
         needsUpdate = true;
       }
 
@@ -127,10 +131,9 @@ class ReferralFormViewModel extends ChangeNotifier {
       if ((_formCache!.recentMedication ?? '').isEmpty) {
         final medications = await db.treatmentDao.getMedications(medicalId);
         if (medications.isNotEmpty) {
-          final medList =
-              medications
-                  .map((m) => '${m.name} ${m.dose ?? ''}${m.unit ?? ''}')
-                  .join(', ');
+          final medList = medications
+              .map((m) => '${m.name} ${m.dose ?? ''}${m.unit ?? ''}')
+              .join(', ');
           companion = companion.copyWith(recentMedication: Value(medList));
           needsUpdate = true;
         }
@@ -147,14 +150,16 @@ class ReferralFormViewModel extends ChangeNotifier {
           final vitalSigns = [
             if (latest.temperature != null) 'BT:${latest.temperature}',
             if (latest.pulse != null) 'PR:${latest.pulse}',
-            if (latest.systolic != null) 'BP:${latest.systolic}/${latest.diastolic}',
+            if (latest.systolic != null)
+              'BP:${latest.systolic}/${latest.diastolic}',
             if (latest.spo2 != null) 'SpO2:${latest.spo2}%',
           ].join(' ');
-          
+
           if (vitalSigns.isNotEmpty) {
-             companion = companion.copyWith(
-                 recentExamResult: Value('生命徵象: $vitalSigns'));
-             needsUpdate = true;
+            companion = companion.copyWith(
+              recentExamResult: Value('生命徵象: $vitalSigns'),
+            );
+            needsUpdate = true;
           }
         }
       }
@@ -169,10 +174,12 @@ class ReferralFormViewModel extends ChangeNotifier {
             final hospital = refService.referralHospitals.firstWhere(
               (h) => h.id == treatment.referralHospitalId,
             );
-            
+
             // 如果不是 "其他醫院"，則使用其資料
             if (!hospital.isOther) {
-              companion = companion.copyWith(hospitalName: Value(hospital.name));
+              companion = companion.copyWith(
+                hospitalName: Value(hospital.name),
+              );
               needsUpdate = true;
               hospitalFound = true;
 
@@ -180,22 +187,25 @@ class ReferralFormViewModel extends ChangeNotifier {
               if ((_formCache!.hospitalPhone ?? '').isEmpty &&
                   (hospital.phone ?? '').isNotEmpty) {
                 companion = companion.copyWith(
-                    hospitalPhone: Value(hospital.phone));
+                  hospitalPhone: Value(hospital.phone),
+                );
               }
               if ((_formCache!.hospitalAddress ?? '').isEmpty &&
                   (hospital.address ?? '').isNotEmpty) {
                 companion = companion.copyWith(
-                    hospitalAddress: Value(hospital.address));
+                  hospitalAddress: Value(hospital.address),
+                );
               }
             }
           } catch (_) {}
         }
 
         // 2. 如果沒有找到 (或選擇了 "其他醫院")，且有手動輸入的醫院名稱，則使用該名稱
-        if (!hospitalFound && 
+        if (!hospitalFound &&
             (treatment.referralHospitalFinal ?? '').isNotEmpty) {
           companion = companion.copyWith(
-              hospitalName: Value(treatment.referralHospitalFinal));
+            hospitalName: Value(treatment.referralHospitalFinal),
+          );
           needsUpdate = true;
         }
       }
@@ -209,7 +219,8 @@ class ReferralFormViewModel extends ChangeNotifier {
           treatment?.directorName != null &&
           treatment!.directorName!.isNotEmpty) {
         companion = companion.copyWith(
-            doctorName: Value(treatment.directorName));
+          doctorName: Value(treatment.directorName),
+        );
         needsUpdate = true;
       }
 
@@ -233,11 +244,10 @@ class ReferralFormViewModel extends ChangeNotifier {
 
           if ((companion.doctorName.value == null ||
               (companion.doctorName.value ?? '').isEmpty)) {
-            
             String? doctorName = primaryDoctor.staffName;
-            
+
             // 若 assignment 中沒有名字，但有 ID，嘗試從 Reference 查找
-            if ((doctorName == null || doctorName.isEmpty) && 
+            if ((doctorName == null || doctorName.isEmpty) &&
                 primaryDoctor.staffId != null) {
               try {
                 final staff = refService.medicalStaffList.firstWhere(
@@ -248,8 +258,7 @@ class ReferralFormViewModel extends ChangeNotifier {
             }
 
             if (doctorName != null && doctorName.isNotEmpty) {
-              companion = companion.copyWith(
-                  doctorName: Value(doctorName));
+              companion = companion.copyWith(doctorName: Value(doctorName));
               needsUpdate = true;
             }
           }
@@ -261,7 +270,8 @@ class ReferralFormViewModel extends ChangeNotifier {
             );
             if ((staff.department ?? '').isNotEmpty) {
               companion = companion.copyWith(
-                  doctorDepartment: Value(staff.department));
+                doctorDepartment: Value(staff.department),
+              );
               needsUpdate = true;
             }
           }
@@ -290,8 +300,9 @@ class ReferralFormViewModel extends ChangeNotifier {
                 (t) => t.name == '其他' || t.nameEn?.toLowerCase() == 'other',
               );
               companion = companion.copyWith(
-                  relationshipId: Value(otherType.id),
-                  otherRelationship: Value(relation));
+                relationshipId: Value(otherType.id),
+                otherRelationship: Value(relation),
+              );
               needsUpdate = true;
             } catch (_) {}
           }
@@ -321,7 +332,7 @@ class ReferralFormViewModel extends ChangeNotifier {
   // ========== 聯絡人資料 ==========
   void updateContactInfo({String? name, String? phone, String? address}) {
     if (_formCache == null) return;
-    
+
     final newName = name ?? _formCache!.contactName;
     final newPhone = phone ?? _formCache!.contactPhone;
     final newAddress = address ?? _formCache!.contactAddress;
@@ -357,7 +368,7 @@ class ReferralFormViewModel extends ChangeNotifier {
     String? secondary2,
   }) {
     if (_formCache == null) return;
-    
+
     final newPrimary = primary ?? _formCache!.primaryDiagnosis;
     final newSecondary1 = secondary1 ?? _formCache!.secondaryDiagnosis1;
     final newSecondary2 = secondary2 ?? _formCache!.secondaryDiagnosis2;
@@ -413,7 +424,7 @@ class ReferralFormViewModel extends ChangeNotifier {
   // ========== 轉診目的 ==========
   void updateReferralPurpose(int? purposeId, {String? otherPurpose}) {
     if (_formCache == null) return;
-    
+
     // purposeId is usually explicit, but otherPurpose can be updated independently
     // However, the original code had purposeId as nullable argument to clear selection or set it
     // But updateReferralPurpose is usually called with one or the other or both.
@@ -422,15 +433,16 @@ class ReferralFormViewModel extends ChangeNotifier {
     // The UI calls: updateReferralPurpose(selected ? purpose.id : null) -> this means explicit set/clear.
     // The UI also calls: updateReferralPurpose(viewModel.selectedPurpose?.id, otherPurpose: v) -> keeps ID, updates text.
     // So we need to handle "keep" vs "clear".
-    // For simplicity in this specific function, purposeId is usually passed explicitly. 
+    // For simplicity in this specific function, purposeId is usually passed explicitly.
     // BUT otherPurpose is the main risk.
-    
-    final newPurposeId = purposeId; // This one is tricky because null means "clear" in toggle logic
-    // Actually, looking at UI: `updateReferralPurpose(selected ? purpose.id : null)` 
+
+    final newPurposeId =
+        purposeId; // This one is tricky because null means "clear" in toggle logic
+    // Actually, looking at UI: `updateReferralPurpose(selected ? purpose.id : null)`
     // So null IS a valid value for purposeId (to clear it).
     // But when updating otherPurpose text: `updateReferralPurpose(viewModel.selectedPurpose?.id, otherPurpose: v)`
     // It passes the CURRENT ID. So that's safe.
-    
+
     final newOtherPurpose = otherPurpose ?? _formCache!.otherPurpose;
 
     _formCache = _formCache!.copyWith(
@@ -480,11 +492,8 @@ class ReferralFormViewModel extends ChangeNotifier {
   }
 
   Future<void> updateDoctorFromStaff(MedicalStaffData staff) async {
-    updateDoctorInfo(
-      name: staff.name,
-      department: staff.department,
-    );
-    
+    updateDoctorInfo(name: staff.name, department: staff.department);
+
     if (staff.signature != null) {
       await updateDoctorSignature(staff.signature!);
     }
@@ -529,16 +538,44 @@ class ReferralFormViewModel extends ChangeNotifier {
       hospitalAddress: Value(newAddress),
     );
     notifyListeners();
-    _debounceSave(
-      () => db.referralFormDao.updateHospitalInfo(
+    _debounceSave(() async {
+      await db.referralFormDao.updateHospitalInfo(
         _formCache!.formId,
         name: newName,
         dept: newDept,
         doctor: newDoctor,
         phone: newPhone,
         address: newAddress,
-      ),
+      );
+      if (name != null) {
+        await _syncHospitalNameToTreatment(newName);
+      }
+      return 0;
+    });
+  }
+
+  Future<void> _syncHospitalNameToTreatment(String? hospitalName) async {
+    final treatment = await db.treatmentDao.getTreatment(medicalId);
+    if (treatment == null) return;
+
+    final trimmedName = hospitalName?.trim();
+    final normalizedName = (trimmedName?.isNotEmpty ?? false)
+        ? trimmedName
+        : null;
+
+    ReferralHospitalData? matchedHospital;
+    if (normalizedName != null) {
+      matchedHospital = refService.referralHospitals.where((hospital) {
+        return !hospital.isOther && hospital.name.trim() == normalizedName;
+      }).firstOrNull;
+    }
+
+    final updatedTreatment = treatment.copyWith(
+      referralHospitalId: Value(matchedHospital?.id),
+      referralHospitalFinal: Value(matchedHospital?.name ?? normalizedName),
     );
+
+    await db.treatmentDao.updateTreatment(updatedTreatment.toCompanion(true));
   }
 
   // ========== 安排就醫 ==========
@@ -581,12 +618,12 @@ class ReferralFormViewModel extends ChangeNotifier {
   }) {
     if (_formCache == null) return;
 
-    // relationshipId usually explicitly set/changed. 
+    // relationshipId usually explicitly set/changed.
     // If it's passed as null, check if we intend to clear it?
     // The UI: updateConsent(relationshipId: v.id) -> explicit.
     // The UI date: updateConsent(relationshipId: selectedRelationship?.id, consentDateTime: date) -> preserves ID.
     // So if relationshipId is passed, use it. If null, use existing?
-    // Wait, if I want to CLEAR relationshipId, I'd pass null. 
+    // Wait, if I want to CLEAR relationshipId, I'd pass null.
     // But optional params default to null. So we can't distinguish "not provided" vs "explicit null".
     // In Dart, we can't unless we use a wrapper.
     // However, looking at usage:
@@ -601,7 +638,7 @@ class ReferralFormViewModel extends ChangeNotifier {
     // Then I can never clear it by passing null.
     // But is there a case where we clear it? Usually no. Dropdowns select valid values.
     // So using ?? is safer for preventing accidental clears.
-    
+
     final newRelId = relationshipId ?? _formCache!.relationshipId;
     final newOther = otherRelationship ?? _formCache!.otherRelationship;
     final newDate = consentDateTime ?? _formCache!.consentDateTime;

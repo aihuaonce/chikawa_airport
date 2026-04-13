@@ -1,4 +1,4 @@
-﻿import 'dart:convert';
+import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
@@ -893,6 +893,35 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
     final fee = results[3] as AmbulanceFeeData?;
     final treatmentRecord = results[4] as AmbulanceTreatmentRecordData?;
 
+    // DEBUG: 顯示資料庫讀取的資料
+    print('=== DEBUG: 救護記錄表資料 ===');
+    print('medicalId: $medicalId');
+    print('ambulanceRecord: ${ambulanceRecord != null ? "exists" : "null"}');
+    if (ambulanceRecord != null) {
+      print('  - licensePlate: ${ambulanceRecord.licensePlate}');
+      print('  - dispatchTime: ${ambulanceRecord.dispatchTime}');
+      print('  - arrivalTime: ${ambulanceRecord.arrivalTime}');
+      print('  - hospitalId: ${ambulanceRecord.hospitalId}');
+    }
+    print('sceneRecord: ${sceneRecord != null ? "exists" : "null"}');
+    if (sceneRecord != null) {
+      print('  - patientComplaint: ${sceneRecord.patientComplaint}');
+      print('  - allergyStatus: ${sceneRecord.allergyStatus}');
+      print('  - historyStatus: ${sceneRecord.historyStatus}');
+    }
+    print('personalProperty: ${personalProperty != null ? "exists" : "null"}');
+    print('fee: ${fee != null ? "exists" : "null"}');
+    if (fee != null) {
+      print('  - ambulanceFee: ${fee.ambulanceFee}');
+      print('  - oxygenFee: ${fee.oxygenFee}');
+      print('  - paymentStatus: ${fee.paymentStatus}');
+    }
+    print('treatmentRecord: ${treatmentRecord != null ? "exists" : "null"}');
+    if (treatmentRecord != null) {
+      print('  - receivingHospital: ${treatmentRecord.receivingHospital}');
+    }
+    print('=== END DEBUG ===');
+
     final treatmentRecordId = treatmentRecord?.id;
     final joinedItems = treatmentRecordId == null
         ? <JoinedTreatmentItem>[]
@@ -1650,12 +1679,15 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
     final medicalId = row.record.medicalId;
 
     // 先取得 chiefComplaint 來獲取 ID
-    final chiefComplaintTmp = await db.treatmentDao.getChiefComplaint(medicalId);
-    
+    final chiefComplaintTmp = await db.treatmentDao.getChiefComplaint(
+      medicalId,
+    );
+
     final results = await Future.wait([
       db.flightDao.getFlightByMedicalId(medicalId),
       db.incidentDao.getByMedicalId(medicalId),
       db.treatmentDao.getTreatment(medicalId),
+      db.referralFormDao.getFormByMedicalId(medicalId),
       db.medicalFeeDao.getFeeByMedicalId(medicalId),
       db.treatmentDao.getStaffAssignments(medicalId),
       db.treatmentDao.getChiefComplaint(medicalId),
@@ -1663,20 +1695,23 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
       db.treatmentDao.getMedicalHistory(medicalId),
       db.treatmentDao.getHealthAssessments(medicalId),
       chiefComplaintTmp != null
-          ? db.treatmentDao.getChiefComplaintSymptomIds(chiefComplaintTmp.complaintId)
+          ? db.treatmentDao.getChiefComplaintSymptomIds(
+              chiefComplaintTmp.complaintId,
+            )
           : Future.value(<int>[]),
     ]);
 
     final flight = results[0] as FlightRecordData?;
     final incident = results[1] as IncidentRecordData?;
     final treatment = results[2] as TreatmentData?;
-    final fee = results[3] as MedicalFeeData?;
-    final staffAssignments = results[4] as List<MedicalStaffAssignmentData>;
-    final chiefComplaint = results[5] as ChiefComplaintData?;
-    final assessments = results[6] as List<MedicalAssessmentData>;
-    final medicalHistory = results[7] as MedicalHistoryData?;
-    final healthAssessments = results[8] as List<HealthAssessmentFormData>;
-    final selectedSymptomIds = results[9] as List<int>;
+    final referralForm = results[3] as ReferralFormData?;
+    final fee = results[4] as MedicalFeeData?;
+    final staffAssignments = results[5] as List<MedicalStaffAssignmentData>;
+    final chiefComplaint = results[6] as ChiefComplaintData?;
+    final assessments = results[7] as List<MedicalAssessmentData>;
+    final medicalHistory = results[8] as MedicalHistoryData?;
+    final healthAssessments = results[9] as List<HealthAssessmentFormData>;
+    final selectedSymptomIds = results[10] as List<int>;
 
     final transitLocations = flight == null
         ? []
@@ -1716,7 +1751,7 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
         ? ''
         : transitLocationList.map((l) => l!.name.trim()).join(', ');
     final transitIsTpe = transitLocationList.any((l) => l?.code == 'TPE');
-    
+
     // DEBUG: 經過地
     print('transitLocations count: ${transitLocations.length}');
     print('transitLocation: $transitLocation');
@@ -1764,14 +1799,16 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
     print('assessments count: ${assessments.length}');
     if (assessments.isNotEmpty) {
       final firstAssessment = assessments.first;
-      print('  - first assessment: temperature=${firstAssessment.temperature}, pulse=${firstAssessment.pulse}, breath=${firstAssessment.breath}');
+      print(
+        '  - first assessment: temperature=${firstAssessment.temperature}, pulse=${firstAssessment.pulse}, breath=${firstAssessment.breath}',
+      );
     }
     print('=== END DEBUG ===');
 
     // 找出有生命徵象資料的評估記錄
     MedicalAssessmentData? vitalSignsAssessment;
     MedicalAssessmentData? consciousnessAssessment;
-    
+
     for (final assessment in assessments) {
       if (assessment.temperature != null ||
           assessment.pulse != null ||
@@ -1783,7 +1820,7 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
         break;
       }
     }
-    
+
     // 找出有意識/理學檢查資料的評估記錄
     for (final assessment in assessments) {
       if (assessment.consciousnessLevelId != null ||
@@ -1821,6 +1858,12 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
           return refService.getMedicalStaffById(assignment.staffId)?.name ?? '';
         })
         .firstWhere((name) => name.isNotEmpty, orElse: () => '');
+    final ambulanceStaffName =
+        refService
+            .getMedicalStaffById(treatment?.ambulanceStaffId)
+            ?.name
+            .trim() ??
+        '';
 
     final totalFee = (fee?.consultFee ?? 0) + (fee?.ambulanceFee ?? 0);
     final medicalArrivalMinutes = _minutesBetween(
@@ -1880,8 +1923,8 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
           direction.isNotEmpty && !['入境', '過境', '出境'].contains(direction),
       otherTravelStatus:
           direction.isNotEmpty && !['入境', '過境', '出境'].contains(direction)
-              ? direction
-              : '',
+          ? direction
+          : '',
       dateYear: incidentDate.year.toString(),
       dateMonth: _twoDigits(incidentDate.month),
       dateDay: _twoDigits(incidentDate.day),
@@ -1956,8 +1999,11 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
           : '',
       healthAssessment: healthAssessmentEntries.isNotEmpty,
       healthAssessments: healthAssessmentEntries,
-      generalClearance: hasClearanceId || _containsAnyText(transportMethod, ['一般通關']),
-      emergencyClearance: hasExpeditedClearanceId || _containsAnyText(transportMethod, ['緊急通關']),
+      generalClearance:
+          hasClearanceId || _containsAnyText(transportMethod, ['一般通關']),
+      emergencyClearance:
+          hasExpeditedClearanceId ||
+          _containsAnyText(transportMethod, ['緊急通關']),
       emergencyPublicGate: _containsAnyText(transportMethod, ['公務門']),
       emergencyApron: _containsAnyText(transportMethod, ['機坪']),
       ambulanceClinic:
@@ -1969,8 +2015,14 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
       ambulancePrivateDetail: '',
       ambulanceFireDepartment: _containsAnyText(transportMethod, ['消防']),
       ambulanceFireDepartmentDetail: '',
-      transferHospital: _resolveTransferHospital(treatment, refService),
-      escortStaff: treatment?.assistStaff?.trim().isNotEmpty == true
+      transferHospital: _resolveTransferHospital(
+        treatment,
+        refService,
+        referralForm: referralForm,
+      ),
+      escortStaff: ambulanceStaffName.isNotEmpty
+          ? ambulanceStaffName
+          : treatment?.assistStaff?.trim().isNotEmpty == true
           ? treatment!.assistStaff!.trim()
           : staffNames.nurse,
       outreachFee: fee == null || fee.consultFee == 0
@@ -2023,7 +2075,10 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
       temperature: _formatReal(vitalSignsAssessment?.temperature),
       pulse: vitalSignsAssessment?.pulse?.toString() ?? '',
       breath: vitalSignsAssessment?.breath?.toString() ?? '',
-      bloodPressure: _formatBp(vitalSignsAssessment?.systolic, vitalSignsAssessment?.diastolic),
+      bloodPressure: _formatBp(
+        vitalSignsAssessment?.systolic,
+        vitalSignsAssessment?.diastolic,
+      ),
       spo2: vitalSignsAssessment?.spo2?.toString() ?? '',
       // 意識與理學檢查使用 consciousnessAssessment
       consciousnessClear: _containsAnyText(consciousnessLevel?.name, [
@@ -2267,15 +2322,15 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
     TreatmentData? treatment,
     TreatmentResultData? result,
   ) {
+    final fallback = treatment?.referralHospitalFinal?.trim();
+    if (fallback != null && fallback.isNotEmpty) {
+      return fallback;
+    }
     if (treatment?.referralHospitalId != null) {
       return refService
               .getReferralHospitalById(treatment!.referralHospitalId)
               ?.name ??
           '';
-    }
-    final fallback = treatment?.referralHospitalFinal?.trim();
-    if (fallback != null && fallback.isNotEmpty) {
-      return fallback;
     }
     final resultName = result?.name ?? '';
     if (resultName.contains('醫院')) {
@@ -2431,7 +2486,11 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
     final parts = <String>[];
 
     // 1. 主訴類別
-    final typeName = refService.getChiefComplaintTypeById(chiefComplaint.chiefComplaintTypeId)?.name ?? '';
+    final typeName =
+        refService
+            .getChiefComplaintTypeById(chiefComplaint.chiefComplaintTypeId)
+            ?.name ??
+        '';
     if (typeName.isNotEmpty) {
       parts.add(typeName);
     }
@@ -2460,7 +2519,7 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
       parts.add(supplementary);
     }
 
-    return parts.join('\n');
+    return parts.join(' ');
   }
 
   (String, String) _splitBp(String bp) {
@@ -2485,15 +2544,23 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
 
   String _resolveTransferHospital(
     TreatmentData? treatment,
-    ReferenceService refService,
-  ) {
+    ReferenceService refService, {
+    ReferralFormData? referralForm,
+  }) {
+    final formHospital = referralForm?.hospitalName?.trim() ?? '';
+    if (formHospital.isNotEmpty) return formHospital;
+
+    final fallback = treatment?.referralHospitalFinal?.trim() ?? '';
+    if (fallback.isNotEmpty) return fallback;
+
     if (treatment?.referralHospitalId != null) {
       return refService
               .getReferralHospitalById(treatment!.referralHospitalId)
               ?.name ??
           '';
     }
-    return treatment?.referralHospitalFinal?.trim() ?? '';
+
+    return '';
   }
 
   String _mapSexToChinese(String value) {

@@ -172,6 +172,21 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
       _glucoseController.text = treatment.glucose ?? '';
       _oxygenFlowController.text = treatment.oxygenFlow?.toString() ?? '';
 
+      // 從 transportMethod 解析通關方式和救護車來源
+      final tm = treatment.transportMethod ?? '';
+      if (tm.contains('緊急通關')) {
+        _clearanceMethod = '緊急通關';
+      } else if (tm.contains('一般通關')) {
+        _clearanceMethod = '一般通關';
+      }
+      if (tm.contains('民間')) {
+        _ambulanceSource = '民間';
+      } else if (tm.contains('消防')) {
+        _ambulanceSource = '消防隊';
+      } else {
+        _ambulanceSource = '醫療中心';
+      }
+
       // 狀態變數同步
       if (treatment.intubationMethod != null) {
         _intubationMethod = treatment.intubationMethod!;
@@ -1300,7 +1315,10 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
                       _buildSegmentedControl(
                         ['一般通關', '緊急通關'],
                         _clearanceMethod,
-                        (v) => setState(() => _clearanceMethod = v),
+                        (v) {
+                          setState(() => _clearanceMethod = v);
+                          _syncReferralTransportSettings(viewModel);
+                        },
                       ),
                     ),
                     const SizedBox(height: 20),
@@ -1309,7 +1327,10 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
                       _buildSegmentedControl(
                         ['醫療中心', '民間', '消防隊'],
                         _ambulanceSource,
-                        (v) => setState(() => _ambulanceSource = v),
+                        (v) {
+                          setState(() => _ambulanceSource = v);
+                          _syncReferralTransportSettings(viewModel);
+                        },
                       ),
                     ),
                   ],
@@ -1923,7 +1944,10 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
                   _clearanceMethod = '一般通關';
                   _ambulanceSource = '醫療中心';
                 });
+                viewModel.updateTransportRequired(false);
+                viewModel.updateTransportMethod(null);
                 viewModel.updateClearanceId(null);
+                viewModel.updateExpeditedClearanceId(null);
                 viewModel.updateReferralHospitalId(null);
                 viewModel.updateReferralHospitalFinal(null);
                 viewModel.updateAmbulanceStaffId(null);
@@ -1938,7 +1962,10 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
               }
             }
             // 使用 ViewModel 的多對多方法
-            viewModel.toggleActionItem(item.id);
+            await viewModel.toggleActionItem(item.id);
+            if (sel && item.name == '建議轉診') {
+              _syncReferralTransportSettings(viewModel);
+            }
           },
           selectedColor: primaryColor.withValues(alpha: 0.1),
           checkmarkColor: primaryColor,
@@ -2839,6 +2866,19 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
   }
 
   // 生命徵象變更時觸發自動儲存
+  void _syncReferralTransportSettings(TreatmentViewModel viewModel) {
+    final transportMethod = '$_clearanceMethod / $_ambulanceSource';
+
+    viewModel.updateTransportRequired(true);
+    viewModel.updateTransportMethod(transportMethod);
+
+    if (_clearanceMethod == '一般通關') {
+      viewModel.updateExpeditedClearanceId(null);
+    } else if (_clearanceMethod == '緊急通關') {
+      viewModel.updateClearanceId(null);
+    }
+  }
+
   void _onVitalSignChanged(TreatmentViewModel viewModel) {
     // 更新快取並觸發自動儲存（參考 incident_view.dart 模式）
     viewModel.updateVitalSignsCache(
