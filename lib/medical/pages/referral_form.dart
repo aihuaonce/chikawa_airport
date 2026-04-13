@@ -233,11 +233,29 @@ class _ReferralFormState extends State<ReferralForm> {
     _controllersInitialized = true;
   }
 
+  void _syncHospitalControllers(ReferralFormData? form) {
+    if (form == null) return;
+
+    final hospitalName = form.hospitalName ?? '';
+    final hospitalPhone = form.hospitalPhone ?? '';
+    final hospitalAddress = form.hospitalAddress ?? '';
+
+    if (_hospitalNameController.text != hospitalName) {
+      _hospitalNameController.text = hospitalName;
+    }
+    if (_hospitalPhoneController.text != hospitalPhone) {
+      _hospitalPhoneController.text = hospitalPhone;
+    }
+    if (_hospitalAddressController.text != hospitalAddress) {
+      _hospitalAddressController.text = hospitalAddress;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<ReferralFormViewModel>();
     final treatmentViewModel = context.watch<TreatmentViewModel>();
-    
+
     // 檢查是否有轉診需求 (hasAmbulance)
     final medicalRecord = treatmentViewModel.medicalRecord;
     if (medicalRecord == null || !medicalRecord.hasAmbulance) {
@@ -252,6 +270,7 @@ class _ReferralFormState extends State<ReferralForm> {
 
     // 同步 ViewModel 資料到 Controllers
     _updateControllers(viewModel, treatmentViewModel);
+    _syncHospitalControllers(viewModel.form);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -470,30 +489,40 @@ class _ReferralFormState extends State<ReferralForm> {
                     const SizedBox(width: 8),
                     GestureDetector(
                       onTap: () async {
-                        final result = await ReferenceSearchSheet.show<MedicalStaffData>(
-                          context,
-                          title: '選擇醫師',
-                          searchFunction: (query) async {
-                             final staff = viewModel.refService.medicalStaffList
-                                .where((s) => s.role == 'DOCTOR' || s.role == 'PHYSICIAN')
-                                .toList();
-                             if (query.isEmpty) return staff;
-                             return staff.where((s) => s.name.contains(query)).toList();
-                          },
-                          itemBuilder: (context, item, isSelected) {
-                            return ListTile(
-                              title: Text(item.name),
-                              subtitle: Text(item.department ?? ''),
+                        final result =
+                            await ReferenceSearchSheet.show<MedicalStaffData>(
+                              context,
+                              title: '選擇醫師',
+                              searchFunction: (query) async {
+                                final staff = viewModel
+                                    .refService
+                                    .medicalStaffList
+                                    .where(
+                                      (s) =>
+                                          s.role == 'DOCTOR' ||
+                                          s.role == 'PHYSICIAN',
+                                    )
+                                    .toList();
+                                if (query.isEmpty) return staff;
+                                return staff
+                                    .where((s) => s.name.contains(query))
+                                    .toList();
+                              },
+                              itemBuilder: (context, item, isSelected) {
+                                return ListTile(
+                                  title: Text(item.name),
+                                  subtitle: Text(item.department ?? ''),
+                                );
+                              },
                             );
-                          },
-                        );
-                        
+
                         if (result != null) {
-                           await viewModel.updateDoctorFromStaff(result);
-                           if (mounted) {
-                             _doctorNameController.text = result.name;
-                             _doctorDepartmentController.text = result.department ?? '';
-                           }
+                          await viewModel.updateDoctorFromStaff(result);
+                          if (mounted) {
+                            _doctorNameController.text = result.name;
+                            _doctorDepartmentController.text =
+                                result.department ?? '';
+                          }
                         }
                       },
                       child: Container(
@@ -914,7 +943,6 @@ class _ReferralFormState extends State<ReferralForm> {
     );
   }
 
-
   Widget _buildConsentSection(ReferralFormViewModel viewModel) {
     final selectedRelationship = viewModel.selectedRelationship;
     final isOther =
@@ -1065,8 +1093,7 @@ class _ReferralFormState extends State<ReferralForm> {
           itemBuilder: (context, item, isSelected) {
             return ListTile(
               title: Text(item.name),
-              subtitle:
-                  item.nameEn != null ? Text(item.nameEn!) : null,
+              subtitle: item.nameEn != null ? Text(item.nameEn!) : null,
               trailing: isSelected
                   ? const Icon(Icons.check, color: primaryColor)
                   : null,
@@ -1092,14 +1119,15 @@ class _ReferralFormState extends State<ReferralForm> {
             Text(
               selectedRelationship != null
                   ? (selectedRelationship.nameEn != null &&
-                          selectedRelationship.nameEn!.isNotEmpty
-                      ? '${selectedRelationship.name} (${selectedRelationship.nameEn})'
-                      : selectedRelationship.name)
+                            selectedRelationship.nameEn!.isNotEmpty
+                        ? '${selectedRelationship.name} (${selectedRelationship.nameEn})'
+                        : selectedRelationship.name)
                   : '請選擇關係',
               style: TextStyle(
                 fontSize: 14,
-                color:
-                    selectedRelationship != null ? textDark : textMuted.withValues(alpha: 0.4),
+                color: selectedRelationship != null
+                    ? textDark
+                    : textMuted.withValues(alpha: 0.4),
               ),
             ),
             const Icon(Icons.arrow_drop_down, color: textMuted),

@@ -524,11 +524,22 @@ class ReferralFormViewModel extends ChangeNotifier {
   }) {
     if (_formCache == null) return;
 
+    final matchedHospital = name != null
+        ? _findReferralHospitalByName(name)
+        : null;
     final newName = name ?? _formCache!.hospitalName;
     final newDept = dept ?? _formCache!.hospitalDept;
     final newDoctor = doctor ?? _formCache!.hospitalDoctor;
-    final newPhone = phone ?? _formCache!.hospitalPhone;
-    final newAddress = address ?? _formCache!.hospitalAddress;
+    final newPhone =
+        phone ??
+        (name != null
+            ? (matchedHospital?.phone ?? _formCache!.hospitalPhone)
+            : _formCache!.hospitalPhone);
+    final newAddress =
+        address ??
+        (name != null
+            ? (matchedHospital?.address ?? _formCache!.hospitalAddress)
+            : _formCache!.hospitalAddress);
 
     _formCache = _formCache!.copyWith(
       hospitalName: Value(newName),
@@ -554,6 +565,15 @@ class ReferralFormViewModel extends ChangeNotifier {
     });
   }
 
+  ReferralHospitalData? _findReferralHospitalByName(String? hospitalName) {
+    final trimmed = hospitalName?.trim();
+    if (trimmed == null || trimmed.isEmpty) return null;
+
+    return refService.referralHospitals.where((hospital) {
+      return !hospital.isOther && hospital.name.trim() == trimmed;
+    }).firstOrNull;
+  }
+
   Future<void> _syncHospitalNameToTreatment(String? hospitalName) async {
     final treatment = await db.treatmentDao.getTreatment(medicalId);
     if (treatment == null) return;
@@ -563,12 +583,7 @@ class ReferralFormViewModel extends ChangeNotifier {
         ? trimmedName
         : null;
 
-    ReferralHospitalData? matchedHospital;
-    if (normalizedName != null) {
-      matchedHospital = refService.referralHospitals.where((hospital) {
-        return !hospital.isOther && hospital.name.trim() == normalizedName;
-      }).firstOrNull;
-    }
+    final matchedHospital = _findReferralHospitalByName(normalizedName);
 
     final updatedTreatment = treatment.copyWith(
       referralHospitalId: Value(matchedHospital?.id),
