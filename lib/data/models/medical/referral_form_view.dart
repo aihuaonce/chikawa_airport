@@ -330,17 +330,24 @@ class ReferralFormViewModel extends ChangeNotifier {
   }
 
   // ========== 聯絡人資料 ==========
-  void updateContactInfo({String? name, String? phone, String? address}) {
+  void updateContactInfo({
+    String? name,
+    String? phone,
+    String? address,
+    String? idNo,
+  }) {
     if (_formCache == null) return;
 
     final newName = name ?? _formCache!.contactName;
     final newPhone = phone ?? _formCache!.contactPhone;
     final newAddress = address ?? _formCache!.contactAddress;
+    final newIdNo = idNo ?? _formCache!.contactIdNo;
 
     _formCache = _formCache!.copyWith(
       contactName: Value(newName),
       contactPhone: Value(newPhone),
       contactAddress: Value(newAddress),
+      contactIdNo: Value(newIdNo),
     );
     notifyListeners();
     _debounceSave(
@@ -349,6 +356,7 @@ class ReferralFormViewModel extends ChangeNotifier {
         name: newName,
         phone: newPhone,
         address: newAddress,
+        idNo: newIdNo,
       ),
     );
   }

@@ -1101,17 +1101,50 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
     final cprShockItem = findItem(cprItems, '電擊');
     final otherOtherItem = findOther(otherItems);
 
+    int compareTimeText(String? a, String? b) {
+      final left = a?.trim() ?? '';
+      final right = b?.trim() ?? '';
+      if (left.isEmpty && right.isEmpty) return 0;
+      if (left.isEmpty) return 1;
+      if (right.isEmpty) return -1;
+      return left.compareTo(right);
+    }
+
+    final sortedMedicationLogs = [...medicationLogs]
+      ..sort((a, b) {
+        final timeCompare = compareTimeText(a.time, b.time);
+        if (timeCompare != 0) return timeCompare;
+        return a.id.compareTo(b.id);
+      });
+
     final medicationTime = List.filled(4, '');
     final medicationName = List.filled(4, '');
     final medicationRoute = List.filled(4, '');
     final medicationExecutor = List.filled(4, '');
-    for (var i = 0; i < medicationLogs.length && i < 4; i++) {
-      final log = medicationLogs[i];
+    for (var i = 0; i < sortedMedicationLogs.length && i < 4; i++) {
+      final log = sortedMedicationLogs[i];
       medicationTime[i] = log.time ?? '';
       medicationName[i] = log.drugName ?? '';
       medicationRoute[i] = _mergeStrings(log.route, log.dose);
       medicationExecutor[i] = log.emtName ?? '';
     }
+
+    final sortedVitalSigns = [...vitalSigns]
+      ..sort((a, b) {
+        final timeCompare = compareTimeText(a.time, b.time);
+        if (timeCompare != 0) return timeCompare;
+        return a.id.compareTo(b.id);
+      });
+    final preHospitalVitalSigns = sortedVitalSigns
+        .where((vs) => !vs.atHospital)
+        .toList();
+    final atHospitalVitalSigns = sortedVitalSigns
+        .where((vs) => vs.atHospital)
+        .toList();
+    final reportVitalSigns = <AmbulanceVitalSignData>[
+      ...preHospitalVitalSigns.take(2),
+      if (atHospitalVitalSigns.isNotEmpty) atHospitalVitalSigns.last,
+    ];
 
     final vsTime = List.filled(4, '');
     final vsConsciousness = List.filled(4, '');
@@ -1125,8 +1158,8 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
     final vsGcsV = List.filled(4, '');
     final vsGcsM = List.filled(4, '');
 
-    for (var i = 0; i < vitalSigns.length && i < 4; i++) {
-      final vs = vitalSigns[i];
+    for (var i = 0; i < reportVitalSigns.length && i < 4; i++) {
+      final vs = reportVitalSigns[i];
       final bp = vs.bloodPressure ?? '';
       final split = _splitBp(bp);
       vsTime[i] = vs.time ?? '';
@@ -1142,7 +1175,7 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
       vsGcsM[i] = vs.gcsM ?? '';
     }
 
-    final atHospital = vitalSigns.reversed.firstWhere(
+    final atHospital = sortedVitalSigns.reversed.firstWhere(
       (vs) => vs.atHospital,
       orElse: () =>
           AmbulanceVitalSignData(id: -1, recordId: -1, atHospital: false),
@@ -1206,6 +1239,8 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
       ..age = age
       ..guardian = guardian
       ..address = patient.address?.trim() ?? ''
+      ..propertyNote = personalProperty?.financialDetails?.trim() ?? ''
+      ..guardianSign = personalProperty?.custodianSignature
       ..propertyNone = personalProperty != null && !propertyHandled
       ..propertyHas = propertyHandled
       ..ntiEmergency = hasAcute || containsKey(acute, '昏迷')
@@ -1891,6 +1926,40 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
           ),
         )
         .toList();
+    final treatmentActionIds = treatment?.treatmentId == null
+        ? <int>[]
+        : await db.treatmentDao.getTreatmentActionIds(treatment!.treatmentId);
+    final patientDisplayName = patient.name?.trim().isNotEmpty == true
+        ? patient.name!.trim()
+        : patient.anonymizationName?.trim() ?? '';
+    final patientIdOrPassport = _resolveIdOrPassport(patient);
+    final refusalDateTime = referralForm?.consentDateTime ?? incidentDate;
+    final refusalSignatoryName =
+        referralForm?.contactName?.trim().isNotEmpty == true
+        ? referralForm!.contactName!.trim()
+        : patientDisplayName;
+    final refusalSignatoryIdNo =
+        referralForm?.contactIdNo?.trim().isNotEmpty == true
+        ? referralForm!.contactIdNo!.trim()
+        : patientIdOrPassport;
+    final refusalAddress =
+        referralForm?.contactAddress?.trim().isNotEmpty == true
+        ? referralForm!.contactAddress!.trim()
+        : patient.address?.trim() ?? '';
+    final refusalPhone = referralForm?.contactPhone?.trim().isNotEmpty == true
+        ? referralForm!.contactPhone!.trim()
+        : patient.telephone?.trim() ?? '';
+    final refusalRelationship =
+        referralForm?.otherRelationship?.trim().isNotEmpty == true
+        ? referralForm!.otherRelationship!.trim()
+        : (refusalSignatoryName == patientDisplayName &&
+                  refusalSignatoryIdNo == patientIdOrPassport
+              ? '本人'
+              : '');
+    final signedFourCopy = treatmentActionIds.any((actionId) {
+      final actionName = refService.getActionItemById(actionId)?.name ?? '';
+      return actionName.contains('簽四聯單');
+    });
 
     return MedicalServiceApplicationData(
       isCrew: visitReasonCode == 'crew',
@@ -1904,15 +1973,13 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
               !['crew', 'passenger', 'staff'].contains(visitReasonCode)
           ? visitReason?.name ?? ''
           : '',
-      patientName: patient.name?.trim().isNotEmpty == true
-          ? patient.name!.trim()
-          : patient.anonymizationName?.trim() ?? '',
+      patientName: patientDisplayName,
       birthYear: birthday == null ? '' : birthday.year.toString(),
       birthMonth: birthday == null ? '' : _twoDigits(birthday.month),
       birthDay: birthday == null ? '' : _twoDigits(birthday.day),
       isMale: _mapSexToChinese(sexName) == '男',
       isFemale: _mapSexToChinese(sexName) == '女',
-      idOrPassportNo: _resolveIdOrPassport(patient),
+      idOrPassportNo: patientIdOrPassport,
       nationality: nationality,
       airline: airline,
       flightNo: flight?.flightNumber.trim() ?? '',
@@ -2117,16 +2184,26 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
       abdomen: consciousnessAssessment?.abdomenExam?.trim() ?? '',
       extremity: consciousnessAssessment?.extremitiesExam?.trim() ?? '',
       tentativeDiagnosis: await _buildDiagnosisWithIcdNames(db, treatment),
-      signedFourCopy: fee?.userAgreed ?? false,
+      signedFourCopy: signedFourCopy,
       advisedReferral:
           _containsAnyText(treatmentResultName, ['轉', '醫院']) ||
           (treatment?.transportRequired ?? false),
       doctorName: staffNames.doctor,
       nurseName: staffNames.nurse,
       emtName: emtName,
-      refusalRelationship: '',
-      consentSignature: fee?.consenterSignature,
-      witnessSignature: fee?.witnessSignature,
+      refusalSignatoryName: refusalSignatoryName,
+      refusalSignatoryIdNo: refusalSignatoryIdNo,
+      refusalRelationship: refusalRelationship,
+      refusalAddress: refusalAddress,
+      refusalPhone: refusalPhone,
+      refusalDateYear: refusalDateTime.year.toString(),
+      refusalDateMonth: _twoDigits(refusalDateTime.month),
+      refusalDateDay: _twoDigits(refusalDateTime.day),
+      chargeConsentSignature: fee?.consenterSignature,
+      chargeWitnessSignature: fee?.witnessSignature,
+      referralConsentSignature:
+          referralForm?.consentSignature ?? fee?.consenterSignature,
+      referralWitnessSignature: fee?.witnessSignature,
       hasRefusal: _containsAnyText(treatmentResultName, ['拒絕']),
     );
   }

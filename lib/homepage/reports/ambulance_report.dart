@@ -751,21 +751,43 @@ Future<Uint8List> buildAmbulanceReportPdf(
                                         padding: const pw.EdgeInsets.symmetric(
                                           vertical: 0,
                                         ),
-                                        child: pw.Row(
+                                        child: pw.Column(
                                           mainAxisAlignment:
                                               pw.MainAxisAlignment.center,
                                           children: [
-                                            _chk(
-                                              '未經手',
-                                              d.propertyNone,
-                                              fillBlack: true,
+                                            pw.Row(
+                                              mainAxisAlignment:
+                                                  pw.MainAxisAlignment.center,
+                                              children: [
+                                                _chk(
+                                                  '未經手',
+                                                  d.propertyNone,
+                                                  fillBlack: true,
+                                                ),
+                                                pw.SizedBox(width: 3),
+                                                _chk(
+                                                  '有',
+                                                  d.propertyHas,
+                                                  fillBlack: true,
+                                                ),
+                                              ],
                                             ),
-                                            pw.SizedBox(width: 3),
-                                            _chk(
-                                              '有',
-                                              d.propertyHas,
-                                              fillBlack: true,
-                                            ),
+                                            if (d.propertyNote
+                                                .trim()
+                                                .isNotEmpty)
+                                              pw.Padding(
+                                                padding:
+                                                    const pw.EdgeInsets.only(
+                                                      top: 2,
+                                                      left: 3,
+                                                      right: 3,
+                                                    ),
+                                                child: pw.Text(
+                                                  d.propertyNote,
+                                                  style: ts9(),
+                                                  textAlign: pw.TextAlign.left,
+                                                ),
+                                              ),
                                           ],
                                         ),
                                       ),
@@ -2486,15 +2508,32 @@ Future<Uint8List> buildAmbulanceReportPdf(
                                                               ),
                                                             ),
                                                         child: i == 2
-                                                            ? pw.Text(
-                                                                '到院後\n檢傷站',
-                                                                style: ts(
-                                                                  sz: 5,
-                                                                  bold: true,
-                                                                ),
-                                                                textAlign: pw
-                                                                    .TextAlign
+                                                            ? pw.Column(
+                                                                mainAxisAlignment: pw
+                                                                    .MainAxisAlignment
                                                                     .center,
+                                                                children: [
+                                                                  if (d
+                                                                      .vsTime[i]
+                                                                      .isNotEmpty)
+                                                                    pw.Text(
+                                                                      d.vsTime[i],
+                                                                      style: ts(
+                                                                        sz: 6,
+                                                                      ),
+                                                                    ),
+                                                                  pw.Text(
+                                                                    '到院後\n檢傷站',
+                                                                    style: ts(
+                                                                      sz: 5,
+                                                                      bold:
+                                                                          true,
+                                                                    ),
+                                                                    textAlign: pw
+                                                                        .TextAlign
+                                                                        .center,
+                                                                  ),
+                                                                ],
                                                               )
                                                             : pw.Text(
                                                                 d.vsTime[i],
@@ -2532,19 +2571,10 @@ Future<Uint8List> buildAmbulanceReportPdf(
                                                                     ),
                                                               ),
                                                             ),
-                                                        child: i == 0
-                                                            ? pw.Text(
-                                                                '',
-                                                                style: ts(
-                                                                  sz: 6,
-                                                                ),
-                                                              )
-                                                            : pw.Text(
-                                                                d.vsConsciousness[i],
-                                                                style: ts(
-                                                                  sz: 6,
-                                                                ),
-                                                              ),
+                                                        child: pw.Text(
+                                                          d.vsConsciousness[i],
+                                                          style: ts(sz: 6),
+                                                        ),
                                                       ),
                                                     ),
                                                   ),
@@ -2575,19 +2605,10 @@ Future<Uint8List> buildAmbulanceReportPdf(
                                                                     ),
                                                               ),
                                                             ),
-                                                        child: i == 0
-                                                            ? pw.Text(
-                                                                '',
-                                                                style: ts(
-                                                                  sz: 6,
-                                                                ),
-                                                              )
-                                                            : pw.Text(
-                                                                d.vsTemp[i],
-                                                                style: ts(
-                                                                  sz: 6,
-                                                                ),
-                                                              ),
+                                                        child: pw.Text(
+                                                          d.vsTemp[i],
+                                                          style: ts(sz: 6),
+                                                        ),
                                                       ),
                                                     ),
                                                   ),
@@ -2618,19 +2639,10 @@ Future<Uint8List> buildAmbulanceReportPdf(
                                                                     ),
                                                               ),
                                                             ),
-                                                        child: i == 0
-                                                            ? pw.Text(
-                                                                '',
-                                                                style: ts(
-                                                                  sz: 6,
-                                                                ),
-                                                              )
-                                                            : pw.Text(
-                                                                d.vsPulse[i],
-                                                                style: ts(
-                                                                  sz: 6,
-                                                                ),
-                                                              ),
+                                                        child: pw.Text(
+                                                          d.vsPulse[i],
+                                                          style: ts(sz: 6),
+                                                        ),
                                                       ),
                                                     ),
                                                   ),
@@ -2661,19 +2673,10 @@ Future<Uint8List> buildAmbulanceReportPdf(
                                                                     ),
                                                               ),
                                                             ),
-                                                        child: i == 0
-                                                            ? pw.Text(
-                                                                '',
-                                                                style: ts(
-                                                                  sz: 6,
-                                                                ),
-                                                              )
-                                                            : pw.Text(
-                                                                d.vsBreathing[i],
-                                                                style: ts(
-                                                                  sz: 6,
-                                                                ),
-                                                              ),
+                                                        child: pw.Text(
+                                                          d.vsBreathing[i],
+                                                          style: ts(sz: 6),
+                                                        ),
                                                       ),
                                                     ),
                                                   ),
@@ -2704,19 +2707,15 @@ Future<Uint8List> buildAmbulanceReportPdf(
                                                                     ),
                                                               ),
                                                             ),
-                                                        child: i == 0
-                                                            ? pw.Text(
-                                                                '',
-                                                                style: ts(
-                                                                  sz: 6,
-                                                                ),
-                                                              )
-                                                            : pw.Text(
-                                                                '${d.vsBPSys[i]} / ${d.vsBPDia[i]}',
-                                                                style: ts(
-                                                                  sz: 6,
-                                                                ),
-                                                              ),
+                                                        child: pw.Text(
+                                                          d.vsBPSys[i].isEmpty &&
+                                                                  d
+                                                                      .vsBPDia[i]
+                                                                      .isEmpty
+                                                              ? ''
+                                                              : '${d.vsBPSys[i]} / ${d.vsBPDia[i]}',
+                                                          style: ts(sz: 6),
+                                                        ),
                                                       ),
                                                     ),
                                                   ),
@@ -2748,7 +2747,9 @@ Future<Uint8List> buildAmbulanceReportPdf(
                                                               ),
                                                             ),
                                                         child: pw.Text(
-                                                          '${d.vsSpO2[i]}%',
+                                                          d.vsSpO2[i].isEmpty
+                                                              ? ''
+                                                              : '${d.vsSpO2[i]}%',
                                                           style: ts(sz: 6),
                                                         ),
                                                       ),
@@ -2775,75 +2776,73 @@ Future<Uint8List> buildAmbulanceReportPdf(
                                                                     ),
                                                               ),
                                                             ),
-                                                        child: i == 0
-                                                            ? pw.Text(
-                                                                'E   V   M',
+                                                        child: pw.RichText(
+                                                          text: pw.TextSpan(
+                                                            children: [
+                                                              pw.TextSpan(
+                                                                text:
+                                                                    d
+                                                                        .vsGcsE[i]
+                                                                        .isEmpty
+                                                                    ? ''
+                                                                    : 'E${d.vsGcsE[i]}',
                                                                 style: ts(
                                                                   sz: 6,
                                                                   bold: true,
                                                                 ),
-                                                              )
-                                                            : pw.RichText(
-                                                                text: pw.TextSpan(
-                                                                  children: [
-                                                                    pw.TextSpan(
-                                                                      text:
-                                                                          d.vsGcsE[i].isEmpty
-                                                                          ? ''
-                                                                          : 'E${d.vsGcsE[i]}',
-                                                                      style: ts(
-                                                                        sz: 6,
-                                                                        bold:
-                                                                            true,
-                                                                      ),
-                                                                    ),
-                                                                    pw.TextSpan(
-                                                                      text:
-                                                                          d.vsGcsE[i].isEmpty
-                                                                          ? ''
-                                                                          : '   V   ',
-                                                                      style: ts(
-                                                                        sz: 6,
-                                                                        bold:
-                                                                            true,
-                                                                      ),
-                                                                    ),
-                                                                    pw.TextSpan(
-                                                                      text:
-                                                                          d.vsGcsV[i].isEmpty
-                                                                          ? ''
-                                                                          : '${d.vsGcsV[i]}',
-                                                                      style: ts(
-                                                                        sz: 6,
-                                                                        bold:
-                                                                            true,
-                                                                      ),
-                                                                    ),
-                                                                    pw.TextSpan(
-                                                                      text:
-                                                                          d.vsGcsV[i].isEmpty
-                                                                          ? ''
-                                                                          : '   M   ',
-                                                                      style: ts(
-                                                                        sz: 6,
-                                                                        bold:
-                                                                            true,
-                                                                      ),
-                                                                    ),
-                                                                    pw.TextSpan(
-                                                                      text:
-                                                                          d.vsGcsM[i].isEmpty
-                                                                          ? ''
-                                                                          : d.vsGcsM[i],
-                                                                      style: ts(
-                                                                        sz: 6,
-                                                                        bold:
-                                                                            true,
-                                                                      ),
-                                                                    ),
-                                                                  ],
+                                                              ),
+                                                              pw.TextSpan(
+                                                                text:
+                                                                    d.vsGcsV[i].isEmpty &&
+                                                                        d
+                                                                            .vsGcsM[i]
+                                                                            .isEmpty
+                                                                    ? ''
+                                                                    : '   V',
+                                                                style: ts(
+                                                                  sz: 6,
+                                                                  bold: true,
                                                                 ),
                                                               ),
+                                                              pw.TextSpan(
+                                                                text:
+                                                                    d
+                                                                        .vsGcsV[i]
+                                                                        .isEmpty
+                                                                    ? ''
+                                                                    : d.vsGcsV[i],
+                                                                style: ts(
+                                                                  sz: 6,
+                                                                  bold: true,
+                                                                ),
+                                                              ),
+                                                              pw.TextSpan(
+                                                                text:
+                                                                    d
+                                                                        .vsGcsM[i]
+                                                                        .isEmpty
+                                                                    ? ''
+                                                                    : '   M',
+                                                                style: ts(
+                                                                  sz: 6,
+                                                                  bold: true,
+                                                                ),
+                                                              ),
+                                                              pw.TextSpan(
+                                                                text:
+                                                                    d
+                                                                        .vsGcsM[i]
+                                                                        .isEmpty
+                                                                    ? ''
+                                                                    : d.vsGcsM[i],
+                                                                style: ts(
+                                                                  sz: 6,
+                                                                  bold: true,
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
                                                       ),
                                                     ),
                                                   ),

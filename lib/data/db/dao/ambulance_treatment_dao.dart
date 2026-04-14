@@ -4,15 +4,17 @@ import '../tables/ambulance_treatment_tables.dart';
 
 part 'ambulance_treatment_dao.g.dart';
 
-@DriftAccessor(tables: [
-  AmbulanceTreatmentRecords,
-  AmbulanceTreatmentCategories,
-  AmbulanceTreatmentItems,
-  AmbulanceTreatmentRecordItems,
-  AmbulanceMedicationLogs,
-  AmbulanceVitalSigns,
-  AmbulanceEscortStaff,
-])
+@DriftAccessor(
+  tables: [
+    AmbulanceTreatmentRecords,
+    AmbulanceTreatmentCategories,
+    AmbulanceTreatmentItems,
+    AmbulanceTreatmentRecordItems,
+    AmbulanceMedicationLogs,
+    AmbulanceVitalSigns,
+    AmbulanceEscortStaff,
+  ],
+)
 class AmbulanceTreatmentDao extends DatabaseAccessor<AppDatabase>
     with _$AmbulanceTreatmentDaoMixin {
   AmbulanceTreatmentDao(super.db);
@@ -20,7 +22,9 @@ class AmbulanceTreatmentDao extends DatabaseAccessor<AppDatabase>
   // --- Initialization ---
 
   Future<void> initializeTreatmentData() async {
-    final count = await (select(ambulanceTreatmentCategories).get()).then((l) => l.length);
+    final count = await (select(
+      ambulanceTreatmentCategories,
+    ).get()).then((l) => l.length);
     if (count > 0) return;
 
     await batch((batch) async {
@@ -33,8 +37,18 @@ class AmbulanceTreatmentDao extends DatabaseAccessor<AppDatabase>
         ),
       );
       final airwayItems = [
-        '口咽呼吸道', '鼻咽呼吸道', '抽吸', '哈姆立克法', '鼻管', 
-        '面罩', '非再呼吸型面罩', 'BVM', 'LMA', 'I-Gel', '氣管內管', '其它'
+        '口咽呼吸道',
+        '鼻咽呼吸道',
+        '抽吸',
+        '哈姆立克法',
+        '鼻管',
+        '面罩',
+        '非再呼吸型面罩',
+        'BVM',
+        'LMA',
+        'I-Gel',
+        '氣管內管',
+        '其它',
       ];
       _insertItems(batch, airwayId, airwayItems);
 
@@ -47,7 +61,13 @@ class AmbulanceTreatmentDao extends DatabaseAccessor<AppDatabase>
         ),
       );
       final traumaItems = [
-        '頸圈', '清洗傷口', '止血、包紮', '骨折固定', '長背板固定', '鏟式擔架固定', '其它'
+        '頸圈',
+        '清洗傷口',
+        '止血、包紮',
+        '骨折固定',
+        '長背板固定',
+        '鏟式擔架固定',
+        '其它',
       ];
       _insertItems(batch, traumaId, traumaItems);
 
@@ -114,9 +134,9 @@ class AmbulanceTreatmentDao extends DatabaseAccessor<AppDatabase>
   // --- Reference Getters ---
 
   Future<List<AmbulanceTreatmentCategoryData>> getCategories() {
-    return (select(ambulanceTreatmentCategories)
-          ..orderBy([(t) => OrderingTerm.asc(t.sortOrder)]))
-        .get();
+    return (select(
+      ambulanceTreatmentCategories,
+    )..orderBy([(t) => OrderingTerm.asc(t.sortOrder)])).get();
   }
 
   Future<List<AmbulanceTreatmentItemData>> getItemsByCategory(int catId) {
@@ -125,10 +145,14 @@ class AmbulanceTreatmentDao extends DatabaseAccessor<AppDatabase>
           ..orderBy([(t) => OrderingTerm.asc(t.sortOrder)]))
         .get();
   }
-  
+
   // Also provide a way to get items by category code if needed
-  Future<List<AmbulanceTreatmentItemData>> getItemsByCategoryCode(String code) async {
-    final cat = await (select(ambulanceTreatmentCategories)..where((t) => t.code.equals(code))).getSingleOrNull();
+  Future<List<AmbulanceTreatmentItemData>> getItemsByCategoryCode(
+    String code,
+  ) async {
+    final cat = await (select(
+      ambulanceTreatmentCategories,
+    )..where((t) => t.code.equals(code))).getSingleOrNull();
     if (cat == null) return [];
     return getItemsByCategory(cat.id);
   }
@@ -136,7 +160,9 @@ class AmbulanceTreatmentDao extends DatabaseAccessor<AppDatabase>
   // --- Record CRUD ---
 
   Future<AmbulanceTreatmentRecordData?> getRecord(int medicalId) {
-    return (select(ambulanceTreatmentRecords)..where((t) => t.medicalId.equals(medicalId))).getSingleOrNull();
+    return (select(
+      ambulanceTreatmentRecords,
+    )..where((t) => t.medicalId.equals(medicalId))).getSingleOrNull();
   }
 
   // Create or Update Record
@@ -144,9 +170,11 @@ class AmbulanceTreatmentDao extends DatabaseAccessor<AppDatabase>
     // Check if exists
     final medicalId = companion.medicalId.value;
     final existing = await getRecord(medicalId);
-    
+
     if (existing != null) {
-      await (update(ambulanceTreatmentRecords)..where((t) => t.id.equals(existing.id))).write(companion);
+      await (update(
+        ambulanceTreatmentRecords,
+      )..where((t) => t.id.equals(existing.id))).write(companion);
       return existing.id;
     } else {
       return await into(ambulanceTreatmentRecords).insert(companion);
@@ -156,18 +184,30 @@ class AmbulanceTreatmentDao extends DatabaseAccessor<AppDatabase>
   // --- Item Links Management ---
 
   Future<List<AmbulanceTreatmentRecordItemData>> getRecordItems(int recordId) {
-    return (select(ambulanceTreatmentRecordItems)..where((t) => t.recordId.equals(recordId))).get();
+    return (select(
+      ambulanceTreatmentRecordItems,
+    )..where((t) => t.recordId.equals(recordId))).get();
   }
-  
+
   // Get joined data (Item + Link Details)
   Future<List<JoinedTreatmentItem>> getJoinedRecordItems(int recordId) async {
     final query = select(ambulanceTreatmentRecordItems).join([
-      innerJoin(ambulanceTreatmentItems, ambulanceTreatmentItems.id.equalsExp(ambulanceTreatmentRecordItems.itemId)),
-      innerJoin(ambulanceTreatmentCategories, ambulanceTreatmentCategories.id.equalsExp(ambulanceTreatmentItems.categoryId)),
+      innerJoin(
+        ambulanceTreatmentItems,
+        ambulanceTreatmentItems.id.equalsExp(
+          ambulanceTreatmentRecordItems.itemId,
+        ),
+      ),
+      innerJoin(
+        ambulanceTreatmentCategories,
+        ambulanceTreatmentCategories.id.equalsExp(
+          ambulanceTreatmentItems.categoryId,
+        ),
+      ),
     ]);
-    
+
     query.where(ambulanceTreatmentRecordItems.recordId.equals(recordId));
-    
+
     final rows = await query.get();
     return rows.map((row) {
       return JoinedTreatmentItem(
@@ -178,32 +218,44 @@ class AmbulanceTreatmentDao extends DatabaseAccessor<AppDatabase>
     }).toList();
   }
 
-  Future<void> addOrUpdateItemLink(AmbulanceTreatmentRecordItemsCompanion companion) async {
-     // Check if link exists for this record and item
-     final recordId = companion.recordId.value;
-     final itemId = companion.itemId.value;
-     
-     final existing = await (select(ambulanceTreatmentRecordItems)
-       ..where((t) => t.recordId.equals(recordId) & t.itemId.equals(itemId))
-     ).getSingleOrNull();
-     
-     if (existing != null) {
-       await (update(ambulanceTreatmentRecordItems)..where((t) => t.id.equals(existing.id))).write(companion);
-     } else {
-       await into(ambulanceTreatmentRecordItems).insert(companion);
-     }
+  Future<void> addOrUpdateItemLink(
+    AmbulanceTreatmentRecordItemsCompanion companion,
+  ) async {
+    // Check if link exists for this record and item
+    final recordId = companion.recordId.value;
+    final itemId = companion.itemId.value;
+
+    final existing =
+        await (select(ambulanceTreatmentRecordItems)..where(
+              (t) => t.recordId.equals(recordId) & t.itemId.equals(itemId),
+            ))
+            .getSingleOrNull();
+
+    if (existing != null) {
+      await (update(
+        ambulanceTreatmentRecordItems,
+      )..where((t) => t.id.equals(existing.id))).write(companion);
+    } else {
+      await into(ambulanceTreatmentRecordItems).insert(companion);
+    }
   }
 
   Future<void> removeItemLink(int recordId, int itemId) async {
     await (delete(ambulanceTreatmentRecordItems)
-      ..where((t) => t.recordId.equals(recordId) & t.itemId.equals(itemId))
-    ).go();
+          ..where((t) => t.recordId.equals(recordId) & t.itemId.equals(itemId)))
+        .go();
   }
 
   // --- Medication Logs ---
 
   Future<List<AmbulanceMedicationLogData>> getMedicationLogs(int recordId) {
-    return (select(ambulanceMedicationLogs)..where((t) => t.recordId.equals(recordId))).get();
+    return (select(ambulanceMedicationLogs)
+          ..where((t) => t.recordId.equals(recordId))
+          ..orderBy([
+            (t) => OrderingTerm.asc(t.time),
+            (t) => OrderingTerm.asc(t.id),
+          ]))
+        .get();
   }
 
   Future<int> addMedicationLog(AmbulanceMedicationLogsCompanion companion) {
@@ -211,24 +263,34 @@ class AmbulanceTreatmentDao extends DatabaseAccessor<AppDatabase>
   }
 
   Future<void> deleteMedicationLog(int id) {
-    return (delete(ambulanceMedicationLogs)..where((t) => t.id.equals(id))).go();
+    return (delete(
+      ambulanceMedicationLogs,
+    )..where((t) => t.id.equals(id))).go();
   }
 
   // --- Vital Signs ---
 
   Future<List<AmbulanceVitalSignData>> getVitalSigns(int recordId) {
-    return (select(ambulanceVitalSigns)..where((t) => t.recordId.equals(recordId))).get();
+    return (select(ambulanceVitalSigns)
+          ..where((t) => t.recordId.equals(recordId))
+          ..orderBy([
+            (t) => OrderingTerm.asc(t.time),
+            (t) => OrderingTerm.asc(t.id),
+          ]))
+        .get();
   }
 
   Future<int> addVitalSign(AmbulanceVitalSignsCompanion companion) {
     return into(ambulanceVitalSigns).insert(companion);
   }
-  
+
   Future<void> updateVitalSign(AmbulanceVitalSignsCompanion companion) async {
-     // Assuming id is present in companion for updates
-     if (companion.id.present) {
-       await (update(ambulanceVitalSigns)..where((t) => t.id.equals(companion.id.value))).write(companion);
-     }
+    // Assuming id is present in companion for updates
+    if (companion.id.present) {
+      await (update(
+        ambulanceVitalSigns,
+      )..where((t) => t.id.equals(companion.id.value))).write(companion);
+    }
   }
 
   Future<void> deleteVitalSign(int id) {
@@ -238,7 +300,9 @@ class AmbulanceTreatmentDao extends DatabaseAccessor<AppDatabase>
   // --- Escort Staff ---
 
   Future<List<AmbulanceEscortStaffData>> getEscortStaff(int recordId) {
-    return (select(ambulanceEscortStaff)..where((t) => t.recordId.equals(recordId))).get();
+    return (select(
+      ambulanceEscortStaff,
+    )..where((t) => t.recordId.equals(recordId))).get();
   }
 
   Future<int> addEscortStaff(AmbulanceEscortStaffCompanion companion) {
@@ -254,6 +318,10 @@ class JoinedTreatmentItem {
   final AmbulanceTreatmentItemData item;
   final AmbulanceTreatmentRecordItemData link;
   final AmbulanceTreatmentCategoryData category;
-  
-  JoinedTreatmentItem({required this.item, required this.link, required this.category});
+
+  JoinedTreatmentItem({
+    required this.item,
+    required this.link,
+    required this.category,
+  });
 }

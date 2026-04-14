@@ -1900,8 +1900,15 @@ class TreatmentViewModel extends ChangeNotifier {
   void updateReferralConsent({
     String? otherRelationship,
     Uint8List? signature,
+    DateTime? consentDateTime,
   }) {
     if (_referralForm == null) return;
+    final existingConsentDateTime = _referralForm!.consentDateTime;
+    final nextConsentDateTime =
+        consentDateTime ??
+        (signature != null
+            ? existingConsentDateTime ?? DateTime.now()
+            : existingConsentDateTime);
     _referralForm = _referralForm!.copyWith(
       otherRelationship: otherRelationship != null
           ? Value(otherRelationship)
@@ -1909,8 +1916,10 @@ class TreatmentViewModel extends ChangeNotifier {
       consentSignature: signature != null
           ? Value(signature)
           : const Value.absent(),
-      consentDateTime: signature != null
-          ? Value(DateTime.now())
+      consentDateTime:
+          consentDateTime != null ||
+              (signature != null && existingConsentDateTime == null)
+          ? Value(nextConsentDateTime)
           : const Value.absent(),
     );
     notifyListeners();

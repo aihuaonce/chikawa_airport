@@ -1,4 +1,4 @@
-﻿import 'dart:typed_data';
+import 'dart:typed_data';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
@@ -128,9 +128,18 @@ class MedicalServiceApplicationData {
   final String doctorName;
   final String nurseName;
   final String emtName;
+  final String refusalSignatoryName;
+  final String refusalSignatoryIdNo;
   final String refusalRelationship;
-  final Uint8List? consentSignature;
-  final Uint8List? witnessSignature;
+  final String refusalAddress;
+  final String refusalPhone;
+  final String refusalDateYear;
+  final String refusalDateMonth;
+  final String refusalDateDay;
+  final Uint8List? chargeConsentSignature;
+  final Uint8List? chargeWitnessSignature;
+  final Uint8List? referralConsentSignature;
+  final Uint8List? referralWitnessSignature;
   final bool hasRefusal; // 是否有拒絕轉診
 
   const MedicalServiceApplicationData({
@@ -246,9 +255,18 @@ class MedicalServiceApplicationData {
     this.doctorName = '',
     this.nurseName = '',
     this.emtName = '',
+    this.refusalSignatoryName = '',
+    this.refusalSignatoryIdNo = '',
     this.refusalRelationship = '',
-    this.consentSignature,
-    this.witnessSignature,
+    this.refusalAddress = '',
+    this.refusalPhone = '',
+    this.refusalDateYear = '',
+    this.refusalDateMonth = '',
+    this.refusalDateDay = '',
+    this.chargeConsentSignature,
+    this.chargeWitnessSignature,
+    this.referralConsentSignature,
+    this.referralWitnessSignature,
     this.hasRefusal = false,
   });
 }
@@ -638,7 +656,6 @@ Future<Uint8List> buildMedicalServiceApplicationPdf(
                       buildCheckBox('公務門', d.emergencyPublicGate),
                       buildCheckBox('機坪)', d.emergencyApron),
                     ],
-                    
                   ),
                   pw.Row(
                     children: [
@@ -856,8 +873,8 @@ Future<Uint8List> buildMedicalServiceApplicationPdf(
                         style: ts(),
                       ),
                     ),
-                    buildSignatureBox(d.consentSignature),
-                    buildSignatureBox(d.witnessSignature),
+                    buildSignatureBox(d.chargeConsentSignature),
+                    buildSignatureBox(d.chargeWitnessSignature),
                   ],
                 ),
                 pw.TableRow(
@@ -869,8 +886,8 @@ Future<Uint8List> buildMedicalServiceApplicationPdf(
                         style: ts(),
                       ),
                     ),
-                    buildSignatureBox(d.consentSignature, height: 45),
-                    buildSignatureBox(d.witnessSignature, height: 45),
+                    buildSignatureBox(d.referralConsentSignature, height: 45),
+                    buildSignatureBox(d.referralWitnessSignature, height: 45),
                   ],
                 ),
               ],
@@ -1254,12 +1271,18 @@ Future<Uint8List> buildMedicalServiceApplicationPdf(
                               ),
                             ),
                             pw.SizedBox(height: 10),
-                            pw.Text(
-                              'Signature：____________________',
-                              style: ts(sz: 8),
+                            pw.Row(
+                              children: [
+                                pw.Text('Signature：', style: ts(sz: 8)),
+                                buildUnderline(
+                                  d.refusalSignatoryName,
+                                  45 * PdfPageFormat.mm,
+                                  sz: 8,
+                                ),
+                              ],
                             ),
                             pw.Text(
-                              'Date：${d.dateYear}/${d.dateMonth}/${d.dateDay}',
+                              'Date：${d.refusalDateYear}/${d.refusalDateMonth}/${d.refusalDateDay}',
                               style: ts(sz: 8),
                             ),
                           ],
@@ -1305,7 +1328,7 @@ Future<Uint8List> buildMedicalServiceApplicationPdf(
                                 children: [
                                   pw.WidgetSpan(
                                     child: buildUnderline(
-                                      d.dateYear,
+                                      d.refusalDateYear,
                                       10 * PdfPageFormat.mm,
                                       sz: 8,
                                     ),
@@ -1313,7 +1336,7 @@ Future<Uint8List> buildMedicalServiceApplicationPdf(
                                   const pw.TextSpan(text: ' 年 '),
                                   pw.WidgetSpan(
                                     child: buildUnderline(
-                                      d.dateMonth,
+                                      d.refusalDateMonth,
                                       7 * PdfPageFormat.mm,
                                       sz: 8,
                                     ),
@@ -1321,7 +1344,7 @@ Future<Uint8List> buildMedicalServiceApplicationPdf(
                                   const pw.TextSpan(text: ' 月 '),
                                   pw.WidgetSpan(
                                     child: buildUnderline(
-                                      d.dateDay,
+                                      d.refusalDateDay,
                                       7 * PdfPageFormat.mm,
                                       sz: 8,
                                     ),
@@ -1349,31 +1372,51 @@ Future<Uint8List> buildMedicalServiceApplicationPdf(
                             pw.Row(
                               children: [
                                 pw.Text('立切結書人：', style: ts(sz: 7.5)),
-                                buildUnderline('', 35 * PdfPageFormat.mm),
+                                buildUnderline(
+                                  d.refusalSignatoryName,
+                                  35 * PdfPageFormat.mm,
+                                  sz: 7.5,
+                                ),
                               ],
                             ),
                             pw.Row(
                               children: [
                                 pw.Text('身分證字號：', style: ts(sz: 7.5)),
-                                buildUnderline('', 35 * PdfPageFormat.mm),
+                                buildUnderline(
+                                  d.refusalSignatoryIdNo,
+                                  35 * PdfPageFormat.mm,
+                                  sz: 7.5,
+                                ),
                               ],
                             ),
                             pw.Row(
                               children: [
                                 pw.Text('與病患關係：', style: ts(sz: 7.5)),
-                                buildUnderline('', 35 * PdfPageFormat.mm),
+                                buildUnderline(
+                                  d.refusalRelationship,
+                                  35 * PdfPageFormat.mm,
+                                  sz: 7.5,
+                                ),
                               ],
                             ),
                             pw.Row(
                               children: [
                                 pw.Text('住址：', style: ts(sz: 7.5)),
-                                buildUnderline('', 55 * PdfPageFormat.mm),
+                                buildUnderline(
+                                  d.refusalAddress,
+                                  55 * PdfPageFormat.mm,
+                                  sz: 7.5,
+                                ),
                               ],
                             ),
                             pw.Row(
                               children: [
                                 pw.Text('電話：', style: ts(sz: 7.5)),
-                                buildUnderline('', 35 * PdfPageFormat.mm),
+                                buildUnderline(
+                                  d.refusalPhone,
+                                  35 * PdfPageFormat.mm,
+                                  sz: 7.5,
+                                ),
                               ],
                             ),
                           ],
