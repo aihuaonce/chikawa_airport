@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../data/models/sync_service_provider.dart';
-import '../../data/sync/models/sync_models.dart';
+import '../../data/sync/models/sync_models.dart' hide SyncState;
 
 class PaginationBar extends StatelessWidget {
   final int currentPage;

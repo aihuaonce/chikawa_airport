@@ -1,58 +1,13 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:drift/drift.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../db/database.dart';
-import '../db/dao/sync_dao.dart';
-import '../services/api_client.dart';
 import '../utils/icd10_importer.dart';
 import '../utils/csv_reference_importer.dart';
 
 class ReferenceService extends ChangeNotifier {
   final AppDatabase db;
-  final SyncDao _syncDao;
-
-  static const String _defaultApiUrl =
-      'https://8d17-2001-b400-e2c2-9359-e9a6-a337-3252-1b9.ngrok-free.app';
-  static const String _referenceVersionKey = 'reference_sync_version';
-  static const List<String> _referenceTables = [
-    'sex',
-    'nationality',
-    'airline',
-    'travel_status',
-    'location',
-    'incident_place_category',
-    'incident_place_category2',
-    'reporting_unit',
-    'chief_complaint_type',
-    'chief_complaint_detail',
-    'diagnosis_category',
-    'triage_level',
-    'treatment_on_site',
-    'treatment_result',
-    'referral_hospital',
-    'action_item',
-    'medical_staff',
-    'nursing_phrase',
-    'payment_method',
-    'collection_status',
-    'currency_ref',
-    'referral_purpose',
-    'station_ref',
-    'relationship_type',
-    'visit_reason',
-    'drug_ref',
-    'special_note_ref',
-    'intubation_method_ref',
-    'respiration_mode_ref',
-    'ambulance_reference_items',
-    'ambulance_treatment_categories',
-    'ambulance_treatment_items',
-  ];
-
-  final Map<String, Set<String>> _tableColumnsCache = {};
 
   // === 病患相關參考資料 ===
   List<SexData> _sexList = [];
@@ -131,7 +86,7 @@ class ReferenceService extends ChangeNotifier {
   List<ConsciousnessLevelRefData> get consciousnessLevelList =>
       _consciousnessLevelList;
 
-  ReferenceService(this.db) : _syncDao = SyncDao(db);
+  ReferenceService(this.db);
 
   List<MedicalStaffRoleData> get staffRoles => _medicalStaffRoleList;
 
@@ -142,13 +97,11 @@ class ReferenceService extends ChangeNotifier {
 
     if (roleRef == null) return [];
 
-    // Based on seed data, MedicalStaff.role matches MedicalStaffRole.nameEn
     final searchKey = roleRef.nameEn ?? roleRef.code;
 
     return _medicalStaffList.where((s) => s.role == searchKey).toList();
   }
 
-  /// 初始化所有參考資料
   Future<void> initialize() async {
     await init();
   }
@@ -159,17 +112,8 @@ class ReferenceService extends ChangeNotifier {
     await _loadTreatmentReferences();
     await _importIcd10Data();
     notifyListeners();
-    unawaited(_syncReferenceTablesInBackground());
   }
 
-  Future<void> _syncReferenceTablesInBackground() async {
-    final result = await syncReferenceTablesFromServer();
-    if (!result.success) {
-      debugPrint('Reference background sync skipped: ${result.errorMessage}');
-    }
-  }
-
-  /// 匯入參考資料（CSV）
   Future<void> _importReferenceData() async {
     try {
       await CsvReferenceImporter.importAll(db);
@@ -389,183 +333,6 @@ class ReferenceService extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// 查詢輔助方法
-  Future<ReferenceSyncResult> syncReferenceTablesFromServer({
-    String? apiUrl,
-  }) async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final resolvedApiUrl =
-          apiUrl ?? prefs.getString('sync_api_url') ?? _defaultApiUrl;
-      final versionRaw = await _syncDao.getConfig(_referenceVersionKey);
-      final since = versionRaw == null ? null : DateTime.tryParse(versionRaw);
-
-      final client = ApiClient(baseUrl: resolvedApiUrl);
-      final response = await client.getReferenceSnapshot(since: since);
-      final errors = response['errors'];
-      if (errors is List && errors.isNotEmpty) {
-        final tableNames = errors
-            .whereType<Map>()
-            .map((e) => e['table'])
-            .whereType<String>()
-            .toList();
-        final summary = tableNames.isEmpty
-            ? '${errors.length} table errors'
-            : tableNames.join(', ');
-        return ReferenceSyncResult(
-          success: false,
-          changed: false,
-          errorMessage: 'Reference snapshot errors: $summary',
-        );
-      }
-
-      final changed = response['changed'] == true;
-      final latestVersion = response['version'];
-
-      if (!changed) {
-        if (latestVersion is String && latestVersion.isNotEmpty) {
-          await _syncDao.setConfig(_referenceVersionKey, latestVersion);
-        }
-        return const ReferenceSyncResult(success: true, changed: false);
-      }
-
-      final tablesRaw = response['tables'];
-      if (tablesRaw is! Map) {
-        return const ReferenceSyncResult(
-          success: false,
-          changed: false,
-          errorMessage: 'Invalid reference payload',
-        );
-      }
-
-      final tables = Map<String, dynamic>.from(tablesRaw);
-      final appliedRowCount = await _applyReferenceSnapshot(tables);
-
-      if (latestVersion is String && latestVersion.isNotEmpty) {
-        await _syncDao.setConfig(_referenceVersionKey, latestVersion);
-      }
-
-      await _loadBasicReferences();
-      await _loadTreatmentReferences();
-      notifyListeners();
-
-      return ReferenceSyncResult(
-        success: true,
-        changed: true,
-        tableCount: tables.length,
-        rowCount: appliedRowCount,
-      );
-    } catch (e) {
-      debugPrint('Reference server sync failed: $e');
-      return ReferenceSyncResult(
-        success: false,
-        changed: false,
-        errorMessage: e.toString(),
-      );
-    }
-  }
-
-  Future<int> _applyReferenceSnapshot(Map<String, dynamic> tables) async {
-    int appliedRows = 0;
-    final incomingTables = _referenceTables
-        .where((table) => tables.containsKey(table))
-        .toList();
-
-    if (incomingTables.isEmpty) {
-      return 0;
-    }
-
-    await db.transaction(() async {
-      for (final table in incomingTables.reversed) {
-        await db.customStatement('DELETE FROM $table');
-      }
-
-      for (final table in incomingTables) {
-        final tableRows = tables[table];
-        if (tableRows is! List) continue;
-
-        final allowedColumns = await _loadTableColumns(table);
-        for (final rawRow in tableRows) {
-          if (rawRow is! Map) continue;
-          final row = _normalizeRowMap(Map<String, dynamic>.from(rawRow));
-          final filtered = <String, dynamic>{};
-
-          for (final entry in row.entries) {
-            if (!allowedColumns.contains(entry.key)) continue;
-            filtered[entry.key] = _normalizeSqlValue(entry.value);
-          }
-
-          if (filtered.isEmpty) continue;
-
-          final columns = filtered.keys.toList();
-          final placeholders = List.filled(columns.length, '?').join(', ');
-          final args = columns.map((column) => filtered[column]).toList();
-
-          await db.customStatement(
-            'INSERT INTO $table (${columns.join(', ')}) '
-            'VALUES ($placeholders)',
-            args,
-          );
-          appliedRows++;
-        }
-      }
-    });
-
-    return appliedRows;
-  }
-
-  Future<Set<String>> _loadTableColumns(String table) async {
-    final cached = _tableColumnsCache[table];
-    if (cached != null) {
-      return cached;
-    }
-
-    final rows = await db.customSelect('PRAGMA table_info($table)').get();
-    final columns = <String>{};
-    for (final row in rows) {
-      columns.add(row.read<String>('name'));
-    }
-    _tableColumnsCache[table] = columns;
-    return columns;
-  }
-
-  Map<String, dynamic> _normalizeRowMap(Map<String, dynamic> row) {
-    final normalized = <String, dynamic>{};
-    for (final entry in row.entries) {
-      final key = entry.key;
-      final normalizedKey = key.contains('_') ? key : _toSnakeCase(key);
-      normalized[normalizedKey] = entry.value;
-    }
-    return normalized;
-  }
-
-  String _toSnakeCase(String key) {
-    return key.replaceAllMapped(
-      RegExp(r'([A-Z])'),
-      (match) => '_${match.group(1)!.toLowerCase()}',
-    );
-  }
-
-  dynamic _normalizeSqlValue(dynamic value) {
-    if (value is Map) {
-      final type = value['type'];
-      final data = value['data'];
-      if (type == 'Buffer' && data is List) {
-        return Uint8List.fromList(
-          data.whereType<num>().map((v) => v.toInt()).toList(),
-        );
-      }
-      return jsonEncode(value);
-    }
-    if (value is List) {
-      if (value.every((item) => item is int)) {
-        return Uint8List.fromList(value.cast<int>());
-      }
-      return jsonEncode(value);
-    }
-    return value;
-  }
-
   SexData? getSexById(int? id) {
     if (id == null) return null;
     try {
@@ -707,20 +474,4 @@ class ReferenceService extends ChangeNotifier {
       return null;
     }
   }
-}
-
-class ReferenceSyncResult {
-  final bool success;
-  final bool changed;
-  final int tableCount;
-  final int rowCount;
-  final String? errorMessage;
-
-  const ReferenceSyncResult({
-    required this.success,
-    required this.changed,
-    this.tableCount = 0,
-    this.rowCount = 0,
-    this.errorMessage,
-  });
 }

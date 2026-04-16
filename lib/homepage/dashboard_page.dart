@@ -5,7 +5,6 @@ import '../data/models/dashboard_view_model.dart';
 import 'widgets/header_bar.dart';
 import 'widgets/records_table.dart';
 import 'widgets/sidebar.dart';
-import 'widgets/firebase_test_widget.dart';
 
 class DashboardPage extends StatelessWidget {
   const DashboardPage({super.key});
@@ -29,11 +28,6 @@ class _DashboardView extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFF6F8FA),
       resizeToAvoidBottomInset: false,
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => showFirebaseTestDialog(context),
-        tooltip: '測試 Firebase 連線',
-        child: const Icon(Icons.cloud_done),
-      ),
       body: Row(
         children: [
           Sidebar(

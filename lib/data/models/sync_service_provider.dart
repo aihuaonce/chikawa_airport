@@ -3,18 +3,37 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../db/database.dart';
 import '../services/firestore_sync_service.dart';
 
+enum SyncState { idle, syncing, error, offline }
+
 class SyncServiceProvider extends ChangeNotifier with WidgetsBindingObserver {
   late final FirestoreSyncService _syncService;
   bool _initialized = false;
   DateTime? _pausedTime;
+  SyncState _state = SyncState.idle;
+  String? _lastError;
+  int _pendingCount = 0;
 
   FirestoreSyncService get service => _syncService;
   bool get isInitialized => _initialized;
 
-  bool get isSyncing => _syncService.isSyncing;
+  SyncState get state => _state;
+  bool get isOnline => true;
+  int get pendingCount => _pendingCount;
+  int get conflictCount => 0;
+  DateTime? get lastSyncTime => null;
+  String? get lastError => _lastError;
 
   String get statusText {
-    return isSyncing ? '同步中...' : '已同步';
+    switch (_state) {
+      case SyncState.idle:
+        return '已同步';
+      case SyncState.syncing:
+        return '同步中...';
+      case SyncState.error:
+        return '同步失敗';
+      case SyncState.offline:
+        return '離線模式';
+    }
   }
 
   Future<void> initialize(AppDatabase db) async {
@@ -54,13 +73,44 @@ class SyncServiceProvider extends ChangeNotifier with WidgetsBindingObserver {
   }
 
   Future<void> syncAll() async {
+    _state = SyncState.syncing;
+    _lastError = null;
+    notifyListeners();
+
     try {
       await _syncService.syncAll();
-      notifyListeners();
+      _state = SyncState.idle;
     } catch (e) {
+      _state = SyncState.error;
+      _lastError = e.toString();
       debugPrint('Sync error: $e');
     }
+    notifyListeners();
   }
+
+  Future<void> syncOnHomeReturn() async {
+    await syncAll();
+  }
+
+  Future<void> markAsPending({
+    required String tableName,
+    required int recordId,
+    required String operation,
+    required Map<String, dynamic> data,
+  }) async {
+    _pendingCount++;
+    notifyListeners();
+  }
+
+  Future<void> pushPendingChanges() async {
+    await syncAll();
+  }
+
+  Future<void> retryFailed() async {
+    await syncAll();
+  }
+
+  Future<void> clearSyncedLogs() async {}
 
   @override
   void dispose() {

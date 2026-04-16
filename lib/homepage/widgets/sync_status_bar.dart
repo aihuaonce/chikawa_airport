@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../data/models/sync_service_provider.dart';
-import '../../data/sync/models/sync_models.dart';
+import '../../data/sync/models/sync_models.dart' hide SyncState;
 
 class SyncStatusIndicator extends StatelessWidget {
   const SyncStatusIndicator({super.key});
@@ -30,12 +30,10 @@ class SyncStatusIndicator extends StatelessWidget {
               return Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  _buildStatusIcon(provider.state),
+                  _buildStatusIcon(context, provider, provider.state),
                   if (showText) ...[
                     const SizedBox(width: 8),
-                    Expanded(
-                      child: _buildStatusText(provider),
-                    ),
+                    Expanded(child: _buildStatusText(provider)),
                     const SizedBox(width: 8),
                   ],
                   _buildSyncButton(context, provider),
@@ -48,7 +46,11 @@ class SyncStatusIndicator extends StatelessWidget {
     );
   }
 
-  Widget _buildStatusIcon(SyncState state) {
+  Widget _buildStatusIcon(
+    BuildContext context,
+    SyncServiceProvider provider,
+    SyncState state,
+  ) {
     final IconData icon;
     final Color color;
 
@@ -78,7 +80,22 @@ class SyncStatusIndicator extends StatelessWidget {
       );
     }
 
-    return Icon(icon, size: 18, color: color);
+    return InkWell(
+      onTap: () {
+        provider.syncAll();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('開始同步...'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      },
+      borderRadius: BorderRadius.circular(4),
+      child: Padding(
+        padding: const EdgeInsets.all(4),
+        child: Icon(icon, size: 18, color: color),
+      ),
+    );
   }
 
   Widget _buildStatusText(SyncServiceProvider provider) {
@@ -131,24 +148,24 @@ class SyncStatusIndicator extends StatelessWidget {
             borderRadius: BorderRadius.circular(4),
             child: const Padding(
               padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              child: Icon(
-                Icons.add,
-                size: 14,
-                color: Color(0xFF94A3B8),
-              ),
+              child: Icon(Icons.add, size: 14, color: Color(0xFF94A3B8)),
             ),
           ),
         ],
         InkWell(
-          onTap: () => provider.syncAll(),
+          onTap: () {
+            provider.syncAll();
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('開始同步...'),
+                duration: Duration(seconds: 1),
+              ),
+            );
+          },
           borderRadius: BorderRadius.circular(4),
           child: const Padding(
             padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-            child: Icon(
-              Icons.refresh,
-              size: 14,
-              color: Color(0xFF94A3B8),
-            ),
+            child: Icon(Icons.refresh, size: 14, color: Color(0xFF94A3B8)),
           ),
         ),
       ],

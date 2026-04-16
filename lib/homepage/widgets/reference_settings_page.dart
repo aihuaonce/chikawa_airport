@@ -308,31 +308,14 @@ class _ReferenceSettingsPageState extends State<ReferenceSettingsPage> {
     setState(() => _isSyncing = true);
     try {
       final service = context.read<ReferenceService>();
-      final pushed = await _pushPendingReferenceChanges(showError: false);
-      if (!pushed) {
-        if (!mounted) return;
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('本機待同步資料上傳失敗，已取消此次同步')));
-        return;
-      }
-
-      final result = await service.syncReferenceTablesFromServer();
+      await service.reload();
 
       if (!mounted) return;
       await _loadSelectedTable();
 
-      final message = result.success
-          ? (result.changed
-                ? '同步完成：${result.tableCount} 張表、${result.rowCount} 筆資料'
-                : '沒有伺服器變更')
-          : '同步失敗：${result.errorMessage ?? '未知錯誤'}';
-
-      if (!mounted) return;
-
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text(message)));
+      ).showSnackBar(const SnackBar(content: Text('已重新載入參考資料')));
     } finally {
       if (mounted) {
         setState(() => _isSyncing = false);
