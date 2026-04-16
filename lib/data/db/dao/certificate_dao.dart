@@ -35,7 +35,10 @@ class CertificateDao extends DatabaseAccessor<AppDatabase>
     return (update(
       medicalCertificates,
     )..where((c) => c.certificateId.equals(certificateId))).write(
-      MedicalCertificatesCompanion(diagnosisResult: Value(diagnosisResult)),
+      MedicalCertificatesCompanion(
+        diagnosisResult: Value(diagnosisResult),
+        syncStatus: const Value(1), // 待同步
+      ),
     );
   }
 
@@ -49,6 +52,7 @@ class CertificateDao extends DatabaseAccessor<AppDatabase>
     )..where((c) => c.certificateId.equals(certificateId))).write(
       MedicalCertificatesCompanion(
         diagnosisCategoryId: Value(diagnosisCategoryId),
+        syncStatus: const Value(1), // 待同步
       ),
     );
   }
@@ -58,7 +62,10 @@ class CertificateDao extends DatabaseAccessor<AppDatabase>
     return (update(
       medicalCertificates,
     )..where((c) => c.certificateId.equals(certificateId))).write(
-      MedicalCertificatesCompanion(chineseAdvice: Value(chineseAdvice)),
+      MedicalCertificatesCompanion(
+        chineseAdvice: Value(chineseAdvice),
+        syncStatus: const Value(1), // 待同步
+      ),
     );
   }
 
@@ -67,15 +74,23 @@ class CertificateDao extends DatabaseAccessor<AppDatabase>
     return (update(
       medicalCertificates,
     )..where((c) => c.certificateId.equals(certificateId))).write(
-      MedicalCertificatesCompanion(englishAdvice: Value(englishAdvice)),
+      MedicalCertificatesCompanion(
+        englishAdvice: Value(englishAdvice),
+        syncStatus: const Value(1), // 待同步
+      ),
     );
   }
 
   // 更新開立日期
   Future<int> updateIssuanceDate(int certificateId, DateTime? issuanceDate) {
-    return (update(medicalCertificates)
-          ..where((c) => c.certificateId.equals(certificateId)))
-        .write(MedicalCertificatesCompanion(issuanceDate: Value(issuanceDate)));
+    return (update(
+      medicalCertificates,
+    )..where((c) => c.certificateId.equals(certificateId))).write(
+      MedicalCertificatesCompanion(
+        issuanceDate: Value(issuanceDate),
+        syncStatus: const Value(1), // 待同步
+      ),
+    );
   }
 
   // 更新完整診斷證明書

@@ -40,6 +40,7 @@ class ReferralFormDao extends DatabaseAccessor<AppDatabase>
         contactPhone: Value(phone),
         contactAddress: Value(address),
         contactIdNo: Value(idNo),
+        syncStatus: const Value(1), // 待同步
       ),
     );
   }
@@ -56,6 +57,7 @@ class ReferralFormDao extends DatabaseAccessor<AppDatabase>
         primaryDiagnosis: Value(primary),
         secondaryDiagnosis1: Value(secondary1),
         secondaryDiagnosis2: Value(secondary2),
+        syncStatus: const Value(1), // 待同步
       ),
     );
   }
@@ -74,6 +76,7 @@ class ReferralFormDao extends DatabaseAccessor<AppDatabase>
         examDate: Value(examDate),
         recentMedication: Value(recentMedication),
         medicationDate: Value(medicationDate),
+        syncStatus: const Value(1), // 待同步
       ),
     );
   }
@@ -88,6 +91,7 @@ class ReferralFormDao extends DatabaseAccessor<AppDatabase>
       ReferralFormsCompanion(
         referralPurposeId: Value(purposeId),
         otherPurpose: Value(otherPurpose),
+        syncStatus: const Value(1), // 待同步
       ),
     );
   }
@@ -106,13 +110,17 @@ class ReferralFormDao extends DatabaseAccessor<AppDatabase>
         doctorDepartment: Value(department),
         orderDate: Value(orderDate),
         notes: Value(notes),
+        syncStatus: const Value(1), // 待同步
       ),
     );
   }
 
   Future<int> updateDoctorSignature(int formId, Uint8List signature) {
     return (update(referralForms)..where((f) => f.formId.equals(formId))).write(
-      ReferralFormsCompanion(doctorSignature: Value(signature)),
+      ReferralFormsCompanion(
+        doctorSignature: Value(signature),
+        syncStatus: const Value(1), // 待同步
+      ),
     );
   }
 
@@ -132,6 +140,7 @@ class ReferralFormDao extends DatabaseAccessor<AppDatabase>
         hospitalDoctor: Value(doctor),
         hospitalPhone: Value(phone),
         hospitalAddress: Value(address),
+        syncStatus: const Value(1), // 待同步
       ),
     );
   }
@@ -150,6 +159,7 @@ class ReferralFormDao extends DatabaseAccessor<AppDatabase>
         scheduledDept: Value(dept),
         scheduledRoom: Value(room),
         scheduledNumber: Value(number),
+        syncStatus: const Value(1), // 待同步
       ),
     );
   }
@@ -166,13 +176,17 @@ class ReferralFormDao extends DatabaseAccessor<AppDatabase>
         relationshipId: Value(relationshipId),
         otherRelationship: Value(otherRelationship),
         consentDateTime: Value(consentDateTime),
+        syncStatus: const Value(1), // 待同步
       ),
     );
   }
 
   Future<int> updateConsentSignature(int formId, Uint8List signature) {
     return (update(referralForms)..where((f) => f.formId.equals(formId))).write(
-      ReferralFormsCompanion(consentSignature: Value(signature)),
+      ReferralFormsCompanion(
+        consentSignature: Value(signature),
+        syncStatus: const Value(1), // 待同步
+      ),
     );
   }
 
@@ -188,6 +202,40 @@ class ReferralFormDao extends DatabaseAccessor<AppDatabase>
     }
     return (update(
       referralForms,
-    )..where((f) => f.formId.equals(form.formId.value))).write(form);
+    )..where((f) => f.formId.equals(form.formId.value))).write(
+      ReferralFormsCompanion(
+        // 保留原有資料，只更新 syncStatus
+        contactName: form.contactName,
+        contactPhone: form.contactPhone,
+        contactAddress: form.contactAddress,
+        contactIdNo: form.contactIdNo,
+        primaryDiagnosis: form.primaryDiagnosis,
+        secondaryDiagnosis1: form.secondaryDiagnosis1,
+        secondaryDiagnosis2: form.secondaryDiagnosis2,
+        recentExamResult: form.recentExamResult,
+        examDate: form.examDate,
+        recentMedication: form.recentMedication,
+        medicationDate: form.medicationDate,
+        referralPurposeId: form.referralPurposeId,
+        otherPurpose: form.otherPurpose,
+        doctorName: form.doctorName,
+        doctorDepartment: form.doctorDepartment,
+        orderDate: form.orderDate,
+        notes: form.notes,
+        hospitalName: form.hospitalName,
+        hospitalDept: form.hospitalDept,
+        hospitalDoctor: form.hospitalDoctor,
+        hospitalPhone: form.hospitalPhone,
+        hospitalAddress: form.hospitalAddress,
+        scheduledDate: form.scheduledDate,
+        scheduledDept: form.scheduledDept,
+        scheduledRoom: form.scheduledRoom,
+        scheduledNumber: form.scheduledNumber,
+        relationshipId: form.relationshipId,
+        otherRelationship: form.otherRelationship,
+        consentDateTime: form.consentDateTime,
+        syncStatus: const Value(1), // 待同步
+      ),
+    );
   }
 }

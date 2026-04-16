@@ -142,9 +142,11 @@ class MedicalDao extends DatabaseAccessor<AppDatabase> with _$MedicalDaoMixin {
 
   // 更新病患資料的特定欄位
   Future<int> updatePatientColumn(int medicalId, PatientCompanion companion) {
+    // 加入 syncStatus = 1 待同步
+    final updatedCompanion = companion.copyWith(syncStatus: const Value(1));
     return (update(
       patient,
-    )..where((tbl) => tbl.medicalId.equals(medicalId))).write(companion);
+    )..where((tbl) => tbl.medicalId.equals(medicalId))).write(updatedCompanion);
   }
 
   // 根據 medicalId 獲取醫療主表記錄

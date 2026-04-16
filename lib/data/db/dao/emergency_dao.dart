@@ -46,9 +46,11 @@ class EmergencyDao extends DatabaseAccessor<AppDatabase>
 
   // 更新急救處置記錄 (使用 write 進行部分更新)
   Future<int> updateEmergencyTreatment(EmergencyTreatmentCompanion companion) {
+    // 加入 syncStatus = 1 待同步
+    final updatedCompanion = companion.copyWith(syncStatus: const Value(1));
     return (update(
       emergencyTreatment,
-    )..where((t) => t.id.equals(companion.id.value))).write(companion);
+    )..where((t) => t.id.equals(companion.id.value))).write(updatedCompanion);
   }
 
   // 獲取最新的醫療評估 (By medicalId)
@@ -88,9 +90,11 @@ class EmergencyDao extends DatabaseAccessor<AppDatabase>
 
   // 更新醫療評估 (使用 write 進行部分更新)
   Future<int> updateAssessment(MedicalAssessmentCompanion companion) {
+    // 加入 syncStatus = 1 待同步
+    final updatedCompanion = companion.copyWith(syncStatus: const Value(1));
     return (update(medicalAssessment)
           ..where((t) => t.assessmentId.equals(companion.assessmentId.value)))
-        .write(companion);
+        .write(updatedCompanion);
   }
 
   // 獲取急救藥物記錄

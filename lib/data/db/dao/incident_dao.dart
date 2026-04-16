@@ -87,6 +87,7 @@ class IncidentDao extends DatabaseAccessor<AppDatabase>
         incidentPlaceCategoryId: Value(categoryId),
         incidentPlaceCategory2Id: Value(category2Id),
         incidentPlaceFinal: Value(finalPlace),
+        syncStatus: const Value(1), // 待同步
       ),
     );
   }
@@ -105,6 +106,7 @@ class IncidentDao extends DatabaseAccessor<AppDatabase>
         notificationTime: Value(notificationTime),
         notificationPerson: Value(notificationPerson),
         reportingUnitId: Value(reportingUnitId),
+        syncStatus: const Value(1), // 待同步
       ),
     );
   }
@@ -121,6 +123,7 @@ class IncidentDao extends DatabaseAccessor<AppDatabase>
       IncidentRecordCompanion(
         beforeLanding: Value(beforeLanding),
         landingTime: Value(landingTime),
+        syncStatus: const Value(1), // 待同步
       ),
     );
   }

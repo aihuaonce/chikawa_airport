@@ -53,14 +53,21 @@ class NursingRecordDao extends DatabaseAccessor<AppDatabase>
             : const Value.absent(),
         content: content != null ? Value(content) : const Value.absent(),
         nurseId: nurseId != null ? Value(nurseId) : const Value.absent(),
+        syncStatus: const Value(1), // 待同步
       ),
     );
   }
 
   // 更新護理師簽名
   Future<int> updateSignature(int recordId, Uint8List signature) {
-    return (update(nursingRecords)..where((r) => r.recordId.equals(recordId)))
-        .write(NursingRecordsCompanion(signature: Value(signature)));
+    return (update(
+      nursingRecords,
+    )..where((r) => r.recordId.equals(recordId))).write(
+      NursingRecordsCompanion(
+        signature: Value(signature),
+        syncStatus: const Value(1), // 待同步
+      ),
+    );
   }
 
   // 刪除護理記錄

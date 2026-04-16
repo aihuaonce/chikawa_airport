@@ -44,6 +44,7 @@ class AmbulanceDao extends DatabaseAccessor<AppDatabase>
             .getSingleOrNull();
 
     if (existing != null) {
+      // AmbulanceSceneRecords 沒有 syncStatus，直接更新
       await (update(
         ambulanceSceneRecords,
       )..where((t) => t.medicalId.equals(data.medicalId.value))).write(data);
@@ -250,10 +251,11 @@ class AmbulanceDao extends DatabaseAccessor<AppDatabase>
             .getSingleOrNull();
 
     if (existing != null) {
-      // 如果存在，執行更新
-      await (update(
-        ambulancePersonalProperty,
-      )..where((t) => t.medicalId.equals(data.medicalId.value))).write(data);
+      // 加入 syncStatus = 1 待同步
+      final updatedData = data.copyWith(syncStatus: const Value(1));
+      await (update(ambulancePersonalProperty)
+            ..where((t) => t.medicalId.equals(data.medicalId.value)))
+          .write(updatedData);
       return existing.id;
     } else {
       // 如果不存在，執行插入
@@ -279,10 +281,11 @@ class AmbulanceDao extends DatabaseAccessor<AppDatabase>
             .getSingleOrNull();
 
     if (existing != null) {
-      // 如果存在，執行更新
-      await (update(
-        ambulanceFees,
-      )..where((t) => t.medicalId.equals(data.medicalId.value))).write(data);
+      // 加入 syncStatus = 1 待同步
+      final updatedData = data.copyWith(syncStatus: const Value(1));
+      await (update(ambulanceFees)
+            ..where((t) => t.medicalId.equals(data.medicalId.value)))
+          .write(updatedData);
       return existing.feeId;
     } else {
       // 如果不存在，執行插入
@@ -404,13 +407,14 @@ class AmbulanceDao extends DatabaseAccessor<AppDatabase>
     )..where((t) => t.medicalId.equals(medicalId))).getSingleOrNull();
 
     if (existing != null) {
-      // 記錄存在，正常更新
+      // 記錄存在，正常更新並設定 syncStatus = 1
       await (update(
         ambulanceRecords,
       )..where((t) => t.medicalId.equals(medicalId))).write(
         AmbulanceRecordsCompanion(
           bodyMapJson: Value(bodyMapJson),
           updatedAt: Value(DateTime.now()),
+          syncStatus: const Value(1), // 待同步
         ),
       );
     } else {

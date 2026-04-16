@@ -31,8 +31,9 @@ class TreatmentDao extends DatabaseAccessor<AppDatabase>
   }
 
   Future<List<MedicationData>> getMedications(int medicalId) {
-    return (select(medications)..where((t) => t.medicalId.equals(medicalId)))
-        .get();
+    return (select(
+      medications,
+    )..where((t) => t.medicalId.equals(medicalId))).get();
   }
 
   Future<bool> updateMedication(MedicationsCompanion data) {
@@ -40,9 +41,9 @@ class TreatmentDao extends DatabaseAccessor<AppDatabase>
   }
 
   Future<int> deleteMedication(int medicationId) {
-    return (delete(medications)
-          ..where((t) => t.medicationId.equals(medicationId)))
-        .go();
+    return (delete(
+      medications,
+    )..where((t) => t.medicationId.equals(medicationId))).go();
   }
 
   // CDC 健康評估
@@ -130,9 +131,9 @@ class TreatmentDao extends DatabaseAccessor<AppDatabase>
   }
 
   Future<int> updateMedicalHistory(MedicalHistoryCompanion data) {
-    return (update(medicalHistory)
-          ..where((t) => t.historyId.equals(data.historyId.value)))
-        .write(data);
+    return (update(
+      medicalHistory,
+    )..where((t) => t.historyId.equals(data.historyId.value))).write(data);
   }
 
   // 處置 / 診斷
@@ -148,6 +149,8 @@ class TreatmentDao extends DatabaseAccessor<AppDatabase>
   }
 
   Future<bool> updateTreatment(TreatmentCompanion data) {
+    // Treatment 表有 syncStatus，但 replace 方法無法直接設定
+    // 需要在呼叫端確保 syncStatus=1
     return update(treatment).replace(data);
   }
 
@@ -226,9 +229,9 @@ class TreatmentDao extends DatabaseAccessor<AppDatabase>
   // 主訴症狀關聯方法（取代 JSON 存儲）
 
   Future<List<int>> getChiefComplaintSymptomIds(int complaintId) async {
-    final links = await (select(chiefComplaintSymptomLinks)
-          ..where((l) => l.complaintId.equals(complaintId)))
-        .get();
+    final links = await (select(
+      chiefComplaintSymptomLinks,
+    )..where((l) => l.complaintId.equals(complaintId))).get();
     return links.map((l) => l.symptomId).toList();
   }
 
@@ -242,16 +245,28 @@ class TreatmentDao extends DatabaseAccessor<AppDatabase>
     );
   }
 
-  Future<void> removeChiefComplaintSymptom(int complaintId, int symptomId) async {
-    await (delete(chiefComplaintSymptomLinks)
-          ..where((l) => l.complaintId.equals(complaintId) & l.symptomId.equals(symptomId)))
+  Future<void> removeChiefComplaintSymptom(
+    int complaintId,
+    int symptomId,
+  ) async {
+    await (delete(chiefComplaintSymptomLinks)..where(
+          (l) =>
+              l.complaintId.equals(complaintId) & l.symptomId.equals(symptomId),
+        ))
         .go();
   }
 
-  Future<void> toggleChiefComplaintSymptom(int complaintId, int symptomId) async {
-    final exists = await (select(chiefComplaintSymptomLinks)
-          ..where((l) => l.complaintId.equals(complaintId) & l.symptomId.equals(symptomId)))
-        .getSingleOrNull();
+  Future<void> toggleChiefComplaintSymptom(
+    int complaintId,
+    int symptomId,
+  ) async {
+    final exists =
+        await (select(chiefComplaintSymptomLinks)..where(
+              (l) =>
+                  l.complaintId.equals(complaintId) &
+                  l.symptomId.equals(symptomId),
+            ))
+            .getSingleOrNull();
     if (exists != null) {
       await removeChiefComplaintSymptom(complaintId, symptomId);
     } else {
@@ -260,17 +275,17 @@ class TreatmentDao extends DatabaseAccessor<AppDatabase>
   }
 
   Future<void> clearChiefComplaintSymptoms(int complaintId) async {
-    await (delete(chiefComplaintSymptomLinks)
-          ..where((l) => l.complaintId.equals(complaintId)))
-        .go();
+    await (delete(
+      chiefComplaintSymptomLinks,
+    )..where((l) => l.complaintId.equals(complaintId))).go();
   }
 
   // 處置項目關聯方法（取代 JSON 存儲）
 
   Future<List<int>> getTreatmentActionIds(int treatmentId) async {
-    final links = await (select(treatmentActionLinks)
-          ..where((l) => l.treatmentId.equals(treatmentId)))
-        .get();
+    final links = await (select(
+      treatmentActionLinks,
+    )..where((l) => l.treatmentId.equals(treatmentId))).get();
     return links.map((l) => l.actionItemId).toList();
   }
 
@@ -285,15 +300,22 @@ class TreatmentDao extends DatabaseAccessor<AppDatabase>
   }
 
   Future<void> removeTreatmentAction(int treatmentId, int actionItemId) async {
-    await (delete(treatmentActionLinks)
-          ..where((l) => l.treatmentId.equals(treatmentId) & l.actionItemId.equals(actionItemId)))
+    await (delete(treatmentActionLinks)..where(
+          (l) =>
+              l.treatmentId.equals(treatmentId) &
+              l.actionItemId.equals(actionItemId),
+        ))
         .go();
   }
 
   Future<void> toggleTreatmentAction(int treatmentId, int actionItemId) async {
-    final exists = await (select(treatmentActionLinks)
-          ..where((l) => l.treatmentId.equals(treatmentId) & l.actionItemId.equals(actionItemId)))
-        .getSingleOrNull();
+    final exists =
+        await (select(treatmentActionLinks)..where(
+              (l) =>
+                  l.treatmentId.equals(treatmentId) &
+                  l.actionItemId.equals(actionItemId),
+            ))
+            .getSingleOrNull();
     if (exists != null) {
       await removeTreatmentAction(treatmentId, actionItemId);
     } else {
@@ -302,40 +324,40 @@ class TreatmentDao extends DatabaseAccessor<AppDatabase>
   }
 
   Future<void> clearTreatmentActions(int treatmentId) async {
-    await (delete(treatmentActionLinks)
-          ..where((l) => l.treatmentId.equals(treatmentId)))
-        .go();
+    await (delete(
+      treatmentActionLinks,
+    )..where((l) => l.treatmentId.equals(treatmentId))).go();
   }
 
   // 特別註記關聯方法（取代 JSON 存儲）
 
   Future<List<int>> getSpecialNoteIds(int noteId) async {
-    final links = await (select(specialNoteLinks)
-          ..where((l) => l.noteId.equals(noteId)))
-        .get();
+    final links = await (select(
+      specialNoteLinks,
+    )..where((l) => l.noteId.equals(noteId))).get();
     return links.map((l) => l.noteRefId).toList();
   }
 
   Future<void> addSpecialNote(int noteId, int noteRefId) async {
     await into(specialNoteLinks).insert(
-      SpecialNoteLinksCompanion.insert(
-        noteId: noteId,
-        noteRefId: noteRefId,
-      ),
+      SpecialNoteLinksCompanion.insert(noteId: noteId, noteRefId: noteRefId),
       mode: InsertMode.insertOrIgnore,
     );
   }
 
   Future<void> removeSpecialNote(int noteId, int noteRefId) async {
-    await (delete(specialNoteLinks)
-          ..where((l) => l.noteId.equals(noteId) & l.noteRefId.equals(noteRefId)))
+    await (delete(specialNoteLinks)..where(
+          (l) => l.noteId.equals(noteId) & l.noteRefId.equals(noteRefId),
+        ))
         .go();
   }
 
   Future<void> toggleSpecialNote(int noteId, int noteRefId) async {
-    final exists = await (select(specialNoteLinks)
-          ..where((l) => l.noteId.equals(noteId) & l.noteRefId.equals(noteRefId)))
-        .getSingleOrNull();
+    final exists =
+        await (select(specialNoteLinks)..where(
+              (l) => l.noteId.equals(noteId) & l.noteRefId.equals(noteRefId),
+            ))
+            .getSingleOrNull();
     if (exists != null) {
       await removeSpecialNote(noteId, noteRefId);
     } else {
@@ -344,8 +366,8 @@ class TreatmentDao extends DatabaseAccessor<AppDatabase>
   }
 
   Future<void> clearSpecialNotes(int noteId) async {
-    await (delete(specialNoteLinks)
-          ..where((l) => l.noteId.equals(noteId)))
-        .go();
+    await (delete(
+      specialNoteLinks,
+    )..where((l) => l.noteId.equals(noteId))).go();
   }
 }

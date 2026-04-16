@@ -33,16 +33,26 @@ class TelexDao extends DatabaseAccessor<AppDatabase> with _$TelexDaoMixin {
 
   // 更新收件站點
   Future<int> updateToStation(int documentId, int? toStationId) {
-    return (update(telexDocuments)
-          ..where((t) => t.documentId.equals(documentId)))
-        .write(TelexDocumentsCompanion(toStationId: Value(toStationId)));
+    return (update(
+      telexDocuments,
+    )..where((t) => t.documentId.equals(documentId))).write(
+      TelexDocumentsCompanion(
+        toStationId: Value(toStationId),
+        syncStatus: const Value(1), // 待同步
+      ),
+    );
   }
 
   // 更新寄件站點
   Future<int> updateFromStation(int documentId, int? fromStationId) {
-    return (update(telexDocuments)
-          ..where((t) => t.documentId.equals(documentId)))
-        .write(TelexDocumentsCompanion(fromStationId: Value(fromStationId)));
+    return (update(
+      telexDocuments,
+    )..where((t) => t.documentId.equals(documentId))).write(
+      TelexDocumentsCompanion(
+        fromStationId: Value(fromStationId),
+        syncStatus: const Value(1), // 待同步
+      ),
+    );
   }
 
   // 刪除 TELEX 文件
