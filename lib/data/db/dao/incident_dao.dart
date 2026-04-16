@@ -63,6 +63,7 @@ class IncidentDao extends DatabaseAccessor<AppDatabase>
         beforeLanding: Value(beforeLanding),
         landingTime: Value(landingTime),
         occArrived: Value(occArrived),
+        syncStatus: const Value(1), // 待同步
       ),
     );
   }

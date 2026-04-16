@@ -66,6 +66,7 @@ class FlightDao extends DatabaseAccessor<AppDatabase> with _$FlightDaoMixin {
         travelStatusId: Value(travelStatusId),
         departureLocationId: Value(departureLocationId),
         arrivalLocationId: Value(arrivalLocationId),
+        syncStatus: const Value(1), // 待同步
       ),
     );
   }

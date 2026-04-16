@@ -73,19 +73,23 @@ class SyncServiceProvider extends ChangeNotifier with WidgetsBindingObserver {
   }
 
   Future<void> syncAll() async {
+    debugPrint('SyncServiceProvider: syncAll() called');
     _state = SyncState.syncing;
     _lastError = null;
     notifyListeners();
 
     try {
       await _syncService.syncAll();
+      debugPrint('SyncServiceProvider: sync completed, setting state to idle');
       _state = SyncState.idle;
     } catch (e) {
+      debugPrint('SyncServiceProvider: sync failed: $e');
       _state = SyncState.error;
       _lastError = e.toString();
       debugPrint('Sync error: $e');
     }
     notifyListeners();
+    debugPrint('SyncServiceProvider: syncAll() done');
   }
 
   Future<void> syncOnHomeReturn() async {

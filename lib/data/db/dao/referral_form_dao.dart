@@ -11,9 +11,9 @@ class ReferralFormDao extends DatabaseAccessor<AppDatabase>
 
   // 根據 medicalId 取得轉診單
   Future<ReferralFormData?> getFormByMedicalId(int medicalId) {
-    return (select(referralForms)
-          ..where((f) => f.medicalId.equals(medicalId)))
-        .getSingleOrNull();
+    return (select(
+      referralForms,
+    )..where((f) => f.medicalId.equals(medicalId))).getSingleOrNull();
   }
 
   // 建立新的轉診單
@@ -21,6 +21,7 @@ class ReferralFormDao extends DatabaseAccessor<AppDatabase>
     return into(referralForms).insert(
       ReferralFormsCompanion.insert(
         medicalId: medicalId,
+        syncStatus: const Value(1), // 待同步
       ),
     );
   }
@@ -185,8 +186,8 @@ class ReferralFormDao extends DatabaseAccessor<AppDatabase>
     if (!form.formId.present) {
       throw ArgumentError('formId must be present for update');
     }
-    return (update(referralForms)
-          ..where((f) => f.formId.equals(form.formId.value)))
-        .write(form);
+    return (update(
+      referralForms,
+    )..where((f) => f.formId.equals(form.formId.value))).write(form);
   }
 }

@@ -11,9 +11,9 @@ class MedicalFeeDao extends DatabaseAccessor<AppDatabase>
 
   // 根據 medicalId 取得醫療費用
   Future<MedicalFeeData?> getFeeByMedicalId(int medicalId) {
-    return (select(medicalFees)
-          ..where((f) => f.medicalId.equals(medicalId)))
-        .getSingleOrNull();
+    return (select(
+      medicalFees,
+    )..where((f) => f.medicalId.equals(medicalId))).getSingleOrNull();
   }
 
   // 建立新的醫療費用記錄
@@ -23,6 +23,7 @@ class MedicalFeeDao extends DatabaseAccessor<AppDatabase>
         medicalId: medicalId,
         consultFee: const Value(0),
         ambulanceFee: const Value(0),
+        syncStatus: const Value(1), // 待同步
       ),
     );
   }

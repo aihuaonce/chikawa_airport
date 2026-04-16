@@ -31,6 +31,10 @@ class FirestoreSyncService {
         _syncFees(),
         _syncNursingRecords(),
         _syncReferralForms(),
+        _syncFlightRecords(),
+        _syncMedications(),
+        _syncEmergencyTreatments(),
+        _syncReferenceTables(),
       ]);
       debugPrint('Firestore sync completed');
     } catch (e) {
@@ -41,10 +45,111 @@ class FirestoreSyncService {
     }
   }
 
+  // === 同步參考表 ===
+  Future<void> _syncReferenceTables() async {
+    try {
+      // 性別
+      final sexList = await _db.referenceDao.getAllSex();
+      for (final item in sexList) {
+        await _firebase.setDocument('reference_sex', item.sexId.toString(), {
+          'sexId': item.sexId,
+          'name': item.name,
+        });
+      }
+      debugPrint('Synced ${sexList.length} sex records');
+
+      // 國籍
+      final nationalityList = await _db.referenceDao.getAllNationality();
+      for (final item in nationalityList) {
+        await _firebase.setDocument(
+          'reference_nationality',
+          item.nationalityId.toString(),
+          {'nationalityId': item.nationalityId, 'name': item.name},
+        );
+      }
+      debugPrint('Synced ${nationalityList.length} nationality records');
+
+      // 航空公司
+      final airlineList = await _db.referenceDao.getAllAirline();
+      for (final item in airlineList) {
+        await _firebase
+            .setDocument('reference_airline', item.airlineId.toString(), {
+              'airlineId': item.airlineId,
+              'code': item.code,
+              'name': item.name,
+              'isOther': item.isOther,
+            });
+      }
+      debugPrint('Synced ${airlineList.length} airline records');
+
+      // 旅行狀態
+      final travelStatusList = await _db.referenceDao.getAllTravelStatus();
+      for (final item in travelStatusList) {
+        await _firebase.setDocument(
+          'reference_travel_status',
+          item.travelStatusId.toString(),
+          {
+            'travelStatusId': item.travelStatusId,
+            'code': item.code,
+            'name': item.name,
+          },
+        );
+      }
+      debugPrint('Synced ${travelStatusList.length} travel status records');
+
+      // 地點
+      final locationList = await _db.referenceDao.getAllLocation();
+      for (final item in locationList) {
+        await _firebase.setDocument(
+          'reference_location',
+          item.locationId.toString(),
+          {'locationId': item.locationId, 'code': item.code, 'name': item.name},
+        );
+      }
+      debugPrint('Synced ${locationList.length} location records');
+
+      // 檢傷分級
+      final triageList = await _db.referenceDao.getAllTriageLevels();
+      for (final item in triageList) {
+        await _firebase
+            .setDocument('reference_triage_level', item.id.toString(), {
+              'id': item.id,
+              'level': item.level,
+              'name': item.name,
+              'colorCode': item.colorCode,
+              'description': item.description,
+            });
+      }
+      debugPrint('Synced ${triageList.length} triage level records');
+
+      // 轉診醫院
+      final hospitalList = await _db.referenceDao.getAllReferralHospitals();
+      for (final item in hospitalList) {
+        await _firebase.setDocument(
+          'reference_referral_hospital',
+          item.id.toString(),
+          {
+            'id': item.id,
+            'name': item.name,
+            'address': item.address,
+            'phone': item.phone,
+          },
+        );
+      }
+      debugPrint('Synced ${hospitalList.length} hospital records');
+
+      debugPrint('Synced all reference tables');
+    } catch (e) {
+      debugPrint('Error syncing reference tables: $e');
+    }
+  }
+
+  // === 同步主要資料表 ===
+
   Future<void> _syncMedicalRecords() async {
     final records = await (_db.select(
       _db.medicalRecord,
-    )..where((t) => t.syncStatus.equals(syncStatusPending))).get();
+    )..where((t) => t.syncStatus.equals(1))).get();
 
     for (final record in records) {
       try {
@@ -58,14 +163,11 @@ class FirestoreSyncService {
               'createdAt': record.createdAt.toIso8601String(),
               'updatedAt': record.updatedAt.toIso8601String(),
               'lastModified': FieldValue.serverTimestamp(),
-              'syncStatus': syncStatusSynced,
             });
 
-        await (_db.update(
-          _db.medicalRecord,
-        )..where((t) => t.medicalId.equals(record.medicalId))).write(
-          MedicalRecordCompanion(syncStatus: const Value(syncStatusSynced)),
-        );
+        await (_db.update(_db.medicalRecord)
+              ..where((t) => t.medicalId.equals(record.medicalId)))
+            .write(MedicalRecordCompanion(syncStatus: const Value(0)));
 
         debugPrint('Synced medical_record ${record.medicalId}');
       } catch (e) {
@@ -77,7 +179,7 @@ class FirestoreSyncService {
   Future<void> _syncPatients() async {
     final patients = await (_db.select(
       _db.patient,
-    )..where((t) => t.syncStatus.equals(syncStatusPending))).get();
+    )..where((t) => t.syncStatus.equals(1))).get();
 
     for (final patient in patients) {
       try {
@@ -95,12 +197,11 @@ class FirestoreSyncService {
           'telephone': patient.telephone,
           'address': patient.address,
           'lastModified': FieldValue.serverTimestamp(),
-          'syncStatus': syncStatusSynced,
         });
 
         await (_db.update(_db.patient)
               ..where((t) => t.patientId.equals(patient.patientId)))
-            .write(PatientCompanion(syncStatus: const Value(syncStatusSynced)));
+            .write(PatientCompanion(syncStatus: const Value(0)));
       } catch (e) {
         debugPrint('Error syncing patient ${patient.patientId}: $e');
       }
@@ -110,7 +211,7 @@ class FirestoreSyncService {
   Future<void> _syncTreatments() async {
     final treatments = await (_db.select(
       _db.treatment,
-    )..where((t) => t.syncStatus.equals(syncStatusPending))).get();
+    )..where((t) => t.syncStatus.equals(1))).get();
 
     for (final treatment in treatments) {
       try {
@@ -131,14 +232,11 @@ class FirestoreSyncService {
               'referralHospitalId': treatment.referralHospitalId,
               'treatmentTime': treatment.treatmentTime.toIso8601String(),
               'lastModified': FieldValue.serverTimestamp(),
-              'syncStatus': syncStatusSynced,
             });
 
-        await (_db.update(
-          _db.treatment,
-        )..where((t) => t.treatmentId.equals(treatment.treatmentId))).write(
-          TreatmentCompanion(syncStatus: const Value(syncStatusSynced)),
-        );
+        await (_db.update(_db.treatment)
+              ..where((t) => t.treatmentId.equals(treatment.treatmentId)))
+            .write(TreatmentCompanion(syncStatus: const Value(0)));
       } catch (e) {
         debugPrint('Error syncing treatment ${treatment.treatmentId}: $e');
       }
@@ -148,7 +246,7 @@ class FirestoreSyncService {
   Future<void> _syncAmbulanceRecords() async {
     final records = await (_db.select(
       _db.ambulanceRecords,
-    )..where((t) => t.syncStatus.equals(syncStatusPending))).get();
+    )..where((t) => t.syncStatus.equals(1))).get();
 
     for (final record in records) {
       try {
@@ -169,14 +267,11 @@ class FirestoreSyncService {
                   ?.toIso8601String(),
               'bodyMapJson': record.bodyMapJson,
               'lastModified': FieldValue.serverTimestamp(),
-              'syncStatus': syncStatusSynced,
             });
 
-        await (_db.update(
-          _db.ambulanceRecords,
-        )..where((t) => t.ambulanceId.equals(record.ambulanceId))).write(
-          AmbulanceRecordsCompanion(syncStatus: const Value(syncStatusSynced)),
-        );
+        await (_db.update(_db.ambulanceRecords)
+              ..where((t) => t.ambulanceId.equals(record.ambulanceId)))
+            .write(AmbulanceRecordsCompanion(syncStatus: const Value(0)));
       } catch (e) {
         debugPrint('Error syncing ambulance_record ${record.ambulanceId}: $e');
       }
@@ -186,7 +281,7 @@ class FirestoreSyncService {
   Future<void> _syncFees() async {
     final fees = await (_db.select(
       _db.medicalFees,
-    )..where((t) => t.syncStatus.equals(syncStatusPending))).get();
+    )..where((t) => t.syncStatus.equals(1))).get();
 
     for (final fee in fees) {
       try {
@@ -206,14 +301,11 @@ class FirestoreSyncService {
           'applicantPhone': fee.applicantPhone,
           'remarks': fee.remarks,
           'lastModified': FieldValue.serverTimestamp(),
-          'syncStatus': syncStatusSynced,
         });
 
-        await (_db.update(
-          _db.medicalFees,
-        )..where((t) => t.feeId.equals(fee.feeId))).write(
-          MedicalFeesCompanion(syncStatus: const Value(syncStatusSynced)),
-        );
+        await (_db.update(_db.medicalFees)
+              ..where((t) => t.feeId.equals(fee.feeId)))
+            .write(MedicalFeesCompanion(syncStatus: const Value(0)));
       } catch (e) {
         debugPrint('Error syncing fee ${fee.feeId}: $e');
       }
@@ -223,7 +315,7 @@ class FirestoreSyncService {
   Future<void> _syncNursingRecords() async {
     final records = await (_db.select(
       _db.nursingRecords,
-    )..where((t) => t.syncStatus.equals(syncStatusPending))).get();
+    )..where((t) => t.syncStatus.equals(1))).get();
 
     for (final record in records) {
       try {
@@ -235,14 +327,11 @@ class FirestoreSyncService {
               'content': record.content,
               'nurseId': record.nurseId,
               'lastModified': FieldValue.serverTimestamp(),
-              'syncStatus': syncStatusSynced,
             });
 
-        await (_db.update(
-          _db.nursingRecords,
-        )..where((t) => t.recordId.equals(record.recordId))).write(
-          NursingRecordsCompanion(syncStatus: const Value(syncStatusSynced)),
-        );
+        await (_db.update(_db.nursingRecords)
+              ..where((t) => t.recordId.equals(record.recordId)))
+            .write(NursingRecordsCompanion(syncStatus: const Value(0)));
       } catch (e) {
         debugPrint('Error syncing nursing_record ${record.recordId}: $e');
       }
@@ -252,7 +341,7 @@ class FirestoreSyncService {
   Future<void> _syncReferralForms() async {
     final forms = await (_db.select(
       _db.referralForms,
-    )..where((t) => t.syncStatus.equals(syncStatusPending))).get();
+    )..where((t) => t.syncStatus.equals(1))).get();
 
     for (final form in forms) {
       try {
@@ -273,43 +362,92 @@ class FirestoreSyncService {
           'hospitalPhone': form.hospitalPhone,
           'hospitalAddress': form.hospitalAddress,
           'lastModified': FieldValue.serverTimestamp(),
-          'syncStatus': syncStatusSynced,
         });
 
-        await (_db.update(
-          _db.referralForms,
-        )..where((t) => t.formId.equals(form.formId))).write(
-          ReferralFormsCompanion(syncStatus: const Value(syncStatusSynced)),
-        );
+        await (_db.update(_db.referralForms)
+              ..where((t) => t.formId.equals(form.formId)))
+            .write(ReferralFormsCompanion(syncStatus: const Value(0)));
       } catch (e) {
         debugPrint('Error syncing referral_form ${form.formId}: $e');
       }
     }
   }
 
-  Future<void> pullFromServer() async {
-    try {
-      final docs = await _firebase.queryDocuments(
-        'medical_records',
-        whereField: 'syncStatus',
-        whereEqualTo: syncStatusPending,
-        limit: 100,
-      );
+  Future<void> _syncFlightRecords() async {
+    final records = await (_db.select(
+      _db.flightRecord,
+    )..where((t) => t.syncStatus.equals(1))).get();
 
-      for (final doc in docs) {
-        final data = Map<String, dynamic>.from(doc.data());
-        await _applyRemoteRecord('medical_records', doc.id, data);
+    for (final record in records) {
+      try {
+        await _firebase
+            .setDocument('flight_records', record.flightRecordId.toString(), {
+              'flightRecordId': record.flightRecordId,
+              'medicalId': record.medicalId,
+              'flightNumber': record.flightNumber,
+              'airlineId': record.airlineId,
+              'travelStatusId': record.travelStatusId,
+              'lastModified': FieldValue.serverTimestamp(),
+            });
+
+        await (_db.update(_db.flightRecord)
+              ..where((t) => t.flightRecordId.equals(record.flightRecordId)))
+            .write(FlightRecordCompanion(syncStatus: const Value(0)));
+      } catch (e) {
+        debugPrint('Error syncing flight_record ${record.flightRecordId}: $e');
       }
-    } catch (e) {
-      debugPrint('Error pulling from server: $e');
     }
   }
 
-  Future<void> _applyRemoteRecord(
-    String collection,
-    String docId,
-    Map<String, dynamic> data,
-  ) async {
-    debugPrint('Applying remote record: $collection/$docId');
+  // === 同步藥物記錄 ===
+  Future<void> _syncMedications() async {
+    final records = await _db.select(_db.medications).get();
+
+    for (final record in records) {
+      try {
+        await _firebase
+            .setDocument('medications', record.medicationId.toString(), {
+              'medicationId': record.medicationId,
+              'medicalId': record.medicalId,
+              'name': record.name,
+              'method': record.method,
+              'frequency': record.frequency,
+              'days': record.days,
+              'dose': record.dose,
+              'unit': record.unit,
+              'remarks': record.remarks,
+              'createdAt': record.createdAt.toIso8601String(),
+              'lastModified': FieldValue.serverTimestamp(),
+            });
+      } catch (e) {
+        debugPrint('Error syncing medication ${record.medicationId}: $e');
+      }
+    }
+    debugPrint('Synced ${records.length} medications');
+  }
+
+  // === 同步急救處置 ===
+  Future<void> _syncEmergencyTreatments() async {
+    final records = await _db.select(_db.emergencyTreatment).get();
+
+    for (final record in records) {
+      try {
+        await _firebase
+            .setDocument('emergency_treatments', record.id.toString(), {
+              'id': record.id,
+              'medicalId': record.medicalId,
+              'startTime': record.startTime?.toIso8601String(),
+              'diagnosis': record.diagnosis,
+              'incidentContext': record.incidentContext,
+              'intubationMethod': record.intubationMethod,
+              'intubationSize': record.intubationSize,
+              'ivLineSize': record.ivLineSize,
+              'lastModified': FieldValue.serverTimestamp(),
+            });
+      } catch (e) {
+        debugPrint('Error syncing emergency_treatment ${record.id}: $e');
+      }
+    }
+    debugPrint('Synced ${records.length} emergency treatments');
   }
 }

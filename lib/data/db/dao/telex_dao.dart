@@ -10,9 +10,9 @@ class TelexDao extends DatabaseAccessor<AppDatabase> with _$TelexDaoMixin {
 
   // 根據 medicalId 取得 TELEX 文件
   Future<TelexDocumentData?> getTelexByMedicalId(int medicalId) {
-    return (select(telexDocuments)
-          ..where((t) => t.medicalId.equals(medicalId)))
-        .getSingleOrNull();
+    return (select(
+      telexDocuments,
+    )..where((t) => t.medicalId.equals(medicalId))).getSingleOrNull();
   }
 
   // 建立新的 TELEX 文件
@@ -26,6 +26,7 @@ class TelexDao extends DatabaseAccessor<AppDatabase> with _$TelexDaoMixin {
         medicalId: medicalId,
         toStationId: Value(toStationId),
         fromStationId: Value(fromStationId),
+        syncStatus: const Value(1), // 待同步
       ),
     );
   }
@@ -34,28 +35,20 @@ class TelexDao extends DatabaseAccessor<AppDatabase> with _$TelexDaoMixin {
   Future<int> updateToStation(int documentId, int? toStationId) {
     return (update(telexDocuments)
           ..where((t) => t.documentId.equals(documentId)))
-        .write(
-      TelexDocumentsCompanion(
-        toStationId: Value(toStationId),
-      ),
-    );
+        .write(TelexDocumentsCompanion(toStationId: Value(toStationId)));
   }
 
   // 更新寄件站點
   Future<int> updateFromStation(int documentId, int? fromStationId) {
     return (update(telexDocuments)
           ..where((t) => t.documentId.equals(documentId)))
-        .write(
-      TelexDocumentsCompanion(
-        fromStationId: Value(fromStationId),
-      ),
-    );
+        .write(TelexDocumentsCompanion(fromStationId: Value(fromStationId)));
   }
 
   // 刪除 TELEX 文件
   Future<int> deleteTelex(int documentId) {
-    return (delete(telexDocuments)
-          ..where((t) => t.documentId.equals(documentId)))
-        .go();
+    return (delete(
+      telexDocuments,
+    )..where((t) => t.documentId.equals(documentId))).go();
   }
 }

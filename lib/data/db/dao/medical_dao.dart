@@ -16,11 +16,17 @@ class MedicalDao extends DatabaseAccessor<AppDatabase> with _$MedicalDaoMixin {
         MedicalRecordCompanion.insert(
           isEmergency: const Value(false),
           hasAmbulance: const Value(false),
+          syncStatus: const Value(1), // 待同步
         ),
       );
 
       // 2. 建立病患基本資料並關聯 ID
-      await into(patient).insert(PatientCompanion.insert(medicalId: medicalId));
+      await into(patient).insert(
+        PatientCompanion.insert(
+          medicalId: medicalId,
+          syncStatus: const Value(1), // 待同步
+        ),
+      );
 
       return medicalId;
     });

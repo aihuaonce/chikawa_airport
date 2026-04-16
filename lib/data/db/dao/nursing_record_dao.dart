@@ -32,6 +32,7 @@ class NursingRecordDao extends DatabaseAccessor<AppDatabase>
         content: Value(content),
         nurseId: Value(nurseId),
         signature: Value(signature),
+        syncStatus: const Value(1), // 待同步
       ),
     );
   }
@@ -43,11 +44,13 @@ class NursingRecordDao extends DatabaseAccessor<AppDatabase>
     String? content,
     int? nurseId,
   }) {
-    return (update(nursingRecords)
-          ..where((r) => r.recordId.equals(recordId)))
-        .write(
+    return (update(
+      nursingRecords,
+    )..where((r) => r.recordId.equals(recordId))).write(
       NursingRecordsCompanion(
-        recordTime: recordTime != null ? Value(recordTime) : const Value.absent(),
+        recordTime: recordTime != null
+            ? Value(recordTime)
+            : const Value.absent(),
         content: content != null ? Value(content) : const Value.absent(),
         nurseId: nurseId != null ? Value(nurseId) : const Value.absent(),
       ),
@@ -56,24 +59,21 @@ class NursingRecordDao extends DatabaseAccessor<AppDatabase>
 
   // 更新護理師簽名
   Future<int> updateSignature(int recordId, Uint8List signature) {
-    return (update(nursingRecords)
-          ..where((r) => r.recordId.equals(recordId)))
-        .write(
-      NursingRecordsCompanion(signature: Value(signature)),
-    );
+    return (update(nursingRecords)..where((r) => r.recordId.equals(recordId)))
+        .write(NursingRecordsCompanion(signature: Value(signature)));
   }
 
   // 刪除護理記錄
   Future<int> deleteRecord(int recordId) {
-    return (delete(nursingRecords)
-          ..where((r) => r.recordId.equals(recordId)))
-        .go();
+    return (delete(
+      nursingRecords,
+    )..where((r) => r.recordId.equals(recordId))).go();
   }
 
   // 根據 ID 取得單筆記錄
   Future<NursingRecordData?> getRecordById(int recordId) {
-    return (select(nursingRecords)
-          ..where((r) => r.recordId.equals(recordId)))
-        .getSingleOrNull();
+    return (select(
+      nursingRecords,
+    )..where((r) => r.recordId.equals(recordId))).getSingleOrNull();
   }
 }

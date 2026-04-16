@@ -191,6 +191,7 @@ class TreatmentViewModel extends ChangeNotifier {
         TreatmentCompanion.insert(
           medicalId: medicalId,
           transportRequired: const Value(false),
+          syncStatus: const Value(1), // 待同步
         ),
       );
       debugPrint('系統:已建立預設處置記錄');

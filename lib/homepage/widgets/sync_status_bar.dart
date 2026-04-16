@@ -1,46 +1,160 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../data/models/sync_service_provider.dart';
 import '../../data/sync/models/sync_models.dart' hide SyncState;
 
-class SyncStatusIndicator extends StatelessWidget {
+class SyncStatusIndicator extends StatefulWidget {
   const SyncStatusIndicator({super.key});
+
+  @override
+  State<SyncStatusIndicator> createState() => _SyncStatusIndicatorState();
+}
+
+class _SyncStatusIndicatorState extends State<SyncStatusIndicator>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _rotationController;
+  bool _showSuccessNotification = false;
+  Timer? _notificationTimer;
+  SyncState? _lastState;
+
+  @override
+  void initState() {
+    super.initState();
+    _rotationController = AnimationController(
+      duration: const Duration(seconds: 1),
+      vsync: this,
+    );
+  }
+
+  @override
+  void dispose() {
+    _rotationController.dispose();
+    _notificationTimer?.cancel();
+    super.dispose();
+  }
+
+  void _checkStateChange(SyncState newState) {
+    debugPrint('SyncStatus: _lastState=$_lastState, newState=$newState');
+    if (_lastState == SyncState.syncing && newState == SyncState.idle) {
+      // Sync completed
+      debugPrint('SyncStatus: Sync completed! Showing notification');
+      setState(() => _showSuccessNotification = true);
+      _notificationTimer?.cancel();
+      _notificationTimer = Timer(const Duration(seconds: 3), () {
+        if (mounted) {
+          setState(() => _showSuccessNotification = false);
+        }
+      });
+    }
+    _lastState = newState;
+  }
 
   @override
   Widget build(BuildContext context) {
     return Consumer<SyncServiceProvider>(
       builder: (context, provider, _) {
+        // 監聽狀態變化
+        _checkStateChange(provider.state);
+
+        // 同步時播放動畫
+        if (provider.state == SyncState.syncing) {
+          if (!_rotationController.isAnimating) {
+            _rotationController.repeat();
+          }
+        } else {
+          _rotationController.stop();
+          _rotationController.reset();
+        }
+
         if (!provider.isInitialized) {
           return const SizedBox.shrink();
         }
 
-        return Container(
-          height: 48,
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          decoration: BoxDecoration(
-            color: const Color(0xFFF1F5F9),
-            border: Border(
-              top: BorderSide(color: Colors.grey.shade200, width: 1),
-            ),
-          ),
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              final showText = constraints.maxWidth > 150;
+        return Stack(
+          clipBehavior: Clip.none,
+          children: [
+            // 主體
+            Container(
+              height: 48,
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF1F5F9),
+                border: Border(
+                  top: BorderSide(color: Colors.grey.shade200, width: 1),
+                ),
+              ),
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final showText = constraints.maxWidth > 150;
 
-              return Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  _buildStatusIcon(context, provider, provider.state),
-                  if (showText) ...[
-                    const SizedBox(width: 8),
-                    Expanded(child: _buildStatusText(provider)),
-                    const SizedBox(width: 8),
-                  ],
-                  _buildSyncButton(context, provider),
-                ],
-              );
-            },
-          ),
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _buildStatusIcon(context, provider, provider.state),
+                      if (showText) ...[
+                        const SizedBox(width: 8),
+                        Expanded(child: _buildStatusText(provider)),
+                        const SizedBox(width: 8),
+                      ],
+                      _buildSyncButton(context, provider),
+                    ],
+                  );
+                },
+              ),
+            ),
+
+            // 右上角成功通知
+            if (_showSuccessNotification)
+              Positioned(
+                bottom: 56,
+                right: 16,
+                child: TweenAnimationBuilder<double>(
+                  tween: Tween(begin: 0.0, end: 1.0),
+                  duration: const Duration(milliseconds: 300),
+                  builder: (context, value, child) {
+                    return Opacity(
+                      opacity: value,
+                      child: Transform.translate(
+                        offset: Offset(0, 20 * (1 - value)),
+                        child: child,
+                      ),
+                    );
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.green.shade600,
+                      borderRadius: BorderRadius.circular(8),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.2),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.check_circle, color: Colors.white, size: 20),
+                        SizedBox(width: 8),
+                        Text(
+                          '同步完成',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+          ],
         );
       },
     );
@@ -70,25 +184,23 @@ class SyncStatusIndicator extends StatelessWidget {
     }
 
     if (state == SyncState.syncing) {
-      return SizedBox(
-        width: 18,
-        height: 18,
-        child: CircularProgressIndicator(
-          strokeWidth: 2,
-          valueColor: AlwaysStoppedAnimation<Color>(color),
+      return RotationTransition(
+        turns: _rotationController,
+        child: SizedBox(
+          width: 18,
+          height: 18,
+          child: CircularProgressIndicator(
+            strokeWidth: 2,
+            valueColor: AlwaysStoppedAnimation<Color>(color),
+          ),
         ),
       );
     }
 
     return InkWell(
       onTap: () {
+        debugPrint('Sync button tapped');
         provider.syncAll();
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('開始同步...'),
-            duration: Duration(seconds: 2),
-          ),
-        );
       },
       borderRadius: BorderRadius.circular(4),
       child: Padding(
@@ -108,17 +220,17 @@ class SyncStatusIndicator extends StatelessWidget {
         textColor = const Color(0xFF64748B);
       case SyncState.syncing:
         text = '同步中...';
-        textColor = const Color(0xFF64748B);
+        textColor = const Color(0xFF007A8A);
       case SyncState.error:
-        text = '同步失败';
+        text = '同步失敗';
         textColor = Colors.red;
       case SyncState.offline:
-        text = '离线';
+        text = '離線';
         textColor = Colors.grey;
     }
 
     if (provider.pendingCount > 0 && provider.state != SyncState.syncing) {
-      text = '${provider.pendingCount} 笔待同步';
+      text = '${provider.pendingCount} 筆待同步';
       textColor = Colors.orange;
     }
 
@@ -155,12 +267,6 @@ class SyncStatusIndicator extends StatelessWidget {
         InkWell(
           onTap: () {
             provider.syncAll();
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('開始同步...'),
-                duration: Duration(seconds: 1),
-              ),
-            );
           },
           borderRadius: BorderRadius.circular(4),
           child: const Padding(
