@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../data/models/sync_service_provider.dart';
-import '../../data/sync/models/sync_models.dart' hide SyncState;
 
 class SyncStatusIndicator extends StatefulWidget {
   const SyncStatusIndicator({super.key});
@@ -127,11 +126,11 @@ class _SyncStatusIndicatorState extends State<SyncStatusIndicator>
                       vertical: 12,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.green.shade600,
+                      color: const Color(0xFF22C55E),
                       borderRadius: BorderRadius.circular(8),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.2),
+                          color: Colors.black.withValues(alpha: 0.2),
                           blurRadius: 8,
                           offset: const Offset(0, 2),
                         ),
@@ -165,25 +164,12 @@ class _SyncStatusIndicatorState extends State<SyncStatusIndicator>
     SyncServiceProvider provider,
     SyncState state,
   ) {
-    final IconData icon;
-    final Color color;
+    // 根據是否有待同步資料來顯示不同圖示
+    final bool hasPending = provider.pendingCount > 0;
+    final bool isSyncing = state == SyncState.syncing;
 
-    switch (state) {
-      case SyncState.idle:
-        icon = Icons.cloud_done;
-        color = const Color(0xFF007A8A);
-      case SyncState.syncing:
-        icon = Icons.sync;
-        color = const Color(0xFF007A8A);
-      case SyncState.error:
-        icon = Icons.sync_problem;
-        color = Colors.red;
-      case SyncState.offline:
-        icon = Icons.cloud_off;
-        color = Colors.grey;
-    }
-
-    if (state == SyncState.syncing) {
+    if (isSyncing) {
+      // 同步中：顯示旋轉動畫
       return RotationTransition(
         turns: _rotationController,
         child: SizedBox(
@@ -191,16 +177,21 @@ class _SyncStatusIndicatorState extends State<SyncStatusIndicator>
           height: 18,
           child: CircularProgressIndicator(
             strokeWidth: 2,
-            valueColor: AlwaysStoppedAnimation<Color>(color),
+            valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF007A8A)),
           ),
         ),
       );
     }
 
+    // 待同步：顯示警告圖示（橙色）
+    // 同步完成：顯示完成圖示（綠色）
+    final IconData icon = hasPending ? Icons.cloud_upload : Icons.cloud_done;
+    final Color color = hasPending ? Colors.orange : const Color(0xFF22C55E);
+
     return InkWell(
       onTap: () {
         debugPrint('Sync button tapped');
-        provider.syncAll();
+        provider.syncBidirectional();
       },
       borderRadius: BorderRadius.circular(4),
       child: Padding(
@@ -211,27 +202,21 @@ class _SyncStatusIndicatorState extends State<SyncStatusIndicator>
   }
 
   Widget _buildStatusText(SyncServiceProvider provider) {
+    final bool hasPending = provider.pendingCount > 0;
+    final bool isSyncing = provider.state == SyncState.syncing;
+
     String text;
     Color textColor;
 
-    switch (provider.state) {
-      case SyncState.idle:
-        text = '已同步';
-        textColor = const Color(0xFF64748B);
-      case SyncState.syncing:
-        text = '同步中...';
-        textColor = const Color(0xFF007A8A);
-      case SyncState.error:
-        text = '同步失敗';
-        textColor = Colors.red;
-      case SyncState.offline:
-        text = '離線';
-        textColor = Colors.grey;
-    }
-
-    if (provider.pendingCount > 0 && provider.state != SyncState.syncing) {
+    if (isSyncing) {
+      text = '同步中...';
+      textColor = const Color(0xFF007A8A);
+    } else if (hasPending) {
       text = '${provider.pendingCount} 筆待同步';
       textColor = Colors.orange;
+    } else {
+      text = '同步完成';
+      textColor = const Color(0xFF22C55E);
     }
 
     return Text(
@@ -266,7 +251,7 @@ class _SyncStatusIndicatorState extends State<SyncStatusIndicator>
         ],
         InkWell(
           onTap: () {
-            provider.syncAll();
+            provider.syncBidirectional();
           },
           borderRadius: BorderRadius.circular(4),
           child: const Padding(

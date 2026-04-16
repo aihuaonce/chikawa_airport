@@ -1,5 +1,4 @@
 import 'package:flutter/widgets.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../db/database.dart';
 import '../services/firestore_sync_service.dart';
 
@@ -43,6 +42,9 @@ class SyncServiceProvider extends ChangeNotifier with WidgetsBindingObserver {
 
     _syncService = FirestoreSyncService(db);
 
+    // 啟動定期自動同步（15 分鐘一次）
+    _syncService.startPeriodicSync();
+
     _initialized = true;
     debugPrint('FirestoreSyncService initialized');
     notifyListeners();
@@ -68,18 +70,19 @@ class SyncServiceProvider extends ChangeNotifier with WidgetsBindingObserver {
 
   void _onAppResumed() {
     if (_initialized) {
-      syncAll();
+      syncBidirectional();
     }
   }
 
-  Future<void> syncAll() async {
-    debugPrint('SyncServiceProvider: syncAll() called');
+  /// 雙向同步：上傳本地變更 + 下載遠端變更
+  Future<void> syncBidirectional() async {
+    debugPrint('SyncServiceProvider: syncBidirectional() called');
     _state = SyncState.syncing;
     _lastError = null;
     notifyListeners();
 
     try {
-      await _syncService.syncAll();
+      await _syncService.syncBidirectional();
       debugPrint('SyncServiceProvider: sync completed, setting state to idle');
       _state = SyncState.idle;
     } catch (e) {
@@ -89,7 +92,50 @@ class SyncServiceProvider extends ChangeNotifier with WidgetsBindingObserver {
       debugPrint('Sync error: $e');
     }
     notifyListeners();
-    debugPrint('SyncServiceProvider: syncAll() done');
+    debugPrint('SyncServiceProvider: syncBidirectional() done');
+  }
+
+  /// 僅上傳本地變更到遠端
+  Future<void> syncToRemote() async {
+    debugPrint('SyncServiceProvider: syncToRemote() called');
+    _state = SyncState.syncing;
+    _lastError = null;
+    notifyListeners();
+
+    try {
+      await _syncService.syncToRemote();
+      debugPrint('SyncServiceProvider: upload completed');
+      _state = SyncState.idle;
+    } catch (e) {
+      debugPrint('SyncServiceProvider: upload failed: $e');
+      _state = SyncState.error;
+      _lastError = e.toString();
+    }
+    notifyListeners();
+  }
+
+  /// 僅從遠端下載資料到本地
+  Future<void> syncFromRemote() async {
+    debugPrint('SyncServiceProvider: syncFromRemote() called');
+    _state = SyncState.syncing;
+    _lastError = null;
+    notifyListeners();
+
+    try {
+      await _syncService.syncFromRemote();
+      debugPrint('SyncServiceProvider: download completed');
+      _state = SyncState.idle;
+    } catch (e) {
+      debugPrint('SyncServiceProvider: download failed: $e');
+      _state = SyncState.error;
+      _lastError = e.toString();
+    }
+    notifyListeners();
+  }
+
+  @Deprecated('Use syncBidirectional() instead')
+  Future<void> syncAll() async {
+    await syncBidirectional();
   }
 
   Future<void> syncOnHomeReturn() async {
@@ -119,6 +165,7 @@ class SyncServiceProvider extends ChangeNotifier with WidgetsBindingObserver {
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _syncService.stopPeriodicSync();
     super.dispose();
   }
 }

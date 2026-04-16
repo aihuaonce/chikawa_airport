@@ -31,6 +31,7 @@ import 'dao/referral_form_dao.dart';
 import 'dao/contact_dao.dart';
 import 'dao/ambulance_treatment_dao.dart';
 import 'dao/emergency_dao.dart';
+import 'dao/sync_dao.dart';
 
 part 'database.g.dart';
 
@@ -141,6 +142,7 @@ part 'database.g.dart';
     AmbulanceDao,
     AmbulanceTreatmentDao,
     EmergencyDao,
+    SyncDao,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -188,4 +190,7 @@ class AppDatabase extends _$AppDatabase {
   @override
   AmbulanceTreatmentDao get ambulanceTreatmentDao =>
       AmbulanceTreatmentDao(this);
+
+  @override
+  SyncDao get syncDao => SyncDao(this);
 }

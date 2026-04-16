@@ -24,6 +24,9 @@ void main() async {
   await syncServiceProvider.initialize(database);
   await firebaseService.initialize();
 
+  // 啟動時執行雙向同步
+  syncServiceProvider.syncBidirectional();
+
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.landscapeLeft,
     DeviceOrientation.landscapeRight,

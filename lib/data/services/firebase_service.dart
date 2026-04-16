@@ -35,7 +35,16 @@ class FirebaseService {
 
   String? get currentUserId => _auth.currentUser?.uid;
 
-  CollectionReference collection(String path) => _firestore.collection(path);
+  CollectionReference<Map<String, dynamic>> collection(String path) =>
+      _firestore.collection(path);
+
+  /// 取得 Firestore Collection 的 QuerySnapshot
+  Future<QuerySnapshot<Map<String, dynamic>>> getCollectionSnapshot(
+    String path,
+  ) async {
+    final snapshot = await _firestore.collection(path).get();
+    return snapshot;
+  }
 
   Future<void> setDocument(
     String collectionPath,

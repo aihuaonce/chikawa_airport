@@ -40449,6 +40449,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final AmbulanceTreatmentDao ambulanceTreatmentDao =
       AmbulanceTreatmentDao(this as AppDatabase);
   late final EmergencyDao emergencyDao = EmergencyDao(this as AppDatabase);
+  late final SyncDao syncDao = SyncDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
