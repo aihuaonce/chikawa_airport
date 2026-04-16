@@ -35,6 +35,7 @@ class EmergencyDao extends DatabaseAccessor<AppDatabase>
         medicalId: Value(medicalId),
         createdAt: Value(DateTime.now()),
         updatedAt: Value(DateTime.now()),
+        syncStatus: const Value(1), // 待同步
       ),
     );
 
@@ -76,6 +77,7 @@ class EmergencyDao extends DatabaseAccessor<AppDatabase>
       MedicalAssessmentCompanion(
         medicalId: Value(medicalId),
         assessmentTime: Value(DateTime.now()),
+        syncStatus: const Value(1), // 待同步
       ),
     );
 

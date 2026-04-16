@@ -34,13 +34,15 @@ class Patient extends Table {
   TextColumn get anonymizationName => text().nullable()();
   DateTimeColumn get birthday => dateTime().nullable()();
 
-  IntColumn get sexId => integer().withDefault(const Constant(1)).references(Sex, #sexId)();
+  IntColumn get sexId =>
+      integer().withDefault(const Constant(1)).references(Sex, #sexId)();
 
   TextColumn get passportOrIdNo => text().nullable()();
   TextColumn get idNo => text().nullable()(); // 新增身分證字號欄位
 
-  IntColumn get visitReasonId =>
-      integer().withDefault(const Constant(1)).references(VisitReason, #id)(); // 為何至機場
+  IntColumn get visitReasonId => integer()
+      .withDefault(const Constant(1))
+      .references(VisitReason, #id)(); // 為何至機場
 
   IntColumn get nationalityId =>
       integer().nullable().references(Nationality, #nationalityId)();
@@ -217,6 +219,10 @@ class MedicalAssessment extends Table {
   IntColumn get triageId => integer().nullable()();
   DateTimeColumn get assessmentTime =>
       dateTime().withDefault(currentDateAndTime)();
+
+  IntColumn get syncStatus => integer().withDefault(const Constant(0))();
+  TextColumn get remoteId => text().nullable()();
+  DateTimeColumn get lastModified => dateTime().nullable()();
 }
 
 //處置-病史表
@@ -529,6 +535,10 @@ class EmergencyTreatment extends Table {
 
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
   DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
+
+  IntColumn get syncStatus => integer().withDefault(const Constant(0))();
+  TextColumn get remoteId => text().nullable()();
+  DateTimeColumn get lastModified => dateTime().nullable()();
 }
 
 // 急救處置-急救藥物記錄表
