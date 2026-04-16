@@ -46,8 +46,8 @@ class SyncService extends ChangeNotifier {
   int _conflictCount = 0;
   bool _isPushingPending = false;
 
-  // Background sync interval (default: 5 minutes)
-  static const Duration _syncInterval = Duration(minutes: 5);
+  // Background sync interval (default: 15 minutes)
+  static const Duration _syncInterval = Duration(minutes: 15);
 
   // Tables to include in snapshot (in FK order for proper resolution)
   static const List<String> snapshotTables = [
@@ -1812,11 +1812,8 @@ class SyncService extends ChangeNotifier {
         return;
       }
 
-      final tables = pendingLogs
-          .map((log) => log.syncTableName)
-          .toSet()
-          .toList()
-        ..sort();
+      final tables =
+          pendingLogs.map((log) => log.syncTableName).toSet().toList()..sort();
       debugPrint(
         'Push pending logs: ${pendingLogs.length} (${tables.join(', ')})',
       );
