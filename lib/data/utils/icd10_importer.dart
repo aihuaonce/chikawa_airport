@@ -24,8 +24,12 @@ class Icd10Importer {
         'CSV 前100字符: ${csvData.substring(0, csvData.length > 100 ? 100 : csvData.length)}',
       );
 
-      // 解析 CSV
-      final rows = const CsvToListConverter().convert(csvData);
+      // 解析 CSV - 使用明确的换行符
+      final rows = const CsvToListConverter(
+        eol: '\n',
+        shouldParseNumbers: false,
+      ).convert(csvData);
+
       debugPrint('CSV 行数: ${rows.length}');
 
       if (rows.isEmpty) {
@@ -42,10 +46,10 @@ class Icd10Importer {
         if (row.length >= 4) {
           companions.add(
             Icd10CodeCompanion.insert(
-              code: row[0].toString(),
-              nameEn: row[2].toString(),
-              nameCh: row[3].toString(),
-              isLeaf: row[1].toString() == '1',
+              code: row[0].toString().trim(),
+              nameEn: row[2].toString().trim(),
+              nameCh: row[3].toString().trim(),
+              isLeaf: row[1].toString().trim() == '1',
             ),
           );
         } else {
