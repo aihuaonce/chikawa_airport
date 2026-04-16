@@ -58,6 +58,11 @@ dependencies:
   fl_chart: ^0.70.0
   csv: ^6.0.0
 
+  # Firebase
+  firebase_core: ^3.13.0
+  cloud_firestore: ^5.6.6
+  firebase_auth: ^5.5.3
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

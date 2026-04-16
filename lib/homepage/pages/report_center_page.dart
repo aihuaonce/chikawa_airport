@@ -1820,16 +1820,16 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
     print('=== DEBUG: 緊急醫療救護申請單資料 ===');
     print('treatment: ${treatment != null ? "exists" : "null"}');
     if (treatment != null) {
-      print('  - tentative: ${treatment!.tentative}');
-      print('  - secondaryDiagnosis1: ${treatment!.secondaryDiagnosis1}');
-      print('  - referralHospitalFinal: ${treatment!.referralHospitalFinal}');
-      print('  - transportMethod: ${treatment!.transportMethod}');
-      print('  - clearanceId: ${treatment!.clearanceId}');
-      print('  - expeditedClearanceId: ${treatment!.expeditedClearanceId}');
+      print('  - tentative: ${treatment.tentative}');
+      print('  - secondaryDiagnosis1: ${treatment.secondaryDiagnosis1}');
+      print('  - referralHospitalFinal: ${treatment.referralHospitalFinal}');
+      print('  - transportMethod: ${treatment.transportMethod}');
+      print('  - clearanceId: ${treatment.clearanceId}');
+      print('  - expeditedClearanceId: ${treatment.expeditedClearanceId}');
     }
     print('chiefComplaint: ${chiefComplaint != null ? "exists" : "null"}');
     if (chiefComplaint != null) {
-      print('  - chiefComplaintFinal: ${chiefComplaint!.chiefComplaintFinal}');
+      print('  - chiefComplaintFinal: ${chiefComplaint.chiefComplaintFinal}');
     }
     print('assessments count: ${assessments.length}');
     if (assessments.isNotEmpty) {

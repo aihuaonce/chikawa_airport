@@ -1,6 +1,8 @@
 import 'package:chikawa_airport/data/models/reference_service.dart';
 import 'package:chikawa_airport/data/models/sync_service_provider.dart';
+import 'package:chikawa_airport/data/services/firebase_service.dart';
 import 'package:chikawa_airport/ambulance/pages/body_map.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -9,12 +11,24 @@ import 'data/db/database.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await Firebase.initializeApp(
+    options: const FirebaseOptions(
+      apiKey: 'YOUR_API_KEY',
+      appId: 'YOUR_APP_ID',
+      messagingSenderId: 'YOUR_SENDER_ID',
+      projectId: 'YOUR_PROJECT_ID',
+    ),
+  );
+
   final database = AppDatabase();
   final refService = ReferenceService(database);
   final syncServiceProvider = SyncServiceProvider();
+  final firebaseService = FirebaseService();
 
   await refService.init();
   await syncServiceProvider.initialize(database);
+  await firebaseService.initialize();
 
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.landscapeLeft,
@@ -26,8 +40,13 @@ void main() async {
       providers: [
         Provider<AppDatabase>.value(value: database),
         ChangeNotifierProvider<ReferenceService>.value(value: refService),
-        ChangeNotifierProvider<SyncServiceProvider>.value(value: syncServiceProvider),
-        ChangeNotifierProvider<BodyMapProvider>(create: (_) => BodyMapProvider()),
+        ChangeNotifierProvider<SyncServiceProvider>.value(
+          value: syncServiceProvider,
+        ),
+        Provider<FirebaseService>.value(value: firebaseService),
+        ChangeNotifierProvider<BodyMapProvider>(
+          create: (_) => BodyMapProvider(),
+        ),
       ],
       child: const MyApp(),
     ),
