@@ -53,3 +53,11 @@ android/app/google-services.json
 firebase.json
 ios/Runner/GoogleService-Info.plist
 lib/firebase_options.dart
+
+# Firebase service account key
+service-account-key.json
+*.json
+
+# Node.js
+functions/
+node_modules/
