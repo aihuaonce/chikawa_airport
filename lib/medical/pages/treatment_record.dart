@@ -162,7 +162,7 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
       _actionSummaryOtherController.text = treatment.actionSummaryOther ?? '';
       _tentativeController.text = treatment.tentative ?? '';
       _secondaryDiagnosis1Controller.text = treatment.secondaryDiagnosis1 ?? '';
-      _secondaryDiagnosis2Controller.text = treatment.secondaryDiagnosis1 ?? '';
+      _secondaryDiagnosis2Controller.text = treatment.secondaryDiagnosis2 ?? '';
       _directorNameController.text = treatment.directorName ?? '';
       _referralHospitalFinalController.text =
           treatment.referralHospitalFinal ?? '';
