@@ -5,7 +5,26 @@ import 'package:flutter/foundation.dart';
 import '../db/database.dart';
 
 class CsvReferenceImporter {
-  static const _csvConverter = CsvToListConverter();
+  // 使用正確的設定：明確指定 eol 為 LF (Unix 換行符號)
+  static const _csvConverter = CsvToListConverter(
+    eol: '\n',
+    shouldParseNumbers: false,
+  );
+
+  /// 手動解析 CSV（備用方案）
+  static List<List<dynamic>> _parseCsvManual(String data) {
+    final List<List<dynamic>> result = [];
+    final lines = data.split('\n');
+
+    for (final line in lines) {
+      if (line.trim().isEmpty) continue;
+      // 簡單解析：按逗號分割
+      final parts = line.split(',');
+      result.add(parts.map((p) => p.trim()).toList());
+    }
+
+    return result;
+  }
 
   /// 匯入所有參考資料 CSV
   static Future<void> importAll(AppDatabase db) async {
@@ -19,7 +38,11 @@ class CsvReferenceImporter {
   static Future<void> importLocations(AppDatabase db) async {
     // 檢查是否已存在資料
     final count = await (db.select(db.location).get()).then((l) => l.length);
-    if (count > 0) return;
+    debugPrint('地點資料庫現有筆數: $count');
+    if (count > 0) {
+      debugPrint('地點資料已存在，跳過匯入');
+      return;
+    }
 
     debugPrint('正在匯入地點資料...');
     final files = ['assets/csv/airport.medical.arrival.csv'];
@@ -29,7 +52,35 @@ class CsvReferenceImporter {
     for (final file in files) {
       try {
         final data = await rootBundle.loadString(file);
+        debugPrint('地點 CSV 載入成功，長度: ${data.length}');
+
+        // 除錯：顯示前 200 字元
+        debugPrint(
+          'CSV 前200字元: ${data.substring(0, data.length > 200 ? 200 : data.length).replaceAll('\n', '\\n').replaceAll('\r', '\\r')}',
+        );
+
         final rows = _csvConverter.convert(data);
+        debugPrint('地點 CSV 解析後行數: ${rows.length}');
+
+        // 如果 csv 套件解析失敗（只有1行），使用手動解析
+        if (rows.length <= 1 && data.length > 10) {
+          debugPrint('CSV 套件解析失敗，嘗試手動解析...');
+          final manualRows = _parseCsvManual(data);
+          debugPrint('手動解析後行數: ${manualRows.length}');
+          if (manualRows.length > rows.length) {
+            debugPrint('使用手動解析結果');
+            rows.clear();
+            rows.addAll(manualRows);
+          }
+        }
+
+        // 除錯：顯示前3行
+        if (rows.length > 0) {
+          debugPrint('第一行: ${rows[0]}');
+          if (rows.length > 1) {
+            debugPrint('第二行: ${rows[1]}');
+          }
+        }
 
         // 跳過標題行 (name,country)
         for (var i = 1; i < rows.length; i++) {
@@ -53,21 +104,32 @@ class CsvReferenceImporter {
             }
           }
         }
+        debugPrint('地點解析完成，待匯入筆數: ${uniqueLocations.length}');
       } catch (e) {
         debugPrint('匯入地點 CSV 失敗 ($file): $e');
       }
     }
 
     if (uniqueLocations.isNotEmpty) {
-      await db.referenceDao.addLocationBatch(uniqueLocations.values.toList());
-      debugPrint('已匯入 ${uniqueLocations.length} 筆地點資料');
+      try {
+        await db.referenceDao.addLocationBatch(uniqueLocations.values.toList());
+        debugPrint('已匯入 ${uniqueLocations.length} 筆地點資料');
+      } catch (e) {
+        debugPrint('寫入地點資料庫失敗: $e');
+      }
+    } else {
+      debugPrint('警告: 地點資料為空，未匯入任何資料');
     }
   }
 
   /// 2. 匯入航空公司 (Airline)
   static Future<void> importAirlines(AppDatabase db) async {
     final count = await (db.select(db.airline).get()).then((l) => l.length);
-    if (count > 0) return;
+    debugPrint('航空公司資料庫現有筆數: $count');
+    if (count > 0) {
+      debugPrint('航空公司資料已存在，跳過匯入');
+      return;
+    }
 
     debugPrint('正在匯入航空公司資料...');
     final List<Map<String, dynamic>> airlines = [];
@@ -77,7 +139,16 @@ class CsvReferenceImporter {
       final data = await rootBundle.loadString(
         'assets/csv/airport.medical.company.csv',
       );
-      final rows = _csvConverter.convert(data);
+      debugPrint('常用航空公司 CSV 載入成功，長度: ${data.length}');
+      var rows = _csvConverter.convert(data);
+      debugPrint('常用航空公司 CSV 解析後行數: ${rows.length}');
+
+      // 如果 csv 套件解析失敗，使用手動解析
+      if (rows.length <= 1 && data.length > 10) {
+        debugPrint('常用航空公司 CSV 套件解析失敗，嘗試手動解析...');
+        rows = _parseCsvManual(data);
+        debugPrint('常用航空公司手動解析後行數: ${rows.length}');
+      }
 
       for (var i = 1; i < rows.length; i++) {
         final row = rows[i];
@@ -95,6 +166,7 @@ class CsvReferenceImporter {
           }
         }
       }
+      debugPrint('常用航空公司解析完成: ${airlines.length} 筆');
     } catch (e) {
       debugPrint('匯入常用航空公司 CSV 失敗: $e');
     }
@@ -104,7 +176,16 @@ class CsvReferenceImporter {
       final data = await rootBundle.loadString(
         'assets/csv/airport.medical.company.other.csv',
       );
-      final rows = _csvConverter.convert(data);
+      debugPrint('其他航空公司 CSV 載入成功，長度: ${data.length}');
+      var rows = _csvConverter.convert(data);
+      debugPrint('其他航空公司 CSV 解析後行數: ${rows.length}');
+
+      // 如果 csv 套件解析失敗，使用手動解析
+      if (rows.length <= 1 && data.length > 10) {
+        debugPrint('其他航空公司 CSV 套件解析失敗，嘗試手動解析...');
+        rows = _parseCsvManual(data);
+        debugPrint('其他航空公司手動解析後行數: ${rows.length}');
+      }
 
       for (var i = 1; i < rows.length; i++) {
         final row = rows[i];
@@ -125,32 +206,43 @@ class CsvReferenceImporter {
           }
         }
       }
+      debugPrint('其他航空公司解析完成: ${airlines.length} 筆');
     } catch (e) {
       debugPrint('匯入其他航空公司 CSV 失敗: $e');
     }
 
     if (airlines.isNotEmpty) {
-      // 批次寫入
-      await db.batch((batch) {
-        batch.insertAll(
-          db.airline,
-          airlines.map(
-            (a) => AirlineCompanion.insert(
-              code: a['code'] as String,
-              name: a['name'] as String,
-              isOther: Value(a['isOther'] as bool),
+      try {
+        // 批次寫入
+        await db.batch((batch) {
+          batch.insertAll(
+            db.airline,
+            airlines.map(
+              (a) => AirlineCompanion.insert(
+                code: a['code'] as String,
+                name: a['name'] as String,
+                isOther: Value(a['isOther'] as bool),
+              ),
             ),
-          ),
-        );
-      });
-      debugPrint('已匯入 ${airlines.length} 筆航空公司資料');
+          );
+        });
+        debugPrint('已匯入 ${airlines.length} 筆航空公司資料');
+      } catch (e) {
+        debugPrint('寫入航空公司資料庫失敗: $e');
+      }
+    } else {
+      debugPrint('警告: 航空公司資料為空，未匯入任何資料');
     }
   }
 
   /// 3. 匯入國籍 (Nationality)
   static Future<void> importNationalities(AppDatabase db) async {
     final count = await (db.select(db.nationality).get()).then((l) => l.length);
-    if (count > 0) return;
+    debugPrint('國籍資料庫現有筆數: $count');
+    if (count > 0) {
+      debugPrint('國籍資料已存在，跳過匯入');
+      return;
+    }
 
     debugPrint('正在匯入國籍資料...');
     final files = [
@@ -166,7 +258,16 @@ class CsvReferenceImporter {
     for (final file in files) {
       try {
         final data = await rootBundle.loadString(file);
-        final rows = _csvConverter.convert(data);
+        debugPrint('國籍 CSV ($file) 載入成功，長度: ${data.length}');
+        var rows = _csvConverter.convert(data);
+        debugPrint('國籍 CSV 解析後行數: ${rows.length}');
+
+        // 如果 csv 套件解析失敗，使用手動解析
+        if (rows.length <= 1 && data.length > 10) {
+          debugPrint('國籍 CSV ($file) 套件解析失敗，嘗試手動解析...');
+          rows = _parseCsvManual(data);
+          debugPrint('國籍 CSV ($file) 手動解析後行數: ${rows.length}');
+        }
 
         // 跳過標題行 (name)
         for (var i = 1; i < rows.length; i++) {
@@ -188,14 +289,22 @@ class CsvReferenceImporter {
 
           nationalities.add({'name': nameCh, 'nameEn': nameEn});
         }
+        debugPrint('國籍 CSV ($file) 解析完成');
       } catch (e) {
         debugPrint('匯入國籍 CSV 失敗 ($file): $e');
       }
     }
+    debugPrint('國籍解析完成，待匯入筆數: ${nationalities.length}');
 
     if (nationalities.isNotEmpty) {
-      await db.referenceDao.addNationalityBatch(nationalities);
-      debugPrint('已匯入 ${nationalities.length} 筆國籍資料');
+      try {
+        await db.referenceDao.addNationalityBatch(nationalities);
+        debugPrint('已匯入 ${nationalities.length} 筆國籍資料');
+      } catch (e) {
+        debugPrint('寫入國籍資料庫失敗: $e');
+      }
+    } else {
+      debugPrint('警告: 國籍資料為空，未匯入任何資料');
     }
   }
 

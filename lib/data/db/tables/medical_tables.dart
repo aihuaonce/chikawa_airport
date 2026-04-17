@@ -85,6 +85,9 @@ class FlightRecord extends Table {
   IntColumn get syncStatus => integer().withDefault(const Constant(0))();
   TextColumn get remoteId => text().nullable()();
   DateTimeColumn get lastModified => dateTime().nullable()();
+
+  // 軟刪除標記
+  DateTimeColumn get deletedAt => dateTime().nullable()();
 }
 
 //飛航-經過點表
@@ -104,6 +107,9 @@ class FlightTransitLocations extends Table {
 
   // 排序：例如第一站、第二站
   IntColumn get stopOrder => integer().withDefault(const Constant(0))();
+
+  // 軟刪除標記
+  DateTimeColumn get deletedAt => dateTime().nullable()();
 }
 
 //事件紀錄表

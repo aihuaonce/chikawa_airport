@@ -65,6 +65,11 @@ class FirebaseService {
     return doc.data();
   }
 
+  /// 刪除 Firestore 文件
+  Future<void> deleteDocument(String collectionPath, String docId) async {
+    await _firestore.collection(collectionPath).doc(docId).delete();
+  }
+
   Stream<DocumentSnapshot<Map<String, dynamic>>> watchDocument(
     String collectionPath,
     String docId,

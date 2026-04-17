@@ -12623,6 +12623,17 @@ class $FlightRecordTable extends FlightRecord
     type: DriftSqlType.dateTime,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _deletedAtMeta = const VerificationMeta(
+    'deletedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
+    'deleted_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     flightRecordId,
@@ -12636,6 +12647,7 @@ class $FlightRecordTable extends FlightRecord
     syncStatus,
     remoteId,
     lastModified,
+    deletedAt,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -12737,6 +12749,12 @@ class $FlightRecordTable extends FlightRecord
         ),
       );
     }
+    if (data.containsKey('deleted_at')) {
+      context.handle(
+        _deletedAtMeta,
+        deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
+      );
+    }
     return context;
   }
 
@@ -12790,6 +12808,10 @@ class $FlightRecordTable extends FlightRecord
         DriftSqlType.dateTime,
         data['${effectivePrefix}last_modified'],
       ),
+      deletedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}deleted_at'],
+      ),
     );
   }
 
@@ -12812,6 +12834,7 @@ class FlightRecordData extends DataClass
   final int syncStatus;
   final String? remoteId;
   final DateTime? lastModified;
+  final DateTime? deletedAt;
   const FlightRecordData({
     required this.flightRecordId,
     required this.medicalId,
@@ -12824,6 +12847,7 @@ class FlightRecordData extends DataClass
     required this.syncStatus,
     this.remoteId,
     this.lastModified,
+    this.deletedAt,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -12850,6 +12874,9 @@ class FlightRecordData extends DataClass
     }
     if (!nullToAbsent || lastModified != null) {
       map['last_modified'] = Variable<DateTime>(lastModified);
+    }
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt);
     }
     return map;
   }
@@ -12879,6 +12906,9 @@ class FlightRecordData extends DataClass
       lastModified: lastModified == null && nullToAbsent
           ? const Value.absent()
           : Value(lastModified),
+      deletedAt: deletedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deletedAt),
     );
   }
 
@@ -12901,6 +12931,7 @@ class FlightRecordData extends DataClass
       syncStatus: serializer.fromJson<int>(json['syncStatus']),
       remoteId: serializer.fromJson<String?>(json['remoteId']),
       lastModified: serializer.fromJson<DateTime?>(json['lastModified']),
+      deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
     );
   }
   @override
@@ -12918,6 +12949,7 @@ class FlightRecordData extends DataClass
       'syncStatus': serializer.toJson<int>(syncStatus),
       'remoteId': serializer.toJson<String?>(remoteId),
       'lastModified': serializer.toJson<DateTime?>(lastModified),
+      'deletedAt': serializer.toJson<DateTime?>(deletedAt),
     };
   }
 
@@ -12933,6 +12965,7 @@ class FlightRecordData extends DataClass
     int? syncStatus,
     Value<String?> remoteId = const Value.absent(),
     Value<DateTime?> lastModified = const Value.absent(),
+    Value<DateTime?> deletedAt = const Value.absent(),
   }) => FlightRecordData(
     flightRecordId: flightRecordId ?? this.flightRecordId,
     medicalId: medicalId ?? this.medicalId,
@@ -12951,6 +12984,7 @@ class FlightRecordData extends DataClass
     syncStatus: syncStatus ?? this.syncStatus,
     remoteId: remoteId.present ? remoteId.value : this.remoteId,
     lastModified: lastModified.present ? lastModified.value : this.lastModified,
+    deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
   );
   FlightRecordData copyWithCompanion(FlightRecordCompanion data) {
     return FlightRecordData(
@@ -12979,6 +13013,7 @@ class FlightRecordData extends DataClass
       lastModified: data.lastModified.present
           ? data.lastModified.value
           : this.lastModified,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
     );
   }
 
@@ -12995,7 +13030,8 @@ class FlightRecordData extends DataClass
           ..write('createdAt: $createdAt, ')
           ..write('syncStatus: $syncStatus, ')
           ..write('remoteId: $remoteId, ')
-          ..write('lastModified: $lastModified')
+          ..write('lastModified: $lastModified, ')
+          ..write('deletedAt: $deletedAt')
           ..write(')'))
         .toString();
   }
@@ -13013,6 +13049,7 @@ class FlightRecordData extends DataClass
     syncStatus,
     remoteId,
     lastModified,
+    deletedAt,
   );
   @override
   bool operator ==(Object other) =>
@@ -13028,7 +13065,8 @@ class FlightRecordData extends DataClass
           other.createdAt == this.createdAt &&
           other.syncStatus == this.syncStatus &&
           other.remoteId == this.remoteId &&
-          other.lastModified == this.lastModified);
+          other.lastModified == this.lastModified &&
+          other.deletedAt == this.deletedAt);
 }
 
 class FlightRecordCompanion extends UpdateCompanion<FlightRecordData> {
@@ -13043,6 +13081,7 @@ class FlightRecordCompanion extends UpdateCompanion<FlightRecordData> {
   final Value<int> syncStatus;
   final Value<String?> remoteId;
   final Value<DateTime?> lastModified;
+  final Value<DateTime?> deletedAt;
   const FlightRecordCompanion({
     this.flightRecordId = const Value.absent(),
     this.medicalId = const Value.absent(),
@@ -13055,6 +13094,7 @@ class FlightRecordCompanion extends UpdateCompanion<FlightRecordData> {
     this.syncStatus = const Value.absent(),
     this.remoteId = const Value.absent(),
     this.lastModified = const Value.absent(),
+    this.deletedAt = const Value.absent(),
   });
   FlightRecordCompanion.insert({
     this.flightRecordId = const Value.absent(),
@@ -13068,6 +13108,7 @@ class FlightRecordCompanion extends UpdateCompanion<FlightRecordData> {
     this.syncStatus = const Value.absent(),
     this.remoteId = const Value.absent(),
     this.lastModified = const Value.absent(),
+    this.deletedAt = const Value.absent(),
   }) : medicalId = Value(medicalId),
        flightNumber = Value(flightNumber);
   static Insertable<FlightRecordData> custom({
@@ -13082,6 +13123,7 @@ class FlightRecordCompanion extends UpdateCompanion<FlightRecordData> {
     Expression<int>? syncStatus,
     Expression<String>? remoteId,
     Expression<DateTime>? lastModified,
+    Expression<DateTime>? deletedAt,
   }) {
     return RawValuesInsertable({
       if (flightRecordId != null) 'flight_record_id': flightRecordId,
@@ -13096,6 +13138,7 @@ class FlightRecordCompanion extends UpdateCompanion<FlightRecordData> {
       if (syncStatus != null) 'sync_status': syncStatus,
       if (remoteId != null) 'remote_id': remoteId,
       if (lastModified != null) 'last_modified': lastModified,
+      if (deletedAt != null) 'deleted_at': deletedAt,
     });
   }
 
@@ -13111,6 +13154,7 @@ class FlightRecordCompanion extends UpdateCompanion<FlightRecordData> {
     Value<int>? syncStatus,
     Value<String?>? remoteId,
     Value<DateTime?>? lastModified,
+    Value<DateTime?>? deletedAt,
   }) {
     return FlightRecordCompanion(
       flightRecordId: flightRecordId ?? this.flightRecordId,
@@ -13124,6 +13168,7 @@ class FlightRecordCompanion extends UpdateCompanion<FlightRecordData> {
       syncStatus: syncStatus ?? this.syncStatus,
       remoteId: remoteId ?? this.remoteId,
       lastModified: lastModified ?? this.lastModified,
+      deletedAt: deletedAt ?? this.deletedAt,
     );
   }
 
@@ -13163,6 +13208,9 @@ class FlightRecordCompanion extends UpdateCompanion<FlightRecordData> {
     if (lastModified.present) {
       map['last_modified'] = Variable<DateTime>(lastModified.value);
     }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
+    }
     return map;
   }
 
@@ -13179,7 +13227,8 @@ class FlightRecordCompanion extends UpdateCompanion<FlightRecordData> {
           ..write('createdAt: $createdAt, ')
           ..write('syncStatus: $syncStatus, ')
           ..write('remoteId: $remoteId, ')
-          ..write('lastModified: $lastModified')
+          ..write('lastModified: $lastModified, ')
+          ..write('deletedAt: $deletedAt')
           ..write(')'))
         .toString();
   }
@@ -13244,12 +13293,24 @@ class $FlightTransitLocationsTable extends FlightTransitLocations
     requiredDuringInsert: false,
     defaultValue: const Constant(0),
   );
+  static const VerificationMeta _deletedAtMeta = const VerificationMeta(
+    'deletedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
+    'deleted_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
     flightRecordId,
     locationId,
     stopOrder,
+    deletedAt,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -13291,6 +13352,12 @@ class $FlightTransitLocationsTable extends FlightTransitLocations
         stopOrder.isAcceptableOrUnknown(data['stop_order']!, _stopOrderMeta),
       );
     }
+    if (data.containsKey('deleted_at')) {
+      context.handle(
+        _deletedAtMeta,
+        deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
+      );
+    }
     return context;
   }
 
@@ -13319,6 +13386,10 @@ class $FlightTransitLocationsTable extends FlightTransitLocations
         DriftSqlType.int,
         data['${effectivePrefix}stop_order'],
       )!,
+      deletedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}deleted_at'],
+      ),
     );
   }
 
@@ -13334,11 +13405,13 @@ class FlightTransitLocationData extends DataClass
   final int flightRecordId;
   final int locationId;
   final int stopOrder;
+  final DateTime? deletedAt;
   const FlightTransitLocationData({
     required this.id,
     required this.flightRecordId,
     required this.locationId,
     required this.stopOrder,
+    this.deletedAt,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -13347,6 +13420,9 @@ class FlightTransitLocationData extends DataClass
     map['flight_record_id'] = Variable<int>(flightRecordId);
     map['location_id'] = Variable<int>(locationId);
     map['stop_order'] = Variable<int>(stopOrder);
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt);
+    }
     return map;
   }
 
@@ -13356,6 +13432,9 @@ class FlightTransitLocationData extends DataClass
       flightRecordId: Value(flightRecordId),
       locationId: Value(locationId),
       stopOrder: Value(stopOrder),
+      deletedAt: deletedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deletedAt),
     );
   }
 
@@ -13369,6 +13448,7 @@ class FlightTransitLocationData extends DataClass
       flightRecordId: serializer.fromJson<int>(json['flightRecordId']),
       locationId: serializer.fromJson<int>(json['locationId']),
       stopOrder: serializer.fromJson<int>(json['stopOrder']),
+      deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
     );
   }
   @override
@@ -13379,6 +13459,7 @@ class FlightTransitLocationData extends DataClass
       'flightRecordId': serializer.toJson<int>(flightRecordId),
       'locationId': serializer.toJson<int>(locationId),
       'stopOrder': serializer.toJson<int>(stopOrder),
+      'deletedAt': serializer.toJson<DateTime?>(deletedAt),
     };
   }
 
@@ -13387,11 +13468,13 @@ class FlightTransitLocationData extends DataClass
     int? flightRecordId,
     int? locationId,
     int? stopOrder,
+    Value<DateTime?> deletedAt = const Value.absent(),
   }) => FlightTransitLocationData(
     id: id ?? this.id,
     flightRecordId: flightRecordId ?? this.flightRecordId,
     locationId: locationId ?? this.locationId,
     stopOrder: stopOrder ?? this.stopOrder,
+    deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
   );
   FlightTransitLocationData copyWithCompanion(
     FlightTransitLocationsCompanion data,
@@ -13405,6 +13488,7 @@ class FlightTransitLocationData extends DataClass
           ? data.locationId.value
           : this.locationId,
       stopOrder: data.stopOrder.present ? data.stopOrder.value : this.stopOrder,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
     );
   }
 
@@ -13414,13 +13498,15 @@ class FlightTransitLocationData extends DataClass
           ..write('id: $id, ')
           ..write('flightRecordId: $flightRecordId, ')
           ..write('locationId: $locationId, ')
-          ..write('stopOrder: $stopOrder')
+          ..write('stopOrder: $stopOrder, ')
+          ..write('deletedAt: $deletedAt')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, flightRecordId, locationId, stopOrder);
+  int get hashCode =>
+      Object.hash(id, flightRecordId, locationId, stopOrder, deletedAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -13428,7 +13514,8 @@ class FlightTransitLocationData extends DataClass
           other.id == this.id &&
           other.flightRecordId == this.flightRecordId &&
           other.locationId == this.locationId &&
-          other.stopOrder == this.stopOrder);
+          other.stopOrder == this.stopOrder &&
+          other.deletedAt == this.deletedAt);
 }
 
 class FlightTransitLocationsCompanion
@@ -13437,17 +13524,20 @@ class FlightTransitLocationsCompanion
   final Value<int> flightRecordId;
   final Value<int> locationId;
   final Value<int> stopOrder;
+  final Value<DateTime?> deletedAt;
   const FlightTransitLocationsCompanion({
     this.id = const Value.absent(),
     this.flightRecordId = const Value.absent(),
     this.locationId = const Value.absent(),
     this.stopOrder = const Value.absent(),
+    this.deletedAt = const Value.absent(),
   });
   FlightTransitLocationsCompanion.insert({
     this.id = const Value.absent(),
     required int flightRecordId,
     required int locationId,
     this.stopOrder = const Value.absent(),
+    this.deletedAt = const Value.absent(),
   }) : flightRecordId = Value(flightRecordId),
        locationId = Value(locationId);
   static Insertable<FlightTransitLocationData> custom({
@@ -13455,12 +13545,14 @@ class FlightTransitLocationsCompanion
     Expression<int>? flightRecordId,
     Expression<int>? locationId,
     Expression<int>? stopOrder,
+    Expression<DateTime>? deletedAt,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (flightRecordId != null) 'flight_record_id': flightRecordId,
       if (locationId != null) 'location_id': locationId,
       if (stopOrder != null) 'stop_order': stopOrder,
+      if (deletedAt != null) 'deleted_at': deletedAt,
     });
   }
 
@@ -13469,12 +13561,14 @@ class FlightTransitLocationsCompanion
     Value<int>? flightRecordId,
     Value<int>? locationId,
     Value<int>? stopOrder,
+    Value<DateTime?>? deletedAt,
   }) {
     return FlightTransitLocationsCompanion(
       id: id ?? this.id,
       flightRecordId: flightRecordId ?? this.flightRecordId,
       locationId: locationId ?? this.locationId,
       stopOrder: stopOrder ?? this.stopOrder,
+      deletedAt: deletedAt ?? this.deletedAt,
     );
   }
 
@@ -13493,6 +13587,9 @@ class FlightTransitLocationsCompanion
     if (stopOrder.present) {
       map['stop_order'] = Variable<int>(stopOrder.value);
     }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
+    }
     return map;
   }
 
@@ -13502,7 +13599,8 @@ class FlightTransitLocationsCompanion
           ..write('id: $id, ')
           ..write('flightRecordId: $flightRecordId, ')
           ..write('locationId: $locationId, ')
-          ..write('stopOrder: $stopOrder')
+          ..write('stopOrder: $stopOrder, ')
+          ..write('deletedAt: $deletedAt')
           ..write(')'))
         .toString();
   }
@@ -54031,6 +54129,7 @@ typedef $$FlightRecordTableCreateCompanionBuilder =
       Value<int> syncStatus,
       Value<String?> remoteId,
       Value<DateTime?> lastModified,
+      Value<DateTime?> deletedAt,
     });
 typedef $$FlightRecordTableUpdateCompanionBuilder =
     FlightRecordCompanion Function({
@@ -54045,6 +54144,7 @@ typedef $$FlightRecordTableUpdateCompanionBuilder =
       Value<int> syncStatus,
       Value<String?> remoteId,
       Value<DateTime?> lastModified,
+      Value<DateTime?> deletedAt,
     });
 
 final class $$FlightRecordTableReferences
@@ -54232,6 +54332,11 @@ class $$FlightRecordTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
   $$MedicalRecordTableFilterComposer get medicalId {
     final $$MedicalRecordTableFilterComposer composer = $composerBuilder(
       composer: this,
@@ -54413,6 +54518,11 @@ class $$FlightRecordTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   $$MedicalRecordTableOrderingComposer get medicalId {
     final $$MedicalRecordTableOrderingComposer composer = $composerBuilder(
       composer: this,
@@ -54563,6 +54673,9 @@ class $$FlightRecordTableAnnotationComposer
     column: $table.lastModified,
     builder: (column) => column,
   );
+
+  GeneratedColumn<DateTime> get deletedAt =>
+      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
 
   $$MedicalRecordTableAnnotationComposer get medicalId {
     final $$MedicalRecordTableAnnotationComposer composer = $composerBuilder(
@@ -54752,6 +54865,7 @@ class $$FlightRecordTableTableManager
                 Value<int> syncStatus = const Value.absent(),
                 Value<String?> remoteId = const Value.absent(),
                 Value<DateTime?> lastModified = const Value.absent(),
+                Value<DateTime?> deletedAt = const Value.absent(),
               }) => FlightRecordCompanion(
                 flightRecordId: flightRecordId,
                 medicalId: medicalId,
@@ -54764,6 +54878,7 @@ class $$FlightRecordTableTableManager
                 syncStatus: syncStatus,
                 remoteId: remoteId,
                 lastModified: lastModified,
+                deletedAt: deletedAt,
               ),
           createCompanionCallback:
               ({
@@ -54778,6 +54893,7 @@ class $$FlightRecordTableTableManager
                 Value<int> syncStatus = const Value.absent(),
                 Value<String?> remoteId = const Value.absent(),
                 Value<DateTime?> lastModified = const Value.absent(),
+                Value<DateTime?> deletedAt = const Value.absent(),
               }) => FlightRecordCompanion.insert(
                 flightRecordId: flightRecordId,
                 medicalId: medicalId,
@@ -54790,6 +54906,7 @@ class $$FlightRecordTableTableManager
                 syncStatus: syncStatus,
                 remoteId: remoteId,
                 lastModified: lastModified,
+                deletedAt: deletedAt,
               ),
           withReferenceMapper: (p0) => p0
               .map(
@@ -54965,6 +55082,7 @@ typedef $$FlightTransitLocationsTableCreateCompanionBuilder =
       required int flightRecordId,
       required int locationId,
       Value<int> stopOrder,
+      Value<DateTime?> deletedAt,
     });
 typedef $$FlightTransitLocationsTableUpdateCompanionBuilder =
     FlightTransitLocationsCompanion Function({
@@ -54972,6 +55090,7 @@ typedef $$FlightTransitLocationsTableUpdateCompanionBuilder =
       Value<int> flightRecordId,
       Value<int> locationId,
       Value<int> stopOrder,
+      Value<DateTime?> deletedAt,
     });
 
 final class $$FlightTransitLocationsTableReferences
@@ -55051,6 +55170,11 @@ class $$FlightTransitLocationsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
   $$FlightRecordTableFilterComposer get flightRecordId {
     final $$FlightRecordTableFilterComposer composer = $composerBuilder(
       composer: this,
@@ -55117,6 +55241,11 @@ class $$FlightTransitLocationsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   $$FlightRecordTableOrderingComposer get flightRecordId {
     final $$FlightRecordTableOrderingComposer composer = $composerBuilder(
       composer: this,
@@ -55178,6 +55307,9 @@ class $$FlightTransitLocationsTableAnnotationComposer
 
   GeneratedColumn<int> get stopOrder =>
       $composableBuilder(column: $table.stopOrder, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get deletedAt =>
+      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
 
   $$FlightRecordTableAnnotationComposer get flightRecordId {
     final $$FlightRecordTableAnnotationComposer composer = $composerBuilder(
@@ -55269,11 +55401,13 @@ class $$FlightTransitLocationsTableTableManager
                 Value<int> flightRecordId = const Value.absent(),
                 Value<int> locationId = const Value.absent(),
                 Value<int> stopOrder = const Value.absent(),
+                Value<DateTime?> deletedAt = const Value.absent(),
               }) => FlightTransitLocationsCompanion(
                 id: id,
                 flightRecordId: flightRecordId,
                 locationId: locationId,
                 stopOrder: stopOrder,
+                deletedAt: deletedAt,
               ),
           createCompanionCallback:
               ({
@@ -55281,11 +55415,13 @@ class $$FlightTransitLocationsTableTableManager
                 required int flightRecordId,
                 required int locationId,
                 Value<int> stopOrder = const Value.absent(),
+                Value<DateTime?> deletedAt = const Value.absent(),
               }) => FlightTransitLocationsCompanion.insert(
                 id: id,
                 flightRecordId: flightRecordId,
                 locationId: locationId,
                 stopOrder: stopOrder,
+                deletedAt: deletedAt,
               ),
           withReferenceMapper: (p0) => p0
               .map(

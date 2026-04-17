@@ -137,102 +137,177 @@ class FirestoreSyncService {
   // ============================================================
 
   /// 同步參考表（僅上傳，本地參考表為主）
+  /// 先下載遠端 ID 清單，只上傳本地有但遠端沒有的資料
   Future<void> _syncReferenceTables() async {
     try {
+      // 1. 先批量下載所有遠端參考表的 ID 清單
+      final remoteIds = await _getAllRemoteReferenceIds();
+
+      // 2. 上傳本地參考表（只上傳遠端沒有的）
+      int totalUploaded = 0;
+
       // 性別
       final sexList = await _db.referenceDao.getAllSex();
+      int sexUploaded = 0;
       for (final item in sexList) {
-        await _firebase.setDocument('reference_sex', item.sexId.toString(), {
-          'sexId': item.sexId,
-          'name': item.name,
-        });
+        final key = 'reference_sex_${item.sexId}';
+        if (!remoteIds.contains(key)) {
+          await _firebase.setDocument('reference_sex', item.sexId.toString(), {
+            'sexId': item.sexId,
+            'name': item.name,
+          });
+          sexUploaded++;
+        }
       }
-      debugPrint('Synced ${sexList.length} sex records');
+      totalUploaded += sexUploaded;
 
       // 國籍
       final nationalityList = await _db.referenceDao.getAllNationality();
+      int nationalityUploaded = 0;
       for (final item in nationalityList) {
-        await _firebase.setDocument(
-          'reference_nationality',
-          item.nationalityId.toString(),
-          {'nationalityId': item.nationalityId, 'name': item.name},
-        );
+        final key = 'reference_nationality_${item.nationalityId}';
+        if (!remoteIds.contains(key)) {
+          await _firebase.setDocument(
+            'reference_nationality',
+            item.nationalityId.toString(),
+            {'nationalityId': item.nationalityId, 'name': item.name},
+          );
+          nationalityUploaded++;
+        }
       }
-      debugPrint('Synced ${nationalityList.length} nationality records');
+      totalUploaded += nationalityUploaded;
 
       // 航空公司
       final airlineList = await _db.referenceDao.getAllAirline();
+      int airlineUploaded = 0;
       for (final item in airlineList) {
-        await _firebase
-            .setDocument('reference_airline', item.airlineId.toString(), {
-              'airlineId': item.airlineId,
-              'code': item.code,
-              'name': item.name,
-              'isOther': item.isOther,
-            });
+        final key = 'reference_airline_${item.airlineId}';
+        if (!remoteIds.contains(key)) {
+          await _firebase
+              .setDocument('reference_airline', item.airlineId.toString(), {
+                'airlineId': item.airlineId,
+                'code': item.code,
+                'name': item.name,
+                'isOther': item.isOther,
+              });
+          airlineUploaded++;
+        }
       }
-      debugPrint('Synced ${airlineList.length} airline records');
+      totalUploaded += airlineUploaded;
 
       // 旅行狀態
       final travelStatusList = await _db.referenceDao.getAllTravelStatus();
+      int travelStatusUploaded = 0;
       for (final item in travelStatusList) {
-        await _firebase.setDocument(
-          'reference_travel_status',
-          item.travelStatusId.toString(),
-          {
-            'travelStatusId': item.travelStatusId,
-            'code': item.code,
-            'name': item.name,
-          },
-        );
+        final key = 'reference_travel_status_${item.travelStatusId}';
+        if (!remoteIds.contains(key)) {
+          await _firebase.setDocument(
+            'reference_travel_status',
+            item.travelStatusId.toString(),
+            {
+              'travelStatusId': item.travelStatusId,
+              'code': item.code,
+              'name': item.name,
+            },
+          );
+          travelStatusUploaded++;
+        }
       }
-      debugPrint('Synced ${travelStatusList.length} travel status records');
+      totalUploaded += travelStatusUploaded;
 
       // 地點
       final locationList = await _db.referenceDao.getAllLocation();
+      int locationUploaded = 0;
       for (final item in locationList) {
-        await _firebase.setDocument(
-          'reference_location',
-          item.locationId.toString(),
-          {'locationId': item.locationId, 'code': item.code, 'name': item.name},
-        );
+        final key = 'reference_location_${item.locationId}';
+        if (!remoteIds.contains(key)) {
+          await _firebase.setDocument(
+            'reference_location',
+            item.locationId.toString(),
+            {
+              'locationId': item.locationId,
+              'code': item.code,
+              'name': item.name,
+            },
+          );
+          locationUploaded++;
+        }
       }
-      debugPrint('Synced ${locationList.length} location records');
+      totalUploaded += locationUploaded;
 
       // 檢傷分級
       final triageList = await _db.referenceDao.getAllTriageLevels();
+      int triageUploaded = 0;
       for (final item in triageList) {
-        await _firebase
-            .setDocument('reference_triage_level', item.id.toString(), {
-              'id': item.id,
-              'level': item.level,
-              'name': item.name,
-              'colorCode': item.colorCode,
-              'description': item.description,
-            });
+        final key = 'reference_triage_level_${item.id}';
+        if (!remoteIds.contains(key)) {
+          await _firebase
+              .setDocument('reference_triage_level', item.id.toString(), {
+                'id': item.id,
+                'level': item.level,
+                'name': item.name,
+                'colorCode': item.colorCode,
+                'description': item.description,
+              });
+          triageUploaded++;
+        }
       }
-      debugPrint('Synced ${triageList.length} triage level records');
+      totalUploaded += triageUploaded;
 
       // 轉診醫院
       final hospitalList = await _db.referenceDao.getAllReferralHospitals();
+      int hospitalUploaded = 0;
       for (final item in hospitalList) {
-        await _firebase.setDocument(
-          'reference_referral_hospital',
-          item.id.toString(),
-          {
-            'id': item.id,
-            'name': item.name,
-            'address': item.address,
-            'phone': item.phone,
-          },
-        );
+        final key = 'reference_referral_hospital_${item.id}';
+        if (!remoteIds.contains(key)) {
+          await _firebase
+              .setDocument('reference_referral_hospital', item.id.toString(), {
+                'id': item.id,
+                'name': item.name,
+                'address': item.address,
+                'phone': item.phone,
+              });
+          hospitalUploaded++;
+        }
       }
-      debugPrint('Synced ${hospitalList.length} hospital records');
+      totalUploaded += hospitalUploaded;
 
-      debugPrint('Synced all reference tables');
+      debugPrint('參考表同步完成，共上傳 $totalUploaded 筆');
     } catch (e) {
       debugPrint('Error syncing reference tables: $e');
     }
+  }
+
+  /// 批量下載所有遠端參考表的 ID 清單
+  Future<Set<String>> _getAllRemoteReferenceIds() async {
+    final Set<String> remoteIds = {};
+
+    try {
+      final collections = [
+        'reference_sex',
+        'reference_nationality',
+        'reference_airline',
+        'reference_travel_status',
+        'reference_location',
+        'reference_triage_level',
+        'reference_referral_hospital',
+      ];
+
+      for (final coll in collections) {
+        try {
+          final snapshot = await _firebase.getCollectionSnapshot(coll);
+          for (final doc in snapshot.docs) {
+            remoteIds.add('${coll}_${doc.id}');
+          }
+        } catch (e) {
+          // 某個 collection 可能不存在，繼續處理下一個
+        }
+      }
+    } catch (e) {
+      debugPrint('Error getting remote reference IDs: $e');
+    }
+
+    return remoteIds;
   }
 
   /// 上傳醫療主表
@@ -473,9 +548,12 @@ class FirestoreSyncService {
 
   /// 上傳飛航記錄
   Future<void> _uploadFlightRecords() async {
+    // 只上傳 syncStatus=1 且未刪除的記錄
     final records = await (_db.select(
       _db.flightRecord,
-    )..where((t) => t.syncStatus.equals(1))).get();
+    )..where((t) => t.syncStatus.equals(1) & t.deletedAt.isNull())).get();
+
+    debugPrint('上傳飛航記錄: 待上傳 ${records.length} 筆');
 
     for (final record in records) {
       try {
@@ -486,15 +564,115 @@ class FirestoreSyncService {
               'flightNumber': record.flightNumber,
               'airlineId': record.airlineId,
               'travelStatusId': record.travelStatusId,
+              'departureLocationId': record.departureLocationId,
+              'arrivalLocationId': record.arrivalLocationId,
               'lastModified': FieldValue.serverTimestamp(),
+              'deletedAt': record.deletedAt?.toIso8601String(),
             });
 
         await (_db.update(_db.flightRecord)
               ..where((t) => t.flightRecordId.equals(record.flightRecordId)))
             .write(FlightRecordCompanion(syncStatus: const Value(0)));
+
+        debugPrint('Uploaded flight_record ${record.flightRecordId}');
       } catch (e) {
         debugPrint(
           'Error uploading flight_record ${record.flightRecordId}: $e',
+        );
+      }
+    }
+
+    // 上傳已刪除的飛航記錄
+    await _uploadDeletedFlightRecords();
+
+    // 上傳經過點
+    await _uploadFlightTransitLocations();
+  }
+
+  /// 上傳已刪除的飛航記錄（真正從 Firestore 刪除）
+  Future<void> _uploadDeletedFlightRecords() async {
+    final deletedRecords = await (_db.select(
+      _db.flightRecord,
+    )..where((t) => t.syncStatus.equals(1) & t.deletedAt.isNotNull())).get();
+
+    for (final record in deletedRecords) {
+      try {
+        // 真正刪除 Firestore 文件
+        await _firebase.deleteDocument(
+          'flight_records',
+          record.flightRecordId.toString(),
+        );
+
+        // 同步刪除該飛航記錄的所有經過點
+        final transitLocations = await (_db.select(
+          _db.flightTransitLocations,
+        )..where((t) => t.flightRecordId.equals(record.flightRecordId))).get();
+
+        for (final transit in transitLocations) {
+          await _firebase.deleteDocument(
+            'flight_transit_locations',
+            transit.id.toString(),
+          );
+        }
+
+        // 更新本地 syncStatus = 0
+        await (_db.update(_db.flightRecord)
+              ..where((t) => t.flightRecordId.equals(record.flightRecordId)))
+            .write(const FlightRecordCompanion(syncStatus: Value(0)));
+
+        debugPrint('已從遠端刪除 flight_record ${record.flightRecordId}');
+      } catch (e) {
+        debugPrint(
+          'Error deleting flight_record from remote ${record.flightRecordId}: $e',
+        );
+      }
+    }
+  }
+
+  /// 上傳飛航經過點
+  Future<void> _uploadFlightTransitLocations() async {
+    // 只上傳未刪除的經過點
+    final transitRecords = await (_db.select(
+      _db.flightTransitLocations,
+    )..where((t) => t.deletedAt.isNull())).get();
+
+    debugPrint('上傳飛航經過點: ${transitRecords.length} 筆');
+
+    for (final record in transitRecords) {
+      try {
+        await _firebase
+            .setDocument('flight_transit_locations', record.id.toString(), {
+              'id': record.id,
+              'flightRecordId': record.flightRecordId,
+              'locationId': record.locationId,
+              'stopOrder': record.stopOrder,
+            });
+      } catch (e) {
+        debugPrint('Error uploading flight_transit_location ${record.id}: $e');
+      }
+    }
+
+    // 上傳已刪除的經過點
+    await _uploadDeletedTransitLocations();
+  }
+
+  /// 上傳已刪除的經過點（真正從 Firestore 刪除）
+  Future<void> _uploadDeletedTransitLocations() async {
+    final deletedRecords = await (_db.select(
+      _db.flightTransitLocations,
+    )..where((t) => t.deletedAt.isNotNull())).get();
+
+    for (final record in deletedRecords) {
+      try {
+        // 真正刪除 Firestore 文件
+        await _firebase.deleteDocument(
+          'flight_transit_locations',
+          record.id.toString(),
+        );
+        debugPrint('已從遠端刪除 transit_location ${record.id}');
+      } catch (e) {
+        debugPrint(
+          'Error deleting transit_location from remote ${record.id}: $e',
         );
       }
     }
@@ -557,6 +735,8 @@ class FirestoreSyncService {
     final records = await (_db.select(
       _db.incidentRecord,
     )..where((t) => t.syncStatus.equals(1))).get();
+
+    debugPrint('上傳事故記錄: 待上傳 ${records.length} 筆');
 
     for (final record in records) {
       try {
@@ -1028,6 +1208,8 @@ class FirestoreSyncService {
     try {
       final snapshot = await _firebase.getCollectionSnapshot('flight_records');
 
+      debugPrint('下載飛航記錄: 遠端有 ${snapshot.docs.length} 筆');
+
       for (final doc in snapshot.docs) {
         final data = doc.data();
 
@@ -1035,12 +1217,17 @@ class FirestoreSyncService {
         if (flightRecordId == null) continue;
 
         final existing =
-            await (_db.select(
-                  _db.flightRecord,
-                )..where((t) => t.flightRecordId.equals(flightRecordId as int)))
+            await (_db.select(_db.flightRecord)..where(
+                  (t) =>
+                      t.flightRecordId.equals(flightRecordId as int) &
+                      t.deletedAt.isNull(),
+                ))
                 .getSingleOrNull();
 
-        if (existing != null) continue;
+        if (existing != null) {
+          debugPrint('飛航記錄 $flightRecordId 已存在本地，跳過下載');
+          continue;
+        }
 
         await _db
             .into(_db.flightRecord)
@@ -1050,6 +1237,8 @@ class FirestoreSyncService {
                 flightNumber: (data['flightNumber'] as String?) ?? '',
                 airlineId: Value(data['airlineId'] as int?),
                 travelStatusId: Value(data['travelStatusId'] as int?),
+                departureLocationId: Value(data['departureLocationId'] as int?),
+                arrivalLocationId: Value(data['arrivalLocationId'] as int?),
                 syncStatus: const Value(0),
                 remoteId: Value(doc.id),
                 lastModified: Value(DateTime.now()),
@@ -1057,8 +1246,50 @@ class FirestoreSyncService {
             );
         debugPrint('Downloaded flight_record $flightRecordId');
       }
+
+      // 下載經過點
+      await _downloadFlightTransitLocations();
     } catch (e) {
       debugPrint('Error downloading flight_records: $e');
+    }
+  }
+
+  /// 從 Firestore 下載飛航經過點
+  Future<void> _downloadFlightTransitLocations() async {
+    try {
+      final snapshot = await _firebase.getCollectionSnapshot(
+        'flight_transit_locations',
+      );
+
+      debugPrint('下載飛航經過點: 遠端有 ${snapshot.docs.length} 筆');
+
+      for (final doc in snapshot.docs) {
+        final data = doc.data();
+
+        final id = data['id'];
+        if (id == null) continue;
+
+        // 只下載未刪除的記錄（已刪除的已被真正刪除）
+        final existing =
+            await (_db.select(_db.flightTransitLocations)
+                  ..where((t) => t.id.equals(id as int) & t.deletedAt.isNull()))
+                .getSingleOrNull();
+
+        if (existing != null) continue;
+
+        await _db
+            .into(_db.flightTransitLocations)
+            .insert(
+              FlightTransitLocationsCompanion.insert(
+                flightRecordId: (data['flightRecordId'] as int?) ?? 0,
+                locationId: (data['locationId'] as int?) ?? 0,
+                stopOrder: Value(data['stopOrder'] as int? ?? 0),
+              ),
+            );
+        debugPrint('Downloaded flight_transit_location $id');
+      }
+    } catch (e) {
+      debugPrint('Error downloading flight_transit_locations: $e');
     }
   }
 
@@ -1068,6 +1299,8 @@ class FirestoreSyncService {
       final snapshot = await _firebase.getCollectionSnapshot(
         'incident_records',
       );
+
+      debugPrint('下載事故記錄: 遠端有 ${snapshot.docs.length} 筆');
 
       for (final doc in snapshot.docs) {
         final data = doc.data();
@@ -1080,7 +1313,10 @@ class FirestoreSyncService {
                   ..where((t) => t.incidentId.equals(incidentId as int)))
                 .getSingleOrNull();
 
-        if (existing != null) continue;
+        if (existing != null) {
+          debugPrint('事故記錄 $incidentId 已存在本地，跳過下載');
+          continue;
+        }
 
         await _db
             .into(_db.incidentRecord)
@@ -1092,9 +1328,37 @@ class FirestoreSyncService {
                     : DateTime.now(),
                 incidentPlaceCategoryId:
                     (data['incidentPlaceCategoryId'] as int?) ?? 1,
+                incidentPlaceCategory2Id: Value(
+                  data['incidentPlaceCategory2Id'] as int?,
+                ),
+                incidentPlaceFinal: Value(
+                  data['incidentPlaceFinal'] as String?,
+                ),
+                notificationTime: data['notificationTime'] != null
+                    ? Value(DateTime.parse(data['notificationTime']))
+                    : const Value.absent(),
+                notificationPerson: Value(
+                  data['notificationPerson'] as String?,
+                ),
                 reportingUnitId: (data['reportingUnitId'] as int?) ?? 1,
-                beforeLanding: Value(data['beforeLanding'] as bool? ?? false),
+                incomingPhone: Value(data['incomingPhone'] as String?),
+                notificationToOccTime: data['notificationToOccTime'] != null
+                    ? Value(DateTime.parse(data['notificationToOccTime']))
+                    : const Value.absent(),
+                teamDepartureTime: data['teamDepartureTime'] != null
+                    ? Value(DateTime.parse(data['teamDepartureTime']))
+                    : const Value.absent(),
                 occArrived: Value(data['occArrived'] as bool? ?? false),
+                beforeLanding: Value(data['beforeLanding'] as bool? ?? false),
+                landingTime: data['landingTime'] != null
+                    ? Value(DateTime.parse(data['landingTime']))
+                    : const Value.absent(),
+                medicalArrivalTime: data['medicalArrivalTime'] != null
+                    ? Value(DateTime.parse(data['medicalArrivalTime']))
+                    : const Value.absent(),
+                examinationTime: data['examinationTime'] != null
+                    ? Value(DateTime.parse(data['examinationTime']))
+                    : const Value.absent(),
                 syncStatus: const Value(0),
                 remoteId: Value(doc.id),
                 lastModified: Value(DateTime.now()),

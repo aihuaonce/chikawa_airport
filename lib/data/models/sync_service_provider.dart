@@ -26,7 +26,7 @@ class SyncServiceProvider extends ChangeNotifier with WidgetsBindingObserver {
   String get statusText {
     switch (_state) {
       case SyncState.idle:
-        return '已同步';
+        return '待同步';
       case SyncState.syncing:
         return '同步中...';
       case SyncState.error:

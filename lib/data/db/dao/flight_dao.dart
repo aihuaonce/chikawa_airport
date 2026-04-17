@@ -72,20 +72,56 @@ class FlightDao extends DatabaseAccessor<AppDatabase> with _$FlightDaoMixin {
   }
 
   // 更新飛航記錄
-  Future<bool> updateFlight(FlightRecordData data) {
-    return update(flightRecord).replace(data);
+  Future<bool> updateFlight(FlightRecordData data) async {
+    // 先取得舊資料
+    final oldData =
+        await (select(flightRecord)
+              ..where((f) => f.flightRecordId.equals(data.flightRecordId)))
+            .getSingleOrNull();
+
+    // 檢查是否有變更，有變更才設 syncStatus = 1
+    final hasChanges =
+        oldData == null ||
+        oldData.flightNumber != data.flightNumber ||
+        oldData.airlineId != data.airlineId ||
+        oldData.travelStatusId != data.travelStatusId ||
+        oldData.departureLocationId != data.departureLocationId ||
+        oldData.arrivalLocationId != data.arrivalLocationId;
+
+    if (hasChanges) {
+      await (update(
+        flightRecord,
+      )..where((f) => f.flightRecordId.equals(data.flightRecordId))).write(
+        FlightRecordCompanion(
+          flightNumber: Value(data.flightNumber),
+          airlineId: Value(data.airlineId),
+          travelStatusId: Value(data.travelStatusId),
+          departureLocationId: Value(data.departureLocationId),
+          arrivalLocationId: Value(data.arrivalLocationId),
+          syncStatus: const Value(1), // 設為待同步
+          lastModified: Value(DateTime.now()),
+        ),
+      );
+      return true;
+    }
+    return false;
   }
 
-  // 刪除飛航記錄
-  Future<int> deleteFlight(int flightRecordId) {
-    return (delete(
-      flightRecord,
-    )..where((f) => f.flightRecordId.equals(flightRecordId))).go();
+  // 刪除飛航記錄（軟刪除）
+  Future<bool> deleteFlight(int flightRecordId) async {
+    final result =
+        await (update(
+          flightRecord,
+        )..where((f) => f.flightRecordId.equals(flightRecordId))).write(
+          FlightRecordCompanion(
+            deletedAt: Value(DateTime.now()),
+            syncStatus: const Value(1), // 設為待同步
+          ),
+        );
+    return result > 0;
   }
 
-  //  經過點相關
-
-  // 取得飛航記錄的所有經過點（含地點資料與中間表 ID）
+  // 取得飛航記錄的所有經過點（含地點資料與中間表 ID）- 排除已刪除
   Future<List<TransitLocationWithData>> getTransitLocations(
     int flightRecordId,
   ) async {
@@ -96,7 +132,10 @@ class FlightDao extends DatabaseAccessor<AppDatabase> with _$FlightDaoMixin {
               location.locationId.equalsExp(flightTransitLocations.locationId),
             ),
           ])
-          ..where(flightTransitLocations.flightRecordId.equals(flightRecordId))
+          ..where(
+            flightTransitLocations.flightRecordId.equals(flightRecordId) &
+                flightTransitLocations.deletedAt.isNull(),
+          )
           ..orderBy([OrderingTerm.asc(flightTransitLocations.stopOrder)]);
 
     final results = await query.get();
@@ -124,18 +163,24 @@ class FlightDao extends DatabaseAccessor<AppDatabase> with _$FlightDaoMixin {
     );
   }
 
-  // 刪除經過點 (透過中間表的 ID)
-  Future<int> deleteTransitLocation(int transitId) {
-    return (delete(
-      flightTransitLocations,
-    )..where((t) => t.id.equals(transitId))).go();
+  // 刪除經過點 (軟刪除)
+  Future<bool> deleteTransitLocation(int transitId) async {
+    final result =
+        await (update(
+          flightTransitLocations,
+        )..where((t) => t.id.equals(transitId))).write(
+          FlightTransitLocationsCompanion(deletedAt: Value(DateTime.now())),
+        );
+    return result > 0;
   }
 
-  // 刪除飛航記錄的所有經過點
-  Future<int> deleteAllTransitLocations(int flightRecordId) {
-    return (delete(
+  // 刪除飛航記錄的所有經過點 (軟刪除)
+  Future<int> deleteAllTransitLocations(int flightRecordId) async {
+    return (update(
       flightTransitLocations,
-    )..where((t) => t.flightRecordId.equals(flightRecordId))).go();
+    )..where((t) => t.flightRecordId.equals(flightRecordId))).write(
+      FlightTransitLocationsCompanion(deletedAt: Value(DateTime.now())),
+    );
   }
 
   // 更新經過點順序

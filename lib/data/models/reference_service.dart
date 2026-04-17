@@ -137,15 +137,20 @@ class ReferenceService extends ChangeNotifier {
       // 病患相關
       await _seedVisitReasons();
       _sexList = await db.referenceDao.getAllSex();
+      debugPrint('系統:載入性別 ${_sexList.length} 筆');
       _nationalityList = await db.referenceDao.getAllNationality();
+      debugPrint('系統:載入國籍 ${_nationalityList.length} 筆');
       _visitReasonList = await (db.select(
         db.visitReason,
       )..orderBy([(t) => OrderingTerm.asc(t.sortOrder)])).get();
 
       // 飛航相關
       _airlineList = await db.referenceDao.getAllAirline();
+      debugPrint('系統:載入航空公司 ${_airlineList.length} 筆');
       _travelStatusList = await db.referenceDao.getAllTravelStatus();
+      debugPrint('系統:載入旅行狀態 ${_travelStatusList.length} 筆');
       _locationList = await db.referenceDao.getAllLocation();
+      debugPrint('系統:載入地點 ${_locationList.length} 筆');
 
       // 事故相關
       _incidentPlaceCategories = await db.referenceDao
