@@ -329,8 +329,9 @@ class TreatmentViewModel extends ChangeNotifier {
       debugPrint('系統:正在自動儲存主訴資料...');
       try {
         if (_chiefComplaint == null) return;
+        // 確保 syncStatus=1 以觸發 Firestore 同步
         await db.treatmentDao.updateChiefComplaint(
-          _chiefComplaint!.toCompanion(true),
+          _chiefComplaint!.copyWith(syncStatus: 1).toCompanion(true),
         );
         debugPrint('系統:主訴自動存檔成功');
       } catch (e) {
@@ -910,6 +911,7 @@ class TreatmentViewModel extends ChangeNotifier {
                 ? Value(allergyStatusId)
                 : const Value.absent(),
             allergyDetail: effectiveAllergyDetail,
+            syncStatus: const Value(1), // 確保 syncStatus=1 以觸發 Firestore 同步
           ),
         );
       }
@@ -1426,6 +1428,7 @@ class TreatmentViewModel extends ChangeNotifier {
             otherNotes: otherNotes != null
                 ? Value(otherNotes)
                 : const Value.absent(),
+            syncStatus: const Value(1), // 確保 syncStatus=1 以觸發 Firestore 同步
           ),
         );
       }
@@ -1511,6 +1514,7 @@ class TreatmentViewModel extends ChangeNotifier {
           dose: dose != null ? Value(dose) : const Value.absent(),
           unit: unit != null ? Value(unit) : const Value.absent(),
           remarks: remarks != null ? Value(remarks) : const Value.absent(),
+          syncStatus: const Value(1), // 確保 syncStatus=1 以觸發 Firestore 同步
         ),
       );
       // 更新列表但保持 UI 狀態
@@ -1997,7 +2001,10 @@ class TreatmentViewModel extends ChangeNotifier {
     if (_isDisposed) return;
     try {
       if (_treatment != null) {
-        await db.treatmentDao.updateTreatment(_treatment!.toCompanion(true));
+        // 確保 syncStatus=1 以觸發 Firestore 同步
+        await db.treatmentDao.updateTreatment(
+          _treatment!.copyWith(syncStatus: 1).toCompanion(true),
+        );
       }
 
       debugPrint('系統:處置記錄已儲存');

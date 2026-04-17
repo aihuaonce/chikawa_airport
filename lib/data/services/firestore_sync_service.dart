@@ -58,12 +58,15 @@ class FirestoreSyncService {
       _uploadMedicalRecords(),
       _uploadPatients(),
       _uploadTreatments(),
+      _uploadChiefComplaints(),
+      _uploadMedicalHistories(),
+      _uploadSpecialNotes(),
+      _uploadMedications(),
       _uploadAmbulanceRecords(),
       _uploadFees(),
       _uploadNursingRecords(),
       _uploadReferralForms(),
       _uploadFlightRecords(),
-      _uploadMedications(),
       _uploadEmergencyTreatments(),
       _uploadIncidentRecords(),
       _uploadCertificates(),
@@ -631,10 +634,10 @@ class FirestoreSyncService {
 
   /// 上傳飛航經過點
   Future<void> _uploadFlightTransitLocations() async {
-    // 只上傳未刪除的經過點
+    // 只上傳未刪除且 syncStatus=1 的經過點
     final transitRecords = await (_db.select(
       _db.flightTransitLocations,
-    )..where((t) => t.deletedAt.isNull())).get();
+    )..where((t) => t.syncStatus.equals(1) & t.deletedAt.isNull())).get();
 
     debugPrint('上傳飛航經過點: ${transitRecords.length} 筆');
 
@@ -647,12 +650,17 @@ class FirestoreSyncService {
               'locationId': record.locationId,
               'stopOrder': record.stopOrder,
             });
+
+        // 上傳成功後設 syncStatus=0
+        await (_db.update(_db.flightTransitLocations)
+              ..where((t) => t.id.equals(record.id)))
+            .write(FlightTransitLocationsCompanion(syncStatus: const Value(0)));
       } catch (e) {
         debugPrint('Error uploading flight_transit_location ${record.id}: $e');
       }
     }
 
-    // 上傳已刪除的經過點
+    // 上傳已刪除的經過點（真正從 Firestore 刪除）
     await _uploadDeletedTransitLocations();
   }
 
@@ -680,7 +688,9 @@ class FirestoreSyncService {
 
   /// 上傳藥物記錄
   Future<void> _uploadMedications() async {
-    final records = await _db.select(_db.medications).get();
+    final records = await (_db.select(
+      _db.medications,
+    )..where((t) => t.syncStatus.equals(1))).get();
 
     for (final record in records) {
       try {
@@ -698,11 +708,106 @@ class FirestoreSyncService {
               'createdAt': record.createdAt.toIso8601String(),
               'lastModified': FieldValue.serverTimestamp(),
             });
+
+        await (_db.update(_db.medications)
+              ..where((t) => t.medicationId.equals(record.medicationId)))
+            .write(MedicationsCompanion(syncStatus: const Value(0)));
       } catch (e) {
         debugPrint('Error uploading medication ${record.medicationId}: $e');
       }
     }
     debugPrint('Uploaded ${records.length} medications');
+  }
+
+  /// 上傳主訴記錄
+  Future<void> _uploadChiefComplaints() async {
+    final records = await (_db.select(
+      _db.chiefComplaint,
+    )..where((t) => t.syncStatus.equals(1))).get();
+
+    for (final record in records) {
+      try {
+        await _firebase
+            .setDocument('chief_complaints', record.complaintId.toString(), {
+              'complaintId': record.complaintId,
+              'medicalId': record.medicalId,
+              'chiefComplaintTypeId': record.chiefComplaintTypeId,
+              'selectedSymptoms': record.selectedSymptoms,
+              'otherSymptomDetail': record.otherSymptomDetail,
+              'chiefComplaintFinal': record.chiefComplaintFinal,
+              'supplementaryNotes': record.supplementaryNotes,
+              'onsetTime': record.onsetTime?.toIso8601String(),
+              'reportedBy': record.reportedBy,
+              'isConfirmed': record.isConfirmed,
+              'createdAt': record.createdAt.toIso8601String(),
+              'lastModified': FieldValue.serverTimestamp(),
+            });
+
+        await (_db.update(_db.chiefComplaint)
+              ..where((t) => t.complaintId.equals(record.complaintId)))
+            .write(ChiefComplaintCompanion(syncStatus: const Value(0)));
+      } catch (e) {
+        debugPrint('Error uploading chief_complaint ${record.complaintId}: $e');
+      }
+    }
+    debugPrint('Uploaded ${records.length} chief_complaints');
+  }
+
+  /// 上傳病史記錄
+  Future<void> _uploadMedicalHistories() async {
+    final records = await (_db.select(
+      _db.medicalHistory,
+    )..where((t) => t.syncStatus.equals(1))).get();
+
+    for (final record in records) {
+      try {
+        await _firebase
+            .setDocument('medical_histories', record.historyId.toString(), {
+              'historyId': record.historyId,
+              'medicalId': record.medicalId,
+              'pastHistoryStatusId': record.pastHistoryStatusId,
+              'pastHistoryDetail': record.pastHistoryDetail,
+              'allergyStatusId': record.allergyStatusId,
+              'allergyDetail': record.allergyDetail,
+              'createdAt': record.createdAt.toIso8601String(),
+              'lastModified': FieldValue.serverTimestamp(),
+            });
+
+        await (_db.update(_db.medicalHistory)
+              ..where((t) => t.historyId.equals(record.historyId)))
+            .write(MedicalHistoryCompanion(syncStatus: const Value(0)));
+      } catch (e) {
+        debugPrint('Error uploading medical_history ${record.historyId}: $e');
+      }
+    }
+    debugPrint('Uploaded ${records.length} medical_histories');
+  }
+
+  /// 上傳特別註記
+  Future<void> _uploadSpecialNotes() async {
+    final records = await (_db.select(
+      _db.specialNotes,
+    )..where((t) => t.syncStatus.equals(1))).get();
+
+    for (final record in records) {
+      try {
+        await _firebase.setDocument('special_notes', record.noteId.toString(), {
+          'noteId': record.noteId,
+          'medicalId': record.medicalId,
+          'selectedNotes': record.selectedNotes,
+          'otherNotes': record.otherNotes,
+          'createdAt': record.createdAt.toIso8601String(),
+          'lastModified': FieldValue.serverTimestamp(),
+        });
+
+        await (_db.update(_db.specialNotes)
+              ..where((t) => t.noteId.equals(record.noteId)))
+            .write(SpecialNotesCompanion(syncStatus: const Value(0)));
+      } catch (e) {
+        debugPrint('Error uploading special_note ${record.noteId}: $e');
+      }
+    }
+    debugPrint('Uploaded ${records.length} special_notes');
   }
 
   /// 上傳急救處置
@@ -1269,24 +1374,40 @@ class FirestoreSyncService {
         final id = data['id'];
         if (id == null) continue;
 
-        // 只下載未刪除的記錄（已刪除的已被真正刪除）
+        final flightRecordId = data['flightRecordId'] as int?;
+        final stopOrder = data['stopOrder'] as int? ?? 0;
+
+        if (flightRecordId == null) continue;
+
+        // 用 flightRecordId + stopOrder 判斷是否已存在（不用 id，因為本地 id 是 auto-increment）
+        // 只查詢未刪除的記錄
         final existing =
-            await (_db.select(_db.flightTransitLocations)
-                  ..where((t) => t.id.equals(id as int) & t.deletedAt.isNull()))
+            await (_db.select(_db.flightTransitLocations)..where(
+                  (t) =>
+                      t.flightRecordId.equals(flightRecordId) &
+                      t.stopOrder.equals(stopOrder) &
+                      t.deletedAt.isNull(),
+                ))
                 .getSingleOrNull();
 
-        if (existing != null) continue;
+        if (existing != null) {
+          // 已存在且未刪除，跳過
+          continue;
+        }
 
+        // 不存在，新增
         await _db
             .into(_db.flightTransitLocations)
             .insert(
               FlightTransitLocationsCompanion.insert(
-                flightRecordId: (data['flightRecordId'] as int?) ?? 0,
+                flightRecordId: flightRecordId,
                 locationId: (data['locationId'] as int?) ?? 0,
-                stopOrder: Value(data['stopOrder'] as int? ?? 0),
+                stopOrder: Value(stopOrder),
               ),
             );
-        debugPrint('Downloaded flight_transit_location $id');
+        debugPrint(
+          'Downloaded flight_transit_location $id (stopOrder=$stopOrder)',
+        );
       }
     } catch (e) {
       debugPrint('Error downloading flight_transit_locations: $e');

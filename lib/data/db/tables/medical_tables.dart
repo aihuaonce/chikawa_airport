@@ -110,6 +110,11 @@ class FlightTransitLocations extends Table {
 
   // 軟刪除標記
   DateTimeColumn get deletedAt => dateTime().nullable()();
+
+  // 同步狀態
+  IntColumn get syncStatus => integer().withDefault(const Constant(0))();
+  TextColumn get remoteId => text().nullable()();
+  DateTimeColumn get lastModified => dateTime().nullable()();
 }
 
 //事件紀錄表
@@ -167,6 +172,10 @@ class ChiefComplaint extends Table {
       text().nullable()(); // patient / family / crew / staff
   BoolColumn get isConfirmed => boolean().withDefault(const Constant(false))();
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+
+  IntColumn get syncStatus => integer().withDefault(const Constant(0))();
+  TextColumn get remoteId => text().nullable()();
+  DateTimeColumn get lastModified => dateTime().nullable()();
 }
 
 //處置-醫療影像表
@@ -248,6 +257,10 @@ class MedicalHistory extends Table {
   TextColumn get allergyDetail => text().nullable()();
 
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+
+  IntColumn get syncStatus => integer().withDefault(const Constant(0))();
+  TextColumn get remoteId => text().nullable()();
+  DateTimeColumn get lastModified => dateTime().nullable()();
 }
 
 //處置-處置診斷表
@@ -329,6 +342,10 @@ class SpecialNotes extends Table {
   TextColumn get selectedNotes => text().nullable()(); // JSON 或逗號分隔
   TextColumn get otherNotes => text().nullable()(); // 其他特別註記
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+
+  IntColumn get syncStatus => integer().withDefault(const Constant(0))();
+  TextColumn get remoteId => text().nullable()();
+  DateTimeColumn get lastModified => dateTime().nullable()();
 }
 
 // 1. 診斷證明書表 - MedicalCertificate

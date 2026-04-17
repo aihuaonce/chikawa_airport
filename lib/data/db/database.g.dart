@@ -13304,6 +13304,40 @@ class $FlightTransitLocationsTable extends FlightTransitLocations
     type: DriftSqlType.dateTime,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _syncStatusMeta = const VerificationMeta(
+    'syncStatus',
+  );
+  @override
+  late final GeneratedColumn<int> syncStatus = GeneratedColumn<int>(
+    'sync_status',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _remoteIdMeta = const VerificationMeta(
+    'remoteId',
+  );
+  @override
+  late final GeneratedColumn<String> remoteId = GeneratedColumn<String>(
+    'remote_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _lastModifiedMeta = const VerificationMeta(
+    'lastModified',
+  );
+  @override
+  late final GeneratedColumn<DateTime> lastModified = GeneratedColumn<DateTime>(
+    'last_modified',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -13311,6 +13345,9 @@ class $FlightTransitLocationsTable extends FlightTransitLocations
     locationId,
     stopOrder,
     deletedAt,
+    syncStatus,
+    remoteId,
+    lastModified,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -13358,6 +13395,27 @@ class $FlightTransitLocationsTable extends FlightTransitLocations
         deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
       );
     }
+    if (data.containsKey('sync_status')) {
+      context.handle(
+        _syncStatusMeta,
+        syncStatus.isAcceptableOrUnknown(data['sync_status']!, _syncStatusMeta),
+      );
+    }
+    if (data.containsKey('remote_id')) {
+      context.handle(
+        _remoteIdMeta,
+        remoteId.isAcceptableOrUnknown(data['remote_id']!, _remoteIdMeta),
+      );
+    }
+    if (data.containsKey('last_modified')) {
+      context.handle(
+        _lastModifiedMeta,
+        lastModified.isAcceptableOrUnknown(
+          data['last_modified']!,
+          _lastModifiedMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -13390,6 +13448,18 @@ class $FlightTransitLocationsTable extends FlightTransitLocations
         DriftSqlType.dateTime,
         data['${effectivePrefix}deleted_at'],
       ),
+      syncStatus: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}sync_status'],
+      )!,
+      remoteId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}remote_id'],
+      ),
+      lastModified: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}last_modified'],
+      ),
     );
   }
 
@@ -13406,12 +13476,18 @@ class FlightTransitLocationData extends DataClass
   final int locationId;
   final int stopOrder;
   final DateTime? deletedAt;
+  final int syncStatus;
+  final String? remoteId;
+  final DateTime? lastModified;
   const FlightTransitLocationData({
     required this.id,
     required this.flightRecordId,
     required this.locationId,
     required this.stopOrder,
     this.deletedAt,
+    required this.syncStatus,
+    this.remoteId,
+    this.lastModified,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -13422,6 +13498,13 @@ class FlightTransitLocationData extends DataClass
     map['stop_order'] = Variable<int>(stopOrder);
     if (!nullToAbsent || deletedAt != null) {
       map['deleted_at'] = Variable<DateTime>(deletedAt);
+    }
+    map['sync_status'] = Variable<int>(syncStatus);
+    if (!nullToAbsent || remoteId != null) {
+      map['remote_id'] = Variable<String>(remoteId);
+    }
+    if (!nullToAbsent || lastModified != null) {
+      map['last_modified'] = Variable<DateTime>(lastModified);
     }
     return map;
   }
@@ -13435,6 +13518,13 @@ class FlightTransitLocationData extends DataClass
       deletedAt: deletedAt == null && nullToAbsent
           ? const Value.absent()
           : Value(deletedAt),
+      syncStatus: Value(syncStatus),
+      remoteId: remoteId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(remoteId),
+      lastModified: lastModified == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastModified),
     );
   }
 
@@ -13449,6 +13539,9 @@ class FlightTransitLocationData extends DataClass
       locationId: serializer.fromJson<int>(json['locationId']),
       stopOrder: serializer.fromJson<int>(json['stopOrder']),
       deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
+      syncStatus: serializer.fromJson<int>(json['syncStatus']),
+      remoteId: serializer.fromJson<String?>(json['remoteId']),
+      lastModified: serializer.fromJson<DateTime?>(json['lastModified']),
     );
   }
   @override
@@ -13460,6 +13553,9 @@ class FlightTransitLocationData extends DataClass
       'locationId': serializer.toJson<int>(locationId),
       'stopOrder': serializer.toJson<int>(stopOrder),
       'deletedAt': serializer.toJson<DateTime?>(deletedAt),
+      'syncStatus': serializer.toJson<int>(syncStatus),
+      'remoteId': serializer.toJson<String?>(remoteId),
+      'lastModified': serializer.toJson<DateTime?>(lastModified),
     };
   }
 
@@ -13469,12 +13565,18 @@ class FlightTransitLocationData extends DataClass
     int? locationId,
     int? stopOrder,
     Value<DateTime?> deletedAt = const Value.absent(),
+    int? syncStatus,
+    Value<String?> remoteId = const Value.absent(),
+    Value<DateTime?> lastModified = const Value.absent(),
   }) => FlightTransitLocationData(
     id: id ?? this.id,
     flightRecordId: flightRecordId ?? this.flightRecordId,
     locationId: locationId ?? this.locationId,
     stopOrder: stopOrder ?? this.stopOrder,
     deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+    syncStatus: syncStatus ?? this.syncStatus,
+    remoteId: remoteId.present ? remoteId.value : this.remoteId,
+    lastModified: lastModified.present ? lastModified.value : this.lastModified,
   );
   FlightTransitLocationData copyWithCompanion(
     FlightTransitLocationsCompanion data,
@@ -13489,6 +13591,13 @@ class FlightTransitLocationData extends DataClass
           : this.locationId,
       stopOrder: data.stopOrder.present ? data.stopOrder.value : this.stopOrder,
       deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+      syncStatus: data.syncStatus.present
+          ? data.syncStatus.value
+          : this.syncStatus,
+      remoteId: data.remoteId.present ? data.remoteId.value : this.remoteId,
+      lastModified: data.lastModified.present
+          ? data.lastModified.value
+          : this.lastModified,
     );
   }
 
@@ -13499,14 +13608,25 @@ class FlightTransitLocationData extends DataClass
           ..write('flightRecordId: $flightRecordId, ')
           ..write('locationId: $locationId, ')
           ..write('stopOrder: $stopOrder, ')
-          ..write('deletedAt: $deletedAt')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('syncStatus: $syncStatus, ')
+          ..write('remoteId: $remoteId, ')
+          ..write('lastModified: $lastModified')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode =>
-      Object.hash(id, flightRecordId, locationId, stopOrder, deletedAt);
+  int get hashCode => Object.hash(
+    id,
+    flightRecordId,
+    locationId,
+    stopOrder,
+    deletedAt,
+    syncStatus,
+    remoteId,
+    lastModified,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -13515,7 +13635,10 @@ class FlightTransitLocationData extends DataClass
           other.flightRecordId == this.flightRecordId &&
           other.locationId == this.locationId &&
           other.stopOrder == this.stopOrder &&
-          other.deletedAt == this.deletedAt);
+          other.deletedAt == this.deletedAt &&
+          other.syncStatus == this.syncStatus &&
+          other.remoteId == this.remoteId &&
+          other.lastModified == this.lastModified);
 }
 
 class FlightTransitLocationsCompanion
@@ -13525,12 +13648,18 @@ class FlightTransitLocationsCompanion
   final Value<int> locationId;
   final Value<int> stopOrder;
   final Value<DateTime?> deletedAt;
+  final Value<int> syncStatus;
+  final Value<String?> remoteId;
+  final Value<DateTime?> lastModified;
   const FlightTransitLocationsCompanion({
     this.id = const Value.absent(),
     this.flightRecordId = const Value.absent(),
     this.locationId = const Value.absent(),
     this.stopOrder = const Value.absent(),
     this.deletedAt = const Value.absent(),
+    this.syncStatus = const Value.absent(),
+    this.remoteId = const Value.absent(),
+    this.lastModified = const Value.absent(),
   });
   FlightTransitLocationsCompanion.insert({
     this.id = const Value.absent(),
@@ -13538,6 +13667,9 @@ class FlightTransitLocationsCompanion
     required int locationId,
     this.stopOrder = const Value.absent(),
     this.deletedAt = const Value.absent(),
+    this.syncStatus = const Value.absent(),
+    this.remoteId = const Value.absent(),
+    this.lastModified = const Value.absent(),
   }) : flightRecordId = Value(flightRecordId),
        locationId = Value(locationId);
   static Insertable<FlightTransitLocationData> custom({
@@ -13546,6 +13678,9 @@ class FlightTransitLocationsCompanion
     Expression<int>? locationId,
     Expression<int>? stopOrder,
     Expression<DateTime>? deletedAt,
+    Expression<int>? syncStatus,
+    Expression<String>? remoteId,
+    Expression<DateTime>? lastModified,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -13553,6 +13688,9 @@ class FlightTransitLocationsCompanion
       if (locationId != null) 'location_id': locationId,
       if (stopOrder != null) 'stop_order': stopOrder,
       if (deletedAt != null) 'deleted_at': deletedAt,
+      if (syncStatus != null) 'sync_status': syncStatus,
+      if (remoteId != null) 'remote_id': remoteId,
+      if (lastModified != null) 'last_modified': lastModified,
     });
   }
 
@@ -13562,6 +13700,9 @@ class FlightTransitLocationsCompanion
     Value<int>? locationId,
     Value<int>? stopOrder,
     Value<DateTime?>? deletedAt,
+    Value<int>? syncStatus,
+    Value<String?>? remoteId,
+    Value<DateTime?>? lastModified,
   }) {
     return FlightTransitLocationsCompanion(
       id: id ?? this.id,
@@ -13569,6 +13710,9 @@ class FlightTransitLocationsCompanion
       locationId: locationId ?? this.locationId,
       stopOrder: stopOrder ?? this.stopOrder,
       deletedAt: deletedAt ?? this.deletedAt,
+      syncStatus: syncStatus ?? this.syncStatus,
+      remoteId: remoteId ?? this.remoteId,
+      lastModified: lastModified ?? this.lastModified,
     );
   }
 
@@ -13590,6 +13734,15 @@ class FlightTransitLocationsCompanion
     if (deletedAt.present) {
       map['deleted_at'] = Variable<DateTime>(deletedAt.value);
     }
+    if (syncStatus.present) {
+      map['sync_status'] = Variable<int>(syncStatus.value);
+    }
+    if (remoteId.present) {
+      map['remote_id'] = Variable<String>(remoteId.value);
+    }
+    if (lastModified.present) {
+      map['last_modified'] = Variable<DateTime>(lastModified.value);
+    }
     return map;
   }
 
@@ -13600,7 +13753,10 @@ class FlightTransitLocationsCompanion
           ..write('flightRecordId: $flightRecordId, ')
           ..write('locationId: $locationId, ')
           ..write('stopOrder: $stopOrder, ')
-          ..write('deletedAt: $deletedAt')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('syncStatus: $syncStatus, ')
+          ..write('remoteId: $remoteId, ')
+          ..write('lastModified: $lastModified')
           ..write(')'))
         .toString();
   }
@@ -14997,6 +15153,40 @@ class $ChiefComplaintTable extends ChiefComplaint
     requiredDuringInsert: false,
     defaultValue: currentDateAndTime,
   );
+  static const VerificationMeta _syncStatusMeta = const VerificationMeta(
+    'syncStatus',
+  );
+  @override
+  late final GeneratedColumn<int> syncStatus = GeneratedColumn<int>(
+    'sync_status',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _remoteIdMeta = const VerificationMeta(
+    'remoteId',
+  );
+  @override
+  late final GeneratedColumn<String> remoteId = GeneratedColumn<String>(
+    'remote_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _lastModifiedMeta = const VerificationMeta(
+    'lastModified',
+  );
+  @override
+  late final GeneratedColumn<DateTime> lastModified = GeneratedColumn<DateTime>(
+    'last_modified',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     complaintId,
@@ -15010,6 +15200,9 @@ class $ChiefComplaintTable extends ChiefComplaint
     reportedBy,
     isConfirmed,
     createdAt,
+    syncStatus,
+    remoteId,
+    lastModified,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -15112,6 +15305,27 @@ class $ChiefComplaintTable extends ChiefComplaint
         createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
       );
     }
+    if (data.containsKey('sync_status')) {
+      context.handle(
+        _syncStatusMeta,
+        syncStatus.isAcceptableOrUnknown(data['sync_status']!, _syncStatusMeta),
+      );
+    }
+    if (data.containsKey('remote_id')) {
+      context.handle(
+        _remoteIdMeta,
+        remoteId.isAcceptableOrUnknown(data['remote_id']!, _remoteIdMeta),
+      );
+    }
+    if (data.containsKey('last_modified')) {
+      context.handle(
+        _lastModifiedMeta,
+        lastModified.isAcceptableOrUnknown(
+          data['last_modified']!,
+          _lastModifiedMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -15165,6 +15379,18 @@ class $ChiefComplaintTable extends ChiefComplaint
         DriftSqlType.dateTime,
         data['${effectivePrefix}created_at'],
       )!,
+      syncStatus: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}sync_status'],
+      )!,
+      remoteId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}remote_id'],
+      ),
+      lastModified: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}last_modified'],
+      ),
     );
   }
 
@@ -15187,6 +15413,9 @@ class ChiefComplaintData extends DataClass
   final String? reportedBy;
   final bool isConfirmed;
   final DateTime createdAt;
+  final int syncStatus;
+  final String? remoteId;
+  final DateTime? lastModified;
   const ChiefComplaintData({
     required this.complaintId,
     required this.medicalId,
@@ -15199,6 +15428,9 @@ class ChiefComplaintData extends DataClass
     this.reportedBy,
     required this.isConfirmed,
     required this.createdAt,
+    required this.syncStatus,
+    this.remoteId,
+    this.lastModified,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -15228,6 +15460,13 @@ class ChiefComplaintData extends DataClass
     }
     map['is_confirmed'] = Variable<bool>(isConfirmed);
     map['created_at'] = Variable<DateTime>(createdAt);
+    map['sync_status'] = Variable<int>(syncStatus);
+    if (!nullToAbsent || remoteId != null) {
+      map['remote_id'] = Variable<String>(remoteId);
+    }
+    if (!nullToAbsent || lastModified != null) {
+      map['last_modified'] = Variable<DateTime>(lastModified);
+    }
     return map;
   }
 
@@ -15258,6 +15497,13 @@ class ChiefComplaintData extends DataClass
           : Value(reportedBy),
       isConfirmed: Value(isConfirmed),
       createdAt: Value(createdAt),
+      syncStatus: Value(syncStatus),
+      remoteId: remoteId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(remoteId),
+      lastModified: lastModified == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastModified),
     );
   }
 
@@ -15286,6 +15532,9 @@ class ChiefComplaintData extends DataClass
       reportedBy: serializer.fromJson<String?>(json['reportedBy']),
       isConfirmed: serializer.fromJson<bool>(json['isConfirmed']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      syncStatus: serializer.fromJson<int>(json['syncStatus']),
+      remoteId: serializer.fromJson<String?>(json['remoteId']),
+      lastModified: serializer.fromJson<DateTime?>(json['lastModified']),
     );
   }
   @override
@@ -15303,6 +15552,9 @@ class ChiefComplaintData extends DataClass
       'reportedBy': serializer.toJson<String?>(reportedBy),
       'isConfirmed': serializer.toJson<bool>(isConfirmed),
       'createdAt': serializer.toJson<DateTime>(createdAt),
+      'syncStatus': serializer.toJson<int>(syncStatus),
+      'remoteId': serializer.toJson<String?>(remoteId),
+      'lastModified': serializer.toJson<DateTime?>(lastModified),
     };
   }
 
@@ -15318,6 +15570,9 @@ class ChiefComplaintData extends DataClass
     Value<String?> reportedBy = const Value.absent(),
     bool? isConfirmed,
     DateTime? createdAt,
+    int? syncStatus,
+    Value<String?> remoteId = const Value.absent(),
+    Value<DateTime?> lastModified = const Value.absent(),
   }) => ChiefComplaintData(
     complaintId: complaintId ?? this.complaintId,
     medicalId: medicalId ?? this.medicalId,
@@ -15340,6 +15595,9 @@ class ChiefComplaintData extends DataClass
     reportedBy: reportedBy.present ? reportedBy.value : this.reportedBy,
     isConfirmed: isConfirmed ?? this.isConfirmed,
     createdAt: createdAt ?? this.createdAt,
+    syncStatus: syncStatus ?? this.syncStatus,
+    remoteId: remoteId.present ? remoteId.value : this.remoteId,
+    lastModified: lastModified.present ? lastModified.value : this.lastModified,
   );
   ChiefComplaintData copyWithCompanion(ChiefComplaintCompanion data) {
     return ChiefComplaintData(
@@ -15370,6 +15628,13 @@ class ChiefComplaintData extends DataClass
           ? data.isConfirmed.value
           : this.isConfirmed,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      syncStatus: data.syncStatus.present
+          ? data.syncStatus.value
+          : this.syncStatus,
+      remoteId: data.remoteId.present ? data.remoteId.value : this.remoteId,
+      lastModified: data.lastModified.present
+          ? data.lastModified.value
+          : this.lastModified,
     );
   }
 
@@ -15386,7 +15651,10 @@ class ChiefComplaintData extends DataClass
           ..write('onsetTime: $onsetTime, ')
           ..write('reportedBy: $reportedBy, ')
           ..write('isConfirmed: $isConfirmed, ')
-          ..write('createdAt: $createdAt')
+          ..write('createdAt: $createdAt, ')
+          ..write('syncStatus: $syncStatus, ')
+          ..write('remoteId: $remoteId, ')
+          ..write('lastModified: $lastModified')
           ..write(')'))
         .toString();
   }
@@ -15404,6 +15672,9 @@ class ChiefComplaintData extends DataClass
     reportedBy,
     isConfirmed,
     createdAt,
+    syncStatus,
+    remoteId,
+    lastModified,
   );
   @override
   bool operator ==(Object other) =>
@@ -15419,7 +15690,10 @@ class ChiefComplaintData extends DataClass
           other.onsetTime == this.onsetTime &&
           other.reportedBy == this.reportedBy &&
           other.isConfirmed == this.isConfirmed &&
-          other.createdAt == this.createdAt);
+          other.createdAt == this.createdAt &&
+          other.syncStatus == this.syncStatus &&
+          other.remoteId == this.remoteId &&
+          other.lastModified == this.lastModified);
 }
 
 class ChiefComplaintCompanion extends UpdateCompanion<ChiefComplaintData> {
@@ -15434,6 +15708,9 @@ class ChiefComplaintCompanion extends UpdateCompanion<ChiefComplaintData> {
   final Value<String?> reportedBy;
   final Value<bool> isConfirmed;
   final Value<DateTime> createdAt;
+  final Value<int> syncStatus;
+  final Value<String?> remoteId;
+  final Value<DateTime?> lastModified;
   const ChiefComplaintCompanion({
     this.complaintId = const Value.absent(),
     this.medicalId = const Value.absent(),
@@ -15446,6 +15723,9 @@ class ChiefComplaintCompanion extends UpdateCompanion<ChiefComplaintData> {
     this.reportedBy = const Value.absent(),
     this.isConfirmed = const Value.absent(),
     this.createdAt = const Value.absent(),
+    this.syncStatus = const Value.absent(),
+    this.remoteId = const Value.absent(),
+    this.lastModified = const Value.absent(),
   });
   ChiefComplaintCompanion.insert({
     this.complaintId = const Value.absent(),
@@ -15459,6 +15739,9 @@ class ChiefComplaintCompanion extends UpdateCompanion<ChiefComplaintData> {
     this.reportedBy = const Value.absent(),
     this.isConfirmed = const Value.absent(),
     this.createdAt = const Value.absent(),
+    this.syncStatus = const Value.absent(),
+    this.remoteId = const Value.absent(),
+    this.lastModified = const Value.absent(),
   }) : medicalId = Value(medicalId);
   static Insertable<ChiefComplaintData> custom({
     Expression<int>? complaintId,
@@ -15472,6 +15755,9 @@ class ChiefComplaintCompanion extends UpdateCompanion<ChiefComplaintData> {
     Expression<String>? reportedBy,
     Expression<bool>? isConfirmed,
     Expression<DateTime>? createdAt,
+    Expression<int>? syncStatus,
+    Expression<String>? remoteId,
+    Expression<DateTime>? lastModified,
   }) {
     return RawValuesInsertable({
       if (complaintId != null) 'complaint_id': complaintId,
@@ -15488,6 +15774,9 @@ class ChiefComplaintCompanion extends UpdateCompanion<ChiefComplaintData> {
       if (reportedBy != null) 'reported_by': reportedBy,
       if (isConfirmed != null) 'is_confirmed': isConfirmed,
       if (createdAt != null) 'created_at': createdAt,
+      if (syncStatus != null) 'sync_status': syncStatus,
+      if (remoteId != null) 'remote_id': remoteId,
+      if (lastModified != null) 'last_modified': lastModified,
     });
   }
 
@@ -15503,6 +15792,9 @@ class ChiefComplaintCompanion extends UpdateCompanion<ChiefComplaintData> {
     Value<String?>? reportedBy,
     Value<bool>? isConfirmed,
     Value<DateTime>? createdAt,
+    Value<int>? syncStatus,
+    Value<String?>? remoteId,
+    Value<DateTime?>? lastModified,
   }) {
     return ChiefComplaintCompanion(
       complaintId: complaintId ?? this.complaintId,
@@ -15516,6 +15808,9 @@ class ChiefComplaintCompanion extends UpdateCompanion<ChiefComplaintData> {
       reportedBy: reportedBy ?? this.reportedBy,
       isConfirmed: isConfirmed ?? this.isConfirmed,
       createdAt: createdAt ?? this.createdAt,
+      syncStatus: syncStatus ?? this.syncStatus,
+      remoteId: remoteId ?? this.remoteId,
+      lastModified: lastModified ?? this.lastModified,
     );
   }
 
@@ -15559,6 +15854,15 @@ class ChiefComplaintCompanion extends UpdateCompanion<ChiefComplaintData> {
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
+    if (syncStatus.present) {
+      map['sync_status'] = Variable<int>(syncStatus.value);
+    }
+    if (remoteId.present) {
+      map['remote_id'] = Variable<String>(remoteId.value);
+    }
+    if (lastModified.present) {
+      map['last_modified'] = Variable<DateTime>(lastModified.value);
+    }
     return map;
   }
 
@@ -15575,7 +15879,10 @@ class ChiefComplaintCompanion extends UpdateCompanion<ChiefComplaintData> {
           ..write('onsetTime: $onsetTime, ')
           ..write('reportedBy: $reportedBy, ')
           ..write('isConfirmed: $isConfirmed, ')
-          ..write('createdAt: $createdAt')
+          ..write('createdAt: $createdAt, ')
+          ..write('syncStatus: $syncStatus, ')
+          ..write('remoteId: $remoteId, ')
+          ..write('lastModified: $lastModified')
           ..write(')'))
         .toString();
   }
@@ -18215,6 +18522,40 @@ class $MedicalHistoryTable extends MedicalHistory
     requiredDuringInsert: false,
     defaultValue: currentDateAndTime,
   );
+  static const VerificationMeta _syncStatusMeta = const VerificationMeta(
+    'syncStatus',
+  );
+  @override
+  late final GeneratedColumn<int> syncStatus = GeneratedColumn<int>(
+    'sync_status',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _remoteIdMeta = const VerificationMeta(
+    'remoteId',
+  );
+  @override
+  late final GeneratedColumn<String> remoteId = GeneratedColumn<String>(
+    'remote_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _lastModifiedMeta = const VerificationMeta(
+    'lastModified',
+  );
+  @override
+  late final GeneratedColumn<DateTime> lastModified = GeneratedColumn<DateTime>(
+    'last_modified',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     historyId,
@@ -18224,6 +18565,9 @@ class $MedicalHistoryTable extends MedicalHistory
     allergyStatusId,
     allergyDetail,
     createdAt,
+    syncStatus,
+    remoteId,
+    lastModified,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -18293,6 +18637,27 @@ class $MedicalHistoryTable extends MedicalHistory
         createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
       );
     }
+    if (data.containsKey('sync_status')) {
+      context.handle(
+        _syncStatusMeta,
+        syncStatus.isAcceptableOrUnknown(data['sync_status']!, _syncStatusMeta),
+      );
+    }
+    if (data.containsKey('remote_id')) {
+      context.handle(
+        _remoteIdMeta,
+        remoteId.isAcceptableOrUnknown(data['remote_id']!, _remoteIdMeta),
+      );
+    }
+    if (data.containsKey('last_modified')) {
+      context.handle(
+        _lastModifiedMeta,
+        lastModified.isAcceptableOrUnknown(
+          data['last_modified']!,
+          _lastModifiedMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -18330,6 +18695,18 @@ class $MedicalHistoryTable extends MedicalHistory
         DriftSqlType.dateTime,
         data['${effectivePrefix}created_at'],
       )!,
+      syncStatus: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}sync_status'],
+      )!,
+      remoteId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}remote_id'],
+      ),
+      lastModified: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}last_modified'],
+      ),
     );
   }
 
@@ -18348,6 +18725,9 @@ class MedicalHistoryData extends DataClass
   final int? allergyStatusId;
   final String? allergyDetail;
   final DateTime createdAt;
+  final int syncStatus;
+  final String? remoteId;
+  final DateTime? lastModified;
   const MedicalHistoryData({
     required this.historyId,
     required this.medicalId,
@@ -18356,6 +18736,9 @@ class MedicalHistoryData extends DataClass
     this.allergyStatusId,
     this.allergyDetail,
     required this.createdAt,
+    required this.syncStatus,
+    this.remoteId,
+    this.lastModified,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -18375,6 +18758,13 @@ class MedicalHistoryData extends DataClass
       map['allergy_detail'] = Variable<String>(allergyDetail);
     }
     map['created_at'] = Variable<DateTime>(createdAt);
+    map['sync_status'] = Variable<int>(syncStatus);
+    if (!nullToAbsent || remoteId != null) {
+      map['remote_id'] = Variable<String>(remoteId);
+    }
+    if (!nullToAbsent || lastModified != null) {
+      map['last_modified'] = Variable<DateTime>(lastModified);
+    }
     return map;
   }
 
@@ -18395,6 +18785,13 @@ class MedicalHistoryData extends DataClass
           ? const Value.absent()
           : Value(allergyDetail),
       createdAt: Value(createdAt),
+      syncStatus: Value(syncStatus),
+      remoteId: remoteId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(remoteId),
+      lastModified: lastModified == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastModified),
     );
   }
 
@@ -18415,6 +18812,9 @@ class MedicalHistoryData extends DataClass
       allergyStatusId: serializer.fromJson<int?>(json['allergyStatusId']),
       allergyDetail: serializer.fromJson<String?>(json['allergyDetail']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      syncStatus: serializer.fromJson<int>(json['syncStatus']),
+      remoteId: serializer.fromJson<String?>(json['remoteId']),
+      lastModified: serializer.fromJson<DateTime?>(json['lastModified']),
     );
   }
   @override
@@ -18428,6 +18828,9 @@ class MedicalHistoryData extends DataClass
       'allergyStatusId': serializer.toJson<int?>(allergyStatusId),
       'allergyDetail': serializer.toJson<String?>(allergyDetail),
       'createdAt': serializer.toJson<DateTime>(createdAt),
+      'syncStatus': serializer.toJson<int>(syncStatus),
+      'remoteId': serializer.toJson<String?>(remoteId),
+      'lastModified': serializer.toJson<DateTime?>(lastModified),
     };
   }
 
@@ -18439,6 +18842,9 @@ class MedicalHistoryData extends DataClass
     Value<int?> allergyStatusId = const Value.absent(),
     Value<String?> allergyDetail = const Value.absent(),
     DateTime? createdAt,
+    int? syncStatus,
+    Value<String?> remoteId = const Value.absent(),
+    Value<DateTime?> lastModified = const Value.absent(),
   }) => MedicalHistoryData(
     historyId: historyId ?? this.historyId,
     medicalId: medicalId ?? this.medicalId,
@@ -18455,6 +18861,9 @@ class MedicalHistoryData extends DataClass
         ? allergyDetail.value
         : this.allergyDetail,
     createdAt: createdAt ?? this.createdAt,
+    syncStatus: syncStatus ?? this.syncStatus,
+    remoteId: remoteId.present ? remoteId.value : this.remoteId,
+    lastModified: lastModified.present ? lastModified.value : this.lastModified,
   );
   MedicalHistoryData copyWithCompanion(MedicalHistoryCompanion data) {
     return MedicalHistoryData(
@@ -18473,6 +18882,13 @@ class MedicalHistoryData extends DataClass
           ? data.allergyDetail.value
           : this.allergyDetail,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      syncStatus: data.syncStatus.present
+          ? data.syncStatus.value
+          : this.syncStatus,
+      remoteId: data.remoteId.present ? data.remoteId.value : this.remoteId,
+      lastModified: data.lastModified.present
+          ? data.lastModified.value
+          : this.lastModified,
     );
   }
 
@@ -18485,7 +18901,10 @@ class MedicalHistoryData extends DataClass
           ..write('pastHistoryDetail: $pastHistoryDetail, ')
           ..write('allergyStatusId: $allergyStatusId, ')
           ..write('allergyDetail: $allergyDetail, ')
-          ..write('createdAt: $createdAt')
+          ..write('createdAt: $createdAt, ')
+          ..write('syncStatus: $syncStatus, ')
+          ..write('remoteId: $remoteId, ')
+          ..write('lastModified: $lastModified')
           ..write(')'))
         .toString();
   }
@@ -18499,6 +18918,9 @@ class MedicalHistoryData extends DataClass
     allergyStatusId,
     allergyDetail,
     createdAt,
+    syncStatus,
+    remoteId,
+    lastModified,
   );
   @override
   bool operator ==(Object other) =>
@@ -18510,7 +18932,10 @@ class MedicalHistoryData extends DataClass
           other.pastHistoryDetail == this.pastHistoryDetail &&
           other.allergyStatusId == this.allergyStatusId &&
           other.allergyDetail == this.allergyDetail &&
-          other.createdAt == this.createdAt);
+          other.createdAt == this.createdAt &&
+          other.syncStatus == this.syncStatus &&
+          other.remoteId == this.remoteId &&
+          other.lastModified == this.lastModified);
 }
 
 class MedicalHistoryCompanion extends UpdateCompanion<MedicalHistoryData> {
@@ -18521,6 +18946,9 @@ class MedicalHistoryCompanion extends UpdateCompanion<MedicalHistoryData> {
   final Value<int?> allergyStatusId;
   final Value<String?> allergyDetail;
   final Value<DateTime> createdAt;
+  final Value<int> syncStatus;
+  final Value<String?> remoteId;
+  final Value<DateTime?> lastModified;
   const MedicalHistoryCompanion({
     this.historyId = const Value.absent(),
     this.medicalId = const Value.absent(),
@@ -18529,6 +18957,9 @@ class MedicalHistoryCompanion extends UpdateCompanion<MedicalHistoryData> {
     this.allergyStatusId = const Value.absent(),
     this.allergyDetail = const Value.absent(),
     this.createdAt = const Value.absent(),
+    this.syncStatus = const Value.absent(),
+    this.remoteId = const Value.absent(),
+    this.lastModified = const Value.absent(),
   });
   MedicalHistoryCompanion.insert({
     this.historyId = const Value.absent(),
@@ -18538,6 +18969,9 @@ class MedicalHistoryCompanion extends UpdateCompanion<MedicalHistoryData> {
     this.allergyStatusId = const Value.absent(),
     this.allergyDetail = const Value.absent(),
     this.createdAt = const Value.absent(),
+    this.syncStatus = const Value.absent(),
+    this.remoteId = const Value.absent(),
+    this.lastModified = const Value.absent(),
   }) : medicalId = Value(medicalId);
   static Insertable<MedicalHistoryData> custom({
     Expression<int>? historyId,
@@ -18547,6 +18981,9 @@ class MedicalHistoryCompanion extends UpdateCompanion<MedicalHistoryData> {
     Expression<int>? allergyStatusId,
     Expression<String>? allergyDetail,
     Expression<DateTime>? createdAt,
+    Expression<int>? syncStatus,
+    Expression<String>? remoteId,
+    Expression<DateTime>? lastModified,
   }) {
     return RawValuesInsertable({
       if (historyId != null) 'history_id': historyId,
@@ -18557,6 +18994,9 @@ class MedicalHistoryCompanion extends UpdateCompanion<MedicalHistoryData> {
       if (allergyStatusId != null) 'allergy_status_id': allergyStatusId,
       if (allergyDetail != null) 'allergy_detail': allergyDetail,
       if (createdAt != null) 'created_at': createdAt,
+      if (syncStatus != null) 'sync_status': syncStatus,
+      if (remoteId != null) 'remote_id': remoteId,
+      if (lastModified != null) 'last_modified': lastModified,
     });
   }
 
@@ -18568,6 +19008,9 @@ class MedicalHistoryCompanion extends UpdateCompanion<MedicalHistoryData> {
     Value<int?>? allergyStatusId,
     Value<String?>? allergyDetail,
     Value<DateTime>? createdAt,
+    Value<int>? syncStatus,
+    Value<String?>? remoteId,
+    Value<DateTime?>? lastModified,
   }) {
     return MedicalHistoryCompanion(
       historyId: historyId ?? this.historyId,
@@ -18577,6 +19020,9 @@ class MedicalHistoryCompanion extends UpdateCompanion<MedicalHistoryData> {
       allergyStatusId: allergyStatusId ?? this.allergyStatusId,
       allergyDetail: allergyDetail ?? this.allergyDetail,
       createdAt: createdAt ?? this.createdAt,
+      syncStatus: syncStatus ?? this.syncStatus,
+      remoteId: remoteId ?? this.remoteId,
+      lastModified: lastModified ?? this.lastModified,
     );
   }
 
@@ -18604,6 +19050,15 @@ class MedicalHistoryCompanion extends UpdateCompanion<MedicalHistoryData> {
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
+    if (syncStatus.present) {
+      map['sync_status'] = Variable<int>(syncStatus.value);
+    }
+    if (remoteId.present) {
+      map['remote_id'] = Variable<String>(remoteId.value);
+    }
+    if (lastModified.present) {
+      map['last_modified'] = Variable<DateTime>(lastModified.value);
+    }
     return map;
   }
 
@@ -18616,7 +19071,10 @@ class MedicalHistoryCompanion extends UpdateCompanion<MedicalHistoryData> {
           ..write('pastHistoryDetail: $pastHistoryDetail, ')
           ..write('allergyStatusId: $allergyStatusId, ')
           ..write('allergyDetail: $allergyDetail, ')
-          ..write('createdAt: $createdAt')
+          ..write('createdAt: $createdAt, ')
+          ..write('syncStatus: $syncStatus, ')
+          ..write('remoteId: $remoteId, ')
+          ..write('lastModified: $lastModified')
           ..write(')'))
         .toString();
   }
@@ -21202,6 +21660,40 @@ class $SpecialNotesTable extends SpecialNotes
     requiredDuringInsert: false,
     defaultValue: currentDateAndTime,
   );
+  static const VerificationMeta _syncStatusMeta = const VerificationMeta(
+    'syncStatus',
+  );
+  @override
+  late final GeneratedColumn<int> syncStatus = GeneratedColumn<int>(
+    'sync_status',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _remoteIdMeta = const VerificationMeta(
+    'remoteId',
+  );
+  @override
+  late final GeneratedColumn<String> remoteId = GeneratedColumn<String>(
+    'remote_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _lastModifiedMeta = const VerificationMeta(
+    'lastModified',
+  );
+  @override
+  late final GeneratedColumn<DateTime> lastModified = GeneratedColumn<DateTime>(
+    'last_modified',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     noteId,
@@ -21209,6 +21701,9 @@ class $SpecialNotesTable extends SpecialNotes
     selectedNotes,
     otherNotes,
     createdAt,
+    syncStatus,
+    remoteId,
+    lastModified,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -21257,6 +21752,27 @@ class $SpecialNotesTable extends SpecialNotes
         createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
       );
     }
+    if (data.containsKey('sync_status')) {
+      context.handle(
+        _syncStatusMeta,
+        syncStatus.isAcceptableOrUnknown(data['sync_status']!, _syncStatusMeta),
+      );
+    }
+    if (data.containsKey('remote_id')) {
+      context.handle(
+        _remoteIdMeta,
+        remoteId.isAcceptableOrUnknown(data['remote_id']!, _remoteIdMeta),
+      );
+    }
+    if (data.containsKey('last_modified')) {
+      context.handle(
+        _lastModifiedMeta,
+        lastModified.isAcceptableOrUnknown(
+          data['last_modified']!,
+          _lastModifiedMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -21286,6 +21802,18 @@ class $SpecialNotesTable extends SpecialNotes
         DriftSqlType.dateTime,
         data['${effectivePrefix}created_at'],
       )!,
+      syncStatus: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}sync_status'],
+      )!,
+      remoteId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}remote_id'],
+      ),
+      lastModified: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}last_modified'],
+      ),
     );
   }
 
@@ -21302,12 +21830,18 @@ class SpecialNotesData extends DataClass
   final String? selectedNotes;
   final String? otherNotes;
   final DateTime createdAt;
+  final int syncStatus;
+  final String? remoteId;
+  final DateTime? lastModified;
   const SpecialNotesData({
     required this.noteId,
     required this.medicalId,
     this.selectedNotes,
     this.otherNotes,
     required this.createdAt,
+    required this.syncStatus,
+    this.remoteId,
+    this.lastModified,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -21321,6 +21855,13 @@ class SpecialNotesData extends DataClass
       map['other_notes'] = Variable<String>(otherNotes);
     }
     map['created_at'] = Variable<DateTime>(createdAt);
+    map['sync_status'] = Variable<int>(syncStatus);
+    if (!nullToAbsent || remoteId != null) {
+      map['remote_id'] = Variable<String>(remoteId);
+    }
+    if (!nullToAbsent || lastModified != null) {
+      map['last_modified'] = Variable<DateTime>(lastModified);
+    }
     return map;
   }
 
@@ -21335,6 +21876,13 @@ class SpecialNotesData extends DataClass
           ? const Value.absent()
           : Value(otherNotes),
       createdAt: Value(createdAt),
+      syncStatus: Value(syncStatus),
+      remoteId: remoteId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(remoteId),
+      lastModified: lastModified == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastModified),
     );
   }
 
@@ -21349,6 +21897,9 @@ class SpecialNotesData extends DataClass
       selectedNotes: serializer.fromJson<String?>(json['selectedNotes']),
       otherNotes: serializer.fromJson<String?>(json['otherNotes']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      syncStatus: serializer.fromJson<int>(json['syncStatus']),
+      remoteId: serializer.fromJson<String?>(json['remoteId']),
+      lastModified: serializer.fromJson<DateTime?>(json['lastModified']),
     );
   }
   @override
@@ -21360,6 +21911,9 @@ class SpecialNotesData extends DataClass
       'selectedNotes': serializer.toJson<String?>(selectedNotes),
       'otherNotes': serializer.toJson<String?>(otherNotes),
       'createdAt': serializer.toJson<DateTime>(createdAt),
+      'syncStatus': serializer.toJson<int>(syncStatus),
+      'remoteId': serializer.toJson<String?>(remoteId),
+      'lastModified': serializer.toJson<DateTime?>(lastModified),
     };
   }
 
@@ -21369,6 +21923,9 @@ class SpecialNotesData extends DataClass
     Value<String?> selectedNotes = const Value.absent(),
     Value<String?> otherNotes = const Value.absent(),
     DateTime? createdAt,
+    int? syncStatus,
+    Value<String?> remoteId = const Value.absent(),
+    Value<DateTime?> lastModified = const Value.absent(),
   }) => SpecialNotesData(
     noteId: noteId ?? this.noteId,
     medicalId: medicalId ?? this.medicalId,
@@ -21377,6 +21934,9 @@ class SpecialNotesData extends DataClass
         : this.selectedNotes,
     otherNotes: otherNotes.present ? otherNotes.value : this.otherNotes,
     createdAt: createdAt ?? this.createdAt,
+    syncStatus: syncStatus ?? this.syncStatus,
+    remoteId: remoteId.present ? remoteId.value : this.remoteId,
+    lastModified: lastModified.present ? lastModified.value : this.lastModified,
   );
   SpecialNotesData copyWithCompanion(SpecialNotesCompanion data) {
     return SpecialNotesData(
@@ -21389,6 +21949,13 @@ class SpecialNotesData extends DataClass
           ? data.otherNotes.value
           : this.otherNotes,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      syncStatus: data.syncStatus.present
+          ? data.syncStatus.value
+          : this.syncStatus,
+      remoteId: data.remoteId.present ? data.remoteId.value : this.remoteId,
+      lastModified: data.lastModified.present
+          ? data.lastModified.value
+          : this.lastModified,
     );
   }
 
@@ -21399,14 +21966,25 @@ class SpecialNotesData extends DataClass
           ..write('medicalId: $medicalId, ')
           ..write('selectedNotes: $selectedNotes, ')
           ..write('otherNotes: $otherNotes, ')
-          ..write('createdAt: $createdAt')
+          ..write('createdAt: $createdAt, ')
+          ..write('syncStatus: $syncStatus, ')
+          ..write('remoteId: $remoteId, ')
+          ..write('lastModified: $lastModified')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode =>
-      Object.hash(noteId, medicalId, selectedNotes, otherNotes, createdAt);
+  int get hashCode => Object.hash(
+    noteId,
+    medicalId,
+    selectedNotes,
+    otherNotes,
+    createdAt,
+    syncStatus,
+    remoteId,
+    lastModified,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -21415,7 +21993,10 @@ class SpecialNotesData extends DataClass
           other.medicalId == this.medicalId &&
           other.selectedNotes == this.selectedNotes &&
           other.otherNotes == this.otherNotes &&
-          other.createdAt == this.createdAt);
+          other.createdAt == this.createdAt &&
+          other.syncStatus == this.syncStatus &&
+          other.remoteId == this.remoteId &&
+          other.lastModified == this.lastModified);
 }
 
 class SpecialNotesCompanion extends UpdateCompanion<SpecialNotesData> {
@@ -21424,12 +22005,18 @@ class SpecialNotesCompanion extends UpdateCompanion<SpecialNotesData> {
   final Value<String?> selectedNotes;
   final Value<String?> otherNotes;
   final Value<DateTime> createdAt;
+  final Value<int> syncStatus;
+  final Value<String?> remoteId;
+  final Value<DateTime?> lastModified;
   const SpecialNotesCompanion({
     this.noteId = const Value.absent(),
     this.medicalId = const Value.absent(),
     this.selectedNotes = const Value.absent(),
     this.otherNotes = const Value.absent(),
     this.createdAt = const Value.absent(),
+    this.syncStatus = const Value.absent(),
+    this.remoteId = const Value.absent(),
+    this.lastModified = const Value.absent(),
   });
   SpecialNotesCompanion.insert({
     this.noteId = const Value.absent(),
@@ -21437,6 +22024,9 @@ class SpecialNotesCompanion extends UpdateCompanion<SpecialNotesData> {
     this.selectedNotes = const Value.absent(),
     this.otherNotes = const Value.absent(),
     this.createdAt = const Value.absent(),
+    this.syncStatus = const Value.absent(),
+    this.remoteId = const Value.absent(),
+    this.lastModified = const Value.absent(),
   }) : medicalId = Value(medicalId);
   static Insertable<SpecialNotesData> custom({
     Expression<int>? noteId,
@@ -21444,6 +22034,9 @@ class SpecialNotesCompanion extends UpdateCompanion<SpecialNotesData> {
     Expression<String>? selectedNotes,
     Expression<String>? otherNotes,
     Expression<DateTime>? createdAt,
+    Expression<int>? syncStatus,
+    Expression<String>? remoteId,
+    Expression<DateTime>? lastModified,
   }) {
     return RawValuesInsertable({
       if (noteId != null) 'note_id': noteId,
@@ -21451,6 +22044,9 @@ class SpecialNotesCompanion extends UpdateCompanion<SpecialNotesData> {
       if (selectedNotes != null) 'selected_notes': selectedNotes,
       if (otherNotes != null) 'other_notes': otherNotes,
       if (createdAt != null) 'created_at': createdAt,
+      if (syncStatus != null) 'sync_status': syncStatus,
+      if (remoteId != null) 'remote_id': remoteId,
+      if (lastModified != null) 'last_modified': lastModified,
     });
   }
 
@@ -21460,6 +22056,9 @@ class SpecialNotesCompanion extends UpdateCompanion<SpecialNotesData> {
     Value<String?>? selectedNotes,
     Value<String?>? otherNotes,
     Value<DateTime>? createdAt,
+    Value<int>? syncStatus,
+    Value<String?>? remoteId,
+    Value<DateTime?>? lastModified,
   }) {
     return SpecialNotesCompanion(
       noteId: noteId ?? this.noteId,
@@ -21467,6 +22066,9 @@ class SpecialNotesCompanion extends UpdateCompanion<SpecialNotesData> {
       selectedNotes: selectedNotes ?? this.selectedNotes,
       otherNotes: otherNotes ?? this.otherNotes,
       createdAt: createdAt ?? this.createdAt,
+      syncStatus: syncStatus ?? this.syncStatus,
+      remoteId: remoteId ?? this.remoteId,
+      lastModified: lastModified ?? this.lastModified,
     );
   }
 
@@ -21488,6 +22090,15 @@ class SpecialNotesCompanion extends UpdateCompanion<SpecialNotesData> {
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
+    if (syncStatus.present) {
+      map['sync_status'] = Variable<int>(syncStatus.value);
+    }
+    if (remoteId.present) {
+      map['remote_id'] = Variable<String>(remoteId.value);
+    }
+    if (lastModified.present) {
+      map['last_modified'] = Variable<DateTime>(lastModified.value);
+    }
     return map;
   }
 
@@ -21498,7 +22109,10 @@ class SpecialNotesCompanion extends UpdateCompanion<SpecialNotesData> {
           ..write('medicalId: $medicalId, ')
           ..write('selectedNotes: $selectedNotes, ')
           ..write('otherNotes: $otherNotes, ')
-          ..write('createdAt: $createdAt')
+          ..write('createdAt: $createdAt, ')
+          ..write('syncStatus: $syncStatus, ')
+          ..write('remoteId: $remoteId, ')
+          ..write('lastModified: $lastModified')
           ..write(')'))
         .toString();
   }
@@ -55083,6 +55697,9 @@ typedef $$FlightTransitLocationsTableCreateCompanionBuilder =
       required int locationId,
       Value<int> stopOrder,
       Value<DateTime?> deletedAt,
+      Value<int> syncStatus,
+      Value<String?> remoteId,
+      Value<DateTime?> lastModified,
     });
 typedef $$FlightTransitLocationsTableUpdateCompanionBuilder =
     FlightTransitLocationsCompanion Function({
@@ -55091,6 +55708,9 @@ typedef $$FlightTransitLocationsTableUpdateCompanionBuilder =
       Value<int> locationId,
       Value<int> stopOrder,
       Value<DateTime?> deletedAt,
+      Value<int> syncStatus,
+      Value<String?> remoteId,
+      Value<DateTime?> lastModified,
     });
 
 final class $$FlightTransitLocationsTableReferences
@@ -55175,6 +55795,21 @@ class $$FlightTransitLocationsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<int> get syncStatus => $composableBuilder(
+    column: $table.syncStatus,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get remoteId => $composableBuilder(
+    column: $table.remoteId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get lastModified => $composableBuilder(
+    column: $table.lastModified,
+    builder: (column) => ColumnFilters(column),
+  );
+
   $$FlightRecordTableFilterComposer get flightRecordId {
     final $$FlightRecordTableFilterComposer composer = $composerBuilder(
       composer: this,
@@ -55246,6 +55881,21 @@ class $$FlightTransitLocationsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<int> get syncStatus => $composableBuilder(
+    column: $table.syncStatus,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get remoteId => $composableBuilder(
+    column: $table.remoteId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get lastModified => $composableBuilder(
+    column: $table.lastModified,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   $$FlightRecordTableOrderingComposer get flightRecordId {
     final $$FlightRecordTableOrderingComposer composer = $composerBuilder(
       composer: this,
@@ -55310,6 +55960,19 @@ class $$FlightTransitLocationsTableAnnotationComposer
 
   GeneratedColumn<DateTime> get deletedAt =>
       $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+
+  GeneratedColumn<int> get syncStatus => $composableBuilder(
+    column: $table.syncStatus,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get remoteId =>
+      $composableBuilder(column: $table.remoteId, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get lastModified => $composableBuilder(
+    column: $table.lastModified,
+    builder: (column) => column,
+  );
 
   $$FlightRecordTableAnnotationComposer get flightRecordId {
     final $$FlightRecordTableAnnotationComposer composer = $composerBuilder(
@@ -55402,12 +56065,18 @@ class $$FlightTransitLocationsTableTableManager
                 Value<int> locationId = const Value.absent(),
                 Value<int> stopOrder = const Value.absent(),
                 Value<DateTime?> deletedAt = const Value.absent(),
+                Value<int> syncStatus = const Value.absent(),
+                Value<String?> remoteId = const Value.absent(),
+                Value<DateTime?> lastModified = const Value.absent(),
               }) => FlightTransitLocationsCompanion(
                 id: id,
                 flightRecordId: flightRecordId,
                 locationId: locationId,
                 stopOrder: stopOrder,
                 deletedAt: deletedAt,
+                syncStatus: syncStatus,
+                remoteId: remoteId,
+                lastModified: lastModified,
               ),
           createCompanionCallback:
               ({
@@ -55416,12 +56085,18 @@ class $$FlightTransitLocationsTableTableManager
                 required int locationId,
                 Value<int> stopOrder = const Value.absent(),
                 Value<DateTime?> deletedAt = const Value.absent(),
+                Value<int> syncStatus = const Value.absent(),
+                Value<String?> remoteId = const Value.absent(),
+                Value<DateTime?> lastModified = const Value.absent(),
               }) => FlightTransitLocationsCompanion.insert(
                 id: id,
                 flightRecordId: flightRecordId,
                 locationId: locationId,
                 stopOrder: stopOrder,
                 deletedAt: deletedAt,
+                syncStatus: syncStatus,
+                remoteId: remoteId,
+                lastModified: lastModified,
               ),
           withReferenceMapper: (p0) => p0
               .map(
@@ -56476,6 +57151,9 @@ typedef $$ChiefComplaintTableCreateCompanionBuilder =
       Value<String?> reportedBy,
       Value<bool> isConfirmed,
       Value<DateTime> createdAt,
+      Value<int> syncStatus,
+      Value<String?> remoteId,
+      Value<DateTime?> lastModified,
     });
 typedef $$ChiefComplaintTableUpdateCompanionBuilder =
     ChiefComplaintCompanion Function({
@@ -56490,6 +57168,9 @@ typedef $$ChiefComplaintTableUpdateCompanionBuilder =
       Value<String?> reportedBy,
       Value<bool> isConfirmed,
       Value<DateTime> createdAt,
+      Value<int> syncStatus,
+      Value<String?> remoteId,
+      Value<DateTime?> lastModified,
     });
 
 final class $$ChiefComplaintTableReferences
@@ -56620,6 +57301,21 @@ class $$ChiefComplaintTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<int> get syncStatus => $composableBuilder(
+    column: $table.syncStatus,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get remoteId => $composableBuilder(
+    column: $table.remoteId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get lastModified => $composableBuilder(
+    column: $table.lastModified,
+    builder: (column) => ColumnFilters(column),
+  );
+
   $$MedicalRecordTableFilterComposer get medicalId {
     final $$MedicalRecordTableFilterComposer composer = $composerBuilder(
       composer: this,
@@ -56730,6 +57426,21 @@ class $$ChiefComplaintTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<int> get syncStatus => $composableBuilder(
+    column: $table.syncStatus,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get remoteId => $composableBuilder(
+    column: $table.remoteId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get lastModified => $composableBuilder(
+    column: $table.lastModified,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   $$MedicalRecordTableOrderingComposer get medicalId {
     final $$MedicalRecordTableOrderingComposer composer = $composerBuilder(
       composer: this,
@@ -56808,6 +57519,19 @@ class $$ChiefComplaintTableAnnotationComposer
 
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<int> get syncStatus => $composableBuilder(
+    column: $table.syncStatus,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get remoteId =>
+      $composableBuilder(column: $table.remoteId, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get lastModified => $composableBuilder(
+    column: $table.lastModified,
+    builder: (column) => column,
+  );
 
   $$MedicalRecordTableAnnotationComposer get medicalId {
     final $$MedicalRecordTableAnnotationComposer composer = $composerBuilder(
@@ -56906,6 +57630,9 @@ class $$ChiefComplaintTableTableManager
                 Value<String?> reportedBy = const Value.absent(),
                 Value<bool> isConfirmed = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
+                Value<int> syncStatus = const Value.absent(),
+                Value<String?> remoteId = const Value.absent(),
+                Value<DateTime?> lastModified = const Value.absent(),
               }) => ChiefComplaintCompanion(
                 complaintId: complaintId,
                 medicalId: medicalId,
@@ -56918,6 +57645,9 @@ class $$ChiefComplaintTableTableManager
                 reportedBy: reportedBy,
                 isConfirmed: isConfirmed,
                 createdAt: createdAt,
+                syncStatus: syncStatus,
+                remoteId: remoteId,
+                lastModified: lastModified,
               ),
           createCompanionCallback:
               ({
@@ -56932,6 +57662,9 @@ class $$ChiefComplaintTableTableManager
                 Value<String?> reportedBy = const Value.absent(),
                 Value<bool> isConfirmed = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
+                Value<int> syncStatus = const Value.absent(),
+                Value<String?> remoteId = const Value.absent(),
+                Value<DateTime?> lastModified = const Value.absent(),
               }) => ChiefComplaintCompanion.insert(
                 complaintId: complaintId,
                 medicalId: medicalId,
@@ -56944,6 +57677,9 @@ class $$ChiefComplaintTableTableManager
                 reportedBy: reportedBy,
                 isConfirmed: isConfirmed,
                 createdAt: createdAt,
+                syncStatus: syncStatus,
+                remoteId: remoteId,
+                lastModified: lastModified,
               ),
           withReferenceMapper: (p0) => p0
               .map(
@@ -58886,6 +59622,9 @@ typedef $$MedicalHistoryTableCreateCompanionBuilder =
       Value<int?> allergyStatusId,
       Value<String?> allergyDetail,
       Value<DateTime> createdAt,
+      Value<int> syncStatus,
+      Value<String?> remoteId,
+      Value<DateTime?> lastModified,
     });
 typedef $$MedicalHistoryTableUpdateCompanionBuilder =
     MedicalHistoryCompanion Function({
@@ -58896,6 +59635,9 @@ typedef $$MedicalHistoryTableUpdateCompanionBuilder =
       Value<int?> allergyStatusId,
       Value<String?> allergyDetail,
       Value<DateTime> createdAt,
+      Value<int> syncStatus,
+      Value<String?> remoteId,
+      Value<DateTime?> lastModified,
     });
 
 final class $$MedicalHistoryTableReferences
@@ -59007,6 +59749,21 @@ class $$MedicalHistoryTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<int> get syncStatus => $composableBuilder(
+    column: $table.syncStatus,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get remoteId => $composableBuilder(
+    column: $table.remoteId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get lastModified => $composableBuilder(
+    column: $table.lastModified,
+    builder: (column) => ColumnFilters(column),
+  );
+
   $$MedicalRecordTableFilterComposer get medicalId {
     final $$MedicalRecordTableFilterComposer composer = $composerBuilder(
       composer: this,
@@ -59106,6 +59863,21 @@ class $$MedicalHistoryTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<int> get syncStatus => $composableBuilder(
+    column: $table.syncStatus,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get remoteId => $composableBuilder(
+    column: $table.remoteId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get lastModified => $composableBuilder(
+    column: $table.lastModified,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   $$MedicalRecordTableOrderingComposer get medicalId {
     final $$MedicalRecordTableOrderingComposer composer = $composerBuilder(
       composer: this,
@@ -59200,6 +59972,19 @@ class $$MedicalHistoryTableAnnotationComposer
 
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<int> get syncStatus => $composableBuilder(
+    column: $table.syncStatus,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get remoteId =>
+      $composableBuilder(column: $table.remoteId, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get lastModified => $composableBuilder(
+    column: $table.lastModified,
+    builder: (column) => column,
+  );
 
   $$MedicalRecordTableAnnotationComposer get medicalId {
     final $$MedicalRecordTableAnnotationComposer composer = $composerBuilder(
@@ -59312,6 +60097,9 @@ class $$MedicalHistoryTableTableManager
                 Value<int?> allergyStatusId = const Value.absent(),
                 Value<String?> allergyDetail = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
+                Value<int> syncStatus = const Value.absent(),
+                Value<String?> remoteId = const Value.absent(),
+                Value<DateTime?> lastModified = const Value.absent(),
               }) => MedicalHistoryCompanion(
                 historyId: historyId,
                 medicalId: medicalId,
@@ -59320,6 +60108,9 @@ class $$MedicalHistoryTableTableManager
                 allergyStatusId: allergyStatusId,
                 allergyDetail: allergyDetail,
                 createdAt: createdAt,
+                syncStatus: syncStatus,
+                remoteId: remoteId,
+                lastModified: lastModified,
               ),
           createCompanionCallback:
               ({
@@ -59330,6 +60121,9 @@ class $$MedicalHistoryTableTableManager
                 Value<int?> allergyStatusId = const Value.absent(),
                 Value<String?> allergyDetail = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
+                Value<int> syncStatus = const Value.absent(),
+                Value<String?> remoteId = const Value.absent(),
+                Value<DateTime?> lastModified = const Value.absent(),
               }) => MedicalHistoryCompanion.insert(
                 historyId: historyId,
                 medicalId: medicalId,
@@ -59338,6 +60132,9 @@ class $$MedicalHistoryTableTableManager
                 allergyStatusId: allergyStatusId,
                 allergyDetail: allergyDetail,
                 createdAt: createdAt,
+                syncStatus: syncStatus,
+                remoteId: remoteId,
+                lastModified: lastModified,
               ),
           withReferenceMapper: (p0) => p0
               .map(
@@ -61074,6 +61871,9 @@ typedef $$SpecialNotesTableCreateCompanionBuilder =
       Value<String?> selectedNotes,
       Value<String?> otherNotes,
       Value<DateTime> createdAt,
+      Value<int> syncStatus,
+      Value<String?> remoteId,
+      Value<DateTime?> lastModified,
     });
 typedef $$SpecialNotesTableUpdateCompanionBuilder =
     SpecialNotesCompanion Function({
@@ -61082,6 +61882,9 @@ typedef $$SpecialNotesTableUpdateCompanionBuilder =
       Value<String?> selectedNotes,
       Value<String?> otherNotes,
       Value<DateTime> createdAt,
+      Value<int> syncStatus,
+      Value<String?> remoteId,
+      Value<DateTime?> lastModified,
     });
 
 final class $$SpecialNotesTableReferences
@@ -61164,6 +61967,21 @@ class $$SpecialNotesTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<int> get syncStatus => $composableBuilder(
+    column: $table.syncStatus,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get remoteId => $composableBuilder(
+    column: $table.remoteId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get lastModified => $composableBuilder(
+    column: $table.lastModified,
+    builder: (column) => ColumnFilters(column),
+  );
+
   $$MedicalRecordTableFilterComposer get medicalId {
     final $$MedicalRecordTableFilterComposer composer = $composerBuilder(
       composer: this,
@@ -61242,6 +62060,21 @@ class $$SpecialNotesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<int> get syncStatus => $composableBuilder(
+    column: $table.syncStatus,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get remoteId => $composableBuilder(
+    column: $table.remoteId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get lastModified => $composableBuilder(
+    column: $table.lastModified,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   $$MedicalRecordTableOrderingComposer get medicalId {
     final $$MedicalRecordTableOrderingComposer composer = $composerBuilder(
       composer: this,
@@ -61290,6 +62123,19 @@ class $$SpecialNotesTableAnnotationComposer
 
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<int> get syncStatus => $composableBuilder(
+    column: $table.syncStatus,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get remoteId =>
+      $composableBuilder(column: $table.remoteId, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get lastModified => $composableBuilder(
+    column: $table.lastModified,
+    builder: (column) => column,
+  );
 
   $$MedicalRecordTableAnnotationComposer get medicalId {
     final $$MedicalRecordTableAnnotationComposer composer = $composerBuilder(
@@ -61373,12 +62219,18 @@ class $$SpecialNotesTableTableManager
                 Value<String?> selectedNotes = const Value.absent(),
                 Value<String?> otherNotes = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
+                Value<int> syncStatus = const Value.absent(),
+                Value<String?> remoteId = const Value.absent(),
+                Value<DateTime?> lastModified = const Value.absent(),
               }) => SpecialNotesCompanion(
                 noteId: noteId,
                 medicalId: medicalId,
                 selectedNotes: selectedNotes,
                 otherNotes: otherNotes,
                 createdAt: createdAt,
+                syncStatus: syncStatus,
+                remoteId: remoteId,
+                lastModified: lastModified,
               ),
           createCompanionCallback:
               ({
@@ -61387,12 +62239,18 @@ class $$SpecialNotesTableTableManager
                 Value<String?> selectedNotes = const Value.absent(),
                 Value<String?> otherNotes = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
+                Value<int> syncStatus = const Value.absent(),
+                Value<String?> remoteId = const Value.absent(),
+                Value<DateTime?> lastModified = const Value.absent(),
               }) => SpecialNotesCompanion.insert(
                 noteId: noteId,
                 medicalId: medicalId,
                 selectedNotes: selectedNotes,
                 otherNotes: otherNotes,
                 createdAt: createdAt,
+                syncStatus: syncStatus,
+                remoteId: remoteId,
+                lastModified: lastModified,
               ),
           withReferenceMapper: (p0) => p0
               .map(

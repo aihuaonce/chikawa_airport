@@ -90,7 +90,31 @@ class IncidentViewModel extends ChangeNotifier {
 
   // 事故記錄更新
   void _updateIncidentCacheAndSave(IncidentRecordData newData) {
-    _incidentCache = newData;
+    // 檢查是否有變更，有變更才設 syncStatus = 1
+    final oldData = _incidentCache;
+    final hasChanges =
+        oldData == null ||
+        oldData.incidentDate != newData.incidentDate ||
+        oldData.incidentPlaceCategoryId != newData.incidentPlaceCategoryId ||
+        oldData.incidentPlaceCategory2Id != newData.incidentPlaceCategory2Id ||
+        oldData.incidentPlaceFinal != newData.incidentPlaceFinal ||
+        oldData.notificationTime != newData.notificationTime ||
+        oldData.notificationPerson != newData.notificationPerson ||
+        oldData.reportingUnitId != newData.reportingUnitId ||
+        oldData.incomingPhone != newData.incomingPhone ||
+        oldData.notificationToOccTime != newData.notificationToOccTime ||
+        oldData.teamDepartureTime != newData.teamDepartureTime ||
+        oldData.occArrived != newData.occArrived ||
+        oldData.beforeLanding != newData.beforeLanding ||
+        oldData.landingTime != newData.landingTime ||
+        oldData.medicalArrivalTime != newData.medicalArrivalTime ||
+        oldData.examinationTime != newData.examinationTime;
+
+    if (hasChanges) {
+      _incidentCache = newData.copyWith(syncStatus: 1);
+    } else {
+      _incidentCache = newData;
+    }
     notifyListeners();
     _autoSave();
   }
@@ -251,25 +275,29 @@ class IncidentViewModel extends ChangeNotifier {
   Future<List<ReportingUnitData>> searchReportingUnits(String keyword) async {
     if (keyword.isEmpty) return refService.reportingUnits;
     final lower = keyword.toLowerCase();
-    return refService.reportingUnits.where((u) =>
-      u.name.toLowerCase().contains(lower)
-    ).toList();
+    return refService.reportingUnits
+        .where((u) => u.name.toLowerCase().contains(lower))
+        .toList();
   }
 
-  Future<List<IncidentPlaceCategoryData>> searchPlaceCategories(String keyword) async {
+  Future<List<IncidentPlaceCategoryData>> searchPlaceCategories(
+    String keyword,
+  ) async {
     if (keyword.isEmpty) return refService.incidentPlaceCategories;
     final lower = keyword.toLowerCase();
-    return refService.incidentPlaceCategories.where((c) =>
-      c.name.toLowerCase().contains(lower)
-    ).toList();
+    return refService.incidentPlaceCategories
+        .where((c) => c.name.toLowerCase().contains(lower))
+        .toList();
   }
 
-  Future<List<IncidentPlaceCategory2Data>> searchPlaceCategories2(String keyword) async {
+  Future<List<IncidentPlaceCategory2Data>> searchPlaceCategories2(
+    String keyword,
+  ) async {
     if (keyword.isEmpty) return _currentCategory2Options;
     final lower = keyword.toLowerCase();
-    return _currentCategory2Options.where((c) =>
-      c.name.toLowerCase().contains(lower)
-    ).toList();
+    return _currentCategory2Options
+        .where((c) => c.name.toLowerCase().contains(lower))
+        .toList();
   }
 
   // === 延遲存檔邏輯 ===
