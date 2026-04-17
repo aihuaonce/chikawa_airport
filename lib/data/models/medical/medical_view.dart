@@ -393,10 +393,20 @@ class MedicalViewModel extends ChangeNotifier {
     try {
       await db.transaction(() async {
         if (_patientCache != null) {
-          await db.medicalDao.updatePatient(_patientCache!);
+          // 設定 syncStatus = 1 待同步，並更新 lastModified
+          final updatedPatient = _patientCache!.copyWith(
+            syncStatus: 1,
+            lastModified: Value(DateTime.now()),
+          );
+          await db.medicalDao.updatePatient(updatedPatient);
         }
         if (_flightCache != null) {
-          await db.flightDao.updateFlight(_flightCache!);
+          // 設定 syncStatus = 1 待同步，並更新 lastModified
+          final updatedFlight = _flightCache!.copyWith(
+            syncStatus: 1,
+            lastModified: Value(DateTime.now()),
+          );
+          await db.flightDao.updateFlight(updatedFlight);
         }
       });
 

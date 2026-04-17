@@ -484,6 +484,10 @@ class Medications extends Table {
   TextColumn get remarks => text().nullable()(); // 備註
 
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+
+  IntColumn get syncStatus => integer().withDefault(const Constant(0))();
+  TextColumn get remoteId => text().nullable()();
+  DateTimeColumn get lastModified => dateTime().nullable()();
 }
 
 // --- Emergency Tables ---

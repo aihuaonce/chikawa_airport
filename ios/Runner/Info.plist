@@ -2,6 +2,12 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>NSCameraUsageDescription</key>
+	<string>此應用程式需要相機權限來拍攝醫療記錄照片</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>此應用程式需要相簿權限來選擇醫療相關照片</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>此應用程式需要相簿權限來保存醫療記錄照片</string>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>

@@ -6,6 +6,7 @@ enum SyncState { idle, syncing, error, offline }
 
 class SyncServiceProvider extends ChangeNotifier with WidgetsBindingObserver {
   late final FirestoreSyncService _syncService;
+  late final AppDatabase _db;
   bool _initialized = false;
   DateTime? _pausedTime;
   SyncState _state = SyncState.idle;
@@ -39,15 +40,96 @@ class SyncServiceProvider extends ChangeNotifier with WidgetsBindingObserver {
     if (_initialized) return;
 
     WidgetsBinding.instance.addObserver(this);
-
+    _db = db;
     _syncService = FirestoreSyncService(db);
 
     // 啟動定期自動同步（15 分鐘一次）
     _syncService.startPeriodicSync();
 
+    // 初始化待同步數量
+    await _updatePendingCount();
+
     _initialized = true;
     debugPrint('FirestoreSyncService initialized');
     notifyListeners();
+  }
+
+  /// 更新待同步數量
+  Future<void> _updatePendingCount() async {
+    if (!_initialized) return;
+
+    int count = 0;
+    try {
+      // 計算所有 syncStatus = 1 的記錄
+      final patients = await (_db.select(
+        _db.patient,
+      )..where((t) => t.syncStatus.equals(1))).get();
+      count += patients.length;
+
+      final treatments = await (_db.select(
+        _db.treatment,
+      )..where((t) => t.syncStatus.equals(1))).get();
+      count += treatments.length;
+
+      final fees = await (_db.select(
+        _db.medicalFees,
+      )..where((t) => t.syncStatus.equals(1))).get();
+      count += fees.length;
+
+      final nursingRecords = await (_db.select(
+        _db.nursingRecords,
+      )..where((t) => t.syncStatus.equals(1))).get();
+      count += nursingRecords.length;
+
+      final referralForms = await (_db.select(
+        _db.referralForms,
+      )..where((t) => t.syncStatus.equals(1))).get();
+      count += referralForms.length;
+
+      final flightRecords = await (_db.select(
+        _db.flightRecord,
+      )..where((t) => t.syncStatus.equals(1))).get();
+      count += flightRecords.length;
+
+      final certificates = await (_db.select(
+        _db.medicalCertificates,
+      )..where((t) => t.syncStatus.equals(1))).get();
+      count += certificates.length;
+
+      final incidents = await (_db.select(
+        _db.incidentRecord,
+      )..where((t) => t.syncStatus.equals(1))).get();
+      count += incidents.length;
+
+      final telexes = await (_db.select(
+        _db.telexDocuments,
+      )..where((t) => t.syncStatus.equals(1))).get();
+      count += telexes.length;
+
+      final ambulanceRecords = await (_db.select(
+        _db.ambulanceRecords,
+      )..where((t) => t.syncStatus.equals(1))).get();
+      count += ambulanceRecords.length;
+
+      final ambulancePersonalProperty = await (_db.select(
+        _db.ambulancePersonalProperty,
+      )..where((t) => t.syncStatus.equals(1))).get();
+      count += ambulancePersonalProperty.length;
+
+      final ambulanceFees = await (_db.select(
+        _db.ambulanceFees,
+      )..where((t) => t.syncStatus.equals(1))).get();
+      count += ambulanceFees.length;
+
+      final contacts = await (_db.select(
+        _db.contact,
+      )..where((t) => t.syncStatus.equals(1))).get();
+      count += contacts.length;
+
+      _pendingCount = count;
+    } catch (e) {
+      debugPrint('Error counting pending syncs: $e');
+    }
   }
 
   @override
@@ -85,6 +167,8 @@ class SyncServiceProvider extends ChangeNotifier with WidgetsBindingObserver {
       await _syncService.syncBidirectional();
       debugPrint('SyncServiceProvider: sync completed, setting state to idle');
       _state = SyncState.idle;
+      // 同步完成後更新待同步數量
+      await _updatePendingCount();
     } catch (e) {
       debugPrint('SyncServiceProvider: sync failed: $e');
       _state = SyncState.error;
@@ -106,6 +190,8 @@ class SyncServiceProvider extends ChangeNotifier with WidgetsBindingObserver {
       await _syncService.syncToRemote();
       debugPrint('SyncServiceProvider: upload completed');
       _state = SyncState.idle;
+      // 上傳完成後更新待同步數量
+      await _updatePendingCount();
     } catch (e) {
       debugPrint('SyncServiceProvider: upload failed: $e');
       _state = SyncState.error;
@@ -148,7 +234,8 @@ class SyncServiceProvider extends ChangeNotifier with WidgetsBindingObserver {
     required String operation,
     required Map<String, dynamic> data,
   }) async {
-    _pendingCount++;
+    // 更新待同步數量
+    await _updatePendingCount();
     notifyListeners();
   }
 
