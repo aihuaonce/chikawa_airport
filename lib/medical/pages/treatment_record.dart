@@ -36,6 +36,7 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
   bool _cdcPassed = false;
   String _screeningMethod = '';
   bool _photoTrauma = false, _photoEcg = false, _photoOther = false;
+  bool _photoInitializedFromSync = false; // 標記是否已從同步初始化過勾選狀態
 
   // --- 動態欄位狀態 (前端專用) ---
   String _intubationMethod = 'Endotracheal tube';
@@ -67,6 +68,9 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
   late TextEditingController _ekgInterpretationController;
   late TextEditingController _glucoseController;
   late TextEditingController _oxygenFlowController;
+
+  // 其它影像描述
+  late TextEditingController _otherPhotoDescriptionController;
 
   final Map<int, Map<String, TextEditingController>>
   _healthAssessmentControllers = {};
@@ -114,6 +118,7 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
     _ekgInterpretationController = TextEditingController();
     _glucoseController = TextEditingController();
     _oxygenFlowController = TextEditingController();
+    _otherPhotoDescriptionController = TextEditingController();
   }
 
   @override
@@ -139,6 +144,7 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
     _ekgInterpretationController.dispose();
     _glucoseController.dispose();
     _oxygenFlowController.dispose();
+    _otherPhotoDescriptionController.dispose();
 
     for (var controllers in _healthAssessmentControllers.values) {
       controllers['name']?.dispose();
@@ -156,6 +162,7 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
     // 當 medicalId 變化時（例如切換病患），重置初始化狀態
     if (oldWidget.medicalId != widget.medicalId) {
       _isInitialized = false;
+      _photoInitializedFromSync = false;
     }
   }
 
@@ -193,6 +200,8 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
       _ekgInterpretationController.text = treatment.ekgInterpretation ?? '';
       _glucoseController.text = treatment.glucose ?? '';
       _oxygenFlowController.text = treatment.oxygenFlow?.toString() ?? '';
+      _otherPhotoDescriptionController.text =
+          treatment.otherPhotoDescription ?? '';
 
       // 從 transportMethod 解析通關方式和救護車來源
       final tm = treatment.transportMethod ?? '';
@@ -264,21 +273,23 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
       _screeningMethod = medicalRecord.screeningMethod ?? '';
     }
 
-    // 使用 debounce 避免每次 rebuild 都同步控制器
-    if (treatment != null) {
-      _scheduleControllerSync(viewModel);
-    }
-
-    // 如果有從遠端同步回來的影像資料，自動勾選對應的 checkbox
-    if (treatment != null && !_isInitialized) {
+    // 每次 rebuild 都同步影像類型勾選狀態（確保從遠端同步回來後能正確顯示）
+    // 有影像時自動勾選，但允許用戶手動取消
+    if (treatment != null && !_photoInitializedFromSync) {
       final hasTrauma = viewModel.getMediaByType('trauma').isNotEmpty;
       final hasEcg = viewModel.getMediaByType('ecg').isNotEmpty;
       final hasOther = viewModel.getMediaByType('other').isNotEmpty;
-      if (hasTrauma || hasEcg || hasOther) {
-        _photoTrauma = hasTrauma;
-        _photoEcg = hasEcg;
-        _photoOther = hasOther;
-      }
+
+      if (hasTrauma) _photoTrauma = true;
+      if (hasEcg) _photoEcg = true;
+      if (hasOther) _photoOther = true;
+
+      _photoInitializedFromSync = true;
+    }
+
+    // 使用 debounce 避免每次 rebuild 都同步控制器
+    if (treatment != null) {
+      _scheduleControllerSync(viewModel);
     }
 
     if (treatment == null) {
@@ -540,8 +551,9 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
           const SizedBox(height: 8),
           _buildTextField(
             hint: '請註明影像內容...',
+            controller: _otherPhotoDescriptionController,
             onChanged: (val) {
-              // 可選：保存描述到資料庫
+              viewModel.updateOtherPhotoDescription(val);
             },
           ),
         ],

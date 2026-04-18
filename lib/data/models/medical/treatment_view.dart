@@ -3,6 +3,7 @@ import 'package:drift/drift.dart';
 import 'package:flutter/foundation.dart';
 import '../../db/database.dart';
 import '../reference_service.dart';
+import '../../services/firebase_service.dart';
 
 enum SaveStatus { idle, saving, success }
 
@@ -497,8 +498,27 @@ class TreatmentViewModel extends ChangeNotifier {
 
   Future<void> deleteMedicalMedia(int mediaId) async {
     try {
+      // 先取得要刪除的資料（用於刪除 Firestore）
+      final media = _medicalMediaList.firstWhere(
+        (m) => m.mediaId == mediaId,
+        orElse: () => throw Exception('找不到影像'),
+      );
+
+      // 刪除本地資料
       await db.treatmentDao.deleteMedicalMedia(mediaId);
       await _reloadMedicalMedia();
+
+      // 刪除 Firestore 遠端資料
+      try {
+        await FirebaseService().deleteDocument(
+          'medical_media',
+          mediaId.toString(),
+        );
+        debugPrint('系統:已刪除 Firestore 醫療影像 $mediaId');
+      } catch (e) {
+        debugPrint('系統:刪除 Firestore 醫療影像失敗 - $e');
+      }
+
       debugPrint('系統:刪除醫療影像成功');
     } catch (e) {
       debugPrint('系統:刪除醫療影像失敗 - $e');
@@ -566,6 +586,7 @@ class TreatmentViewModel extends ChangeNotifier {
           extremitiesExam: Value(extremitiesExam),
           otherPhysicalExam: Value(otherPhysicalExam),
           triageId: Value(triageId),
+          syncStatus: const Value(1), // 待同步
         ),
       );
       await _reloadMedicalAssessments();
@@ -654,6 +675,7 @@ class TreatmentViewModel extends ChangeNotifier {
           systolic: Value(_cachedSystolic),
           diastolic: Value(_cachedDiastolic),
           spo2: Value(_cachedSpo2),
+          syncStatus: const Value(1), // 待同步
         ),
       );
       await _reloadMedicalAssessments();
@@ -844,6 +866,7 @@ class TreatmentViewModel extends ChangeNotifier {
           abdomenExam: Value(_cachedAbdomenExam),
           extremitiesExam: Value(_cachedExtremitiesExam),
           otherPhysicalExam: Value(_cachedOtherPhysicalExam),
+          syncStatus: const Value(1), // 待同步
         ),
       );
       await _reloadMedicalAssessments();
@@ -1286,6 +1309,15 @@ class TreatmentViewModel extends ChangeNotifier {
   void updateTreatmentTime(DateTime? time) {
     if (_treatment == null) return;
     _updateTreatmentCacheAndSave(_treatment!.copyWith(treatmentTime: time));
+  }
+
+  // 其它影像描述更新
+  void updateOtherPhotoDescription(String? description) {
+    if (_treatment == null) return;
+    _updateTreatmentCacheAndSave(
+      _treatment!.copyWith(otherPhotoDescription: Value(description)),
+      notify: false, // 避免頻繁觸發 UI 重繪
+    );
   }
 
   // ===================================================================

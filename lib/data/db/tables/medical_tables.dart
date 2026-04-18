@@ -315,6 +315,9 @@ class Treatment extends Table {
   TextColumn get doctorOrderCh => text().nullable()();
   TextColumn get doctorOrderEn => text().nullable()();
 
+  // 其它影像描述
+  TextColumn get otherPhotoDescription => text().nullable()();
+
   // 醫護人員
   TextColumn get directorName => text().nullable()(); // 院長/負責人
   TextColumn get assistStaff => text().nullable()(); // 輔助人員 (逗號分隔)

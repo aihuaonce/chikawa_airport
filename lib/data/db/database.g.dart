@@ -19697,6 +19697,17 @@ class $TreatmentTable extends Treatment
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _otherPhotoDescriptionMeta =
+      const VerificationMeta('otherPhotoDescription');
+  @override
+  late final GeneratedColumn<String> otherPhotoDescription =
+      GeneratedColumn<String>(
+        'other_photo_description',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
   static const VerificationMeta _directorNameMeta = const VerificationMeta(
     'directorName',
   );
@@ -19795,6 +19806,7 @@ class $TreatmentTable extends Treatment
     expeditedClearanceId,
     doctorOrderCh,
     doctorOrderEn,
+    otherPhotoDescription,
     directorName,
     assistStaff,
     treatmentTime,
@@ -20041,6 +20053,15 @@ class $TreatmentTable extends Treatment
         ),
       );
     }
+    if (data.containsKey('other_photo_description')) {
+      context.handle(
+        _otherPhotoDescriptionMeta,
+        otherPhotoDescription.isAcceptableOrUnknown(
+          data['other_photo_description']!,
+          _otherPhotoDescriptionMeta,
+        ),
+      );
+    }
     if (data.containsKey('director_name')) {
       context.handle(
         _directorNameMeta,
@@ -20206,6 +20227,10 @@ class $TreatmentTable extends Treatment
         DriftSqlType.string,
         data['${effectivePrefix}doctor_order_en'],
       ),
+      otherPhotoDescription: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}other_photo_description'],
+      ),
       directorName: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}director_name'],
@@ -20267,6 +20292,7 @@ class TreatmentData extends DataClass implements Insertable<TreatmentData> {
   final int? expeditedClearanceId;
   final String? doctorOrderCh;
   final String? doctorOrderEn;
+  final String? otherPhotoDescription;
   final String? directorName;
   final String? assistStaff;
   final DateTime treatmentTime;
@@ -20301,6 +20327,7 @@ class TreatmentData extends DataClass implements Insertable<TreatmentData> {
     this.expeditedClearanceId,
     this.doctorOrderCh,
     this.doctorOrderEn,
+    this.otherPhotoDescription,
     this.directorName,
     this.assistStaff,
     required this.treatmentTime,
@@ -20387,6 +20414,9 @@ class TreatmentData extends DataClass implements Insertable<TreatmentData> {
     }
     if (!nullToAbsent || doctorOrderEn != null) {
       map['doctor_order_en'] = Variable<String>(doctorOrderEn);
+    }
+    if (!nullToAbsent || otherPhotoDescription != null) {
+      map['other_photo_description'] = Variable<String>(otherPhotoDescription);
     }
     if (!nullToAbsent || directorName != null) {
       map['director_name'] = Variable<String>(directorName);
@@ -20484,6 +20514,9 @@ class TreatmentData extends DataClass implements Insertable<TreatmentData> {
       doctorOrderEn: doctorOrderEn == null && nullToAbsent
           ? const Value.absent()
           : Value(doctorOrderEn),
+      otherPhotoDescription: otherPhotoDescription == null && nullToAbsent
+          ? const Value.absent()
+          : Value(otherPhotoDescription),
       directorName: directorName == null && nullToAbsent
           ? const Value.absent()
           : Value(directorName),
@@ -20548,6 +20581,9 @@ class TreatmentData extends DataClass implements Insertable<TreatmentData> {
       ),
       doctorOrderCh: serializer.fromJson<String?>(json['doctorOrderCh']),
       doctorOrderEn: serializer.fromJson<String?>(json['doctorOrderEn']),
+      otherPhotoDescription: serializer.fromJson<String?>(
+        json['otherPhotoDescription'],
+      ),
       directorName: serializer.fromJson<String?>(json['directorName']),
       assistStaff: serializer.fromJson<String?>(json['assistStaff']),
       treatmentTime: serializer.fromJson<DateTime>(json['treatmentTime']),
@@ -20589,6 +20625,9 @@ class TreatmentData extends DataClass implements Insertable<TreatmentData> {
       'expeditedClearanceId': serializer.toJson<int?>(expeditedClearanceId),
       'doctorOrderCh': serializer.toJson<String?>(doctorOrderCh),
       'doctorOrderEn': serializer.toJson<String?>(doctorOrderEn),
+      'otherPhotoDescription': serializer.toJson<String?>(
+        otherPhotoDescription,
+      ),
       'directorName': serializer.toJson<String?>(directorName),
       'assistStaff': serializer.toJson<String?>(assistStaff),
       'treatmentTime': serializer.toJson<DateTime>(treatmentTime),
@@ -20626,6 +20665,7 @@ class TreatmentData extends DataClass implements Insertable<TreatmentData> {
     Value<int?> expeditedClearanceId = const Value.absent(),
     Value<String?> doctorOrderCh = const Value.absent(),
     Value<String?> doctorOrderEn = const Value.absent(),
+    Value<String?> otherPhotoDescription = const Value.absent(),
     Value<String?> directorName = const Value.absent(),
     Value<String?> assistStaff = const Value.absent(),
     DateTime? treatmentTime,
@@ -20694,6 +20734,9 @@ class TreatmentData extends DataClass implements Insertable<TreatmentData> {
     doctorOrderEn: doctorOrderEn.present
         ? doctorOrderEn.value
         : this.doctorOrderEn,
+    otherPhotoDescription: otherPhotoDescription.present
+        ? otherPhotoDescription.value
+        : this.otherPhotoDescription,
     directorName: directorName.present ? directorName.value : this.directorName,
     assistStaff: assistStaff.present ? assistStaff.value : this.assistStaff,
     treatmentTime: treatmentTime ?? this.treatmentTime,
@@ -20774,6 +20817,9 @@ class TreatmentData extends DataClass implements Insertable<TreatmentData> {
       doctorOrderEn: data.doctorOrderEn.present
           ? data.doctorOrderEn.value
           : this.doctorOrderEn,
+      otherPhotoDescription: data.otherPhotoDescription.present
+          ? data.otherPhotoDescription.value
+          : this.otherPhotoDescription,
       directorName: data.directorName.present
           ? data.directorName.value
           : this.directorName,
@@ -20823,6 +20869,7 @@ class TreatmentData extends DataClass implements Insertable<TreatmentData> {
           ..write('expeditedClearanceId: $expeditedClearanceId, ')
           ..write('doctorOrderCh: $doctorOrderCh, ')
           ..write('doctorOrderEn: $doctorOrderEn, ')
+          ..write('otherPhotoDescription: $otherPhotoDescription, ')
           ..write('directorName: $directorName, ')
           ..write('assistStaff: $assistStaff, ')
           ..write('treatmentTime: $treatmentTime, ')
@@ -20862,6 +20909,7 @@ class TreatmentData extends DataClass implements Insertable<TreatmentData> {
     expeditedClearanceId,
     doctorOrderCh,
     doctorOrderEn,
+    otherPhotoDescription,
     directorName,
     assistStaff,
     treatmentTime,
@@ -20900,6 +20948,7 @@ class TreatmentData extends DataClass implements Insertable<TreatmentData> {
           other.expeditedClearanceId == this.expeditedClearanceId &&
           other.doctorOrderCh == this.doctorOrderCh &&
           other.doctorOrderEn == this.doctorOrderEn &&
+          other.otherPhotoDescription == this.otherPhotoDescription &&
           other.directorName == this.directorName &&
           other.assistStaff == this.assistStaff &&
           other.treatmentTime == this.treatmentTime &&
@@ -20936,6 +20985,7 @@ class TreatmentCompanion extends UpdateCompanion<TreatmentData> {
   final Value<int?> expeditedClearanceId;
   final Value<String?> doctorOrderCh;
   final Value<String?> doctorOrderEn;
+  final Value<String?> otherPhotoDescription;
   final Value<String?> directorName;
   final Value<String?> assistStaff;
   final Value<DateTime> treatmentTime;
@@ -20970,6 +21020,7 @@ class TreatmentCompanion extends UpdateCompanion<TreatmentData> {
     this.expeditedClearanceId = const Value.absent(),
     this.doctorOrderCh = const Value.absent(),
     this.doctorOrderEn = const Value.absent(),
+    this.otherPhotoDescription = const Value.absent(),
     this.directorName = const Value.absent(),
     this.assistStaff = const Value.absent(),
     this.treatmentTime = const Value.absent(),
@@ -21005,6 +21056,7 @@ class TreatmentCompanion extends UpdateCompanion<TreatmentData> {
     this.expeditedClearanceId = const Value.absent(),
     this.doctorOrderCh = const Value.absent(),
     this.doctorOrderEn = const Value.absent(),
+    this.otherPhotoDescription = const Value.absent(),
     this.directorName = const Value.absent(),
     this.assistStaff = const Value.absent(),
     this.treatmentTime = const Value.absent(),
@@ -21040,6 +21092,7 @@ class TreatmentCompanion extends UpdateCompanion<TreatmentData> {
     Expression<int>? expeditedClearanceId,
     Expression<String>? doctorOrderCh,
     Expression<String>? doctorOrderEn,
+    Expression<String>? otherPhotoDescription,
     Expression<String>? directorName,
     Expression<String>? assistStaff,
     Expression<DateTime>? treatmentTime,
@@ -21082,6 +21135,8 @@ class TreatmentCompanion extends UpdateCompanion<TreatmentData> {
         'expedited_clearance_id': expeditedClearanceId,
       if (doctorOrderCh != null) 'doctor_order_ch': doctorOrderCh,
       if (doctorOrderEn != null) 'doctor_order_en': doctorOrderEn,
+      if (otherPhotoDescription != null)
+        'other_photo_description': otherPhotoDescription,
       if (directorName != null) 'director_name': directorName,
       if (assistStaff != null) 'assist_staff': assistStaff,
       if (treatmentTime != null) 'treatment_time': treatmentTime,
@@ -21119,6 +21174,7 @@ class TreatmentCompanion extends UpdateCompanion<TreatmentData> {
     Value<int?>? expeditedClearanceId,
     Value<String?>? doctorOrderCh,
     Value<String?>? doctorOrderEn,
+    Value<String?>? otherPhotoDescription,
     Value<String?>? directorName,
     Value<String?>? assistStaff,
     Value<DateTime>? treatmentTime,
@@ -21155,6 +21211,8 @@ class TreatmentCompanion extends UpdateCompanion<TreatmentData> {
       expeditedClearanceId: expeditedClearanceId ?? this.expeditedClearanceId,
       doctorOrderCh: doctorOrderCh ?? this.doctorOrderCh,
       doctorOrderEn: doctorOrderEn ?? this.doctorOrderEn,
+      otherPhotoDescription:
+          otherPhotoDescription ?? this.otherPhotoDescription,
       directorName: directorName ?? this.directorName,
       assistStaff: assistStaff ?? this.assistStaff,
       treatmentTime: treatmentTime ?? this.treatmentTime,
@@ -21250,6 +21308,11 @@ class TreatmentCompanion extends UpdateCompanion<TreatmentData> {
     if (doctorOrderEn.present) {
       map['doctor_order_en'] = Variable<String>(doctorOrderEn.value);
     }
+    if (otherPhotoDescription.present) {
+      map['other_photo_description'] = Variable<String>(
+        otherPhotoDescription.value,
+      );
+    }
     if (directorName.present) {
       map['director_name'] = Variable<String>(directorName.value);
     }
@@ -21301,6 +21364,7 @@ class TreatmentCompanion extends UpdateCompanion<TreatmentData> {
           ..write('expeditedClearanceId: $expeditedClearanceId, ')
           ..write('doctorOrderCh: $doctorOrderCh, ')
           ..write('doctorOrderEn: $doctorOrderEn, ')
+          ..write('otherPhotoDescription: $otherPhotoDescription, ')
           ..write('directorName: $directorName, ')
           ..write('assistStaff: $assistStaff, ')
           ..write('treatmentTime: $treatmentTime, ')
@@ -60698,6 +60762,7 @@ typedef $$TreatmentTableCreateCompanionBuilder =
       Value<int?> expeditedClearanceId,
       Value<String?> doctorOrderCh,
       Value<String?> doctorOrderEn,
+      Value<String?> otherPhotoDescription,
       Value<String?> directorName,
       Value<String?> assistStaff,
       Value<DateTime> treatmentTime,
@@ -60734,6 +60799,7 @@ typedef $$TreatmentTableUpdateCompanionBuilder =
       Value<int?> expeditedClearanceId,
       Value<String?> doctorOrderCh,
       Value<String?> doctorOrderEn,
+      Value<String?> otherPhotoDescription,
       Value<String?> directorName,
       Value<String?> assistStaff,
       Value<DateTime> treatmentTime,
@@ -60952,6 +61018,11 @@ class $$TreatmentTableFilterComposer
 
   ColumnFilters<String> get doctorOrderEn => $composableBuilder(
     column: $table.doctorOrderEn,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get otherPhotoDescription => $composableBuilder(
+    column: $table.otherPhotoDescription,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -61191,6 +61262,11 @@ class $$TreatmentTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get otherPhotoDescription => $composableBuilder(
+    column: $table.otherPhotoDescription,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get directorName => $composableBuilder(
     column: $table.directorName,
     builder: (column) => ColumnOrderings(column),
@@ -61394,6 +61470,11 @@ class $$TreatmentTableAnnotationComposer
     builder: (column) => column,
   );
 
+  GeneratedColumn<String> get otherPhotoDescription => $composableBuilder(
+    column: $table.otherPhotoDescription,
+    builder: (column) => column,
+  );
+
   GeneratedColumn<String> get directorName => $composableBuilder(
     column: $table.directorName,
     builder: (column) => column,
@@ -61554,6 +61635,7 @@ class $$TreatmentTableTableManager
                 Value<int?> expeditedClearanceId = const Value.absent(),
                 Value<String?> doctorOrderCh = const Value.absent(),
                 Value<String?> doctorOrderEn = const Value.absent(),
+                Value<String?> otherPhotoDescription = const Value.absent(),
                 Value<String?> directorName = const Value.absent(),
                 Value<String?> assistStaff = const Value.absent(),
                 Value<DateTime> treatmentTime = const Value.absent(),
@@ -61588,6 +61670,7 @@ class $$TreatmentTableTableManager
                 expeditedClearanceId: expeditedClearanceId,
                 doctorOrderCh: doctorOrderCh,
                 doctorOrderEn: doctorOrderEn,
+                otherPhotoDescription: otherPhotoDescription,
                 directorName: directorName,
                 assistStaff: assistStaff,
                 treatmentTime: treatmentTime,
@@ -61624,6 +61707,7 @@ class $$TreatmentTableTableManager
                 Value<int?> expeditedClearanceId = const Value.absent(),
                 Value<String?> doctorOrderCh = const Value.absent(),
                 Value<String?> doctorOrderEn = const Value.absent(),
+                Value<String?> otherPhotoDescription = const Value.absent(),
                 Value<String?> directorName = const Value.absent(),
                 Value<String?> assistStaff = const Value.absent(),
                 Value<DateTime> treatmentTime = const Value.absent(),
@@ -61658,6 +61742,7 @@ class $$TreatmentTableTableManager
                 expeditedClearanceId: expeditedClearanceId,
                 doctorOrderCh: doctorOrderCh,
                 doctorOrderEn: doctorOrderEn,
+                otherPhotoDescription: otherPhotoDescription,
                 directorName: directorName,
                 assistStaff: assistStaff,
                 treatmentTime: treatmentTime,
