@@ -7,12 +7,14 @@ class MedicalHeader extends StatelessWidget {
   final List<Map<String, dynamic>> sections;
   final int currentIndex;
   final Function(int) onSectionChanged;
+  final VoidCallback? onSaveAndExit;
 
   const MedicalHeader({
     super.key,
     required this.sections,
     required this.currentIndex,
     required this.onSectionChanged,
+    this.onSaveAndExit,
   });
 
   static const Color primaryColor = Color(0xFF007A8A);
@@ -164,6 +166,7 @@ class MedicalHeader extends StatelessWidget {
 
   Widget _buildNextButton() {
     const Size buttonSize = Size(125, 40);
+    final isLastPage = currentIndex == sections.length - 1;
 
     return Container(
       decoration: BoxDecoration(
@@ -177,9 +180,12 @@ class MedicalHeader extends StatelessWidget {
       ),
       child: ElevatedButton(
         onPressed: () {
-          if (currentIndex < sections.length - 1) {
-            onSectionChanged(currentIndex + 1);
+          if (isLastPage) {
+            // Last page: call save and exit callback
+            onSaveAndExit?.call();
+            return;
           }
+          onSectionChanged(currentIndex + 1);
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: primaryColor,
@@ -189,15 +195,17 @@ class MedicalHeader extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 4),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
-        child: const Row(
+        child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              '下一步',
+              isLastPage ? '儲存' : '下一步',
               style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
             ),
-            SizedBox(width: 4),
-            Icon(Icons.arrow_forward, size: 14),
+            if (!isLastPage) ...[
+              SizedBox(width: 4),
+              Icon(Icons.arrow_forward, size: 14),
+            ],
           ],
         ),
       ),

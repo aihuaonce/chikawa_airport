@@ -73,6 +73,7 @@ class _AmbulancePageState extends State<AmbulancePage> {
                   _currentSectionIndex = index;
                 });
               },
+              onSaveAndExit: () => Navigator.of(context).pop(),
             ),
 
             // 2. 中間內容區域

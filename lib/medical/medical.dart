@@ -153,6 +153,7 @@ class _MedicalPageState extends State<MedicalPage> {
                   currentIndex: _currentSectionIndex,
                   onSectionChanged: (index) =>
                       setState(() => _currentSectionIndex = index),
+                  onSaveAndExit: () => Navigator.of(context).pop(),
                 ),
               ),
               Expanded(

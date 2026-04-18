@@ -64,6 +64,7 @@ class _EmergencyPageState extends State<EmergencyPage> {
                   _currentSectionIndex = index;
                 });
               },
+              onSaveAndExit: () => Navigator.of(context).pop(),
             ),
 
             // 中間內容滾動區

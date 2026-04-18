@@ -5,6 +5,7 @@ class EmergencyHeader extends StatelessWidget {
   final int currentIndex;
   final Function(int) onSectionChanged;
   final String caseId;
+  final VoidCallback? onSaveAndExit;
 
   const EmergencyHeader({
     super.key,
@@ -12,6 +13,7 @@ class EmergencyHeader extends StatelessWidget {
     required this.currentIndex,
     required this.onSectionChanged,
     required this.caseId,
+    this.onSaveAndExit,
   });
 
   static const Color primaryColor = Color(0xFF007A8A);
@@ -122,32 +124,41 @@ class EmergencyHeader extends StatelessWidget {
               ),
             ],
           ),
-          child: ElevatedButton(
-            onPressed: () {
-              if (currentIndex < sections.length - 1) {
-                onSectionChanged(currentIndex + 1);
-              }
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: primaryColor,
-              foregroundColor: Colors.white,
-              fixedSize: const Size(110, 38),
-              elevation: 0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-            child: const Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  '下一步',
-                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+          child: Builder(
+            builder: (context) {
+              final isLastPage = currentIndex == sections.length - 1;
+              return ElevatedButton(
+                onPressed: () {
+                  if (isLastPage) {
+                    onSaveAndExit?.call();
+                  } else {
+                    onSectionChanged(currentIndex + 1);
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: primaryColor,
+                  foregroundColor: Colors.white,
+                  fixedSize: const Size(110, 38),
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
-                SizedBox(width: 4),
-                Icon(Icons.arrow_forward, size: 14),
-              ],
-            ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      isLastPage ? '儲存' : '下一步',
+                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                    ),
+                    if (!isLastPage) ...[
+                      SizedBox(width: 4),
+                      Icon(Icons.arrow_forward, size: 14),
+                    ],
+                  ],
+                ),
+              );
+            },
           ),
         ),
       ],
