@@ -600,8 +600,44 @@ class TreatmentViewModel extends ChangeNotifier {
     _medicalAssessments = await db.treatmentDao.getMedicalAssessments(
       medicalId,
     );
+
+    // 從現有記錄初始化 assessment IDs
+    for (final assessment in _medicalAssessments) {
+      // 檢查是否為生命徵象記錄（有體溫、脈搏等）
+      final isVitalSigns =
+          assessment.temperature != null ||
+          assessment.pulse != null ||
+          assessment.breath != null ||
+          assessment.systolic != null ||
+          assessment.diastolic != null ||
+          assessment.spo2 != null;
+
+      // 檢查是否為意識與理學檢查記錄（有意識等級、GCS等）
+      final isConsciousnessExam =
+          assessment.consciousnessLevelId != null ||
+          assessment.gcs != null ||
+          assessment.gcsE != null ||
+          assessment.gcsV != null ||
+          assessment.gcsM != null ||
+          assessment.leftPupilReactionId != null ||
+          assessment.rightPupilReactionId != null ||
+          assessment.headNeckExam != null ||
+          assessment.chestExam != null;
+
+      if (isVitalSigns || isConsciousnessExam) {
+        // 所有資料存在同一個 assessment 記錄
+        if (_medicalAssessmentId == null) {
+          _medicalAssessmentId = assessment.assessmentId;
+          debugPrint('系統:找到醫療評估記錄 ID: ${assessment.assessmentId}');
+        }
+      }
+    }
+
     notifyListeners();
   }
+
+  // 統一的醫療評估記錄 ID（生命徵象 + 意識與理學檢查都存在這裡）
+  int? _medicalAssessmentId;
 
   // ===================================================================
   // 生命徵象自動儲存（參考 incident_view.dart 模式）
@@ -678,19 +714,70 @@ class TreatmentViewModel extends ChangeNotifier {
         return;
       }
 
-      // 新增新的醫療評估記錄（生命徵象）
-      await db.treatmentDao.insertMedicalAssessment(
-        MedicalAssessmentCompanion.insert(
-          medicalId: medicalId,
-          temperature: Value(_cachedTemperature),
-          pulse: Value(_cachedPulse),
-          breath: Value(_cachedBreath),
-          systolic: Value(_cachedSystolic),
-          diastolic: Value(_cachedDiastolic),
-          spo2: Value(_cachedSpo2),
-          syncStatus: const Value(1), // 待同步
-        ),
-      );
+      // 使用統一的 ID，存在同一個記錄裡
+      if (_medicalAssessmentId != null) {
+        // 更新現有記錄（包含生命徵象和意識與理學檢查）
+        await db.treatmentDao.updateMedicalAssessment(
+          MedicalAssessmentCompanion(
+            temperature: Value(_cachedTemperature),
+            pulse: Value(_cachedPulse),
+            breath: Value(_cachedBreath),
+            systolic: Value(_cachedSystolic),
+            diastolic: Value(_cachedDiastolic),
+            spo2: Value(_cachedSpo2),
+            // 同時更新意識與理學檢查的欄位
+            consciousnessLevelId: Value(_cachedConsciousnessLevelId),
+            gcsE: Value(_cachedGcsE),
+            gcsV: Value(_cachedGcsV),
+            gcsM: Value(_cachedGcsM),
+            gcs: Value(_cachedGcs),
+            leftPupilReactionId: Value(_cachedLeftPupilReactionId),
+            leftPupilSize: Value(_cachedLeftPupilSize),
+            rightPupilReactionId: Value(_cachedRightPupilReactionId),
+            rightPupilSize: Value(_cachedRightPupilSize),
+            headNeckExam: Value(_cachedHeadNeckExam),
+            chestExam: Value(_cachedChestExam),
+            abdomenExam: Value(_cachedAbdomenExam),
+            extremitiesExam: Value(_cachedExtremitiesExam),
+            otherPhysicalExam: Value(_cachedOtherPhysicalExam),
+            syncStatus: const Value(1), // 待同步
+          ),
+          _medicalAssessmentId!,
+        );
+        debugPrint('系統:生命徵象更新成功 (id: $_medicalAssessmentId)');
+      } else {
+        // 新增新的醫療評估記錄（包含生命徵象）
+        final newId = await db.treatmentDao.insertMedicalAssessment(
+          MedicalAssessmentCompanion.insert(
+            medicalId: medicalId,
+            temperature: Value(_cachedTemperature),
+            pulse: Value(_cachedPulse),
+            breath: Value(_cachedBreath),
+            systolic: Value(_cachedSystolic),
+            diastolic: Value(_cachedDiastolic),
+            spo2: Value(_cachedSpo2),
+            // 同時儲存意識與理學檢查
+            consciousnessLevelId: Value(_cachedConsciousnessLevelId),
+            gcsE: Value(_cachedGcsE),
+            gcsV: Value(_cachedGcsV),
+            gcsM: Value(_cachedGcsM),
+            gcs: Value(_cachedGcs),
+            leftPupilReactionId: Value(_cachedLeftPupilReactionId),
+            leftPupilSize: Value(_cachedLeftPupilSize),
+            rightPupilReactionId: Value(_cachedRightPupilReactionId),
+            rightPupilSize: Value(_cachedRightPupilSize),
+            headNeckExam: Value(_cachedHeadNeckExam),
+            chestExam: Value(_cachedChestExam),
+            abdomenExam: Value(_cachedAbdomenExam),
+            extremitiesExam: Value(_cachedExtremitiesExam),
+            otherPhysicalExam: Value(_cachedOtherPhysicalExam),
+            syncStatus: const Value(1), // 待同步
+          ),
+        );
+        _medicalAssessmentId = newId;
+        debugPrint('系統:生命徵象新增成功 (id: $newId)');
+      }
+
       await _reloadMedicalAssessments();
       debugPrint('系統:生命徵象自動儲存成功');
 
@@ -881,27 +968,70 @@ class TreatmentViewModel extends ChangeNotifier {
         return;
       }
 
-      // 新增新的醫療評估記錄（意識與理學檢查）
-      await db.treatmentDao.insertMedicalAssessment(
-        MedicalAssessmentCompanion.insert(
-          medicalId: medicalId,
-          consciousnessLevelId: Value(_cachedConsciousnessLevelId),
-          gcsE: Value(_cachedGcsE),
-          gcsV: Value(_cachedGcsV),
-          gcsM: Value(_cachedGcsM),
-          gcs: Value(_cachedGcs),
-          leftPupilReactionId: Value(_cachedLeftPupilReactionId),
-          leftPupilSize: Value(_cachedLeftPupilSize),
-          rightPupilReactionId: Value(_cachedRightPupilReactionId),
-          rightPupilSize: Value(_cachedRightPupilSize),
-          headNeckExam: Value(_cachedHeadNeckExam),
-          chestExam: Value(_cachedChestExam),
-          abdomenExam: Value(_cachedAbdomenExam),
-          extremitiesExam: Value(_cachedExtremitiesExam),
-          otherPhysicalExam: Value(_cachedOtherPhysicalExam),
-          syncStatus: const Value(1), // 待同步
-        ),
-      );
+      // 如果已有 assessmentId，更新現有記錄；否則新增
+      if (_medicalAssessmentId != null) {
+        // 更新時同時保留生命徵象資料
+        await db.treatmentDao.updateMedicalAssessment(
+          MedicalAssessmentCompanion(
+            consciousnessLevelId: Value(_cachedConsciousnessLevelId),
+            gcsE: Value(_cachedGcsE),
+            gcsV: Value(_cachedGcsV),
+            gcsM: Value(_cachedGcsM),
+            gcs: Value(_cachedGcs),
+            leftPupilReactionId: Value(_cachedLeftPupilReactionId),
+            leftPupilSize: Value(_cachedLeftPupilSize),
+            rightPupilReactionId: Value(_cachedRightPupilReactionId),
+            rightPupilSize: Value(_cachedRightPupilSize),
+            headNeckExam: Value(_cachedHeadNeckExam),
+            chestExam: Value(_cachedChestExam),
+            abdomenExam: Value(_cachedAbdomenExam),
+            extremitiesExam: Value(_cachedExtremitiesExam),
+            otherPhysicalExam: Value(_cachedOtherPhysicalExam),
+            // 同時保留生命徵象
+            temperature: Value(_cachedTemperature),
+            pulse: Value(_cachedPulse),
+            breath: Value(_cachedBreath),
+            systolic: Value(_cachedSystolic),
+            diastolic: Value(_cachedDiastolic),
+            spo2: Value(_cachedSpo2),
+            syncStatus: const Value(1), // 待同步
+          ),
+          _medicalAssessmentId!,
+        );
+        debugPrint('系統:意識與理學檢查更新成功 (id: $_medicalAssessmentId)');
+      } else {
+        // 新增新的醫療評估記錄（意識與理學檢查）
+        final newId = await db.treatmentDao.insertMedicalAssessment(
+          MedicalAssessmentCompanion.insert(
+            medicalId: medicalId,
+            consciousnessLevelId: Value(_cachedConsciousnessLevelId),
+            gcsE: Value(_cachedGcsE),
+            gcsV: Value(_cachedGcsV),
+            gcsM: Value(_cachedGcsM),
+            gcs: Value(_cachedGcs),
+            leftPupilReactionId: Value(_cachedLeftPupilReactionId),
+            leftPupilSize: Value(_cachedLeftPupilSize),
+            rightPupilReactionId: Value(_cachedRightPupilReactionId),
+            rightPupilSize: Value(_cachedRightPupilSize),
+            headNeckExam: Value(_cachedHeadNeckExam),
+            chestExam: Value(_cachedChestExam),
+            abdomenExam: Value(_cachedAbdomenExam),
+            extremitiesExam: Value(_cachedExtremitiesExam),
+            otherPhysicalExam: Value(_cachedOtherPhysicalExam),
+            // 同時儲存生命徵象
+            temperature: Value(_cachedTemperature),
+            pulse: Value(_cachedPulse),
+            breath: Value(_cachedBreath),
+            systolic: Value(_cachedSystolic),
+            diastolic: Value(_cachedDiastolic),
+            spo2: Value(_cachedSpo2),
+            syncStatus: const Value(1), // 待同步
+          ),
+        );
+        _medicalAssessmentId = newId;
+        debugPrint('系統:意識與理學檢查新增成功 (id: $newId)');
+      }
+
       await _reloadMedicalAssessments();
       debugPrint('系統:意識與理學檢查自動儲存成功');
 
@@ -944,6 +1074,7 @@ class TreatmentViewModel extends ChangeNotifier {
             allergyStatusId: Value(allergyStatusId),
             pastHistoryDetail: Value(pastHistoryDetail),
             allergyDetail: Value(allergyDetail),
+            syncStatus: const Value(1), // 待同步到 Firestore
           ),
         );
       } else {

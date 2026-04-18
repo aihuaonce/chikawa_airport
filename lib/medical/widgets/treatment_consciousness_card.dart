@@ -40,11 +40,12 @@ class _TreatmentConsciousnessCardState
   @override
   void initState() {
     super.initState();
-    _isAlert = false; // 初始化為 false
+    _isAlert = true; // 初始化為 true（預設勾選意識清晰）
     _isInitialized = false;
     _gcsEController = TextEditingController();
     _gcsVController = TextEditingController();
     _gcsMController = TextEditingController();
+    // 不预设 EVM 值，等待用户操作
     _leftPupilSizeController = TextEditingController();
     _rightPupilSizeController = TextEditingController();
     _headNeckController = TextEditingController();
@@ -179,7 +180,8 @@ class _TreatmentConsciousnessCardState
           value: _isAlert,
           onChanged: (v) {
             setState(() => _isAlert = v!);
-            if (_isAlert) {
+            if (!_isAlert) {
+              // 取消勾選時才顯示 GCS 欄位
               _gcsEController.clear();
               _gcsVController.clear();
               _gcsMController.clear();
@@ -190,6 +192,36 @@ class _TreatmentConsciousnessCardState
             _onConsciousnessAndExamChanged(viewModel);
           },
         ),
+        // 只有在未勾選意識清晰時才顯示 EVM 總分（用戶有輸入時）
+        if (!_isAlert && _gcsTotal != null) ...[
+          const SizedBox(height: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: const Color(0xFF22C55E).withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: const Color(0xFF22C55E)),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(
+                  Icons.check_circle,
+                  color: Color(0xFF22C55E),
+                  size: 18,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  'EVM Total: $_gcsTotal (E${_gcsEController.text.isEmpty ? '-' : _gcsEController.text}V${_gcsVController.text.isEmpty ? '-' : _gcsVController.text}M${_gcsMController.text.isEmpty ? '-' : _gcsMController.text})',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF22C55E),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
         if (!_isAlert) ...[
           const SizedBox(height: 12),
           _buildLabel('GCS 指數評估'),

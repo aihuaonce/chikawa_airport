@@ -242,6 +242,19 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
       _diastolicController.text = latestAssessment.diastolic?.toString() ?? '';
       _spo2Controller.text = latestAssessment.spo2?.toString() ?? '';
     }
+
+    // 病史與過敏 - 從 ViewModel 同步到 Controller（僅當 Controller 為空時，避免覆蓋用戶輸入）
+    final medicalHistory = viewModel.medicalHistory;
+    if (medicalHistory != null) {
+      if (_pastHistoryDetailController.text.isEmpty &&
+          medicalHistory.pastHistoryDetail != null) {
+        _pastHistoryDetailController.text = medicalHistory.pastHistoryDetail!;
+      }
+      if (_allergyDetailController.text.isEmpty &&
+          medicalHistory.allergyDetail != null) {
+        _allergyDetailController.text = medicalHistory.allergyDetail!;
+      }
+    }
   }
 
   // 同步健康評估表編輯的值到資料庫

@@ -106,6 +106,15 @@ class TreatmentDao extends DatabaseAccessor<AppDatabase>
     return into(medicalAssessment).insert(data);
   }
 
+  Future<int> updateMedicalAssessment(
+    MedicalAssessmentCompanion data,
+    int assessmentId,
+  ) {
+    return (update(
+      medicalAssessment,
+    )..where((t) => t.assessmentId.equals(assessmentId))).write(data);
+  }
+
   Future<List<MedicalAssessmentData>> getMedicalAssessments(int medicalId) {
     return (select(medicalAssessment)
           ..where((t) => t.medicalId.equals(medicalId))
