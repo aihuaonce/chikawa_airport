@@ -432,6 +432,7 @@ class FirestoreSyncService {
               'expeditedClearanceId': treatment.expeditedClearanceId,
               'doctorOrderCh': treatment.doctorOrderCh,
               'doctorOrderEn': treatment.doctorOrderEn,
+              'otherPhotoDescription': treatment.otherPhotoDescription,
               'directorName': treatment.directorName,
               'assistStaff': treatment.assistStaff,
               'ekgInterpretation': treatment.ekgInterpretation,
@@ -1358,6 +1359,9 @@ class FirestoreSyncService {
                       ? DateTime.parse(data['treatmentTime'] as String)
                       : DateTime.now(),
                 ),
+                otherPhotoDescription: Value(
+                  data['otherPhotoDescription'] as String?,
+                ),
                 syncStatus: const Value(0),
                 remoteId: Value(doc.id),
                 lastModified: Value(DateTime.now()),
@@ -2121,14 +2125,33 @@ class FirestoreSyncService {
       for (final doc in snapshot.docs) {
         final data = doc.data();
 
-        final mediaId = data['mediaId'];
-        if (mediaId == null) continue;
+        // 使用 doc.id 作為唯一識別（格式為 medicalId_mediaType）
+        final docId = doc.id;
 
-        final existing = await (_db.select(
-          _db.medicalMedia,
-        )..where((t) => t.mediaId.equals(mediaId as int))).getSingleOrNull();
+        // 從 doc.id 解析出 medicalId 和 mediaType
+        final parts = docId.split('_');
+        if (parts.length != 2) {
+          debugPrint('Invalid doc.id format: $docId, skipping');
+          continue;
+        }
 
-        if (existing != null) continue;
+        final medicalId = int.tryParse(parts[0]);
+        final mediaType = parts[1];
+
+        if (medicalId == null) continue;
+
+        // 檢查是否已有相同 medicalId + mediaType 的記錄
+        final existingByType =
+            await (_db.select(_db.medicalMedia)..where(
+                  (t) =>
+                      t.medicalId.equals(medicalId) &
+                      t.mediaType.equals(mediaType),
+                ))
+                .getSingleOrNull();
+
+        if (existingByType != null) {
+          continue;
+        }
 
         final createdAtStr = data['createdAt'] as String?;
         DateTime createdAt = DateTime.now();
@@ -2141,14 +2164,16 @@ class FirestoreSyncService {
             .into(_db.medicalMedia)
             .insert(
               MedicalMediaCompanion.insert(
-                medicalId: (data['medicalId'] as int?) ?? 0,
-                mediaType: data['mediaType'] as String? ?? 'other',
+                medicalId: medicalId,
+                mediaType: mediaType,
                 base64Data: data['base64Data'] as String? ?? '',
                 description: Value(data['description'] as String?),
                 createdAt: Value(createdAt),
+                syncStatus: const Value(0),
+                remoteId: Value(doc.id),
               ),
             );
-        debugPrint('Downloaded medical_media $mediaId');
+        debugPrint('Downloaded medical_media $docId (type: $mediaType)');
       }
     } catch (e) {
       debugPrint('Error downloading medical_media: $e');
@@ -2247,23 +2272,45 @@ class FirestoreSyncService {
 
     for (final record in records) {
       try {
-        debugPrint('UPLOAD: uploading medical_media ${record.mediaId}');
-        await _firebase
-            .setDocument('medical_media', record.mediaId.toString(), {
-              'mediaId': record.mediaId,
-              'medicalId': record.medicalId,
-              'mediaType': record.mediaType,
-              'base64Data': record.base64Data,
-              'description': record.description,
-              'createdAt': record.createdAt.toIso8601String(),
-              'lastModified': FieldValue.serverTimestamp(),
-            });
+        debugPrint(
+          'UPLOAD: uploading medical_media ${record.mediaId}, type: ${record.mediaType}',
+        );
+
+        // 建立資料 map，過濾掉 null 值和空字串
+        final Map<String, dynamic> data = {};
+
+        // 只加入有值的欄位
+        data['mediaId'] = record.mediaId;
+        data['medicalId'] = record.medicalId;
+        data['mediaType'] = record.mediaType;
+
+        // base64Data 可能很大，只在有內容時加入
+        if (record.base64Data.isNotEmpty) {
+          data['base64Data'] = record.base64Data;
+        }
+
+        // description 只在非空時加入
+        if (record.description != null && record.description!.isNotEmpty) {
+          data['description'] = record.description;
+        }
+
+        data['createdAt'] = record.createdAt.toIso8601String();
+        data['lastModified'] = FieldValue.serverTimestamp();
+
+        debugPrint('UPLOAD: data keys: ${data.keys.toList()}');
+
+        // 使用 medicalId + mediaType 作為 document ID，避免不同類型覆蓋
+        final docId = '${record.medicalId}_${record.mediaType}';
+
+        await _firebase.setDocument('medical_media', docId, data);
 
         await (_db.update(_db.medicalMedia)
               ..where((t) => t.mediaId.equals(record.mediaId)))
             .write(MedicalMediaCompanion(syncStatus: const Value(0)));
-      } catch (e) {
+        debugPrint('UPLOAD: medical_media ${record.mediaId} success');
+      } catch (e, stack) {
         debugPrint('Error uploading medical_media ${record.mediaId}: $e');
+        debugPrint('Stack: $stack');
       }
     }
     debugPrint('Uploaded ${records.length} medical_media');
