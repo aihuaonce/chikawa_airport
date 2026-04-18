@@ -343,17 +343,10 @@ Future<Uint8List> buildMedicalServiceApplicationPdf(
   }
 
   // 簽名框 helper
-  pw.Widget buildSignatureBox(Uint8List? data, {double height = 35}) {
+  pw.Widget buildSignatureBox(Uint8List? data, {double height = 45}) {
     return pw.Container(
       height: height,
-      alignment: pw.Alignment.centerLeft,
-      decoration: const pw.BoxDecoration(
-        border: pw.Border(
-          left: pw.BorderSide(width: 0.5, color: PdfColors.black),
-          right: pw.BorderSide(width: 0.5, color: PdfColors.black),
-          bottom: pw.BorderSide(width: 0.5, color: PdfColors.black),
-        ),
-      ),
+      alignment: pw.Alignment.center,
       child: data != null && data.isNotEmpty
           ? pw.Image(pw.MemoryImage(data), fit: pw.BoxFit.contain)
           : pw.SizedBox(),
@@ -837,6 +830,7 @@ Future<Uint8List> buildMedicalServiceApplicationPdf(
               },
               children: [
                 pw.TableRow(
+                  verticalAlignment: pw.TableCellVerticalAlignment.middle,
                   children: [
                     pw.Container(
                       padding: const pw.EdgeInsets.all(4),
@@ -865,6 +859,7 @@ Future<Uint8List> buildMedicalServiceApplicationPdf(
                   ],
                 ),
                 pw.TableRow(
+                  verticalAlignment: pw.TableCellVerticalAlignment.middle,
                   children: [
                     pw.Container(
                       padding: const pw.EdgeInsets.all(4),
@@ -878,6 +873,7 @@ Future<Uint8List> buildMedicalServiceApplicationPdf(
                   ],
                 ),
                 pw.TableRow(
+                  verticalAlignment: pw.TableCellVerticalAlignment.middle,
                   children: [
                     pw.Container(
                       padding: const pw.EdgeInsets.all(4),
