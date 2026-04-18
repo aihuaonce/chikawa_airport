@@ -355,6 +355,22 @@ class TreatmentViewModel extends ChangeNotifier {
     String? reportedBy,
     bool? isConfirmed,
   }) {
+    // 檢查是否切換了主訴類型
+    final bool typeChanged =
+        chiefComplaintTypeId != null &&
+        _chiefComplaint != null &&
+        _chiefComplaint!.chiefComplaintTypeId != chiefComplaintTypeId;
+
+    // 如果類型改變且有選中的症狀，先清除資料庫中的症狀關聯
+    if (typeChanged && _selectedSymptomIds.isNotEmpty) {
+      _clearAllSymptoms();
+      // 清除 otherSymptomDetail - 傳遞空字串給後續處理
+      otherSymptomDetail = '';
+    } else if (typeChanged) {
+      // 沒有選中症狀但類型改變，也要清除 otherSymptomDetail
+      otherSymptomDetail = '';
+    }
+
     if (_chiefComplaint == null) {
       // 第一次建立，需立即寫入 DB 取得 ID
       _createChiefComplaint(
@@ -1729,12 +1745,19 @@ class TreatmentViewModel extends ChangeNotifier {
   bool get hasOtherActionSelected =>
       _selectedActionIds.contains(_getOtherActionId());
 
-  // 獲取「其它」症狀的 ID
+  // 獲取當前主訴類型的「其它」症狀 ID
   int? _getOtherSymptomId() {
+    if (_chiefComplaint?.chiefComplaintTypeId == null) return null;
+
+    // 取得當前類型的所有症狀細項
+    final typeId = _chiefComplaint!.chiefComplaintTypeId!;
+    final details = getChiefComplaintDetails(typeId);
+
+    // 在當前類型中找「其它」或「其他」
     try {
-      final details = refService.chiefComplaintDetails;
-      return details.firstWhere((d) => d.name == '其它').id;
+      return details.firstWhere((d) => d.name == '其它' || d.name == '其他').id;
     } catch (e) {
+      debugPrint('系統:找不到「其它」症狀 ID for typeId=$typeId');
       return null;
     }
   }
@@ -1762,6 +1785,20 @@ class TreatmentViewModel extends ChangeNotifier {
       debugPrint('系統:症狀選擇已切換 ID=$symptomId');
     } catch (e) {
       debugPrint('系統:症狀選擇切換失敗 - $e');
+    }
+  }
+
+  Future<void> _clearAllSymptoms() async {
+    if (_chiefComplaint == null) return;
+    try {
+      await db.treatmentDao.clearChiefComplaintSymptoms(
+        _chiefComplaint!.complaintId,
+      );
+      _selectedSymptomIds = [];
+      notifyListeners();
+      debugPrint('系統:已清除主訴症狀關聯 (主訴類型切換)');
+    } catch (e) {
+      debugPrint('系統:清除主訴症狀失敗 - $e');
     }
   }
 
