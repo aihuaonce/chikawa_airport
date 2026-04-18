@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 import '../../data/models/medical/treatment_view.dart';
 import '../../data/db/database.dart';
 import '../widgets/icd10_search_sheet.dart';
@@ -72,6 +74,12 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
   String _clearanceMethod = '一般通關';
   String _ambulanceSource = '醫療中心';
 
+  // --- 效能優化：Debounce Timer ---
+  Timer? _controllerSyncTimer;
+
+  // --- 效能優化：圖片快取 ---
+  final Map<String, Uint8List> _imageCache = {};
+
   Widget _buildFieldWrapper(String label, Widget field) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -137,6 +145,8 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
       controllers['relation']?.dispose();
       controllers['temp']?.dispose();
     }
+    // 取消 debounce timer
+    _controllerSyncTimer?.cancel();
     super.dispose();
   }
 
@@ -215,13 +225,29 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
 
   // 同步健康評估表編輯的值到資料庫
 
+  // --- 效能優化：取得或解碼圖片（使用快取）---
+  Uint8List _getCachedImage(String base64Data) {
+    return _imageCache.putIfAbsent(base64Data, () => base64Decode(base64Data));
+  }
+
+  // --- 效能優化：Debounce 同步控制器 ---
+  void _scheduleControllerSync(TreatmentViewModel viewModel) {
+    _controllerSyncTimer?.cancel();
+    _controllerSyncTimer = Timer(const Duration(milliseconds: 100), () {
+      if (mounted) {
+        _updateControllers(viewModel);
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<TreatmentViewModel>();
     final treatment = viewModel.treatment;
 
+    // 使用 debounce 避免每次 rebuild 都同步控制器
     if (treatment != null) {
-      _updateControllers(viewModel);
+      _scheduleControllerSync(viewModel);
     }
 
     if (treatment == null) {
@@ -574,7 +600,7 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
                             minScale: 0.5,
                             maxScale: 4.0,
                             child: Image.memory(
-                              base64Decode(media.base64Data),
+                              _getCachedImage(media.base64Data),
                               fit: BoxFit.contain,
                             ),
                           ),
@@ -629,7 +655,7 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
               borderRadius: BorderRadius.circular(8),
               border: Border.all(color: borderColor),
               image: DecorationImage(
-                image: MemoryImage(base64Decode(media.base64Data)),
+                image: MemoryImage(_getCachedImage(media.base64Data)),
                 fit: BoxFit.cover,
               ),
             ),

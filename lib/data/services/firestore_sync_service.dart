@@ -379,9 +379,12 @@ class FirestoreSyncService {
 
   /// 上傳處置記錄
   Future<void> _uploadTreatments() async {
+    // 上傳所有 syncStatus=1 或沒有 remoteId 的治療記錄
     final treatments = await (_db.select(
       _db.treatment,
-    )..where((t) => t.syncStatus.equals(1))).get();
+    )..where((t) => t.syncStatus.equals(1) | t.remoteId.isNull())).get();
+
+    debugPrint('上傳治療記錄: 待上傳 ${treatments.length} 筆');
 
     for (final treatment in treatments) {
       try {
@@ -400,13 +403,35 @@ class FirestoreSyncService {
               'resultId': treatment.resultId,
               'transportRequired': treatment.transportRequired,
               'referralHospitalId': treatment.referralHospitalId,
+              'transportMethod': treatment.transportMethod,
+              'referralHospitalFinal': treatment.referralHospitalFinal,
+              'ambulanceStaffId': treatment.ambulanceStaffId,
+              'arrivalTime': treatment.arrivalTime?.toIso8601String(),
+              'clearanceId': treatment.clearanceId,
+              'expeditedClearanceId': treatment.expeditedClearanceId,
+              'doctorOrderCh': treatment.doctorOrderCh,
+              'doctorOrderEn': treatment.doctorOrderEn,
+              'directorName': treatment.directorName,
+              'assistStaff': treatment.assistStaff,
+              'ekgInterpretation': treatment.ekgInterpretation,
+              'glucose': treatment.glucose,
+              'intubationMethod': treatment.intubationMethod,
+              'oxygenMethod': treatment.oxygenMethod,
+              'oxygenFlow': treatment.oxygenFlow,
+              'certificateLogs': treatment.certificateLogs,
               'treatmentTime': treatment.treatmentTime.toIso8601String(),
               'lastModified': FieldValue.serverTimestamp(),
             });
 
-        await (_db.update(_db.treatment)
-              ..where((t) => t.treatmentId.equals(treatment.treatmentId)))
-            .write(TreatmentCompanion(syncStatus: const Value(0)));
+        await (_db.update(
+          _db.treatment,
+        )..where((t) => t.treatmentId.equals(treatment.treatmentId))).write(
+          TreatmentCompanion(
+            syncStatus: const Value(0),
+            remoteId: Value(treatment.treatmentId.toString()),
+          ),
+        );
+        debugPrint('上傳治療記錄成功: ${treatment.treatmentId}');
       } catch (e) {
         debugPrint('Error uploading treatment ${treatment.treatmentId}: $e');
       }
@@ -1145,24 +1170,38 @@ class FirestoreSyncService {
     try {
       final snapshot = await _firebase.getCollectionSnapshot('treatments');
 
+      debugPrint('下載處置記錄: 遠端有 ${snapshot.docs.length} 筆');
+
       for (final doc in snapshot.docs) {
         final data = doc.data();
 
         final treatmentId = data['treatmentId'];
+        final medicalId = data['medicalId'] as int?;
+
+        debugPrint('嘗試下載 treatment: id=$treatmentId, medicalId=$medicalId');
+
         if (treatmentId == null) continue;
+        if (medicalId == null || medicalId == 0) {
+          debugPrint('跳過 treatment $treatmentId: medicalId 無效 ($medicalId)');
+          continue;
+        }
 
         final existing =
             await (_db.select(_db.treatment)
                   ..where((t) => t.treatmentId.equals(treatmentId as int)))
                 .getSingleOrNull();
 
-        if (existing != null) continue;
+        if (existing != null) {
+          debugPrint('treatment $treatmentId 已存在本地，跳過');
+          continue;
+        }
 
         await _db
             .into(_db.treatment)
             .insert(
               TreatmentCompanion.insert(
-                medicalId: (data['medicalId'] as int?) ?? 0,
+                medicalId: medicalId,
+                tentativeCategoryId: Value(data['tentativeCategoryId'] as int?),
                 tentative: Value(data['tentative'] as String?),
                 secondaryDiagnosis1: Value(
                   data['secondaryDiagnosis1'] as String?,
@@ -1171,7 +1210,19 @@ class FirestoreSyncService {
                   data['secondaryDiagnosis2'] as String?,
                 ),
                 triageId: Value(data['triageId'] as int?),
+                treatmentOnSiteId: Value(data['treatmentOnSiteId'] as int?),
                 actionSummary: Value(data['actionSummary'] as String?),
+                actionSummaryOther: Value(
+                  data['actionSummaryOther'] as String?,
+                ),
+                resultId: Value(data['resultId'] as int?),
+                transportRequired: Value(data['transportRequired'] as bool?),
+                referralHospitalId: Value(data['referralHospitalId'] as int?),
+                treatmentTime: Value(
+                  data['treatmentTime'] != null
+                      ? DateTime.parse(data['treatmentTime'] as String)
+                      : DateTime.now(),
+                ),
                 syncStatus: const Value(0),
                 remoteId: Value(doc.id),
                 lastModified: Value(DateTime.now()),
