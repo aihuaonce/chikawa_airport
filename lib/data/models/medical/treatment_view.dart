@@ -2019,6 +2019,9 @@ class TreatmentViewModel extends ChangeNotifier {
       );
       await _reloadActionIds();
 
+      // 同步更新 actionSummary 欄位（供 Firestore 同步使用）
+      await _syncActionSummaryToTreatment();
+
       // 同步更新 MedicalRecord 狀態
       // 1. 取得目前所有選中的項目名稱
       final selectedItems = actionItems
@@ -2042,6 +2045,29 @@ class TreatmentViewModel extends ChangeNotifier {
     } catch (e) {
       debugPrint('系統:處置項目選擇切換失敗 - $e');
     }
+  }
+
+  // 同步 actionSummary 到 Treatment 表（供 Firestore 同步）
+  Future<void> _syncActionSummaryToTreatment() async {
+    if (_treatment == null) return;
+
+    final selectedNames = actionItems
+        .where((item) => _selectedActionIds.contains(item.id))
+        .map((item) => item.name)
+        .toList();
+
+    final actionSummaryStr = selectedNames.join(',');
+
+    await db.treatmentDao.updateTreatment(
+      TreatmentCompanion(
+        treatmentId: Value(_treatment!.treatmentId),
+        actionSummary: Value(actionSummaryStr),
+        syncStatus: const Value(1),
+      ),
+    );
+
+    // 重新載入 treatment
+    _treatment = await db.treatmentDao.getTreatment(medicalId);
   }
 
   Future<void> _reloadActionIds() async {
