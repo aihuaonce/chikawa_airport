@@ -24,6 +24,23 @@ class FirestoreSyncService {
   bool get isSyncing => _isSyncing;
   DateTime? get lastSyncTime => _lastSyncTime;
 
+  Uint8List? _parseBytes(dynamic value) {
+    if (value == null) return null;
+    if (value is Uint8List) return value;
+    if (value is Blob) return value.bytes;
+    if (value is List<int>) return Uint8List.fromList(value);
+    if (value is List) {
+      return Uint8List.fromList(
+        value.whereType<num>().map((e) => e.toInt()).toList(),
+      );
+    }
+
+    debugPrint(
+      'FirestoreSyncService: Unsupported binary type ${value.runtimeType}',
+    );
+    return null;
+  }
+
   /// 雙向同步：上傳本地變更 + 下載遠端變更
   Future<void> syncBidirectional() async {
     if (_isSyncing) {
@@ -58,6 +75,7 @@ class FirestoreSyncService {
       _uploadMedicalRecords(),
       _uploadPatients(),
       _uploadTreatments(),
+      _uploadMedicalStaffAssignments(),
       _uploadChiefComplaints(),
       _uploadMedicalHistories(),
       _uploadSpecialNotes(),
@@ -91,6 +109,7 @@ class FirestoreSyncService {
       _downloadMedicalRecords(),
       _downloadPatients(),
       _downloadTreatments(),
+      _downloadMedicalStaffAssignments(),
       _downloadFees(),
       _downloadNursingRecords(),
       _downloadReferralForms(),
@@ -456,6 +475,38 @@ class FirestoreSyncService {
         debugPrint('上傳治療記錄成功: ${treatment.treatmentId}');
       } catch (e) {
         debugPrint('Error uploading treatment ${treatment.treatmentId}: $e');
+      }
+    }
+  }
+
+  /// 上傳醫療人員指派記錄
+  Future<void> _uploadMedicalStaffAssignments() async {
+    final assignments = await _db.select(_db.medicalStaffAssignment).get();
+
+    debugPrint('上傳醫療人員指派: 待上傳 ${assignments.length} 筆');
+
+    for (final assignment in assignments) {
+      try {
+        await _firebase.setDocument(
+          'medical_staff_assignments',
+          assignment.staffAssignmentId.toString(),
+          {
+            'staffAssignmentId': assignment.staffAssignmentId,
+            'medicalId': assignment.medicalId,
+            'staffRoleId': assignment.staffRoleId,
+            'staffId': assignment.staffId,
+            'staffName': assignment.staffName,
+            'isPrimary': assignment.isPrimary,
+            'signature': assignment.signature,
+            'signedAt': assignment.signedAt?.toIso8601String(),
+            'assignedAt': assignment.assignedAt.toIso8601String(),
+            'lastModified': FieldValue.serverTimestamp(),
+          },
+        );
+      } catch (e) {
+        debugPrint(
+          'Error uploading medical_staff_assignment ${assignment.staffAssignmentId}: $e',
+        );
       }
     }
   }
@@ -1327,50 +1378,109 @@ class FirestoreSyncService {
                   ..where((t) => t.treatmentId.equals(treatmentId as int)))
                 .getSingleOrNull();
 
-        if (existing != null) {
-          debugPrint('treatment $treatmentId 已存在本地，跳過');
-          continue;
-        }
+        final treatmentTime = data['treatmentTime'] != null
+            ? DateTime.tryParse(data['treatmentTime'] as String)
+            : null;
+        final arrivalTime = data['arrivalTime'] != null
+            ? DateTime.tryParse(data['arrivalTime'] as String)
+            : null;
 
-        await _db
-            .into(_db.treatment)
-            .insert(
-              TreatmentCompanion.insert(
-                medicalId: medicalId,
-                tentativeCategoryId: Value(data['tentativeCategoryId'] as int?),
-                tentative: Value(data['tentative'] as String?),
-                secondaryDiagnosis1: Value(
-                  data['secondaryDiagnosis1'] as String?,
-                ),
-                secondaryDiagnosis2: Value(
-                  data['secondaryDiagnosis2'] as String?,
-                ),
-                triageId: Value(data['triageId'] as int?),
-                treatmentOnSiteId: Value(data['treatmentOnSiteId'] as int?),
-                actionSummary: Value(data['actionSummary'] as String?),
-                actionSummaryOther: Value(
-                  data['actionSummaryOther'] as String?,
-                ),
-                resultId: Value(data['resultId'] as int?),
-                transportRequired: Value(data['transportRequired'] as bool?),
-                referralHospitalId: Value(data['referralHospitalId'] as int?),
-                treatmentTime: Value(
-                  data['treatmentTime'] != null
-                      ? DateTime.parse(data['treatmentTime'] as String)
-                      : DateTime.now(),
-                ),
-                otherPhotoDescription: Value(
-                  data['otherPhotoDescription'] as String?,
-                ),
-                syncStatus: const Value(0),
-                remoteId: Value(doc.id),
-                lastModified: Value(DateTime.now()),
-              ),
-            );
-        debugPrint('Downloaded treatment $treatmentId');
+        final companion = TreatmentCompanion(
+          treatmentId: Value(treatmentId),
+          medicalId: Value(medicalId),
+          tentativeCategoryId: Value(data['tentativeCategoryId'] as int?),
+          tentative: Value(data['tentative'] as String?),
+          secondaryDiagnosis1: Value(data['secondaryDiagnosis1'] as String?),
+          secondaryDiagnosis2: Value(data['secondaryDiagnosis2'] as String?),
+          triageId: Value(data['triageId'] as int?),
+          treatmentOnSiteId: Value(data['treatmentOnSiteId'] as int?),
+          actionSummary: Value(data['actionSummary'] as String?),
+          actionSummaryOther: Value(data['actionSummaryOther'] as String?),
+          resultId: Value(data['resultId'] as int?),
+          transportRequired: Value(data['transportRequired'] as bool?),
+          referralHospitalId: Value(data['referralHospitalId'] as int?),
+          transportMethod: Value(data['transportMethod'] as String?),
+          referralHospitalFinal: Value(
+            data['referralHospitalFinal'] as String?,
+          ),
+          ambulanceStaffId: Value(data['ambulanceStaffId'] as int?),
+          arrivalTime: Value(arrivalTime),
+          clearanceId: Value(data['clearanceId'] as int?),
+          expeditedClearanceId: Value(data['expeditedClearanceId'] as int?),
+          doctorOrderCh: Value(data['doctorOrderCh'] as String?),
+          doctorOrderEn: Value(data['doctorOrderEn'] as String?),
+          otherPhotoDescription: Value(
+            data['otherPhotoDescription'] as String?,
+          ),
+          directorName: Value(data['directorName'] as String?),
+          assistStaff: Value(data['assistStaff'] as String?),
+          ekgInterpretation: Value(data['ekgInterpretation'] as String?),
+          glucose: Value(data['glucose'] as String?),
+          intubationMethod: Value(data['intubationMethod'] as String?),
+          oxygenMethod: Value(data['oxygenMethod'] as String?),
+          oxygenFlow: Value((data['oxygenFlow'] as num?)?.toDouble()),
+          certificateLogs: Value(data['certificateLogs'] as String?),
+          treatmentTime: Value(treatmentTime ?? DateTime.now()),
+          syncStatus: const Value(0),
+          remoteId: Value(doc.id),
+          lastModified: Value(DateTime.now()),
+        );
+
+        await _db.into(_db.treatment).insertOnConflictUpdate(companion);
+        debugPrint(
+          existing != null
+              ? 'Updated treatment $treatmentId from remote'
+              : 'Downloaded treatment $treatmentId',
+        );
       }
     } catch (e) {
       debugPrint('Error downloading treatments: $e');
+    }
+  }
+
+  /// 從 Firestore 下載醫療人員指派
+  Future<void> _downloadMedicalStaffAssignments() async {
+    try {
+      final snapshot = await _firebase.getCollectionSnapshot(
+        'medical_staff_assignments',
+      );
+
+      debugPrint('下載醫療人員指派: 遠端有 ${snapshot.docs.length} 筆');
+
+      for (final doc in snapshot.docs) {
+        final data = doc.data();
+        final staffAssignmentId = data['staffAssignmentId'] as int?;
+        final medicalId = data['medicalId'] as int?;
+
+        if (staffAssignmentId == null || medicalId == null || medicalId == 0) {
+          continue;
+        }
+
+        final signedAt = data['signedAt'] != null
+            ? DateTime.tryParse(data['signedAt'] as String)
+            : null;
+        final assignedAt = data['assignedAt'] != null
+            ? DateTime.tryParse(data['assignedAt'] as String)
+            : null;
+
+        await _db
+            .into(_db.medicalStaffAssignment)
+            .insertOnConflictUpdate(
+              MedicalStaffAssignmentCompanion(
+                staffAssignmentId: Value(staffAssignmentId),
+                medicalId: Value(medicalId),
+                staffRoleId: Value(data['staffRoleId'] as int?),
+                staffId: Value(data['staffId'] as int?),
+                staffName: Value(data['staffName'] as String?),
+                isPrimary: Value(data['isPrimary'] as bool? ?? false),
+                signature: Value(_parseBytes(data['signature'])),
+                signedAt: Value(signedAt),
+                assignedAt: Value(assignedAt ?? DateTime.now()),
+              ),
+            );
+      }
+    } catch (e) {
+      debugPrint('Error downloading medical_staff_assignments: $e');
     }
   }
 

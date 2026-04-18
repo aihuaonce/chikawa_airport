@@ -1511,6 +1511,10 @@ class TreatmentViewModel extends ChangeNotifier {
     bool isPrimary = false,
   }) async {
     try {
+      debugPrint(
+        '系統:addStaffAssignment start medicalId=$medicalId role=$staffRoleCode staffId=$staffId staffName=$staffName isPrimary=$isPrimary',
+      );
+
       final roleId = getRoleIdByCode(staffRoleCode);
       if (roleId == null) {
         debugPrint('系統: 找不到醫療人員角色代碼 $staffRoleCode');
@@ -1523,6 +1527,9 @@ class TreatmentViewModel extends ChangeNotifier {
           (a) => a.staffRoleId == roleId && a.isPrimary,
         );
         for (var assignment in existingPrimary) {
+          debugPrint(
+            '系統:addStaffAssignment delete existing primary assignmentId=${assignment.staffAssignmentId} roleId=${assignment.staffRoleId} staffId=${assignment.staffId}',
+          );
           await db.treatmentDao.deleteStaffAssignment(
             assignment.staffAssignmentId,
           );
@@ -1555,9 +1562,11 @@ class TreatmentViewModel extends ChangeNotifier {
         ),
       );
       await _reloadStaffAssignments();
-      debugPrint('系統:新增醫療人員指派成功');
+      debugPrint(
+        '系統:新增醫療人員指派成功 role=$staffRoleCode roleId=$roleId staffId=$staffId currentAssignments=${_staffAssignments.map((a) => '${a.staffAssignmentId}:${a.staffRoleId}:${a.staffId}:${a.isPrimary}').join(',')}',
+      );
     } catch (e) {
-      debugPrint('系統:新增醫療人員指派失敗 - $e');
+      debugPrint('系統:新增醫療人員指派失敗 role=$staffRoleCode staffId=$staffId - $e');
     }
   }
 

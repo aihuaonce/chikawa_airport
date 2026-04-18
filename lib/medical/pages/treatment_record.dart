@@ -2153,6 +2153,9 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
                               primaryNurse?.staffId,
                               '請選擇主責護理師',
                               (staffId) {
+                                debugPrint(
+                                  'UI: selected primary nurse staffId=$staffId currentPrimaryNurse=${primaryNurse?.staffId}',
+                                );
                                 if (staffId != null) {
                                   viewModel.addStaffAssignment(
                                     staffRoleCode: 'NURSE',
@@ -2239,6 +2242,9 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
                     emtAssignment?.staffId,
                     '請選擇 EMT',
                     (staffId) {
+                      debugPrint(
+                        'UI: selected EMT staffId=$staffId currentEmt=${emtAssignment?.staffId}',
+                      );
                       if (staffId != null) {
                         viewModel.addStaffAssignment(
                           staffRoleCode: 'EMT',
