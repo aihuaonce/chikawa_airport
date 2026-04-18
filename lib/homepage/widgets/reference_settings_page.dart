@@ -714,6 +714,10 @@ class _ReferenceSettingsPageState extends State<ReferenceSettingsPage> {
               ),
               OutlinedButton.icon(
                 onPressed: _isLoading ? null : _loadSelectedTable,
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: primaryColor,
+                  side: const BorderSide(color: borderColor),
+                ),
                 icon: const Icon(Icons.refresh, size: 18),
                 label: const Text('重新整理'),
               ),
@@ -1105,6 +1109,7 @@ class _ReferenceOptionDialogState extends State<_ReferenceOptionDialog> {
   Widget build(BuildContext context) {
     final isEdit = widget.initialValues.isNotEmpty;
     return Dialog(
+      backgroundColor: Colors.white,
       insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
       child: ConstrainedBox(
@@ -1180,9 +1185,12 @@ class _ReferenceOptionDialogState extends State<_ReferenceOptionDialog> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  TextButton(
+TextButton(
                     onPressed: () => Navigator.of(context).pop(),
-                    child: const Text('取消'),
+                    child: Text(
+                      '取消',
+                      style: TextStyle(color: _primaryColor),
+                    ),
                   ),
                   const SizedBox(width: 8),
                   FilledButton.icon(
