@@ -272,6 +272,10 @@ class TreatmentDao extends DatabaseAccessor<AppDatabase>
     } else {
       await addChiefComplaintSymptom(complaintId, symptomId);
     }
+    // 更新 syncStatus 觸發 Firestore 同步
+    await (update(chiefComplaint)
+          ..where((t) => t.complaintId.equals(complaintId)))
+        .write(ChiefComplaintCompanion(syncStatus: const Value(1)));
   }
 
   Future<void> clearChiefComplaintSymptoms(int complaintId) async {

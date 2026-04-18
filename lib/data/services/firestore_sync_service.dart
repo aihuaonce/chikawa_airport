@@ -74,6 +74,10 @@ class FirestoreSyncService {
       _uploadAmbulancePersonalProperty(),
       _uploadAmbulanceFees(),
       _uploadContacts(),
+      // 新增上傳
+      _uploadMedicalMedia(),
+      _uploadMedicalAssessments(),
+      _uploadHealthAssessments(),
       _syncReferenceTables(),
     ]);
     debugPrint('FirestoreSyncService: Upload to remote completed');
@@ -81,6 +85,7 @@ class FirestoreSyncService {
 
   /// 僅下載：從 Firestore 下載新資料到本地
   Future<void> syncFromRemote() async {
+    debugPrint('=== STARTING SYNC FROM REMOTE ===');
     await Future.wait([
       _downloadMedicalRecords(),
       _downloadPatients(),
@@ -94,6 +99,13 @@ class FirestoreSyncService {
       _downloadTelexDocuments(),
       _downloadContacts(),
       _downloadEmergencyTreatments(),
+      // 新增下載
+      _downloadChiefComplaints(),
+      _downloadMedicalHistories(),
+      _downloadSpecialNotes(),
+      _downloadMedicalMedia(),
+      _downloadMedicalAssessments(),
+      _downloadHealthAssessments(),
     ]);
     debugPrint('FirestoreSyncService: Download from remote completed');
   }
@@ -319,8 +331,15 @@ class FirestoreSyncService {
       _db.medicalRecord,
     )..where((t) => t.syncStatus.equals(1))).get();
 
+    debugPrint(
+      'UPLOAD: medical_records - found ${records.length} records with syncStatus=1',
+    );
+
     for (final record in records) {
       try {
+        debugPrint(
+          'UPLOAD: uploading medical_record ${record.medicalId}, cdcPassed=${record.cdcPassed}',
+        );
         await _firebase
             .setDocument('medical_records', record.medicalId.toString(), {
               'medicalId': record.medicalId,
@@ -750,8 +769,18 @@ class FirestoreSyncService {
       _db.chiefComplaint,
     )..where((t) => t.syncStatus.equals(1))).get();
 
+    debugPrint(
+      'UPLOAD: chief_complaints - found ${records.length} records with syncStatus=1',
+    );
+    for (final r in records) {
+      debugPrint(
+        '  - complaintId=${r.complaintId}, syncStatus=${r.syncStatus}',
+      );
+    }
+
     for (final record in records) {
       try {
+        debugPrint('UPLOAD: uploading chief_complaint ${record.complaintId}');
         await _firebase
             .setDocument('chief_complaints', record.complaintId.toString(), {
               'complaintId': record.complaintId,
@@ -784,8 +813,13 @@ class FirestoreSyncService {
       _db.medicalHistory,
     )..where((t) => t.syncStatus.equals(1))).get();
 
+    debugPrint(
+      'UPLOAD: medical_histories - found ${records.length} records with syncStatus=1',
+    );
+
     for (final record in records) {
       try {
+        debugPrint('UPLOAD: uploading medical_history ${record.historyId}');
         await _firebase
             .setDocument('medical_histories', record.historyId.toString(), {
               'historyId': record.historyId,
@@ -814,8 +848,13 @@ class FirestoreSyncService {
       _db.specialNotes,
     )..where((t) => t.syncStatus.equals(1))).get();
 
+    debugPrint(
+      'UPLOAD: special_notes - found ${records.length} records with syncStatus=1',
+    );
+
     for (final record in records) {
       try {
+        debugPrint('UPLOAD: uploading special_note ${record.noteId}');
         await _firebase.setDocument('special_notes', record.noteId.toString(), {
           'noteId': record.noteId,
           'medicalId': record.medicalId,
@@ -1091,7 +1130,20 @@ class FirestoreSyncService {
                   ..where((t) => t.medicalId.equals(medicalId as int)))
                 .getSingleOrNull();
 
-        if (existing != null) continue;
+        if (existing != null) {
+          // 如果已存在，更新 syncStatus 為 0（已同步）
+          await (_db.update(
+            _db.medicalRecord,
+          )..where((t) => t.medicalId.equals(medicalId as int))).write(
+            MedicalRecordCompanion(
+              syncStatus: const Value(0),
+              remoteId: Value(doc.id),
+              lastModified: Value(DateTime.now()),
+            ),
+          );
+          debugPrint('Updated medical_record $medicalId sync status');
+          continue;
+        }
 
         // 新增到本地
         await _db
@@ -1100,6 +1152,8 @@ class FirestoreSyncService {
               MedicalRecordCompanion.insert(
                 isEmergency: Value(data['isEmergency'] as bool? ?? false),
                 hasAmbulance: Value(data['hasAmbulance'] as bool? ?? false),
+                cdcPassed: Value(data['cdcPassed'] as bool?),
+                screeningMethod: Value(data['screeningMethod'] as String?),
                 syncStatus: const Value(0),
                 remoteId: Value(doc.id),
                 lastModified: Value(DateTime.now()),
@@ -1802,6 +1856,487 @@ class FirestoreSyncService {
       }
     } catch (e) {
       debugPrint('Error downloading emergency_treatments: $e');
+    }
+  }
+
+  // ============================================================
+  // 新增：下載方法 (Download from Remote)
+  // ============================================================
+
+  /// 從 Firestore 下載主訴記錄
+  Future<void> _downloadChiefComplaints() async {
+    debugPrint('=== Downloading chief_complaints ===');
+    try {
+      final snapshot = await _firebase.getCollectionSnapshot(
+        'chief_complaints',
+      );
+      debugPrint('chief_complaints: Found ${snapshot.docs.length} docs');
+
+      for (final doc in snapshot.docs) {
+        debugPrint('Processing chief_complaint: ${doc.id}');
+
+        final data = doc.data();
+
+        final complaintId = data['complaintId'];
+        if (complaintId == null) {
+          debugPrint('  Skipping: complaintId is null');
+          continue;
+        }
+
+        final existing =
+            await (_db.select(_db.chiefComplaint)
+                  ..where((t) => t.complaintId.equals(complaintId as int)))
+                .getSingleOrNull();
+
+        if (existing != null) {
+          debugPrint('  Skipping: already exists');
+          continue;
+        }
+
+        final createdAtStr = data['createdAt'] as String?;
+        final onsetTimeStr = data['onsetTime'] as String?;
+        DateTime createdAt = DateTime.now();
+        DateTime? onsetTime;
+
+        if (createdAtStr != null) {
+          createdAt = DateTime.tryParse(createdAtStr) ?? DateTime.now();
+        }
+        if (onsetTimeStr != null) {
+          onsetTime = DateTime.tryParse(onsetTimeStr);
+        }
+
+        await _db
+            .into(_db.chiefComplaint)
+            .insert(
+              ChiefComplaintCompanion.insert(
+                medicalId: (data['medicalId'] as int?) ?? 0,
+                chiefComplaintTypeId: Value(
+                  data['chiefComplaintTypeId'] as int?,
+                ),
+                selectedSymptoms: Value(data['selectedSymptoms'] as String?),
+                otherSymptomDetail: Value(
+                  data['otherSymptomDetail'] as String?,
+                ),
+                chiefComplaintFinal: Value(
+                  data['chiefComplaintFinal'] as String?,
+                ),
+                supplementaryNotes: Value(
+                  data['supplementaryNotes'] as String?,
+                ),
+                onsetTime: Value(onsetTime),
+                reportedBy: Value(data['reportedBy'] as String?),
+                isConfirmed: Value(data['isConfirmed'] as bool? ?? false),
+                createdAt: Value(createdAt),
+                syncStatus: const Value(0),
+                remoteId: Value(doc.id),
+                lastModified: Value(DateTime.now()),
+              ),
+            );
+        debugPrint('Downloaded chief_complaint $complaintId');
+      }
+    } catch (e) {
+      debugPrint('Error downloading chief_complaints: $e');
+    }
+  }
+
+  /// 從 Firestore 下載病史記錄
+  Future<void> _downloadMedicalHistories() async {
+    try {
+      final snapshot = await _firebase.getCollectionSnapshot(
+        'medical_histories',
+      );
+
+      for (final doc in snapshot.docs) {
+        final data = doc.data();
+
+        final historyId = data['historyId'];
+        if (historyId == null) continue;
+
+        final existing =
+            await (_db.select(_db.medicalHistory)
+                  ..where((t) => t.historyId.equals(historyId as int)))
+                .getSingleOrNull();
+
+        if (existing != null) continue;
+
+        final createdAtStr = data['createdAt'] as String?;
+        DateTime createdAt = DateTime.now();
+
+        if (createdAtStr != null) {
+          createdAt = DateTime.tryParse(createdAtStr) ?? DateTime.now();
+        }
+
+        await _db
+            .into(_db.medicalHistory)
+            .insert(
+              MedicalHistoryCompanion.insert(
+                medicalId: (data['medicalId'] as int?) ?? 0,
+                pastHistoryStatusId: Value(data['pastHistoryStatusId'] as int?),
+                pastHistoryDetail: Value(data['pastHistoryDetail'] as String?),
+                allergyStatusId: Value(data['allergyStatusId'] as int?),
+                allergyDetail: Value(data['allergyDetail'] as String?),
+                createdAt: Value(createdAt),
+                syncStatus: const Value(0),
+                remoteId: Value(doc.id),
+                lastModified: Value(DateTime.now()),
+              ),
+            );
+        debugPrint('Downloaded medical_history $historyId');
+      }
+    } catch (e) {
+      debugPrint('Error downloading medical_histories: $e');
+    }
+  }
+
+  /// 從 Firestore 下載特別註記
+  Future<void> _downloadSpecialNotes() async {
+    try {
+      final snapshot = await _firebase.getCollectionSnapshot('special_notes');
+
+      for (final doc in snapshot.docs) {
+        final data = doc.data();
+
+        final noteId = data['noteId'];
+        if (noteId == null) continue;
+
+        final existing = await (_db.select(
+          _db.specialNotes,
+        )..where((t) => t.noteId.equals(noteId as int))).getSingleOrNull();
+
+        if (existing != null) continue;
+
+        final createdAtStr = data['createdAt'] as String?;
+        DateTime createdAt = DateTime.now();
+
+        if (createdAtStr != null) {
+          createdAt = DateTime.tryParse(createdAtStr) ?? DateTime.now();
+        }
+
+        await _db
+            .into(_db.specialNotes)
+            .insert(
+              SpecialNotesCompanion.insert(
+                medicalId: (data['medicalId'] as int?) ?? 0,
+                selectedNotes: Value(data['selectedNotes'] as String?),
+                otherNotes: Value(data['otherNotes'] as String?),
+                createdAt: Value(createdAt),
+                syncStatus: const Value(0),
+                remoteId: Value(doc.id),
+                lastModified: Value(DateTime.now()),
+              ),
+            );
+        debugPrint('Downloaded special_note $noteId');
+      }
+    } catch (e) {
+      debugPrint('Error downloading special_notes: $e');
+    }
+  }
+
+  /// 從 Firestore 下載醫療影像
+  Future<void> _downloadMedicalMedia() async {
+    try {
+      final snapshot = await _firebase.getCollectionSnapshot('medical_media');
+
+      for (final doc in snapshot.docs) {
+        final data = doc.data();
+
+        final mediaId = data['mediaId'];
+        if (mediaId == null) continue;
+
+        final existing = await (_db.select(
+          _db.medicalMedia,
+        )..where((t) => t.mediaId.equals(mediaId as int))).getSingleOrNull();
+
+        if (existing != null) continue;
+
+        final createdAtStr = data['createdAt'] as String?;
+        DateTime createdAt = DateTime.now();
+
+        if (createdAtStr != null) {
+          createdAt = DateTime.tryParse(createdAtStr) ?? DateTime.now();
+        }
+
+        await _db
+            .into(_db.medicalMedia)
+            .insert(
+              MedicalMediaCompanion.insert(
+                medicalId: (data['medicalId'] as int?) ?? 0,
+                mediaType: data['mediaType'] as String? ?? 'other',
+                base64Data: data['base64Data'] as String? ?? '',
+                description: Value(data['description'] as String?),
+                createdAt: Value(createdAt),
+              ),
+            );
+        debugPrint('Downloaded medical_media $mediaId');
+      }
+    } catch (e) {
+      debugPrint('Error downloading medical_media: $e');
+    }
+  }
+
+  /// 從 Firestore 下載醫療評估（生命徵象+理學檢查）
+  Future<void> _downloadMedicalAssessments() async {
+    try {
+      final snapshot = await _firebase.getCollectionSnapshot(
+        'medical_assessments',
+      );
+
+      for (final doc in snapshot.docs) {
+        final data = doc.data();
+
+        final assessmentId = data['assessmentId'];
+        if (assessmentId == null) continue;
+
+        final existing =
+            await (_db.select(_db.medicalAssessment)
+                  ..where((t) => t.assessmentId.equals(assessmentId as int)))
+                .getSingleOrNull();
+
+        if (existing != null) continue;
+
+        final assessmentTimeStr = data['assessmentTime'] as String?;
+        DateTime assessmentTime = DateTime.now();
+
+        if (assessmentTimeStr != null) {
+          assessmentTime =
+              DateTime.tryParse(assessmentTimeStr) ?? DateTime.now();
+        }
+
+        await _db
+            .into(_db.medicalAssessment)
+            .insert(
+              MedicalAssessmentCompanion.insert(
+                medicalId: (data['medicalId'] as int?) ?? 0,
+                temperature: Value(data['temperature'] as double?),
+                pulse: Value(data['pulse'] as int?),
+                breath: Value(data['breath'] as int?),
+                systolic: Value(data['systolic'] as int?),
+                diastolic: Value(data['diastolic'] as int?),
+                spo2: Value(data['spo2'] as int?),
+                painScore: Value(data['painScore'] as int?),
+                consciousnessLevelId: Value(
+                  data['consciousnessLevelId'] as int?,
+                ),
+                gcs: Value(data['gcs'] as int?),
+                gcsE: Value(data['gcsE'] as String?),
+                gcsM: Value(data['gcsM'] as String?),
+                gcsV: Value(data['gcsV'] as String?),
+                leftPupilReactionId: Value(data['leftPupilReactionId'] as int?),
+                leftPupilReaction: Value(data['leftPupilReaction'] as String?),
+                leftPupilSize: Value(data['leftPupilSize'] as double?),
+                rightPupilReactionId: Value(
+                  data['rightPupilReactionId'] as int?,
+                ),
+                rightPupilReaction: Value(
+                  data['rightPupilReaction'] as String?,
+                ),
+                rightPupilSize: Value(data['rightPupilSize'] as double?),
+                headNeckExam: Value(data['headNeckExam'] as String?),
+                chestExam: Value(data['chestExam'] as String?),
+                abdomenExam: Value(data['abdomenExam'] as String?),
+                extremitiesExam: Value(data['extremitiesExam'] as String?),
+                otherPhysicalExam: Value(data['otherPhysicalExam'] as String?),
+                triageId: Value(data['triageId'] as int?),
+                assessmentTime: Value(assessmentTime),
+                syncStatus: const Value(0),
+                remoteId: Value(doc.id),
+                lastModified: Value(DateTime.now()),
+              ),
+            );
+        debugPrint('Downloaded medical_assessment $assessmentId');
+      }
+    } catch (e) {
+      debugPrint('Error downloading medical_assessments: $e');
+    }
+  }
+
+  // ============================================================
+  // 新增：上傳方法 (Upload to Remote)
+  // ============================================================
+
+  /// 上傳醫療影像
+  Future<void> _uploadMedicalMedia() async {
+    final records = await (_db.select(
+      _db.medicalMedia,
+    )..where((t) => t.syncStatus.equals(1))).get();
+
+    debugPrint(
+      'UPLOAD: medical_media - found ${records.length} records with syncStatus=1',
+    );
+
+    for (final record in records) {
+      try {
+        debugPrint('UPLOAD: uploading medical_media ${record.mediaId}');
+        await _firebase
+            .setDocument('medical_media', record.mediaId.toString(), {
+              'mediaId': record.mediaId,
+              'medicalId': record.medicalId,
+              'mediaType': record.mediaType,
+              'base64Data': record.base64Data,
+              'description': record.description,
+              'createdAt': record.createdAt.toIso8601String(),
+              'lastModified': FieldValue.serverTimestamp(),
+            });
+
+        await (_db.update(_db.medicalMedia)
+              ..where((t) => t.mediaId.equals(record.mediaId)))
+            .write(MedicalMediaCompanion(syncStatus: const Value(0)));
+      } catch (e) {
+        debugPrint('Error uploading medical_media ${record.mediaId}: $e');
+      }
+    }
+    debugPrint('Uploaded ${records.length} medical_media');
+  }
+
+  /// 上傳醫療評估（生命徵象+理學檢查）
+  Future<void> _uploadMedicalAssessments() async {
+    final records = await (_db.select(
+      _db.medicalAssessment,
+    )..where((t) => t.syncStatus.equals(1))).get();
+
+    debugPrint(
+      'UPLOAD: medical_assessments - found ${records.length} records with syncStatus=1',
+    );
+
+    for (final record in records) {
+      try {
+        await _firebase.setDocument(
+          'medical_assessments',
+          record.assessmentId.toString(),
+          {
+            'assessmentId': record.assessmentId,
+            'medicalId': record.medicalId,
+            'temperature': record.temperature,
+            'pulse': record.pulse,
+            'breath': record.breath,
+            'systolic': record.systolic,
+            'diastolic': record.diastolic,
+            'spo2': record.spo2,
+            'painScore': record.painScore,
+            'consciousnessLevelId': record.consciousnessLevelId,
+            'gcs': record.gcs,
+            'gcsE': record.gcsE,
+            'gcsM': record.gcsM,
+            'gcsV': record.gcsV,
+            'leftPupilReactionId': record.leftPupilReactionId,
+            'leftPupilReaction': record.leftPupilReaction,
+            'leftPupilSize': record.leftPupilSize,
+            'rightPupilReactionId': record.rightPupilReactionId,
+            'rightPupilReaction': record.rightPupilReaction,
+            'rightPupilSize': record.rightPupilSize,
+            'headNeckExam': record.headNeckExam,
+            'chestExam': record.chestExam,
+            'abdomenExam': record.abdomenExam,
+            'extremitiesExam': record.extremitiesExam,
+            'otherPhysicalExam': record.otherPhysicalExam,
+            'triageId': record.triageId,
+            'assessmentTime': record.assessmentTime.toIso8601String(),
+            'createdAt': record.assessmentTime.toIso8601String(),
+            'lastModified': FieldValue.serverTimestamp(),
+          },
+        );
+
+        await (_db.update(_db.medicalAssessment)
+              ..where((t) => t.assessmentId.equals(record.assessmentId)))
+            .write(MedicalAssessmentCompanion(syncStatus: const Value(0)));
+      } catch (e) {
+        debugPrint(
+          'Error uploading medical_assessment ${record.assessmentId}: $e',
+        );
+      }
+    }
+    debugPrint('Uploaded ${records.length} medical_assessments');
+  }
+
+  /// 上傳 CDC 健康評估表
+  Future<void> _uploadHealthAssessments() async {
+    final records = await (_db.select(
+      _db.healthAssessmentForm,
+    )..where((t) => t.syncStatus.equals(1))).get();
+
+    debugPrint(
+      'UPLOAD: health_assessments - found ${records.length} records with syncStatus=1',
+    );
+
+    for (final record in records) {
+      try {
+        debugPrint(
+          'UPLOAD: uploading health_assessment ${record.assessmentFormId}',
+        );
+        await _firebase.setDocument(
+          'health_assessments',
+          record.assessmentFormId.toString(),
+          {
+            'assessmentFormId': record.assessmentFormId,
+            'medicalId': record.medicalId,
+            'name': record.name,
+            'relation': record.relation,
+            'temperature': record.temperature,
+            'createdAt': record.createdAt.toIso8601String(),
+            'lastModified': FieldValue.serverTimestamp(),
+          },
+        );
+
+        await (_db.update(
+              _db.healthAssessmentForm,
+            )..where((t) => t.assessmentFormId.equals(record.assessmentFormId)))
+            .write(HealthAssessmentFormCompanion(syncStatus: const Value(0)));
+      } catch (e) {
+        debugPrint(
+          'Error uploading health_assessment ${record.assessmentFormId}: $e',
+        );
+      }
+    }
+    debugPrint('Uploaded ${records.length} health_assessments');
+  }
+
+  /// 從 Firestore 下載 CDC 健康評估表
+  Future<void> _downloadHealthAssessments() async {
+    try {
+      final snapshot = await _firebase.getCollectionSnapshot(
+        'health_assessments',
+      );
+      debugPrint('health_assessments: Found ${snapshot.docs.length} docs');
+
+      for (final doc in snapshot.docs) {
+        final data = doc.data();
+
+        final assessmentFormId = data['assessmentFormId'];
+        if (assessmentFormId == null) continue;
+
+        final existing =
+            await (_db.select(_db.healthAssessmentForm)..where(
+                  (t) => t.assessmentFormId.equals(assessmentFormId as int),
+                ))
+                .getSingleOrNull();
+
+        if (existing != null) continue;
+
+        final createdAtStr = data['createdAt'] as String?;
+        DateTime createdAt = DateTime.now();
+
+        if (createdAtStr != null) {
+          createdAt = DateTime.tryParse(createdAtStr) ?? DateTime.now();
+        }
+
+        await _db
+            .into(_db.healthAssessmentForm)
+            .insert(
+              HealthAssessmentFormCompanion.insert(
+                medicalId: (data['medicalId'] as int?) ?? 0,
+                name: data['name'] as String? ?? '',
+                relation: Value(data['relation'] as String?),
+                temperature: Value((data['temperature'] as num?)?.toDouble()),
+                createdAt: Value(createdAt),
+                syncStatus: const Value(0),
+                remoteId: Value(doc.id),
+                lastModified: Value(DateTime.now()),
+              ),
+            );
+        debugPrint('Downloaded health_assessment $assessmentFormId');
+      }
+    } catch (e) {
+      debugPrint('Error downloading health_assessments: $e');
     }
   }
 
