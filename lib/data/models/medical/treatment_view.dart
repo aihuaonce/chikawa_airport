@@ -264,7 +264,7 @@ class TreatmentViewModel extends ChangeNotifier {
     }
 
     _healthAssessmentDebounceTimers[assessmentFormId] = Timer(
-      const Duration(seconds: 2),
+      const Duration(seconds: 5),
       () async {
         try {
           await db.treatmentDao.updateHealthAssessment(
@@ -331,7 +331,7 @@ class TreatmentViewModel extends ChangeNotifier {
       _chiefComplaintDebounceTimer!.cancel();
     }
 
-    _chiefComplaintDebounceTimer = Timer(const Duration(seconds: 2), () async {
+    _chiefComplaintDebounceTimer = Timer(const Duration(seconds: 5), () async {
       debugPrint('系統:正在自動儲存主訴資料...');
       try {
         if (_chiefComplaint == null) return;
@@ -618,6 +618,7 @@ class TreatmentViewModel extends ChangeNotifier {
   int? _cachedSystolic;
   int? _cachedDiastolic;
   int? _cachedSpo2;
+  bool _vitalSignsChanged = false; // 追蹤是否有變更
 
   void updateVitalSignsCache({
     double? temperature,
@@ -627,6 +628,18 @@ class TreatmentViewModel extends ChangeNotifier {
     int? diastolic,
     int? spo2,
   }) {
+    // 檢查是否有實際變更
+    final changed =
+        temperature != _cachedTemperature ||
+        pulse != _cachedPulse ||
+        breath != _cachedBreath ||
+        systolic != _cachedSystolic ||
+        diastolic != _cachedDiastolic ||
+        spo2 != _cachedSpo2;
+
+    if (!changed) return; // 沒有變更，不觸發儲存
+
+    _vitalSignsChanged = true;
     _cachedTemperature = temperature;
     _cachedPulse = pulse;
     _cachedBreath = breath;
@@ -642,7 +655,7 @@ class TreatmentViewModel extends ChangeNotifier {
     }
     _vitalSignsSaveStatus = SaveStatus.saving;
 
-    _vitalSignsDebounceTimer = Timer(const Duration(seconds: 2), () async {
+    _vitalSignsDebounceTimer = Timer(const Duration(seconds: 5), () async {
       debugPrint('系統:正在自動儲存生命徵象...');
       unawaited(_saveVitalSignsToDatabase());
     });
@@ -790,6 +803,26 @@ class TreatmentViewModel extends ChangeNotifier {
     String? extremitiesExam,
     String? otherPhysicalExam,
   }) {
+    // 檢查是否有實際變更
+    final changed =
+        isAlert != _cachedIsAlert ||
+        consciousnessLevelId != _cachedConsciousnessLevelId ||
+        gcsE != _cachedGcsE ||
+        gcsV != _cachedGcsV ||
+        gcsM != _cachedGcsM ||
+        gcs != _cachedGcs ||
+        leftPupilReactionId != _cachedLeftPupilReactionId ||
+        leftPupilSize != _cachedLeftPupilSize ||
+        rightPupilReactionId != _cachedRightPupilReactionId ||
+        rightPupilSize != _cachedRightPupilSize ||
+        headNeckExam != _cachedHeadNeckExam ||
+        chestExam != _cachedChestExam ||
+        abdomenExam != _cachedAbdomenExam ||
+        extremitiesExam != _cachedExtremitiesExam ||
+        otherPhysicalExam != _cachedOtherPhysicalExam;
+
+    if (!changed) return; // 沒有變更，不觸發儲存
+
     _cachedIsAlert = isAlert;
     _cachedConsciousnessLevelId = consciousnessLevelId;
     _cachedGcsE = gcsE;
@@ -815,7 +848,7 @@ class TreatmentViewModel extends ChangeNotifier {
     _consciousnessExamSaveStatus = SaveStatus.saving;
 
     _consciousnessExamDebounceTimer = Timer(
-      const Duration(seconds: 2),
+      const Duration(seconds: 5),
       () async {
         debugPrint('系統:正在自動儲存意識與理學檢查...');
         unawaited(_saveConsciousnessAndExamToDatabase());
@@ -1019,7 +1052,7 @@ class TreatmentViewModel extends ChangeNotifier {
       _historyDebounceTimer!.cancel();
     }
 
-    _historyDebounceTimer = Timer(const Duration(seconds: 2), () async {
+    _historyDebounceTimer = Timer(const Duration(seconds: 5), () async {
       debugPrint('系統:正在自動儲存病史資料...');
       unawaited(_saveHistoryToDatabase());
     });
@@ -2025,7 +2058,7 @@ class TreatmentViewModel extends ChangeNotifier {
     }
     _referralFormSaveStatus = SaveStatus.saving;
 
-    _referralFormDebounceTimer = Timer(const Duration(seconds: 2), () async {
+    _referralFormDebounceTimer = Timer(const Duration(seconds: 5), () async {
       if (_isDisposed) return;
       debugPrint('系統:正在自動儲存轉診單/切結書...');
       await _saveReferralFormToDatabase();
@@ -2079,7 +2112,7 @@ class TreatmentViewModel extends ChangeNotifier {
     if (_debounceTimer?.isActive ?? false) _debounceTimer!.cancel();
     _saveStatus = SaveStatus.saving;
 
-    _debounceTimer = Timer(const Duration(seconds: 2), () async {
+    _debounceTimer = Timer(const Duration(seconds: 5), () async {
       debugPrint('系統:正在自動存檔處置記錄至資料庫...');
       unawaited(_saveToDatabase());
     });
@@ -2121,27 +2154,47 @@ class TreatmentViewModel extends ChangeNotifier {
     // 取消處置記錄的延遲儲存
     if (_debounceTimer?.isActive ?? false) {
       _debounceTimer!.cancel();
-      _saveToDatabase();
+      try {
+        _saveToDatabase();
+      } catch (e) {
+        debugPrint('系統:處置記錄儲存失敗 - $e');
+      }
     }
     // 生命徵象儲存（參考 incident_view.dart 模式）
     if (_vitalSignsDebounceTimer?.isActive ?? false) {
       _vitalSignsDebounceTimer!.cancel();
-      _saveVitalSignsToDatabase();
+      try {
+        _saveVitalSignsToDatabase();
+      } catch (e) {
+        debugPrint('系統:生命徵象儲存失敗 - $e');
+      }
     }
     // 意識與理學檢查儲存
     if (_consciousnessExamDebounceTimer?.isActive ?? false) {
       _consciousnessExamDebounceTimer!.cancel();
-      _saveConsciousnessAndExamToDatabase();
+      try {
+        _saveConsciousnessAndExamToDatabase();
+      } catch (e) {
+        debugPrint('系統:意識與理學檢查儲存失敗 - $e');
+      }
     }
     // 病史與過敏儲存
     if (_historyDebounceTimer?.isActive ?? false) {
       _historyDebounceTimer!.cancel();
-      _saveHistoryToDatabase();
+      try {
+        _saveHistoryToDatabase();
+      } catch (e) {
+        debugPrint('系統:病史儲存失敗 - $e');
+      }
     }
     // 轉診單/切結書儲存
     if (_referralFormDebounceTimer?.isActive ?? false) {
       _referralFormDebounceTimer!.cancel();
-      _saveReferralFormToDatabase();
+      try {
+        _saveReferralFormToDatabase();
+      } catch (e) {
+        debugPrint('系統:轉診單儲存失敗 - $e');
+      }
     }
     _isDisposed = true;
     super.dispose();

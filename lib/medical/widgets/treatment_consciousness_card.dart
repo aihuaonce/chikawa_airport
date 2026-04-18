@@ -23,6 +23,7 @@ class _TreatmentConsciousnessCardState
   int? _leftPupilReactionId = 1;
   int? _rightPupilReactionId = 1;
   int? _gcsTotal;
+  bool _isInitialized = false; // 控制是否從 ViewModel 同步
 
   // --- 控制器 ---
   late TextEditingController _gcsEController;
@@ -39,6 +40,8 @@ class _TreatmentConsciousnessCardState
   @override
   void initState() {
     super.initState();
+    _isAlert = false; // 初始化為 false
+    _isInitialized = false;
     _gcsEController = TextEditingController();
     _gcsVController = TextEditingController();
     _gcsMController = TextEditingController();
@@ -67,8 +70,9 @@ class _TreatmentConsciousnessCardState
   }
 
   void _updateControllers(TreatmentViewModel viewModel) {
-    // 每次 build 都同步 Controller，確保最新資料能顯示在 UI 上
-    // 不再使用 _isInitialized 來阻止更新
+    // 只在首次初始化時從 ViewModel 同步一次，避免每次 build 都覆蓋用戶輸入
+    if (_isInitialized) return;
+    _isInitialized = true;
 
     final latestConsciousnessExam = viewModel.latestConsciousnessExam;
     if (latestConsciousnessExam != null) {
@@ -107,8 +111,10 @@ class _TreatmentConsciousnessCardState
   }
 
   // GCS 自動計算並驗證
-  void _updateGCSTotalAndValidate(TreatmentViewModel viewModel,
-      {bool save = true}) {
+  void _updateGCSTotalAndValidate(
+    TreatmentViewModel viewModel, {
+    bool save = true,
+  }) {
     // 驗證各欄位
     final eError = _validateGCS(_gcsEController.text, 4, 'E');
     final vError = _validateGCS(_gcsVController.text, 5, 'V');
@@ -159,7 +165,7 @@ class _TreatmentConsciousnessCardState
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<TreatmentViewModel>();
-    
+
     // 每次 build 都同步控制器，確保最新資料能顯示在 UI 上
     if (viewModel.treatment != null) {
       _updateControllers(viewModel);
@@ -340,14 +346,14 @@ class _TreatmentConsciousnessCardState
   // --- UI Helpers ---
 
   Widget _buildLabel(String text) => Text(
-        text,
-        style: const TextStyle(
-          color: textMuted,
-          fontSize: 10,
-          fontWeight: FontWeight.bold,
-          letterSpacing: 0.5,
-        ),
-      );
+    text,
+    style: const TextStyle(
+      color: textMuted,
+      fontSize: 10,
+      fontWeight: FontWeight.bold,
+      letterSpacing: 0.5,
+    ),
+  );
 
   Widget _buildTextField({
     String? hint,
