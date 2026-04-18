@@ -477,70 +477,10 @@ class _ReferralFormState extends State<ReferralForm> {
             Expanded(
               child: _buildFieldWrapper(
                 '診治醫師姓名 Doctor Name',
-                Row(
-                  children: [
-                    Expanded(
-                      child: _buildTextField(
-                        hint: '醫師姓名',
-                        controller: _doctorNameController,
-                        onChanged: (v) => viewModel.updateDoctorInfo(name: v),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    GestureDetector(
-                      onTap: () async {
-                        final result =
-                            await ReferenceSearchSheet.show<MedicalStaffData>(
-                              context,
-                              title: '選擇醫師',
-                              searchFunction: (query) async {
-                                final staff = viewModel
-                                    .refService
-                                    .medicalStaffList
-                                    .where(
-                                      (s) =>
-                                          s.role == 'DOCTOR' ||
-                                          s.role == 'PHYSICIAN',
-                                    )
-                                    .toList();
-                                if (query.isEmpty) return staff;
-                                return staff
-                                    .where((s) => s.name.contains(query))
-                                    .toList();
-                              },
-                              itemBuilder: (context, item, isSelected) {
-                                return ListTile(
-                                  title: Text(item.name),
-                                  subtitle: Text(item.department ?? ''),
-                                );
-                              },
-                            );
-
-                        if (result != null) {
-                          await viewModel.updateDoctorFromStaff(result);
-                          if (mounted) {
-                            _doctorNameController.text = result.name;
-                            _doctorDepartmentController.text =
-                                result.department ?? '';
-                          }
-                        }
-                      },
-                      child: Container(
-                        width: 44,
-                        height: 44,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: borderColor),
-                        ),
-                        child: const Icon(
-                          Icons.search,
-                          color: primaryColor,
-                          size: 20,
-                        ),
-                      ),
-                    ),
-                  ],
+                _buildTextField(
+                  hint: '醫師姓名',
+                  controller: _doctorNameController,
+                  onChanged: (v) => viewModel.updateDoctorInfo(name: v),
                 ),
               ),
             ),
