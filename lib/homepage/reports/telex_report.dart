@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
@@ -126,6 +127,10 @@ Future<Uint8List> buildTelexPdf(TelexReportData d) async {
   final font = await PdfGoogleFonts.notoSansTCRegular();
   final fontB = await PdfGoogleFonts.notoSansTCBold();
 
+  final logoBytes = (await rootBundle.load('assets/images/landseed_logo.png'))
+      .buffer
+      .asUint8List();
+
   pdf.addPage(
     pw.Page(
       pageFormat: PdfPageFormat.a4,
@@ -137,7 +142,7 @@ Future<Uint8List> buildTelexPdf(TelexReportData d) async {
         crossAxisAlignment: pw.CrossAxisAlignment.start,
         children: [
           // ── Header ──────────────────────────────────────────────────────
-          _buildHeader(font, fontB),
+          _buildHeader(font, fontB, logoBytes),
           pw.SizedBox(height: _spacerMd),
           pw.Divider(thickness: 0.8, color: _primaryColor),
           pw.SizedBox(height: _spacerMd),
@@ -222,29 +227,17 @@ Future<Uint8List> buildTelexPdf(TelexReportData d) async {
 // Section Builders
 // ============================================================================
 
-pw.Widget _buildHeader(pw.Font font, pw.Font fontB) {
+pw.Widget _buildHeader(pw.Font font, pw.Font fontB, Uint8List? logoBytes) {
   return pw.Row(
     crossAxisAlignment: pw.CrossAxisAlignment.center,
     children: [
-      // Logo circle
-      pw.Container(
-        width: 12 * PdfPageFormat.mm,
-        height: 12 * PdfPageFormat.mm,
-        decoration: pw.BoxDecoration(
-          color: _primaryColor,
-          shape: pw.BoxShape.circle,
+      if (logoBytes != null)
+        pw.Image(
+          pw.MemoryImage(logoBytes),
+          width: 18 * PdfPageFormat.mm,
+          height: 18 * PdfPageFormat.mm,
+          fit: pw.BoxFit.contain,
         ),
-        child: pw.Center(
-          child: pw.Text(
-            '❖',
-            style: pw.TextStyle(
-              font: font,
-              fontSize: 14,
-              color: PdfColors.white,
-            ),
-          ),
-        ),
-      ),
       pw.SizedBox(width: 8),
       pw.Column(
         crossAxisAlignment: pw.CrossAxisAlignment.start,
