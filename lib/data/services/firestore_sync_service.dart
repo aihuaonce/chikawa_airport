@@ -78,6 +78,7 @@ class FirestoreSyncService {
       _uploadMedicalMedia(),
       _uploadMedicalAssessments(),
       _uploadHealthAssessments(),
+      _uploadChiefComplaintSymptomLinks(),
       _syncReferenceTables(),
     ]);
     debugPrint('FirestoreSyncService: Upload to remote completed');
@@ -106,6 +107,7 @@ class FirestoreSyncService {
       _downloadMedicalMedia(),
       _downloadMedicalAssessments(),
       _downloadHealthAssessments(),
+      _downloadChiefComplaintSymptomLinks(),
     ]);
     debugPrint('FirestoreSyncService: Download from remote completed');
   }
@@ -805,6 +807,85 @@ class FirestoreSyncService {
       }
     }
     debugPrint('Uploaded ${records.length} chief_complaints');
+  }
+
+  /// 上傳主訴症狀關聯
+  Future<void> _uploadChiefComplaintSymptomLinks() async {
+    // 找出所有有主訴記錄且 syncStatus=1 的 medicalId
+    final complaints = await (_db.select(
+      _db.chiefComplaint,
+    )..where((t) => t.syncStatus.equals(1))).get();
+
+    for (final complaint in complaints) {
+      try {
+        // 取得該主訴的所有症狀關聯
+        final symptomLinks = await (_db.select(
+          _db.chiefComplaintSymptomLinks,
+        )..where((l) => l.complaintId.equals(complaint.complaintId))).get();
+
+        if (symptomLinks.isEmpty) continue;
+
+        // 將每個症狀關聯上傳到 Firestore
+        for (final link in symptomLinks) {
+          final docId = '${complaint.complaintId}_${link.symptomId}';
+          await _firebase.setDocument('chief_complaint_symptom_links', docId, {
+            'complaintId': complaint.complaintId,
+            'symptomId': link.symptomId,
+            'createdAt': DateTime.now().toIso8601String(),
+          });
+        }
+        debugPrint(
+          'Uploaded ${symptomLinks.length} symptom links for complaint ${complaint.complaintId}',
+        );
+      } catch (e) {
+        debugPrint(
+          'Error uploading symptom links for complaint ${complaint.complaintId}: $e',
+        );
+      }
+    }
+  }
+
+  /// 從 Firestore 下載主訴症狀關聯
+  Future<void> _downloadChiefComplaintSymptomLinks() async {
+    try {
+      final snapshot = await _firebase.getCollectionSnapshot(
+        'chief_complaint_symptom_links',
+      );
+
+      for (final doc in snapshot.docs) {
+        final data = doc.data();
+        final complaintId = data['complaintId'] as int?;
+        final symptomId = data['symptomId'] as int?;
+
+        if (complaintId == null || symptomId == null) continue;
+
+        // 檢查本地是否已有這個關聯
+        final existing =
+            await (_db.select(_db.chiefComplaintSymptomLinks)..where(
+                  (l) =>
+                      l.complaintId.equals(complaintId) &
+                      l.symptomId.equals(symptomId),
+                ))
+                .getSingleOrNull();
+
+        if (existing != null) continue;
+
+        // 插入新的關聯
+        await _db
+            .into(_db.chiefComplaintSymptomLinks)
+            .insert(
+              ChiefComplaintSymptomLinksCompanion.insert(
+                complaintId: complaintId,
+                symptomId: symptomId,
+              ),
+            );
+        debugPrint(
+          'Downloaded symptom link: complaint=$complaintId, symptom=$symptomId',
+        );
+      }
+    } catch (e) {
+      debugPrint('Error downloading chief_complaint_symptom_links: $e');
+    }
   }
 
   /// 上傳病史記錄
