@@ -153,8 +153,12 @@ class HealthAssessmentForm extends Table {
   IntColumn get medicalId => integer().references(MedicalRecord, #medicalId)();
   TextColumn get name => text()();
   TextColumn get relation => text().nullable()(); // 關係
-  RealColumn get temperature => real()(); // 體溫
+  RealColumn get temperature => real().nullable()(); // 體溫（可为空）
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+
+  IntColumn get syncStatus => integer().withDefault(const Constant(0))();
+  TextColumn get remoteId => text().nullable()();
+  DateTimeColumn get lastModified => dateTime().nullable()();
 }
 
 //處置-主訴表
@@ -187,6 +191,10 @@ class MedicalMedia extends Table {
   TextColumn get base64Data => text()(); // base64 編碼的影像資料
   TextColumn get description => text().nullable()(); // 影像說明
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+
+  IntColumn get syncStatus => integer().withDefault(const Constant(0))();
+  TextColumn get remoteId => text().nullable()();
+  DateTimeColumn get lastModified => dateTime().nullable()();
 }
 
 //處置-醫療評估表

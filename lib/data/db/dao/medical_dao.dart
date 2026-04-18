@@ -183,6 +183,7 @@ class MedicalDao extends DatabaseAccessor<AppDatabase> with _$MedicalDaoMixin {
             screeningMethod: Value(
               screeningMethod?.isEmpty ?? true ? null : screeningMethod,
             ),
+            syncStatus: const Value(1), // 觸發 Firestore 同步
           ),
         )
         .then((count) => count > 0);

@@ -174,6 +174,9 @@ class TreatmentViewModel extends ChangeNotifier {
     // 載入特別註記
     _specialNotes = await db.treatmentDao.getSpecialNotes(medicalId);
 
+    // 載入多對多關聯資料（症狀、處置項目、特別註記）
+    await _loadMultiSelectData();
+
     // 載入轉診單/切結書
     _referralForm = await db.referralFormDao.getFormByMedicalId(medicalId);
     if (_referralForm == null) {
@@ -215,7 +218,8 @@ class TreatmentViewModel extends ChangeNotifier {
           medicalId: medicalId,
           name: name,
           relation: Value(relation),
-          temperature: temperature ?? 0.0,
+          temperature: Value(temperature),
+          syncStatus: const Value(1), // 待同步
         ),
       );
       await _reloadHealthAssessments();
@@ -239,7 +243,7 @@ class TreatmentViewModel extends ChangeNotifier {
     required int assessmentFormId,
     required String name,
     required String relation,
-    required double temperature,
+    double? temperature,
   }) async {
     // 1. Optimistic Update (更新本地快取，但不通知 UI 以避免重建)
     final index = _healthAssessments.indexWhere(
@@ -249,7 +253,7 @@ class TreatmentViewModel extends ChangeNotifier {
       _healthAssessments[index] = _healthAssessments[index].copyWith(
         name: name,
         relation: Value(relation),
-        temperature: temperature,
+        temperature: Value(temperature),
       );
     }
 
@@ -269,6 +273,7 @@ class TreatmentViewModel extends ChangeNotifier {
               name: Value(name),
               relation: Value(relation),
               temperature: Value(temperature),
+              syncStatus: const Value(1), // 觸發 Firestore 同步
             ),
           );
           debugPrint('系統:更新健康評估表成功 (Debounced)');
@@ -432,6 +437,7 @@ class TreatmentViewModel extends ChangeNotifier {
           onsetTime: Value(onsetTime),
           reportedBy: Value(reportedBy),
           isConfirmed: Value(isConfirmed ?? false),
+          syncStatus: const Value(1), // 待同步
         ),
       );
       _chiefComplaint = await db.treatmentDao.getChiefComplaint(medicalId);
@@ -458,6 +464,7 @@ class TreatmentViewModel extends ChangeNotifier {
           mediaType: mediaType,
           base64Data: base64Data,
           description: Value(description),
+          syncStatus: const Value(1), // 待同步
         ),
       );
       await _reloadMedicalMedia();
@@ -1415,6 +1422,7 @@ class TreatmentViewModel extends ChangeNotifier {
             medicalId: medicalId,
             selectedNotes: Value(selectedNotes),
             otherNotes: Value(otherNotes),
+            syncStatus: const Value(1), // 待同步
           ),
         );
       } else {
@@ -1820,7 +1828,10 @@ class TreatmentViewModel extends ChangeNotifier {
       // 確保 SpecialNotes 記錄存在
       if (_specialNotes == null) {
         await db.treatmentDao.insertSpecialNotes(
-          SpecialNotesCompanion.insert(medicalId: medicalId),
+          SpecialNotesCompanion.insert(
+            medicalId: medicalId,
+            syncStatus: const Value(1), // 待同步
+          ),
         );
         _specialNotes = await db.treatmentDao.getSpecialNotes(medicalId);
       }
@@ -1830,6 +1841,14 @@ class TreatmentViewModel extends ChangeNotifier {
           _specialNotes!.noteId,
           noteRefId,
         );
+        // 更新 syncStatus 觸發上傳
+        await db.treatmentDao.updateSpecialNotes(
+          SpecialNotesCompanion(
+            noteId: Value(_specialNotes!.noteId),
+            syncStatus: const Value(1),
+          ),
+        );
+        _specialNotes = await db.treatmentDao.getSpecialNotes(medicalId);
         await _reloadSpecialNoteIds();
         debugPrint('系統:特別註記選擇已切換 ID=$noteRefId');
       }

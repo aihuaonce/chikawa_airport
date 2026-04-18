@@ -32,7 +32,7 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
   static const Color bgField = Color(0xFFF9FBFC);
 
   // --- 狀態控制與標記 ---
-  bool _isInitialized = false;
+  bool _isInitialized = false; // 控制是否同步 controller（避免覆蓋用戶輸入）
   bool _cdcPassed = false;
   String _screeningMethod = '';
   bool _photoTrauma = false, _photoEcg = false, _photoOther = false;
@@ -150,10 +150,22 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
     super.dispose();
   }
 
+  @override
+  void didUpdateWidget(covariant TreatmentRecord oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // 當 medicalId 變化時（例如切換病患），重置初始化狀態
+    if (oldWidget.medicalId != widget.medicalId) {
+      _isInitialized = false;
+    }
+  }
+
   // --- 核心邏輯：ViewModel 同步 ---
   void _updateControllers(TreatmentViewModel viewModel) {
-    // 每次 build 都同步 Controller，確保最新資料能顯示在 UI 上
-    // 不再使用 _isInitialized 來阻止更新
+    // 只在首次初始化時從 ViewModel 同步資料到 Controller
+    // 避免覆蓋用戶正在輸入的內容
+
+    if (_isInitialized) return; // 已經初始化過，跳過同步
+    _isInitialized = true; // 標記為已初始化
 
     final medicalRecord = viewModel.medicalRecord;
     if (medicalRecord != null) {
@@ -244,10 +256,29 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
   Widget build(BuildContext context) {
     final viewModel = context.watch<TreatmentViewModel>();
     final treatment = viewModel.treatment;
+    final medicalRecord = viewModel.medicalRecord;
+
+    // 從 ViewModel 同步 CDC 狀態（每次 rebuild 都同步，確保不丟失）
+    if (medicalRecord != null) {
+      _cdcPassed = medicalRecord.cdcPassed ?? false;
+      _screeningMethod = medicalRecord.screeningMethod ?? '';
+    }
 
     // 使用 debounce 避免每次 rebuild 都同步控制器
     if (treatment != null) {
       _scheduleControllerSync(viewModel);
+    }
+
+    // 如果有從遠端同步回來的影像資料，自動勾選對應的 checkbox
+    if (treatment != null && !_isInitialized) {
+      final hasTrauma = viewModel.getMediaByType('trauma').isNotEmpty;
+      final hasEcg = viewModel.getMediaByType('ecg').isNotEmpty;
+      final hasOther = viewModel.getMediaByType('other').isNotEmpty;
+      if (hasTrauma || hasEcg || hasOther) {
+        _photoTrauma = hasTrauma;
+        _photoEcg = hasEcg;
+        _photoOther = hasOther;
+      }
     }
 
     if (treatment == null) {
@@ -369,15 +400,16 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
           label: '疾病管制署篩檢項目 Passed',
           value: _cdcPassed,
           onChanged: (v) async {
-            setState(() => _cdcPassed = v!);
+            final newValue = v ?? false;
+            setState(() => _cdcPassed = newValue);
             // 取消勾選時清除篩檢方式資料
-            if (!_cdcPassed) {
+            if (!newValue) {
               _screeningMethod = '';
             }
             // 保存到資料庫
             await viewModel.updateCDCStatus(
-              cdcPassed: v!,
-              screeningMethod: _cdcPassed ? _screeningMethod : '',
+              cdcPassed: newValue,
+              screeningMethod: newValue ? _screeningMethod : '',
             );
           },
         ),
@@ -3051,9 +3083,10 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
                   controller: controllers['name'],
                   onChanged: (val) async {
                     // 保存到資料庫
-                    final temp =
-                        double.tryParse(controllers['temp']?.text ?? '0') ??
-                        0.0;
+                    final tempStr = controllers['temp']?.text.trim() ?? '';
+                    final temp = tempStr.isEmpty
+                        ? null
+                        : double.tryParse(tempStr);
                     await viewModel.updateHealthAssessment(
                       assessmentFormId: assessment.assessmentFormId,
                       name: val,
@@ -3070,9 +3103,10 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
                   controller: controllers['relation'],
                   onChanged: (val) async {
                     // 保存到資料庫
-                    final temp =
-                        double.tryParse(controllers['temp']?.text ?? '0') ??
-                        0.0;
+                    final tempStr = controllers['temp']?.text.trim() ?? '';
+                    final temp = tempStr.isEmpty
+                        ? null
+                        : double.tryParse(tempStr);
                     await viewModel.updateHealthAssessment(
                       assessmentFormId: assessment.assessmentFormId,
                       name: controllers['name']?.text ?? '',
@@ -3090,7 +3124,10 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
                   controller: controllers['temp'],
                   onChanged: (val) async {
                     // 保存到資料庫
-                    final temp = double.tryParse(val) ?? 0.0;
+                    final tempStr = val.trim();
+                    final temp = tempStr.isEmpty
+                        ? null
+                        : double.tryParse(tempStr);
                     await viewModel.updateHealthAssessment(
                       assessmentFormId: assessment.assessmentFormId,
                       name: controllers['name']?.text ?? '',
