@@ -19,7 +19,6 @@ class HeaderBar extends StatefulWidget {
 }
 
 class _HeaderBarState extends State<HeaderBar> {
-  String _selectedLang = 'EN';
   late final TextEditingController _searchController;
 
   static const Color primaryColor = Color(0xFF007A8A);
@@ -127,8 +126,6 @@ class _HeaderBarState extends State<HeaderBar> {
             ),
           ),
           const SizedBox(width: 24),
-          _buildSlidingLangSelector(),
-          const SizedBox(width: 16),
           OutlinedButton.icon(
             onPressed: () {
               Navigator.push(
@@ -199,68 +196,6 @@ class _HeaderBarState extends State<HeaderBar> {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildSlidingLangSelector() {
-    return Container(
-      width: 100,
-      height: 36,
-      padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF1F5F9),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Stack(
-        children: [
-          AnimatedAlign(
-            duration: const Duration(milliseconds: 250),
-            curve: Curves.easeInOut,
-            alignment: _selectedLang == 'EN'
-                ? Alignment.centerLeft
-                : Alignment.centerRight,
-            child: Container(
-              width: 44,
-              height: 28,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(6),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.05),
-                    blurRadius: 2,
-                    offset: const Offset(0, 1),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          Row(
-            children: [
-              Expanded(child: _buildLangText('EN')),
-              Expanded(child: _buildLangText('CH')),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildLangText(String lang) {
-    final isActive = _selectedLang == lang;
-    return GestureDetector(
-      onTap: () => setState(() => _selectedLang = lang),
-      behavior: HitTestBehavior.opaque,
-      child: Center(
-        child: Text(
-          lang,
-          style: TextStyle(
-            fontSize: 11,
-            fontWeight: FontWeight.bold,
-            color: isActive ? textDark : textMuted,
-          ),
-        ),
       ),
     );
   }
