@@ -1,5 +1,7 @@
 import 'dart:typed_data';
 
+import 'dart:typed_data';
+
 import 'package:drift/drift.dart' show Variable;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -7,6 +9,7 @@ import 'package:provider/provider.dart';
 import '../../data/db/database.dart';
 import '../../data/models/reference_service.dart';
 import '../../data/models/sync_service_provider.dart';
+import '../../medical/widgets/signature_field.dart';
 
 class ReferenceSettingsPage extends StatefulWidget {
   const ReferenceSettingsPage({super.key});
@@ -112,14 +115,12 @@ class _ReferenceSettingsPageState extends State<ReferenceSettingsPage> {
           (c) =>
               !c.isPrimaryKey &&
               !excluded.contains(c.name) &&
-              !_isBlobColumn(c),
+              // Exclude blob columns EXCEPT 'signature' which should be editable
+              !((c.type.toUpperCase().contains('BLOB') ||
+                c.type.toUpperCase().contains('BYTEA')) &&
+               c.name != 'signature'),
         )
         .toList();
-  }
-
-  bool _isBlobColumn(_TableColumnSchema column) {
-    final type = column.type.toUpperCase();
-    return type.contains('BLOB') || type.contains('BYTEA');
   }
 
   Future<void> _loadSelectedTable() async {
@@ -917,6 +918,7 @@ class _ReferenceOptionDialogState extends State<_ReferenceOptionDialog> {
   final _formKey = GlobalKey<FormState>();
   final Map<String, TextEditingController> _controllers = {};
   final Map<String, bool> _boolValues = {};
+  final Map<String, Uint8List?> _signatureValues = {};
 
   @override
   void initState() {
@@ -932,6 +934,18 @@ class _ReferenceOptionDialogState extends State<_ReferenceOptionDialog> {
         _boolValues[column.name] = widget.initialValues.containsKey(column.name)
             ? boolValue
             : column.name == 'is_active';
+      } else if (_isSignatureColumn(column)) {
+        if (initialValue is Uint8List) {
+          _signatureValues[column.name] = initialValue;
+        } else if (initialValue != null) {
+          try {
+            _signatureValues[column.name] = Uint8List.fromList(
+              List<int>.from(initialValue),
+            );
+          } catch (_) {
+            _signatureValues[column.name] = null;
+          }
+        }
       } else {
         _controllers[column.name] = TextEditingController(
           text: initialValue?.toString() ?? '',
@@ -951,6 +965,11 @@ class _ReferenceOptionDialogState extends State<_ReferenceOptionDialog> {
   bool _isBoolColumn(_TableColumnSchema column) {
     final type = column.type.toUpperCase();
     return type.contains('BOOL') || column.name.startsWith('is_');
+  }
+
+  bool _isSignatureColumn(_TableColumnSchema column) {
+    final type = column.type.toUpperCase();
+    return type.contains('BLOB') || type.contains('BYTEA');
   }
 
   bool _isIntColumn(_TableColumnSchema column) {
@@ -1010,6 +1029,14 @@ class _ReferenceOptionDialogState extends State<_ReferenceOptionDialog> {
         continue;
       }
 
+      if (_isSignatureColumn(column)) {
+        final signatureData = _signatureValues[column.name];
+        if (signatureData != null) {
+          payload[column.name] = signatureData;
+        }
+        continue;
+      }
+
       payload[column.name] = raw;
     }
 
@@ -1018,6 +1045,39 @@ class _ReferenceOptionDialogState extends State<_ReferenceOptionDialog> {
 
   Widget _buildField(_TableColumnSchema column) {
     final required = !column.isNullable && !column.hasDefaultValue;
+
+    // Check if this is a signature column (blob type named 'signature')
+    if (_isSignatureColumn(column) && column.name == 'signature') {
+      return Container(
+        margin: const EdgeInsets.only(bottom: 10),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              _label(column.name),
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                color: _textMuted,
+              ),
+            ),
+            const SizedBox(height: 6),
+            SignatureField(
+              value: _signatureValues[column.name],
+              placeholder: '點擊簽名 Click to Sign',
+              height: 100,
+              onChanged: (data) {
+                setState(() {
+                  _signatureValues[column.name] = data;
+                });
+              },
+              backgroundColor: _cardBg,
+              borderColor: _borderColor,
+            ),
+          ],
+        ),
+      );
+    }
 
     if (_isBoolColumn(column)) {
       return Container(
