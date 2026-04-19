@@ -942,9 +942,9 @@ class _EmergencyTreatmentRecordState extends State<EmergencyTreatmentRecord> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (context) {
+      builder: (sheetContext) {
         return StatefulBuilder(
-          builder: (context, setModalState) {
+          builder: (stateContext, setModalState) {
             return Container(
               padding: EdgeInsets.fromLTRB(
                 24,
@@ -1040,7 +1040,11 @@ class _EmergencyTreatmentRecordState extends State<EmergencyTreatmentRecord> {
                         TextButton.icon(
                           onPressed: () {
                             // 開啟藥物搜尋對話框
-                            _showDrugSearchDialog(setModalState, tempOtherMeds);
+                            _showDrugSearchDialog(
+                              sheetContext,
+                              setModalState,
+                              tempOtherMeds,
+                            );
                           },
                           icon: const Icon(Icons.add, size: 16),
                           label: const Text('搜尋並新增藥物'),
@@ -1083,9 +1087,10 @@ class _EmergencyTreatmentRecordState extends State<EmergencyTreatmentRecord> {
                               ),
                               const SizedBox(width: 12),
                               Expanded(
-                                flex: 3,
-                                child: Text(
-                                  e.value['name'] ?? '',
+                                flex: 2,
+                                child: TextFormField(
+                                  key: ValueKey(e.value['name']),
+                                  initialValue: e.value['dose'] ?? '',
                                   style: TextStyle(
                                     fontSize: 13,
                                     fontWeight: FontWeight.w500,
@@ -1095,10 +1100,9 @@ class _EmergencyTreatmentRecordState extends State<EmergencyTreatmentRecord> {
                               const SizedBox(width: 12),
                               Expanded(
                                 flex: 2,
-                                child: TextField(
-                                  controller: TextEditingController(
-                                    text: e.value['dose'] ?? '',
-                                  ),
+                                child: TextFormField(
+                                  key: ValueKey('${e.value['name']}_${e.key}'),
+                                  initialValue: e.value['dose'] ?? '',
                                   style: TextStyle(fontSize: 13),
                                   decoration: InputDecoration(
                                     hintText: '劑量',
@@ -1208,6 +1212,7 @@ class _EmergencyTreatmentRecordState extends State<EmergencyTreatmentRecord> {
 
   // 藥物搜尋對話框
   void _showDrugSearchDialog(
+    BuildContext sheetContext,
     StateSetter outerSetModalState,
     List<Map<String, dynamic>> outerTempOtherMeds,
   ) {
@@ -1218,7 +1223,7 @@ class _EmergencyTreatmentRecordState extends State<EmergencyTreatmentRecord> {
     final drugList = outerTempOtherMeds;
 
     showDialog(
-      context: context,
+      context: sheetContext,
       builder: (dialogContext) {
         return StatefulBuilder(
           builder: (dialogContext, setDialogState) {
@@ -1332,17 +1337,11 @@ class _EmergencyTreatmentRecordState extends State<EmergencyTreatmentRecord> {
                           ),
                         ),
                         onChanged: (val) {
-                          if (val.isNotEmpty) {
-                            _performDrugSearchInDialog(val, searchResults, (r) {
-                              setDialogState(() {
-                                searchResults = r;
-                              });
-                            });
-                          } else {
+                          _performDrugSearchInDialog(val, searchResults, (r) {
                             setDialogState(() {
-                              searchResults = [];
+                              searchResults = r;
                             });
-                          }
+                          });
                         },
                       ),
                     ),

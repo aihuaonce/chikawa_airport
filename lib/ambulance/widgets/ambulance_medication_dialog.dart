@@ -30,15 +30,19 @@ class _AmbulanceMedicationDialogState extends State<AmbulanceMedicationDialog> {
   late TextEditingController _doseController;
   late TextEditingController _emtNameController;
 
-  // Drug search
+  // Drug search - 使用同一个 controller
   final TextEditingController _searchController = TextEditingController();
   List<DrugRefData> _drugResults = [];
   bool _isSearching = false;
+  bool _showDropdown = false;  // 控制下拉选单显示
   Timer? _debounceTimer;
 
   @override
   void initState() {
     super.initState();
+    // 监听 _searchController 的变化
+    _searchController.addListener(_onSearchChanged);
+    
     _timeController = TextEditingController(
       text: widget.initialData?.time ??
           DateFormat('HH:mm:ss').format(DateTime.now()),
@@ -55,9 +59,6 @@ class _AmbulanceMedicationDialogState extends State<AmbulanceMedicationDialog> {
     _emtNameController = TextEditingController(
       text: widget.initialData?.emtName ?? '',
     );
-
-    // Initialize drug search (empty initially - no results shown)
-    _searchController.addListener(_onSearchChanged);
   }
 
   void _onSearchChanged() {
@@ -102,12 +103,14 @@ class _AmbulanceMedicationDialogState extends State<AmbulanceMedicationDialog> {
     }
   }
 
-  void _selectDrug(DrugRefData drug) {
+  void _selectDrug(DrugRefData drug, [StateSetter? setDropdownState]) {
     setState(() {
       _drugNameController.text = drug.name;
       _searchController.clear();
       _drugResults.clear();
+      _showDropdown = false;  // 隐藏下拉选单
     });
+    setDropdownState?.call(() {});
   }
 
   @override
@@ -273,10 +276,13 @@ class _AmbulanceMedicationDialogState extends State<AmbulanceMedicationDialog> {
                                           ? IconButton(
                                               icon: Icon(Icons.clear, color: Color(0xFF94A3B8)),
                                               onPressed: () {
-                                                _drugNameController.clear();
-                                                setDropdownState(() {
+                                                setState(() {
+                                                  _drugNameController.clear();
+                                                  _searchController.clear();
                                                   _drugResults.clear();
+                                                  _showDropdown = false;
                                                 });
+                                                setDropdownState(() {});
                                               },
                                             )
                                           : null,
@@ -300,24 +306,40 @@ class _AmbulanceMedicationDialogState extends State<AmbulanceMedicationDialog> {
                                       ),
                                     ),
                                     onTap: () {
-                                      // Show all drugs when focusing on the field
-                                      if (_drugResults.isEmpty) {
-                                        _performDrugSearch('');
+                                      // 点击搜索框时：
+                                      // 1. 如果输入框为空，显示选单
+                                      // 2. 如果输入框有内容，清空并显示选单
+                                      final isEmpty = _drugNameController.text.isEmpty;
+                                      if (isEmpty) {
+                                        // 输入框为空，点击显示选单
+                                        setState(() {
+                                          _showDropdown = true;
+                                          _drugResults = context.read<ReferenceService>().drugList;
+                                        });
+                                      } else {
+                                        // 输入框有内容，清空并显示选单
+                                        setState(() {
+                                          _drugNameController.clear();
+                                          _showDropdown = true;
+                                          _drugResults = context.read<ReferenceService>().drugList;
+                                        });
                                       }
+                                      setDropdownState(() {});  // 触发 StatefulBuilder 重建
                                     },
                                     onChanged: (val) {
                                       setDropdownState(() {});
                                       if (val.isNotEmpty) {
+                                        // 输入文字时：搜索并显示选单
                                         _performDrugSearch(val);
+                                        setState(() => _showDropdown = true);
                                       } else {
-                                        setDropdownState(() {
-                                          _drugResults.clear();
-                                        });
+                                        // 清空时：隐藏选单
+                                        setState(() => _showDropdown = false);
                                       }
                                     },
                                   ),
-                                  // Dropdown results (only show when user typed something)
-                                  if (_drugNameController.text.isNotEmpty && _drugResults.isNotEmpty) ...[
+                                  // Dropdown results (显示条件：_showDropdown && 有结果)
+                                  if (_showDropdown && _drugResults.isNotEmpty) ...[
                                     SizedBox(height: 4),
                                     Container(
                                       constraints: BoxConstraints(maxHeight: 200),
