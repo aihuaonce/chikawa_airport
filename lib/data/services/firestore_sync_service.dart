@@ -122,6 +122,7 @@ class FirestoreSyncService {
       _downloadTelexDocuments(),
       _downloadContacts(),
       _downloadEmergencyTreatments(),
+      _downloadAmbulanceRecords(),
       _downloadFirstAidLogs(),
       _downloadEmergencyAssistStaff(),
       // 新增下載
@@ -2316,32 +2317,41 @@ class FirestoreSyncService {
         final ambulanceId = data['ambulanceId'];
         if (ambulanceId == null) continue;
 
-        final existing =
-            await (_db.select(_db.ambulanceRecords)
-                  ..where((t) => t.ambulanceId.equals(ambulanceId as int)))
-                .getSingleOrNull();
-
-        if (existing != null) continue;
-
-        final dispatchTimeStr = data['dispatchTime'] as String?;
-        DateTime? dispatchTime;
-        if (dispatchTimeStr != null) {
-          dispatchTime = DateTime.tryParse(dispatchTimeStr);
-        }
-
-        await _db
-            .into(_db.ambulanceRecords)
-            .insert(
-              AmbulanceRecordsCompanion.insert(
+        await _db.into(_db.ambulanceRecords).insertOnConflictUpdate(
+              AmbulanceRecordsCompanion(
+                ambulanceId: Value(ambulanceId as int),
                 medicalId: Value((data['medicalId'] as int?) ?? 0),
                 licensePlate: Value(data['licensePlate'] as String?),
-                dispatchTime: Value(dispatchTime),
+                incidentLocationId: Value(data['incidentLocationId'] as int?),
+                incidentLocation2Id: Value(data['incidentLocation2Id'] as int?),
+                locationRemarks: Value(data['locationRemarks'] as String?),
+                dispatchTime: Value(data['dispatchTime'] != null
+                    ? DateTime.tryParse(data['dispatchTime'])
+                    : null),
+                arrivalTime: Value(data['arrivalTime'] != null
+                    ? DateTime.tryParse(data['arrivalTime'])
+                    : null),
+                hospitalId: Value(data['hospitalId'] as int?),
+                transportReason: Value(data['transportReason'] as String?),
+                leavingSceneTime: Value(data['leavingSceneTime'] != null
+                    ? DateTime.tryParse(data['leavingSceneTime'])
+                    : null),
+                arrivalHospitalTime: Value(data['arrivalHospitalTime'] != null
+                    ? DateTime.tryParse(data['arrivalHospitalTime'])
+                    : null),
+                leavingHospitalTime: Value(data['leavingHospitalTime'] != null
+                    ? DateTime.tryParse(data['leavingHospitalTime'])
+                    : null),
+                returnStandbyTime: Value(data['returnStandbyTime'] != null
+                    ? DateTime.tryParse(data['returnStandbyTime'])
+                    : null),
+                bodyMapJson: Value(data['bodyMapJson'] as String?),
                 syncStatus: const Value(0),
                 remoteId: Value(doc.id),
                 lastModified: Value(DateTime.now()),
               ),
             );
-        debugPrint('Downloaded ambulance_record $ambulanceId');
+        debugPrint('Downloaded/Updated ambulance_record $ambulanceId');
       }
     } catch (e) {
       debugPrint('Error downloading ambulance_records: $e');
