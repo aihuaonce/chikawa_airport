@@ -146,6 +146,7 @@ class _MedicalPageState extends State<MedicalPage> {
         backgroundColor: bgLight,
         body: SafeArea(
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
               Consumer<MedicalViewModel>(
                 builder: (context, vm, child) => MedicalHeader(

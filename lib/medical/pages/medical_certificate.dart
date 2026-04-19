@@ -1,4 +1,5 @@
 import 'package:chikawa_airport/data/models/reference_service.dart';
+import 'package:chikawa_airport/data/models/sync_service_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -31,12 +32,15 @@ class _MedicalCertificateState extends State<MedicalCertificate> {
       TextEditingController();
   final TextEditingController _dateController = TextEditingController();
 
-  // 初始化標誌
-  bool _isInitialized = false;
+  // 用於監聽同步狀態
+  SyncServiceProvider? _syncProvider;
+  bool _syncCompleted = false;
 
   @override
   void initState() {
     super.initState();
+    // 重置同步完成標誌，每次打開頁面都可以響應同步
+    _syncCompleted = false;
   }
 
   @override
@@ -48,13 +52,11 @@ class _MedicalCertificateState extends State<MedicalCertificate> {
     super.dispose();
   }
 
-  // 同步 ViewModel 資料到 Controllers（只執行一次）
+  // 同步 ViewModel 資料到 Controllers
   void _updateControllers(
     MedicalCertificateViewModel viewModel,
     TreatmentViewModel treatmentViewModel,
   ) {
-    if (_isInitialized) return;
-
     // 檢查關鍵資料是否已載入
     if (treatmentViewModel.treatment == null) {
       return;
@@ -75,14 +77,13 @@ class _MedicalCertificateState extends State<MedicalCertificate> {
       _chineseAdviceController.text = certificate.chineseAdvice ?? '';
       _englishAdviceController.text = certificate.englishAdvice ?? '';
       if (certificate.issuanceDate != null) {
-        _dateController.text =
-            DateFormat('yyyy-MM-dd').format(certificate.issuanceDate!);
+        _dateController.text = DateFormat(
+          'yyyy-MM-dd',
+        ).format(certificate.issuanceDate!);
       } else {
         _dateController.text = DateFormat('yyyy-MM-dd').format(DateTime.now());
       }
     }
-
-    _isInitialized = true;
   }
 
   // 帶入囑言範本
@@ -140,7 +141,20 @@ class _MedicalCertificateState extends State<MedicalCertificate> {
     final treatmentViewModel = context.watch<TreatmentViewModel>();
     final refService = context.watch<ReferenceService>();
 
-    // 同步資料到 Controllers（只執行一次）
+    // 監聽同步服務
+    _syncProvider = context.watch<SyncServiceProvider>();
+    final lastSyncTime = _syncProvider?.lastSyncTime;
+
+    // 檢查是否同步完成需要重新整理（避免重複）
+    if (lastSyncTime != null && !_syncCompleted) {
+      _syncCompleted = true;
+      // 同步完成後重新整理資料
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        viewModel.refresh();
+      });
+    }
+
+    // 同步資料到 Controllers
     _updateControllers(viewModel, treatmentViewModel);
 
     return Column(

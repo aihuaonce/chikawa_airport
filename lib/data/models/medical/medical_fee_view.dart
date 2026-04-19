@@ -83,6 +83,16 @@ class MedicalFeeViewModel extends ChangeNotifier {
     }
   }
 
+  // 從遠端刷新資料
+  Future<void> refreshFromRemote() async {
+    debugPrint('MedicalFeeViewModel: refreshFromRemote() called');
+    _feeCache = await db.medicalFeeDao.getFeeByMedicalId(medicalId);
+    notifyListeners();
+    debugPrint(
+      'MedicalFeeViewModel: refreshFromRemote() done, fee: $_feeCache',
+    );
+  }
+
   // 更新付款方式
   void updatePaymentMethod(int? methodId) {
     if (_feeCache == null) return;

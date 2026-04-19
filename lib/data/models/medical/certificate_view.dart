@@ -38,6 +38,12 @@ class MedicalCertificateViewModel extends ChangeNotifier {
   // 初始化
   Future<void> init() async {
     // 載入證明書資料
+    await _loadCertificate();
+    notifyListeners();
+  }
+
+  // 載入診斷證明書
+  Future<void> _loadCertificate() async {
     _certificateCache = await db.certificateDao.getCertificateByMedicalId(
       medicalId,
     );
@@ -50,8 +56,13 @@ class MedicalCertificateViewModel extends ChangeNotifier {
         medicalId,
       );
     }
+  }
 
+  // 重新整理（同步後呼叫）
+  Future<void> refresh() async {
+    await _loadCertificate();
     notifyListeners();
+    debugPrint('系統：診斷證明書已重新整理');
   }
 
   // 建立預設診斷證明書
@@ -132,7 +143,7 @@ class MedicalCertificateViewModel extends ChangeNotifier {
       _saveStatus = SaveStatus.success;
       debugPrint('系統：診斷證明書已儲存');
       notifyListeners();
-      
+
       Future.delayed(const Duration(seconds: 2), () {
         _saveStatus = SaveStatus.idle;
         notifyListeners();

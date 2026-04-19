@@ -51,6 +51,11 @@ class ReferralFormViewModel extends ChangeNotifier {
 
   // 初始化
   Future<void> init() async {
+    await _loadForm();
+    notifyListeners();
+  }
+
+  Future<void> _loadForm() async {
     _formCache = await db.referralFormDao.getFormByMedicalId(medicalId);
 
     if (_formCache == null) {
@@ -64,8 +69,13 @@ class ReferralFormViewModel extends ChangeNotifier {
 
     // 載入病患 ID
     await _loadPatientId();
+  }
 
+  // 重新整理（同步後呼叫）
+  Future<void> refresh() async {
+    await _loadForm();
     notifyListeners();
+    debugPrint('系統：轉診單/切結書已重新整理');
   }
 
   Future<void> _loadPatientId() async {
@@ -725,5 +735,33 @@ class ReferralFormViewModel extends ChangeNotifier {
   void dispose() {
     _debounceTimer?.cancel();
     super.dispose();
+  }
+
+  // 清除所有資料（當「建議轉診」被取消時呼叫）
+  Future<void> clearAllData() async {
+    if (_formCache == null) return;
+
+    try {
+      await db.referralFormDao.updateReferralForm(
+        ReferralFormsCompanion(
+          formId: Value(_formCache!.formId),
+          contactName: const Value(null),
+          contactIdNo: const Value(null),
+          contactPhone: const Value(null),
+          contactAddress: const Value(null),
+          relationshipId: const Value(null),
+          otherRelationship: const Value(null),
+          consentDateTime: const Value(null),
+          consentSignature: const Value(null),
+          syncStatus: const Value(1), // 待同步
+        ),
+      );
+      // 重新載入
+      await _loadForm();
+      notifyListeners();
+      debugPrint('系統：已清除拒絕轉診切結書資料');
+    } catch (e) {
+      debugPrint('系統：清除拒絕轉診切結書資料失敗 - $e');
+    }
   }
 }

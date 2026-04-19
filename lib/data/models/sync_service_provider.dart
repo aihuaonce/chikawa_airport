@@ -12,6 +12,7 @@ class SyncServiceProvider extends ChangeNotifier with WidgetsBindingObserver {
   SyncState _state = SyncState.idle;
   String? _lastError;
   int _pendingCount = 0;
+  DateTime? _lastSyncTime;
 
   FirestoreSyncService get service => _syncService;
   bool get isInitialized => _initialized;
@@ -20,7 +21,7 @@ class SyncServiceProvider extends ChangeNotifier with WidgetsBindingObserver {
   bool get isOnline => true;
   int get pendingCount => _pendingCount;
   int get conflictCount => 0;
-  DateTime? get lastSyncTime => null;
+  DateTime? get lastSyncTime => _lastSyncTime;
   String? get lastError => _lastError;
 
   String get statusText {
@@ -181,6 +182,7 @@ class SyncServiceProvider extends ChangeNotifier with WidgetsBindingObserver {
     try {
       await _syncService.syncBidirectional();
       debugPrint('SyncServiceProvider: sync completed, setting state to idle');
+      _lastSyncTime = DateTime.now();
       _state = SyncState.idle;
       // 同步完成後更新待同步數量
       await _updatePendingCount();
@@ -204,6 +206,7 @@ class SyncServiceProvider extends ChangeNotifier with WidgetsBindingObserver {
     try {
       await _syncService.syncToRemote();
       debugPrint('SyncServiceProvider: upload completed');
+      _lastSyncTime = DateTime.now();
       _state = SyncState.idle;
       // 上傳完成後更新待同步數量
       await _updatePendingCount();
@@ -225,6 +228,7 @@ class SyncServiceProvider extends ChangeNotifier with WidgetsBindingObserver {
     try {
       await _syncService.syncFromRemote();
       debugPrint('SyncServiceProvider: download completed');
+      _lastSyncTime = DateTime.now();
       _state = SyncState.idle;
     } catch (e) {
       debugPrint('SyncServiceProvider: download failed: $e');
