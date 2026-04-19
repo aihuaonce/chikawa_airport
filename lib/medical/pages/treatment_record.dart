@@ -23,7 +23,8 @@ class TreatmentRecord extends StatefulWidget {
   State<TreatmentRecord> createState() => _TreatmentRecordState();
 }
 
-class _TreatmentRecordState extends State<TreatmentRecord> {
+class _TreatmentRecordState extends State<TreatmentRecord>
+    with WidgetsBindingObserver {
   // --- 樣式定義 ---
   static const Color primaryColor = Color(0xFF007A8A);
   static const Color textDark = Color(0xFF1E293B);
@@ -96,7 +97,25 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
   @override
   void initState() {
     super.initState();
+    // 監聽 app 恢復到前台，刷新勾選狀態
+    WidgetsBinding.instance.addObserver(this);
     // 初始化所有控制器
+    _initControllers();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // 每次進入頁面時檢查是否需要刷新勾選狀態
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        final viewModel = context.read<TreatmentViewModel>();
+        viewModel.refreshFromRemote();
+      }
+    });
+  }
+
+  void _initControllers() {
     _otherSymptomController = TextEditingController();
     _supplementaryNotesController = TextEditingController();
     _pastHistoryDetailController = TextEditingController();
@@ -123,6 +142,8 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
 
   @override
   void dispose() {
+    // 移除 app 生命週期監聽
+    WidgetsBinding.instance.removeObserver(this);
     // 釋放所有控制器，避免記憶體洩漏
     _otherSymptomController.dispose();
     _supplementaryNotesController.dispose();
@@ -163,6 +184,15 @@ class _TreatmentRecordState extends State<TreatmentRecord> {
     if (oldWidget.medicalId != widget.medicalId) {
       _isInitialized = false;
       _photoInitializedFromSync = false;
+    }
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // 當 app 恢復到前台時，刷新勾選狀態（確保同步後的資料正確顯示）
+    if (state == AppLifecycleState.resumed) {
+      final viewModel = context.read<TreatmentViewModel>();
+      viewModel.refreshFromRemote();
     }
   }
 

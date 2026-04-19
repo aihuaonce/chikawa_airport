@@ -458,6 +458,8 @@ class TreatmentViewModel extends ChangeNotifier {
         ),
       );
       _chiefComplaint = await db.treatmentDao.getChiefComplaint(medicalId);
+      // 刷新症狀勾選狀態（確保 UI 同步）
+      await _reloadSymptomIds();
       notifyListeners();
       debugPrint('系統:主訴建立成功');
     } catch (e) {
@@ -1646,6 +1648,8 @@ class TreatmentViewModel extends ChangeNotifier {
             syncStatus: const Value(1), // 待同步
           ),
         );
+        // 刷新勾選狀態（確保 UI 同步）
+        await _reloadSpecialNoteIds();
       } else {
         await db.treatmentDao.updateSpecialNotes(
           SpecialNotesCompanion(
@@ -1662,6 +1666,8 @@ class TreatmentViewModel extends ChangeNotifier {
         );
       }
       _specialNotes = await db.treatmentDao.getSpecialNotes(medicalId);
+      // 刷新勾選狀態（確保 UI 同步）
+      await _reloadSpecialNoteIds();
       notifyListeners();
       debugPrint('系統:特別註記更新成功');
     } catch (e) {
@@ -2065,11 +2071,15 @@ class TreatmentViewModel extends ChangeNotifier {
         .map((item) => item.name)
         .toList();
 
+    debugPrint(
+      '系統: _syncActionSummaryToTreatment - selectedActionIds: $_selectedActionIds, names: $selectedNames',
+    );
     final actionSummaryStr = selectedNames.join(',');
 
     await db.treatmentDao.updateTreatment(
       TreatmentCompanion(
         treatmentId: Value(_treatment!.treatmentId),
+        medicalId: Value(medicalId),
         actionSummary: Value(actionSummaryStr),
         syncStatus: const Value(1),
       ),
@@ -2077,6 +2087,9 @@ class TreatmentViewModel extends ChangeNotifier {
 
     // 重新載入 treatment
     _treatment = await db.treatmentDao.getTreatment(medicalId);
+
+    // 刷新勾選狀態（確保 UI 同步）
+    await _reloadActionIds();
   }
 
   Future<void> _reloadActionIds() async {
@@ -2087,6 +2100,9 @@ class TreatmentViewModel extends ChangeNotifier {
         _treatment!.treatmentId,
       );
     }
+    debugPrint(
+      '系統: _reloadActionIds - treatmentId: ${_treatment?.treatmentId}, actionIds: $_selectedActionIds',
+    );
     notifyListeners();
   }
 
@@ -2109,20 +2125,40 @@ class TreatmentViewModel extends ChangeNotifier {
           _specialNotes!.noteId,
           noteRefId,
         );
-        // 更新 syncStatus 觸發上傳
-        await db.treatmentDao.updateSpecialNotes(
-          SpecialNotesCompanion(
-            noteId: Value(_specialNotes!.noteId),
-            syncStatus: const Value(1),
-          ),
-        );
-        _specialNotes = await db.treatmentDao.getSpecialNotes(medicalId);
-        await _reloadSpecialNoteIds();
+        // 同步 selectedNotes 欄位（供 Firestore 同步）
+        await _syncSelectedNotesToSpecialNotes();
         debugPrint('系統:特別註記選擇已切換 ID=$noteRefId');
       }
     } catch (e) {
       debugPrint('系統:特別註記選擇切換失敗 - $e');
     }
+  }
+
+  // 同步 selectedNotes 到 SpecialNotes 表（供 Firestore 同步）
+  Future<void> _syncSelectedNotesToSpecialNotes() async {
+    if (_specialNotes == null) return;
+
+    final selectedNames = specialNoteRefs
+        .where((item) => _selectedSpecialNoteIds.contains(item.id))
+        .map((item) => item.name)
+        .toList();
+
+    final selectedNotesStr = selectedNames.join(',');
+
+    await db.treatmentDao.updateSpecialNotes(
+      SpecialNotesCompanion(
+        noteId: Value(_specialNotes!.noteId),
+        medicalId: Value(medicalId),
+        selectedNotes: Value(selectedNotesStr),
+        syncStatus: const Value(1),
+      ),
+    );
+
+    // 重新載入 specialNotes
+    _specialNotes = await db.treatmentDao.getSpecialNotes(medicalId);
+
+    // 刷新勾選狀態（確保 UI 同步）
+    await _reloadSpecialNoteIds();
   }
 
   Future<void> _reloadSpecialNoteIds() async {
@@ -2162,6 +2198,79 @@ class TreatmentViewModel extends ChangeNotifier {
     await _reloadSymptomIds();
     await _reloadActionIds();
     await _reloadSpecialNoteIds();
+  }
+
+  /// 公開方法：同步後刷新所有勾選狀態
+  /// 由同步服務在下载完远程数据后调用
+  Future<void> refreshFromRemote() async {
+    // 重新載入 treatment
+    _treatment = await db.treatmentDao.getTreatment(medicalId);
+    // 刷新 specialNotes
+    _specialNotes = await db.treatmentDao.getSpecialNotes(medicalId);
+
+    // 如果 actionSummary 有值但關聯表是空的，從 actionSummary 重建關聯
+    await _syncActionLinksFromSummary();
+
+    // 如果 selectedNotes 有值但關聯表是空的，從 selectedNotes 重建關聯
+    await _syncSpecialNoteLinksFromSelected();
+
+    // 刷新所有多對多關聯資料（症狀、處置項目特別註記）
+    await _loadMultiSelectData();
+    notifyListeners();
+  }
+
+  /// 從 actionSummary 字串同步到 treatmentActionLinks
+  Future<void> _syncActionLinksFromSummary() async {
+    final actionSummary = _treatment?.actionSummary;
+    if (actionSummary == null || actionSummary.isEmpty) return;
+
+    final currentIds = await db.treatmentDao.getTreatmentActionIds(
+      _treatment!.treatmentId,
+    );
+    if (currentIds.isNotEmpty) return; // 已有關聯，不需要重建
+
+    // 解析 actionSummary 字串，找到對應的 actionItem ID
+    final names = actionSummary.split(',');
+    for (final name in names) {
+      final trimmed = name.trim();
+      if (trimmed.isEmpty) continue;
+
+      // 從 actionItems 找到 ID
+      final item = actionItems.where((a) => a.name == trimmed).firstOrNull;
+      if (item != null) {
+        await db.treatmentDao.addTreatmentAction(
+          _treatment!.treatmentId,
+          item.id,
+        );
+        debugPrint('系統: 從 actionSummary 重建關聯: $trimmed (id=${item.id})');
+      }
+    }
+  }
+
+  // 從 selectedNotes 字串同步到 specialNoteLinks
+  Future<void> _syncSpecialNoteLinksFromSelected() async {
+    final selectedNotes = _specialNotes?.selectedNotes;
+    if (selectedNotes == null || selectedNotes.isEmpty) return;
+    if (_specialNotes == null) return;
+
+    final currentIds = await db.treatmentDao.getSpecialNoteIds(
+      _specialNotes!.noteId,
+    );
+    if (currentIds.isNotEmpty) return; // 已有關聯，不需要重建
+
+    // 解析 selectedNotes 字串，找到對應的 noteRef ID
+    final names = selectedNotes.split(',');
+    for (final name in names) {
+      final trimmed = name.trim();
+      if (trimmed.isEmpty) continue;
+
+      // 從 specialNoteRefs 找到 ID
+      final item = specialNoteRefs.where((a) => a.name == trimmed).firstOrNull;
+      if (item != null) {
+        await db.treatmentDao.addSpecialNote(_specialNotes!.noteId, item.id);
+        debugPrint('系統: 從 selectedNotes 重建關聯: $trimmed (id=${item.id})');
+      }
+    }
   }
 
   // ===================================================================
