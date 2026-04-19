@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -5,6 +6,7 @@ import 'package:provider/provider.dart';
 import '../../data/models/medical/referral_form_view.dart';
 import '../../data/models/medical/treatment_view.dart';
 import '../../data/db/database.dart';
+import '../../data/models/sync_service_provider.dart';
 import '../widgets/reference_search_sheet.dart';
 import '../widgets/signature_field.dart';
 
@@ -84,6 +86,10 @@ class _ReferralFormState extends State<ReferralForm> {
 
   bool _controllersInitialized = false;
 
+  // 用於監聽同步狀態
+  SyncServiceProvider? _syncProvider;
+  DateTime? _lastSyncTime;
+
   @override
   void initState() {
     super.initState();
@@ -98,6 +104,25 @@ class _ReferralFormState extends State<ReferralForm> {
         });
       }
     });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // 監聽同步服務
+    _syncProvider = context.watch<SyncServiceProvider>();
+  }
+
+  // 同步完成後刷新資料
+  void _onSyncComplete() {
+    if (mounted) {
+      final viewModel = context.read<ReferralFormViewModel>();
+      viewModel.refresh();
+      setState(() {
+        _controllersInitialized = false;
+      });
+      debugPrint('系統：轉診單已從同步刷新');
+    }
   }
 
   @override
@@ -255,6 +280,23 @@ class _ReferralFormState extends State<ReferralForm> {
   Widget build(BuildContext context) {
     final viewModel = context.watch<ReferralFormViewModel>();
     final treatmentViewModel = context.watch<TreatmentViewModel>();
+
+    // 監聽同步服務
+    _syncProvider = context.watch<SyncServiceProvider>();
+    final currentSyncTime = _syncProvider?.lastSyncTime;
+
+    // 頁面首次載入時同步一次（為了顯示之前同步下來的資料）
+    if (!_controllersInitialized &&
+        currentSyncTime != null &&
+        _lastSyncTime != currentSyncTime) {
+      _lastSyncTime = currentSyncTime;
+      Timer(const Duration(milliseconds: 500), () {
+        if (mounted) {
+          viewModel.refresh();
+          debugPrint('系統：轉診單已刷新同步下來的資料');
+        }
+      });
+    }
 
     // 檢查是否有轉診需求 (從 treatment.actionSummary 取得，而非從 medicalRecord.hasAmbulance)
     // 因為 medicalRecord.hasAmbulance 需要儲存後才會更新

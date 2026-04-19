@@ -618,6 +618,12 @@ class FirestoreSyncService {
 
     for (final record in records) {
       try {
+        // 簽名轉為 base64
+        String? signatureBase64;
+        if (record.signature != null) {
+          signatureBase64 = base64Encode(record.signature!);
+        }
+
         await _firebase
             .setDocument('nursing_records', record.recordId.toString(), {
               'recordId': record.recordId,
@@ -625,6 +631,7 @@ class FirestoreSyncService {
               'recordTime': record.recordTime.toIso8601String(),
               'content': record.content,
               'nurseId': record.nurseId,
+              'signature': signatureBase64,
               'lastModified': FieldValue.serverTimestamp(),
             });
 
@@ -1681,6 +1688,17 @@ class FirestoreSyncService {
             ? DateTime.tryParse(recordTimeStr) ?? DateTime.now()
             : DateTime.now();
 
+        // 解碼簽名（base64 -> Uint8List）
+        Uint8List? signatureBytes;
+        final signatureBase64 = data['signature'] as String?;
+        if (signatureBase64 != null && signatureBase64.isNotEmpty) {
+          try {
+            signatureBytes = base64Decode(signatureBase64);
+          } catch (e) {
+            debugPrint('Error decoding nursing signature: $e');
+          }
+        }
+
         await _db
             .into(_db.nursingRecords)
             .insert(
@@ -1689,6 +1707,7 @@ class FirestoreSyncService {
                 recordTime: recordTime,
                 content: Value(data['content'] as String?),
                 nurseId: Value(data['nurseId'] as int?),
+                signature: Value(signatureBytes),
                 syncStatus: const Value(0),
                 remoteId: Value(doc.id),
                 lastModified: Value(DateTime.now()),
