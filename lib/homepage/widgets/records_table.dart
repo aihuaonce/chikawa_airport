@@ -128,7 +128,7 @@ class _TableHeader extends StatelessWidget {
       color: RecordsTable.headerBg,
       child: Row(
         children: [
-          _cell('日期與時間', 2, headerStyle),
+          _cell('事發日期時間', 2, headerStyle),
           _cell('病患名稱', 2, headerStyle),
           _cell('國籍', 2, headerStyle),
           _cell('事發地點', 3, headerStyle),

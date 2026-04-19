@@ -73,11 +73,13 @@ class IncidentViewModel extends ChangeNotifier {
         return;
       }
 
+      final now = DateTime.now();
       await db.incidentDao.createIncidentRecord(
         medicalId: medicalId,
-        incidentDate: DateTime.now(),
+        incidentDate: now,
         incidentPlaceCategoryId: refService.incidentPlaceCategories.first.id,
         reportingUnitId: refService.reportingUnits.first.id,
+        notificationTime: now,
         beforeLanding: false,
         occArrived: false,
       );

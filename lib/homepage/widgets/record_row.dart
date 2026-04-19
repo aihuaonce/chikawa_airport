@@ -50,8 +50,13 @@ class _RecordRowState extends State<RecordRow> {
     final medicalId = widget.data.record.medicalId;
 
     String incidentPlace = '未填寫';
+    DateTime? incidentDate;
+    DateTime? notificationTime;
     final incident = await db.incidentDao.getByMedicalId(medicalId);
     if (incident != null) {
+      incidentDate = incident.incidentDate;
+      notificationTime = incident.notificationTime;
+
       final category1Name = refService
           .getIncidentPlaceCategoryById(incident.incidentPlaceCategoryId)
           ?.name
@@ -96,7 +101,12 @@ class _RecordRowState extends State<RecordRow> {
       nurseName = nurse?.name ?? '未指派';
     }
 
-    return _RecordExtraInfo(incidentPlace: incidentPlace, nurseName: nurseName);
+    return _RecordExtraInfo(
+      incidentPlace: incidentPlace,
+      nurseName: nurseName,
+      incidentDate: incidentDate,
+      notificationTime: notificationTime,
+    );
   }
 
   int? _calculateAge(DateTime? birthday) {
@@ -181,27 +191,45 @@ class _RecordRowState extends State<RecordRow> {
             child: Row(
               children: [
                 _cell(
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        DateFormat('yyyy/MM/dd').format(record.createdAt),
-                        style: const TextStyle(
-                          color: textDark,
-                          fontWeight: FontWeight.w400,
-                          fontSize: 14,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        DateFormat('HH:mm').format(record.createdAt),
-                        style: const TextStyle(
-                          color: textDark,
-                          fontWeight: FontWeight.w400,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ],
+                  Builder(
+                    builder: (context) {
+                      final incidentDate = extra?.incidentDate;
+                      final notificationTime = extra?.notificationTime;
+                      final hasIncidentData =
+                          incidentDate != null || notificationTime != null;
+
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            hasIncidentData && incidentDate != null
+                                ? DateFormat('yyyy/MM/dd').format(incidentDate)
+                                : DateFormat('yyyy/MM/dd')
+                                    .format(record.createdAt),
+                            style: const TextStyle(
+                              color: textDark,
+                              fontWeight: FontWeight.w400,
+                              fontSize: 14,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            hasIncidentData && notificationTime != null
+                                ? DateFormat('HH:mm')
+                                    .format(notificationTime)
+                                : (hasIncidentData
+                                    ? '--:--'
+                                    : DateFormat('HH:mm')
+                                        .format(record.createdAt)),
+                            style: const TextStyle(
+                              color: textDark,
+                              fontWeight: FontWeight.w400,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      );
+                    },
                   ),
                   2,
                 ),
@@ -315,9 +343,13 @@ class _RecordRowState extends State<RecordRow> {
 class _RecordExtraInfo {
   final String incidentPlace;
   final String nurseName;
+  final DateTime? incidentDate;
+  final DateTime? notificationTime;
 
   const _RecordExtraInfo({
     required this.incidentPlace,
     required this.nurseName,
+    this.incidentDate,
+    this.notificationTime,
   });
 }

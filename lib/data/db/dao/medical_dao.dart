@@ -99,7 +99,7 @@ class MedicalDao extends DatabaseAccessor<AppDatabase> with _$MedicalDaoMixin {
 
     query
       ..limit(limit, offset: offset)
-      ..orderBy([OrderingTerm.desc(medicalRecord.createdAt)]);
+      ..orderBy([OrderingTerm.desc(medicalRecord.medicalId)]);
 
     return query.watch().map((rows) {
       return rows.map((row) {
@@ -165,7 +165,7 @@ class MedicalDao extends DatabaseAccessor<AppDatabase> with _$MedicalDaoMixin {
   Future<List<MedicalRecordData>> getRecordsPaged(int limit, int offset) {
     return (select(medicalRecord)
           ..limit(limit, offset: offset)
-          ..orderBy([(t) => OrderingTerm.desc(t.createdAt)]))
+          ..orderBy([(t) => OrderingTerm.desc(t.medicalId)]))
         .get();
   }
 
