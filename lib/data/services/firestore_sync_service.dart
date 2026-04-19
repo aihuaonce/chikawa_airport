@@ -127,6 +127,7 @@ class FirestoreSyncService {
       _downloadMedicalAssessments(),
       _downloadHealthAssessments(),
       _downloadChiefComplaintSymptomLinks(),
+      _downloadMedications(),
     ]);
     debugPrint('FirestoreSyncService: Download from remote completed');
   }
@@ -1961,12 +1962,16 @@ class FirestoreSyncService {
   Future<void> _downloadMedications() async {
     try {
       final snapshot = await _firebase.getCollectionSnapshot('medications');
+      debugPrint('下載藥物記錄: 遠端有 ${snapshot.docs.length} 筆');
 
       for (final doc in snapshot.docs) {
         final data = doc.data();
 
         final medicationId = data['medicationId'];
-        if (medicationId == null) continue;
+        final medicalId = data['medicalId'] as int?;
+        if (medicationId == null || medicalId == null) continue;
+
+        debugPrint('檢查藥物: medicationId=$medicationId, medicalId=$medicalId');
 
         final existing =
             await (_db.select(_db.medications)
@@ -1985,7 +1990,7 @@ class FirestoreSyncService {
             .into(_db.medications)
             .insert(
               MedicationsCompanion.insert(
-                medicalId: (data['medicalId'] as int?) ?? 0,
+                medicalId: medicalId,
                 name: Value(data['name'] as String?),
                 method: Value(data['method'] as String?),
                 frequency: Value(data['frequency'] as String?),

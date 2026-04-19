@@ -1681,13 +1681,19 @@ class TreatmentViewModel extends ChangeNotifier {
 
   Future<void> _reloadMedications() async {
     _medications = await db.treatmentDao.getMedications(medicalId);
+    debugPrint(
+      '系統: _reloadMedications - medicalId: $medicalId, count: ${_medications?.length ?? 0}',
+    );
     notifyListeners();
   }
 
   Future<void> addMedication() async {
     try {
       await db.treatmentDao.insertMedication(
-        MedicationsCompanion.insert(medicalId: medicalId),
+        MedicationsCompanion.insert(
+          medicalId: medicalId,
+          syncStatus: const Value(1), // 待同步
+        ),
       );
       await _reloadMedications();
       debugPrint('系統:新增藥物記錄成功');
@@ -1710,12 +1716,13 @@ class TreatmentViewModel extends ChangeNotifier {
   Future<void> saveMedication(MedicationsCompanion medication) async {
     try {
       if (medication.medicationId.present) {
-        // Update
+        // Update - 保持原有 syncStatus
         await db.treatmentDao.updateMedication(medication);
         debugPrint('系統:更新藥物記錄成功');
       } else {
-        // Insert
-        await db.treatmentDao.insertMedication(medication);
+        // Insert - 確保 syncStatus = 1
+        final dataWithSync = medication.copyWith(syncStatus: const Value(1));
+        await db.treatmentDao.insertMedication(dataWithSync);
         debugPrint('系統:新增藥物記錄成功');
       }
       await _reloadMedications();
@@ -2125,6 +2132,8 @@ class TreatmentViewModel extends ChangeNotifier {
           _specialNotes!.noteId,
           noteRefId,
         );
+        // 先刷新勾選 ID
+        await _reloadSpecialNoteIds();
         // 同步 selectedNotes 欄位（供 Firestore 同步）
         await _syncSelectedNotesToSpecialNotes();
         debugPrint('系統:特別註記選擇已切換 ID=$noteRefId');
@@ -2138,11 +2147,16 @@ class TreatmentViewModel extends ChangeNotifier {
   Future<void> _syncSelectedNotesToSpecialNotes() async {
     if (_specialNotes == null) return;
 
+    debugPrint(
+      '系統: _syncSelectedNotesToSpecialNotes - selectedIds: $_selectedSpecialNoteIds',
+    );
+
     final selectedNames = specialNoteRefs
         .where((item) => _selectedSpecialNoteIds.contains(item.id))
         .map((item) => item.name)
         .toList();
 
+    debugPrint('系統: _syncSelectedNotesToSpecialNotes - names: $selectedNames');
     final selectedNotesStr = selectedNames.join(',');
 
     await db.treatmentDao.updateSpecialNotes(
@@ -2213,6 +2227,9 @@ class TreatmentViewModel extends ChangeNotifier {
 
     // 如果 selectedNotes 有值但關聯表是空的，從 selectedNotes 重建關聯
     await _syncSpecialNoteLinksFromSelected();
+
+    // 刷新藥物記錄
+    await _reloadMedications();
 
     // 刷新所有多對多關聯資料（症狀、處置項目特別註記）
     await _loadMultiSelectData();
