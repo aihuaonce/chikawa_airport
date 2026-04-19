@@ -1,8 +1,10 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:drift/drift.dart' as drift;
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../../data/db/database.dart';
+import '../../data/models/reference_service.dart';
 
 class AmbulanceMedicationDialog extends StatefulWidget {
   final int recordId;
@@ -28,6 +30,12 @@ class _AmbulanceMedicationDialogState extends State<AmbulanceMedicationDialog> {
   late TextEditingController _doseController;
   late TextEditingController _emtNameController;
 
+  // Drug search
+  final TextEditingController _searchController = TextEditingController();
+  List<DrugRefData> _drugResults = [];
+  bool _isSearching = false;
+  Timer? _debounceTimer;
+
   @override
   void initState() {
     super.initState();
@@ -47,6 +55,59 @@ class _AmbulanceMedicationDialogState extends State<AmbulanceMedicationDialog> {
     _emtNameController = TextEditingController(
       text: widget.initialData?.emtName ?? '',
     );
+
+    // Initialize drug search (empty initially - no results shown)
+    _searchController.addListener(_onSearchChanged);
+  }
+
+  void _onSearchChanged() {
+    _debounceTimer?.cancel();
+    _debounceTimer = Timer(const Duration(milliseconds: 300), () {
+      _performDrugSearch(_searchController.text);
+    });
+  }
+
+  Future<void> _performDrugSearch(String query) async {
+    setState(() => _isSearching = true);
+
+    try {
+      final refService = context.read<ReferenceService>();
+      final drugs = refService.drugList;
+
+      if (query.isEmpty) {
+        setState(() {
+          _drugResults = drugs;
+          _isSearching = false;
+        });
+        return;
+      }
+
+      final lowerQuery = query.toLowerCase();
+      final results = drugs
+          .where((d) =>
+              d.name.toLowerCase().contains(lowerQuery) ||
+              d.category.toLowerCase().contains(lowerQuery))
+          .toList();
+
+      setState(() {
+        _drugResults = results;
+        _isSearching = false;
+      });
+    } catch (e) {
+      debugPrint('Drug search error: $e');
+      setState(() {
+        _drugResults = [];
+        _isSearching = false;
+      });
+    }
+  }
+
+  void _selectDrug(DrugRefData drug) {
+    setState(() {
+      _drugNameController.text = drug.name;
+      _searchController.clear();
+      _drugResults.clear();
+    });
   }
 
   @override
@@ -56,6 +117,8 @@ class _AmbulanceMedicationDialogState extends State<AmbulanceMedicationDialog> {
     _routeController.dispose();
     _doseController.dispose();
     _emtNameController.dispose();
+    _searchController.dispose();
+    _debounceTimer?.cancel();
     super.dispose();
   }
 
@@ -163,11 +226,179 @@ class _AmbulanceMedicationDialogState extends State<AmbulanceMedicationDialog> {
                         icon: Icons.access_time,
                       ),
                       const SizedBox(height: 16),
-                      _buildTextField(
-                        label: '藥品名稱',
-                        subLabel: 'DRUG NAME',
-                        controller: _drugNameController,
-                        icon: Icons.medication,
+                      // Drug Search Field
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(Icons.medication, size: 14, color: Color(0xFF64748B)),
+                              SizedBox(width: 6),
+                              Text(
+                                '藥品名稱',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF475569),
+                                ),
+                              ),
+                              SizedBox(width: 6),
+                              Text(
+                                'DRUG NAME',
+                                style: TextStyle(fontSize: 11, color: Color(0xFF94A3B8)),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 8),
+                          // Search input with dropdown
+                          StatefulBuilder(
+                            builder: (context, setDropdownState) {
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  TextFormField(
+                                    controller: _drugNameController,
+                                    style: TextStyle(fontSize: 14),
+                                    decoration: InputDecoration(
+                                      hintText: '點擊搜尋藥物...',
+                                      hintStyle: TextStyle(
+                                        color: Color(0xFF94A3B8),
+                                        fontWeight: FontWeight.normal,
+                                      ),
+                                      prefixIcon: Icon(
+                                        Icons.search,
+                                        color: primaryColor,
+                                      ),
+                                      suffixIcon: _drugNameController.text.isNotEmpty
+                                          ? IconButton(
+                                              icon: Icon(Icons.clear, color: Color(0xFF94A3B8)),
+                                              onPressed: () {
+                                                _drugNameController.clear();
+                                                setDropdownState(() {
+                                                  _drugResults.clear();
+                                                });
+                                              },
+                                            )
+                                          : null,
+                                      filled: true,
+                                      fillColor: Colors.white,
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                        borderSide: BorderSide(color: borderColor),
+                                      ),
+                                      enabledBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                        borderSide: BorderSide(color: borderColor),
+                                      ),
+                                      focusedBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                        borderSide: BorderSide(color: primaryColor),
+                                      ),
+                                      contentPadding: EdgeInsets.symmetric(
+                                        horizontal: 16,
+                                        vertical: 12,
+                                      ),
+                                    ),
+                                    onTap: () {
+                                      // Show all drugs when focusing on the field
+                                      if (_drugResults.isEmpty) {
+                                        _performDrugSearch('');
+                                      }
+                                    },
+                                    onChanged: (val) {
+                                      setDropdownState(() {});
+                                      if (val.isNotEmpty) {
+                                        _performDrugSearch(val);
+                                      } else {
+                                        setDropdownState(() {
+                                          _drugResults.clear();
+                                        });
+                                      }
+                                    },
+                                  ),
+                                  // Dropdown results (only show when user typed something)
+                                  if (_drugNameController.text.isNotEmpty && _drugResults.isNotEmpty) ...[
+                                    SizedBox(height: 4),
+                                    Container(
+                                      constraints: BoxConstraints(maxHeight: 200),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(8),
+                                        border: Border.all(color: primaryColor),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.black.withValues(alpha: 0.1),
+                                            blurRadius: 8,
+                                            offset: Offset(0, 4),
+                                          ),
+                                        ],
+                                      ),
+                                      child: ListView.builder(
+                                        shrinkWrap: true,
+                                        padding: EdgeInsets.zero,
+                                        itemCount: _drugResults.length,
+                                        itemBuilder: (context, index) {
+                                          final drug = _drugResults[index];
+                                          return InkWell(
+                                            onTap: () {
+                                              _selectDrug(drug);
+                                              setDropdownState(() {});
+                                            },
+                                            child: Container(
+                                              padding: EdgeInsets.symmetric(
+                                                horizontal: 16,
+                                                vertical: 10,
+                                              ),
+                                              decoration: BoxDecoration(
+                                                border: Border(
+                                                  bottom: BorderSide(
+                                                    color: borderColor.withValues(alpha: 0.5),
+                                                  ),
+                                                ),
+                                              ),
+                                              child: Row(
+                                                children: [
+                                                  Container(
+                                                    padding: EdgeInsets.symmetric(
+                                                      horizontal: 8,
+                                                      vertical: 4,
+                                                    ),
+                                                    decoration: BoxDecoration(
+                                                      color: Color(0xFFF1F5F9),
+                                                      borderRadius: BorderRadius.circular(4),
+                                                    ),
+                                                    child: Text(
+                                                      drug.category,
+                                                      style: TextStyle(
+                                                        fontSize: 10,
+                                                        fontWeight: FontWeight.bold,
+                                                        color: primaryColor,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  SizedBox(width: 12),
+                                                  Expanded(
+                                                    child: Text(
+                                                      drug.name,
+                                                      style: TextStyle(
+                                                        fontSize: 13,
+                                                        color: Color(0xFF1E293B),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  ],
+                                ],
+                              );
+                            },
+                          ),
+                        ],
                       ),
                       const SizedBox(height: 16),
                       Row(
