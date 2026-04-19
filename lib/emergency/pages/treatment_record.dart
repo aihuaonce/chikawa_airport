@@ -818,7 +818,7 @@ class _EmergencyTreatmentRecordState extends State<EmergencyTreatmentRecord> {
   // --- UI 元件實作 ---
 
   Widget _buildFirstAidMedsTable(List<FirstAidLogData> logs) {
-    final flexes = [3, 2, 2, 2, 3, 2, 2, 3, 1];
+    final flexes = [3, 2, 2, 2, 3, 2, 2, 4, 1];
     final labels = [
       '記錄時間',
       '心跳',
@@ -828,19 +828,27 @@ class _EmergencyTreatmentRecordState extends State<EmergencyTreatmentRecord> {
       'Shock(J)',
       'Epi(mg)',
       '其他藥物',
-      '',
+      '操作',
     ];
 
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: SizedBox(
-        width: 1100,
+        width: 1250,
         child: Column(
           children: [
             _buildTableHeaderRow(labels, flexes),
-            if (logs.isEmpty) _buildEmptyRow(),
-            ...logs.asMap().entries.map((entry) {
-              final log = entry.value;
+            if (logs.isEmpty)
+              Container(
+                width: 1250,
+                padding: const EdgeInsets.all(24),
+                alignment: Alignment.center,
+                child: const Text(
+                  '無記錄，請點擊 Add Row 新增',
+                  style: TextStyle(color: textMuted, fontSize: 13),
+                ),
+              ),
+            ...logs.map((log) {
               return _buildDataRow(flexes, [
                 _buildCompactTimeField(log.time ?? ''),
                 Center(
@@ -887,16 +895,25 @@ class _EmergencyTreatmentRecordState extends State<EmergencyTreatmentRecord> {
                 ),
                 Text(
                   log.otherMeds ?? '--',
-                  style: const TextStyle(fontSize: 11, color: textMuted),
+                  style: const TextStyle(fontSize: 12, color: textMuted),
                   overflow: TextOverflow.ellipsis,
                 ),
-                _buildDeleteBtn(() async {
-                  await context
-                      .read<AppDatabase>()
-                      .emergencyDao
-                      .deleteFirstAidLog(log.id);
-                  // Stream 會自動更新 UI，不需要手動呼叫 _loadData()
-                }),
+                // 操作按鈕
+                Center(
+                  child: IconButton(
+                    icon: const Icon(
+                      Icons.cancel_outlined,
+                      color: Colors.redAccent,
+                      size: 20,
+                    ),
+                    onPressed: () async {
+                      await context
+                          .read<AppDatabase>()
+                          .emergencyDao
+                          .deleteFirstAidLog(log.id);
+                    },
+                  ),
+                ),
               ]);
             }),
           ],
@@ -915,7 +932,8 @@ class _EmergencyTreatmentRecordState extends State<EmergencyTreatmentRecord> {
     final TextEditingController o2Ctrl = TextEditingController();
     final TextEditingController shockCtrl = TextEditingController();
     final TextEditingController epiCtrl = TextEditingController();
-    List<Map<String, String>> tempOtherMeds = [];
+    // 使用藥物列表（包含選擇的藥物和劑量）
+    List<Map<String, dynamic>> tempOtherMeds = [];
 
     showModalBottomSheet(
       context: context,
@@ -1014,52 +1032,114 @@ class _EmergencyTreatmentRecordState extends State<EmergencyTreatmentRecord> {
                       ],
                     ),
                     const SizedBox(height: 32),
+                    // 藥物搜尋與選擇區塊
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         _buildLabel('使用其它藥物記錄 OTHER MEDS'),
                         TextButton.icon(
-                          onPressed: () => setModalState(
-                            () => tempOtherMeds.add({'name': '', 'dose': ''}),
-                          ),
+                          onPressed: () {
+                            // 開啟藥物搜尋對話框
+                            _showDrugSearchDialog(setModalState, tempOtherMeds);
+                          },
                           icon: const Icon(Icons.add, size: 16),
-                          label: const Text('新增藥物'),
+                          label: const Text('搜尋並新增藥物'),
                           style: TextButton.styleFrom(
                             foregroundColor: primaryColor,
                           ),
                         ),
                       ],
                     ),
+                    // 已選藥物列表
                     ...tempOtherMeds.asMap().entries.map(
                       (e) => Padding(
                         padding: const EdgeInsets.only(bottom: 8),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              flex: 3,
-                              child: _buildTextField(
-                                hint: '藥物名稱',
-                                onChanged: (v) => e.value['name'] = v,
+                        child: Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Color(0xFFF1F5F9),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: borderColor),
+                          ),
+                          child: Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: primaryColor.withValues(alpha: 0.1),
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: Text(
+                                  e.value['category'] ?? '',
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.bold,
+                                    color: primaryColor,
+                                  ),
+                                ),
                               ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              flex: 2,
-                              child: _buildTextField(
-                                hint: '劑量',
-                                onChanged: (v) => e.value['dose'] = v,
+                              const SizedBox(width: 12),
+                              Expanded(
+                                flex: 3,
+                                child: Text(
+                                  e.value['name'] ?? '',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
                               ),
-                            ),
-                            IconButton(
-                              icon: const Icon(
-                                Icons.remove_circle_outline,
-                                color: Colors.redAccent,
+                              const SizedBox(width: 12),
+                              Expanded(
+                                flex: 2,
+                                child: TextField(
+                                  controller: TextEditingController(
+                                    text: e.value['dose'] ?? '',
+                                  ),
+                                  style: TextStyle(fontSize: 13),
+                                  decoration: InputDecoration(
+                                    hintText: '劑量',
+                                    hintStyle: TextStyle(
+                                      fontSize: 12,
+                                      color: textMuted,
+                                    ),
+                                    contentPadding: EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                      vertical: 8,
+                                    ),
+                                    filled: true,
+                                    fillColor: Colors.white,
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(6),
+                                      borderSide: BorderSide(
+                                        color: borderColor,
+                                      ),
+                                    ),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(6),
+                                      borderSide: BorderSide(
+                                        color: borderColor,
+                                      ),
+                                    ),
+                                  ),
+                                  onChanged: (v) => e.value['dose'] = v,
+                                ),
                               ),
-                              onPressed: () => setModalState(
-                                () => tempOtherMeds.removeAt(e.key),
+                              const SizedBox(width: 8),
+                              IconButton(
+                                icon: const Icon(
+                                  Icons.remove_circle_outline,
+                                  color: Colors.redAccent,
+                                ),
+                                onPressed: () => setModalState(
+                                  () => tempOtherMeds.removeAt(e.key),
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -1083,12 +1163,15 @@ class _EmergencyTreatmentRecordState extends State<EmergencyTreatmentRecord> {
                               final dao = context
                                   .read<AppDatabase>()
                                   .emergencyDao;
-                              // Format meds to string
+                              // Format meds to string (include category)
                               String otherMedsStr = tempOtherMeds
-                                  .map(
-                                    (m) =>
-                                        "${m['name'] ?? ''}(${m['dose'] ?? ''})",
-                                  )
+                                  .map((m) {
+                                    final name = m['name'] as String? ?? '';
+                                    final category =
+                                        m['category'] as String? ?? '';
+                                    final dose = m['dose'] as String? ?? '';
+                                    return "$category:$name($dose)";
+                                  })
                                   .join(", ");
 
                               await dao.addFirstAidLog(
@@ -1123,10 +1206,299 @@ class _EmergencyTreatmentRecordState extends State<EmergencyTreatmentRecord> {
     );
   }
 
+  // 藥物搜尋對話框
+  void _showDrugSearchDialog(
+    StateSetter outerSetModalState,
+    List<Map<String, dynamic>> outerTempOtherMeds,
+  ) {
+    final TextEditingController searchCtrl = TextEditingController();
+    List<DrugRefData> searchResults = [];
+    // 引用外部的 tempOtherMeds 和 setModalState
+    final outerStateSetter = outerSetModalState;
+    final drugList = outerTempOtherMeds;
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) {
+        return StatefulBuilder(
+          builder: (dialogContext, setDialogState) {
+            return Dialog(
+              insetPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 24,
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              backgroundColor: Colors.white,
+              elevation: 0,
+              child: Container(
+                width: 500,
+                constraints: BoxConstraints(
+                  maxHeight: MediaQuery.of(context).size.height * 0.7,
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Header
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 20,
+                      ),
+                      decoration: BoxDecoration(
+                        border: Border(bottom: BorderSide(color: borderColor)),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: primaryColor.withValues(alpha: 0.1),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Icon(
+                                  Icons.medication,
+                                  color: primaryColor,
+                                  size: 24,
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              const Text(
+                                '搜尋藥物',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF1E293B),
+                                ),
+                              ),
+                            ],
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.close),
+                            onPressed: () => Navigator.of(dialogContext).pop(),
+                            color: const Color(0xFF94A3B8),
+                          ),
+                        ],
+                      ),
+                    ),
+                    // Search input
+                    Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: TextField(
+                        controller: searchCtrl,
+                        style: const TextStyle(fontSize: 14),
+                        decoration: InputDecoration(
+                          hintText: '輸入藥物名稱或類別進行搜尋...',
+                          hintStyle: TextStyle(
+                            color: Color(0xFF94A3B8),
+                            fontWeight: FontWeight.normal,
+                          ),
+                          prefixIcon: Icon(Icons.search, color: primaryColor),
+                          suffixIcon: searchCtrl.text.isNotEmpty
+                              ? IconButton(
+                                  icon: Icon(
+                                    Icons.clear,
+                                    color: Color(0xFF94A3B8),
+                                  ),
+                                  onPressed: () {
+                                    searchCtrl.clear();
+                                    setDialogState(() {
+                                      searchResults = [];
+                                    });
+                                  },
+                                )
+                              : null,
+                          filled: true,
+                          fillColor: Colors.white,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide(color: borderColor),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide(color: borderColor),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide(color: primaryColor),
+                          ),
+                          contentPadding: EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
+                        ),
+                        onChanged: (val) {
+                          if (val.isNotEmpty) {
+                            _performDrugSearchInDialog(val, searchResults, (r) {
+                              setDialogState(() {
+                                searchResults = r;
+                              });
+                            });
+                          } else {
+                            setDialogState(() {
+                              searchResults = [];
+                            });
+                          }
+                        },
+                      ),
+                    ),
+                    // Results list
+                    Flexible(
+                      child: searchResults.isEmpty
+                          ? Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.search,
+                                    size: 48,
+                                    color: borderColor,
+                                  ),
+                                  const SizedBox(height: 12),
+                                  Text(
+                                    searchCtrl.text.isEmpty
+                                        ? '請輸入關鍵字進行搜尋'
+                                        : '找不到符合的藥物',
+                                    style: TextStyle(
+                                      color: textMuted,
+                                      fontSize: 13,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                          : Container(
+                              decoration: BoxDecoration(
+                                border: Border(
+                                  top: BorderSide(color: borderColor),
+                                ),
+                              ),
+                              child: ListView.builder(
+                                shrinkWrap: true,
+                                padding: EdgeInsets.zero,
+                                itemCount: searchResults.length,
+                                itemBuilder: (context, index) {
+                                  final drug = searchResults[index];
+                                  return InkWell(
+                                    onTap: () {
+                                      // 新增藥物到列表
+                                      outerStateSetter(() {
+                                        drugList.add({
+                                          'name': drug.name,
+                                          'category': drug.category,
+                                          'dose': '',
+                                        });
+                                      });
+                                      Navigator.of(dialogContext).pop();
+                                    },
+                                    child: Container(
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: 24,
+                                        vertical: 12,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        border: Border(
+                                          bottom: BorderSide(
+                                            color: borderColor.withValues(
+                                              alpha: 0.5,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          Container(
+                                            padding: EdgeInsets.symmetric(
+                                              horizontal: 8,
+                                              vertical: 4,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: Color(0xFFF1F5F9),
+                                              borderRadius:
+                                                  BorderRadius.circular(4),
+                                            ),
+                                            child: Text(
+                                              drug.category,
+                                              style: TextStyle(
+                                                fontSize: 10,
+                                                fontWeight: FontWeight.bold,
+                                                color: primaryColor,
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(width: 12),
+                                          Expanded(
+                                            child: Text(
+                                              drug.name,
+                                              style: TextStyle(
+                                                fontSize: 13,
+                                                color: Color(0xFF1E293B),
+                                              ),
+                                            ),
+                                          ),
+                                          Icon(
+                                            Icons.add_circle_outline,
+                                            color: primaryColor,
+                                            size: 20,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  // 藥物搜尋（在對話框中使用）
+  Future<void> _performDrugSearchInDialog(
+    String query,
+    List<DrugRefData> currentResults,
+    void Function(List<DrugRefData>) updateResults,
+  ) async {
+    try {
+      final refService = context.read<ReferenceService>();
+      final drugs = refService.drugList;
+
+      if (query.isEmpty) {
+        updateResults(drugs);
+        return;
+      }
+
+      final lowerQuery = query.toLowerCase();
+      final results = drugs
+          .where(
+            (d) =>
+                d.name.toLowerCase().contains(lowerQuery) ||
+                d.category.toLowerCase().contains(lowerQuery),
+          )
+          .toList();
+
+      updateResults(results);
+    } catch (e) {
+      debugPrint('Drug search error: $e');
+      updateResults([]);
+    }
+  }
+
   // --- 表格對齊工具 ---
 
   Widget _buildTableHeaderRow(List<String> labels, List<int> flexes) {
     return Container(
+      width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
       decoration: const BoxDecoration(
         color: headerBg,
@@ -1157,25 +1529,22 @@ class _EmergencyTreatmentRecordState extends State<EmergencyTreatmentRecord> {
 
   Widget _buildDataRow(List<int> flexes, List<Widget> children) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 16),
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
       decoration: const BoxDecoration(
         border: Border(top: BorderSide(color: borderColor)),
       ),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: children
-            .asMap()
-            .entries
-            .map(
-              (e) => Expanded(
-                flex: flexes[e.key],
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4),
-                  child: e.value,
-                ),
-              ),
-            )
-            .toList(),
+        children: List.generate(
+          children.length,
+          (i) => Expanded(
+            flex: flexes[i],
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 2),
+              child: children[i],
+            ),
+          ),
+        ),
       ),
     );
   }
