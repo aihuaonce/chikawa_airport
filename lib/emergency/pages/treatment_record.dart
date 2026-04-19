@@ -183,6 +183,11 @@ class _EmergencyTreatmentRecordState extends State<EmergencyTreatmentRecord> {
           .firstOrNull;
       _aidEmt = assignments.where((a) => a.staffRoleId == emtRole).firstOrNull;
 
+      // 4.1 獲取協助人員列表
+      final assistStaff = await dao.getAssistStaff(treatment.id);
+      _assistStaffList.clear();
+      _assistStaffList.addAll(assistStaff);
+
       // 5. 獲取 Diagnosis (from Treatment table)
       final mainTreatment =
           await (db.select(db.treatment)
@@ -213,7 +218,7 @@ class _EmergencyTreatmentRecordState extends State<EmergencyTreatmentRecord> {
     }
   }
 
-  void _populateControllers(String diagnosisFromTreatment) {
+  Future<void> _populateControllers(String diagnosisFromTreatment) async {
     if (_emergencyTreatment == null) return;
     final t = _emergencyTreatment!;
 
@@ -257,8 +262,8 @@ class _EmergencyTreatmentRecordState extends State<EmergencyTreatmentRecord> {
     _endRecordController.text = t.endCareNotes ?? '';
 
     // Assessments
-    _populateAssessment(_initialAssessment, isPost: false);
-    _populateAssessment(_postAssessment, isPost: true);
+    await _populateAssessment(_initialAssessment, isPost: false);
+    await _populateAssessment(_postAssessment, isPost: true);
   }
 
   Future<String> _getPupilReactionSymbol(int? id, String? text) async {
@@ -272,7 +277,7 @@ class _EmergencyTreatmentRecordState extends State<EmergencyTreatmentRecord> {
     return ref?.symbol ?? '+';
   }
 
-  void _populateAssessment(
+  Future<void> _populateAssessment(
     MedicalAssessmentData? a, {
     required bool isPost,
   }) async {
@@ -2420,25 +2425,22 @@ class _EmergencyTreatmentRecordState extends State<EmergencyTreatmentRecord> {
             .getSingleOrNull();
 
     if (existing != null) {
-      await (db.update(db.medicalStaffAssignment)..where(
-            (t) => t.staffAssignmentId.equals(existing.staffAssignmentId),
-          ))
-          .write(
-            MedicalStaffAssignmentCompanion(
-              staffId: drift.Value(staff.id),
-              staffName: drift.Value(staff.name),
-            ),
-          );
+      await db.emergencyDao.updateMedicalStaffAssignment(
+        MedicalStaffAssignmentCompanion(
+          staffAssignmentId: drift.Value(existing.staffAssignmentId),
+          staffId: drift.Value(staff.id),
+          staffName: drift.Value(staff.name),
+        ),
+      );
     } else {
-      await db
-          .into(db.medicalStaffAssignment)
-          .insert(
+      await db.into(db.medicalStaffAssignment).insert(
             MedicalStaffAssignmentCompanion(
               medicalId: drift.Value(widget.emergencyId),
               staffRoleId: drift.Value(roleId),
               staffId: drift.Value(staff.id),
               staffName: drift.Value(staff.name),
               isPrimary: drift.Value(true),
+              syncStatus: const drift.Value(1),
             ),
           );
     }
@@ -2451,15 +2453,13 @@ class _EmergencyTreatmentRecordState extends State<EmergencyTreatmentRecord> {
   ) async {
     if (assignment == null) return;
     final db = context.read<AppDatabase>();
-    await (db.update(db.medicalStaffAssignment)..where(
-          (t) => t.staffAssignmentId.equals(assignment.staffAssignmentId),
-        ))
-        .write(
-          MedicalStaffAssignmentCompanion(
-            signature: drift.Value(signature),
-            signedAt: drift.Value(DateTime.now()),
-          ),
-        );
+    await db.emergencyDao.updateMedicalStaffAssignment(
+      MedicalStaffAssignmentCompanion(
+        staffAssignmentId: drift.Value(assignment.staffAssignmentId),
+        signature: drift.Value(signature),
+        signedAt: drift.Value(DateTime.now()),
+      ),
+    );
     _loadData(); // Partial reload
   }
 }

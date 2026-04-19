@@ -295,12 +295,16 @@ class AmbulanceDao extends DatabaseAccessor<AppDatabase>
 
   // 建立救護車紀錄
   Future<int> createAmbulanceRecord(AmbulanceRecordsCompanion data) {
-    return into(ambulanceRecords).insert(data);
+    // 加入 syncStatus = 1 待同步
+    final dataWithSync = data.copyWith(syncStatus: const Value(1));
+    return into(ambulanceRecords).insert(dataWithSync);
   }
 
   // 更新救護車紀錄
   Future<bool> updateAmbulanceRecord(AmbulanceRecordsCompanion data) {
-    return update(ambulanceRecords).replace(data);
+    // 加入 syncStatus = 1 待同步
+    final dataWithSync = data.copyWith(syncStatus: const Value(1));
+    return update(ambulanceRecords).replace(dataWithSync);
   }
 
   // 插入或更新

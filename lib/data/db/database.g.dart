@@ -21496,6 +21496,40 @@ class $MedicalStaffAssignmentTable extends MedicalStaffAssignment
     requiredDuringInsert: false,
     defaultValue: currentDateAndTime,
   );
+  static const VerificationMeta _syncStatusMeta = const VerificationMeta(
+    'syncStatus',
+  );
+  @override
+  late final GeneratedColumn<int> syncStatus = GeneratedColumn<int>(
+    'sync_status',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _remoteIdMeta = const VerificationMeta(
+    'remoteId',
+  );
+  @override
+  late final GeneratedColumn<String> remoteId = GeneratedColumn<String>(
+    'remote_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _lastModifiedMeta = const VerificationMeta(
+    'lastModified',
+  );
+  @override
+  late final GeneratedColumn<DateTime> lastModified = GeneratedColumn<DateTime>(
+    'last_modified',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     staffAssignmentId,
@@ -21507,6 +21541,9 @@ class $MedicalStaffAssignmentTable extends MedicalStaffAssignment
     signature,
     signedAt,
     assignedAt,
+    syncStatus,
+    remoteId,
+    lastModified,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -21582,6 +21619,27 @@ class $MedicalStaffAssignmentTable extends MedicalStaffAssignment
         assignedAt.isAcceptableOrUnknown(data['assigned_at']!, _assignedAtMeta),
       );
     }
+    if (data.containsKey('sync_status')) {
+      context.handle(
+        _syncStatusMeta,
+        syncStatus.isAcceptableOrUnknown(data['sync_status']!, _syncStatusMeta),
+      );
+    }
+    if (data.containsKey('remote_id')) {
+      context.handle(
+        _remoteIdMeta,
+        remoteId.isAcceptableOrUnknown(data['remote_id']!, _remoteIdMeta),
+      );
+    }
+    if (data.containsKey('last_modified')) {
+      context.handle(
+        _lastModifiedMeta,
+        lastModified.isAcceptableOrUnknown(
+          data['last_modified']!,
+          _lastModifiedMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -21630,6 +21688,18 @@ class $MedicalStaffAssignmentTable extends MedicalStaffAssignment
         DriftSqlType.dateTime,
         data['${effectivePrefix}assigned_at'],
       )!,
+      syncStatus: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}sync_status'],
+      )!,
+      remoteId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}remote_id'],
+      ),
+      lastModified: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}last_modified'],
+      ),
     );
   }
 
@@ -21650,6 +21720,9 @@ class MedicalStaffAssignmentData extends DataClass
   final Uint8List? signature;
   final DateTime? signedAt;
   final DateTime assignedAt;
+  final int syncStatus;
+  final String? remoteId;
+  final DateTime? lastModified;
   const MedicalStaffAssignmentData({
     required this.staffAssignmentId,
     required this.medicalId,
@@ -21660,6 +21733,9 @@ class MedicalStaffAssignmentData extends DataClass
     this.signature,
     this.signedAt,
     required this.assignedAt,
+    required this.syncStatus,
+    this.remoteId,
+    this.lastModified,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -21683,6 +21759,13 @@ class MedicalStaffAssignmentData extends DataClass
       map['signed_at'] = Variable<DateTime>(signedAt);
     }
     map['assigned_at'] = Variable<DateTime>(assignedAt);
+    map['sync_status'] = Variable<int>(syncStatus);
+    if (!nullToAbsent || remoteId != null) {
+      map['remote_id'] = Variable<String>(remoteId);
+    }
+    if (!nullToAbsent || lastModified != null) {
+      map['last_modified'] = Variable<DateTime>(lastModified);
+    }
     return map;
   }
 
@@ -21707,6 +21790,13 @@ class MedicalStaffAssignmentData extends DataClass
           ? const Value.absent()
           : Value(signedAt),
       assignedAt: Value(assignedAt),
+      syncStatus: Value(syncStatus),
+      remoteId: remoteId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(remoteId),
+      lastModified: lastModified == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastModified),
     );
   }
 
@@ -21725,6 +21815,9 @@ class MedicalStaffAssignmentData extends DataClass
       signature: serializer.fromJson<Uint8List?>(json['signature']),
       signedAt: serializer.fromJson<DateTime?>(json['signedAt']),
       assignedAt: serializer.fromJson<DateTime>(json['assignedAt']),
+      syncStatus: serializer.fromJson<int>(json['syncStatus']),
+      remoteId: serializer.fromJson<String?>(json['remoteId']),
+      lastModified: serializer.fromJson<DateTime?>(json['lastModified']),
     );
   }
   @override
@@ -21740,6 +21833,9 @@ class MedicalStaffAssignmentData extends DataClass
       'signature': serializer.toJson<Uint8List?>(signature),
       'signedAt': serializer.toJson<DateTime?>(signedAt),
       'assignedAt': serializer.toJson<DateTime>(assignedAt),
+      'syncStatus': serializer.toJson<int>(syncStatus),
+      'remoteId': serializer.toJson<String?>(remoteId),
+      'lastModified': serializer.toJson<DateTime?>(lastModified),
     };
   }
 
@@ -21753,6 +21849,9 @@ class MedicalStaffAssignmentData extends DataClass
     Value<Uint8List?> signature = const Value.absent(),
     Value<DateTime?> signedAt = const Value.absent(),
     DateTime? assignedAt,
+    int? syncStatus,
+    Value<String?> remoteId = const Value.absent(),
+    Value<DateTime?> lastModified = const Value.absent(),
   }) => MedicalStaffAssignmentData(
     staffAssignmentId: staffAssignmentId ?? this.staffAssignmentId,
     medicalId: medicalId ?? this.medicalId,
@@ -21763,6 +21862,9 @@ class MedicalStaffAssignmentData extends DataClass
     signature: signature.present ? signature.value : this.signature,
     signedAt: signedAt.present ? signedAt.value : this.signedAt,
     assignedAt: assignedAt ?? this.assignedAt,
+    syncStatus: syncStatus ?? this.syncStatus,
+    remoteId: remoteId.present ? remoteId.value : this.remoteId,
+    lastModified: lastModified.present ? lastModified.value : this.lastModified,
   );
   MedicalStaffAssignmentData copyWithCompanion(
     MedicalStaffAssignmentCompanion data,
@@ -21783,6 +21885,13 @@ class MedicalStaffAssignmentData extends DataClass
       assignedAt: data.assignedAt.present
           ? data.assignedAt.value
           : this.assignedAt,
+      syncStatus: data.syncStatus.present
+          ? data.syncStatus.value
+          : this.syncStatus,
+      remoteId: data.remoteId.present ? data.remoteId.value : this.remoteId,
+      lastModified: data.lastModified.present
+          ? data.lastModified.value
+          : this.lastModified,
     );
   }
 
@@ -21797,7 +21906,10 @@ class MedicalStaffAssignmentData extends DataClass
           ..write('isPrimary: $isPrimary, ')
           ..write('signature: $signature, ')
           ..write('signedAt: $signedAt, ')
-          ..write('assignedAt: $assignedAt')
+          ..write('assignedAt: $assignedAt, ')
+          ..write('syncStatus: $syncStatus, ')
+          ..write('remoteId: $remoteId, ')
+          ..write('lastModified: $lastModified')
           ..write(')'))
         .toString();
   }
@@ -21813,6 +21925,9 @@ class MedicalStaffAssignmentData extends DataClass
     $driftBlobEquality.hash(signature),
     signedAt,
     assignedAt,
+    syncStatus,
+    remoteId,
+    lastModified,
   );
   @override
   bool operator ==(Object other) =>
@@ -21826,7 +21941,10 @@ class MedicalStaffAssignmentData extends DataClass
           other.isPrimary == this.isPrimary &&
           $driftBlobEquality.equals(other.signature, this.signature) &&
           other.signedAt == this.signedAt &&
-          other.assignedAt == this.assignedAt);
+          other.assignedAt == this.assignedAt &&
+          other.syncStatus == this.syncStatus &&
+          other.remoteId == this.remoteId &&
+          other.lastModified == this.lastModified);
 }
 
 class MedicalStaffAssignmentCompanion
@@ -21840,6 +21958,9 @@ class MedicalStaffAssignmentCompanion
   final Value<Uint8List?> signature;
   final Value<DateTime?> signedAt;
   final Value<DateTime> assignedAt;
+  final Value<int> syncStatus;
+  final Value<String?> remoteId;
+  final Value<DateTime?> lastModified;
   const MedicalStaffAssignmentCompanion({
     this.staffAssignmentId = const Value.absent(),
     this.medicalId = const Value.absent(),
@@ -21850,6 +21971,9 @@ class MedicalStaffAssignmentCompanion
     this.signature = const Value.absent(),
     this.signedAt = const Value.absent(),
     this.assignedAt = const Value.absent(),
+    this.syncStatus = const Value.absent(),
+    this.remoteId = const Value.absent(),
+    this.lastModified = const Value.absent(),
   });
   MedicalStaffAssignmentCompanion.insert({
     this.staffAssignmentId = const Value.absent(),
@@ -21861,6 +21985,9 @@ class MedicalStaffAssignmentCompanion
     this.signature = const Value.absent(),
     this.signedAt = const Value.absent(),
     this.assignedAt = const Value.absent(),
+    this.syncStatus = const Value.absent(),
+    this.remoteId = const Value.absent(),
+    this.lastModified = const Value.absent(),
   }) : medicalId = Value(medicalId);
   static Insertable<MedicalStaffAssignmentData> custom({
     Expression<int>? staffAssignmentId,
@@ -21872,6 +21999,9 @@ class MedicalStaffAssignmentCompanion
     Expression<Uint8List>? signature,
     Expression<DateTime>? signedAt,
     Expression<DateTime>? assignedAt,
+    Expression<int>? syncStatus,
+    Expression<String>? remoteId,
+    Expression<DateTime>? lastModified,
   }) {
     return RawValuesInsertable({
       if (staffAssignmentId != null) 'staff_assignment_id': staffAssignmentId,
@@ -21883,6 +22013,9 @@ class MedicalStaffAssignmentCompanion
       if (signature != null) 'signature': signature,
       if (signedAt != null) 'signed_at': signedAt,
       if (assignedAt != null) 'assigned_at': assignedAt,
+      if (syncStatus != null) 'sync_status': syncStatus,
+      if (remoteId != null) 'remote_id': remoteId,
+      if (lastModified != null) 'last_modified': lastModified,
     });
   }
 
@@ -21896,6 +22029,9 @@ class MedicalStaffAssignmentCompanion
     Value<Uint8List?>? signature,
     Value<DateTime?>? signedAt,
     Value<DateTime>? assignedAt,
+    Value<int>? syncStatus,
+    Value<String?>? remoteId,
+    Value<DateTime?>? lastModified,
   }) {
     return MedicalStaffAssignmentCompanion(
       staffAssignmentId: staffAssignmentId ?? this.staffAssignmentId,
@@ -21907,6 +22043,9 @@ class MedicalStaffAssignmentCompanion
       signature: signature ?? this.signature,
       signedAt: signedAt ?? this.signedAt,
       assignedAt: assignedAt ?? this.assignedAt,
+      syncStatus: syncStatus ?? this.syncStatus,
+      remoteId: remoteId ?? this.remoteId,
+      lastModified: lastModified ?? this.lastModified,
     );
   }
 
@@ -21940,6 +22079,15 @@ class MedicalStaffAssignmentCompanion
     if (assignedAt.present) {
       map['assigned_at'] = Variable<DateTime>(assignedAt.value);
     }
+    if (syncStatus.present) {
+      map['sync_status'] = Variable<int>(syncStatus.value);
+    }
+    if (remoteId.present) {
+      map['remote_id'] = Variable<String>(remoteId.value);
+    }
+    if (lastModified.present) {
+      map['last_modified'] = Variable<DateTime>(lastModified.value);
+    }
     return map;
   }
 
@@ -21954,7 +22102,10 @@ class MedicalStaffAssignmentCompanion
           ..write('isPrimary: $isPrimary, ')
           ..write('signature: $signature, ')
           ..write('signedAt: $signedAt, ')
-          ..write('assignedAt: $assignedAt')
+          ..write('assignedAt: $assignedAt, ')
+          ..write('syncStatus: $syncStatus, ')
+          ..write('remoteId: $remoteId, ')
+          ..write('lastModified: $lastModified')
           ..write(')'))
         .toString();
   }
@@ -39814,6 +39965,40 @@ class $FirstAidLogTable extends FirstAidLog
     requiredDuringInsert: false,
     defaultValue: const Constant(0),
   );
+  static const VerificationMeta _syncStatusMeta = const VerificationMeta(
+    'syncStatus',
+  );
+  @override
+  late final GeneratedColumn<int> syncStatus = GeneratedColumn<int>(
+    'sync_status',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _remoteIdMeta = const VerificationMeta(
+    'remoteId',
+  );
+  @override
+  late final GeneratedColumn<String> remoteId = GeneratedColumn<String>(
+    'remote_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _lastModifiedMeta = const VerificationMeta(
+    'lastModified',
+  );
+  @override
+  late final GeneratedColumn<DateTime> lastModified = GeneratedColumn<DateTime>(
+    'last_modified',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -39827,6 +40012,9 @@ class $FirstAidLogTable extends FirstAidLog
     epinephrine,
     otherMeds,
     sortOrder,
+    syncStatus,
+    remoteId,
+    lastModified,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -39914,6 +40102,27 @@ class $FirstAidLogTable extends FirstAidLog
         sortOrder.isAcceptableOrUnknown(data['sort_order']!, _sortOrderMeta),
       );
     }
+    if (data.containsKey('sync_status')) {
+      context.handle(
+        _syncStatusMeta,
+        syncStatus.isAcceptableOrUnknown(data['sync_status']!, _syncStatusMeta),
+      );
+    }
+    if (data.containsKey('remote_id')) {
+      context.handle(
+        _remoteIdMeta,
+        remoteId.isAcceptableOrUnknown(data['remote_id']!, _remoteIdMeta),
+      );
+    }
+    if (data.containsKey('last_modified')) {
+      context.handle(
+        _lastModifiedMeta,
+        lastModified.isAcceptableOrUnknown(
+          data['last_modified']!,
+          _lastModifiedMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -39967,6 +40176,18 @@ class $FirstAidLogTable extends FirstAidLog
         DriftSqlType.int,
         data['${effectivePrefix}sort_order'],
       )!,
+      syncStatus: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}sync_status'],
+      )!,
+      remoteId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}remote_id'],
+      ),
+      lastModified: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}last_modified'],
+      ),
     );
   }
 
@@ -39988,6 +40209,9 @@ class FirstAidLogData extends DataClass implements Insertable<FirstAidLogData> {
   final String? epinephrine;
   final String? otherMeds;
   final int sortOrder;
+  final int syncStatus;
+  final String? remoteId;
+  final DateTime? lastModified;
   const FirstAidLogData({
     required this.id,
     required this.emergencyTreatmentId,
@@ -40000,6 +40224,9 @@ class FirstAidLogData extends DataClass implements Insertable<FirstAidLogData> {
     this.epinephrine,
     this.otherMeds,
     required this.sortOrder,
+    required this.syncStatus,
+    this.remoteId,
+    this.lastModified,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -40031,6 +40258,13 @@ class FirstAidLogData extends DataClass implements Insertable<FirstAidLogData> {
       map['other_meds'] = Variable<String>(otherMeds);
     }
     map['sort_order'] = Variable<int>(sortOrder);
+    map['sync_status'] = Variable<int>(syncStatus);
+    if (!nullToAbsent || remoteId != null) {
+      map['remote_id'] = Variable<String>(remoteId);
+    }
+    if (!nullToAbsent || lastModified != null) {
+      map['last_modified'] = Variable<DateTime>(lastModified);
+    }
     return map;
   }
 
@@ -40059,6 +40293,13 @@ class FirstAidLogData extends DataClass implements Insertable<FirstAidLogData> {
           ? const Value.absent()
           : Value(otherMeds),
       sortOrder: Value(sortOrder),
+      syncStatus: Value(syncStatus),
+      remoteId: remoteId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(remoteId),
+      lastModified: lastModified == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastModified),
     );
   }
 
@@ -40081,6 +40322,9 @@ class FirstAidLogData extends DataClass implements Insertable<FirstAidLogData> {
       epinephrine: serializer.fromJson<String?>(json['epinephrine']),
       otherMeds: serializer.fromJson<String?>(json['otherMeds']),
       sortOrder: serializer.fromJson<int>(json['sortOrder']),
+      syncStatus: serializer.fromJson<int>(json['syncStatus']),
+      remoteId: serializer.fromJson<String?>(json['remoteId']),
+      lastModified: serializer.fromJson<DateTime?>(json['lastModified']),
     );
   }
   @override
@@ -40098,6 +40342,9 @@ class FirstAidLogData extends DataClass implements Insertable<FirstAidLogData> {
       'epinephrine': serializer.toJson<String?>(epinephrine),
       'otherMeds': serializer.toJson<String?>(otherMeds),
       'sortOrder': serializer.toJson<int>(sortOrder),
+      'syncStatus': serializer.toJson<int>(syncStatus),
+      'remoteId': serializer.toJson<String?>(remoteId),
+      'lastModified': serializer.toJson<DateTime?>(lastModified),
     };
   }
 
@@ -40113,6 +40360,9 @@ class FirstAidLogData extends DataClass implements Insertable<FirstAidLogData> {
     Value<String?> epinephrine = const Value.absent(),
     Value<String?> otherMeds = const Value.absent(),
     int? sortOrder,
+    int? syncStatus,
+    Value<String?> remoteId = const Value.absent(),
+    Value<DateTime?> lastModified = const Value.absent(),
   }) => FirstAidLogData(
     id: id ?? this.id,
     emergencyTreatmentId: emergencyTreatmentId ?? this.emergencyTreatmentId,
@@ -40129,6 +40379,9 @@ class FirstAidLogData extends DataClass implements Insertable<FirstAidLogData> {
     epinephrine: epinephrine.present ? epinephrine.value : this.epinephrine,
     otherMeds: otherMeds.present ? otherMeds.value : this.otherMeds,
     sortOrder: sortOrder ?? this.sortOrder,
+    syncStatus: syncStatus ?? this.syncStatus,
+    remoteId: remoteId.present ? remoteId.value : this.remoteId,
+    lastModified: lastModified.present ? lastModified.value : this.lastModified,
   );
   FirstAidLogData copyWithCompanion(FirstAidLogCompanion data) {
     return FirstAidLogData(
@@ -40151,6 +40404,13 @@ class FirstAidLogData extends DataClass implements Insertable<FirstAidLogData> {
           : this.epinephrine,
       otherMeds: data.otherMeds.present ? data.otherMeds.value : this.otherMeds,
       sortOrder: data.sortOrder.present ? data.sortOrder.value : this.sortOrder,
+      syncStatus: data.syncStatus.present
+          ? data.syncStatus.value
+          : this.syncStatus,
+      remoteId: data.remoteId.present ? data.remoteId.value : this.remoteId,
+      lastModified: data.lastModified.present
+          ? data.lastModified.value
+          : this.lastModified,
     );
   }
 
@@ -40167,7 +40427,10 @@ class FirstAidLogData extends DataClass implements Insertable<FirstAidLogData> {
           ..write('shock: $shock, ')
           ..write('epinephrine: $epinephrine, ')
           ..write('otherMeds: $otherMeds, ')
-          ..write('sortOrder: $sortOrder')
+          ..write('sortOrder: $sortOrder, ')
+          ..write('syncStatus: $syncStatus, ')
+          ..write('remoteId: $remoteId, ')
+          ..write('lastModified: $lastModified')
           ..write(')'))
         .toString();
   }
@@ -40185,6 +40448,9 @@ class FirstAidLogData extends DataClass implements Insertable<FirstAidLogData> {
     epinephrine,
     otherMeds,
     sortOrder,
+    syncStatus,
+    remoteId,
+    lastModified,
   );
   @override
   bool operator ==(Object other) =>
@@ -40200,7 +40466,10 @@ class FirstAidLogData extends DataClass implements Insertable<FirstAidLogData> {
           other.shock == this.shock &&
           other.epinephrine == this.epinephrine &&
           other.otherMeds == this.otherMeds &&
-          other.sortOrder == this.sortOrder);
+          other.sortOrder == this.sortOrder &&
+          other.syncStatus == this.syncStatus &&
+          other.remoteId == this.remoteId &&
+          other.lastModified == this.lastModified);
 }
 
 class FirstAidLogCompanion extends UpdateCompanion<FirstAidLogData> {
@@ -40215,6 +40484,9 @@ class FirstAidLogCompanion extends UpdateCompanion<FirstAidLogData> {
   final Value<String?> epinephrine;
   final Value<String?> otherMeds;
   final Value<int> sortOrder;
+  final Value<int> syncStatus;
+  final Value<String?> remoteId;
+  final Value<DateTime?> lastModified;
   const FirstAidLogCompanion({
     this.id = const Value.absent(),
     this.emergencyTreatmentId = const Value.absent(),
@@ -40227,6 +40499,9 @@ class FirstAidLogCompanion extends UpdateCompanion<FirstAidLogData> {
     this.epinephrine = const Value.absent(),
     this.otherMeds = const Value.absent(),
     this.sortOrder = const Value.absent(),
+    this.syncStatus = const Value.absent(),
+    this.remoteId = const Value.absent(),
+    this.lastModified = const Value.absent(),
   });
   FirstAidLogCompanion.insert({
     this.id = const Value.absent(),
@@ -40240,6 +40515,9 @@ class FirstAidLogCompanion extends UpdateCompanion<FirstAidLogData> {
     this.epinephrine = const Value.absent(),
     this.otherMeds = const Value.absent(),
     this.sortOrder = const Value.absent(),
+    this.syncStatus = const Value.absent(),
+    this.remoteId = const Value.absent(),
+    this.lastModified = const Value.absent(),
   }) : emergencyTreatmentId = Value(emergencyTreatmentId);
   static Insertable<FirstAidLogData> custom({
     Expression<int>? id,
@@ -40253,6 +40531,9 @@ class FirstAidLogCompanion extends UpdateCompanion<FirstAidLogData> {
     Expression<String>? epinephrine,
     Expression<String>? otherMeds,
     Expression<int>? sortOrder,
+    Expression<int>? syncStatus,
+    Expression<String>? remoteId,
+    Expression<DateTime>? lastModified,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -40267,6 +40548,9 @@ class FirstAidLogCompanion extends UpdateCompanion<FirstAidLogData> {
       if (epinephrine != null) 'epinephrine': epinephrine,
       if (otherMeds != null) 'other_meds': otherMeds,
       if (sortOrder != null) 'sort_order': sortOrder,
+      if (syncStatus != null) 'sync_status': syncStatus,
+      if (remoteId != null) 'remote_id': remoteId,
+      if (lastModified != null) 'last_modified': lastModified,
     });
   }
 
@@ -40282,6 +40566,9 @@ class FirstAidLogCompanion extends UpdateCompanion<FirstAidLogData> {
     Value<String?>? epinephrine,
     Value<String?>? otherMeds,
     Value<int>? sortOrder,
+    Value<int>? syncStatus,
+    Value<String?>? remoteId,
+    Value<DateTime?>? lastModified,
   }) {
     return FirstAidLogCompanion(
       id: id ?? this.id,
@@ -40295,6 +40582,9 @@ class FirstAidLogCompanion extends UpdateCompanion<FirstAidLogData> {
       epinephrine: epinephrine ?? this.epinephrine,
       otherMeds: otherMeds ?? this.otherMeds,
       sortOrder: sortOrder ?? this.sortOrder,
+      syncStatus: syncStatus ?? this.syncStatus,
+      remoteId: remoteId ?? this.remoteId,
+      lastModified: lastModified ?? this.lastModified,
     );
   }
 
@@ -40334,6 +40624,15 @@ class FirstAidLogCompanion extends UpdateCompanion<FirstAidLogData> {
     if (sortOrder.present) {
       map['sort_order'] = Variable<int>(sortOrder.value);
     }
+    if (syncStatus.present) {
+      map['sync_status'] = Variable<int>(syncStatus.value);
+    }
+    if (remoteId.present) {
+      map['remote_id'] = Variable<String>(remoteId.value);
+    }
+    if (lastModified.present) {
+      map['last_modified'] = Variable<DateTime>(lastModified.value);
+    }
     return map;
   }
 
@@ -40350,7 +40649,10 @@ class FirstAidLogCompanion extends UpdateCompanion<FirstAidLogData> {
           ..write('shock: $shock, ')
           ..write('epinephrine: $epinephrine, ')
           ..write('otherMeds: $otherMeds, ')
-          ..write('sortOrder: $sortOrder')
+          ..write('sortOrder: $sortOrder, ')
+          ..write('syncStatus: $syncStatus, ')
+          ..write('remoteId: $remoteId, ')
+          ..write('lastModified: $lastModified')
           ..write(')'))
         .toString();
   }
@@ -40397,8 +40699,49 @@ class $EmergencyAssistStaffTable extends EmergencyAssistStaff
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _syncStatusMeta = const VerificationMeta(
+    'syncStatus',
+  );
   @override
-  List<GeneratedColumn> get $columns => [id, emergencyTreatmentId, name];
+  late final GeneratedColumn<int> syncStatus = GeneratedColumn<int>(
+    'sync_status',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _remoteIdMeta = const VerificationMeta(
+    'remoteId',
+  );
+  @override
+  late final GeneratedColumn<String> remoteId = GeneratedColumn<String>(
+    'remote_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _lastModifiedMeta = const VerificationMeta(
+    'lastModified',
+  );
+  @override
+  late final GeneratedColumn<DateTime> lastModified = GeneratedColumn<DateTime>(
+    'last_modified',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    emergencyTreatmentId,
+    name,
+    syncStatus,
+    remoteId,
+    lastModified,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -40433,6 +40776,27 @@ class $EmergencyAssistStaffTable extends EmergencyAssistStaff
     } else if (isInserting) {
       context.missing(_nameMeta);
     }
+    if (data.containsKey('sync_status')) {
+      context.handle(
+        _syncStatusMeta,
+        syncStatus.isAcceptableOrUnknown(data['sync_status']!, _syncStatusMeta),
+      );
+    }
+    if (data.containsKey('remote_id')) {
+      context.handle(
+        _remoteIdMeta,
+        remoteId.isAcceptableOrUnknown(data['remote_id']!, _remoteIdMeta),
+      );
+    }
+    if (data.containsKey('last_modified')) {
+      context.handle(
+        _lastModifiedMeta,
+        lastModified.isAcceptableOrUnknown(
+          data['last_modified']!,
+          _lastModifiedMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -40457,6 +40821,18 @@ class $EmergencyAssistStaffTable extends EmergencyAssistStaff
         DriftSqlType.string,
         data['${effectivePrefix}name'],
       )!,
+      syncStatus: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}sync_status'],
+      )!,
+      remoteId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}remote_id'],
+      ),
+      lastModified: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}last_modified'],
+      ),
     );
   }
 
@@ -40471,10 +40847,16 @@ class EmergencyAssistStaffData extends DataClass
   final int id;
   final int emergencyTreatmentId;
   final String name;
+  final int syncStatus;
+  final String? remoteId;
+  final DateTime? lastModified;
   const EmergencyAssistStaffData({
     required this.id,
     required this.emergencyTreatmentId,
     required this.name,
+    required this.syncStatus,
+    this.remoteId,
+    this.lastModified,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -40482,6 +40864,13 @@ class EmergencyAssistStaffData extends DataClass
     map['id'] = Variable<int>(id);
     map['emergency_treatment_id'] = Variable<int>(emergencyTreatmentId);
     map['name'] = Variable<String>(name);
+    map['sync_status'] = Variable<int>(syncStatus);
+    if (!nullToAbsent || remoteId != null) {
+      map['remote_id'] = Variable<String>(remoteId);
+    }
+    if (!nullToAbsent || lastModified != null) {
+      map['last_modified'] = Variable<DateTime>(lastModified);
+    }
     return map;
   }
 
@@ -40490,6 +40879,13 @@ class EmergencyAssistStaffData extends DataClass
       id: Value(id),
       emergencyTreatmentId: Value(emergencyTreatmentId),
       name: Value(name),
+      syncStatus: Value(syncStatus),
+      remoteId: remoteId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(remoteId),
+      lastModified: lastModified == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastModified),
     );
   }
 
@@ -40504,6 +40900,9 @@ class EmergencyAssistStaffData extends DataClass
         json['emergencyTreatmentId'],
       ),
       name: serializer.fromJson<String>(json['name']),
+      syncStatus: serializer.fromJson<int>(json['syncStatus']),
+      remoteId: serializer.fromJson<String?>(json['remoteId']),
+      lastModified: serializer.fromJson<DateTime?>(json['lastModified']),
     );
   }
   @override
@@ -40513,6 +40912,9 @@ class EmergencyAssistStaffData extends DataClass
       'id': serializer.toJson<int>(id),
       'emergencyTreatmentId': serializer.toJson<int>(emergencyTreatmentId),
       'name': serializer.toJson<String>(name),
+      'syncStatus': serializer.toJson<int>(syncStatus),
+      'remoteId': serializer.toJson<String?>(remoteId),
+      'lastModified': serializer.toJson<DateTime?>(lastModified),
     };
   }
 
@@ -40520,10 +40922,16 @@ class EmergencyAssistStaffData extends DataClass
     int? id,
     int? emergencyTreatmentId,
     String? name,
+    int? syncStatus,
+    Value<String?> remoteId = const Value.absent(),
+    Value<DateTime?> lastModified = const Value.absent(),
   }) => EmergencyAssistStaffData(
     id: id ?? this.id,
     emergencyTreatmentId: emergencyTreatmentId ?? this.emergencyTreatmentId,
     name: name ?? this.name,
+    syncStatus: syncStatus ?? this.syncStatus,
+    remoteId: remoteId.present ? remoteId.value : this.remoteId,
+    lastModified: lastModified.present ? lastModified.value : this.lastModified,
   );
   EmergencyAssistStaffData copyWithCompanion(
     EmergencyAssistStaffCompanion data,
@@ -40534,6 +40942,13 @@ class EmergencyAssistStaffData extends DataClass
           ? data.emergencyTreatmentId.value
           : this.emergencyTreatmentId,
       name: data.name.present ? data.name.value : this.name,
+      syncStatus: data.syncStatus.present
+          ? data.syncStatus.value
+          : this.syncStatus,
+      remoteId: data.remoteId.present ? data.remoteId.value : this.remoteId,
+      lastModified: data.lastModified.present
+          ? data.lastModified.value
+          : this.lastModified,
     );
   }
 
@@ -40542,20 +40957,33 @@ class EmergencyAssistStaffData extends DataClass
     return (StringBuffer('EmergencyAssistStaffData(')
           ..write('id: $id, ')
           ..write('emergencyTreatmentId: $emergencyTreatmentId, ')
-          ..write('name: $name')
+          ..write('name: $name, ')
+          ..write('syncStatus: $syncStatus, ')
+          ..write('remoteId: $remoteId, ')
+          ..write('lastModified: $lastModified')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, emergencyTreatmentId, name);
+  int get hashCode => Object.hash(
+    id,
+    emergencyTreatmentId,
+    name,
+    syncStatus,
+    remoteId,
+    lastModified,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is EmergencyAssistStaffData &&
           other.id == this.id &&
           other.emergencyTreatmentId == this.emergencyTreatmentId &&
-          other.name == this.name);
+          other.name == this.name &&
+          other.syncStatus == this.syncStatus &&
+          other.remoteId == this.remoteId &&
+          other.lastModified == this.lastModified);
 }
 
 class EmergencyAssistStaffCompanion
@@ -40563,27 +40991,42 @@ class EmergencyAssistStaffCompanion
   final Value<int> id;
   final Value<int> emergencyTreatmentId;
   final Value<String> name;
+  final Value<int> syncStatus;
+  final Value<String?> remoteId;
+  final Value<DateTime?> lastModified;
   const EmergencyAssistStaffCompanion({
     this.id = const Value.absent(),
     this.emergencyTreatmentId = const Value.absent(),
     this.name = const Value.absent(),
+    this.syncStatus = const Value.absent(),
+    this.remoteId = const Value.absent(),
+    this.lastModified = const Value.absent(),
   });
   EmergencyAssistStaffCompanion.insert({
     this.id = const Value.absent(),
     required int emergencyTreatmentId,
     required String name,
+    this.syncStatus = const Value.absent(),
+    this.remoteId = const Value.absent(),
+    this.lastModified = const Value.absent(),
   }) : emergencyTreatmentId = Value(emergencyTreatmentId),
        name = Value(name);
   static Insertable<EmergencyAssistStaffData> custom({
     Expression<int>? id,
     Expression<int>? emergencyTreatmentId,
     Expression<String>? name,
+    Expression<int>? syncStatus,
+    Expression<String>? remoteId,
+    Expression<DateTime>? lastModified,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (emergencyTreatmentId != null)
         'emergency_treatment_id': emergencyTreatmentId,
       if (name != null) 'name': name,
+      if (syncStatus != null) 'sync_status': syncStatus,
+      if (remoteId != null) 'remote_id': remoteId,
+      if (lastModified != null) 'last_modified': lastModified,
     });
   }
 
@@ -40591,11 +41034,17 @@ class EmergencyAssistStaffCompanion
     Value<int>? id,
     Value<int>? emergencyTreatmentId,
     Value<String>? name,
+    Value<int>? syncStatus,
+    Value<String?>? remoteId,
+    Value<DateTime?>? lastModified,
   }) {
     return EmergencyAssistStaffCompanion(
       id: id ?? this.id,
       emergencyTreatmentId: emergencyTreatmentId ?? this.emergencyTreatmentId,
       name: name ?? this.name,
+      syncStatus: syncStatus ?? this.syncStatus,
+      remoteId: remoteId ?? this.remoteId,
+      lastModified: lastModified ?? this.lastModified,
     );
   }
 
@@ -40611,6 +41060,15 @@ class EmergencyAssistStaffCompanion
     if (name.present) {
       map['name'] = Variable<String>(name.value);
     }
+    if (syncStatus.present) {
+      map['sync_status'] = Variable<int>(syncStatus.value);
+    }
+    if (remoteId.present) {
+      map['remote_id'] = Variable<String>(remoteId.value);
+    }
+    if (lastModified.present) {
+      map['last_modified'] = Variable<DateTime>(lastModified.value);
+    }
     return map;
   }
 
@@ -40619,7 +41077,10 @@ class EmergencyAssistStaffCompanion
     return (StringBuffer('EmergencyAssistStaffCompanion(')
           ..write('id: $id, ')
           ..write('emergencyTreatmentId: $emergencyTreatmentId, ')
-          ..write('name: $name')
+          ..write('name: $name, ')
+          ..write('syncStatus: $syncStatus, ')
+          ..write('remoteId: $remoteId, ')
+          ..write('lastModified: $lastModified')
           ..write(')'))
         .toString();
   }
@@ -61874,6 +62335,9 @@ typedef $$MedicalStaffAssignmentTableCreateCompanionBuilder =
       Value<Uint8List?> signature,
       Value<DateTime?> signedAt,
       Value<DateTime> assignedAt,
+      Value<int> syncStatus,
+      Value<String?> remoteId,
+      Value<DateTime?> lastModified,
     });
 typedef $$MedicalStaffAssignmentTableUpdateCompanionBuilder =
     MedicalStaffAssignmentCompanion Function({
@@ -61886,6 +62350,9 @@ typedef $$MedicalStaffAssignmentTableUpdateCompanionBuilder =
       Value<Uint8List?> signature,
       Value<DateTime?> signedAt,
       Value<DateTime> assignedAt,
+      Value<int> syncStatus,
+      Value<String?> remoteId,
+      Value<DateTime?> lastModified,
     });
 
 final class $$MedicalStaffAssignmentTableReferences
@@ -61990,6 +62457,21 @@ class $$MedicalStaffAssignmentTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<int> get syncStatus => $composableBuilder(
+    column: $table.syncStatus,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get remoteId => $composableBuilder(
+    column: $table.remoteId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get lastModified => $composableBuilder(
+    column: $table.lastModified,
+    builder: (column) => ColumnFilters(column),
+  );
+
   $$MedicalRecordTableFilterComposer get medicalId {
     final $$MedicalRecordTableFilterComposer composer = $composerBuilder(
       composer: this,
@@ -62081,6 +62563,21 @@ class $$MedicalStaffAssignmentTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<int> get syncStatus => $composableBuilder(
+    column: $table.syncStatus,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get remoteId => $composableBuilder(
+    column: $table.remoteId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get lastModified => $composableBuilder(
+    column: $table.lastModified,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   $$MedicalRecordTableOrderingComposer get medicalId {
     final $$MedicalRecordTableOrderingComposer composer = $composerBuilder(
       composer: this,
@@ -62159,6 +62656,19 @@ class $$MedicalStaffAssignmentTableAnnotationComposer
 
   GeneratedColumn<DateTime> get assignedAt => $composableBuilder(
     column: $table.assignedAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get syncStatus => $composableBuilder(
+    column: $table.syncStatus,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get remoteId =>
+      $composableBuilder(column: $table.remoteId, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get lastModified => $composableBuilder(
+    column: $table.lastModified,
     builder: (column) => column,
   );
 
@@ -62257,6 +62767,9 @@ class $$MedicalStaffAssignmentTableTableManager
                 Value<Uint8List?> signature = const Value.absent(),
                 Value<DateTime?> signedAt = const Value.absent(),
                 Value<DateTime> assignedAt = const Value.absent(),
+                Value<int> syncStatus = const Value.absent(),
+                Value<String?> remoteId = const Value.absent(),
+                Value<DateTime?> lastModified = const Value.absent(),
               }) => MedicalStaffAssignmentCompanion(
                 staffAssignmentId: staffAssignmentId,
                 medicalId: medicalId,
@@ -62267,6 +62780,9 @@ class $$MedicalStaffAssignmentTableTableManager
                 signature: signature,
                 signedAt: signedAt,
                 assignedAt: assignedAt,
+                syncStatus: syncStatus,
+                remoteId: remoteId,
+                lastModified: lastModified,
               ),
           createCompanionCallback:
               ({
@@ -62279,6 +62795,9 @@ class $$MedicalStaffAssignmentTableTableManager
                 Value<Uint8List?> signature = const Value.absent(),
                 Value<DateTime?> signedAt = const Value.absent(),
                 Value<DateTime> assignedAt = const Value.absent(),
+                Value<int> syncStatus = const Value.absent(),
+                Value<String?> remoteId = const Value.absent(),
+                Value<DateTime?> lastModified = const Value.absent(),
               }) => MedicalStaffAssignmentCompanion.insert(
                 staffAssignmentId: staffAssignmentId,
                 medicalId: medicalId,
@@ -62289,6 +62808,9 @@ class $$MedicalStaffAssignmentTableTableManager
                 signature: signature,
                 signedAt: signedAt,
                 assignedAt: assignedAt,
+                syncStatus: syncStatus,
+                remoteId: remoteId,
+                lastModified: lastModified,
               ),
           withReferenceMapper: (p0) => p0
               .map(
@@ -76775,6 +77297,9 @@ typedef $$FirstAidLogTableCreateCompanionBuilder =
       Value<String?> epinephrine,
       Value<String?> otherMeds,
       Value<int> sortOrder,
+      Value<int> syncStatus,
+      Value<String?> remoteId,
+      Value<DateTime?> lastModified,
     });
 typedef $$FirstAidLogTableUpdateCompanionBuilder =
     FirstAidLogCompanion Function({
@@ -76789,6 +77314,9 @@ typedef $$FirstAidLogTableUpdateCompanionBuilder =
       Value<String?> epinephrine,
       Value<String?> otherMeds,
       Value<int> sortOrder,
+      Value<int> syncStatus,
+      Value<String?> remoteId,
+      Value<DateTime?> lastModified,
     });
 
 final class $$FirstAidLogTableReferences
@@ -76880,6 +77408,21 @@ class $$FirstAidLogTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<int> get syncStatus => $composableBuilder(
+    column: $table.syncStatus,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get remoteId => $composableBuilder(
+    column: $table.remoteId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get lastModified => $composableBuilder(
+    column: $table.lastModified,
+    builder: (column) => ColumnFilters(column),
+  );
+
   $$EmergencyTreatmentTableFilterComposer get emergencyTreatmentId {
     final $$EmergencyTreatmentTableFilterComposer composer = $composerBuilder(
       composer: this,
@@ -76963,6 +77506,21 @@ class $$FirstAidLogTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<int> get syncStatus => $composableBuilder(
+    column: $table.syncStatus,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get remoteId => $composableBuilder(
+    column: $table.remoteId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get lastModified => $composableBuilder(
+    column: $table.lastModified,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   $$EmergencyTreatmentTableOrderingComposer get emergencyTreatmentId {
     final $$EmergencyTreatmentTableOrderingComposer composer = $composerBuilder(
       composer: this,
@@ -77032,6 +77590,19 @@ class $$FirstAidLogTableAnnotationComposer
   GeneratedColumn<int> get sortOrder =>
       $composableBuilder(column: $table.sortOrder, builder: (column) => column);
 
+  GeneratedColumn<int> get syncStatus => $composableBuilder(
+    column: $table.syncStatus,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get remoteId =>
+      $composableBuilder(column: $table.remoteId, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get lastModified => $composableBuilder(
+    column: $table.lastModified,
+    builder: (column) => column,
+  );
+
   $$EmergencyTreatmentTableAnnotationComposer get emergencyTreatmentId {
     final $$EmergencyTreatmentTableAnnotationComposer composer =
         $composerBuilder(
@@ -77096,6 +77667,9 @@ class $$FirstAidLogTableTableManager
                 Value<String?> epinephrine = const Value.absent(),
                 Value<String?> otherMeds = const Value.absent(),
                 Value<int> sortOrder = const Value.absent(),
+                Value<int> syncStatus = const Value.absent(),
+                Value<String?> remoteId = const Value.absent(),
+                Value<DateTime?> lastModified = const Value.absent(),
               }) => FirstAidLogCompanion(
                 id: id,
                 emergencyTreatmentId: emergencyTreatmentId,
@@ -77108,6 +77682,9 @@ class $$FirstAidLogTableTableManager
                 epinephrine: epinephrine,
                 otherMeds: otherMeds,
                 sortOrder: sortOrder,
+                syncStatus: syncStatus,
+                remoteId: remoteId,
+                lastModified: lastModified,
               ),
           createCompanionCallback:
               ({
@@ -77122,6 +77699,9 @@ class $$FirstAidLogTableTableManager
                 Value<String?> epinephrine = const Value.absent(),
                 Value<String?> otherMeds = const Value.absent(),
                 Value<int> sortOrder = const Value.absent(),
+                Value<int> syncStatus = const Value.absent(),
+                Value<String?> remoteId = const Value.absent(),
+                Value<DateTime?> lastModified = const Value.absent(),
               }) => FirstAidLogCompanion.insert(
                 id: id,
                 emergencyTreatmentId: emergencyTreatmentId,
@@ -77134,6 +77714,9 @@ class $$FirstAidLogTableTableManager
                 epinephrine: epinephrine,
                 otherMeds: otherMeds,
                 sortOrder: sortOrder,
+                syncStatus: syncStatus,
+                remoteId: remoteId,
+                lastModified: lastModified,
               ),
           withReferenceMapper: (p0) => p0
               .map(
@@ -77207,12 +77790,18 @@ typedef $$EmergencyAssistStaffTableCreateCompanionBuilder =
       Value<int> id,
       required int emergencyTreatmentId,
       required String name,
+      Value<int> syncStatus,
+      Value<String?> remoteId,
+      Value<DateTime?> lastModified,
     });
 typedef $$EmergencyAssistStaffTableUpdateCompanionBuilder =
     EmergencyAssistStaffCompanion Function({
       Value<int> id,
       Value<int> emergencyTreatmentId,
       Value<String> name,
+      Value<int> syncStatus,
+      Value<String?> remoteId,
+      Value<DateTime?> lastModified,
     });
 
 final class $$EmergencyAssistStaffTableReferences
@@ -77273,6 +77862,21 @@ class $$EmergencyAssistStaffTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<int> get syncStatus => $composableBuilder(
+    column: $table.syncStatus,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get remoteId => $composableBuilder(
+    column: $table.remoteId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get lastModified => $composableBuilder(
+    column: $table.lastModified,
+    builder: (column) => ColumnFilters(column),
+  );
+
   $$EmergencyTreatmentTableFilterComposer get emergencyTreatmentId {
     final $$EmergencyTreatmentTableFilterComposer composer = $composerBuilder(
       composer: this,
@@ -77316,6 +77920,21 @@ class $$EmergencyAssistStaffTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<int> get syncStatus => $composableBuilder(
+    column: $table.syncStatus,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get remoteId => $composableBuilder(
+    column: $table.remoteId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get lastModified => $composableBuilder(
+    column: $table.lastModified,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   $$EmergencyTreatmentTableOrderingComposer get emergencyTreatmentId {
     final $$EmergencyTreatmentTableOrderingComposer composer = $composerBuilder(
       composer: this,
@@ -77354,6 +77973,19 @@ class $$EmergencyAssistStaffTableAnnotationComposer
 
   GeneratedColumn<String> get name =>
       $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<int> get syncStatus => $composableBuilder(
+    column: $table.syncStatus,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get remoteId =>
+      $composableBuilder(column: $table.remoteId, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get lastModified => $composableBuilder(
+    column: $table.lastModified,
+    builder: (column) => column,
+  );
 
   $$EmergencyTreatmentTableAnnotationComposer get emergencyTreatmentId {
     final $$EmergencyTreatmentTableAnnotationComposer composer =
@@ -77419,20 +78051,32 @@ class $$EmergencyAssistStaffTableTableManager
                 Value<int> id = const Value.absent(),
                 Value<int> emergencyTreatmentId = const Value.absent(),
                 Value<String> name = const Value.absent(),
+                Value<int> syncStatus = const Value.absent(),
+                Value<String?> remoteId = const Value.absent(),
+                Value<DateTime?> lastModified = const Value.absent(),
               }) => EmergencyAssistStaffCompanion(
                 id: id,
                 emergencyTreatmentId: emergencyTreatmentId,
                 name: name,
+                syncStatus: syncStatus,
+                remoteId: remoteId,
+                lastModified: lastModified,
               ),
           createCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
                 required int emergencyTreatmentId,
                 required String name,
+                Value<int> syncStatus = const Value.absent(),
+                Value<String?> remoteId = const Value.absent(),
+                Value<DateTime?> lastModified = const Value.absent(),
               }) => EmergencyAssistStaffCompanion.insert(
                 id: id,
                 emergencyTreatmentId: emergencyTreatmentId,
                 name: name,
+                syncStatus: syncStatus,
+                remoteId: remoteId,
+                lastModified: lastModified,
               ),
           withReferenceMapper: (p0) => p0
               .map(

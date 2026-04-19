@@ -1,8 +1,10 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:drift/drift.dart' as drift;
 import '../../data/db/database.dart';
+import '../../data/models/sync_service_provider.dart';
 import '../../medical/widgets/reference_search_sheet.dart';
 
 class DispatchInfo extends StatefulWidget {
@@ -44,6 +46,10 @@ class _DispatchInfoState extends State<DispatchInfo> {
   String _transportReason = '病情需要'; // 病情需要, 病人/家屬要求
   int? _ambulanceRecordId; // 真實的救護車紀錄 ID
 
+  // 用於監聽同步狀態
+  SyncServiceProvider? _syncProvider;
+  DateTime? _lastSyncTime;
+
   // 資料庫資料
   List<IncidentPlaceCategoryData> _locations = [];
   List<IncidentPlaceCategory2Data> _location2s = []; // 二級地點列表
@@ -61,6 +67,21 @@ class _DispatchInfoState extends State<DispatchInfo> {
     // 綁定 FocusListener 以在失焦時儲存
     _licensePlateFocus.addListener(_onFocusChange);
     _locationRemarksFocus.addListener(_onFocusChange);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // 監聽同步服務
+    _syncProvider = context.watch<SyncServiceProvider>();
+  }
+
+  // 同步完成後刷新資料
+  void _onSyncComplete() {
+    if (mounted) {
+      _loadData(); // 重新載入資料
+      debugPrint('系統：救護車派遣資訊已從同步刷新');
+    }
   }
 
   void _onFocusChange() {
@@ -194,7 +215,9 @@ class _DispatchInfoState extends State<DispatchInfo> {
 
     // 3. 代入 Treatment 資料 (如果 ReferralForm 沒有資料)
     if (_selectedHospitalId == null) {
-      final treatment = await db.ambulanceDao.getTreatmentByMedicalId(medicalId);
+      final treatment = await db.ambulanceDao.getTreatmentByMedicalId(
+        medicalId,
+      );
       if (treatment != null) {
         // A. 優先嘗試 ID
         if (treatment.referralHospitalId != null) {
@@ -351,6 +374,21 @@ class _DispatchInfoState extends State<DispatchInfo> {
   Widget build(BuildContext context) {
     if (_isLoading) {
       return const Center(child: CircularProgressIndicator());
+    }
+
+    // 監聽同步服務
+    _syncProvider = context.watch<SyncServiceProvider>();
+    final currentSyncTime = _syncProvider?.lastSyncTime;
+
+    // 頁面首次載入時同步一次（為了顯示之前同步下來的資料）
+    if (currentSyncTime != null && _lastSyncTime != currentSyncTime) {
+      _lastSyncTime = currentSyncTime;
+      Timer(const Duration(milliseconds: 500), () {
+        if (mounted) {
+          _loadData();
+          debugPrint('系統：救護車派遣資訊已刷新同步下來的資料');
+        }
+      });
     }
 
     return Column(

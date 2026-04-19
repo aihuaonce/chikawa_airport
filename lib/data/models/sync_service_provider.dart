@@ -142,6 +142,21 @@ class SyncServiceProvider extends ChangeNotifier with WidgetsBindingObserver {
       )..where((t) => t.syncStatus.equals(1))).get();
       count += healthAssessments.length;
 
+      final emergencyTreatments = await (_db.select(
+        _db.emergencyTreatment,
+      )..where((t) => t.syncStatus.equals(1))).get();
+      count += emergencyTreatments.length;
+
+      final firstAidLogs = await (_db.select(
+        _db.firstAidLog,
+      )..where((t) => t.syncStatus.equals(1))).get();
+      count += firstAidLogs.length;
+
+      final assistStaff = await (_db.select(
+        _db.emergencyAssistStaff,
+      )..where((t) => t.syncStatus.equals(1))).get();
+      count += assistStaff.length;
+
       _pendingCount = count;
     } catch (e) {
       debugPrint('Error counting pending syncs: $e');

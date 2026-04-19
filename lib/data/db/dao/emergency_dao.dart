@@ -11,6 +11,7 @@ part 'emergency_dao.g.dart';
     EmergencyAssistStaff,
     MedicalAssessment,
     MedicalRecord,
+    MedicalStaffAssignment,
   ],
 )
 class EmergencyDao extends DatabaseAccessor<AppDatabase>
@@ -115,11 +116,15 @@ class EmergencyDao extends DatabaseAccessor<AppDatabase>
 
   // 新增急救藥物記錄
   Future<int> addFirstAidLog(FirstAidLogCompanion companion) {
-    return into(firstAidLog).insert(companion);
+    return into(firstAidLog).insert(
+      companion.copyWith(syncStatus: const Value(1)),
+    );
   }
 
   // 刪除急救藥物記錄
   Future<int> deleteFirstAidLog(int id) {
+    // 這裡通常建議使用軟刪除或特殊的同步刪除機制，但目前先直接刪除
+    // 如果要支持同步刪除，需要一個 deletedAt 欄位
     return (delete(firstAidLog)..where((t) => t.id.equals(id))).go();
   }
 
@@ -134,11 +139,25 @@ class EmergencyDao extends DatabaseAccessor<AppDatabase>
 
   // 新增協助人員
   Future<int> addAssistStaff(EmergencyAssistStaffCompanion companion) {
-    return into(emergencyAssistStaff).insert(companion);
+    return into(emergencyAssistStaff).insert(
+      companion.copyWith(syncStatus: const Value(1)),
+    );
   }
 
   // 刪除協助人員
   Future<int> deleteAssistStaff(int id) {
     return (delete(emergencyAssistStaff)..where((t) => t.id.equals(id))).go();
+  }
+
+  // 更新醫療人員指派 (包含簽名)
+  Future<int> updateMedicalStaffAssignment(
+    MedicalStaffAssignmentCompanion companion,
+  ) {
+    final updatedCompanion = companion.copyWith(syncStatus: const Value(1));
+    return (update(medicalStaffAssignment)
+          ..where(
+            (t) => t.staffAssignmentId.equals(companion.staffAssignmentId.value),
+          ))
+        .write(updatedCompanion);
   }
 }
