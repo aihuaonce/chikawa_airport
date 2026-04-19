@@ -43,14 +43,15 @@ class AmbulanceDao extends DatabaseAccessor<AppDatabase>
               ..where((t) => t.medicalId.equals(data.medicalId.value)))
             .getSingleOrNull();
 
+    final dataWithSync = data.copyWith(syncStatus: const Value(1));
+
     if (existing != null) {
-      // AmbulanceSceneRecords 沒有 syncStatus，直接更新
       await (update(
         ambulanceSceneRecords,
-      )..where((t) => t.medicalId.equals(data.medicalId.value))).write(data);
+      )..where((t) => t.medicalId.equals(data.medicalId.value))).write(dataWithSync);
       return existing.id;
     } else {
-      return into(ambulanceSceneRecords).insert(data);
+      return into(ambulanceSceneRecords).insert(dataWithSync);
     }
   }
 

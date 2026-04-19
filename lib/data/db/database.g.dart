@@ -33250,6 +33250,18 @@ class $AmbulanceSceneRecordsTable extends AmbulanceSceneRecords
     requiredDuringInsert: false,
     defaultValue: currentDateAndTime,
   );
+  static const VerificationMeta _syncStatusMeta = const VerificationMeta(
+    'syncStatus',
+  );
+  @override
+  late final GeneratedColumn<int> syncStatus = GeneratedColumn<int>(
+    'sync_status',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -33267,6 +33279,7 @@ class $AmbulanceSceneRecordsTable extends AmbulanceSceneRecords
     historyNote,
     createdAt,
     updatedAt,
+    syncStatus,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -33393,6 +33406,12 @@ class $AmbulanceSceneRecordsTable extends AmbulanceSceneRecords
         updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
       );
     }
+    if (data.containsKey('sync_status')) {
+      context.handle(
+        _syncStatusMeta,
+        syncStatus.isAcceptableOrUnknown(data['sync_status']!, _syncStatusMeta),
+      );
+    }
     return context;
   }
 
@@ -33465,6 +33484,10 @@ class $AmbulanceSceneRecordsTable extends AmbulanceSceneRecords
         DriftSqlType.dateTime,
         data['${effectivePrefix}updated_at'],
       )!,
+      syncStatus: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}sync_status'],
+      )!,
     );
   }
 
@@ -33491,6 +33514,7 @@ class AmbulanceSceneRecordData extends DataClass
   final String? historyNote;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final int syncStatus;
   const AmbulanceSceneRecordData({
     required this.id,
     required this.medicalId,
@@ -33507,6 +33531,7 @@ class AmbulanceSceneRecordData extends DataClass
     this.historyNote,
     required this.createdAt,
     required this.updatedAt,
+    required this.syncStatus,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -33542,6 +33567,7 @@ class AmbulanceSceneRecordData extends DataClass
     }
     map['created_at'] = Variable<DateTime>(createdAt);
     map['updated_at'] = Variable<DateTime>(updatedAt);
+    map['sync_status'] = Variable<int>(syncStatus);
     return map;
   }
 
@@ -33578,6 +33604,7 @@ class AmbulanceSceneRecordData extends DataClass
           : Value(historyNote),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
+      syncStatus: Value(syncStatus),
     );
   }
 
@@ -33602,6 +33629,7 @@ class AmbulanceSceneRecordData extends DataClass
       historyNote: serializer.fromJson<String?>(json['historyNote']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      syncStatus: serializer.fromJson<int>(json['syncStatus']),
     );
   }
   @override
@@ -33623,6 +33651,7 @@ class AmbulanceSceneRecordData extends DataClass
       'historyNote': serializer.toJson<String?>(historyNote),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'syncStatus': serializer.toJson<int>(syncStatus),
     };
   }
 
@@ -33642,6 +33671,7 @@ class AmbulanceSceneRecordData extends DataClass
     Value<String?> historyNote = const Value.absent(),
     DateTime? createdAt,
     DateTime? updatedAt,
+    int? syncStatus,
   }) => AmbulanceSceneRecordData(
     id: id ?? this.id,
     medicalId: medicalId ?? this.medicalId,
@@ -33664,6 +33694,7 @@ class AmbulanceSceneRecordData extends DataClass
     historyNote: historyNote.present ? historyNote.value : this.historyNote,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
+    syncStatus: syncStatus ?? this.syncStatus,
   );
   AmbulanceSceneRecordData copyWithCompanion(
     AmbulanceSceneRecordsCompanion data,
@@ -33704,6 +33735,9 @@ class AmbulanceSceneRecordData extends DataClass
           : this.historyNote,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      syncStatus: data.syncStatus.present
+          ? data.syncStatus.value
+          : this.syncStatus,
     );
   }
 
@@ -33724,7 +33758,8 @@ class AmbulanceSceneRecordData extends DataClass
           ..write('historyStatus: $historyStatus, ')
           ..write('historyNote: $historyNote, ')
           ..write('createdAt: $createdAt, ')
-          ..write('updatedAt: $updatedAt')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('syncStatus: $syncStatus')
           ..write(')'))
         .toString();
   }
@@ -33746,6 +33781,7 @@ class AmbulanceSceneRecordData extends DataClass
     historyNote,
     createdAt,
     updatedAt,
+    syncStatus,
   );
   @override
   bool operator ==(Object other) =>
@@ -33765,7 +33801,8 @@ class AmbulanceSceneRecordData extends DataClass
           other.historyStatus == this.historyStatus &&
           other.historyNote == this.historyNote &&
           other.createdAt == this.createdAt &&
-          other.updatedAt == this.updatedAt);
+          other.updatedAt == this.updatedAt &&
+          other.syncStatus == this.syncStatus);
 }
 
 class AmbulanceSceneRecordsCompanion
@@ -33785,6 +33822,7 @@ class AmbulanceSceneRecordsCompanion
   final Value<String?> historyNote;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
+  final Value<int> syncStatus;
   const AmbulanceSceneRecordsCompanion({
     this.id = const Value.absent(),
     this.medicalId = const Value.absent(),
@@ -33801,6 +33839,7 @@ class AmbulanceSceneRecordsCompanion
     this.historyNote = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
+    this.syncStatus = const Value.absent(),
   });
   AmbulanceSceneRecordsCompanion.insert({
     this.id = const Value.absent(),
@@ -33818,6 +33857,7 @@ class AmbulanceSceneRecordsCompanion
     this.historyNote = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
+    this.syncStatus = const Value.absent(),
   }) : medicalId = Value(medicalId);
   static Insertable<AmbulanceSceneRecordData> custom({
     Expression<int>? id,
@@ -33835,6 +33875,7 @@ class AmbulanceSceneRecordsCompanion
     Expression<String>? historyNote,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
+    Expression<int>? syncStatus,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -33852,6 +33893,7 @@ class AmbulanceSceneRecordsCompanion
       if (historyNote != null) 'history_note': historyNote,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
+      if (syncStatus != null) 'sync_status': syncStatus,
     });
   }
 
@@ -33871,6 +33913,7 @@ class AmbulanceSceneRecordsCompanion
     Value<String?>? historyNote,
     Value<DateTime>? createdAt,
     Value<DateTime>? updatedAt,
+    Value<int>? syncStatus,
   }) {
     return AmbulanceSceneRecordsCompanion(
       id: id ?? this.id,
@@ -33888,6 +33931,7 @@ class AmbulanceSceneRecordsCompanion
       historyNote: historyNote ?? this.historyNote,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      syncStatus: syncStatus ?? this.syncStatus,
     );
   }
 
@@ -33939,6 +33983,9 @@ class AmbulanceSceneRecordsCompanion
     if (updatedAt.present) {
       map['updated_at'] = Variable<DateTime>(updatedAt.value);
     }
+    if (syncStatus.present) {
+      map['sync_status'] = Variable<int>(syncStatus.value);
+    }
     return map;
   }
 
@@ -33959,7 +34006,8 @@ class AmbulanceSceneRecordsCompanion
           ..write('historyStatus: $historyStatus, ')
           ..write('historyNote: $historyNote, ')
           ..write('createdAt: $createdAt, ')
-          ..write('updatedAt: $updatedAt')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('syncStatus: $syncStatus')
           ..write(')'))
         .toString();
   }
@@ -71219,6 +71267,7 @@ typedef $$AmbulanceSceneRecordsTableCreateCompanionBuilder =
       Value<String?> historyNote,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
+      Value<int> syncStatus,
     });
 typedef $$AmbulanceSceneRecordsTableUpdateCompanionBuilder =
     AmbulanceSceneRecordsCompanion Function({
@@ -71237,6 +71286,7 @@ typedef $$AmbulanceSceneRecordsTableUpdateCompanionBuilder =
       Value<String?> historyNote,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
+      Value<int> syncStatus,
     });
 
 final class $$AmbulanceSceneRecordsTableReferences
@@ -71382,6 +71432,11 @@ class $$AmbulanceSceneRecordsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<int> get syncStatus => $composableBuilder(
+    column: $table.syncStatus,
+    builder: (column) => ColumnFilters(column),
+  );
+
   $$MedicalRecordTableFilterComposer get medicalId {
     final $$MedicalRecordTableFilterComposer composer = $composerBuilder(
       composer: this,
@@ -71511,6 +71566,11 @@ class $$AmbulanceSceneRecordsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<int> get syncStatus => $composableBuilder(
+    column: $table.syncStatus,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   $$MedicalRecordTableOrderingComposer get medicalId {
     final $$MedicalRecordTableOrderingComposer composer = $composerBuilder(
       composer: this,
@@ -71605,6 +71665,11 @@ class $$AmbulanceSceneRecordsTableAnnotationComposer
 
   GeneratedColumn<DateTime> get updatedAt =>
       $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<int> get syncStatus => $composableBuilder(
+    column: $table.syncStatus,
+    builder: (column) => column,
+  );
 
   $$MedicalRecordTableAnnotationComposer get medicalId {
     final $$MedicalRecordTableAnnotationComposer composer = $composerBuilder(
@@ -71714,6 +71779,7 @@ class $$AmbulanceSceneRecordsTableTableManager
                 Value<String?> historyNote = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> syncStatus = const Value.absent(),
               }) => AmbulanceSceneRecordsCompanion(
                 id: id,
                 medicalId: medicalId,
@@ -71730,6 +71796,7 @@ class $$AmbulanceSceneRecordsTableTableManager
                 historyNote: historyNote,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
+                syncStatus: syncStatus,
               ),
           createCompanionCallback:
               ({
@@ -71748,6 +71815,7 @@ class $$AmbulanceSceneRecordsTableTableManager
                 Value<String?> historyNote = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> syncStatus = const Value.absent(),
               }) => AmbulanceSceneRecordsCompanion.insert(
                 id: id,
                 medicalId: medicalId,
@@ -71764,6 +71832,7 @@ class $$AmbulanceSceneRecordsTableTableManager
                 historyNote: historyNote,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
+                syncStatus: syncStatus,
               ),
           withReferenceMapper: (p0) => p0
               .map(

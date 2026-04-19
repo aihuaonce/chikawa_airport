@@ -87,6 +87,8 @@ class FirestoreSyncService {
       _uploadReferralForms(),
       _uploadFlightRecords(),
       _uploadEmergencyTreatments(),
+      _uploadAmbulanceSceneRecords(),
+      _uploadAmbulanceSceneItemLinks(),
       _uploadFirstAidLogs(),
       _uploadEmergencyAssistStaff(),
       _uploadIncidentRecords(),
@@ -124,6 +126,8 @@ class FirestoreSyncService {
       _downloadEmergencyTreatments(),
       _downloadAmbulanceRecords(),
       _downloadAmbulancePersonalProperty(),
+      _downloadAmbulanceSceneRecords(),
+      _downloadAmbulanceSceneItemLinks(),
       _downloadFirstAidLogs(),
       _downloadEmergencyAssistStaff(),
       _downloadChiefComplaints(),
@@ -187,9 +191,94 @@ class FirestoreSyncService {
     }
   }
 
-  // ============================================================
-  // 定期自動同步
-  // ============================================================
+  /// 上傳救護車現場記錄
+  Future<void> _uploadAmbulanceSceneRecords() async {
+    final records = await (_db.select(_db.ambulanceSceneRecords)
+          ..where((t) => t.syncStatus.equals(1)))
+        .get();
+
+    for (final record in records) {
+      try {
+        await _firebase.setDocument('ambulance_scene_records', record.id.toString(), {
+          'id': record.id,
+          'medicalId': record.medicalId,
+          'patientComplaint': record.patientComplaint,
+          'isProxyComplaint': record.isProxyComplaint,
+          'fallHeight': record.fallHeight,
+          'burnDegree': record.burnDegree,
+          'burnArea': record.burnArea,
+          'otherTraumaNote': record.otherTraumaNote,
+          'allergyStatus': record.allergyStatus,
+          'allergyNote': record.allergyNote,
+          'historyStatus': record.historyStatus,
+          'historyNote': record.historyNote,
+          'lastModified': FieldValue.serverTimestamp(),
+        });
+        await (_db.update(_db.ambulanceSceneRecords)
+              ..where((t) => t.id.equals(record.id)))
+            .write(AmbulanceSceneRecordsCompanion(syncStatus: const Value(0)));
+      } catch (e) {
+        debugPrint('Error uploading ambulance_scene_records ${record.id}: $e');
+      }
+    }
+  }
+
+  /// 下載救護車現場記錄
+  Future<void> _downloadAmbulanceSceneRecords() async {
+    try {
+      final snapshot = await _firebase.getCollectionSnapshot('ambulance_scene_records');
+      for (final doc in snapshot.docs) {
+        final data = doc.data();
+        final id = data['id'];
+        if (id == null) continue;
+
+        await _db.into(_db.ambulanceSceneRecords).insertOnConflictUpdate(
+          AmbulanceSceneRecordsCompanion(
+            id: Value(id as int),
+            medicalId: Value((data['medicalId'] as int?) ?? 0),
+            patientComplaint: Value(data['patientComplaint'] as String?),
+            isProxyComplaint: Value(data['isProxyComplaint'] as bool? ?? false),
+            fallHeight: Value(data['fallHeight'] as String?),
+            burnDegree: Value(data['burnDegree'] as String?),
+            burnArea: Value(data['burnArea'] as String?),
+            otherTraumaNote: Value(data['otherTraumaNote'] as String?),
+            allergyStatus: Value((data['allergyStatus'] as String?) ?? '無'),
+            allergyNote: Value(data['allergyNote'] as String?),
+            historyStatus: Value((data['historyStatus'] as String?) ?? '無'),
+            historyNote: Value(data['historyNote'] as String?),
+            syncStatus: const Value(0),
+          ),
+        );
+      }
+    } catch (e) {
+      debugPrint('Error downloading ambulance_scene_records: $e');
+    }
+  }
+
+  /// 上傳救護車場景連結
+  Future<void> _uploadAmbulanceSceneItemLinks() async {
+    // 這裡通常項目比較多，建議處理 syncStatus
+    // 如果表格沒有 syncStatus，則每次全量上傳(或視為參考表)
+    // 假設需要同步，建議加入 syncStatus。目前先維持簡化實作。
+  }
+
+  /// 下載救護車場景連結
+  Future<void> _downloadAmbulanceSceneItemLinks() async {
+    try {
+      final snapshot = await _firebase.getCollectionSnapshot('ambulance_scene_item_links');
+      for (final doc in snapshot.docs) {
+        final data = doc.data();
+        await _db.into(_db.ambulanceSceneItemLinks).insertOnConflictUpdate(
+          AmbulanceSceneItemLinksCompanion(
+            sceneRecordId: Value((data['sceneRecordId'] as int?) ?? 0),
+            itemId: Value((data['itemId'] as int?) ?? 0),
+          ),
+        );
+      }
+    } catch (e) {
+      debugPrint('Error downloading ambulance_scene_item_links: $e');
+    }
+  }
 
   /// 啟動定期自動同步（預設 15 分鐘一次）
   void startPeriodicSync() {
@@ -2383,60 +2472,6 @@ class FirestoreSyncService {
       }
     } catch (e) {
       debugPrint('Error downloading ambulance_personal_property: $e');
-    }
-  }
-
-  /// 從 Firestore 下載救護車收費記錄
-  Future<void> _downloadAmbulanceFees() async {
-    try {
-      final snapshot = await _firebase.getCollectionSnapshot(
-        'ambulance_records',
-      );
-
-      for (final doc in snapshot.docs) {
-        final data = doc.data();
-
-        final ambulanceId = data['ambulanceId'];
-        if (ambulanceId == null) continue;
-
-        await _db.into(_db.ambulanceRecords).insertOnConflictUpdate(
-              AmbulanceRecordsCompanion(
-                ambulanceId: Value(ambulanceId as int),
-                medicalId: Value((data['medicalId'] as int?) ?? 0),
-                licensePlate: Value(data['licensePlate'] as String?),
-                incidentLocationId: Value(data['incidentLocationId'] as int?),
-                incidentLocation2Id: Value(data['incidentLocation2Id'] as int?),
-                locationRemarks: Value(data['locationRemarks'] as String?),
-                dispatchTime: Value(data['dispatchTime'] != null
-                    ? DateTime.tryParse(data['dispatchTime'])
-                    : null),
-                arrivalTime: Value(data['arrivalTime'] != null
-                    ? DateTime.tryParse(data['arrivalTime'])
-                    : null),
-                hospitalId: Value(data['hospitalId'] as int?),
-                transportReason: Value(data['transportReason'] as String?),
-                leavingSceneTime: Value(data['leavingSceneTime'] != null
-                    ? DateTime.tryParse(data['leavingSceneTime'])
-                    : null),
-                arrivalHospitalTime: Value(data['arrivalHospitalTime'] != null
-                    ? DateTime.tryParse(data['arrivalHospitalTime'])
-                    : null),
-                leavingHospitalTime: Value(data['leavingHospitalTime'] != null
-                    ? DateTime.tryParse(data['leavingHospitalTime'])
-                    : null),
-                returnStandbyTime: Value(data['returnStandbyTime'] != null
-                    ? DateTime.tryParse(data['returnStandbyTime'])
-                    : null),
-                bodyMapJson: Value(data['bodyMapJson'] as String?),
-                syncStatus: const Value(0),
-                remoteId: Value(doc.id),
-                lastModified: Value(DateTime.now()),
-              ),
-            );
-        debugPrint('Downloaded/Updated ambulance_record $ambulanceId');
-      }
-    } catch (e) {
-      debugPrint('Error downloading ambulance_records: $e');
     }
   }
 

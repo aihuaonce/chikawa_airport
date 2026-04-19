@@ -38,6 +38,7 @@ class AmbulanceSceneRecords extends Table {
 
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
   DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
+  IntColumn get syncStatus => integer().withDefault(const Constant(0))();
 }
 
 // 救護車參考選項表 (用於儲存各類選單項目)
