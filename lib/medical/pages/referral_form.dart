@@ -256,9 +256,12 @@ class _ReferralFormState extends State<ReferralForm> {
     final viewModel = context.watch<ReferralFormViewModel>();
     final treatmentViewModel = context.watch<TreatmentViewModel>();
 
-    // 檢查是否有轉診需求 (hasAmbulance)
-    final medicalRecord = treatmentViewModel.medicalRecord;
-    if (medicalRecord == null || !medicalRecord.hasAmbulance) {
+    // 檢查是否有轉診需求 (從 treatment.actionSummary 取得，而非從 medicalRecord.hasAmbulance)
+    // 因為 medicalRecord.hasAmbulance 需要儲存後才會更新
+    final treatment = treatmentViewModel.treatment;
+    final hasReferral =
+        treatment?.actionSummary?.split(',').contains('建議轉診') ?? false;
+    if (!hasReferral) {
       return const Center(
         child: Text(
           '此案件無需轉診，無需填寫此轉診單。\n(This case does not require referral)',

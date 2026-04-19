@@ -6,6 +6,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 import '../../data/models/medical/treatment_view.dart';
+import '../../data/models/sync_service_provider.dart';
 import '../../data/db/database.dart';
 import '../widgets/icd10_search_sheet.dart';
 import '../widgets/staff_search_sheet.dart';
@@ -38,6 +39,10 @@ class _TreatmentRecordState extends State<TreatmentRecord>
   String _screeningMethod = '';
   bool _photoTrauma = false, _photoEcg = false, _photoOther = false;
   bool _photoInitializedFromSync = false; // 標記是否已從同步初始化過勾選狀態
+
+  // 用於監聽同步狀態
+  SyncServiceProvider? _syncProvider;
+  DateTime? _lastSyncTime;
 
   // --- 動態欄位狀態 (前端專用) ---
   String _intubationMethod = 'Endotracheal tube';
@@ -106,13 +111,8 @@ class _TreatmentRecordState extends State<TreatmentRecord>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // 每次進入頁面時檢查是否需要刷新勾選狀態
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        final viewModel = context.read<TreatmentViewModel>();
-        viewModel.refreshFromRemote();
-      }
-    });
+    // 現在依賴 build() 中的 SyncServiceProvider 監聽來自動處理同步
+    // 移除這裡的 refreshFromRemote() 避免覆蓋用戶修改
   }
 
   void _initControllers() {
@@ -189,11 +189,8 @@ class _TreatmentRecordState extends State<TreatmentRecord>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    // 當 app 恢復到前台時，刷新勾選狀態（確保同步後的資料正確顯示）
-    if (state == AppLifecycleState.resumed) {
-      final viewModel = context.read<TreatmentViewModel>();
-      viewModel.refreshFromRemote();
-    }
+    // 移除 app 恢復時的自動刷新，避免覆蓋用戶修改
+    // 同步會在背景定期執行，用戶可以手動刷新頁面
   }
 
   // --- 核心邏輯：ViewModel 同步 ---
@@ -309,6 +306,25 @@ class _TreatmentRecordState extends State<TreatmentRecord>
     final viewModel = context.watch<TreatmentViewModel>();
     final treatment = viewModel.treatment;
     final medicalRecord = viewModel.medicalRecord;
+
+    // 監聽同步服務
+    _syncProvider = context.watch<SyncServiceProvider>();
+    final currentSyncTime = _syncProvider?.lastSyncTime;
+
+    // 頁面首次載入時同步一次（為了顯示之前同步下來的資料）
+    // treatment == null 時才需要刷新（表示是首次從 init() 加載）
+    if (!_isInitialized && currentSyncTime != null) {
+      _lastSyncTime = currentSyncTime;
+      // 使用 Timer 延遲一點執行，確保 init() 已完成
+      Timer(const Duration(milliseconds: 500), () {
+        if (mounted) {
+          viewModel.refreshFromRemote();
+        }
+      });
+    }
+
+    // 之後只在頁面真正需要刷新時才刷新（例如用戶主動刷新、或從其他頁面返回）
+    // 不再自動監聽 syncTime 變化來刷新，避免覆蓋用戶未儲存的修改
 
     // 從 ViewModel 同步 CDC 狀態（每次 rebuild 都同步，確保不丟失）
     if (medicalRecord != null) {
@@ -2064,14 +2080,6 @@ class _TreatmentRecordState extends State<TreatmentRecord>
                 viewModel.updateReferralHospitalId(null);
                 viewModel.updateReferralHospitalFinal(null);
                 viewModel.updateAmbulanceStaffId(null);
-              } else if (item.name == '藥物使用') {
-                // 刪除所有藥物記錄
-                final medsToDelete = List<int>.from(
-                  viewModel.medications.map((m) => m.medicationId),
-                );
-                for (var id in medsToDelete) {
-                  await viewModel.deleteMedication(id);
-                }
               }
             }
             // 使用 ViewModel 的多對多方法

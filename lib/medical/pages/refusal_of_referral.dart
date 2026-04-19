@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -5,6 +6,7 @@ import 'package:provider/provider.dart';
 
 import '../../data/models/medical/referral_form_view.dart';
 import '../../data/models/medical/treatment_view.dart';
+import '../../data/models/sync_service_provider.dart';
 import '../widgets/signature_field.dart';
 
 class RefusalOfReferral extends StatefulWidget {
@@ -44,6 +46,10 @@ class _RefusalOfReferralState extends State<RefusalOfReferral> {
   // 初始化標記
   bool _isPatientInitialized = false;
   bool _isFormInitialized = false;
+
+  // 用於監聽同步狀態
+  SyncServiceProvider? _syncProvider;
+  DateTime? _lastSyncTime;
 
   Uint8List? _signatorySignature;
 
@@ -136,13 +142,11 @@ class _RefusalOfReferralState extends State<RefusalOfReferral> {
     // 3. 處理轉診單/切結書資料
     final form = referralViewModel.form;
     if (form != null && !_isFormInitialized) {
+      // 先從 selectedRelationship 帶入，若無則從 otherRelationship (自訂值) 帶入
       final relationshipName =
-          referralViewModel.selectedRelationship?.name.trim() ?? '';
-      final otherRelationship = form.otherRelationship?.trim() ?? '';
-      final resolvedRelationship =
-          relationshipName.isNotEmpty && relationshipName != '其他'
-          ? relationshipName
-          : otherRelationship;
+          referralViewModel.selectedRelationship?.name.trim() ??
+          form.otherRelationship?.trim() ??
+          '';
 
       // 填入已存資料
       if (form.contactName != null) {
@@ -151,8 +155,9 @@ class _RefusalOfReferralState extends State<RefusalOfReferral> {
       if (form.contactIdNo != null) {
         _signatoryIdController.text = form.contactIdNo!;
       }
-      if (resolvedRelationship.isNotEmpty) {
-        _relationshipController.text = resolvedRelationship;
+      // 關係優先從 selectedRelationship 帶入，若無則從 otherRelationship 帶入（自訂值）
+      if (relationshipName.isNotEmpty) {
+        _relationshipController.text = relationshipName;
       }
       if (form.contactAddress != null) {
         _addressController.text = form.contactAddress!;
@@ -173,9 +178,11 @@ class _RefusalOfReferralState extends State<RefusalOfReferral> {
       final patientId = (patient?.passportOrIdNo ?? patient?.idNo ?? '').trim();
       final signatoryName = _signatoryNameController.text.trim();
       final signatoryId = _signatoryIdController.text.trim();
+      // 使用 controller 中的值來判斷是否為本人
+      final currentRelationship = _relationshipController.text.trim();
       _isSelf =
-          resolvedRelationship == '本人' ||
-          ((resolvedRelationship.isEmpty || resolvedRelationship == '自己') &&
+          currentRelationship == '本人' ||
+          ((currentRelationship.isEmpty || currentRelationship == '自己') &&
               signatoryName.isNotEmpty &&
               signatoryName == patientName &&
               signatoryId == patientId);
@@ -197,6 +204,21 @@ class _RefusalOfReferralState extends State<RefusalOfReferral> {
   Widget build(BuildContext context) {
     final treatmentViewModel = context.watch<TreatmentViewModel>();
     final referralViewModel = context.watch<ReferralFormViewModel>();
+
+    // 監聽同步服務
+    _syncProvider = context.watch<SyncServiceProvider>();
+    final currentSyncTime = _syncProvider?.lastSyncTime;
+
+    // 頁面首次載入時同步一次（為了顯示之前同步下來的資料）
+    if (!_isFormInitialized && currentSyncTime != null) {
+      _lastSyncTime = currentSyncTime;
+      Timer(const Duration(milliseconds: 500), () {
+        if (mounted) {
+          referralViewModel.refresh();
+        }
+      });
+    }
+
     _updateControllers(treatmentViewModel, referralViewModel);
 
     // 檢查處置結果是否為拒絕轉診
@@ -290,11 +312,23 @@ class _RefusalOfReferralState extends State<RefusalOfReferral> {
                   _buildTextField(
                     hint: '例如：本人、父母、配偶',
                     controller: _relationshipController,
-                    onChanged: (val) => referralViewModel.updateConsent(
-                      relationshipId:
-                          referralViewModel.selectedRelationship?.id,
-                      otherRelationship: val,
-                    ),
+                    onChanged: (val) {
+                      // 直接從 refService 找對應的 relationshipType
+                      // t.name 格式為「配偶 (Spouse)」，需特殊處理
+                      final relTypes = referralViewModel.relationshipTypes;
+                      final matchedType = relTypes
+                          .where(
+                            (t) =>
+                                t.name.startsWith(val) ||
+                                t.name.contains(' ($val)') ||
+                                t.nameEn?.toLowerCase() == val.toLowerCase(),
+                          )
+                          .firstOrNull;
+                      referralViewModel.updateConsent(
+                        relationshipId: matchedType?.id,
+                        otherRelationship: matchedType == null ? val : null,
+                      );
+                    },
                   ),
                 ),
               )
@@ -391,13 +425,24 @@ class _RefusalOfReferralState extends State<RefusalOfReferral> {
                           parsedDate?.month ?? DateTime.now().month,
                           parsedDate?.day ?? DateTime.now().day,
                         );
+                    // 從文字找對應的 relationshipType
+                    // t.name 格式為「配偶 (Spouse)」，需特殊處理
+                    final relText = _relationshipController.text.trim();
+                    final relTypes = referralViewModel.relationshipTypes;
+                    final matchedRel = relTypes
+                        .where(
+                          (t) =>
+                              t.name.startsWith(relText) ||
+                              t.name.contains(' ($relText)') ||
+                              t.nameEn?.toLowerCase() == relText.toLowerCase(),
+                        )
+                        .firstOrNull;
                     referralViewModel.updateConsent(
-                      relationshipId:
-                          referralViewModel.selectedRelationship?.id,
+                      relationshipId: matchedRel?.id,
                       otherRelationship:
-                          _relationshipController.text.trim().isEmpty
-                          ? null
-                          : _relationshipController.text.trim(),
+                          matchedRel == null && relText.isNotEmpty
+                          ? relText
+                          : null,
                       consentDateTime: consentDateTime,
                     );
                     referralViewModel.updateConsentSignature(data);
@@ -626,9 +671,14 @@ class _RefusalOfReferralState extends State<RefusalOfReferral> {
           phone: patient.telephone,
           idNo: patient.passportOrIdNo ?? patient.idNo,
         );
+        // 找「本人」對應的 relationshipType
+        final relTypes = referralViewModel.relationshipTypes;
+        final selfRel = relTypes
+            .where((t) => t.name == '本人' || t.nameEn?.toLowerCase() == 'self')
+            .firstOrNull;
         referralViewModel.updateConsent(
-          relationshipId: referralViewModel.selectedRelationship?.id,
-          otherRelationship: '本人',
+          relationshipId: selfRel?.id,
+          otherRelationship: selfRel == null ? '本人' : null,
         );
       }
     } else {
@@ -645,7 +695,7 @@ class _RefusalOfReferralState extends State<RefusalOfReferral> {
         phone: '',
       );
       referralViewModel.updateConsent(
-        relationshipId: referralViewModel.selectedRelationship?.id,
+        relationshipId: null,
         otherRelationship: '',
       );
     }
@@ -691,11 +741,23 @@ class _RefusalOfReferralState extends State<RefusalOfReferral> {
           'yyyy/MM/dd',
         ).format(selectedDate);
       });
+      // 從文字找對應的 relationshipType
+      // t.name 格式為「配偶 (Spouse)」，需特殊處理
+      final relText = _relationshipController.text.trim();
+      final relTypes = referralViewModel.relationshipTypes;
+      final matchedRel = relTypes
+          .where(
+            (t) =>
+                t.name.startsWith(relText) ||
+                t.name.contains(' ($relText)') ||
+                t.nameEn?.toLowerCase() == relText.toLowerCase(),
+          )
+          .firstOrNull;
       referralViewModel.updateConsent(
-        relationshipId: referralViewModel.selectedRelationship?.id,
-        otherRelationship: _relationshipController.text.trim().isEmpty
-            ? null
-            : _relationshipController.text.trim(),
+        relationshipId: matchedRel?.id,
+        otherRelationship: matchedRel == null && relText.isNotEmpty
+            ? relText
+            : null,
         consentDateTime: selectedDate,
       );
     }

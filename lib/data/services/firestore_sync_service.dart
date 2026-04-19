@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:drift/drift.dart';
 import 'package:flutter/foundation.dart';
@@ -558,7 +559,7 @@ class FirestoreSyncService {
 
     for (final fee in fees) {
       try {
-        await _firebase.setDocument('medical_fees', fee.feeId.toString(), {
+        final Map<String, dynamic> feeData = {
           'feeId': fee.feeId,
           'medicalId': fee.medicalId,
           'paymentMethodId': fee.paymentMethodId,
@@ -573,8 +574,32 @@ class FirestoreSyncService {
           'applicantUnit': fee.applicantUnit,
           'applicantPhone': fee.applicantPhone,
           'remarks': fee.remarks,
+          'abnormalReason': fee.abnormalReason,
           'lastModified': FieldValue.serverTimestamp(),
-        });
+        };
+
+        // 加入簽名欄位（轉為 base64）
+        if (fee.consenterSignature != null) {
+          feeData['consenterSignatureBase64'] = base64Encode(
+            fee.consenterSignature!,
+          );
+        }
+        if (fee.witnessSignature != null) {
+          feeData['witnessSignatureBase64'] = base64Encode(
+            fee.witnessSignature!,
+          );
+        }
+        if (fee.counterSignature != null) {
+          feeData['counterSignatureBase64'] = base64Encode(
+            fee.counterSignature!,
+          );
+        }
+
+        await _firebase.setDocument(
+          'medical_fees',
+          fee.feeId.toString(),
+          feeData,
+        );
 
         await (_db.update(_db.medicalFees)
               ..where((t) => t.feeId.equals(fee.feeId)))
@@ -620,6 +645,16 @@ class FirestoreSyncService {
 
     for (final form in forms) {
       try {
+        // 簽名轉為 base64
+        String? doctorSignatureBase64;
+        if (form.doctorSignature != null) {
+          doctorSignatureBase64 = base64Encode(form.doctorSignature!);
+        }
+        String? consentSignatureBase64;
+        if (form.consentSignature != null) {
+          consentSignatureBase64 = base64Encode(form.consentSignature!);
+        }
+
         await _firebase.setDocument('referral_forms', form.formId.toString(), {
           'formId': form.formId,
           'medicalId': form.medicalId,
@@ -628,14 +663,32 @@ class FirestoreSyncService {
           'contactPhone': form.contactPhone,
           'contactAddress': form.contactAddress,
           'primaryDiagnosis': form.primaryDiagnosis,
+          'secondaryDiagnosis1': form.secondaryDiagnosis1,
+          'secondaryDiagnosis2': form.secondaryDiagnosis2,
+          'recentExamResult': form.recentExamResult,
+          'examDate': form.examDate?.toIso8601String(),
+          'recentMedication': form.recentMedication,
+          'medicationDate': form.medicationDate?.toIso8601String(),
           'referralPurposeId': form.referralPurposeId,
+          'otherPurpose': form.otherPurpose,
           'doctorName': form.doctorName,
           'doctorDepartment': form.doctorDepartment,
+          'doctorSignature': doctorSignatureBase64,
+          'orderDate': form.orderDate?.toIso8601String(),
+          'notes': form.notes,
           'hospitalName': form.hospitalName,
           'hospitalDept': form.hospitalDept,
           'hospitalDoctor': form.hospitalDoctor,
           'hospitalPhone': form.hospitalPhone,
           'hospitalAddress': form.hospitalAddress,
+          'scheduledDate': form.scheduledDate?.toIso8601String(),
+          'scheduledDept': form.scheduledDept,
+          'scheduledRoom': form.scheduledRoom,
+          'scheduledNumber': form.scheduledNumber,
+          'relationshipId': form.relationshipId,
+          'otherRelationship': form.otherRelationship,
+          'consentSignature': consentSignatureBase64,
+          'consentDateTime': form.consentDateTime?.toIso8601String(),
           'lastModified': FieldValue.serverTimestamp(),
         });
 
@@ -1489,6 +1542,7 @@ class FirestoreSyncService {
   Future<void> _downloadFees() async {
     try {
       final snapshot = await _firebase.getCollectionSnapshot('medical_fees');
+      debugPrint('下載醫療費用: 遠端有 ${snapshot.docs.length} 筆');
 
       for (final doc in snapshot.docs) {
         final data = doc.data();
@@ -1496,29 +1550,109 @@ class FirestoreSyncService {
         final feeId = data['feeId'];
         if (feeId == null) continue;
 
+        debugPrint('檢查醫療費用: feeId=$feeId');
+
         final existing = await (_db.select(
           _db.medicalFees,
         )..where((t) => t.feeId.equals(feeId as int))).getSingleOrNull();
 
-        if (existing != null) continue;
+        // 解析簽名（從 base64 解碼）
+        Uint8List? consenterSig;
+        Uint8List? witnessSig;
+        Uint8List? counterSig;
 
-        await _db
-            .into(_db.medicalFees)
-            .insert(
-              MedicalFeesCompanion.insert(
-                medicalId: (data['medicalId'] as int?) ?? 0,
-                consultFee: Value(
-                  (data['consultFee'] as num?)?.toDouble() ?? 0.0,
-                ),
-                ambulanceFee: Value(
-                  (data['ambulanceFee'] as num?)?.toDouble() ?? 0.0,
-                ),
-                syncStatus: const Value(0),
-                remoteId: Value(doc.id),
-                lastModified: Value(DateTime.now()),
+        final consenterBase64 = data['consenterSignatureBase64'] as String?;
+        final witnessBase64 = data['witnessSignatureBase64'] as String?;
+        final counterBase64 = data['counterSignatureBase64'] as String?;
+
+        if (consenterBase64 != null && consenterBase64.isNotEmpty) {
+          try {
+            consenterSig = base64Decode(consenterBase64);
+          } catch (e) {
+            debugPrint('解析 consenterSignature 失敗: $e');
+          }
+        }
+        if (witnessBase64 != null && witnessBase64.isNotEmpty) {
+          try {
+            witnessSig = base64Decode(witnessBase64);
+          } catch (e) {
+            debugPrint('解析 witnessSignature 失敗: $e');
+          }
+        }
+        if (counterBase64 != null && counterBase64.isNotEmpty) {
+          try {
+            counterSig = base64Decode(counterBase64);
+          } catch (e) {
+            debugPrint('解析 counterSignature 失敗: $e');
+          }
+        }
+
+        if (existing != null) {
+          // 記錄已存在，更新欄位
+          await (_db.update(
+            _db.medicalFees,
+          )..where((t) => t.feeId.equals(feeId as int))).write(
+            MedicalFeesCompanion(
+              paymentMethodId: Value(data['paymentMethodId'] as int?),
+              paymentType: Value(data['paymentType'] as String?),
+              consultFee: Value(
+                (data['consultFee'] as num?)?.toDouble() ?? 0.0,
               ),
-            );
-        debugPrint('Downloaded medical_fee $feeId');
+              ambulanceFee: Value(
+                (data['ambulanceFee'] as num?)?.toDouble() ?? 0.0,
+              ),
+              currencyId: Value(data['currencyId'] as int?),
+              collectionStatusId: Value(data['collectionStatusId'] as int?),
+              receiptIssued: Value(data['receiptIssued'] as bool? ?? false),
+              userAgreed: Value(data['userAgreed'] as bool? ?? false),
+              applicantName: Value(data['applicantName'] as String?),
+              applicantUnit: Value(data['applicantUnit'] as String?),
+              applicantPhone: Value(data['applicantPhone'] as String?),
+              remarks: Value(data['remarks'] as String?),
+              abnormalReason: Value(data['abnormalReason'] as String?),
+              consenterSignature: Value(consenterSig),
+              witnessSignature: Value(witnessSig),
+              counterSignature: Value(counterSig),
+              syncStatus: const Value(0),
+              remoteId: Value(doc.id),
+              lastModified: Value(DateTime.now()),
+            ),
+          );
+          debugPrint('Updated medical_fee $feeId from remote');
+        } else {
+          // 記錄不存在，插入新記錄
+          await _db
+              .into(_db.medicalFees)
+              .insert(
+                MedicalFeesCompanion.insert(
+                  medicalId: (data['medicalId'] as int?) ?? 0,
+                  paymentMethodId: Value(data['paymentMethodId'] as int?),
+                  paymentType: Value(data['paymentType'] as String?),
+                  consultFee: Value(
+                    (data['consultFee'] as num?)?.toDouble() ?? 0.0,
+                  ),
+                  ambulanceFee: Value(
+                    (data['ambulanceFee'] as num?)?.toDouble() ?? 0.0,
+                  ),
+                  currencyId: Value(data['currencyId'] as int?),
+                  collectionStatusId: Value(data['collectionStatusId'] as int?),
+                  receiptIssued: Value(data['receiptIssued'] as bool? ?? false),
+                  userAgreed: Value(data['userAgreed'] as bool? ?? false),
+                  applicantName: Value(data['applicantName'] as String?),
+                  applicantUnit: Value(data['applicantUnit'] as String?),
+                  applicantPhone: Value(data['applicantPhone'] as String?),
+                  remarks: Value(data['remarks'] as String?),
+                  abnormalReason: Value(data['abnormalReason'] as String?),
+                  consenterSignature: Value(consenterSig),
+                  witnessSignature: Value(witnessSig),
+                  counterSignature: Value(counterSig),
+                  syncStatus: const Value(0),
+                  remoteId: Value(doc.id),
+                  lastModified: Value(DateTime.now()),
+                ),
+              );
+          debugPrint('Downloaded medical_fee $feeId');
+        }
       }
     } catch (e) {
       debugPrint('Error downloading medical_fees: $e');
@@ -1582,27 +1716,146 @@ class FirestoreSyncService {
           _db.referralForms,
         )..where((t) => t.formId.equals(formId as int))).getSingleOrNull();
 
-        if (existing != null) continue;
+        // 解析日期欄位
+        DateTime? examDate;
+        if (data['examDate'] != null) {
+          examDate = DateTime.tryParse(data['examDate'] as String);
+        }
+        DateTime? medicationDate;
+        if (data['medicationDate'] != null) {
+          medicationDate = DateTime.tryParse(data['medicationDate'] as String);
+        }
+        DateTime? orderDate;
+        if (data['orderDate'] != null) {
+          orderDate = DateTime.tryParse(data['orderDate'] as String);
+        }
+        DateTime? scheduledDate;
+        if (data['scheduledDate'] != null) {
+          scheduledDate = DateTime.tryParse(data['scheduledDate'] as String);
+        }
+        DateTime? consentDateTime;
+        if (data['consentDateTime'] != null) {
+          consentDateTime = DateTime.tryParse(
+            data['consentDateTime'] as String,
+          );
+        }
 
-        await _db
-            .into(_db.referralForms)
-            .insert(
-              ReferralFormsCompanion.insert(
-                medicalId: (data['medicalId'] as int?) ?? 0,
-                contactName: Value(data['contactName'] as String?),
-                contactPhone: Value(data['contactPhone'] as String?),
-                contactAddress: Value(data['contactAddress'] as String?),
-                primaryDiagnosis: Value(data['primaryDiagnosis'] as String?),
-                referralPurposeId: Value(data['referralPurposeId'] as int?),
-                doctorName: Value(data['doctorName'] as String?),
-                hospitalName: Value(data['hospitalName'] as String?),
-                hospitalPhone: Value(data['hospitalPhone'] as String?),
-                syncStatus: const Value(0),
-                remoteId: Value(doc.id),
-                lastModified: Value(DateTime.now()),
+        // 解析簽名 base64
+        Uint8List? doctorSignature;
+        if (data['doctorSignature'] != null) {
+          try {
+            doctorSignature = base64Decode(data['doctorSignature'] as String);
+          } catch (e) {
+            debugPrint('Error decoding doctorSignature: $e');
+          }
+        }
+        Uint8List? consentSignature;
+        if (data['consentSignature'] != null) {
+          try {
+            consentSignature = base64Decode(data['consentSignature'] as String);
+          } catch (e) {
+            debugPrint('Error decoding consentSignature: $e');
+          }
+        }
+
+        if (existing != null) {
+          // 更新已存在的記錄
+          await (_db.update(
+            _db.referralForms,
+          )..where((t) => t.formId.equals(formId as int))).write(
+            ReferralFormsCompanion(
+              contactName: Value(data['contactName'] as String?),
+              contactIdNo: Value(data['contactIdNo'] as String?),
+              contactPhone: Value(data['contactPhone'] as String?),
+              contactAddress: Value(data['contactAddress'] as String?),
+              primaryDiagnosis: Value(data['primaryDiagnosis'] as String?),
+              secondaryDiagnosis1: Value(
+                data['secondaryDiagnosis1'] as String?,
               ),
-            );
-        debugPrint('Downloaded referral_form $formId');
+              secondaryDiagnosis2: Value(
+                data['secondaryDiagnosis2'] as String?,
+              ),
+              recentExamResult: Value(data['recentExamResult'] as String?),
+              examDate: Value(examDate),
+              recentMedication: Value(data['recentMedication'] as String?),
+              medicationDate: Value(medicationDate),
+              referralPurposeId: Value(data['referralPurposeId'] as int?),
+              otherPurpose: Value(data['otherPurpose'] as String?),
+              doctorName: Value(data['doctorName'] as String?),
+              doctorDepartment: Value(data['doctorDepartment'] as String?),
+              doctorSignature: Value(doctorSignature),
+              orderDate: Value(orderDate),
+              notes: Value(data['notes'] as String?),
+              hospitalName: Value(data['hospitalName'] as String?),
+              hospitalDept: Value(data['hospitalDept'] as String?),
+              hospitalDoctor: Value(data['hospitalDoctor'] as String?),
+              hospitalPhone: Value(data['hospitalPhone'] as String?),
+              hospitalAddress: Value(data['hospitalAddress'] as String?),
+              scheduledDate: Value(scheduledDate),
+              scheduledDept: Value(data['scheduledDept'] as String?),
+              scheduledRoom: Value(data['scheduledRoom'] as String?),
+              scheduledNumber: Value(data['scheduledNumber'] as String?),
+              relationshipId: Value(data['relationshipId'] as int?),
+              otherRelationship: Value(data['otherRelationship'] as String?),
+              consentSignature: Value(consentSignature),
+              consentDateTime: Value(consentDateTime),
+              remoteId: Value(doc.id),
+              lastModified: Value(DateTime.now()),
+            ),
+          );
+          debugPrint('Updated referral_form $formId from remote');
+        } else {
+          // 插入新記錄
+          await _db
+              .into(_db.referralForms)
+              .insert(
+                ReferralFormsCompanion.insert(
+                  formId: Value(formId as int),
+                  medicalId: (data['medicalId'] as int?) ?? 0,
+                  contactName: Value(data['contactName'] as String?),
+                  contactIdNo: Value(data['contactIdNo'] as String?),
+                  contactPhone: Value(data['contactPhone'] as String?),
+                  contactAddress: Value(data['contactAddress'] as String?),
+                  primaryDiagnosis: Value(data['primaryDiagnosis'] as String?),
+                  secondaryDiagnosis1: Value(
+                    data['secondaryDiagnosis1'] as String?,
+                  ),
+                  secondaryDiagnosis2: Value(
+                    data['secondaryDiagnosis2'] as String?,
+                  ),
+                  recentExamResult: Value(data['recentExamResult'] as String?),
+                  examDate: Value(examDate),
+                  recentMedication: Value(data['recentMedication'] as String?),
+                  medicationDate: Value(medicationDate),
+                  referralPurposeId: Value(data['referralPurposeId'] as int?),
+                  otherPurpose: Value(data['otherPurpose'] as String?),
+                  doctorName: Value(data['doctorName'] as String?),
+                  doctorDepartment: Value(data['doctorDepartment'] as String?),
+                  doctorSignature: Value(doctorSignature),
+                  orderDate: Value(orderDate),
+                  notes: Value(data['notes'] as String?),
+                  hospitalName: Value(data['hospitalName'] as String?),
+                  hospitalDept: Value(data['hospitalDept'] as String?),
+                  hospitalDoctor: Value(data['hospitalDoctor'] as String?),
+                  hospitalPhone: Value(data['hospitalPhone'] as String?),
+                  hospitalAddress: Value(data['hospitalAddress'] as String?),
+                  scheduledDate: Value(scheduledDate),
+                  scheduledDept: Value(data['scheduledDept'] as String?),
+                  scheduledRoom: Value(data['scheduledRoom'] as String?),
+                  scheduledNumber: Value(data['scheduledNumber'] as String?),
+                  relationshipId: Value(data['relationshipId'] as int?),
+                  otherRelationship: Value(
+                    data['otherRelationship'] as String?,
+                  ),
+                  consentSignature: Value(consentSignature),
+                  consentDateTime: Value(consentDateTime),
+                  syncStatus: const Value(0),
+                  remoteId: Value(doc.id),
+                  lastModified: Value(DateTime.now()),
+                ),
+              );
+          debugPrint('Downloaded referral_form $formId');
+        }
       }
     } catch (e) {
       debugPrint('Error downloading referral_forms: $e');
@@ -1811,26 +2064,50 @@ class FirestoreSyncService {
                   ..where((t) => t.certificateId.equals(certificateId as int)))
                 .getSingleOrNull();
 
-        if (existing != null) continue;
-
         final issuanceDateStr = data['issuanceDate'] as String?;
         DateTime? issuanceDate;
         if (issuanceDateStr != null) {
           issuanceDate = DateTime.tryParse(issuanceDateStr);
         }
 
-        await _db
-            .into(_db.medicalCertificates)
-            .insert(
-              MedicalCertificatesCompanion.insert(
-                medicalId: (data['medicalId'] as int?) ?? 0,
-                issuanceDate: Value(issuanceDate),
-                syncStatus: const Value(0),
-                remoteId: Value(doc.id),
-                lastModified: Value(DateTime.now()),
-              ),
-            );
-        debugPrint('Downloaded medical_certificate $certificateId');
+        if (existing != null) {
+          // 更新已存在的記錄
+          await (_db.update(
+            _db.medicalCertificates,
+          )..where((t) => t.certificateId.equals(certificateId as int))).write(
+            MedicalCertificatesCompanion(
+              diagnosisCategoryId: Value(data['diagnosisCategoryId'] as int?),
+              diagnosisResult: Value(data['diagnosisResult'] as String?),
+              chineseAdvice: Value(data['chineseAdvice'] as String?),
+              englishAdvice: Value(data['englishAdvice'] as String?),
+              issuanceDate: Value(issuanceDate),
+              remoteId: Value(doc.id),
+              lastModified: Value(DateTime.now()),
+            ),
+          );
+          debugPrint('Updated medical_certificate $certificateId from remote');
+        } else {
+          // 插入新記錄
+          await _db
+              .into(_db.medicalCertificates)
+              .insert(
+                MedicalCertificatesCompanion.insert(
+                  certificateId: Value(certificateId as int),
+                  medicalId: (data['medicalId'] as int?) ?? 0,
+                  diagnosisCategoryId: Value(
+                    data['diagnosisCategoryId'] as int?,
+                  ),
+                  diagnosisResult: Value(data['diagnosisResult'] as String?),
+                  chineseAdvice: Value(data['chineseAdvice'] as String?),
+                  englishAdvice: Value(data['englishAdvice'] as String?),
+                  issuanceDate: Value(issuanceDate),
+                  syncStatus: const Value(0),
+                  remoteId: Value(doc.id),
+                  lastModified: Value(DateTime.now()),
+                ),
+              );
+          debugPrint('Downloaded medical_certificate $certificateId');
+        }
       }
     } catch (e) {
       debugPrint('Error downloading medical_certificates: $e');
