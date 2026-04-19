@@ -16,6 +16,10 @@ mixin _$EmergencyDaoMixin on DatabaseAccessor<AppDatabase> {
   $FirstAidLogTable get firstAidLog => attachedDatabase.firstAidLog;
   $EmergencyAssistStaffTable get emergencyAssistStaff =>
       attachedDatabase.emergencyAssistStaff;
+  $MedicalStaffRoleTable get medicalStaffRole =>
+      attachedDatabase.medicalStaffRole;
+  $MedicalStaffAssignmentTable get medicalStaffAssignment =>
+      attachedDatabase.medicalStaffAssignment;
   EmergencyDaoManager get managers => EmergencyDaoManager(this);
 }
 
@@ -50,5 +54,15 @@ class EmergencyDaoManager {
       $$EmergencyAssistStaffTableTableManager(
         _db.attachedDatabase,
         _db.emergencyAssistStaff,
+      );
+  $$MedicalStaffRoleTableTableManager get medicalStaffRole =>
+      $$MedicalStaffRoleTableTableManager(
+        _db.attachedDatabase,
+        _db.medicalStaffRole,
+      );
+  $$MedicalStaffAssignmentTableTableManager get medicalStaffAssignment =>
+      $$MedicalStaffAssignmentTableTableManager(
+        _db.attachedDatabase,
+        _db.medicalStaffAssignment,
       );
 }

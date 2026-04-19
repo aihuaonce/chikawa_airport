@@ -343,6 +343,10 @@ class MedicalStaffAssignment extends Table {
   BlobColumn get signature => blob().nullable()();
   DateTimeColumn get signedAt => dateTime().nullable()();
   DateTimeColumn get assignedAt => dateTime().withDefault(currentDateAndTime)();
+
+  IntColumn get syncStatus => integer().withDefault(const Constant(0))();
+  TextColumn get remoteId => text().nullable()();
+  DateTimeColumn get lastModified => dateTime().nullable()();
 }
 
 //處置-特別註記表
@@ -596,6 +600,10 @@ class FirstAidLog extends Table {
   TextColumn get otherMeds => text().nullable()(); // JSON
 
   IntColumn get sortOrder => integer().withDefault(const Constant(0))();
+
+  IntColumn get syncStatus => integer().withDefault(const Constant(0))();
+  TextColumn get remoteId => text().nullable()();
+  DateTimeColumn get lastModified => dateTime().nullable()();
 }
 
 // 急救處置-協助人員表
@@ -605,4 +613,8 @@ class EmergencyAssistStaff extends Table {
   IntColumn get emergencyTreatmentId =>
       integer().references(EmergencyTreatment, #id)();
   TextColumn get name => text()();
+
+  IntColumn get syncStatus => integer().withDefault(const Constant(0))();
+  TextColumn get remoteId => text().nullable()();
+  DateTimeColumn get lastModified => dateTime().nullable()();
 }
