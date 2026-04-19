@@ -123,9 +123,9 @@ class FirestoreSyncService {
       _downloadContacts(),
       _downloadEmergencyTreatments(),
       _downloadAmbulanceRecords(),
+      _downloadAmbulancePersonalProperty(),
       _downloadFirstAidLogs(),
       _downloadEmergencyAssistStaff(),
-      // 新增下載
       _downloadChiefComplaints(),
       _downloadMedicalHistories(),
       _downloadSpecialNotes(),
@@ -136,6 +136,55 @@ class FirestoreSyncService {
       _downloadMedications(),
     ]);
     debugPrint('FirestoreSyncService: Download from remote completed');
+  }
+
+  /// 從 Firestore 下載救護車記錄
+  Future<void> _downloadAmbulanceRecords() async {
+    try {
+      final snapshot = await _firebase.getCollectionSnapshot('ambulance_records');
+      for (final doc in snapshot.docs) {
+        final data = doc.data();
+        final ambulanceId = data['ambulanceId'];
+        if (ambulanceId == null) continue;
+
+        await _db.into(_db.ambulanceRecords).insertOnConflictUpdate(
+              AmbulanceRecordsCompanion(
+                ambulanceId: Value(ambulanceId as int),
+                medicalId: Value((data['medicalId'] as int?) ?? 0),
+                licensePlate: Value(data['licensePlate'] as String?),
+                incidentLocationId: Value(data['incidentLocationId'] as int?),
+                incidentLocation2Id: Value(data['incidentLocation2Id'] as int?),
+                locationRemarks: Value(data['locationRemarks'] as String?),
+                dispatchTime: Value(data['dispatchTime'] != null
+                    ? DateTime.tryParse(data['dispatchTime'])
+                    : null),
+                arrivalTime: Value(data['arrivalTime'] != null
+                    ? DateTime.tryParse(data['arrivalTime'])
+                    : null),
+                hospitalId: Value(data['hospitalId'] as int?),
+                transportReason: Value(data['transportReason'] as String?),
+                leavingSceneTime: Value(data['leavingSceneTime'] != null
+                    ? DateTime.tryParse(data['leavingSceneTime'])
+                    : null),
+                arrivalHospitalTime: Value(data['arrivalHospitalTime'] != null
+                    ? DateTime.tryParse(data['arrivalHospitalTime'])
+                    : null),
+                leavingHospitalTime: Value(data['leavingHospitalTime'] != null
+                    ? DateTime.tryParse(data['leavingHospitalTime'])
+                    : null),
+                returnStandbyTime: Value(data['returnStandbyTime'] != null
+                    ? DateTime.tryParse(data['returnStandbyTime'])
+                    : null),
+                bodyMapJson: Value(data['bodyMapJson'] as String?),
+                syncStatus: const Value(0),
+                remoteId: Value(doc.id),
+                lastModified: Value(DateTime.now()),
+              ),
+            );
+      }
+    } catch (e) {
+      debugPrint('Error downloading ambulance_records: $e');
+    }
   }
 
   // ============================================================
@@ -1333,6 +1382,7 @@ class FirestoreSyncService {
               'financialDetails': record.financialDetails,
               'isHandled': record.isHandled,
               'custodianName': record.custodianName,
+              'custodianSignature': record.custodianSignature,
               'createdAt': record.createdAt.toIso8601String(),
               'updatedAt': record.updatedAt.toIso8601String(),
               'lastModified': FieldValue.serverTimestamp(),
@@ -2304,8 +2354,40 @@ class FirestoreSyncService {
     }
   }
 
-  /// 從 Firestore 下載救護車記錄
-  Future<void> _downloadAmbulanceRecords() async {
+  /// 從 Firestore 下載救護車個人財物
+  Future<void> _downloadAmbulancePersonalProperty() async {
+    try {
+      final snapshot = await _firebase.getCollectionSnapshot(
+        'ambulance_personal_property',
+      );
+
+      for (final doc in snapshot.docs) {
+        final data = doc.data();
+        final id = data['id'];
+        if (id == null) continue;
+
+        await _db.into(_db.ambulancePersonalProperty).insertOnConflictUpdate(
+              AmbulancePersonalPropertyCompanion(
+                id: Value(id as int),
+                medicalId: Value((data['medicalId'] as int?) ?? 0),
+                financialDetails: Value(data['financialDetails'] as String?),
+                isHandled: Value(data['isHandled'] as bool? ?? false),
+                custodianName: Value(data['custodianName'] as String?),
+                custodianSignature: Value(_parseBytes(data['custodianSignature'])),
+                syncStatus: const Value(0),
+                remoteId: Value(doc.id),
+                lastModified: Value(DateTime.now()),
+              ),
+            );
+        debugPrint('Downloaded/Updated ambulance_personal_property $id');
+      }
+    } catch (e) {
+      debugPrint('Error downloading ambulance_personal_property: $e');
+    }
+  }
+
+  /// 從 Firestore 下載救護車收費記錄
+  Future<void> _downloadAmbulanceFees() async {
     try {
       final snapshot = await _firebase.getCollectionSnapshot(
         'ambulance_records',
