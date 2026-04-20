@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart';
 import '../database.dart';
 import '../tables/ambulance_treatment_tables.dart';
+import '../tables/sync_tables.dart';
 
 part 'ambulance_treatment_dao.g.dart';
 
@@ -171,13 +172,18 @@ class AmbulanceTreatmentDao extends DatabaseAccessor<AppDatabase>
     final medicalId = companion.medicalId.value;
     final existing = await getRecord(medicalId);
 
+    // Always mark as pending sync
+    final companionWithSync = companion.copyWith(
+      syncStatus: const Value(SyncStatus.pending),
+    );
+
     if (existing != null) {
       await (update(
         ambulanceTreatmentRecords,
-      )..where((t) => t.id.equals(existing.id))).write(companion);
+      )..where((t) => t.id.equals(existing.id))).write(companionWithSync);
       return existing.id;
     } else {
-      return await into(ambulanceTreatmentRecords).insert(companion);
+      return await into(ambulanceTreatmentRecords).insert(companionWithSync);
     }
   }
 
@@ -231,12 +237,17 @@ class AmbulanceTreatmentDao extends DatabaseAccessor<AppDatabase>
             ))
             .getSingleOrNull();
 
+    // Always mark as pending sync
+    final companionWithSync = companion.copyWith(
+      syncStatus: const Value(SyncStatus.pending),
+    );
+
     if (existing != null) {
       await (update(
         ambulanceTreatmentRecordItems,
-      )..where((t) => t.id.equals(existing.id))).write(companion);
+      )..where((t) => t.id.equals(existing.id))).write(companionWithSync);
     } else {
-      await into(ambulanceTreatmentRecordItems).insert(companion);
+      await into(ambulanceTreatmentRecordItems).insert(companionWithSync);
     }
   }
 
@@ -259,13 +270,18 @@ class AmbulanceTreatmentDao extends DatabaseAccessor<AppDatabase>
   }
 
   Future<int> addMedicationLog(AmbulanceMedicationLogsCompanion companion) {
-    return into(ambulanceMedicationLogs).insert(companion);
+    // Mark as pending sync
+    final companionWithSync = companion.copyWith(
+      syncStatus: const Value(SyncStatus.pending),
+    );
+    return into(ambulanceMedicationLogs).insert(companionWithSync);
   }
 
-  Future<void> deleteMedicationLog(int id) {
-    return (delete(
-      ambulanceMedicationLogs,
-    )..where((t) => t.id.equals(id))).go();
+  Future<void> deleteMedicationLog(int id) async {
+    // Mark as pending sync before deleting
+    await (update(ambulanceMedicationLogs)..where((t) => t.id.equals(id)))
+        .write(const AmbulanceMedicationLogsCompanion(syncStatus: Value(1)));
+    await (delete(ambulanceMedicationLogs)..where((t) => t.id.equals(id))).go();
   }
 
   // --- Vital Signs ---
@@ -281,20 +297,32 @@ class AmbulanceTreatmentDao extends DatabaseAccessor<AppDatabase>
   }
 
   Future<int> addVitalSign(AmbulanceVitalSignsCompanion companion) {
-    return into(ambulanceVitalSigns).insert(companion);
+    // Mark as pending sync
+    final companionWithSync = companion.copyWith(
+      syncStatus: const Value(SyncStatus.pending),
+    );
+    return into(ambulanceVitalSigns).insert(companionWithSync);
   }
 
   Future<void> updateVitalSign(AmbulanceVitalSignsCompanion companion) async {
-    // Assuming id is present in companion for updates
+    // Assume id is present in companion for updates
     if (companion.id.present) {
-      await (update(
-        ambulanceVitalSigns,
-      )..where((t) => t.id.equals(companion.id.value))).write(companion);
+      // Mark as pending sync
+      final companionWithSync = companion.copyWith(
+        syncStatus: const Value(SyncStatus.pending),
+      );
+      await (update(ambulanceVitalSigns)
+            ..where((t) => t.id.equals(companion.id.value)))
+          .write(companionWithSync);
     }
   }
 
-  Future<void> deleteVitalSign(int id) {
-    return (delete(ambulanceVitalSigns)..where((t) => t.id.equals(id))).go();
+  Future<void> deleteVitalSign(int id) async {
+    // Mark as pending sync before deleting
+    await (update(ambulanceVitalSigns)..where((t) => t.id.equals(id))).write(
+      const AmbulanceVitalSignsCompanion(syncStatus: Value(1)),
+    );
+    await (delete(ambulanceVitalSigns)..where((t) => t.id.equals(id))).go();
   }
 
   // --- Escort Staff ---
@@ -306,11 +334,19 @@ class AmbulanceTreatmentDao extends DatabaseAccessor<AppDatabase>
   }
 
   Future<int> addEscortStaff(AmbulanceEscortStaffCompanion companion) {
-    return into(ambulanceEscortStaff).insert(companion);
+    // Mark as pending sync
+    final companionWithSync = companion.copyWith(
+      syncStatus: const Value(SyncStatus.pending),
+    );
+    return into(ambulanceEscortStaff).insert(companionWithSync);
   }
 
-  Future<void> deleteEscortStaff(int id) {
-    return (delete(ambulanceEscortStaff)..where((t) => t.id.equals(id))).go();
+  Future<void> deleteEscortStaff(int id) async {
+    // Mark as pending sync before deleting
+    await (update(ambulanceEscortStaff)..where((t) => t.id.equals(id))).write(
+      const AmbulanceEscortStaffCompanion(syncStatus: Value(1)),
+    );
+    await (delete(ambulanceEscortStaff)..where((t) => t.id.equals(id))).go();
   }
 }
 

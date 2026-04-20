@@ -89,6 +89,12 @@ class FirestoreSyncService {
       _uploadEmergencyTreatments(),
       _uploadAmbulanceSceneRecords(),
       _uploadAmbulanceSceneItemLinks(),
+      // 救護處置相關
+      _uploadAmbulanceTreatmentRecords(),
+      _uploadAmbulanceTreatmentRecordItems(),
+      _uploadAmbulanceMedicationLogs(),
+      _uploadAmbulanceVitalSigns(),
+      _uploadAmbulanceEscortStaff(),
       _uploadFirstAidLogs(),
       _uploadEmergencyAssistStaff(),
       _uploadIncidentRecords(),
@@ -141,6 +147,12 @@ class FirestoreSyncService {
     ]);
     // 第二批：下載關聯資料（在主記錄之後，避免 FK 參照失效）
     await _downloadAmbulanceSceneItemLinks();
+    // 救護處置相關
+    await _downloadAmbulanceTreatmentRecords();
+    await _downloadAmbulanceTreatmentRecordItems();
+    await _downloadAmbulanceMedicationLogs();
+    await _downloadAmbulanceVitalSigns();
+    await _downloadAmbulanceEscortStaff();
     debugPrint('FirestoreSyncService: Download from remote completed');
   }
 
@@ -299,6 +311,154 @@ class FirestoreSyncService {
     }
   }
 
+  /// 上傳救護車處置紀錄
+  Future<void> _uploadAmbulanceTreatmentRecords() async {
+    try {
+      final records = await (_db.select(
+        _db.ambulanceTreatmentRecords,
+      )..where((t) => t.syncStatus.equals(1))).get();
+      for (final record in records) {
+        await _firebase
+            .setDocument('ambulance_treatment_records', record.id.toString(), {
+              'id': record.id,
+              'medicalId': record.medicalId,
+              'doctorInstructions': record.doctorInstructions,
+              'receivingHospital': record.receivingHospital,
+              'receivingTime': record.receivingTime,
+              'isRefusedHospital': record.isRefusedHospital,
+              'relationship': record.relationship,
+              'relativeName': record.relativeName,
+              'relativePhone': record.relativePhone,
+              'lastModified': FieldValue.serverTimestamp(),
+            });
+        await (_db.update(
+          _db.ambulanceTreatmentRecords,
+        )..where((t) => t.id.equals(record.id))).write(
+          const AmbulanceTreatmentRecordsCompanion(syncStatus: Value(0)),
+        );
+      }
+      debugPrint('Uploaded ${records.length} ambulance_treatment_records');
+    } catch (e) {
+      debugPrint('Error uploading ambulance_treatment_records: $e');
+    }
+  }
+
+  /// 上傳救護車處置項目連結
+  Future<void> _uploadAmbulanceTreatmentRecordItems() async {
+    try {
+      final items = await (_db.select(
+        _db.ambulanceTreatmentRecordItems,
+      )..where((t) => t.syncStatus.equals(1))).get();
+      for (final item in items) {
+        final docId = '${item.recordId}_${item.itemId}';
+        await _firebase.setDocument('ambulance_treatment_record_items', docId, {
+          'id': item.id,
+          'recordId': item.recordId,
+          'itemId': item.itemId,
+          'tubeSize': item.tubeSize,
+          'fixationDepth': item.fixationDepth,
+          'shockCount': item.shockCount,
+          'shockJoules': item.shockJoules,
+          'otherDescription': item.otherDescription,
+        });
+        await (_db.update(
+          _db.ambulanceTreatmentRecordItems,
+        )..where((t) => t.id.equals(item.id))).write(
+          const AmbulanceTreatmentRecordItemsCompanion(syncStatus: Value(0)),
+        );
+      }
+      debugPrint('Uploaded ${items.length} ambulance_treatment_record_items');
+    } catch (e) {
+      debugPrint('Error uploading ambulance_treatment_record_items: $e');
+    }
+  }
+
+  /// 上傳藥物紀錄
+  Future<void> _uploadAmbulanceMedicationLogs() async {
+    try {
+      final logs = await (_db.select(
+        _db.ambulanceMedicationLogs,
+      )..where((t) => t.syncStatus.equals(1))).get();
+      for (final log in logs) {
+        await _firebase
+            .setDocument('ambulance_medication_logs', log.id.toString(), {
+              'id': log.id,
+              'recordId': log.recordId,
+              'time': log.time,
+              'drugName': log.drugName,
+              'route': log.route,
+              'dose': log.dose,
+              'emtName': log.emtName,
+            });
+        await (_db.update(
+          _db.ambulanceMedicationLogs,
+        )..where((t) => t.id.equals(log.id))).write(
+          const AmbulanceMedicationLogsCompanion(syncStatus: Value(0)),
+        );
+      }
+      debugPrint('Uploaded ${logs.length} ambulance_medication_logs');
+    } catch (e) {
+      debugPrint('Error uploading ambulance_medication_logs: $e');
+    }
+  }
+
+  /// 上傳生命徵象紀錄
+  Future<void> _uploadAmbulanceVitalSigns() async {
+    try {
+      final signs = await (_db.select(
+        _db.ambulanceVitalSigns,
+      )..where((t) => t.syncStatus.equals(1))).get();
+      for (final sign in signs) {
+        await _firebase
+            .setDocument('ambulance_vital_signs', sign.id.toString(), {
+              'id': sign.id,
+              'recordId': sign.recordId,
+              'time': sign.time,
+              'atHospital': sign.atHospital,
+              'avpu': sign.avpu,
+              'gcsE': sign.gcsE,
+              'gcsV': sign.gcsV,
+              'gcsM': sign.gcsM,
+              'gcsTotal': sign.gcsTotal,
+              'temperature': sign.temperature,
+              'pulse': sign.pulse,
+              'respirationRate': sign.respirationRate,
+              'bloodPressure': sign.bloodPressure,
+              'spo2': sign.spo2,
+            });
+        await (_db.update(_db.ambulanceVitalSigns)
+              ..where((t) => t.id.equals(sign.id)))
+            .write(const AmbulanceVitalSignsCompanion(syncStatus: Value(0)));
+      }
+      debugPrint('Uploaded ${signs.length} ambulance_vital_signs');
+    } catch (e) {
+      debugPrint('Error uploading ambulance_vital_signs: $e');
+    }
+  }
+
+  /// 上傳隨車人員
+  Future<void> _uploadAmbulanceEscortStaff() async {
+    try {
+      final staff = await (_db.select(
+        _db.ambulanceEscortStaff,
+      )..where((t) => t.syncStatus.equals(1))).get();
+      for (final s in staff) {
+        await _firebase.setDocument('ambulance_escort_staff', s.id.toString(), {
+          'id': s.id,
+          'recordId': s.recordId,
+          'name': s.name,
+          // signature 是 blob，不上傳
+        });
+        await (_db.update(_db.ambulanceEscortStaff)
+              ..where((t) => t.id.equals(s.id)))
+            .write(const AmbulanceEscortStaffCompanion(syncStatus: Value(0)));
+      }
+      debugPrint('Uploaded ${staff.length} ambulance_escort_staff');
+    } catch (e) {
+      debugPrint('Error uploading ambulance_escort_staff: $e');
+    }
+  }
+
   /// 下載救護車場景連結
   Future<void> _downloadAmbulanceSceneItemLinks() async {
     try {
@@ -318,6 +478,167 @@ class FirestoreSyncService {
       }
     } catch (e) {
       debugPrint('Error downloading ambulance_scene_item_links: $e');
+    }
+  }
+
+  /// 下載救護車處置紀錄
+  Future<void> _downloadAmbulanceTreatmentRecords() async {
+    try {
+      final snapshot = await _firebase.getCollectionSnapshot(
+        'ambulance_treatment_records',
+      );
+      for (final doc in snapshot.docs) {
+        final data = doc.data();
+        final id = data['id'];
+        if (id == null) continue;
+        await _db
+            .into(_db.ambulanceTreatmentRecords)
+            .insertOnConflictUpdate(
+              AmbulanceTreatmentRecordsCompanion(
+                id: Value(id as int),
+                medicalId: Value((data['medicalId'] as int?) ?? 0),
+                doctorInstructions: Value(
+                  data['doctorInstructions'] as String?,
+                ),
+                receivingHospital: Value(data['receivingHospital'] as String?),
+                receivingTime: Value(data['receivingTime'] as String?),
+                isRefusedHospital: Value(
+                  data['isRefusedHospital'] as bool? ?? false,
+                ),
+                relationship: Value(
+                  (data['relationship'] as String?) ?? '病患 Patient',
+                ),
+                relativeName: Value(data['relativeName'] as String?),
+                relativePhone: Value(data['relativePhone'] as String?),
+                syncStatus: const Value(0),
+              ),
+            );
+      }
+    } catch (e) {
+      debugPrint('Error downloading ambulance_treatment_records: $e');
+    }
+  }
+
+  /// 下載救護車處置項目連結
+  Future<void> _downloadAmbulanceTreatmentRecordItems() async {
+    try {
+      final snapshot = await _firebase.getCollectionSnapshot(
+        'ambulance_treatment_record_items',
+      );
+      for (final doc in snapshot.docs) {
+        final data = doc.data();
+        await _db
+            .into(_db.ambulanceTreatmentRecordItems)
+            .insertOnConflictUpdate(
+              AmbulanceTreatmentRecordItemsCompanion(
+                id: Value((data['id'] as int?) ?? 0),
+                recordId: Value((data['recordId'] as int?) ?? 0),
+                itemId: Value((data['itemId'] as int?) ?? 0),
+                tubeSize: Value(data['tubeSize'] as String?),
+                fixationDepth: Value(data['fixationDepth'] as String?),
+                shockCount: Value(data['shockCount'] as String?),
+                shockJoules: Value(data['shockJoules'] as String?),
+                otherDescription: Value(data['otherDescription'] as String?),
+                syncStatus: const Value(0),
+              ),
+            );
+      }
+    } catch (e) {
+      debugPrint('Error downloading ambulance_treatment_record_items: $e');
+    }
+  }
+
+  /// 下載藥物紀錄
+  Future<void> _downloadAmbulanceMedicationLogs() async {
+    try {
+      final snapshot = await _firebase.getCollectionSnapshot(
+        'ambulance_medication_logs',
+      );
+      for (final doc in snapshot.docs) {
+        final data = doc.data();
+        final id = data['id'];
+        if (id == null) continue;
+        await _db
+            .into(_db.ambulanceMedicationLogs)
+            .insertOnConflictUpdate(
+              AmbulanceMedicationLogsCompanion(
+                id: Value(id as int),
+                recordId: Value((data['recordId'] as int?) ?? 0),
+                time: Value(data['time'] as String?),
+                drugName: Value(data['drugName'] as String?),
+                route: Value(data['route'] as String?),
+                dose: Value(data['dose'] as String?),
+                emtName: Value(data['emtName'] as String?),
+                syncStatus: const Value(0),
+              ),
+            );
+      }
+    } catch (e) {
+      debugPrint('Error downloading ambulance_medication_logs: $e');
+    }
+  }
+
+  /// 下載生命徵象紀錄
+  Future<void> _downloadAmbulanceVitalSigns() async {
+    try {
+      final snapshot = await _firebase.getCollectionSnapshot(
+        'ambulance_vital_signs',
+      );
+      for (final doc in snapshot.docs) {
+        final data = doc.data();
+        final id = data['id'];
+        if (id == null) continue;
+        await _db
+            .into(_db.ambulanceVitalSigns)
+            .insertOnConflictUpdate(
+              AmbulanceVitalSignsCompanion(
+                id: Value(id as int),
+                recordId: Value((data['recordId'] as int?) ?? 0),
+                time: Value(data['time'] as String?),
+                atHospital: Value(data['atHospital'] as bool? ?? false),
+                avpu: Value(data['avpu'] as String?),
+                gcsE: Value(data['gcsE'] as String?),
+                gcsV: Value(data['gcsV'] as String?),
+                gcsM: Value(data['gcsM'] as String?),
+                gcsTotal: Value(data['gcsTotal'] as String?),
+                temperature: Value(data['temperature'] as String?),
+                pulse: Value(data['pulse'] as String?),
+                respirationRate: Value(data['respirationRate'] as String?),
+                bloodPressure: Value(data['bloodPressure'] as String?),
+                spo2: Value(data['spo2'] as String?),
+                syncStatus: const Value(0),
+              ),
+            );
+      }
+    } catch (e) {
+      debugPrint('Error downloading ambulance_vital_signs: $e');
+    }
+  }
+
+  /// 下載隨車人員
+  Future<void> _downloadAmbulanceEscortStaff() async {
+    try {
+      final snapshot = await _firebase.getCollectionSnapshot(
+        'ambulance_escort_staff',
+      );
+      for (final doc in snapshot.docs) {
+        final data = doc.data();
+        final id = data['id'];
+        if (id == null) continue;
+        await _db
+            .into(_db.ambulanceEscortStaff)
+            .insertOnConflictUpdate(
+              AmbulanceEscortStaffCompanion(
+                id: Value(id as int),
+                recordId: Value((data['recordId'] as int?) ?? 0),
+                name: Value(data['name'] as String?),
+                // signature 是 blob，不下載
+                syncStatus: const Value(0),
+              ),
+            );
+      }
+    } catch (e) {
+      debugPrint('Error downloading ambulance_escort_staff: $e');
     }
   }
 

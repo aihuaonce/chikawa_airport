@@ -36269,6 +36269,18 @@ class $AmbulanceTreatmentRecordItemsTable extends AmbulanceTreatmentRecordItems
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _syncStatusMeta = const VerificationMeta(
+    'syncStatus',
+  );
+  @override
+  late final GeneratedColumn<int> syncStatus = GeneratedColumn<int>(
+    'sync_status',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -36279,6 +36291,7 @@ class $AmbulanceTreatmentRecordItemsTable extends AmbulanceTreatmentRecordItems
     shockCount,
     shockJoules,
     otherDescription,
+    syncStatus,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -36350,6 +36363,12 @@ class $AmbulanceTreatmentRecordItemsTable extends AmbulanceTreatmentRecordItems
         ),
       );
     }
+    if (data.containsKey('sync_status')) {
+      context.handle(
+        _syncStatusMeta,
+        syncStatus.isAcceptableOrUnknown(data['sync_status']!, _syncStatusMeta),
+      );
+    }
     return context;
   }
 
@@ -36394,6 +36413,10 @@ class $AmbulanceTreatmentRecordItemsTable extends AmbulanceTreatmentRecordItems
         DriftSqlType.string,
         data['${effectivePrefix}other_description'],
       ),
+      syncStatus: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}sync_status'],
+      )!,
     );
   }
 
@@ -36413,6 +36436,7 @@ class AmbulanceTreatmentRecordItemData extends DataClass
   final String? shockCount;
   final String? shockJoules;
   final String? otherDescription;
+  final int syncStatus;
   const AmbulanceTreatmentRecordItemData({
     required this.id,
     required this.recordId,
@@ -36422,6 +36446,7 @@ class AmbulanceTreatmentRecordItemData extends DataClass
     this.shockCount,
     this.shockJoules,
     this.otherDescription,
+    required this.syncStatus,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -36444,6 +36469,7 @@ class AmbulanceTreatmentRecordItemData extends DataClass
     if (!nullToAbsent || otherDescription != null) {
       map['other_description'] = Variable<String>(otherDescription);
     }
+    map['sync_status'] = Variable<int>(syncStatus);
     return map;
   }
 
@@ -36467,6 +36493,7 @@ class AmbulanceTreatmentRecordItemData extends DataClass
       otherDescription: otherDescription == null && nullToAbsent
           ? const Value.absent()
           : Value(otherDescription),
+      syncStatus: Value(syncStatus),
     );
   }
 
@@ -36484,6 +36511,7 @@ class AmbulanceTreatmentRecordItemData extends DataClass
       shockCount: serializer.fromJson<String?>(json['shockCount']),
       shockJoules: serializer.fromJson<String?>(json['shockJoules']),
       otherDescription: serializer.fromJson<String?>(json['otherDescription']),
+      syncStatus: serializer.fromJson<int>(json['syncStatus']),
     );
   }
   @override
@@ -36498,6 +36526,7 @@ class AmbulanceTreatmentRecordItemData extends DataClass
       'shockCount': serializer.toJson<String?>(shockCount),
       'shockJoules': serializer.toJson<String?>(shockJoules),
       'otherDescription': serializer.toJson<String?>(otherDescription),
+      'syncStatus': serializer.toJson<int>(syncStatus),
     };
   }
 
@@ -36510,6 +36539,7 @@ class AmbulanceTreatmentRecordItemData extends DataClass
     Value<String?> shockCount = const Value.absent(),
     Value<String?> shockJoules = const Value.absent(),
     Value<String?> otherDescription = const Value.absent(),
+    int? syncStatus,
   }) => AmbulanceTreatmentRecordItemData(
     id: id ?? this.id,
     recordId: recordId ?? this.recordId,
@@ -36523,6 +36553,7 @@ class AmbulanceTreatmentRecordItemData extends DataClass
     otherDescription: otherDescription.present
         ? otherDescription.value
         : this.otherDescription,
+    syncStatus: syncStatus ?? this.syncStatus,
   );
   AmbulanceTreatmentRecordItemData copyWithCompanion(
     AmbulanceTreatmentRecordItemsCompanion data,
@@ -36544,6 +36575,9 @@ class AmbulanceTreatmentRecordItemData extends DataClass
       otherDescription: data.otherDescription.present
           ? data.otherDescription.value
           : this.otherDescription,
+      syncStatus: data.syncStatus.present
+          ? data.syncStatus.value
+          : this.syncStatus,
     );
   }
 
@@ -36557,7 +36591,8 @@ class AmbulanceTreatmentRecordItemData extends DataClass
           ..write('fixationDepth: $fixationDepth, ')
           ..write('shockCount: $shockCount, ')
           ..write('shockJoules: $shockJoules, ')
-          ..write('otherDescription: $otherDescription')
+          ..write('otherDescription: $otherDescription, ')
+          ..write('syncStatus: $syncStatus')
           ..write(')'))
         .toString();
   }
@@ -36572,6 +36607,7 @@ class AmbulanceTreatmentRecordItemData extends DataClass
     shockCount,
     shockJoules,
     otherDescription,
+    syncStatus,
   );
   @override
   bool operator ==(Object other) =>
@@ -36584,7 +36620,8 @@ class AmbulanceTreatmentRecordItemData extends DataClass
           other.fixationDepth == this.fixationDepth &&
           other.shockCount == this.shockCount &&
           other.shockJoules == this.shockJoules &&
-          other.otherDescription == this.otherDescription);
+          other.otherDescription == this.otherDescription &&
+          other.syncStatus == this.syncStatus);
 }
 
 class AmbulanceTreatmentRecordItemsCompanion
@@ -36597,6 +36634,7 @@ class AmbulanceTreatmentRecordItemsCompanion
   final Value<String?> shockCount;
   final Value<String?> shockJoules;
   final Value<String?> otherDescription;
+  final Value<int> syncStatus;
   const AmbulanceTreatmentRecordItemsCompanion({
     this.id = const Value.absent(),
     this.recordId = const Value.absent(),
@@ -36606,6 +36644,7 @@ class AmbulanceTreatmentRecordItemsCompanion
     this.shockCount = const Value.absent(),
     this.shockJoules = const Value.absent(),
     this.otherDescription = const Value.absent(),
+    this.syncStatus = const Value.absent(),
   });
   AmbulanceTreatmentRecordItemsCompanion.insert({
     this.id = const Value.absent(),
@@ -36616,6 +36655,7 @@ class AmbulanceTreatmentRecordItemsCompanion
     this.shockCount = const Value.absent(),
     this.shockJoules = const Value.absent(),
     this.otherDescription = const Value.absent(),
+    this.syncStatus = const Value.absent(),
   }) : recordId = Value(recordId),
        itemId = Value(itemId);
   static Insertable<AmbulanceTreatmentRecordItemData> custom({
@@ -36627,6 +36667,7 @@ class AmbulanceTreatmentRecordItemsCompanion
     Expression<String>? shockCount,
     Expression<String>? shockJoules,
     Expression<String>? otherDescription,
+    Expression<int>? syncStatus,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -36637,6 +36678,7 @@ class AmbulanceTreatmentRecordItemsCompanion
       if (shockCount != null) 'shock_count': shockCount,
       if (shockJoules != null) 'shock_joules': shockJoules,
       if (otherDescription != null) 'other_description': otherDescription,
+      if (syncStatus != null) 'sync_status': syncStatus,
     });
   }
 
@@ -36649,6 +36691,7 @@ class AmbulanceTreatmentRecordItemsCompanion
     Value<String?>? shockCount,
     Value<String?>? shockJoules,
     Value<String?>? otherDescription,
+    Value<int>? syncStatus,
   }) {
     return AmbulanceTreatmentRecordItemsCompanion(
       id: id ?? this.id,
@@ -36659,6 +36702,7 @@ class AmbulanceTreatmentRecordItemsCompanion
       shockCount: shockCount ?? this.shockCount,
       shockJoules: shockJoules ?? this.shockJoules,
       otherDescription: otherDescription ?? this.otherDescription,
+      syncStatus: syncStatus ?? this.syncStatus,
     );
   }
 
@@ -36689,6 +36733,9 @@ class AmbulanceTreatmentRecordItemsCompanion
     if (otherDescription.present) {
       map['other_description'] = Variable<String>(otherDescription.value);
     }
+    if (syncStatus.present) {
+      map['sync_status'] = Variable<int>(syncStatus.value);
+    }
     return map;
   }
 
@@ -36702,7 +36749,8 @@ class AmbulanceTreatmentRecordItemsCompanion
           ..write('fixationDepth: $fixationDepth, ')
           ..write('shockCount: $shockCount, ')
           ..write('shockJoules: $shockJoules, ')
-          ..write('otherDescription: $otherDescription')
+          ..write('otherDescription: $otherDescription, ')
+          ..write('syncStatus: $syncStatus')
           ..write(')'))
         .toString();
   }
@@ -36790,6 +36838,18 @@ class $AmbulanceMedicationLogsTable extends AmbulanceMedicationLogs
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _syncStatusMeta = const VerificationMeta(
+    'syncStatus',
+  );
+  @override
+  late final GeneratedColumn<int> syncStatus = GeneratedColumn<int>(
+    'sync_status',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -36799,6 +36859,7 @@ class $AmbulanceMedicationLogsTable extends AmbulanceMedicationLogs
     route,
     dose,
     emtName,
+    syncStatus,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -36853,6 +36914,12 @@ class $AmbulanceMedicationLogsTable extends AmbulanceMedicationLogs
         emtName.isAcceptableOrUnknown(data['emt_name']!, _emtNameMeta),
       );
     }
+    if (data.containsKey('sync_status')) {
+      context.handle(
+        _syncStatusMeta,
+        syncStatus.isAcceptableOrUnknown(data['sync_status']!, _syncStatusMeta),
+      );
+    }
     return context;
   }
 
@@ -36893,6 +36960,10 @@ class $AmbulanceMedicationLogsTable extends AmbulanceMedicationLogs
         DriftSqlType.string,
         data['${effectivePrefix}emt_name'],
       ),
+      syncStatus: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}sync_status'],
+      )!,
     );
   }
 
@@ -36911,6 +36982,7 @@ class AmbulanceMedicationLogData extends DataClass
   final String? route;
   final String? dose;
   final String? emtName;
+  final int syncStatus;
   const AmbulanceMedicationLogData({
     required this.id,
     required this.recordId,
@@ -36919,6 +36991,7 @@ class AmbulanceMedicationLogData extends DataClass
     this.route,
     this.dose,
     this.emtName,
+    required this.syncStatus,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -36940,6 +37013,7 @@ class AmbulanceMedicationLogData extends DataClass
     if (!nullToAbsent || emtName != null) {
       map['emt_name'] = Variable<String>(emtName);
     }
+    map['sync_status'] = Variable<int>(syncStatus);
     return map;
   }
 
@@ -36958,6 +37032,7 @@ class AmbulanceMedicationLogData extends DataClass
       emtName: emtName == null && nullToAbsent
           ? const Value.absent()
           : Value(emtName),
+      syncStatus: Value(syncStatus),
     );
   }
 
@@ -36974,6 +37049,7 @@ class AmbulanceMedicationLogData extends DataClass
       route: serializer.fromJson<String?>(json['route']),
       dose: serializer.fromJson<String?>(json['dose']),
       emtName: serializer.fromJson<String?>(json['emtName']),
+      syncStatus: serializer.fromJson<int>(json['syncStatus']),
     );
   }
   @override
@@ -36987,6 +37063,7 @@ class AmbulanceMedicationLogData extends DataClass
       'route': serializer.toJson<String?>(route),
       'dose': serializer.toJson<String?>(dose),
       'emtName': serializer.toJson<String?>(emtName),
+      'syncStatus': serializer.toJson<int>(syncStatus),
     };
   }
 
@@ -36998,6 +37075,7 @@ class AmbulanceMedicationLogData extends DataClass
     Value<String?> route = const Value.absent(),
     Value<String?> dose = const Value.absent(),
     Value<String?> emtName = const Value.absent(),
+    int? syncStatus,
   }) => AmbulanceMedicationLogData(
     id: id ?? this.id,
     recordId: recordId ?? this.recordId,
@@ -37006,6 +37084,7 @@ class AmbulanceMedicationLogData extends DataClass
     route: route.present ? route.value : this.route,
     dose: dose.present ? dose.value : this.dose,
     emtName: emtName.present ? emtName.value : this.emtName,
+    syncStatus: syncStatus ?? this.syncStatus,
   );
   AmbulanceMedicationLogData copyWithCompanion(
     AmbulanceMedicationLogsCompanion data,
@@ -37018,6 +37097,9 @@ class AmbulanceMedicationLogData extends DataClass
       route: data.route.present ? data.route.value : this.route,
       dose: data.dose.present ? data.dose.value : this.dose,
       emtName: data.emtName.present ? data.emtName.value : this.emtName,
+      syncStatus: data.syncStatus.present
+          ? data.syncStatus.value
+          : this.syncStatus,
     );
   }
 
@@ -37030,14 +37112,23 @@ class AmbulanceMedicationLogData extends DataClass
           ..write('drugName: $drugName, ')
           ..write('route: $route, ')
           ..write('dose: $dose, ')
-          ..write('emtName: $emtName')
+          ..write('emtName: $emtName, ')
+          ..write('syncStatus: $syncStatus')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode =>
-      Object.hash(id, recordId, time, drugName, route, dose, emtName);
+  int get hashCode => Object.hash(
+    id,
+    recordId,
+    time,
+    drugName,
+    route,
+    dose,
+    emtName,
+    syncStatus,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -37048,7 +37139,8 @@ class AmbulanceMedicationLogData extends DataClass
           other.drugName == this.drugName &&
           other.route == this.route &&
           other.dose == this.dose &&
-          other.emtName == this.emtName);
+          other.emtName == this.emtName &&
+          other.syncStatus == this.syncStatus);
 }
 
 class AmbulanceMedicationLogsCompanion
@@ -37060,6 +37152,7 @@ class AmbulanceMedicationLogsCompanion
   final Value<String?> route;
   final Value<String?> dose;
   final Value<String?> emtName;
+  final Value<int> syncStatus;
   const AmbulanceMedicationLogsCompanion({
     this.id = const Value.absent(),
     this.recordId = const Value.absent(),
@@ -37068,6 +37161,7 @@ class AmbulanceMedicationLogsCompanion
     this.route = const Value.absent(),
     this.dose = const Value.absent(),
     this.emtName = const Value.absent(),
+    this.syncStatus = const Value.absent(),
   });
   AmbulanceMedicationLogsCompanion.insert({
     this.id = const Value.absent(),
@@ -37077,6 +37171,7 @@ class AmbulanceMedicationLogsCompanion
     this.route = const Value.absent(),
     this.dose = const Value.absent(),
     this.emtName = const Value.absent(),
+    this.syncStatus = const Value.absent(),
   }) : recordId = Value(recordId);
   static Insertable<AmbulanceMedicationLogData> custom({
     Expression<int>? id,
@@ -37086,6 +37181,7 @@ class AmbulanceMedicationLogsCompanion
     Expression<String>? route,
     Expression<String>? dose,
     Expression<String>? emtName,
+    Expression<int>? syncStatus,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -37095,6 +37191,7 @@ class AmbulanceMedicationLogsCompanion
       if (route != null) 'route': route,
       if (dose != null) 'dose': dose,
       if (emtName != null) 'emt_name': emtName,
+      if (syncStatus != null) 'sync_status': syncStatus,
     });
   }
 
@@ -37106,6 +37203,7 @@ class AmbulanceMedicationLogsCompanion
     Value<String?>? route,
     Value<String?>? dose,
     Value<String?>? emtName,
+    Value<int>? syncStatus,
   }) {
     return AmbulanceMedicationLogsCompanion(
       id: id ?? this.id,
@@ -37115,6 +37213,7 @@ class AmbulanceMedicationLogsCompanion
       route: route ?? this.route,
       dose: dose ?? this.dose,
       emtName: emtName ?? this.emtName,
+      syncStatus: syncStatus ?? this.syncStatus,
     );
   }
 
@@ -37142,6 +37241,9 @@ class AmbulanceMedicationLogsCompanion
     if (emtName.present) {
       map['emt_name'] = Variable<String>(emtName.value);
     }
+    if (syncStatus.present) {
+      map['sync_status'] = Variable<int>(syncStatus.value);
+    }
     return map;
   }
 
@@ -37154,7 +37256,8 @@ class AmbulanceMedicationLogsCompanion
           ..write('drugName: $drugName, ')
           ..write('route: $route, ')
           ..write('dose: $dose, ')
-          ..write('emtName: $emtName')
+          ..write('emtName: $emtName, ')
+          ..write('syncStatus: $syncStatus')
           ..write(')'))
         .toString();
   }
@@ -37315,6 +37418,18 @@ class $AmbulanceVitalSignsTable extends AmbulanceVitalSigns
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _syncStatusMeta = const VerificationMeta(
+    'syncStatus',
+  );
+  @override
+  late final GeneratedColumn<int> syncStatus = GeneratedColumn<int>(
+    'sync_status',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -37331,6 +37446,7 @@ class $AmbulanceVitalSignsTable extends AmbulanceVitalSigns
     respirationRate,
     bloodPressure,
     spo2,
+    syncStatus,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -37436,6 +37552,12 @@ class $AmbulanceVitalSignsTable extends AmbulanceVitalSigns
         spo2.isAcceptableOrUnknown(data['spo2']!, _spo2Meta),
       );
     }
+    if (data.containsKey('sync_status')) {
+      context.handle(
+        _syncStatusMeta,
+        syncStatus.isAcceptableOrUnknown(data['sync_status']!, _syncStatusMeta),
+      );
+    }
     return context;
   }
 
@@ -37501,6 +37623,10 @@ class $AmbulanceVitalSignsTable extends AmbulanceVitalSigns
         DriftSqlType.string,
         data['${effectivePrefix}spo2'],
       ),
+      syncStatus: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}sync_status'],
+      )!,
     );
   }
 
@@ -37526,6 +37652,7 @@ class AmbulanceVitalSignData extends DataClass
   final String? respirationRate;
   final String? bloodPressure;
   final String? spo2;
+  final int syncStatus;
   const AmbulanceVitalSignData({
     required this.id,
     required this.recordId,
@@ -37541,6 +37668,7 @@ class AmbulanceVitalSignData extends DataClass
     this.respirationRate,
     this.bloodPressure,
     this.spo2,
+    required this.syncStatus,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -37581,6 +37709,7 @@ class AmbulanceVitalSignData extends DataClass
     if (!nullToAbsent || spo2 != null) {
       map['spo2'] = Variable<String>(spo2);
     }
+    map['sync_status'] = Variable<int>(syncStatus);
     return map;
   }
 
@@ -37610,6 +37739,7 @@ class AmbulanceVitalSignData extends DataClass
           ? const Value.absent()
           : Value(bloodPressure),
       spo2: spo2 == null && nullToAbsent ? const Value.absent() : Value(spo2),
+      syncStatus: Value(syncStatus),
     );
   }
 
@@ -37633,6 +37763,7 @@ class AmbulanceVitalSignData extends DataClass
       respirationRate: serializer.fromJson<String?>(json['respirationRate']),
       bloodPressure: serializer.fromJson<String?>(json['bloodPressure']),
       spo2: serializer.fromJson<String?>(json['spo2']),
+      syncStatus: serializer.fromJson<int>(json['syncStatus']),
     );
   }
   @override
@@ -37653,6 +37784,7 @@ class AmbulanceVitalSignData extends DataClass
       'respirationRate': serializer.toJson<String?>(respirationRate),
       'bloodPressure': serializer.toJson<String?>(bloodPressure),
       'spo2': serializer.toJson<String?>(spo2),
+      'syncStatus': serializer.toJson<int>(syncStatus),
     };
   }
 
@@ -37671,6 +37803,7 @@ class AmbulanceVitalSignData extends DataClass
     Value<String?> respirationRate = const Value.absent(),
     Value<String?> bloodPressure = const Value.absent(),
     Value<String?> spo2 = const Value.absent(),
+    int? syncStatus,
   }) => AmbulanceVitalSignData(
     id: id ?? this.id,
     recordId: recordId ?? this.recordId,
@@ -37690,6 +37823,7 @@ class AmbulanceVitalSignData extends DataClass
         ? bloodPressure.value
         : this.bloodPressure,
     spo2: spo2.present ? spo2.value : this.spo2,
+    syncStatus: syncStatus ?? this.syncStatus,
   );
   AmbulanceVitalSignData copyWithCompanion(AmbulanceVitalSignsCompanion data) {
     return AmbulanceVitalSignData(
@@ -37715,6 +37849,9 @@ class AmbulanceVitalSignData extends DataClass
           ? data.bloodPressure.value
           : this.bloodPressure,
       spo2: data.spo2.present ? data.spo2.value : this.spo2,
+      syncStatus: data.syncStatus.present
+          ? data.syncStatus.value
+          : this.syncStatus,
     );
   }
 
@@ -37734,7 +37871,8 @@ class AmbulanceVitalSignData extends DataClass
           ..write('pulse: $pulse, ')
           ..write('respirationRate: $respirationRate, ')
           ..write('bloodPressure: $bloodPressure, ')
-          ..write('spo2: $spo2')
+          ..write('spo2: $spo2, ')
+          ..write('syncStatus: $syncStatus')
           ..write(')'))
         .toString();
   }
@@ -37755,6 +37893,7 @@ class AmbulanceVitalSignData extends DataClass
     respirationRate,
     bloodPressure,
     spo2,
+    syncStatus,
   );
   @override
   bool operator ==(Object other) =>
@@ -37773,7 +37912,8 @@ class AmbulanceVitalSignData extends DataClass
           other.pulse == this.pulse &&
           other.respirationRate == this.respirationRate &&
           other.bloodPressure == this.bloodPressure &&
-          other.spo2 == this.spo2);
+          other.spo2 == this.spo2 &&
+          other.syncStatus == this.syncStatus);
 }
 
 class AmbulanceVitalSignsCompanion
@@ -37792,6 +37932,7 @@ class AmbulanceVitalSignsCompanion
   final Value<String?> respirationRate;
   final Value<String?> bloodPressure;
   final Value<String?> spo2;
+  final Value<int> syncStatus;
   const AmbulanceVitalSignsCompanion({
     this.id = const Value.absent(),
     this.recordId = const Value.absent(),
@@ -37807,6 +37948,7 @@ class AmbulanceVitalSignsCompanion
     this.respirationRate = const Value.absent(),
     this.bloodPressure = const Value.absent(),
     this.spo2 = const Value.absent(),
+    this.syncStatus = const Value.absent(),
   });
   AmbulanceVitalSignsCompanion.insert({
     this.id = const Value.absent(),
@@ -37823,6 +37965,7 @@ class AmbulanceVitalSignsCompanion
     this.respirationRate = const Value.absent(),
     this.bloodPressure = const Value.absent(),
     this.spo2 = const Value.absent(),
+    this.syncStatus = const Value.absent(),
   }) : recordId = Value(recordId);
   static Insertable<AmbulanceVitalSignData> custom({
     Expression<int>? id,
@@ -37839,6 +37982,7 @@ class AmbulanceVitalSignsCompanion
     Expression<String>? respirationRate,
     Expression<String>? bloodPressure,
     Expression<String>? spo2,
+    Expression<int>? syncStatus,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -37855,6 +37999,7 @@ class AmbulanceVitalSignsCompanion
       if (respirationRate != null) 'respiration_rate': respirationRate,
       if (bloodPressure != null) 'blood_pressure': bloodPressure,
       if (spo2 != null) 'spo2': spo2,
+      if (syncStatus != null) 'sync_status': syncStatus,
     });
   }
 
@@ -37873,6 +38018,7 @@ class AmbulanceVitalSignsCompanion
     Value<String?>? respirationRate,
     Value<String?>? bloodPressure,
     Value<String?>? spo2,
+    Value<int>? syncStatus,
   }) {
     return AmbulanceVitalSignsCompanion(
       id: id ?? this.id,
@@ -37889,6 +38035,7 @@ class AmbulanceVitalSignsCompanion
       respirationRate: respirationRate ?? this.respirationRate,
       bloodPressure: bloodPressure ?? this.bloodPressure,
       spo2: spo2 ?? this.spo2,
+      syncStatus: syncStatus ?? this.syncStatus,
     );
   }
 
@@ -37937,6 +38084,9 @@ class AmbulanceVitalSignsCompanion
     if (spo2.present) {
       map['spo2'] = Variable<String>(spo2.value);
     }
+    if (syncStatus.present) {
+      map['sync_status'] = Variable<int>(syncStatus.value);
+    }
     return map;
   }
 
@@ -37956,7 +38106,8 @@ class AmbulanceVitalSignsCompanion
           ..write('pulse: $pulse, ')
           ..write('respirationRate: $respirationRate, ')
           ..write('bloodPressure: $bloodPressure, ')
-          ..write('spo2: $spo2')
+          ..write('spo2: $spo2, ')
+          ..write('syncStatus: $syncStatus')
           ..write(')'))
         .toString();
   }
@@ -38015,8 +38166,26 @@ class $AmbulanceEscortStaffTable extends AmbulanceEscortStaff
     type: DriftSqlType.blob,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _syncStatusMeta = const VerificationMeta(
+    'syncStatus',
+  );
   @override
-  List<GeneratedColumn> get $columns => [id, recordId, name, signature];
+  late final GeneratedColumn<int> syncStatus = GeneratedColumn<int>(
+    'sync_status',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    recordId,
+    name,
+    signature,
+    syncStatus,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -38052,6 +38221,12 @@ class $AmbulanceEscortStaffTable extends AmbulanceEscortStaff
         signature.isAcceptableOrUnknown(data['signature']!, _signatureMeta),
       );
     }
+    if (data.containsKey('sync_status')) {
+      context.handle(
+        _syncStatusMeta,
+        syncStatus.isAcceptableOrUnknown(data['sync_status']!, _syncStatusMeta),
+      );
+    }
     return context;
   }
 
@@ -38080,6 +38255,10 @@ class $AmbulanceEscortStaffTable extends AmbulanceEscortStaff
         DriftSqlType.blob,
         data['${effectivePrefix}signature'],
       ),
+      syncStatus: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}sync_status'],
+      )!,
     );
   }
 
@@ -38095,11 +38274,13 @@ class AmbulanceEscortStaffData extends DataClass
   final int recordId;
   final String? name;
   final Uint8List? signature;
+  final int syncStatus;
   const AmbulanceEscortStaffData({
     required this.id,
     required this.recordId,
     this.name,
     this.signature,
+    required this.syncStatus,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -38112,6 +38293,7 @@ class AmbulanceEscortStaffData extends DataClass
     if (!nullToAbsent || signature != null) {
       map['signature'] = Variable<Uint8List>(signature);
     }
+    map['sync_status'] = Variable<int>(syncStatus);
     return map;
   }
 
@@ -38123,6 +38305,7 @@ class AmbulanceEscortStaffData extends DataClass
       signature: signature == null && nullToAbsent
           ? const Value.absent()
           : Value(signature),
+      syncStatus: Value(syncStatus),
     );
   }
 
@@ -38136,6 +38319,7 @@ class AmbulanceEscortStaffData extends DataClass
       recordId: serializer.fromJson<int>(json['recordId']),
       name: serializer.fromJson<String?>(json['name']),
       signature: serializer.fromJson<Uint8List?>(json['signature']),
+      syncStatus: serializer.fromJson<int>(json['syncStatus']),
     );
   }
   @override
@@ -38146,6 +38330,7 @@ class AmbulanceEscortStaffData extends DataClass
       'recordId': serializer.toJson<int>(recordId),
       'name': serializer.toJson<String?>(name),
       'signature': serializer.toJson<Uint8List?>(signature),
+      'syncStatus': serializer.toJson<int>(syncStatus),
     };
   }
 
@@ -38154,11 +38339,13 @@ class AmbulanceEscortStaffData extends DataClass
     int? recordId,
     Value<String?> name = const Value.absent(),
     Value<Uint8List?> signature = const Value.absent(),
+    int? syncStatus,
   }) => AmbulanceEscortStaffData(
     id: id ?? this.id,
     recordId: recordId ?? this.recordId,
     name: name.present ? name.value : this.name,
     signature: signature.present ? signature.value : this.signature,
+    syncStatus: syncStatus ?? this.syncStatus,
   );
   AmbulanceEscortStaffData copyWithCompanion(
     AmbulanceEscortStaffCompanion data,
@@ -38168,6 +38355,9 @@ class AmbulanceEscortStaffData extends DataClass
       recordId: data.recordId.present ? data.recordId.value : this.recordId,
       name: data.name.present ? data.name.value : this.name,
       signature: data.signature.present ? data.signature.value : this.signature,
+      syncStatus: data.syncStatus.present
+          ? data.syncStatus.value
+          : this.syncStatus,
     );
   }
 
@@ -38177,14 +38367,20 @@ class AmbulanceEscortStaffData extends DataClass
           ..write('id: $id, ')
           ..write('recordId: $recordId, ')
           ..write('name: $name, ')
-          ..write('signature: $signature')
+          ..write('signature: $signature, ')
+          ..write('syncStatus: $syncStatus')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode =>
-      Object.hash(id, recordId, name, $driftBlobEquality.hash(signature));
+  int get hashCode => Object.hash(
+    id,
+    recordId,
+    name,
+    $driftBlobEquality.hash(signature),
+    syncStatus,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -38192,7 +38388,8 @@ class AmbulanceEscortStaffData extends DataClass
           other.id == this.id &&
           other.recordId == this.recordId &&
           other.name == this.name &&
-          $driftBlobEquality.equals(other.signature, this.signature));
+          $driftBlobEquality.equals(other.signature, this.signature) &&
+          other.syncStatus == this.syncStatus);
 }
 
 class AmbulanceEscortStaffCompanion
@@ -38201,29 +38398,34 @@ class AmbulanceEscortStaffCompanion
   final Value<int> recordId;
   final Value<String?> name;
   final Value<Uint8List?> signature;
+  final Value<int> syncStatus;
   const AmbulanceEscortStaffCompanion({
     this.id = const Value.absent(),
     this.recordId = const Value.absent(),
     this.name = const Value.absent(),
     this.signature = const Value.absent(),
+    this.syncStatus = const Value.absent(),
   });
   AmbulanceEscortStaffCompanion.insert({
     this.id = const Value.absent(),
     required int recordId,
     this.name = const Value.absent(),
     this.signature = const Value.absent(),
+    this.syncStatus = const Value.absent(),
   }) : recordId = Value(recordId);
   static Insertable<AmbulanceEscortStaffData> custom({
     Expression<int>? id,
     Expression<int>? recordId,
     Expression<String>? name,
     Expression<Uint8List>? signature,
+    Expression<int>? syncStatus,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (recordId != null) 'record_id': recordId,
       if (name != null) 'name': name,
       if (signature != null) 'signature': signature,
+      if (syncStatus != null) 'sync_status': syncStatus,
     });
   }
 
@@ -38232,12 +38434,14 @@ class AmbulanceEscortStaffCompanion
     Value<int>? recordId,
     Value<String?>? name,
     Value<Uint8List?>? signature,
+    Value<int>? syncStatus,
   }) {
     return AmbulanceEscortStaffCompanion(
       id: id ?? this.id,
       recordId: recordId ?? this.recordId,
       name: name ?? this.name,
       signature: signature ?? this.signature,
+      syncStatus: syncStatus ?? this.syncStatus,
     );
   }
 
@@ -38256,6 +38460,9 @@ class AmbulanceEscortStaffCompanion
     if (signature.present) {
       map['signature'] = Variable<Uint8List>(signature.value);
     }
+    if (syncStatus.present) {
+      map['sync_status'] = Variable<int>(syncStatus.value);
+    }
     return map;
   }
 
@@ -38265,7 +38472,8 @@ class AmbulanceEscortStaffCompanion
           ..write('id: $id, ')
           ..write('recordId: $recordId, ')
           ..write('name: $name, ')
-          ..write('signature: $signature')
+          ..write('signature: $signature, ')
+          ..write('syncStatus: $syncStatus')
           ..write(')'))
         .toString();
   }
@@ -74430,6 +74638,7 @@ typedef $$AmbulanceTreatmentRecordItemsTableCreateCompanionBuilder =
       Value<String?> shockCount,
       Value<String?> shockJoules,
       Value<String?> otherDescription,
+      Value<int> syncStatus,
     });
 typedef $$AmbulanceTreatmentRecordItemsTableUpdateCompanionBuilder =
     AmbulanceTreatmentRecordItemsCompanion Function({
@@ -74441,6 +74650,7 @@ typedef $$AmbulanceTreatmentRecordItemsTableUpdateCompanionBuilder =
       Value<String?> shockCount,
       Value<String?> shockJoules,
       Value<String?> otherDescription,
+      Value<int> syncStatus,
     });
 
 final class $$AmbulanceTreatmentRecordItemsTableReferences
@@ -74540,6 +74750,11 @@ class $$AmbulanceTreatmentRecordItemsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<int> get syncStatus => $composableBuilder(
+    column: $table.syncStatus,
+    builder: (column) => ColumnFilters(column),
+  );
+
   $$AmbulanceTreatmentRecordsTableFilterComposer get recordId {
     final $$AmbulanceTreatmentRecordsTableFilterComposer composer =
         $composerBuilder(
@@ -74628,6 +74843,11 @@ class $$AmbulanceTreatmentRecordItemsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<int> get syncStatus => $composableBuilder(
+    column: $table.syncStatus,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   $$AmbulanceTreatmentRecordsTableOrderingComposer get recordId {
     final $$AmbulanceTreatmentRecordsTableOrderingComposer composer =
         $composerBuilder(
@@ -74709,6 +74929,11 @@ class $$AmbulanceTreatmentRecordItemsTableAnnotationComposer
 
   GeneratedColumn<String> get otherDescription => $composableBuilder(
     column: $table.otherDescription,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get syncStatus => $composableBuilder(
+    column: $table.syncStatus,
     builder: (column) => column,
   );
 
@@ -74811,6 +75036,7 @@ class $$AmbulanceTreatmentRecordItemsTableTableManager
                 Value<String?> shockCount = const Value.absent(),
                 Value<String?> shockJoules = const Value.absent(),
                 Value<String?> otherDescription = const Value.absent(),
+                Value<int> syncStatus = const Value.absent(),
               }) => AmbulanceTreatmentRecordItemsCompanion(
                 id: id,
                 recordId: recordId,
@@ -74820,6 +75046,7 @@ class $$AmbulanceTreatmentRecordItemsTableTableManager
                 shockCount: shockCount,
                 shockJoules: shockJoules,
                 otherDescription: otherDescription,
+                syncStatus: syncStatus,
               ),
           createCompanionCallback:
               ({
@@ -74831,6 +75058,7 @@ class $$AmbulanceTreatmentRecordItemsTableTableManager
                 Value<String?> shockCount = const Value.absent(),
                 Value<String?> shockJoules = const Value.absent(),
                 Value<String?> otherDescription = const Value.absent(),
+                Value<int> syncStatus = const Value.absent(),
               }) => AmbulanceTreatmentRecordItemsCompanion.insert(
                 id: id,
                 recordId: recordId,
@@ -74840,6 +75068,7 @@ class $$AmbulanceTreatmentRecordItemsTableTableManager
                 shockCount: shockCount,
                 shockJoules: shockJoules,
                 otherDescription: otherDescription,
+                syncStatus: syncStatus,
               ),
           withReferenceMapper: (p0) => p0
               .map(
@@ -74937,6 +75166,7 @@ typedef $$AmbulanceMedicationLogsTableCreateCompanionBuilder =
       Value<String?> route,
       Value<String?> dose,
       Value<String?> emtName,
+      Value<int> syncStatus,
     });
 typedef $$AmbulanceMedicationLogsTableUpdateCompanionBuilder =
     AmbulanceMedicationLogsCompanion Function({
@@ -74947,6 +75177,7 @@ typedef $$AmbulanceMedicationLogsTableUpdateCompanionBuilder =
       Value<String?> route,
       Value<String?> dose,
       Value<String?> emtName,
+      Value<int> syncStatus,
     });
 
 final class $$AmbulanceMedicationLogsTableReferences
@@ -75024,6 +75255,11 @@ class $$AmbulanceMedicationLogsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<int> get syncStatus => $composableBuilder(
+    column: $table.syncStatus,
+    builder: (column) => ColumnFilters(column),
+  );
+
   $$AmbulanceTreatmentRecordsTableFilterComposer get recordId {
     final $$AmbulanceTreatmentRecordsTableFilterComposer composer =
         $composerBuilder(
@@ -75088,6 +75324,11 @@ class $$AmbulanceMedicationLogsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<int> get syncStatus => $composableBuilder(
+    column: $table.syncStatus,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   $$AmbulanceTreatmentRecordsTableOrderingComposer get recordId {
     final $$AmbulanceTreatmentRecordsTableOrderingComposer composer =
         $composerBuilder(
@@ -75139,6 +75380,11 @@ class $$AmbulanceMedicationLogsTableAnnotationComposer
 
   GeneratedColumn<String> get emtName =>
       $composableBuilder(column: $table.emtName, builder: (column) => column);
+
+  GeneratedColumn<int> get syncStatus => $composableBuilder(
+    column: $table.syncStatus,
+    builder: (column) => column,
+  );
 
   $$AmbulanceTreatmentRecordsTableAnnotationComposer get recordId {
     final $$AmbulanceTreatmentRecordsTableAnnotationComposer composer =
@@ -75214,6 +75460,7 @@ class $$AmbulanceMedicationLogsTableTableManager
                 Value<String?> route = const Value.absent(),
                 Value<String?> dose = const Value.absent(),
                 Value<String?> emtName = const Value.absent(),
+                Value<int> syncStatus = const Value.absent(),
               }) => AmbulanceMedicationLogsCompanion(
                 id: id,
                 recordId: recordId,
@@ -75222,6 +75469,7 @@ class $$AmbulanceMedicationLogsTableTableManager
                 route: route,
                 dose: dose,
                 emtName: emtName,
+                syncStatus: syncStatus,
               ),
           createCompanionCallback:
               ({
@@ -75232,6 +75480,7 @@ class $$AmbulanceMedicationLogsTableTableManager
                 Value<String?> route = const Value.absent(),
                 Value<String?> dose = const Value.absent(),
                 Value<String?> emtName = const Value.absent(),
+                Value<int> syncStatus = const Value.absent(),
               }) => AmbulanceMedicationLogsCompanion.insert(
                 id: id,
                 recordId: recordId,
@@ -75240,6 +75489,7 @@ class $$AmbulanceMedicationLogsTableTableManager
                 route: route,
                 dose: dose,
                 emtName: emtName,
+                syncStatus: syncStatus,
               ),
           withReferenceMapper: (p0) => p0
               .map(
@@ -75326,6 +75576,7 @@ typedef $$AmbulanceVitalSignsTableCreateCompanionBuilder =
       Value<String?> respirationRate,
       Value<String?> bloodPressure,
       Value<String?> spo2,
+      Value<int> syncStatus,
     });
 typedef $$AmbulanceVitalSignsTableUpdateCompanionBuilder =
     AmbulanceVitalSignsCompanion Function({
@@ -75343,6 +75594,7 @@ typedef $$AmbulanceVitalSignsTableUpdateCompanionBuilder =
       Value<String?> respirationRate,
       Value<String?> bloodPressure,
       Value<String?> spo2,
+      Value<int> syncStatus,
     });
 
 final class $$AmbulanceVitalSignsTableReferences
@@ -75455,6 +75707,11 @@ class $$AmbulanceVitalSignsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<int> get syncStatus => $composableBuilder(
+    column: $table.syncStatus,
+    builder: (column) => ColumnFilters(column),
+  );
+
   $$AmbulanceTreatmentRecordsTableFilterComposer get recordId {
     final $$AmbulanceTreatmentRecordsTableFilterComposer composer =
         $composerBuilder(
@@ -75554,6 +75811,11 @@ class $$AmbulanceVitalSignsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<int> get syncStatus => $composableBuilder(
+    column: $table.syncStatus,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   $$AmbulanceTreatmentRecordsTableOrderingComposer get recordId {
     final $$AmbulanceTreatmentRecordsTableOrderingComposer composer =
         $composerBuilder(
@@ -75635,6 +75897,11 @@ class $$AmbulanceVitalSignsTableAnnotationComposer
   GeneratedColumn<String> get spo2 =>
       $composableBuilder(column: $table.spo2, builder: (column) => column);
 
+  GeneratedColumn<int> get syncStatus => $composableBuilder(
+    column: $table.syncStatus,
+    builder: (column) => column,
+  );
+
   $$AmbulanceTreatmentRecordsTableAnnotationComposer get recordId {
     final $$AmbulanceTreatmentRecordsTableAnnotationComposer composer =
         $composerBuilder(
@@ -75710,6 +75977,7 @@ class $$AmbulanceVitalSignsTableTableManager
                 Value<String?> respirationRate = const Value.absent(),
                 Value<String?> bloodPressure = const Value.absent(),
                 Value<String?> spo2 = const Value.absent(),
+                Value<int> syncStatus = const Value.absent(),
               }) => AmbulanceVitalSignsCompanion(
                 id: id,
                 recordId: recordId,
@@ -75725,6 +75993,7 @@ class $$AmbulanceVitalSignsTableTableManager
                 respirationRate: respirationRate,
                 bloodPressure: bloodPressure,
                 spo2: spo2,
+                syncStatus: syncStatus,
               ),
           createCompanionCallback:
               ({
@@ -75742,6 +76011,7 @@ class $$AmbulanceVitalSignsTableTableManager
                 Value<String?> respirationRate = const Value.absent(),
                 Value<String?> bloodPressure = const Value.absent(),
                 Value<String?> spo2 = const Value.absent(),
+                Value<int> syncStatus = const Value.absent(),
               }) => AmbulanceVitalSignsCompanion.insert(
                 id: id,
                 recordId: recordId,
@@ -75757,6 +76027,7 @@ class $$AmbulanceVitalSignsTableTableManager
                 respirationRate: respirationRate,
                 bloodPressure: bloodPressure,
                 spo2: spo2,
+                syncStatus: syncStatus,
               ),
           withReferenceMapper: (p0) => p0
               .map(
@@ -75833,6 +76104,7 @@ typedef $$AmbulanceEscortStaffTableCreateCompanionBuilder =
       required int recordId,
       Value<String?> name,
       Value<Uint8List?> signature,
+      Value<int> syncStatus,
     });
 typedef $$AmbulanceEscortStaffTableUpdateCompanionBuilder =
     AmbulanceEscortStaffCompanion Function({
@@ -75840,6 +76112,7 @@ typedef $$AmbulanceEscortStaffTableUpdateCompanionBuilder =
       Value<int> recordId,
       Value<String?> name,
       Value<Uint8List?> signature,
+      Value<int> syncStatus,
     });
 
 final class $$AmbulanceEscortStaffTableReferences
@@ -75902,6 +76175,11 @@ class $$AmbulanceEscortStaffTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<int> get syncStatus => $composableBuilder(
+    column: $table.syncStatus,
+    builder: (column) => ColumnFilters(column),
+  );
+
   $$AmbulanceTreatmentRecordsTableFilterComposer get recordId {
     final $$AmbulanceTreatmentRecordsTableFilterComposer composer =
         $composerBuilder(
@@ -75951,6 +76229,11 @@ class $$AmbulanceEscortStaffTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<int> get syncStatus => $composableBuilder(
+    column: $table.syncStatus,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   $$AmbulanceTreatmentRecordsTableOrderingComposer get recordId {
     final $$AmbulanceTreatmentRecordsTableOrderingComposer composer =
         $composerBuilder(
@@ -75993,6 +76276,11 @@ class $$AmbulanceEscortStaffTableAnnotationComposer
 
   GeneratedColumn<Uint8List> get signature =>
       $composableBuilder(column: $table.signature, builder: (column) => column);
+
+  GeneratedColumn<int> get syncStatus => $composableBuilder(
+    column: $table.syncStatus,
+    builder: (column) => column,
+  );
 
   $$AmbulanceTreatmentRecordsTableAnnotationComposer get recordId {
     final $$AmbulanceTreatmentRecordsTableAnnotationComposer composer =
@@ -76059,11 +76347,13 @@ class $$AmbulanceEscortStaffTableTableManager
                 Value<int> recordId = const Value.absent(),
                 Value<String?> name = const Value.absent(),
                 Value<Uint8List?> signature = const Value.absent(),
+                Value<int> syncStatus = const Value.absent(),
               }) => AmbulanceEscortStaffCompanion(
                 id: id,
                 recordId: recordId,
                 name: name,
                 signature: signature,
+                syncStatus: syncStatus,
               ),
           createCompanionCallback:
               ({
@@ -76071,11 +76361,13 @@ class $$AmbulanceEscortStaffTableTableManager
                 required int recordId,
                 Value<String?> name = const Value.absent(),
                 Value<Uint8List?> signature = const Value.absent(),
+                Value<int> syncStatus = const Value.absent(),
               }) => AmbulanceEscortStaffCompanion.insert(
                 id: id,
                 recordId: recordId,
                 name: name,
                 signature: signature,
+                syncStatus: syncStatus,
               ),
           withReferenceMapper: (p0) => p0
               .map(

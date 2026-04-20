@@ -5,9 +5,10 @@ import 'medical_tables.dart';
 @DataClassName('AmbulanceTreatmentRecordData')
 class AmbulanceTreatmentRecords extends Table {
   IntColumn get id => integer().autoIncrement()();
-  
+
   // 關聯到 MedicalRecord (一對一)
-  IntColumn get medicalId => integer().unique().references(MedicalRecord, #medicalId)();
+  IntColumn get medicalId =>
+      integer().unique().references(MedicalRecord, #medicalId)();
 
   // 線上指導醫師指示
   TextColumn get doctorInstructions => text().nullable()();
@@ -19,10 +20,12 @@ class AmbulanceTreatmentRecords extends Table {
   TextColumn get receivingTime => text().nullable()();
 
   // 是否拒絕送醫
-  BoolColumn get isRefusedHospital => boolean().withDefault(const Constant(false))();
+  BoolColumn get isRefusedHospital =>
+      boolean().withDefault(const Constant(false))();
 
   // 關係人身分 (病患/家屬/關係人)
-  TextColumn get relationship => text().withDefault(const Constant('病患 Patient'))();
+  TextColumn get relationship =>
+      text().withDefault(const Constant('病患 Patient'))();
 
   // 關係人姓名
   TextColumn get relativeName => text().nullable()();
@@ -51,13 +54,14 @@ class AmbulanceTreatmentCategories extends Table {
 @DataClassName('AmbulanceTreatmentItemData')
 class AmbulanceTreatmentItems extends Table {
   IntColumn get id => integer().autoIncrement()();
-  
+
   // 關聯到大類
-  IntColumn get categoryId => integer().references(AmbulanceTreatmentCategories, #id)();
-  
+  IntColumn get categoryId =>
+      integer().references(AmbulanceTreatmentCategories, #id)();
+
   TextColumn get name => text()(); // e.g., '口咽呼吸道', 'CPR'
   IntColumn get sortOrder => integer().withDefault(const Constant(0))();
-  
+
   // 是否為"其他"選項 (觸發輸入框)
   BoolColumn get isOther => boolean().withDefault(const Constant(false))();
 }
@@ -66,15 +70,23 @@ class AmbulanceTreatmentItems extends Table {
 @DataClassName('AmbulanceTreatmentRecordItemData')
 class AmbulanceTreatmentRecordItems extends Table {
   IntColumn get id => integer().autoIncrement()();
-  
+
   // 關聯到紀錄
-  IntColumn get recordId => integer().references(AmbulanceTreatmentRecords, #id, onDelete: KeyAction.cascade)();
-  
+  IntColumn get recordId => integer().references(
+    AmbulanceTreatmentRecords,
+    #id,
+    onDelete: KeyAction.cascade,
+  )();
+
   // 關聯到細項
-  IntColumn get itemId => integer().references(AmbulanceTreatmentItems, #id, onDelete: KeyAction.cascade)();
+  IntColumn get itemId => integer().references(
+    AmbulanceTreatmentItems,
+    #id,
+    onDelete: KeyAction.cascade,
+  )();
 
   // --- 詳細欄位 (Specific Fields) ---
-  
+
   // 呼吸道 -> 氣管內管
   TextColumn get tubeSize => text().nullable()(); // 號碼
   TextColumn get fixationDepth => text().nullable()(); // 固定公分數
@@ -84,33 +96,46 @@ class AmbulanceTreatmentRecordItems extends Table {
   TextColumn get shockJoules => text().nullable()(); // 焦耳數
 
   // 其他 -> 描述
-  TextColumn get otherDescription => text().nullable()(); 
+  TextColumn get otherDescription => text().nullable()();
+
+  IntColumn get syncStatus => integer().withDefault(const Constant(0))();
 }
 
 // 藥物紀錄表
 @DataClassName('AmbulanceMedicationLogData')
 class AmbulanceMedicationLogs extends Table {
   IntColumn get id => integer().autoIncrement()();
-  
-  IntColumn get recordId => integer().references(AmbulanceTreatmentRecords, #id, onDelete: KeyAction.cascade)();
+
+  IntColumn get recordId => integer().references(
+    AmbulanceTreatmentRecords,
+    #id,
+    onDelete: KeyAction.cascade,
+  )();
 
   TextColumn get time => text().nullable()();
   TextColumn get drugName => text().nullable()();
   TextColumn get route => text().nullable()(); // 使用方式
   TextColumn get dose => text().nullable()(); // 劑量
   TextColumn get emtName => text().nullable()(); // EMT姓名
+
+  IntColumn get syncStatus => integer().withDefault(const Constant(0))();
 }
 
 // 生命徵象紀錄表
 @DataClassName('AmbulanceVitalSignData')
 class AmbulanceVitalSigns extends Table {
   IntColumn get id => integer().autoIncrement()();
-  
-  IntColumn get recordId => integer().references(AmbulanceTreatmentRecords, #id, onDelete: KeyAction.cascade)();
+
+  IntColumn get recordId => integer().references(
+    AmbulanceTreatmentRecords,
+    #id,
+    onDelete: KeyAction.cascade,
+  )();
 
   TextColumn get time => text().nullable()();
-  BoolColumn get atHospital => boolean().withDefault(const Constant(false))(); // 到院
-  
+  BoolColumn get atHospital =>
+      boolean().withDefault(const Constant(false))(); // 到院
+
   // GCS
   TextColumn get avpu => text().nullable()();
   TextColumn get gcsE => text().nullable()();
@@ -123,15 +148,23 @@ class AmbulanceVitalSigns extends Table {
   TextColumn get respirationRate => text().nullable()();
   TextColumn get bloodPressure => text().nullable()();
   TextColumn get spo2 => text().nullable()();
+
+  IntColumn get syncStatus => integer().withDefault(const Constant(0))();
 }
 
 // 隨車人員表
 @DataClassName('AmbulanceEscortStaffData')
 class AmbulanceEscortStaff extends Table {
   IntColumn get id => integer().autoIncrement()();
-  
-  IntColumn get recordId => integer().references(AmbulanceTreatmentRecords, #id, onDelete: KeyAction.cascade)();
+
+  IntColumn get recordId => integer().references(
+    AmbulanceTreatmentRecords,
+    #id,
+    onDelete: KeyAction.cascade,
+  )();
 
   TextColumn get name => text().nullable()();
   BlobColumn get signature => blob().nullable()();
+
+  IntColumn get syncStatus => integer().withDefault(const Constant(0))();
 }

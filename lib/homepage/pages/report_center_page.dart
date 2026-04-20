@@ -1177,8 +1177,12 @@ class _ReportCenterPageState extends State<ReportCenterPage> {
 
     final atHospital = sortedVitalSigns.reversed.firstWhere(
       (vs) => vs.atHospital,
-      orElse: () =>
-          AmbulanceVitalSignData(id: -1, recordId: -1, atHospital: false),
+      orElse: () => AmbulanceVitalSignData(
+        id: -1,
+        recordId: -1,
+        atHospital: false,
+        syncStatus: 0,
+      ),
     );
     final avpu = atHospital.avpu ?? '';
     final postAlert = avpu.contains('清') || avpu.toUpperCase() == 'A';
