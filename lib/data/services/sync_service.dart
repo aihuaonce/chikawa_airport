@@ -1761,9 +1761,14 @@ class SyncService extends ChangeNotifier {
         );
         break;
       case 'ambulance_scene_records':
-        await (_db.update(_db.ambulanceSceneRecords)
-              ..where((t) => t.id.equals(localId)))
-            .write(AmbulanceSceneRecordsCompanion(updatedAt: Value(syncedAt)));
+        await (_db.update(
+          _db.ambulanceSceneRecords,
+        )..where((t) => t.id.equals(localId))).write(
+          AmbulanceSceneRecordsCompanion(
+            updatedAt: Value(syncedAt),
+            syncStatus: Value(SyncStatus.synced),
+          ),
+        );
         break;
       default:
         debugPrint('Unknown table for markAsSynced: $table');

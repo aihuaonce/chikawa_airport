@@ -110,6 +110,7 @@ class FirestoreSyncService {
   /// 僅下載：從 Firestore 下載新資料到本地
   Future<void> syncFromRemote() async {
     debugPrint('=== STARTING SYNC FROM REMOTE ===');
+    // 第一批：下載主要資料錶（並行）
     await Future.wait([
       _downloadMedicalRecords(),
       _downloadPatients(),
@@ -126,8 +127,7 @@ class FirestoreSyncService {
       _downloadEmergencyTreatments(),
       _downloadAmbulanceRecords(),
       _downloadAmbulancePersonalProperty(),
-      _downloadAmbulanceSceneRecords(),
-      _downloadAmbulanceSceneItemLinks(),
+      _downloadAmbulanceSceneRecords(), // 先下載主記錄
       _downloadFirstAidLogs(),
       _downloadEmergencyAssistStaff(),
       _downloadChiefComplaints(),
@@ -139,19 +139,25 @@ class FirestoreSyncService {
       _downloadChiefComplaintSymptomLinks(),
       _downloadMedications(),
     ]);
+    // 第二批：下載關聯資料（在主記錄之後，避免 FK 參照失效）
+    await _downloadAmbulanceSceneItemLinks();
     debugPrint('FirestoreSyncService: Download from remote completed');
   }
 
   /// 從 Firestore 下載救護車記錄
   Future<void> _downloadAmbulanceRecords() async {
     try {
-      final snapshot = await _firebase.getCollectionSnapshot('ambulance_records');
+      final snapshot = await _firebase.getCollectionSnapshot(
+        'ambulance_records',
+      );
       for (final doc in snapshot.docs) {
         final data = doc.data();
         final ambulanceId = data['ambulanceId'];
         if (ambulanceId == null) continue;
 
-        await _db.into(_db.ambulanceRecords).insertOnConflictUpdate(
+        await _db
+            .into(_db.ambulanceRecords)
+            .insertOnConflictUpdate(
               AmbulanceRecordsCompanion(
                 ambulanceId: Value(ambulanceId as int),
                 medicalId: Value((data['medicalId'] as int?) ?? 0),
@@ -159,26 +165,38 @@ class FirestoreSyncService {
                 incidentLocationId: Value(data['incidentLocationId'] as int?),
                 incidentLocation2Id: Value(data['incidentLocation2Id'] as int?),
                 locationRemarks: Value(data['locationRemarks'] as String?),
-                dispatchTime: Value(data['dispatchTime'] != null
-                    ? DateTime.tryParse(data['dispatchTime'])
-                    : null),
-                arrivalTime: Value(data['arrivalTime'] != null
-                    ? DateTime.tryParse(data['arrivalTime'])
-                    : null),
+                dispatchTime: Value(
+                  data['dispatchTime'] != null
+                      ? DateTime.tryParse(data['dispatchTime'])
+                      : null,
+                ),
+                arrivalTime: Value(
+                  data['arrivalTime'] != null
+                      ? DateTime.tryParse(data['arrivalTime'])
+                      : null,
+                ),
                 hospitalId: Value(data['hospitalId'] as int?),
                 transportReason: Value(data['transportReason'] as String?),
-                leavingSceneTime: Value(data['leavingSceneTime'] != null
-                    ? DateTime.tryParse(data['leavingSceneTime'])
-                    : null),
-                arrivalHospitalTime: Value(data['arrivalHospitalTime'] != null
-                    ? DateTime.tryParse(data['arrivalHospitalTime'])
-                    : null),
-                leavingHospitalTime: Value(data['leavingHospitalTime'] != null
-                    ? DateTime.tryParse(data['leavingHospitalTime'])
-                    : null),
-                returnStandbyTime: Value(data['returnStandbyTime'] != null
-                    ? DateTime.tryParse(data['returnStandbyTime'])
-                    : null),
+                leavingSceneTime: Value(
+                  data['leavingSceneTime'] != null
+                      ? DateTime.tryParse(data['leavingSceneTime'])
+                      : null,
+                ),
+                arrivalHospitalTime: Value(
+                  data['arrivalHospitalTime'] != null
+                      ? DateTime.tryParse(data['arrivalHospitalTime'])
+                      : null,
+                ),
+                leavingHospitalTime: Value(
+                  data['leavingHospitalTime'] != null
+                      ? DateTime.tryParse(data['leavingHospitalTime'])
+                      : null,
+                ),
+                returnStandbyTime: Value(
+                  data['returnStandbyTime'] != null
+                      ? DateTime.tryParse(data['returnStandbyTime'])
+                      : null,
+                ),
                 bodyMapJson: Value(data['bodyMapJson'] as String?),
                 syncStatus: const Value(0),
                 remoteId: Value(doc.id),
@@ -193,27 +211,28 @@ class FirestoreSyncService {
 
   /// 上傳救護車現場記錄
   Future<void> _uploadAmbulanceSceneRecords() async {
-    final records = await (_db.select(_db.ambulanceSceneRecords)
-          ..where((t) => t.syncStatus.equals(1)))
-        .get();
+    final records = await (_db.select(
+      _db.ambulanceSceneRecords,
+    )..where((t) => t.syncStatus.equals(1))).get();
 
     for (final record in records) {
       try {
-        await _firebase.setDocument('ambulance_scene_records', record.id.toString(), {
-          'id': record.id,
-          'medicalId': record.medicalId,
-          'patientComplaint': record.patientComplaint,
-          'isProxyComplaint': record.isProxyComplaint,
-          'fallHeight': record.fallHeight,
-          'burnDegree': record.burnDegree,
-          'burnArea': record.burnArea,
-          'otherTraumaNote': record.otherTraumaNote,
-          'allergyStatus': record.allergyStatus,
-          'allergyNote': record.allergyNote,
-          'historyStatus': record.historyStatus,
-          'historyNote': record.historyNote,
-          'lastModified': FieldValue.serverTimestamp(),
-        });
+        await _firebase
+            .setDocument('ambulance_scene_records', record.id.toString(), {
+              'id': record.id,
+              'medicalId': record.medicalId,
+              'patientComplaint': record.patientComplaint,
+              'isProxyComplaint': record.isProxyComplaint,
+              'fallHeight': record.fallHeight,
+              'burnDegree': record.burnDegree,
+              'burnArea': record.burnArea,
+              'otherTraumaNote': record.otherTraumaNote,
+              'allergyStatus': record.allergyStatus,
+              'allergyNote': record.allergyNote,
+              'historyStatus': record.historyStatus,
+              'historyNote': record.historyNote,
+              'lastModified': FieldValue.serverTimestamp(),
+            });
         await (_db.update(_db.ambulanceSceneRecords)
               ..where((t) => t.id.equals(record.id)))
             .write(AmbulanceSceneRecordsCompanion(syncStatus: const Value(0)));
@@ -226,29 +245,35 @@ class FirestoreSyncService {
   /// 下載救護車現場記錄
   Future<void> _downloadAmbulanceSceneRecords() async {
     try {
-      final snapshot = await _firebase.getCollectionSnapshot('ambulance_scene_records');
+      final snapshot = await _firebase.getCollectionSnapshot(
+        'ambulance_scene_records',
+      );
       for (final doc in snapshot.docs) {
         final data = doc.data();
         final id = data['id'];
         if (id == null) continue;
 
-        await _db.into(_db.ambulanceSceneRecords).insertOnConflictUpdate(
-          AmbulanceSceneRecordsCompanion(
-            id: Value(id as int),
-            medicalId: Value((data['medicalId'] as int?) ?? 0),
-            patientComplaint: Value(data['patientComplaint'] as String?),
-            isProxyComplaint: Value(data['isProxyComplaint'] as bool? ?? false),
-            fallHeight: Value(data['fallHeight'] as String?),
-            burnDegree: Value(data['burnDegree'] as String?),
-            burnArea: Value(data['burnArea'] as String?),
-            otherTraumaNote: Value(data['otherTraumaNote'] as String?),
-            allergyStatus: Value((data['allergyStatus'] as String?) ?? '無'),
-            allergyNote: Value(data['allergyNote'] as String?),
-            historyStatus: Value((data['historyStatus'] as String?) ?? '無'),
-            historyNote: Value(data['historyNote'] as String?),
-            syncStatus: const Value(0),
-          ),
-        );
+        await _db
+            .into(_db.ambulanceSceneRecords)
+            .insertOnConflictUpdate(
+              AmbulanceSceneRecordsCompanion(
+                id: Value(id as int),
+                medicalId: Value((data['medicalId'] as int?) ?? 0),
+                patientComplaint: Value(data['patientComplaint'] as String?),
+                isProxyComplaint: Value(
+                  data['isProxyComplaint'] as bool? ?? false,
+                ),
+                fallHeight: Value(data['fallHeight'] as String?),
+                burnDegree: Value(data['burnDegree'] as String?),
+                burnArea: Value(data['burnArea'] as String?),
+                otherTraumaNote: Value(data['otherTraumaNote'] as String?),
+                allergyStatus: Value((data['allergyStatus'] as String?) ?? '無'),
+                allergyNote: Value(data['allergyNote'] as String?),
+                historyStatus: Value((data['historyStatus'] as String?) ?? '無'),
+                historyNote: Value(data['historyNote'] as String?),
+                syncStatus: const Value(0),
+              ),
+            );
       }
     } catch (e) {
       debugPrint('Error downloading ambulance_scene_records: $e');
@@ -257,23 +282,39 @@ class FirestoreSyncService {
 
   /// 上傳救護車場景連結
   Future<void> _uploadAmbulanceSceneItemLinks() async {
-    // 這裡通常項目比較多，建議處理 syncStatus
-    // 如果表格沒有 syncStatus，則每次全量上傳(或視為參考表)
-    // 假設需要同步，建議加入 syncStatus。目前先維持簡化實作。
+    try {
+      final links = await _db.select(_db.ambulanceSceneItemLinks).get();
+      for (final link in links) {
+        // 使用 sceneRecordId_itemId 作為 Firestore 文件 ID，避免重複
+        final docId = '${link.sceneRecordId}_${link.itemId}';
+        await _firebase.setDocument('ambulance_scene_item_links', docId, {
+          'id': link.id,
+          'sceneRecordId': link.sceneRecordId,
+          'itemId': link.itemId,
+        });
+      }
+      debugPrint('Uploaded ${links.length} ambulance_scene_item_links');
+    } catch (e) {
+      debugPrint('Error uploading ambulance_scene_item_links: $e');
+    }
   }
 
   /// 下載救護車場景連結
   Future<void> _downloadAmbulanceSceneItemLinks() async {
     try {
-      final snapshot = await _firebase.getCollectionSnapshot('ambulance_scene_item_links');
+      final snapshot = await _firebase.getCollectionSnapshot(
+        'ambulance_scene_item_links',
+      );
       for (final doc in snapshot.docs) {
         final data = doc.data();
-        await _db.into(_db.ambulanceSceneItemLinks).insertOnConflictUpdate(
-          AmbulanceSceneItemLinksCompanion(
-            sceneRecordId: Value((data['sceneRecordId'] as int?) ?? 0),
-            itemId: Value((data['itemId'] as int?) ?? 0),
-          ),
-        );
+        await _db
+            .into(_db.ambulanceSceneItemLinks)
+            .insertOnConflictUpdate(
+              AmbulanceSceneItemLinksCompanion(
+                sceneRecordId: Value((data['sceneRecordId'] as int?) ?? 0),
+                itemId: Value((data['itemId'] as int?) ?? 0),
+              ),
+            );
       }
     } catch (e) {
       debugPrint('Error downloading ambulance_scene_item_links: $e');
@@ -626,9 +667,9 @@ class FirestoreSyncService {
 
   /// 上傳醫療人員指派記錄
   Future<void> _uploadMedicalStaffAssignments() async {
-    final assignments = await (_db.select(_db.medicalStaffAssignment)
-          ..where((t) => t.syncStatus.equals(1)))
-        .get();
+    final assignments = await (_db.select(
+      _db.medicalStaffAssignment,
+    )..where((t) => t.syncStatus.equals(1))).get();
 
     debugPrint('上傳醫療人員指派: 待上傳 ${assignments.length} 筆');
 
@@ -651,10 +692,9 @@ class FirestoreSyncService {
           },
         );
 
-        await (_db.update(_db.medicalStaffAssignment)
-              ..where(
-                (t) => t.staffAssignmentId.equals(assignment.staffAssignmentId),
-              ))
+        await (_db.update(_db.medicalStaffAssignment)..where(
+              (t) => t.staffAssignmentId.equals(assignment.staffAssignmentId),
+            ))
             .write(MedicalStaffAssignmentCompanion(syncStatus: const Value(0)));
 
         debugPrint(
@@ -1228,46 +1268,45 @@ class FirestoreSyncService {
 
   /// 上傳急救處置
   Future<void> _uploadEmergencyTreatments() async {
-    final records = await (_db.select(_db.emergencyTreatment)
-          ..where((t) => t.syncStatus.equals(1)))
-        .get();
+    final records = await (_db.select(
+      _db.emergencyTreatment,
+    )..where((t) => t.syncStatus.equals(1))).get();
 
     for (final record in records) {
       try {
-        await _firebase.setDocument(
-          'emergency_treatments',
-          record.id.toString(),
-          {
-            'id': record.id,
-            'medicalId': record.medicalId,
-            'startTime': record.startTime?.toIso8601String(),
-            'diagnosis': record.diagnosis,
-            'incidentContext': record.incidentContext,
-            'initialAssessmentId': record.initialAssessmentId,
-            'postAssessmentId': record.postAssessmentId,
-            'intubationStartTime': record.intubationStartTime?.toIso8601String(),
-            'intubationMethod': record.intubationMethod,
-            'intubationSize': record.intubationSize,
-            'intubationNotes': record.intubationNotes,
-            'ivLineStartTime': record.ivLineStartTime?.toIso8601String(),
-            'ivLineSize': record.ivLineSize,
-            'ivLineNotes': record.ivLineNotes,
-            'cprStartTime': record.cprStartTime?.toIso8601String(),
-            'cprEndTime': record.cprEndTime?.toIso8601String(),
-            'cprNotes': record.cprNotes,
-            'postRespirationMode': record.postRespirationMode,
-            'postRespirationOthers': record.postRespirationOthers,
-            'endTime': record.endTime?.toIso8601String(),
-            'result': record.result,
-            'endCareNotes': record.endCareNotes,
-            'directorName': record.directorName,
-            'createdAt': record.createdAt.toIso8601String(),
-            'updatedAt': record.updatedAt.toIso8601String(),
-            'lastModified': FieldValue.serverTimestamp(),
-          },
-        );
+        await _firebase
+            .setDocument('emergency_treatments', record.id.toString(), {
+              'id': record.id,
+              'medicalId': record.medicalId,
+              'startTime': record.startTime?.toIso8601String(),
+              'diagnosis': record.diagnosis,
+              'incidentContext': record.incidentContext,
+              'initialAssessmentId': record.initialAssessmentId,
+              'postAssessmentId': record.postAssessmentId,
+              'intubationStartTime': record.intubationStartTime
+                  ?.toIso8601String(),
+              'intubationMethod': record.intubationMethod,
+              'intubationSize': record.intubationSize,
+              'intubationNotes': record.intubationNotes,
+              'ivLineStartTime': record.ivLineStartTime?.toIso8601String(),
+              'ivLineSize': record.ivLineSize,
+              'ivLineNotes': record.ivLineNotes,
+              'cprStartTime': record.cprStartTime?.toIso8601String(),
+              'cprEndTime': record.cprEndTime?.toIso8601String(),
+              'cprNotes': record.cprNotes,
+              'postRespirationMode': record.postRespirationMode,
+              'postRespirationOthers': record.postRespirationOthers,
+              'endTime': record.endTime?.toIso8601String(),
+              'result': record.result,
+              'endCareNotes': record.endCareNotes,
+              'directorName': record.directorName,
+              'createdAt': record.createdAt.toIso8601String(),
+              'updatedAt': record.updatedAt.toIso8601String(),
+              'lastModified': FieldValue.serverTimestamp(),
+            });
 
-        await (_db.update(_db.emergencyTreatment)..where((t) => t.id.equals(record.id)))
+        await (_db.update(_db.emergencyTreatment)
+              ..where((t) => t.id.equals(record.id)))
             .write(EmergencyTreatmentCompanion(syncStatus: const Value(0)));
 
         debugPrint('Uploaded emergency_treatment ${record.id}');
@@ -1280,32 +1319,29 @@ class FirestoreSyncService {
 
   /// 上傳急救藥物記錄
   Future<void> _uploadFirstAidLogs() async {
-    final records = await (_db.select(_db.firstAidLog)
-          ..where((t) => t.syncStatus.equals(1)))
-        .get();
+    final records = await (_db.select(
+      _db.firstAidLog,
+    )..where((t) => t.syncStatus.equals(1))).get();
 
     for (final record in records) {
       try {
-        await _firebase.setDocument(
-          'first_aid_logs',
-          record.id.toString(),
-          {
-            'id': record.id,
-            'emergencyTreatmentId': record.emergencyTreatmentId,
-            'time': record.time,
-            'heartRate': record.heartRate,
-            'bloodPressure': record.bloodPressure,
-            'respirationRate': record.respirationRate,
-            'o2': record.o2,
-            'shock': record.shock,
-            'epinephrine': record.epinephrine,
-            'otherMeds': record.otherMeds,
-            'sortOrder': record.sortOrder,
-            'lastModified': FieldValue.serverTimestamp(),
-          },
-        );
+        await _firebase.setDocument('first_aid_logs', record.id.toString(), {
+          'id': record.id,
+          'emergencyTreatmentId': record.emergencyTreatmentId,
+          'time': record.time,
+          'heartRate': record.heartRate,
+          'bloodPressure': record.bloodPressure,
+          'respirationRate': record.respirationRate,
+          'o2': record.o2,
+          'shock': record.shock,
+          'epinephrine': record.epinephrine,
+          'otherMeds': record.otherMeds,
+          'sortOrder': record.sortOrder,
+          'lastModified': FieldValue.serverTimestamp(),
+        });
 
-        await (_db.update(_db.firstAidLog)..where((t) => t.id.equals(record.id)))
+        await (_db.update(_db.firstAidLog)
+              ..where((t) => t.id.equals(record.id)))
             .write(FirstAidLogCompanion(syncStatus: const Value(0)));
 
         debugPrint('Uploaded first_aid_log ${record.id}');
@@ -1317,24 +1353,22 @@ class FirestoreSyncService {
 
   /// 上傳急救協助人員
   Future<void> _uploadEmergencyAssistStaff() async {
-    final records = await (_db.select(_db.emergencyAssistStaff)
-          ..where((t) => t.syncStatus.equals(1)))
-        .get();
+    final records = await (_db.select(
+      _db.emergencyAssistStaff,
+    )..where((t) => t.syncStatus.equals(1))).get();
 
     for (final record in records) {
       try {
-        await _firebase.setDocument(
-          'emergency_assist_staff',
-          record.id.toString(),
-          {
-            'id': record.id,
-            'emergencyTreatmentId': record.emergencyTreatmentId,
-            'name': record.name,
-            'lastModified': FieldValue.serverTimestamp(),
-          },
-        );
+        await _firebase
+            .setDocument('emergency_assist_staff', record.id.toString(), {
+              'id': record.id,
+              'emergencyTreatmentId': record.emergencyTreatmentId,
+              'name': record.name,
+              'lastModified': FieldValue.serverTimestamp(),
+            });
 
-        await (_db.update(_db.emergencyAssistStaff)..where((t) => t.id.equals(record.id)))
+        await (_db.update(_db.emergencyAssistStaff)
+              ..where((t) => t.id.equals(record.id)))
             .write(EmergencyAssistStaffCompanion(syncStatus: const Value(0)));
 
         debugPrint('Uploaded emergency_assist_staff ${record.id}');
@@ -1629,7 +1663,9 @@ class FirestoreSyncService {
           birthday = DateTime.tryParse(birthdayStr);
         }
 
-        await _db.into(_db.patient).insertOnConflictUpdate(
+        await _db
+            .into(_db.patient)
+            .insertOnConflictUpdate(
               PatientCompanion(
                 patientId: Value(patientId as int),
                 medicalId: Value((data['medicalId'] as int?) ?? 0),
@@ -2247,46 +2283,63 @@ class FirestoreSyncService {
         final incidentId = data['incidentId'];
         if (incidentId == null) continue;
 
-        await _db.into(_db.incidentRecord).insertOnConflictUpdate(
+        await _db
+            .into(_db.incidentRecord)
+            .insertOnConflictUpdate(
               IncidentRecordCompanion(
                 incidentId: Value(incidentId as int),
                 medicalId: Value((data['medicalId'] as int?) ?? 0),
-                incidentDate: Value(data['incidentDate'] != null
-                    ? DateTime.parse(data['incidentDate'])
-                    : DateTime.now()),
-                incidentPlaceCategoryId:
-                    Value((data['incidentPlaceCategoryId'] as int?) ?? 1),
+                incidentDate: Value(
+                  data['incidentDate'] != null
+                      ? DateTime.parse(data['incidentDate'])
+                      : DateTime.now(),
+                ),
+                incidentPlaceCategoryId: Value(
+                  (data['incidentPlaceCategoryId'] as int?) ?? 1,
+                ),
                 incidentPlaceCategory2Id: Value(
                   data['incidentPlaceCategory2Id'] as int?,
                 ),
                 incidentPlaceFinal: Value(
                   data['incidentPlaceFinal'] as String?,
                 ),
-                notificationTime: Value(data['notificationTime'] != null
-                    ? DateTime.parse(data['notificationTime'])
-                    : null),
+                notificationTime: Value(
+                  data['notificationTime'] != null
+                      ? DateTime.parse(data['notificationTime'])
+                      : null,
+                ),
                 notificationPerson: Value(
                   data['notificationPerson'] as String?,
                 ),
                 reportingUnitId: Value((data['reportingUnitId'] as int?) ?? 1),
                 incomingPhone: Value(data['incomingPhone'] as String?),
-                notificationToOccTime: Value(data['notificationToOccTime'] != null
-                    ? DateTime.parse(data['notificationToOccTime'])
-                    : null),
-                teamDepartureTime: Value(data['teamDepartureTime'] != null
-                    ? DateTime.parse(data['teamDepartureTime'])
-                    : null),
+                notificationToOccTime: Value(
+                  data['notificationToOccTime'] != null
+                      ? DateTime.parse(data['notificationToOccTime'])
+                      : null,
+                ),
+                teamDepartureTime: Value(
+                  data['teamDepartureTime'] != null
+                      ? DateTime.parse(data['teamDepartureTime'])
+                      : null,
+                ),
                 occArrived: Value(data['occArrived'] as bool? ?? false),
                 beforeLanding: Value(data['beforeLanding'] as bool? ?? false),
-                landingTime: Value(data['landingTime'] != null
-                    ? DateTime.parse(data['landingTime'])
-                    : null),
-                medicalArrivalTime: Value(data['medicalArrivalTime'] != null
-                    ? DateTime.parse(data['medicalArrivalTime'])
-                    : null),
-                examinationTime: Value(data['examinationTime'] != null
-                    ? DateTime.parse(data['examinationTime'])
-                    : null),
+                landingTime: Value(
+                  data['landingTime'] != null
+                      ? DateTime.parse(data['landingTime'])
+                      : null,
+                ),
+                medicalArrivalTime: Value(
+                  data['medicalArrivalTime'] != null
+                      ? DateTime.parse(data['medicalArrivalTime'])
+                      : null,
+                ),
+                examinationTime: Value(
+                  data['examinationTime'] != null
+                      ? DateTime.parse(data['examinationTime'])
+                      : null,
+                ),
                 syncStatus: const Value(0),
                 remoteId: Value(doc.id),
                 lastModified: Value(DateTime.now()),
@@ -2455,14 +2508,18 @@ class FirestoreSyncService {
         final id = data['id'];
         if (id == null) continue;
 
-        await _db.into(_db.ambulancePersonalProperty).insertOnConflictUpdate(
+        await _db
+            .into(_db.ambulancePersonalProperty)
+            .insertOnConflictUpdate(
               AmbulancePersonalPropertyCompanion(
                 id: Value(id as int),
                 medicalId: Value((data['medicalId'] as int?) ?? 0),
                 financialDetails: Value(data['financialDetails'] as String?),
                 isHandled: Value(data['isHandled'] as bool? ?? false),
                 custodianName: Value(data['custodianName'] as String?),
-                custodianSignature: Value(_parseBytes(data['custodianSignature'])),
+                custodianSignature: Value(
+                  _parseBytes(data['custodianSignature']),
+                ),
                 syncStatus: const Value(0),
                 remoteId: Value(doc.id),
                 lastModified: Value(DateTime.now()),
@@ -2550,33 +2607,67 @@ class FirestoreSyncService {
         final createdAtStr = data['createdAt'] as String?;
         final updatedAtStr = data['updatedAt'] as String?;
 
-        await _db.into(_db.emergencyTreatment).insertOnConflictUpdate(
+        await _db
+            .into(_db.emergencyTreatment)
+            .insertOnConflictUpdate(
               EmergencyTreatmentCompanion(
                 id: Value(id as int),
                 medicalId: Value((data['medicalId'] as int?) ?? 0),
-                startTime: Value(startTimeStr != null ? DateTime.tryParse(startTimeStr) : null),
+                startTime: Value(
+                  startTimeStr != null ? DateTime.tryParse(startTimeStr) : null,
+                ),
                 diagnosis: Value(data['diagnosis'] as String?),
                 incidentContext: Value(data['incidentContext'] as String?),
                 initialAssessmentId: Value(data['initialAssessmentId'] as int?),
                 postAssessmentId: Value(data['postAssessmentId'] as int?),
-                intubationStartTime: Value(intubationStartTimeStr != null ? DateTime.tryParse(intubationStartTimeStr) : null),
+                intubationStartTime: Value(
+                  intubationStartTimeStr != null
+                      ? DateTime.tryParse(intubationStartTimeStr)
+                      : null,
+                ),
                 intubationMethod: Value(data['intubationMethod'] as String?),
                 intubationSize: Value(data['intubationSize'] as String?),
                 intubationNotes: Value(data['intubationNotes'] as String?),
-                ivLineStartTime: Value(ivLineStartTimeStr != null ? DateTime.tryParse(ivLineStartTimeStr) : null),
+                ivLineStartTime: Value(
+                  ivLineStartTimeStr != null
+                      ? DateTime.tryParse(ivLineStartTimeStr)
+                      : null,
+                ),
                 ivLineSize: Value(data['ivLineSize'] as String?),
                 ivLineNotes: Value(data['ivLineNotes'] as String?),
-                cprStartTime: Value(cprStartTimeStr != null ? DateTime.tryParse(cprStartTimeStr) : null),
-                cprEndTime: Value(cprEndTimeStr != null ? DateTime.tryParse(cprEndTimeStr) : null),
+                cprStartTime: Value(
+                  cprStartTimeStr != null
+                      ? DateTime.tryParse(cprStartTimeStr)
+                      : null,
+                ),
+                cprEndTime: Value(
+                  cprEndTimeStr != null
+                      ? DateTime.tryParse(cprEndTimeStr)
+                      : null,
+                ),
                 cprNotes: Value(data['cprNotes'] as String?),
-                postRespirationMode: Value(data['postRespirationMode'] as String?),
-                postRespirationOthers: Value(data['postRespirationOthers'] as String?),
-                endTime: Value(endTimeStr != null ? DateTime.tryParse(endTimeStr) : null),
+                postRespirationMode: Value(
+                  data['postRespirationMode'] as String?,
+                ),
+                postRespirationOthers: Value(
+                  data['postRespirationOthers'] as String?,
+                ),
+                endTime: Value(
+                  endTimeStr != null ? DateTime.tryParse(endTimeStr) : null,
+                ),
                 result: Value(data['result'] as String?),
                 endCareNotes: Value(data['endCareNotes'] as String?),
                 directorName: Value(data['directorName'] as String?),
-                createdAt: Value(createdAtStr != null ? DateTime.tryParse(createdAtStr) ?? DateTime.now() : DateTime.now()),
-                updatedAt: Value(updatedAtStr != null ? DateTime.tryParse(updatedAtStr) ?? DateTime.now() : DateTime.now()),
+                createdAt: Value(
+                  createdAtStr != null
+                      ? DateTime.tryParse(createdAtStr) ?? DateTime.now()
+                      : DateTime.now(),
+                ),
+                updatedAt: Value(
+                  updatedAtStr != null
+                      ? DateTime.tryParse(updatedAtStr) ?? DateTime.now()
+                      : DateTime.now(),
+                ),
                 syncStatus: const Value(0),
                 remoteId: Value(doc.id),
                 lastModified: Value(DateTime.now()),
@@ -2599,10 +2690,14 @@ class FirestoreSyncService {
         final id = data['id'];
         if (id == null) continue;
 
-        await _db.into(_db.firstAidLog).insertOnConflictUpdate(
+        await _db
+            .into(_db.firstAidLog)
+            .insertOnConflictUpdate(
               FirstAidLogCompanion(
                 id: Value(id as int),
-                emergencyTreatmentId: Value((data['emergencyTreatmentId'] as int?) ?? 0),
+                emergencyTreatmentId: Value(
+                  (data['emergencyTreatmentId'] as int?) ?? 0,
+                ),
                 time: Value(data['time'] as String?),
                 heartRate: Value(data['heartRate'] as String?),
                 bloodPressure: Value(data['bloodPressure'] as String?),
@@ -2626,17 +2721,23 @@ class FirestoreSyncService {
   /// 從 Firestore 下載急救協助人員
   Future<void> _downloadEmergencyAssistStaff() async {
     try {
-      final snapshot = await _firebase.getCollectionSnapshot('emergency_assist_staff');
+      final snapshot = await _firebase.getCollectionSnapshot(
+        'emergency_assist_staff',
+      );
 
       for (final doc in snapshot.docs) {
         final data = doc.data();
         final id = data['id'];
         if (id == null) continue;
 
-        await _db.into(_db.emergencyAssistStaff).insertOnConflictUpdate(
+        await _db
+            .into(_db.emergencyAssistStaff)
+            .insertOnConflictUpdate(
               EmergencyAssistStaffCompanion(
                 id: Value(id as int),
-                emergencyTreatmentId: Value((data['emergencyTreatmentId'] as int?) ?? 0),
+                emergencyTreatmentId: Value(
+                  (data['emergencyTreatmentId'] as int?) ?? 0,
+                ),
                 name: Value(data['name'] as String? ?? ''),
                 syncStatus: const Value(0),
                 remoteId: Value(doc.id),
@@ -2906,7 +3007,9 @@ class FirestoreSyncService {
               DateTime.tryParse(assessmentTimeStr) ?? DateTime.now();
         }
 
-        await _db.into(_db.medicalAssessment).insertOnConflictUpdate(
+        await _db
+            .into(_db.medicalAssessment)
+            .insertOnConflictUpdate(
               MedicalAssessmentCompanion(
                 assessmentId: Value(assessmentId as int),
                 medicalId: Value((data['medicalId'] as int?) ?? 0),
@@ -2931,7 +3034,8 @@ class FirestoreSyncService {
                   data['rightPupilReactionId'] as int?,
                 ),
                 rightPupilReaction: Value(
-                  data['rightPupilReaction'] as String?),
+                  data['rightPupilReaction'] as String?,
+                ),
                 rightPupilSize: Value(data['rightPupilSize'] as double?),
                 headNeckExam: Value(data['headNeckExam'] as String?),
                 chestExam: Value(data['chestExam'] as String?),

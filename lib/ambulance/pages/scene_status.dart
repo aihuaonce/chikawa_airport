@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:drift/drift.dart' as drift;
 import '../../data/db/database.dart';
+import '../../data/db/tables/sync_tables.dart';
 
 class AmbulanceSceneStatus extends StatefulWidget {
   final int medicalId;
@@ -171,6 +172,8 @@ class _AmbulanceSceneStatusState extends State<AmbulanceSceneStatus> {
     drift.Value<String?>? allergyNote,
     drift.Value<String>? historyStatus,
     drift.Value<String?>? historyNote,
+    // ✅ 新增：同步狀態
+    drift.Value<int>? syncStatus,
   }) async {
     if (!_isInitialized) return;
     final dao = context.read<AppDatabase>().ambulanceDao;
@@ -188,6 +191,8 @@ class _AmbulanceSceneStatusState extends State<AmbulanceSceneStatus> {
         allergyNote: allergyNote ?? const drift.Value.absent(),
         historyStatus: historyStatus ?? const drift.Value.absent(),
         historyNote: historyNote ?? const drift.Value.absent(),
+        // ✅ 標記為待同步狀態
+        syncStatus: syncStatus ?? const drift.Value(SyncStatus.pending),
       ),
     );
   }
