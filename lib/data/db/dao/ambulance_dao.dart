@@ -46,9 +46,9 @@ class AmbulanceDao extends DatabaseAccessor<AppDatabase>
     final dataWithSync = data.copyWith(syncStatus: const Value(1));
 
     if (existing != null) {
-      await (update(
-        ambulanceSceneRecords,
-      )..where((t) => t.medicalId.equals(data.medicalId.value))).write(dataWithSync);
+      await (update(ambulanceSceneRecords)
+            ..where((t) => t.medicalId.equals(data.medicalId.value)))
+          .write(dataWithSync);
       return existing.id;
     } else {
       return into(ambulanceSceneRecords).insert(dataWithSync);
@@ -289,8 +289,9 @@ class AmbulanceDao extends DatabaseAccessor<AppDatabase>
           .write(updatedData);
       return existing.feeId;
     } else {
-      // 如果不存在，執行插入
-      return into(ambulanceFees).insert(data);
+      // 如果不存在，執行插入並標記待同步
+      final insertData = data.copyWith(syncStatus: const Value(1));
+      return into(ambulanceFees).insert(insertData);
     }
   }
 

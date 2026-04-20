@@ -132,6 +132,7 @@ class FirestoreSyncService {
       _downloadContacts(),
       _downloadEmergencyTreatments(),
       _downloadAmbulanceRecords(),
+      _downloadAmbulanceFees(),
       _downloadAmbulancePersonalProperty(),
       _downloadAmbulanceSceneRecords(), // 先下載主記錄
       _downloadFirstAidLogs(),
@@ -218,6 +219,75 @@ class FirestoreSyncService {
       }
     } catch (e) {
       debugPrint('Error downloading ambulance_records: $e');
+    }
+  }
+
+  /// 下載救護車費用
+  Future<void> _downloadAmbulanceFees() async {
+    try {
+      final snapshot = await _firebase.getCollectionSnapshot('ambulance_fees');
+      debugPrint('下載救護車費用: 遠端有 ${snapshot.docs.length} 筆');
+
+      for (final doc in snapshot.docs) {
+        final data = doc.data();
+        final feeId = data['feeId'];
+        if (feeId == null) continue;
+
+        final existing = await (_db.select(
+          _db.ambulanceFees,
+        )..where((t) => t.feeId.equals(feeId as int))).getSingleOrNull();
+
+        if (existing != null) {
+          // 記錄已存在，更新欄位
+          await (_db.update(
+            _db.ambulanceFees,
+          )..where((t) => t.feeId.equals(feeId as int))).write(
+            AmbulanceFeesCompanion(
+              medicalId: Value(
+                (data['medicalId'] as int?) ?? existing.medicalId,
+              ),
+              ambulanceFee: Value(
+                (data['ambulanceFee'] as num?)?.toDouble() ??
+                    existing.ambulanceFee,
+              ),
+              oxygenFee: Value(
+                (data['oxygenFee'] as num?)?.toDouble() ?? existing.oxygenFee,
+              ),
+              paymentStatus: Value(data['paymentStatus'] as String?),
+              paymentMethod: Value(data['paymentMethod'] as String?),
+              unpaidType: Value(data['unpaidType'] as String?),
+              syncStatus: const Value(0),
+              remoteId: Value(doc.id),
+              lastModified: Value(DateTime.now()),
+            ),
+          );
+          debugPrint('Updated ambulance_fee $feeId from remote');
+        } else {
+          // 記錄不存在，插入新記錄
+          await _db
+              .into(_db.ambulanceFees)
+              .insert(
+                AmbulanceFeesCompanion.insert(
+                  medicalId: (data['medicalId'] as int?) ?? 0,
+                  ambulanceFee: Value(
+                    (data['ambulanceFee'] as num?)?.toDouble() ?? 0.0,
+                  ),
+                  oxygenFee: Value(
+                    (data['oxygenFee'] as num?)?.toDouble() ?? 0.0,
+                  ),
+                  paymentStatus: Value(data['paymentStatus'] as String?),
+                  paymentMethod: Value(data['paymentMethod'] as String?),
+                  unpaidType: Value(data['unpaidType'] as String?),
+                  syncStatus: const Value(0),
+                  remoteId: Value(doc.id),
+                  lastModified: Value(DateTime.now()),
+                ),
+              );
+          debugPrint('Downloaded ambulance_fee $feeId');
+        }
+      }
+    } catch (e) {
+      debugPrint('Error downloading ambulance_fees: $e');
     }
   }
 
